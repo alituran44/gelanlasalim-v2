@@ -32,6 +32,13 @@ const activeAudience = ref<'buyer' | 'supplier'>('buyer')
 const openFaq = ref<number | null>(0)
 const showCookieConsent = ref(true)
 
+// Tasarruf Hesaplama Modülü
+const annualVolume = ref(5000000)
+const savingsRate = 0.142
+const calculatedSavings = computed(() => Math.round(annualVolume.value * savingsRate))
+const savedHours = computed(() => Math.round((annualVolume.value / 100000) * 1.5))
+const connectedSuppliersCount = computed(() => Math.round((annualVolume.value / 1000000) * 8 + 32))
+
 /* =========================================================
    FİLTRE STATE'LERİ
 ========================================================= */
@@ -956,6 +963,181 @@ function toggleFilterSection(section: string) {
                 <button @click="clearFilters" class="mt-4 px-4 py-2 border border-slate-200 hover:bg-slate-50 text-xs font-bold rounded-xl transition-all">Filtreleri Temizle</button>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TASARRUF HESAPLAMA ARACI (ROI) -->
+    <section class="border-b border-slate-200 bg-slate-50 py-20">
+      <div class="mx-auto max-w-7xl px-6">
+        <div class="text-center mb-12">
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">VERİMLİLİK & ROI</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Tedarik Tasarrufunuzu Hesaplayın</h2>
+          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Yıllık satın alma hacminizi belirleyin, GelAnlaşalım B2B tersine ihale arenası ile elde edeceğiniz tahmini kazancı anında görün.</p>
+        </div>
+
+        <div class="mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-8 md:p-12 shadow-xl shadow-slate-100 flex flex-col gap-8 md:gap-12 text-left">
+          <!-- Slider area -->
+          <div class="space-y-4">
+            <div class="flex justify-between items-baseline">
+              <label class="text-xs font-black text-slate-800 uppercase tracking-wider font-sans">Yıllık Satın Alma Hacminiz</label>
+              <span class="font-mono text-xl font-black text-blue-600">{{ annualVolume.toLocaleString('tr-TR') }} ₺</span>
+            </div>
+            <input
+              type="range"
+              min="500000"
+              max="50000000"
+              step="500000"
+              v-model.number="annualVolume"
+              class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+            />
+            <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+              <span>500 Bin ₺</span>
+              <span>25 Milyon ₺</span>
+              <span>50 Milyon ₺</span>
+            </div>
+          </div>
+
+          <!-- Calculated values grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Col 1: Net Savings -->
+            <div class="p-6 rounded-2xl bg-blue-50/50 border border-blue-100 flex flex-col gap-1.5">
+              <span class="text-[9px] font-black uppercase text-blue-600 tracking-wider">Tahmini Yıllık Tasarruf (%14.2)</span>
+              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ calculatedSavings.toLocaleString('tr-TR') }} ₺</span>
+              <span class="text-[10px] text-slate-400">Canlı eksiltme arenaları ortalama verisidir.</span>
+            </div>
+
+            <!-- Col 2: Labor hours saved -->
+            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col gap-1.5">
+              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">Kazanılan İş Gücü</span>
+              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ Math.round(savedHours) }} Adam/Ay</span>
+              <span class="text-[10px] text-slate-400">Excel kıyaslama ve e-posta takibi elenir.</span>
+            </div>
+
+            <!-- Col 3: Qualified suppliers reached -->
+            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col gap-1.5">
+              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">Nitelikli Tedarikçi Erişimi</span>
+              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ connectedSuppliersCount }} Firma</span>
+              <span class="text-[10px] text-slate-400">İhalelerinize katılım sağlayacak hazır ağ.</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- KRİPTOGRAFİK ZAMAN DAMGASI & GÜVENLİK (AUDIT TRAIL TIMELINE) -->
+    <section class="border-b border-slate-200 bg-white py-20">
+      <div class="mx-auto max-w-7xl px-6">
+        <div class="text-center mb-16">
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">ŞEFFAFLIK & GÜVENLİK</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Kriptografik ve Damgalı İşlem Takibi</h2>
+          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Satın alma süreçleriniz, KVKK ve Türk Ticaret Kanunu uyumlu, TLS 1.2+ şifreli ve zaman damgalı değişmez bir log günlüğünde saklanır.</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 relative text-left">
+          <!-- Connector line for desktop -->
+          <div class="hidden lg:block absolute top-[40px] left-[12%] right-[12%] h-[1px] bg-slate-200 z-0"></div>
+
+          <!-- Step 1 -->
+          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">1</div>
+            <div>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Şartname Damgalama</h4>
+              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
+                Yayınladığınız şartname dosyalarının kriptografik hash kodları çıkarılarak sisteme damgalanır. Dosya değişmezliği garanti altındadır.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">2</div>
+            <div>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">TLS 1.2+ Şifreli Teklifler</h4>
+              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
+                Tedarikçilerin gönderdiği fiyat ve belgeler SSL/TLS katmanında şifrelenir. Son teklif tarihine kadar kimse tarafından deşifre edilemez.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">3</div>
+            <div>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Canlı Eksiltme Günlüğü</h4>
+              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
+                Ters ihale arenalarındaki her fiyat düşüşü, zaman damgasıyla değişmez denetim izine (audit trail) yazılır. Rekabet şeffaftır.
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">4</div>
+            <div>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">KVKK Uyumlu Arşivleme</h4>
+              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
+                Sonuçlanan ihaleler yasal saklama sürelerine uygun olarak güvenli sunucularda saklanır. Şirket içi denetimlere (audit) anında hazırdır.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ERP & SİSTEM ENTEGRASYONLARI -->
+    <section class="border-b border-slate-200 bg-slate-50 py-20">
+      <div class="mx-auto max-w-7xl px-6">
+        <div class="text-center mb-12">
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">ERP BAĞLANTILARI</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Kurumsal Sistemlerinizle Tam Entegrasyon</h2>
+          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Satın alma, teklif, sipariş ve tedarikçi verilerinizi mevcut ERP, CRM ve finans sistemlerinize kontrollü API entegrasyonu ile bağlayın.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+          <!-- ERP Card 1: SAP -->
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between min-h-[220px]">
+            <div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">SAP Entegrasyonu</div>
+              <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
+                Satın alma taleplerinizi (Purchase Requisitions) SAP üzerinden otomatik çekin; ihale sonuçlarını SAP sipariş fişi (Purchase Order) olarak geri aktarın.
+              </p>
+            </div>
+            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">ERP CONNECTED</span>
+          </div>
+
+          <!-- ERP Card 2: Logo -->
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between min-h-[220px]">
+            <div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">Logo & Netsis Entegrasyonu</div>
+              <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
+                Logo Tiger, Go3 veya Netsis sistemlerinizdeki malzeme kartlarını, birimlerini ve tedarikçi cari hesaplarını anlık olarak platformla senkronize edin.
+              </p>
+            </div>
+            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">API READY</span>
+          </div>
+
+          <!-- ERP Card 3: MS Dynamics -->
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between min-h-[220px]">
+            <div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">Microsoft Dynamics 365</div>
+              <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
+                Dynamics 365 Supply Chain Management modülüyle iki yönlü canlı veri eşleştirmesi sağlayarak teklif toplama süreçlerinizi hızlandırın.
+              </p>
+            </div>
+            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">AUTOMATED SYNC</span>
+          </div>
+
+          <!-- ERP Card 4: Excel & REST API -->
+          <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between min-h-[220px]">
+            <div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">REST API & Excel Entegrasyonu</div>
+              <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
+                Özel şirket içi yazılımlarınız için RESTful API uç noktaları. Veya tek tıkla gelişmiş Excel tablosu yükleme ve karşılaştırma aracı.
+              </p>
+            </div>
+            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">RESTFUL API / XLS</span>
           </div>
         </div>
       </div>
