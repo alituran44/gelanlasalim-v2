@@ -6,48 +6,9 @@ definePageMeta({ layout: 'dashboard' })
 
 const filter = ref<'all' | 'active' | 'closed'>('all')
 
-const ilanlar = ref([
-  {
-    id: 'IHC-2024-001',
-    baslik: 'Ofis Malzemeleri Alımı',
-    kategori: 'Kırtasiye & Ofis',
-    sure: '2 gün',
-    teklifSayisi: 7,
-    durum: 'active',
-    butce: '₺45.000',
-    olusturma: '14 Tem 2024'
-  },
-  {
-    id: 'IHC-2024-002',
-    baslik: 'Güvenlik Kamera Sistemi',
-    kategori: 'Teknoloji & Yazılım',
-    sure: '5 gün',
-    teklifSayisi: 12,
-    durum: 'active',
-    butce: '₺180.000',
-    olusturma: '12 Tem 2024'
-  },
-  {
-    id: 'IHC-2024-003',
-    baslik: 'Tarımsal Sulama Ekipmanı',
-    kategori: 'Tarım & Gıda',
-    sure: 'Sona erdi',
-    teklifSayisi: 4,
-    durum: 'closed',
-    butce: '₺320.000',
-    olusturma: '01 Tem 2024'
-  },
-  {
-    id: 'IHC-2024-004',
-    baslik: 'Lojistik Hizmet Alımı',
-    kategori: 'Lojistik & Nakliye',
-    sure: '10 gün',
-    teklifSayisi: 3,
-    durum: 'active',
-    butce: '₺95.000',
-    olusturma: '10 Tem 2024'
-  },
-])
+const { cmsData } = useCmsData()
+
+const ilanlar = computed(() => cmsData.value.dashboard.tenders)
 
 const filtered = computed(() =>
   filter.value === 'all' ? ilanlar.value : ilanlar.value.filter(i => i.durum === filter.value)

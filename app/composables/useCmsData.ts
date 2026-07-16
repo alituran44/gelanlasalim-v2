@@ -60,6 +60,120 @@ export const DEFAULT_CMS_DATA = {
         'Mobil uyumluluk'
       ]
     ]
+  },
+  dashboard: {
+    tenders: [
+      {
+        id: 'IHC-2024-001',
+        baslik: 'Ofis Malzemeleri Alımı',
+        kategori: 'Kırtasiye & Ofis',
+        sure: '2 gün',
+        teklifSayisi: 7,
+        durum: 'active',
+        butce: '₺45.000',
+        olusturma: '14 Tem 2024'
+      },
+      {
+        id: 'IHC-2024-002',
+        baslik: 'Güvenlik Kamera Sistemi',
+        kategori: 'Teknoloji & Yazılım',
+        sure: '5 gün',
+        teklifSayisi: 12,
+        durum: 'active',
+        butce: '₺180.000',
+        olusturma: '12 Tem 2024'
+      },
+      {
+        id: 'IHC-2024-003',
+        baslik: 'Tarımsal Sulama Ekipmanı',
+        kategori: 'Tarım & Gıda',
+        sure: 'Sona erdi',
+        teklifSayisi: 4,
+        durum: 'closed',
+        butce: '₺320.000',
+        olusturma: '01 Tem 2024'
+      },
+      {
+        id: 'IHC-2024-004',
+        baslik: 'Lojistik Hizmet Alımı',
+        kategori: 'Lojistik & Nakliye',
+        sure: '10 gün',
+        teklifSayisi: 3,
+        durum: 'active',
+        butce: '₺95.000',
+        olusturma: '10 Tem 2024'
+      }
+    ],
+    receivedBids: [
+      {
+        id: 'IHC-2024-001',
+        baslik: 'Ofis Malzemeleri Alımı',
+        kategori: 'Kırtasiye & Ofis',
+        bitis: '16 Tem 2024',
+        teklifler: [
+          { id: 'TKF-001', firma: 'ABC Ofis Malzemeleri A.Ş.', fiyat: '₺38.500', sure: '7 gün', puan: 4.8, durum: 'bekliyor' },
+          { id: 'TKF-002', firma: 'Delta Kırtasiye Ltd.', fiyat: '₺41.200', sure: '5 gün', puan: 4.2, durum: 'bekliyor' },
+          { id: 'TKF-003', firma: 'OfficePro Tedarik', fiyat: '₺36.900', sure: '10 gün', puan: 4.6, durum: 'onaylandi' }
+        ]
+      },
+      {
+        id: 'IHC-2024-002',
+        baslik: 'Güvenlik Kamera Sistemi',
+        kategori: 'Teknoloji & Yazılım',
+        bitis: '21 Tem 2024',
+        teklifler: [
+          { id: 'TKF-004', firma: 'SecureTech Sistemleri', fiyat: '₺162.000', sure: '14 gün', puan: 4.9, durum: 'bekliyor' },
+          { id: 'TKF-005', firma: 'Kamera Dünyası A.Ş.', fiyat: '₺175.000', sure: '7 gün', puan: 4.1, durum: 'bekliyor' }
+        ]
+      },
+      {
+        id: 'IHC-2024-004',
+        baslik: 'Lojistik Hizmet Alımı',
+        kategori: 'Lojistik & Nakliye',
+        bitis: '26 Tem 2024',
+        teklifler: [
+          { id: 'TKF-006', firma: 'HızlıNakliye Ltd.', fiyat: '₺88.000', sure: '30 gün', puan: 4.7, durum: 'bekliyor' }
+        ]
+      }
+    ],
+    submittedBids: [
+      {
+        id: 'TKF-008',
+        ilanBaslik: 'Yazılım Geliştirme Hizmeti',
+        aliciFirma: '****** A.Ş.',
+        kategori: 'Teknoloji & Yazılım',
+        teklifFiyatim: '₺95.000',
+        sure: '45 gün',
+        durum: 'bekliyor',
+        tarih: '14 Tem 2024',
+        bitisTarihi: '20 Tem 2024',
+        notum: 'Teslim süresini 30 güne indirebilirim.'
+      },
+      {
+        id: 'TKF-009',
+        ilanBaslik: 'Tarımsal Gübre Tedariki',
+        aliciFirma: '****** Ltd.',
+        kategori: 'Tarım & Gıda',
+        teklifFiyatim: '₺210.000',
+        sure: '14 gün',
+        durum: 'onaylandi',
+        tarih: '10 Tem 2024',
+        bitisTarihi: '18 Tem 2024',
+        notum: 'ISO belgeli ürünler. Numune gönderebilirim.'
+      },
+      {
+        id: 'TKF-010',
+        ilanBaslik: 'Ofis Mobilyası Alımı',
+        aliciFirma: '****** Grup',
+        kategori: 'Kırtasiye & Ofis',
+        teklifFiyatim: '₺78.500',
+        sure: '21 gün',
+        durum: 'reddedildi',
+        tarih: '08 Tem 2024',
+        bitisTarihi: '15 Tem 2024',
+        notum: ''
+      }
+    ]
   }
 }
 
@@ -71,7 +185,13 @@ export function useCmsData() {
     const saved = localStorage.getItem('cmsData')
     if (saved) {
       try {
-        cmsData.value = JSON.parse(saved)
+        const parsed = JSON.parse(saved)
+        // Ensure backward compatibility if dashboard property is missing in old localstorage
+        if (!parsed.dashboard) {
+          parsed.dashboard = DEFAULT_CMS_DATA.dashboard
+          localStorage.setItem('cmsData', JSON.stringify(parsed))
+        }
+        cmsData.value = parsed
       } catch (e) {
         console.error('Failed to parse saved CMS data, using defaults.', e)
       }

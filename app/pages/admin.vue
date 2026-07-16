@@ -13,7 +13,11 @@ import {
   ListPlus,
   CheckCircle,
   Plus,
-  Trash2
+  Trash2,
+  Folder,
+  Download,
+  Upload,
+  AlertCircle
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 
@@ -32,7 +36,7 @@ const password = ref('')
 const authError = ref('')
 
 // Tabs
-const activeTab = ref<'hero' | 'tender' | 'plans' | 'features'>('hero')
+const activeTab = ref<'hero' | 'tender' | 'plans' | 'features' | 'db_tenders' | 'db_received' | 'db_submitted'>('hero')
 
 // Local copy for editing
 const formState = reactive(JSON.parse(JSON.stringify(cmsData.value)))
@@ -95,15 +99,15 @@ function handleReset() {
   }
 }
 
-// Dynamic Helpers
+// Hero Badge Helpers
 function addBadge() {
   formState.hero.badgeStrip.push('YENİ ÖZELLİK VURGUSU')
 }
-
 function removeBadge(index: number) {
   formState.hero.badgeStrip.splice(index, 1)
 }
 
+// Live Tender Helpers
 function addCompetitor() {
   formState.liveTender.competitors.push({
     name: 'Tedarikçi #' + Math.floor(100 + Math.random() * 900),
@@ -111,27 +115,90 @@ function addCompetitor() {
     leader: false
   })
 }
-
 function removeCompetitor(index: number) {
   formState.liveTender.competitors.splice(index, 1)
 }
-
 function setLeader(index: number) {
   formState.liveTender.competitors.forEach((c: any, i: number) => {
     c.leader = i === index
   })
-  // Auto update best bid
   if (formState.liveTender.competitors[index]) {
     formState.liveTender.bestBid = formState.liveTender.competitors[index].price
   }
 }
 
+// Subscriptions Features Helpers
 function addFeature(colIdx: number) {
   formState.pricing.features[colIdx].push('Yeni e-ihale özelliği maddesi')
 }
-
 function removeFeature(colIdx: number, featIdx: number) {
   formState.pricing.features[colIdx].splice(featIdx, 1)
+}
+
+// Dashboard Tenders (İlanlarım) Helpers
+function addDashboardTender() {
+  const newId = 'IHC-2026-' + Math.floor(100 + Math.random() * 900)
+  formState.dashboard.tenders.push({
+    id: newId,
+    baslik: 'Yeni İhale Başlığı',
+    kategori: 'Kırtasiye & Ofis',
+    sure: '7 gün',
+    teklifSayisi: 0,
+    durum: 'active',
+    butce: '₺50.000',
+    olusturma: 'Bugün'
+  })
+  // Also add a matching received bid container automatically
+  formState.dashboard.receivedBids.push({
+    id: newId,
+    baslik: 'Yeni İhale Başlığı',
+    kategori: 'Kırtasiye & Ofis',
+    bitis: 'Gelecek Hafta',
+    teklifler: []
+  })
+}
+function removeDashboardTender(index: number) {
+  const idToDelete = formState.dashboard.tenders[index].id
+  formState.dashboard.tenders.splice(index, 1)
+  // Clean received bids container too
+  const rIdx = formState.dashboard.receivedBids.findIndex((rb: any) => rb.id === idToDelete)
+  if (rIdx !== -1) {
+    formState.dashboard.receivedBids.splice(rIdx, 1)
+  }
+}
+
+// Dashboard Received Bids Helpers
+function addReceivedBid(tenderIdx: number) {
+  formState.dashboard.receivedBids[tenderIdx].teklifler.push({
+    id: 'TKF-' + Math.floor(100 + Math.random() * 900),
+    firma: 'Yeni Tedarikçi Ltd.',
+    fiyat: '₺40.000',
+    sure: '5 gün',
+    puan: 4.5,
+    durum: 'bekliyor'
+  })
+}
+function removeReceivedBid(tenderIdx: number, bidIdx: number) {
+  formState.dashboard.receivedBids[tenderIdx].teklifler.splice(bidIdx, 1)
+}
+
+// Dashboard Submitted Bids Helpers
+function addSubmittedBid() {
+  formState.dashboard.submittedBids.push({
+    id: 'TKF-' + Math.floor(100 + Math.random() * 900),
+    ilanBaslik: 'Firma Hizmet Alımı İlanı',
+    aliciFirma: '****** A.Ş.',
+    kategori: 'Lojistik & Nakliye',
+    teklifFiyatim: '₺100.000',
+    sure: '10 gün',
+    durum: 'bekliyor',
+    tarih: 'Bugün',
+    bitisTarihi: 'Gelecek Hafta',
+    notum: 'Fiyat teklifimizi ilettik.'
+  })
+}
+function removeSubmittedBid(index: number) {
+  formState.dashboard.submittedBids.splice(index, 1)
 }
 </script>
 
@@ -216,40 +283,71 @@ function removeFeature(colIdx: number, featIdx: number) {
 
           <!-- Navigation Links -->
           <nav class="p-4 space-y-1">
+            <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest px-4 mb-2">ÖN PANEL AYARLARI</div>
+            
             <button 
               @click="activeTab = 'hero'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold transition text-left"
+              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left"
               :class="activeTab === 'hero' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <Home :size="16" />
+              <Home :size="15" />
               Ana Sayfa (Hero & Bant)
             </button>
 
             <button 
               @click="activeTab = 'tender'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold transition text-left"
+              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left"
               :class="activeTab === 'tender' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <Activity :size="16" />
+              <Activity :size="15" />
               Canlı İhale Kartı
             </button>
 
             <button 
               @click="activeTab = 'plans'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold transition text-left"
+              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left"
               :class="activeTab === 'plans' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <CreditCard :size="16" />
+              <CreditCard :size="15" />
               Abonelik Planları
             </button>
 
             <button 
               @click="activeTab = 'features'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-3 text-xs font-bold transition text-left"
+              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left"
               :class="activeTab === 'features' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <ListPlus :size="16" />
+              <ListPlus :size="15" />
               Özellikler Listesi
+            </button>
+
+            <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest px-4 pt-4 mb-2">B2B KULLANICI PANELİ VERİTABANI</div>
+
+            <button 
+              @click="activeTab = 'db_tenders'" 
+              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left"
+              :class="activeTab === 'db_tenders' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+            >
+              <Folder :size="15" />
+              İlanlarım (Tenders)
+            </button>
+
+            <button 
+              @click="activeTab = 'db_received'" 
+              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left"
+              :class="activeTab === 'db_received' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+            >
+              <Download :size="15" />
+              Gelen Teklifler (Bids)
+            </button>
+
+            <button 
+              @click="activeTab = 'db_submitted'" 
+              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left"
+              :class="activeTab === 'db_submitted' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+            >
+              <Upload :size="15" />
+              Yaptığım Teklifler
             </button>
           </nav>
         </div>
@@ -273,7 +371,13 @@ function removeFeature(colIdx: number, featIdx: number) {
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-4 mb-6 gap-4">
           <div>
             <h1 class="text-xl font-black text-white uppercase tracking-tight">
-              {{ activeTab === 'hero' ? 'Ana Sayfa Giriş & Tanıtım Ayarları' : activeTab === 'tender' ? 'Temsili Canlı İhale Kartı Verileri' : activeTab === 'plans' ? 'Abonelik & Fiyat Planları' : 'Detaylı Özellik Listesi' }}
+              <span v-if="activeTab === 'hero'">Ana Sayfa Giriş & Tanıtım Ayarları</span>
+              <span v-else-if="activeTab === 'tender'">Temsili Canlı İhale Kartı Verileri</span>
+              <span v-else-if="activeTab === 'plans'">Abonelik & Fiyat Planları</span>
+              <span v-else-if="activeTab === 'features'">Detaylı Özellik Listesi</span>
+              <span v-else-if="activeTab === 'db_tenders'">Kullanıcı Paneli: İlanlarım (Tenders)</span>
+              <span v-else-if="activeTab === 'db_received'">Kullanıcı Paneli: Gelen Teklifler (Bids)</span>
+              <span v-else>Kullanıcı Paneli: Yaptığım Teklifler</span>
             </h1>
             <p class="text-xs text-slate-400 mt-1">Gerekli düzenlemeleri yaptıktan sonra sağ alttaki "Kaydet" butonu ile yayına alabilirsiniz.</p>
           </div>
@@ -380,7 +484,6 @@ function removeFeature(colIdx: number, featIdx: number) {
                     <input v-model.number="comp.price" type="number" placeholder="Teklif Fiyatı (₺)" class="rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none" />
                   </div>
                   
-                  <!-- Set Leader toggle -->
                   <button 
                     @click="setLeader(index)"
                     type="button"
@@ -441,8 +544,6 @@ function removeFeature(colIdx: number, featIdx: number) {
           <!-- Tab 4: Features grid -->
           <div v-if="activeTab === 'features'" class="space-y-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              
-              <!-- Column manager for each of the 3 columns -->
               <div v-for="(col, colIdx) in formState.pricing.features" :key="colIdx" class="p-4 rounded-xl border border-slate-800 bg-slate-900/30">
                 <div class="flex justify-between items-center mb-3">
                   <span class="text-xs font-bold text-blue-400 uppercase tracking-wider">Sütun {{ colIdx + 1 }} Maddeleri</span>
@@ -464,7 +565,173 @@ function removeFeature(colIdx: number, featIdx: number) {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
 
+          <!-- Tab 5: Dashboard Tenders -->
+          <div v-if="activeTab === 'db_tenders'" class="space-y-4">
+            <div class="flex justify-between items-center mb-2">
+              <label class="block text-xs font-bold text-slate-400">AKTİF KULLANICI İLANLARI (İLANLARIM)</label>
+              <button @click="addDashboardTender" class="flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition">
+                <Plus :size="14" /> İhale İlanı Ekle
+              </button>
+            </div>
+
+            <div class="space-y-4">
+              <div v-for="(tender, index) in formState.dashboard.tenders" :key="tender.id" class="p-4 rounded-xl border border-slate-800 bg-slate-900/30 space-y-3">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs font-mono text-blue-400 font-bold bg-blue-950/30 px-2 py-0.5 rounded">{{ tender.id }}</span>
+                  <button @click="removeDashboardTender(index)" class="p-2 bg-red-950/20 hover:bg-red-950 text-red-400 rounded-lg transition">
+                    <Trash2 :size="14" />
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">İHALE BAŞLIĞI</label>
+                    <input v-model="tender.baslik" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">KATEGORİ</label>
+                    <input v-model="tender.kategori" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">BÜTÇE HEDEFİ</label>
+                    <input v-model="tender.butce" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">SÜRE / GERİ SAYIM</label>
+                    <input v-model="tender.sure" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">DURUM</label>
+                    <select v-model="tender.durum" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none bg-slate-950">
+                      <option value="active">Aktif (Açık)</option>
+                      <option value="closed">Kapandı</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">TARİH</label>
+                    <input v-model="tender.olusturma" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 6: Dashboard Received Bids -->
+          <div v-if="activeTab === 'db_received'" class="space-y-6">
+            <div v-for="(tender, tIdx) in formState.dashboard.receivedBids" :key="tender.id" class="p-5 rounded-2xl border border-slate-800 bg-slate-900/20 space-y-4">
+              <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <div>
+                  <span class="text-[10px] font-mono text-blue-400 font-bold bg-blue-950/30 px-2 py-0.5 rounded mr-2">{{ tender.id }}</span>
+                  <span class="text-xs font-bold text-slate-300">{{ tender.baslik }}</span>
+                </div>
+                <button @click="addReceivedBid(tIdx)" class="flex items-center gap-1 rounded bg-blue-600/30 hover:bg-blue-600 px-3 py-1.5 text-[10px] font-bold text-blue-400 hover:text-white transition">
+                  <Plus :size="12" /> Teklif Ekle
+                </button>
+              </div>
+
+              <!-- List of bids received on this tender -->
+              <div class="space-y-3">
+                <div v-if="tender.teklifler.length === 0" class="text-xs text-slate-500 py-2 italic">Bu ilana henüz teklif eklenmemiş.</div>
+                
+                <div v-for="(bid, bIdx) in tender.teklifler" :key="bid.id" class="p-3.5 rounded-xl border border-slate-800/80 bg-slate-950/40 flex items-start gap-3 justify-between">
+                  <div class="flex-grow grid grid-cols-1 sm:grid-cols-4 gap-2.5">
+                    <div>
+                      <label class="block text-[9px] font-bold text-slate-500 mb-0.5">TEKLİF VEREN FİRMA</label>
+                      <input v-model="bid.firma" type="text" class="w-full rounded border border-slate-800 bg-slate-950 p-1.5 text-xs text-white focus:outline-none" />
+                    </div>
+                    <div>
+                      <label class="block text-[9px] font-bold text-slate-500 mb-0.5">FİYAT (₺)</label>
+                      <input v-model="bid.fiyat" type="text" class="w-full rounded border border-slate-800 bg-slate-950 p-1.5 text-xs text-white focus:outline-none" />
+                    </div>
+                    <div>
+                      <label class="block text-[9px] font-bold text-slate-500 mb-0.5">TESLİMAT SÜRESİ</label>
+                      <input v-model="bid.sure" type="text" class="w-full rounded border border-slate-800 bg-slate-950 p-1.5 text-xs text-white focus:outline-none" />
+                    </div>
+                    <div>
+                      <label class="block text-[9px] font-bold text-slate-500 mb-0.5">DURUM</label>
+                      <select v-model="bid.durum" class="w-full rounded border border-slate-800 bg-slate-950 p-1.5 text-xs text-white focus:outline-none">
+                        <option value="bekliyor">Değerlendiriliyor</option>
+                        <option value="onaylandi">Kabul Edildi</option>
+                        <option value="reddedildi">Reddedildi</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <button @click="removeReceivedBid(tIdx, bIdx)" class="p-2 bg-red-950/20 hover:bg-red-950 text-red-400 rounded-lg transition self-end">
+                    <Trash2 :size="13" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab 7: Dashboard Submitted Bids -->
+          <div v-if="activeTab === 'db_submitted'" class="space-y-4">
+            <div class="flex justify-between items-center mb-2">
+              <label class="block text-xs font-bold text-slate-400">KENDİ VERDİĞİM TEKLİFLER (YAPTIĞIM TEKLİFLER)</label>
+              <button @click="addSubmittedBid" class="flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition">
+                <Plus :size="14" /> Teklif Girişi Yap
+              </button>
+            </div>
+
+            <div class="space-y-4">
+              <div v-for="(bid, index) in formState.dashboard.submittedBids" :key="bid.id" class="p-4 rounded-xl border border-slate-800 bg-slate-900/30 space-y-3">
+                <div class="flex justify-between items-center">
+                  <span class="text-xs font-mono text-blue-400 font-bold bg-blue-950/30 px-2 py-0.5 rounded">{{ bid.id }}</span>
+                  <button @click="removeSubmittedBid(index)" class="p-2 bg-red-950/20 hover:bg-red-950 text-red-400 rounded-lg transition">
+                    <Trash2 :size="14" />
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">İHALE BAŞLIĞI</label>
+                    <input v-model="bid.ilanBaslik" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">ALICI FİRMA</label>
+                    <input v-model="bid.aliciFirma" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">KATEGORİ</label>
+                    <input v-model="bid.kategori" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">TEKLİF FİYATIM</label>
+                    <input v-model="bid.teklifFiyatim" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">TESLİMAT SÜRESİ</label>
+                    <input v-model="bid.sure" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">DURUM</label>
+                    <select v-model="bid.durum" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none bg-slate-950">
+                      <option value="bekliyor">Değerlendiriliyor</option>
+                      <option value="onaylandi">Kabul Edildi</option>
+                      <option value="reddedildi">Reddedildi</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">SON TEKLİF TARİHİ</label>
+                    <input v-model="bid.bitisTarihi" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-500 mb-1">TEKLİF AÇIKLAMASI (TEKLİF NOTU)</label>
+                  <input v-model="bid.notum" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                </div>
+              </div>
             </div>
           </div>
 

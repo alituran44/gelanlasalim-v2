@@ -8,40 +8,9 @@ definePageMeta({ layout: 'dashboard' })
 const route = useRoute()
 const expandedIlan = ref<string | null>(route.query.ilan as string || null)
 
-// Kapalı zarf modeli: Her ilan için teklifler sadece ilan sahibine görünür
-// Tedarikçiler birbirlerinin tekliflerini GÖREMEZ
-const ilanlar = ref([
-  {
-    id: 'IHC-2024-001',
-    baslik: 'Ofis Malzemeleri Alımı',
-    kategori: 'Kırtasiye & Ofis',
-    bitis: '16 Tem 2024',
-    teklifler: [
-      { id: 'TKF-001', firma: 'ABC Ofis Malzemeleri A.Ş.', fiyat: '₺38.500', sure: '7 gün', puan: 4.8, durum: 'bekliyor' },
-      { id: 'TKF-002', firma: 'Delta Kırtasiye Ltd.', fiyat: '₺41.200', sure: '5 gün', puan: 4.2, durum: 'bekliyor' },
-      { id: 'TKF-003', firma: 'OfficePro Tedarik', fiyat: '₺36.900', sure: '10 gün', puan: 4.6, durum: 'onaylandi' },
-    ]
-  },
-  {
-    id: 'IHC-2024-002',
-    baslik: 'Güvenlik Kamera Sistemi',
-    kategori: 'Teknoloji & Yazılım',
-    bitis: '21 Tem 2024',
-    teklifler: [
-      { id: 'TKF-004', firma: 'SecureTech Sistemleri', fiyat: '₺162.000', sure: '14 gün', puan: 4.9, durum: 'bekliyor' },
-      { id: 'TKF-005', firma: 'Kamera Dünyası A.Ş.', fiyat: '₺175.000', sure: '7 gün', puan: 4.1, durum: 'bekliyor' },
-    ]
-  },
-  {
-    id: 'IHC-2024-004',
-    baslik: 'Lojistik Hizmet Alımı',
-    kategori: 'Lojistik & Nakliye',
-    bitis: '26 Tem 2024',
-    teklifler: [
-      { id: 'TKF-006', firma: 'HızlıNakliye Ltd.', fiyat: '₺88.000', sure: '30 gün', puan: 4.7, durum: 'bekliyor' },
-    ]
-  },
-])
+const { cmsData } = useCmsData()
+
+const ilanlar = computed(() => cmsData.value.dashboard.receivedBids)
 
 function toggle(id: string) {
   expandedIlan.value = expandedIlan.value === id ? null : id

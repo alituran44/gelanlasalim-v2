@@ -4,44 +4,10 @@ import { SendHorizonal, Clock, CheckCircle2, XCircle, AlertCircle, Eye } from 'l
 
 definePageMeta({ layout: 'dashboard' })
 
-const teklifler = ref([
-  {
-    id: 'TKF-008',
-    ilanBaslik: 'Yazılım Geliştirme Hizmeti',
-    aliciFirma: '****** A.Ş.',   // Gizli — sadece id gösterilir, isim kapatılır
-    kategori: 'Teknoloji & Yazılım',
-    teklifFiyatim: '₺95.000',
-    sure: '45 gün',
-    durum: 'bekliyor',
-    tarih: '14 Tem 2024',
-    bitisTarihi: '20 Tem 2024',
-    notum: 'Teslim süresini 30 güne indirebilirim.'
-  },
-  {
-    id: 'TKF-009',
-    ilanBaslik: 'Tarımsal Gübre Tedariki',
-    aliciFirma: '****** Ltd.',
-    kategori: 'Tarım & Gıda',
-    teklifFiyatim: '₺210.000',
-    sure: '14 gün',
-    durum: 'onaylandi',
-    tarih: '10 Tem 2024',
-    bitisTarihi: '18 Tem 2024',
-    notum: 'ISO belgeli ürünler. Numune gönderebilirim.'
-  },
-  {
-    id: 'TKF-010',
-    ilanBaslik: 'Ofis Mobilyası Alımı',
-    aliciFirma: '****** Grup',
-    kategori: 'Kırtasiye & Ofis',
-    teklifFiyatim: '₺78.500',
-    sure: '21 gün',
-    durum: 'reddedildi',
-    tarih: '08 Tem 2024',
-    bitisTarihi: '15 Tem 2024',
-    notum: ''
-  },
-])
+import { computed } from 'vue'
+const { cmsData } = useCmsData()
+
+const teklifler = computed(() => cmsData.value.dashboard.submittedBids)
 
 const durumConfig: Record<string, { label: string, icon: any, style: string }> = {
   bekliyor: { label: 'Değerlendiriliyor', icon: AlertCircle, style: 'background: rgba(245,158,11,0.1); color: #D97706;' },
