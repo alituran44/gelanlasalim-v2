@@ -9,40 +9,13 @@ definePageMeta({
 
 const router = useRouter()
 
+const { cmsData } = useCmsData()
+
 // Subscriptions
-const subscriptionPackages = [
-  { id: '1_ay', name: 'Üyelik başvurusu - 1 ay', price: 900, months: 1 },
-  { id: '3_ay', name: 'Üyelik başvurusu - 3 ay', price: 1800, months: 3 },
-  { id: '6_ay', name: 'Üyelik başvurusu - 6 ay', price: 2700, months: 6 },
-  { id: '9_ay', name: 'Üyelik başvurusu - 9 ay', price: 3600, months: 9 }
-]
+const subscriptionPackages = computed(() => cmsData.value.pricing.packages)
 
 // Features divided into three columns
-const featureColumns = [
-  [
-    'Ekap ihaleleri',
-    'Ekap ihale sonuçları',
-    'Doğrudan teminler',
-    'Satış ve Kiralamalar',
-    'KİK Kararları',
-    'Sınır değer hesaplama'
-  ],
-  [
-    'Arama önerileri',
-    'Yaklaşan ihale bildirimleri',
-    'Kazanılan ihale bildirimleri',
-    'İptal-Düzeltme-Sonuç bildirimleri',
-    'Sınırsız bildirim (Sms+Email)',
-    'Sınırsız raporlama (Excel)'
-  ],
-  [
-    'Yüklenici analizleri',
-    'İdare analizleri',
-    'Sektör analizleri',
-    'Rakip analizleri',
-    'Mobil uyumluluk'
-  ]
-]
+const featureColumns = computed(() => cmsData.value.pricing.features)
 
 // Interactive States
 const selectedPackage = ref<typeof subscriptionPackages[0] | null>(null)
@@ -166,7 +139,7 @@ function completeCheckout() {
 
           <!-- KDV Notice -->
           <div class="mt-6 text-center text-xs font-medium text-slate-500">
-            Fiyatlara %20 KDV dahildir.
+            {{ cmsData.pricing.vatNotice }}
           </div>
         </div>
       </div>
@@ -214,7 +187,7 @@ function completeCheckout() {
       <!-- Legal Disclaimer Footer -->
       <div class="mt-12 text-center max-w-4xl mx-auto px-6">
         <p class="text-[10px] leading-relaxed text-slate-400 italic font-medium">
-          Bu hizmet GelAnlaşalım Bilişim A.Ş. tarafından sunulmaktadır. Şirketimizin Kamu İhale Kurumu (EKAP) veya başka bir kamu kurumu ile herhangi bir bağlantısı bulunmamaktadır.
+          {{ cmsData.pricing.disclaimer }}
         </p>
       </div>
 

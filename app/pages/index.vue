@@ -25,6 +25,8 @@ definePageMeta({
   layout: 'public'
 })
 
+const { cmsData } = useCmsData()
+
 /* =========================================================
    GENEL DURUMLAR & TABLAR
 ========================================================= */
@@ -559,15 +561,15 @@ function toggleFilterSection(section: string) {
         <div class="text-left">
           <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em]" style="color: #2563EB;">
             <span class="h-px w-8" style="background-color: #2563EB;"></span>
-            ÖZEL SEKTÖRÜN CANLI TERS İHALE ARENASI
+            {{ cmsData.hero.tagline }}
           </div>
           <h1 class="text-4xl font-black leading-[1.15] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-            ihale Ver.<br />
-            Teklif Al.<br />
-            <span class="font-serif italic font-medium" style="color: #2563EB;">Gel Anlaşalım.</span>
+            {{ cmsData.hero.titleLine1 }}<br />
+            {{ cmsData.hero.titleLine2 }}<br />
+            <span class="font-serif italic font-medium" style="color: #2563EB;">{{ cmsData.hero.titleItalic }}</span>
           </h1>
           <p class="mt-6 max-w-xl text-base leading-relaxed text-slate-600">
-            GelAnlaşalım; e-ihale, teklif toplama, sipariş ve tedarik süreçlerinizi tek platformda dijitalleştirir. Maliyetlerinizi düşürün, zamandan tasarruf edin ve satın alma operasyonlarınızı daha verimli yönetin.
+            {{ cmsData.hero.description }}
           </p>
           
           <!-- Buttons -->
@@ -584,13 +586,10 @@ function toggleFilterSection(section: string) {
 
           <!-- Bottom Features Strip -->
           <div class="mt-8 text-[9px] font-bold text-slate-500 uppercase tracking-widest flex flex-wrap gap-x-4 gap-y-2">
-            <span>KVKK KAPSAMINDA</span>
-            <span class="text-slate-300">•</span>
-            <span>BELGE İZİ & ZAMAN DAMGASI</span>
-            <span class="text-slate-300">•</span>
-            <span>ŞİFRELİ VERİ AKTARIMI</span>
-            <span class="text-slate-300">•</span>
-            <span>LANSMAN DÖNEMİNDE ÜCRETSİZ</span>
+            <template v-for="(badge, index) in cmsData.hero.badgeStrip" :key="index">
+              <span>{{ badge }}</span>
+              <span v-if="index < cmsData.hero.badgeStrip.length - 1" class="text-slate-300">•</span>
+            </template>
           </div>
 
           <!-- Video Button -->
@@ -614,11 +613,11 @@ function toggleFilterSection(section: string) {
                 <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-slate-400">
                   <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> TEMSİLİ CANLI İHALE
                 </span>
-                <h3 class="mt-1.5 text-base font-black text-slate-800">CNC Fason Üretim Partisi</h3>
+                <h3 class="mt-1.5 text-base font-black text-slate-800">{{ cmsData.liveTender.title }}</h3>
               </div>
               <div class="text-right">
                 <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">KALAN SÜRE</span>
-                <div class="mt-1 font-mono text-sm font-black text-slate-800">02:21</div>
+                <div class="mt-1 font-mono text-sm font-black text-slate-800">{{ cmsData.liveTender.remainingTime }}</div>
               </div>
             </div>
 
@@ -626,40 +625,41 @@ function toggleFilterSection(section: string) {
             <div class="py-6 flex justify-between items-start">
               <div>
                 <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">GÜNCEL EN İYİ TEKLİF</span>
-                <div class="mt-1 text-4xl font-black text-slate-900 tracking-tight font-mono">₺396.800</div>
+                <div class="mt-1 text-4xl font-black text-slate-900 tracking-tight font-mono">
+                  ₺{{ cmsData.liveTender.bestBid.toLocaleString('tr-TR') }}
+                </div>
                 <div class="mt-2 text-[10px] text-slate-400 font-bold">
-                  AÇILIŞ FİYATI <span class="font-mono text-slate-600 line-through">₺412.000</span>
+                  AÇILIŞ FİYATI <span class="font-mono text-slate-600 line-through">₺{{ cmsData.liveTender.openingPrice.toLocaleString('tr-TR') }}</span>
                 </div>
               </div>
               
               <div class="text-right">
                 <div class="rounded-lg px-2.5 py-1 text-[9px] font-black" style="background: rgba(37,99,235,0.08); color: #2563EB;">
-                  TASARRUF %3,7
+                  {{ cmsData.liveTender.savingsText }}
                 </div>
               </div>
             </div>
 
             <!-- Competitor List -->
             <div class="space-y-2 border-t border-slate-100 pt-5">
-              <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">2 TEDARİKÇİ YARIŞIYOR</div>
-              
-              <!-- Leader -->
-              <div class="flex items-center justify-between rounded-xl border border-blue-200/60 bg-blue-50/40 px-4 py-2.5">
-                <div class="flex items-center gap-2.5 text-xs font-bold text-slate-800">
-                  <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-                  Tedarikçi #A47
-                  <span class="rounded bg-blue-100 px-1.5 py-0.5 text-[8px] font-black text-blue-700">ÖNDE</span>
-                </div>
-                <span class="font-mono font-bold text-xs text-slate-800">₺396.800</span>
+              <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                {{ cmsData.liveTender.competitors.length }} TEDARİKÇİ YARIŞIYOR
               </div>
               
-              <!-- Second -->
-              <div class="flex items-center justify-between rounded-xl bg-white border border-slate-200/60 px-4 py-2.5">
-                <div class="flex items-center gap-2.5 text-xs font-bold text-slate-500">
-                  <span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span>
-                  Tedarikçi #D08
+              <div 
+                v-for="comp in cmsData.liveTender.competitors" 
+                :key="comp.name" 
+                class="flex items-center justify-between rounded-xl px-4 py-2.5"
+                :class="comp.leader ? 'border border-blue-200/60 bg-blue-50/40' : 'bg-white border border-slate-200/60'"
+              >
+                <div class="flex items-center gap-2.5 text-xs font-bold" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
+                  <span class="h-1.5 w-1.5 rounded-full" :class="comp.leader ? 'bg-blue-600' : 'bg-slate-300'"></span>
+                  {{ comp.name }}
+                  <span v-if="comp.leader" class="rounded bg-blue-100 px-1.5 py-0.5 text-[8px] font-black text-blue-700">ÖNDE</span>
                 </div>
-                <span class="font-mono font-bold text-xs text-slate-500">₺404.500</span>
+                <span class="font-mono font-bold text-xs" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
+                  ₺{{ comp.price.toLocaleString('tr-TR') }}
+                </span>
               </div>
             </div>
 
