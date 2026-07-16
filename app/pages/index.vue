@@ -998,7 +998,7 @@ function toggleFilterSection(section: string) {
     </section>
 
     <!-- TASARRUF HESAPLAMA ARACI (ROI) -->
-    <section class="border-b border-slate-200 bg-slate-50 py-20">
+    <section id="ozellikler" class="border-b border-slate-200 bg-slate-50 py-20">
       <div class="mx-auto max-w-7xl px-6">
         <div class="text-center mb-12">
           <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">VERİMLİLİK & ROI</span>

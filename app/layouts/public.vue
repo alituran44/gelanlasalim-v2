@@ -32,21 +32,21 @@ const mobileMenuOpen = ref(false)
         <!-- Orta: Nav Linkleri -->
         <nav class="hidden lg:flex items-center rounded-full border p-1" style="border-color: #E2E8F0; background: #F8FAFC;">
           <a
-            href="#nasil-calisir"
+            href="/#nasil-calisir"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #475569;"
             onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
           >Nasıl Çalışır</a>
           <a
-            href="#ozellikler"
+            href="/#ozellikler"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #475569;"
             onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
           >Özellikler</a>
           <a
-            href="#ihale-gezgini"
+            href="/#ihale-gezgini"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #475569;"
             onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
@@ -60,7 +60,7 @@ const mobileMenuOpen = ref(false)
             onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
           >Fiyatlandırma</NuxtLink>
           <a
-            href="#sss"
+            href="/#sss"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #475569;"
             onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
@@ -109,11 +109,11 @@ const mobileMenuOpen = ref(false)
       >
         <div v-if="mobileMenuOpen" class="border-t bg-white px-6 py-5 lg:hidden" style="border-color: #F1F5F9;">
           <div class="flex flex-col gap-3 text-sm font-semibold" style="color: #475569;">
-            <a href="#nasil-calisir" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Nasıl Çalışır</a>
-            <a href="#ozellikler" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Özellikler</a>
-            <a href="#ihale-gezgini" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Market</a>
+            <a href="/#nasil-calisir" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Nasıl Çalışır</a>
+            <a href="/#ozellikler" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Özellikler</a>
+            <a href="/#ihale-gezgini" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Market</a>
             <NuxtLink to="/abonelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Fiyatlandırma</NuxtLink>
-            <a href="#sss" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">SSS</a>
+            <a href="/#sss" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">SSS</a>
             <div class="border-t my-1" style="border-color: #F1F5F9;"></div>
             <NuxtLink to="/uyelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Giriş Yap</NuxtLink>
             <NuxtLink
