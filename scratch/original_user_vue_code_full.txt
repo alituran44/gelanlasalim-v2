@@ -1,0 +1,1674 @@
+<USER_REQUEST>
+ana sayfa kodlarını <script setup lang="ts">
+import {
+  Search,
+  MapPin,
+  Building2,
+  BriefcaseBusiness,
+  Clock3,
+  Heart,
+  SlidersHorizontal,
+  Menu,
+  X,
+  Plus,
+  ChevronDown,
+  CheckCircle2,
+  FileText,
+  Users,
+  ShieldCheck,
+  Sparkles,
+  ArrowRight
+} from 'lucide-vue-next'
+
+/* =========================================================
+   GENEL DURUMLAR
+========================================================= */
+
+const mobileMenuOpen = ref(false)
+
+const searchText = ref('')
+const selectedCity = ref('')
+const selectedCategory = ref('')
+const selectedSubcategory = ref('')
+const selectedSector = ref('')
+const selectedType = ref('')
+const selectedMethod = ref('')
+const selectedPricingType = ref('')
+
+const expandedCategory = ref<string | null>(null)
+const expandedFilterSection = ref<string | null>('categories')
+
+/* =========================================================
+   81 İL
+========================================================= */
+
+const cities = [
+  'Adana',
+  'Adıyaman',
+  'Afyonkarahisar',
+  'Ağrı',
+  'Aksaray',
+  'Amasya',
+  'Ankara',
+  'Antalya',
+  'Ardahan',
+  'Artvin',
+  'Aydın',
+  'Balıkesir',
+  'Bartın',
+  'Batman',
+  'Bayburt',
+  'Bilecik',
+  'Bingöl',
+  'Bitlis',
+  'Bolu',
+  'Burdur',
+  'Bursa',
+  'Çanakkale',
+  'Çankırı',
+  'Çorum',
+  'Denizli',
+  'Diyarbakır',
+  'Düzce',
+  'Edirne',
+  'Elazığ',
+  'Erzincan',
+  'Erzurum',
+  'Eskişehir',
+  'Gaziantep',
+  'Giresun',
+  'Gümüşhane',
+  'Hakkari',
+  'Hatay',
+  'Iğdır',
+  'Isparta',
+  'İstanbul',
+  'İzmir',
+  'Kahramanmaraş',
+  'Karabük',
+  'Karaman',
+  'Kars',
+  'Kastamonu',
+  'Kayseri',
+  'Kırıkkale',
+  'Kırklareli',
+  'Kırşehir',
+  'Kilis',
+  'Kocaeli',
+  'Konya',
+  'Kütahya',
+  'Malatya',
+  'Manisa',
+  'Mardin',
+  'Mersin',
+  'Muğla',
+  'Muş',
+  'Nevşehir',
+  'Niğde',
+  'Ordu',
+  'Osmaniye',
+  'Rize',
+  'Sakarya',
+  'Samsun',
+  'Siirt',
+  'Sinop',
+  'Sivas',
+  'Şanlıurfa',
+  'Şırnak',
+  'Tekirdağ',
+  'Tokat',
+  'Trabzon',
+  'Tunceli',
+  'Uşak',
+  'Van',
+  'Yalova',
+  'Yozgat',
+  'Zonguldak'
+]
+
+/* =========================================================
+   KATEGORİLER VE ALT KATEGORİLER
+========================================================= */
+
+const detailedCategories = [
+  {
+    name: 'İnşaat, Altyapı ve Yapı İşleri',
+    count: 248,
+    children: [
+      'İnşaat Malzemeleri',
+      'Tadilat ve Renovasyon',
+      'Taahhüt İşleri',
+      'Yapı ve Yıkım İşleri'
+    ]
+  },
+  {
+    name: 'Kanalizasyon, Boru ve Tesisat',
+    count: 61,
+    children: [
+      'Boru ve Bağlantı Elemanları',
+      'Su Tesisatı',
+      'Doğalgaz Tesisatı',
+      'Sıhhi Tesisat'
+    ]
+  },
+  {
+    name: 'Kent Mobilyaları ve Prefabrik Yapılar',
+    count: 40,
+    children: [
+      'Kent Mobilyaları',
+      'Prefabrik Yapılar',
+      'Konteyner',
+      'Doğramacılık'
+    ]
+  },
+  {
+    name: 'Mühendislik, Mimarlık ve Danışmanlık',
+    count: 95,
+    children: [
+      'Mimarlık Hizmetleri',
+      'Mühendislik Hizmetleri',
+      'Proje ve Çizim',
+      'Teknik Danışmanlık'
+    ]
+  },
+  {
+    name: 'Madencilik, Sondaj ve Doğal Kaynaklar',
+    count: 24,
+    children: [
+      'Madencilik',
+      'Sondaj',
+      'Doğal Kaynaklar',
+      'Hammadde'
+    ]
+  },
+  {
+    name: 'Hırdavat, Metal ve Plastik Ürünler',
+    count: 106,
+    children: [
+      'Hırdavat',
+      'Nalbur Malzemeleri',
+      'Metal Ürünler',
+      'Plastik Ürünler'
+    ]
+  },
+  {
+    name: 'Enerji, Elektrik ve Aydınlatma',
+    count: 117,
+    children: [
+      'Elektrik Malzemeleri',
+      'Aydınlatma',
+      'Güneş Enerjisi',
+      'Elektrik Tesisatı'
+    ]
+  },
+  {
+    name: 'Yangın ve Güvenlik Sistemleri',
+    count: 94,
+    children: [
+      'Yangın Algılama',
+      'Yangın Söndürme',
+      'Alarm Sistemleri',
+      'Güvenlik Ekipmanları'
+    ]
+  },
+  {
+    name: 'Asansör ve Yapı Otomasyonu',
+    count: 75,
+    children: [
+      'Asansör',
+      'Yürüyen Merdiven',
+      'Bina Otomasyonu',
+      'Geçiş Sistemleri'
+    ]
+  },
+  {
+    name: 'Klima, Isıtma ve Havalandırma',
+    count: 207,
+    children: [
+      'Klima',
+      'Soğutma',
+      'Isıtma',
+      'Havalandırma'
+    ]
+  },
+  {
+    name: 'Endüstriyel Makine ve Üretim',
+    count: 323,
+    children: [
+      'Endüstriyel Makine',
+      'Motor ve Redüktör',
+      'Konveyör',
+      'Üretim Ekipmanları'
+    ]
+  },
+  {
+    name: 'Taşıt, İş Makinesi ve Yedek Parça',
+    count: 271,
+    children: [
+      'Otomobil',
+      'Ticari Araç',
+      'İş Makinesi',
+      'Yedek Parça'
+    ]
+  },
+  {
+    name: 'Nakliye, Lojistik ve Taşımacılık',
+    count: 169,
+    children: [
+      'Kara Taşımacılığı',
+      'Personel Taşıma',
+      'Depolama',
+      'Dağıtım'
+    ]
+  },
+  {
+    name: 'Turizm ve Organizasyon',
+    count: 68,
+    children: [
+      'Otel Hizmetleri',
+      'Organizasyon',
+      'Seyahat',
+      'Etkinlik'
+    ]
+  },
+  {
+    name: 'Reklam, Tanıtım ve Pazarlama',
+    count: 142,
+    children: [
+      'Dijital Reklam',
+      'Tabela ve Baskı',
+      'Organizasyon',
+      'Promosyon'
+    ]
+  },
+  {
+    name: 'Matbaa, Kırtasiye ve Ambalaj',
+    count: 337,
+    children: [
+      'Matbaa',
+      'Kırtasiye',
+      'Toner ve Kartuş',
+      'Ambalaj'
+    ]
+  },
+  {
+    name: 'Peyzaj, Bahçe ve Ormancılık',
+    count: 165,
+    children: [
+      'Peyzaj',
+      'Bahçe Bakımı',
+      'Bitki ve Fidan',
+      'Ormancılık'
+    ]
+  },
+  {
+    name: 'Sağlık, Medikal ve Tıbbi Cihaz',
+    count: 251,
+    children: [
+      'Medikal Ürünler',
+      'Tıbbi Cihazlar',
+      'Laboratuvar Ekipmanları',
+      'Sarf Malzemeleri'
+    ]
+  },
+  {
+    name: 'Akaryakıt, Yakıt ve Madeni Yağ',
+    count: 123,
+    children: [
+      'Akaryakıt',
+      'Madeni Yağ',
+      'Endüstriyel Yağ',
+      'Yakıt Ürünleri'
+    ]
+  },
+  {
+    name: 'Gıda, Tarım ve Catering',
+    count: 337,
+    children: [
+      'Gıda Ürünleri',
+      'Tarım Ürünleri',
+      'Hazır Yemek',
+      'Catering'
+    ]
+  },
+  {
+    name: 'Elektronik, Bilgisayar ve İletişim',
+    count: 352,
+    children: [
+      'Bilgisayar ve Laptop',
+      'Sunucu ve Veri Merkezi',
+      'Network Ürünleri',
+      'Elektronik Ekipmanlar'
+    ]
+  },
+  {
+    name: 'Yazılım, Bilişim ve Dijital Hizmetler',
+    count: 149,
+    children: [
+      'Web Yazılım',
+      'Mobil Uygulama',
+      'Kurumsal Yazılım',
+      'Bulut Hizmetleri'
+    ]
+  },
+  {
+    name: 'Kamera, Otomasyon ve Haberleşme',
+    count: 122,
+    children: [
+      'Kamera Sistemleri',
+      'Otomasyon',
+      'Takip Sistemleri',
+      'Haberleşme'
+    ]
+  },
+  {
+    name: 'Temizlik, İlaçlama ve Geri Dönüşüm',
+    count: 247,
+    children: [
+      'Temizlik Hizmetleri',
+      'Temizlik Malzemeleri',
+      'İlaçlama',
+      'Geri Dönüşüm'
+    ]
+  },
+  {
+    name: 'Kimyasal Maddeler ve Endüstriyel Ürünler',
+    count: 225,
+    children: [
+      'Endüstriyel Kimyasallar',
+      'Dezenfektan',
+      'Boya ve Kaplama',
+      'Hammadde'
+    ]
+  },
+  {
+    name: 'Tekstil, Giyim ve İş Kıyafetleri',
+    count: 273,
+    children: [
+      'Tekstil',
+      'Personel Kıyafeti',
+      'İş Elbiseleri',
+      'Ayakkabı'
+    ]
+  },
+  {
+    name: 'İş Sağlığı ve Güvenliği',
+    count: 131,
+    children: [
+      'İSG Ekipmanları',
+      'Koruyucu Ekipman',
+      'İSG Hizmetleri',
+      'İş Güvenliği Eğitimi'
+    ]
+  },
+  {
+    name: 'Mobilya, Ofis ve Dekorasyon',
+    count: 208,
+    children: [
+      'Ofis Mobilyaları',
+      'Ev Mobilyaları',
+      'Dekorasyon',
+      'Mutfak Ekipmanları'
+    ]
+  },
+  {
+    name: 'Özel Güvenlik ve Koruma',
+    count: 85,
+    children: [
+      'Özel Güvenlik',
+      'Koruma Hizmetleri',
+      'Bekçilik',
+      'Güvenlik Danışmanlığı'
+    ]
+  },
+  {
+    name: 'Eğitim ve Kurumsal Gelişim',
+    count: 76,
+    children: [
+      'Kurumsal Eğitim',
+      'Online Eğitim',
+      'Eğitim Materyalleri',
+      'Danışmanlık'
+    ]
+  },
+  {
+    name: 'İnsan Kaynakları ve Sosyal Hizmetler',
+    count: 163,
+    children: [
+      'İnsan Kaynakları',
+      'Personel Temini',
+      'Bordrolama',
+      'Kurumsal Hizmetler'
+    ]
+  },
+  {
+    name: 'Sigorta, Mali ve Hukuki Hizmetler',
+    count: 56,
+    children: [
+      'Sigorta',
+      'Mali Müşavirlik',
+      'Hukuk',
+      'Finansal Danışmanlık'
+    ]
+  },
+  {
+    name: 'Gayrimenkul ve İşyeri Hizmetleri',
+    count: 122,
+    children: [
+      'Gayrimenkul',
+      'İşyeri Kiralama',
+      'Tesis Yönetimi',
+      'Emlak Hizmetleri'
+    ]
+  }
+]
+
+/* =========================================================
+   SEKTÖRLER
+========================================================= */
+
+const sectors = [
+  { name: 'Tarım, Çiftçilik, Balıkçılık ve Ormancılık', count: 84 },
+  { name: 'Petrol, Yakıt, Elektrik ve Enerji', count: 97 },
+  { name: 'Madencilik, Metal ve Hammaddeler', count: 64 },
+  { name: 'Gıda ve İçecek', count: 189 },
+  { name: 'Tarım Makineleri', count: 42 },
+  { name: 'Giyim, Ayakkabı ve Aksesuar', count: 73 },
+  { name: 'Tekstil, Plastik ve Kauçuk', count: 126 },
+  { name: 'Basılı Malzeme ve Matbaa', count: 58 },
+  { name: 'Kimyasal Ürünler', count: 91 },
+  { name: 'Mobilya, Ofis ve Bilgi İşlem Ekipmanları', count: 168 },
+  { name: 'Elektrikli Makine, Cihaz ve Aydınlatma', count: 144 },
+  { name: 'Radyo, TV, İletişim ve Telekomünikasyon', count: 76 },
+  { name: 'Tıbbi Cihaz, İlaç ve Kişisel Bakım', count: 112 },
+  { name: 'Nakliye Araçları ve Yardımcı Ürünler', count: 89 },
+  { name: 'Güvenlik ve Yangınla Mücadele', count: 61 },
+  { name: 'Spor, Oyun, Oyuncak ve Sanat', count: 34 },
+  { name: 'Laboratuvar, Optik ve Hassas Ekipman', count: 52 },
+  { name: 'Mobilya, Mefruşat ve Temizlik Ürünleri', count: 103 },
+  { name: 'Su ve Arıtma Sistemleri', count: 48 },
+  { name: 'Sanayi Tipi Makineler', count: 156 },
+  { name: 'İnşaat Makinesi ve Ekipmanları', count: 137 },
+  { name: 'İnşaat, Yapı ve Yapı Malzemeleri', count: 248 },
+  { name: 'İnşaat ve Taahhüt İşleri', count: 176 },
+  { name: 'Yazılım ve Bilgi Sistemleri', count: 149 },
+  { name: 'Onarım ve Bakım Hizmetleri', count: 118 },
+  { name: 'Kurulum ve Teknik Servis Hizmetleri', count: 96 },
+  { name: 'Otel, Restoran ve Perakende Hizmetleri', count: 67 },
+  { name: 'Nakliye ve Lojistik Hizmetleri', count: 169 },
+  { name: 'Seyahat ve Organizasyon Hizmetleri', count: 44 },
+  { name: 'Posta, Kurye ve Telekomünikasyon Hizmetleri', count: 39 },
+  { name: 'Finans ve Sigorta Hizmetleri', count: 56 },
+  { name: 'Gayrimenkul Hizmetleri', count: 42 },
+  { name: 'Mimarlık, Mühendislik ve Denetim', count: 95 },
+  { name: 'IT, Yazılım Geliştirme ve İnternet Hizmetleri', count: 183 },
+  { name: 'Araştırma, Geliştirme ve Danışmanlık', count: 71 },
+  { name: 'Yönetim ve Kurumsal Hizmetler', count: 63 },
+  { name: 'Enerji ve Petrol Endüstrisi Hizmetleri', count: 54 },
+  { name: 'Pazarlama, Hukuk ve İnsan Kaynakları', count: 81 },
+  { name: 'Eğitim ve Öğretim Hizmetleri', count: 76 },
+  { name: 'Sağlık ve Sosyal Hizmetler', count: 92 },
+  { name: 'Temizlik, Atık ve Çevre Hizmetleri', count: 114 },
+  { name: 'Kültür, Rekreasyon ve Spor Hizmetleri', count: 38 }
+]
+
+/* =========================================================
+   İHALE TÜRLERİ
+========================================================= */
+
+const tenderTypes = [
+  { name: 'Mal Alımı', count: 578 },
+  { name: 'Hizmet Alımı', count: 207 },
+  { name: 'Yapım İşi', count: 180 },
+  { name: 'Fason Üretim', count: 92 },
+  { name: 'Kiralama', count: 85 },
+  { name: 'Satış Talebi', count: 39 }
+]
+
+/* =========================================================
+   TEKLİF YÖNTEMLERİ
+========================================================= */
+
+const offerMethods = [
+  { name: 'Açık Teklif', count: 546 },
+  { name: 'Kapalı Teklif', count: 395 },
+  { name: 'Davetli İhale', count: 151 },
+  { name: 'Ters İhale', count: 98 },
+  { name: 'Fiyat Araştırması', count: 68 },
+  { name: 'Doğrudan Teklif Talebi', count: 57 }
+]
+
+/* =========================================================
+   FİYATLANDIRMA TÜRLERİ
+========================================================= */
+
+const pricingTypes = [
+  { name: 'Toplam / Götürü Bedel', count: 214 },
+  { name: 'Birim Fiyat', count: 323 },
+  { name: 'Kısmi Teklif Verilebilir', count: 115 },
+  { name: 'Kısmi Teklif Verilemez', count: 277 }
+]
+
+/* =========================================================
+   ÖRNEK İHALELER
+========================================================= */
+
+const tenders = ref([
+  {
+    id: 1,
+    featured: true,
+    title: '500 Adet Kurumsal Dizüstü Bilgisayar Alımı',
+    company: 'Marmara Teknoloji Yatırımları A.Ş.',
+    verified: true,
+    category: 'Elektronik, Bilgisayar ve İletişim',
+    sector: 'IT, Yazılım Geliştirme ve İnternet Hizmetleri',
+    city: 'İstanbul',
+    type: 'Mal Alımı',
+    method: 'Kapalı Teklif',
+    pricing: 'Birim Fiyat',
+    deadline: '22 Temmuz 2026',
+    daysLeft: 7,
+    offers: 14,
+    description:
+      'Kurumsal kullanım için teknik şartnameye uygun 500 adet dizüstü bilgisayar alımı.'
+  },
+  {
+    id: 2,
+    featured: false,
+    title: 'Üretim Tesisi Çatı ve İzolasyon Yenileme İşi',
+    company: 'Bursa Endüstri Üretim A.Ş.',
+    verified: true,
+    category: 'İnşaat, Altyapı ve Yapı İşleri',
+    sector: 'İnşaat ve Taahhüt İşleri',
+    city: 'Bursa',
+    type: 'Yapım İşi',
+    method: 'Açık Teklif',
+    pricing: 'Toplam / Götürü Bedel',
+    deadline: '25 Temmuz 2026',
+    daysLeft: 10,
+    offers: 8,
+    description:
+      'Fabrika üretim tesisi çatı kaplama ve ısı izolasyon yenileme işi.'
+  },
+  {
+    id: 3,
+    featured: false,
+    title: '12 Aylık Personel Taşıma Hizmeti',
+    company: 'Ege Gıda Sanayi Ltd. Şti.',
+    verified: true,
+    category: 'Nakliye, Lojistik ve Taşımacılık',
+    sector: 'Nakliye ve Lojistik Hizmetleri',
+    city: 'İzmir',
+    type: 'Hizmet Alımı',
+    method: 'Kapalı Teklif',
+    pricing: 'Toplam / Götürü Bedel',
+    deadline: '19 Temmuz 2026',
+    daysLeft: 4,
+    offers: 21,
+    description:
+      'Üretim tesisi çalışanları için 12 aylık personel servis taşımacılığı hizmeti.'
+  },
+  {
+    id: 4,
+    featured: true,
+    title: '100.000 Adet Özel Tasarım Ürün Kutusu Üretimi',
+    company: 'Anadolu E-Ticaret A.Ş.',
+    verified: true,
+    category: 'Matbaa, Kırtasiye ve Ambalaj',
+    sector: 'Basılı Malzeme ve Matbaa',
+    city: 'Ankara',
+    type: 'Fason Üretim',
+    method: 'Ters İhale',
+    pricing: 'Birim Fiyat',
+    deadline: '18 Temmuz 2026',
+    daysLeft: 3,
+    offers: 17,
+    description:
+      'Marka standartlarına uygun baskılı ürün kutularının fason üretimi.'
+  },
+  {
+    id: 5,
+    featured: false,
+    title: 'Kurumsal Web Yazılım ve Mobil Uygulama Projesi',
+    company: 'Atlas Holding A.Ş.',
+    verified: true,
+    category: 'Yazılım, Bilişim ve Dijital Hizmetler',
+    sector: 'IT, Yazılım Geliştirme ve İnternet Hizmetleri',
+    city: 'İstanbul',
+    type: 'Hizmet Alımı',
+    method: 'Davetli İhale',
+    pricing: 'Toplam / Götürü Bedel',
+    deadline: '30 Temmuz 2026',
+    daysLeft: 15,
+    offers: 6,
+    description:
+      'Kurumsal portal, mobil uygulama ve yönetim paneli geliştirme hizmeti.'
+  }
+])
+
+/* =========================================================
+   FONKSİYONLAR
+========================================================= */
+
+function toggleCategory(categoryName: string) {
+  expandedCategory.value =
+    expandedCategory.value === categoryName ? null : categoryName
+}
+
+function selectMainCategory(categoryName: string) {
+  selectedCategory.value = categoryName
+  selectedSubcategory.value = ''
+}
+
+function selectSubcategory(categoryName: string, subcategory: string) {
+  selectedCategory.value = categoryName
+  selectedSubcategory.value = subcategory
+}
+
+function toggleFilterSection(section: string) {
+  expandedFilterSection.value =
+    expandedFilterSection.value === section ? null : section
+}
+
+function clearFilters() {
+  searchText.value = ''
+  selectedCity.value = ''
+  selectedCategory.value = ''
+  selectedSubcategory.value = ''
+  selectedSector.value = ''
+  selectedType.value = ''
+  selectedMethod.value = ''
+  selectedPricingType.value = ''
+}
+
+/* =========================================================
+   FİLTRELENMİŞ İHALELER
+========================================================= */
+
+const filteredTenders = computed(() => {
+  return tenders.value.filter((tender) => {
+    const searchValue = searchText.value.toLocaleLowerCase('tr')
+
+    const searchMatch =
+      !searchText.value ||
+      tender.title.toLocaleLowerCase('tr').includes(searchValue) ||
+      tender.company.toLocaleLowerCase('tr').includes(searchValue) ||
+      tender.description.toLocaleLowerCase('tr').includes(searchValue)
+
+    const cityMatch =
+      !selectedCity.value ||
+      tender.city === selectedCity.value
+
+    const categoryMatch =
+      !selectedCategory.value ||
+      tender.category === selectedCategory.value
+
+    const sectorMatch =
+      !selectedSector.value ||
+      tender.sector === selectedSector.value
+
+    const typeMatch =
+      !selectedType.value ||
+      tender.type === selectedType.value
+
+    const methodMatch =
+      !selectedMethod.value ||
+      tender.method === selectedMethod.value
+
+    const pricingMatch =
+      !selectedPricingType.value ||
+      tender.pricing === selectedPricingType.value
+
+    return (
+      searchMatch &&
+      cityMatch &&
+      categoryMatch &&
+      sectorMatch &&
+      typeMatch &&
+      methodMatch &&
+      pricingMatch
+    )
+  })
+})
+</script>
+
+<template>
+  <div class="min-h-screen bg-slate-100 text-slate-900">
+
+    <!-- ÜST BİLGİ ÇUBUĞU -->
+    <div class="bg-slate-950 text-slate-300">
+      <div
+        class="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-2 text-xs"
+      >
+        <div class="flex items-center gap-2">
+          <ShieldCheck :size="14" class="text-emerald-400" />
+          <span>Türkiye'nin özel sektör ihale ve teklif platformu</span>
+        </div>
+
+        <div class="hidden items-center gap-5 md:flex">
+          <a href="#" class="hover:text-white">Nasıl Çalışır?</a>
+          <a href="#" class="hover:text-white">Yardım Merkezi</a>
+          <a href="#" class="hover:text-white">Kurumsal</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- HEADER -->
+    <header class="sticky top-0 z-50 border-b border-slate-200 bg-white">
+      <div
+        class="mx-auto flex h-[72px] max-w-[1600px] items-center justify-between px-4"
+      >
+        <NuxtLink to="/" class="flex items-center gap-3">
+          <div
+            class="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-white"
+          >
+            <BriefcaseBusiness :size="23" />
+          </div>
+
+          <div>
+            <div class="text-xl font-black">
+              Gel<span class="text-blue-600">Anlaşalım</span>
+            </div>
+
+            <div class="text-[10px] font-bold tracking-wide text-slate-500">
+              İHALE VER. TEKLİF AL. ANLAŞ.
+            </div>
+          </div>
+        </NuxtLink>
+
+        <nav class="hidden items-center gap-7 lg:flex">
+          <a href="#ihaleler" class="font-bold hover:text-blue-600">
+            İhaleler
+          </a>
+
+          <a href="#kategoriler" class="font-bold hover:text-blue-600">
+            Kategoriler
+          </a>
+
+          <a href="#firmalar" class="font-bold hover:text-blue-600">
+            Firmalar
+          </a>
+
+          <a href="#nasil-calisir" class="font-bold hover:text-blue-600">
+            Nasıl Çalışır?
+          </a>
+        </nav>
+
+        <div class="hidden items-center gap-3 lg:flex">
+          <button class="px-4 py-2 text-sm font-bold">
+            Giriş Yap
+          </button>
+
+          <button
+            class="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-sm font-black text-white hover:bg-blue-700"
+          >
+            <Plus :size="18" />
+            İhale Oluştur
+          </button>
+        </div>
+
+        <button
+          class="lg:hidden"
+          @click="mobileMenuOpen = !mobileMenuOpen"
+        >
+          <X v-if="mobileMenuOpen" />
+          <Menu v-else />
+        </button>
+      </div>
+
+      <div
+        v-if="mobileMenuOpen"
+        class="border-t border-slate-200 bg-white p-5 lg:hidden"
+      >
+        <div class="flex flex-col gap-4 font-bold">
+          <a href="#ihaleler">İhaleler</a>
+          <a href="#kategoriler">Kategoriler</a>
+          <a href="#firmalar">Firmalar</a>
+          <a href="#nasil-calisir">Nasıl Çalışır?</a>
+
+          <button class="rounded-xl bg-blue-600 p-3 text-white">
+            İhale Oluştur
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- HERO -->
+    <section class="relative overflow-hidden bg-slate-950">
+      <div
+        class="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(37,99,235,0.28),transparent_38%)]"
+      ></div>
+
+      <div
+        class="relative mx-auto max-w-[1600px] px-4 py-14 lg:py-16"
+      >
+        <div
+          class="mb-4 inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-500/10 px-4 py-2 text-sm font-bold text-blue-300"
+        >
+          <Sparkles :size="16" />
+          Firmalar arası yeni nesil satın alma ağı
+        </div>
+
+        <h1
+          class="max-w-4xl text-4xl font-black leading-tight text-white md:text-6xl"
+        >
+          İhtiyacını yayınla.
+          <span class="text-blue-500">
+            En iyi teklifle anlaş.
+          </span>
+        </h1>
+
+        <p class="mt-5 max-w-3xl text-lg leading-8 text-slate-300">
+          Özel sektör ihalelerini keşfet, firman için yeni iş fırsatları bul
+          veya satın alma talebini yayınlayarak tedarikçilerden teklif topla.
+        </p>
+
+        <!-- ANA ARAMA -->
+        <div class="mt-8 rounded-2xl bg-white p-3 shadow-2xl">
+          <div
+            class="grid gap-2 lg:grid-cols-[1fr_300px_250px_auto]"
+          >
+            <div class="flex items-center gap-3 px-4">
+              <Search
+                :size="21"
+                class="shrink-0 text-slate-400"
+              />
+
+              <input
+                v-model="searchText"
+                type="text"
+                placeholder="Ürün, hizmet, ihale veya firma ara..."
+                class="w-full py-4 text-sm font-medium outline-none"
+              />
+            </div>
+
+            <select
+              v-model="selectedCategory"
+              class="border-t border-slate-200 bg-white px-4 py-4 text-sm font-bold outline-none lg:border-l lg:border-t-0"
+            >
+              <option value="">
+                Tüm Kategoriler
+              </option>
+
+              <option
+                v-for="category in detailedCategories"
+                :key="category.name"
+                :value="category.name"
+              >
+                {{ category.name }}
+              </option>
+            </select>
+
+            <select
+              v-model="selectedCity"
+              class="border-t border-slate-200 bg-white px-4 py-4 text-sm font-bold outline-none lg:border-l lg:border-t-0"
+            >
+              <option value="">
+                81 İl / Tüm Türkiye
+              </option>
+
+              <option
+                v-for="city in cities"
+                :key="city"
+                :value="city"
+              >
+                {{ city }}
+              </option>
+            </select>
+
+            <button
+              class="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-8 py-4 font-black text-white hover:bg-blue-700"
+            >
+              <Search :size="19" />
+              İhale Bul
+            </button>
+          </div>
+        </div>
+
+        <!-- HIZLI FİLTRE -->
+        <div class="mt-5 flex flex-wrap gap-2">
+          <button
+            @click="selectedType = 'Mal Alımı'"
+            class="rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-bold text-slate-300 hover:border-blue-500 hover:text-white"
+          >
+            📦 Mal Alımı
+          </button>
+
+          <button
+            @click="selectedType = 'Hizmet Alımı'"
+            class="rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-bold text-slate-300 hover:border-blue-500 hover:text-white"
+          >
+            🛠 Hizmet Alımı
+          </button>
+
+          <button
+            @click="selectedType = 'Yapım İşi'"
+            class="rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-bold text-slate-300 hover:border-blue-500 hover:text-white"
+          >
+            🏗 Yapım İşi
+          </button>
+
+          <button
+            @click="selectedMethod = 'Ters İhale'"
+            class="rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-sm font-bold text-slate-300 hover:border-blue-500 hover:text-white"
+          >
+            ⚡ Ters İhale
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- İSTATİSTİK -->
+    <section class="border-b border-slate-200 bg-white">
+      <div
+        class="mx-auto grid max-w-[1600px] grid-cols-2 px-4 lg:grid-cols-4"
+      >
+        <div class="border-r border-slate-100 py-5">
+          <div class="text-2xl font-black">
+            1.248
+          </div>
+          <div class="text-sm text-slate-500">
+            Aktif İhale
+          </div>
+        </div>
+
+        <div class="border-r border-slate-100 py-5 pl-6">
+          <div class="text-2xl font-black">
+            6.420
+          </div>
+          <div class="text-sm text-slate-500">
+            Kayıtlı Firma
+          </div>
+        </div>
+
+        <div class="border-r border-slate-100 py-5 lg:pl-6">
+          <div class="text-2xl font-black">
+            18.750
+          </div>
+          <div class="text-sm text-slate-500">
+            Toplanan Teklif
+          </div>
+        </div>
+
+        <div class="py-5 pl-6">
+          <div class="text-2xl font-black text-emerald-600">
+            ₺2,4 Mr+
+          </div>
+          <div class="text-sm text-slate-500">
+            İşlem Hacmi
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANA PAZAR YERİ -->
+    <main
+      id="ihaleler"
+      class="mx-auto max-w-[1600px] px-4 py-10"
+    >
+      <div class="mb-7">
+        <div
+          class="text-sm font-black uppercase tracking-wider text-blue-600"
+        >
+          İhale Pazarı
+        </div>
+
+        <h2 class="mt-2 text-3xl font-black">
+          Güncel iş fırsatları
+        </h2>
+
+        <p class="mt-2 text-slate-500">
+          Kategori, sektör, ihale türü ve lokasyona göre
+          özel sektör satın alma taleplerini keşfedin.
+        </p>
+      </div>
+
+      <div class="grid gap-6 xl:grid-cols-[380px_1fr]">
+
+        <!-- =====================================================
+             SOL FİLTRE PANELİ
+        ====================================================== -->
+
+        <aside
+          id="kategoriler"
+          class="h-fit overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
+        >
+          <!-- FİLTRE BAŞLIĞI -->
+          <div
+            class="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-4 py-4"
+          >
+            <div class="flex items-center gap-2 font-black">
+              <SlidersHorizontal :size="18" />
+              Detaylı Filtreleme
+            </div>
+
+            <button
+              @click="clearFilters"
+              class="text-xs font-black text-blue-600"
+            >
+              Tümünü Temizle
+            </button>
+          </div>
+
+          <!-- KATEGORİLER -->
+          <div class="border-b border-slate-200">
+            <button
+              @click="toggleFilterSection('categories')"
+              class="flex w-full items-center justify-between px-4 py-4 text-left"
+            >
+              <div class="flex items-center gap-2 font-black">
+                <span>📁</span>
+                Kategoriler
+              </div>
+
+              <ChevronDown
+                :size="18"
+                class="transition-transform"
+                :class="{
+                  'rotate-180':
+                    expandedFilterSection === 'categories'
+                }"
+              />
+            </button>
+
+            <div
+              v-if="expandedFilterSection === 'categories'"
+              class="max-h-[600px] overflow-y-auto border-t border-slate-100"
+            >
+              <div
+                v-for="category in detailedCategories"
+                :key="category.name"
+                class="border-b border-slate-100 last:border-0"
+              >
+                <div
+                  class="flex items-center gap-2 px-3 py-2.5 hover:bg-blue-50"
+                  :class="{
+                    'bg-blue-50':
+                      selectedCategory === category.name
+                  }"
+                >
+                  <button
+                    @click="toggleCategory(category.name)"
+                    class="flex h-6 w-6 shrink-0 items-center justify-center text-slate-400 hover:text-blue-600"
+                  >
+                    <ChevronDown
+                      :size="14"
+                      class="transition-transform"
+                      :class="{
+                        '-rotate-90':
+                          expandedCategory !== category.name
+                      }"
+                    />
+                  </button>
+
+                  <button
+                    @click="selectMainCategory(category.name)"
+                    class="min-w-0 flex-1 text-left text-xs font-bold leading-5 text-slate-700 hover:text-blue-600"
+                  >
+                    {{ category.name }}
+                  </button>
+
+                  <span
+                    class="shrink-0 rounded-md border border-slate-200 bg-white px-2 py-1 text-[10px] font-black text-slate-500"
+                  >
+                    {{ category.count }}
+                  </span>
+                </div>
+
+                <div
+                  v-if="expandedCategory === category.name"
+                  class="bg-slate-50"
+                >
+                  <button
+                    v-for="subcategory in category.children"
+                    :key="subcategory"
+                    @click="
+                      selectSubcategory(
+                        category.name,
+                        subcategory
+                      )
+                    "
+                    class="flex w-full items-center gap-2 border-t border-slate-100 px-8 py-2.5 text-left text-xs font-semibold hover:bg-white hover:text-blue-600"
+                    :class="{
+                      'bg-blue-50 text-blue-700':
+                        selectedSubcategory === subcategory
+                    }"
+                  >
+                    <span class="text-slate-300">└</span>
+                    {{ subcategory }}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SEKTÖRLER -->
+          <div class="border-b border-slate-200">
+            <button
+              @click="toggleFilterSection('sectors')"
+              class="flex w-full items-center justify-between px-4 py-4 text-left"
+            >
+              <div class="flex items-center gap-2 font-black">
+                <span>🏭</span>
+                Sektörler
+              </div>
+
+              <ChevronDown
+                :size="18"
+                class="transition-transform"
+                :class="{
+                  'rotate-180':
+                    expandedFilterSection === 'sectors'
+                }"
+              />
+            </button>
+
+            <div
+              v-if="expandedFilterSection === 'sectors'"
+              class="max-h-[600px] overflow-y-auto border-t border-slate-100"
+            >
+              <button
+                v-for="sector in sectors"
+                :key="sector.name"
+                @click="selectedSector = sector.name"
+                class="flex w-full items-center justify-between gap-3 border-b border-slate-100 px-4 py-3 text-left hover:bg-blue-50"
+                :class="{
+                  'bg-blue-50 text-blue-700':
+                    selectedSector === sector.name
+                }"
+              >
+                <span
+                  class="min-w-0 text-xs font-bold leading-5"
+                >
+                  {{ sector.name }}
+                </span>
+
+                <span
+                  class="shrink-0 rounded-md border bg-white px-2 py-1 text-[10px] font-black text-slate-500"
+                >
+                  {{ sector.count }}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- İHALE TÜRLERİ -->
+          <div class="border-b border-slate-200">
+            <button
+              @click="toggleFilterSection('types')"
+              class="flex w-full items-center justify-between px-4 py-4"
+            >
+              <div class="flex items-center gap-2 font-black">
+                <span>🛠</span>
+                İhale Türleri
+              </div>
+
+              <ChevronDown
+                :size="18"
+                :class="{
+                  'rotate-180':
+                    expandedFilterSection === 'types'
+                }"
+              />
+            </button>
+
+            <div
+              v-if="expandedFilterSection === 'types'"
+              class="border-t border-slate-100 p-3"
+            >
+              <button
+                v-for="type in tenderTypes"
+                :key="type.name"
+                @click="selectedType = type.name"
+                class="mb-2 flex w-full items-center justify-between rounded-lg border border-slate-200 px-3 py-2.5 text-left hover:border-blue-300 hover:bg-blue-50"
+                :class="{
+                  'border-blue-500 bg-blue-50 text-blue-700':
+                    selectedType === type.name
+                }"
+              >
+                <span class="text-xs font-bold">
+                  {{ type.name }}
+                </span>
+
+                <span class="text-[10px] font-black text-slate-500">
+                  {{ type.count }}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- TEKLİF YÖNTEMLERİ -->
+          <div class="border-b border-slate-200">
+            <button
+              @click="toggleFilterSection('methods')"
+              class="flex w-full items-center justify-between px-4 py-4"
+            >
+              <div class="flex items-center gap-2 font-black">
+                <span>🔄</span>
+                Teklif Yöntemleri
+              </div>
+
+              <ChevronDown
+                :size="18"
+                :class="{
+                  'rotate-180':
+                    expandedFilterSection === 'methods'
+                }"
+              />
+            </button>
+
+            <div
+              v-if="expandedFilterSection === 'methods'"
+              class="border-t border-slate-100 p-3"
+            >
+              <button
+                v-for="method in offerMethods"
+                :key="method.name"
+                @click="selectedMethod = method.name"
+                class="mb-2 flex w-full items-center justify-between rounded-lg border border-slate-200 px-3 py-2.5 text-left hover:border-blue-300 hover:bg-blue-50"
+                :class="{
+                  'border-blue-500 bg-blue-50 text-blue-700':
+                    selectedMethod === method.name
+                }"
+              >
+                <span class="text-xs font-bold">
+                  {{ method.name }}
+                </span>
+
+                <span class="text-[10px] font-black text-slate-500">
+                  {{ method.count }}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- FİYATLANDIRMA -->
+          <div class="border-b border-slate-200">
+            <button
+              @click="toggleFilterSection('pricing')"
+              class="flex w-full items-center justify-between px-4 py-4"
+            >
+              <div class="flex items-center gap-2 font-black">
+                <span>📋</span>
+                Fiyatlandırma Türleri
+              </div>
+
+              <ChevronDown
+                :size="18"
+                :class="{
+                  'rotate-180':
+                    expandedFilterSection === 'pricing'
+                }"
+              />
+            </button>
+
+            <div
+              v-if="expandedFilterSection === 'pricing'"
+              class="border-t border-slate-100 p-3"
+            >
+              <button
+                v-for="pricing in pricingTypes"
+                :key="pricing.name"
+                @click="
+                  selectedPricingType = pricing.name
+                "
+                class="mb-2 flex w-full items-center justify-between rounded-lg border border-slate-200 px-3 py-2.5 text-left hover:border-blue-300 hover:bg-blue-50"
+                :class="{
+                  'border-blue-500 bg-blue-50 text-blue-700':
+                    selectedPricingType === pricing.name
+                }"
+              >
+                <span class="text-xs font-bold">
+                  {{ pricing.name }}
+                </span>
+
+                <span class="text-[10px] font-black text-slate-500">
+                  {{ pricing.count }}
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- İLLER -->
+          <div>
+            <button
+              @click="toggleFilterSection('cities')"
+              class="flex w-full items-center justify-between px-4 py-4"
+            >
+              <div class="flex items-center gap-2 font-black">
+                <MapPin :size="17" />
+                İş / Teslimat Yeri
+              </div>
+
+              <ChevronDown
+                :size="18"
+                :class="{
+                  'rotate-180':
+                    expandedFilterSection === 'cities'
+                }"
+              />
+            </button>
+
+            <div
+              v-if="expandedFilterSection === 'cities'"
+              class="border-t border-slate-100 p-3"
+            >
+              <select
+                v-model="selectedCity"
+                class="w-full rounded-xl border border-slate-200 bg-white p-3 text-sm font-bold outline-none focus:border-blue-500"
+              >
+                <option value="">
+                  81 İl / Tüm Türkiye
+                </option>
+
+                <option
+                  v-for="city in cities"
+                  :key="city"
+                  :value="city"
+                >
+                  {{ city }}
+                </option>
+              </select>
+            </div>
+          </div>
+        </aside>
+
+        <!-- =====================================================
+             SAĞ İHALE SONUÇLARI
+        ====================================================== -->
+
+        <section>
+          <!-- AKTİF FİLTRELER -->
+          <div
+            v-if="
+              selectedCategory ||
+              selectedSubcategory ||
+              selectedSector ||
+              selectedType ||
+              selectedMethod ||
+              selectedPricingType ||
+              selectedCity
+            "
+            class="mb-4 rounded-xl border border-blue-100 bg-blue-50 p-4"
+          >
+            <div
+              class="mb-3 text-xs font-black uppercase tracking-wider text-blue-700"
+            >
+              Aktif Filtreler
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-if="selectedCategory"
+                @click="
+                  selectedCategory = '';
+                  selectedSubcategory = ''
+                "
+                class="rounded-full bg-white px-3 py-2 text-xs font-bold text-blue-700 shadow-sm"
+              >
+                {{ selectedCategory }} ×
+              </button>
+
+              <button
+                v-if="selectedSubcategory"
+                @click="selectedSubcategory = ''"
+                class="rounded-full bg-white px-3 py-2 text-xs font-bold text-blue-700 shadow-sm"
+              >
+                {{ selectedSubcategory }} ×
+              </button>
+
+              <button
+                v-if="selectedSector"
+                @click="selectedSector = ''"
+                class="rounded-full bg-white px-3 py-2 text-xs font-bold text-blue-700 shadow-sm"
+              >
+                {{ selectedSector }} ×
+              </button>
+
+              <button
+                v-if="selectedType"
+                @click="selectedType = ''"
+                class="rounded-full bg-white px-3 py-2 text-xs font-bold text-blue-700 shadow-sm"
+              >
+                {{ selectedType }} ×
+              </button>
+
+              <button
+                v-if="selectedMethod"
+                @click="selectedMethod = ''"
+                class="rounded-full bg-white px-3 py-2 text-xs font-bold text-blue-700 shadow-sm"
+              >
+                {{ selectedMethod }} ×
+              </button>
+
+              <button
+                v-if="selectedPricingType"
+                @click="selectedPricingType = ''"
+                class="rounded-full bg-white px-3 py-2 text-xs font-bold text-blue-700 shadow-sm"
+              >
+                {{ selectedPricingType }} ×
+              </button>
+
+              <button
+                v-if="selectedCity"
+                @click="selectedCity = ''"
+                class="rounded-full bg-white px-3 py-2 text-xs font-bold text-blue-700 shadow-sm"
+              >
+                {{ selectedCity }} ×
+              </button>
+            </div>
+          </div>
+
+          <!-- SONUÇ ÜST BAR -->
+          <div
+            class="mb-4 flex flex-col gap-3 rounded-xl border border-slate-200 bg-white px-5 py-4 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <div>
+              <span class="font-black">
+                {{ filteredTenders.length }}
+              </span>
+
+              <span class="text-sm text-slate-500">
+                aktif ihale bulundu
+              </span>
+            </div>
+
+            <select
+              class="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-bold"
+            >
+              <option>En Yeni</option>
+              <option>Yakında Bitecek</option>
+              <option>En Çok Teklif Alan</option>
+            </select>
+          </div>
+
+          <!-- İHALE KARTLARI -->
+          <div class="space-y-4">
+            <article
+              v-for="tender in filteredTenders"
+              :key="tender.id"
+              class="group rounded-2xl border border-slate-200 bg-white p-6 transition hover:border-blue-300 hover:shadow-xl"
+            >
+              <div
+                class="flex flex-col gap-6 xl:flex-row xl:justify-between"
+              >
+                <div class="min-w-0 flex-1">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span
+                      v-if="tender.featured"
+                      class="rounded-full bg-orange-50 px-3 py-1 text-xs font-black text-orange-700"
+                    >
+                      🔥 Öne Çıkan
+                    </span>
+
+                    <span
+                      class="rounded-full bg-blue-50 px-3 py-1 text-xs font-black text-blue-700"
+                    >
+                      {{ tender.type }}
+                    </span>
+
+                    <span
+                      v-if="tender.method === 'Ters İhale'"
+                      class="rounded-full bg-purple-50 px-3 py-1 text-xs font-black text-purple-700"
+                    >
+                      ⚡ Ters İhale
+                    </span>
+                  </div>
+
+                  <h3
+                    class="mt-4 text-xl font-black group-hover:text-blue-600"
+                  >
+                    {{ tender.title }}
+                  </h3>
+
+                  <div
+                    class="mt-3 flex items-center gap-2 text-sm font-semibold text-slate-600"
+                  >
+                    <Building2 :size="17" />
+
+                    {{ tender.company }}
+
+                    <CheckCircle2
+                      v-if="tender.verified"
+                      :size="16"
+                      class="text-blue-600"
+                    />
+                  </div>
+
+                  <p
+                    class="mt-4 max-w-3xl text-sm leading-6 text-slate-500"
+                  >
+                    {{ tender.description }}
+                  </p>
+
+                  <div
+                    class="mt-5 flex flex-wrap gap-4 text-sm font-semibold text-slate-500"
+                  >
+                    <span class="flex items-center gap-2">
+                      <BriefcaseBusiness :size="16" />
+                      {{ tender.category }}
+                    </span>
+
+                    <span class="flex items-center gap-2">
+                      <MapPin :size="16" />
+                      {{ tender.city }}
+                    </span>
+
+                    <span class="flex items-center gap-2">
+                      <FileText :size="16" />
+                      {{ tender.method }}
+                    </span>
+
+                    <span class="flex items-center gap-2">
+                      <Users :size="16" />
+                      {{ tender.offers }} teklif
+                    </span>
+                  </div>
+                </div>
+
+                <div
+                  class="flex min-w-56 flex-col justify-between border-t border-slate-100 pt-5 xl:border-l xl:border-t-0 xl:pl-6 xl:pt-0"
+                >
+                  <div>
+                    <div
+                      class="flex items-center gap-2 text-xs font-bold uppercase text-slate-400"
+                    >
+                      <Clock3 :size="15" />
+                      Son teklif tarihi
+                    </div>
+
+                    <div class="mt-2 font-black">
+                      {{ tender.deadline }}
+                    </div>
+
+                    <div
+                      class="mt-1 text-sm font-black"
+                      :class="
+                        tender.daysLeft <= 4
+                          ? 'text-red-600'
+                          : 'text-orange-600'
+                      "
+                    >
+                      {{ tender.daysLeft }} gün kaldı
+                    </div>
+                  </div>
+
+                  <div class="mt-6 flex gap-2">
+                    <button
+                      class="flex h-11 w-11 items-center justify-center rounded-xl border border-slate-200 hover:bg-red-50 hover:text-red-500"
+                    >
+                      <Heart :size="19" />
+                    </button>
+
+                    <button
+                      class="flex flex-1 items-center justify-center rounded-xl bg-slate-900 px-5 py-3 text-sm font-black text-white hover:bg-blue-600"
+                    >
+                      İhaleyi İncele
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <!-- SONUÇ YOK -->
+            <div
+              v-if="filteredTenders.length === 0"
+              class="rounded-2xl border border-slate-200 bg-white p-12 text-center"
+            >
+              <Search
+                :size="42"
+                class="mx-auto text-slate-300"
+              />
+
+              <h3 class="mt-4 text-xl font-black">
+                İhale bulunamadı
+              </h3>
+
+              <p class="mt-2 text-slate-500">
+                Seçtiğiniz filtrelere uygun örnek ihale bulunamadı.
+              </p>
+
+              <button
+                @click="clearFilters"
+                class="mt-5 font-black text-blue-600"
+              >
+                Filtreleri Temizle
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <!-- ALT CTA -->
+    <section class="px-4 pb-16">
+      <div
+        class="mx-auto max-w-[1600px] rounded-3xl bg-slate-950 px-8 py-12"
+      >
+        <div
+          class="flex flex-col justify-between gap-8 lg:flex-row lg:items-center"
+        >
+          <div>
+            <div
+              class="text-sm font-black uppercase tracking-wider text-blue-400"
+            >
+              Satın alma ihtiyacınız mı var?
+            </div>
+
+            <h2
+              class="mt-3 max-w-3xl text-3xl font-black text-white md:text-4xl"
+            >
+              İhalenizi yayınlayın, doğru tedarikçilerden teklif alın.
+            </h2>
+
+            <p class="mt-4 max-w-2xl text-slate-400">
+              Satın alma sürecinizi dijitalleştirin ve tüm teklifleri
+              tek platformda yönetin.
+            </p>
+          </div>
+
+          <button
+            class="flex shrink-0 items-center justify-center gap-2 rounded-xl bg-bl
+<truncated 1308 bytes>
+
+NOTE: The output was truncated because it was too long. Use a more targeted query or a smaller range to get the information you need.
