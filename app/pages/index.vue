@@ -25,7 +25,19 @@ definePageMeta({
   layout: 'public'
 })
 
+import { onMounted } from 'vue'
+
 const { cmsData } = useCmsData()
+
+const heroVideoRef = ref<HTMLVideoElement | null>(null)
+
+onMounted(() => {
+  if (heroVideoRef.value) {
+    heroVideoRef.value.play().catch(err => {
+      console.warn('Autoplay prevented:', err)
+    })
+  }
+})
 
 /* =========================================================
    GENEL DURUMLAR & TABLAR
@@ -553,16 +565,19 @@ function toggleFilterSection(section: string) {
     <!-- HERO SECTION -->
     <section class="relative overflow-hidden border-b border-slate-200 bg-slate-100 min-h-[640px]">
       <!-- Background Video -->
-      <video 
-        v-if="cmsData.hero.heroVideoUrl"
-        autoplay 
-        loop 
-        muted 
-        playsinline 
-        class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-45"
-      >
-        <source :src="cmsData.hero.heroVideoUrl" type="video/mp4" />
-      </video>
+      <ClientOnly>
+        <video 
+          v-if="cmsData.hero.heroVideoUrl"
+          ref="heroVideoRef"
+          autoplay 
+          loop 
+          muted 
+          playsinline 
+          class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-45"
+        >
+          <source :src="cmsData.hero.heroVideoUrl" type="video/mp4" />
+        </video>
+      </ClientOnly>
       <!-- Fallback image background if video is not available -->
       <div 
         v-else 
