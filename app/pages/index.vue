@@ -549,7 +549,7 @@ function toggleFilterSection(section: string) {
 <template>
   <div class="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
     <!-- HERO SECTION -->
-    <section class="relative overflow-hidden border-b border-slate-200 bg-gradient-to-br from-slate-50 via-slate-100/50 to-blue-50/40">
+    <section class="relative overflow-hidden border-b border-slate-200" style="background-image: linear-gradient(rgba(241, 245, 249, 0.92), rgba(255, 255, 255, 0.88)), url('/hero_port_background.png'); background-size: cover; background-position: center; background-attachment: scroll;">
       <!-- Decorative circles -->
       <div class="absolute right-[-10%] top-[-30%] h-[600px] w-[600px] rounded-full bg-blue-500/5 blur-3xl"></div>
       <div class="absolute bottom-[-30%] left-[-10%] h-[500px] w-[500px] rounded-full bg-cyan-500/5 blur-3xl"></div>
@@ -557,60 +557,122 @@ function toggleFilterSection(section: string) {
       <div class="relative mx-auto grid min-h-[640px] max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr]">
         <!-- Hero Left -->
         <div class="text-left">
-          <div class="mb-6 inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-[0.18em] text-blue-600">
-            <span class="h-px w-8 bg-blue-600"></span>
-            Özel Sektörün Canlı Ters İhale Arenası
+          <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em]" style="color: #1E3A5F;">
+            <span class="h-px w-8" style="background-color: #1E3A5F;"></span>
+            KURUMSAL SATIN ALMA EKİPLERİ İÇİN B2B TERS İHALE PLATFORMU
           </div>
-          <h1 class="text-4xl font-black leading-[1.05] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-            İhale Ver.<br />
-            Teklif Al.<br />
-            <span class="font-serif italic font-medium text-blue-600">Gel Anlaşalım.</span>
+          <h1 class="text-4xl font-black leading-[1.15] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+            Yeni Nesil Dijital<br />
+            Satın alma ve<br />
+            <span class="font-serif italic font-medium" style="color: #2563EB;">Akıllı İhale Platformu.</span>
           </h1>
           <p class="mt-6 max-w-xl text-base leading-relaxed text-slate-600">
-            Satın alma taleplerinizi ve şartnamelerinizi yayınlayın; onaylı üreticiler ile servis sağlayıcıların anlık fiyat kırarak yarıştığı tersine ihale arenasını izleyin.
+            Acsisco; e-ihale, teklif toplama, sipariş ve tedarik süreçlerinizi tek platformda dijitalleştirir. Maliyetlerinizi düşürün, zamandan tasarruf edin ve satın alma operasyonlarınızı daha verimli yönetin.
           </p>
-          <div class="mt-8 flex flex-wrap gap-3">
-            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/10 hover:bg-blue-700 hover:shadow-blue-600/20 hover:scale-[1.01] transition-all">
-              Ücretsiz Başla
+          
+          <!-- Buttons -->
+          <div class="mt-8 flex flex-wrap items-center gap-3">
+            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/10 hover:bg-blue-700 transition-all" style="background: #1D4ED8;">
+              Ücretsiz kurumsal hesap aç
               <ArrowRight :size="15" />
             </NuxtLink>
-            <a href="#nasil-calisir" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-6 py-4 text-xs font-black text-slate-700 hover:bg-slate-50 transition-all">
-              Nasıl Çalışır?
+            <a href="#nasil-calisir" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-6 py-4 text-xs font-black text-slate-700 hover:bg-white transition-all">
+              Nasıl çalışır
+              <ArrowRight :size="15" />
             </a>
           </div>
-          <div class="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-            <span class="flex items-center gap-2">
-              <ShieldCheck :size="16" class="text-blue-600" /> Komisyonsuz Alım
-            </span>
-            <span class="flex items-center gap-2">
-              <LockKeyhole :size="16" class="text-blue-600" /> Güvenli Havuz
-            </span>
-            <span class="flex items-center gap-2">
-              <Scale :size="16" class="text-blue-600" /> Şeffaf Rekabet
-            </span>
+
+          <!-- Bottom Features Strip -->
+          <div class="mt-8 text-[9px] font-bold text-slate-500 uppercase tracking-widest flex flex-wrap gap-x-4 gap-y-2">
+            <span>KVKK KAPSAMINDA</span>
+            <span class="text-slate-300">•</span>
+            <span>BELGE İZİ & ZAMAN DAMGASI</span>
+            <span class="text-slate-300">•</span>
+            <span>ŞİFRELİ VERİ AKTARIMI</span>
+            <span class="text-slate-300">•</span>
+            <span>LANSMAN DÖNEMİNDE ÜCRETSİZ</span>
+          </div>
+
+          <!-- Video Button -->
+          <div class="mt-8">
+            <button class="flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </span>
+              Video rehberlerini izle
+            </button>
           </div>
         </div>
 
-        <!-- Hero Right (B2B Mockup Image) -->
-        <div class="relative group">
-          <!-- Ambient glowing background -->
-          <div class="absolute -inset-4 rounded-3xl bg-gradient-to-r from-blue-600/10 to-amber-500/10 opacity-70 blur-2xl transition duration-500 group-hover:opacity-100"></div>
+        <!-- Hero Right (Live Card styled like the screenshot) -->
+        <div class="relative">
+          <div class="absolute -inset-8 rounded-full bg-blue-500/5 blur-3xl"></div>
           
-          <!-- Image container -->
-          <div class="relative rounded-2xl border border-slate-200/80 bg-white p-2 shadow-2xl transition duration-500 group-hover:scale-[1.01] overflow-hidden">
-            <img 
-              src="/b2b_procurement_mockup.png" 
-              alt="GelAnlaşalım B2B İhale ve Tedarik Yönetim Paneli" 
-              class="w-full h-auto rounded-xl object-cover"
-            />
-            
-            <!-- Floating interactive mini badge -->
-            <div class="absolute bottom-6 left-6 right-6 rounded-xl border border-white/20 bg-slate-900/90 p-4 text-left text-white backdrop-blur-md shadow-xl flex items-center justify-between">
+          <div class="relative mx-auto max-w-[460px] rounded-3xl border border-slate-200/80 bg-white/95 p-6 shadow-2xl backdrop-blur-sm text-left">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
-                <span class="text-[9px] font-black uppercase tracking-widest text-amber-400">CANLI TERS İHALE ARENASI</span>
-                <div class="text-xs font-bold mt-1 text-slate-100">B2B Tedarik ve Fiyat Eksiltme Paneli</div>
+                <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-slate-400">
+                  <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> TEMSİLİ CANLI İHALE
+                </span>
+                <h3 class="mt-1.5 text-base font-black text-slate-800">CNC Fason Üretim Partisi</h3>
               </div>
-              <span class="rounded bg-amber-500 px-2 py-1 text-[9px] font-black text-slate-950 uppercase animate-pulse">CANLI</span>
+              <div class="text-right">
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">KALAN SÜRE</span>
+                <div class="mt-1 font-mono text-sm font-black text-slate-800">02:21</div>
+              </div>
+            </div>
+
+            <!-- Price and Savings info -->
+            <div class="py-6 flex justify-between items-start">
+              <div>
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">GÜNCEL EN İYİ TEKLİF</span>
+                <div class="mt-1 text-4xl font-black text-slate-900 tracking-tight font-mono">₺396.800</div>
+                <div class="mt-2 text-[10px] text-slate-400 font-bold">
+                  AÇILIŞ FİYATI <span class="font-mono text-slate-600 line-through">₺412.000</span>
+                </div>
+              </div>
+              
+              <div class="text-right">
+                <div class="rounded-lg px-2.5 py-1 text-[9px] font-black" style="background: rgba(37,99,235,0.08); color: #2563EB;">
+                  TASARRUF %3,7
+                </div>
+              </div>
+            </div>
+
+            <!-- Competitor List -->
+            <div class="space-y-2 border-t border-slate-100 pt-5">
+              <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">2 TEDARİKÇİ YARIŞIYOR</div>
+              
+              <!-- Leader -->
+              <div class="flex items-center justify-between rounded-xl border border-blue-200/60 bg-blue-50/40 px-4 py-2.5">
+                <div class="flex items-center gap-2.5 text-xs font-bold text-slate-800">
+                  <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+                  Tedarikçi #A47
+                  <span class="rounded bg-blue-100 px-1.5 py-0.5 text-[8px] font-black text-blue-700">ÖNDE</span>
+                </div>
+                <span class="font-mono font-bold text-xs text-slate-800">₺396.800</span>
+              </div>
+              
+              <!-- Second -->
+              <div class="flex items-center justify-between rounded-xl bg-white border border-slate-200/60 px-4 py-2.5">
+                <div class="flex items-center gap-2.5 text-xs font-bold text-slate-500">
+                  <span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span>
+                  Tedarikçi #D08
+                </div>
+                <span class="font-mono font-bold text-xs text-slate-500">₺404.500</span>
+              </div>
+            </div>
+
+            <!-- Bottom Tabs Inside Card -->
+            <div class="grid grid-cols-4 gap-1 mt-6 border-t border-slate-100 pt-4 text-center">
+              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">TALEP</span>
+              <span class="text-[8px] font-black text-blue-600 py-1 border-b-2 border-blue-600">+ TEKLİF</span>
+              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">KARAR</span>
+              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">TESLİMAT</span>
+            </div>
+
+            <div class="mt-4 text-center text-[9px] italic text-slate-400">
+              Temsili veridir - Gerçek teklif değildir
             </div>
           </div>
         </div>

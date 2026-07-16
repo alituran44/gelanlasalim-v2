@@ -12,21 +12,13 @@ const mobileMenuOpen = ref(false)
       <div class="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-6">
 
         <!-- Sol: Logo -->
-        <NuxtLink to="/" class="flex items-center gap-3 shrink-0 hover:opacity-90 transition-opacity">
-          <!-- Inline SVG Premium Logo -->
-          <svg class="h-9 w-9" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="32" height="32" rx="9" fill="#1E3A5F"/>
-            <path d="M22 12C20.8 10.2 18.5 9 16 9C12.1 9 9 12.1 9 16C9 19.9 12.1 23 16 23C19.9 23 23 19.9 23 16H16" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="23" cy="16" r="2" fill="#FFFFFF"/>
+        <NuxtLink to="/" class="flex items-center gap-2.5 border border-slate-900 rounded-xl px-4 py-1.5 hover:bg-slate-50 transition shrink-0">
+          <!-- Inline SVG Premium Acsisco Logo -->
+          <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M3 19L11.05 4.35C11.45 3.65 12.55 3.65 12.95 4.35L21 19H16.5L12 10.5L7.5 19H3Z" fill="#1E3A5F"/>
+            <path d="M12 10.5L9.5 15H14.5L12 10.5Z" fill="#0D9488"/>
           </svg>
-          <div class="leading-none">
-            <div class="text-base font-black tracking-tight" style="color: #1E3A5F;">
-              Gel<span style="color: #F59E0B;">Anlaşalım</span>
-            </div>
-            <div class="text-[9px] font-bold uppercase tracking-widest mt-0.5" style="color: #64748B;">
-              B2B İhale Platformu
-            </div>
-          </div>
+          <span class="text-base font-bold tracking-tight" style="color: #0F172A;">Acsisco</span>
         </NuxtLink>
 
         <!-- Orta: Nav Linkleri -->
@@ -141,15 +133,14 @@ const mobileMenuOpen = ref(false)
           
           <!-- Column 1: Brand Info -->
           <div class="md:col-span-4 flex flex-col gap-5 text-left">
-            <div class="flex items-center gap-3">
-              <!-- Inline SVG Premium Logo -->
-              <svg class="h-10 w-10 shrink-0" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="32" height="32" rx="9" fill="#1E3A5F"/>
-                <path d="M22 12C20.8 10.2 18.5 9 16 9C12.1 9 9 12.1 9 16C9 19.9 12.1 23 16 23C19.9 23 23 19.9 23 16H16" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="23" cy="16" r="2" fill="#FFFFFF"/>
+            <div class="flex items-center gap-2.5">
+              <!-- Inline SVG Premium Acsisco Logo -->
+              <svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 19L11.05 4.35C11.45 3.65 12.55 3.65 12.95 4.35L21 19H16.5L12 10.5L7.5 19H3Z" fill="#1E3A5F"/>
+                <path d="M12 10.5L9.5 15H14.5L12 10.5Z" fill="#0D9488"/>
               </svg>
               <div>
-                <span class="text-lg font-black tracking-tight leading-none" style="color: #1E3A5F;">Gel<span style="color: #F59E0B;">Anlaşalım</span></span>
+                <span class="text-lg font-bold tracking-tight leading-none" style="color: #0F172A;">Acsisco</span>
                 <span class="block text-[8px] font-black uppercase mt-1 tracking-wider" style="color: #64748B;">B2B TERS İHALE PLATFORMU</span>
               </div>
             </div>

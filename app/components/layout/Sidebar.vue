@@ -68,16 +68,15 @@ const activePath = computed(() => route.path)
 
     <!-- Logo Alanı -->
     <div class="px-6 py-5 border-b" style="border-color: rgba(255,255,255,0.08);">
-      <div class="flex items-center gap-3">
-        <!-- Inline SVG Premium Logo -->
-        <svg class="h-9 w-9 shrink-0" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="32" height="32" rx="9" fill="#1E3A5F"/>
-          <path d="M22 12C20.8 10.2 18.5 9 16 9C12.1 9 9 12.1 9 16C9 19.9 12.1 23 16 23C19.9 23 23 19.9 23 16H16" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="23" cy="16" r="2" fill="#FFFFFF"/>
+      <div class="flex items-center gap-2.5">
+        <!-- Inline SVG Premium Acsisco Logo -->
+        <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M3 19L11.05 4.35C11.45 3.65 12.55 3.65 12.95 4.35L21 19H16.5L12 10.5L7.5 19H3Z" fill="#FFFFFF"/>
+          <path d="M12 10.5L9.5 15H14.5L12 10.5Z" fill="#0D9488"/>
         </svg>
         <div>
-          <h1 class="text-sm font-bold text-white tracking-wide">Gel<span style="color: #F59E0B;">Anlaşalım</span></h1>
-          <p class="text-[10px]" style="color: #64748B;">B2B İhale Platformu</p>
+          <h1 class="text-sm font-bold text-white tracking-wide">Acsisco</h1>
+          <p class="text-[9px]" style="color: #64748B;">B2B İhale Platformu</p>
         </div>
       </div>
     </div>
