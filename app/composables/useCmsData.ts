@@ -14,7 +14,7 @@ export const DEFAULT_CMS_DATA = {
       'ŞİFRELİ VERİ AKTARIMI',
       'LANSMAN DÖNEMİNDE ÜCRETSİZ'
     ],
-    heroVideoUrl: '/hero_video.mp4'
+    heroVideoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
   },
   liveTender: {
     title: 'CNC Fason Üretim Partisi',
@@ -191,8 +191,8 @@ export function useCmsData() {
         if (!parsed.dashboard) {
           parsed.dashboard = DEFAULT_CMS_DATA.dashboard
         }
-        // Migrate blocked third-party video URL to local hosted file
-        if (parsed.hero && parsed.hero.heroVideoUrl && parsed.hero.heroVideoUrl.includes('mixkit.co')) {
+        // Migrate blocked third-party video URL or local big file to CDN video
+        if (parsed.hero && parsed.hero.heroVideoUrl && (parsed.hero.heroVideoUrl.includes('mixkit.co') || parsed.hero.heroVideoUrl === '/hero_video.mp4')) {
           parsed.hero.heroVideoUrl = DEFAULT_CMS_DATA.hero.heroVideoUrl
         }
         localStorage.setItem('cmsData', JSON.stringify(parsed))
