@@ -557,17 +557,17 @@ function toggleFilterSection(section: string) {
       <div class="relative mx-auto grid min-h-[640px] max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr]">
         <!-- Hero Left -->
         <div class="text-left">
-          <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em]" style="color: #1E3A5F;">
-            <span class="h-px w-8" style="background-color: #1E3A5F;"></span>
-            KURUMSAL SATIN ALMA EKİPLERİ İÇİN B2B TERS İHALE PLATFORMU
+          <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em]" style="color: #2563EB;">
+            <span class="h-px w-8" style="background-color: #2563EB;"></span>
+            ÖZEL SEKTÖRÜN CANLI TERS İHALE ARENASI
           </div>
           <h1 class="text-4xl font-black leading-[1.15] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-            Yeni Nesil Dijital<br />
-            Satın alma ve<br />
-            <span class="font-serif italic font-medium" style="color: #2563EB;">Akıllı İhale Platformu.</span>
+            ihale Ver.<br />
+            Teklif Al.<br />
+            <span class="font-serif italic font-medium" style="color: #2563EB;">Gel Anlaşalım.</span>
           </h1>
           <p class="mt-6 max-w-xl text-base leading-relaxed text-slate-600">
-            Acsisco; e-ihale, teklif toplama, sipariş ve tedarik süreçlerinizi tek platformda dijitalleştirir. Maliyetlerinizi düşürün, zamandan tasarruf edin ve satın alma operasyonlarınızı daha verimli yönetin.
+            GelAnlaşalım; e-ihale, teklif toplama, sipariş ve tedarik süreçlerinizi tek platformda dijitalleştirir. Maliyetlerinizi düşürün, zamandan tasarruf edin ve satın alma operasyonlarınızı daha verimli yönetin.
           </p>
           
           <!-- Buttons -->

@@ -137,12 +137,13 @@ function handleLogin() {
 
       <!-- Header brand -->
       <div class="relative z-10 flex items-center gap-2.5">
-        <!-- Inline SVG Premium Acsisco Logo -->
+        <!-- Inline SVG Premium G Logo -->
         <svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M3 19L11.05 4.35C11.45 3.65 12.55 3.65 12.95 4.35L21 19H16.5L12 10.5L7.5 19H3Z" fill="#FFFFFF"/>
-          <path d="M12 10.5L9.5 15H14.5L12 10.5Z" fill="#0D9488"/>
+          <rect width="24" height="24" rx="6" fill="#1E3A5F"/>
+          <path d="M17 9C16.1 7.6 14.4 6.7 12.5 6.7C9.5 6.7 7 9.2 7 12.2C7 15.2 9.5 17.7 12.5 17.7C15.5 17.7 17.8 15.2 17.8 12.2H12.5" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="17.8" cy="12.2" r="1.5" fill="#FFFFFF"/>
         </svg>
-        <span class="text-base font-bold tracking-tight text-white">Acsisco</span>
+        <span class="text-base font-bold tracking-tight text-white">Gel<span style="color: #F59E0B;">Anlaşalım</span></span>
       </div>
 
       <!-- Main presentation -->
