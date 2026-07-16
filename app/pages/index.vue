@@ -551,12 +551,33 @@ function toggleFilterSection(section: string) {
 <template>
   <div class="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
     <!-- HERO SECTION -->
-    <section class="relative overflow-hidden border-b border-slate-200" style="background-image: linear-gradient(rgba(241, 245, 249, 0.92), rgba(255, 255, 255, 0.88)), url('/hero_port_background.png'); background-size: cover; background-position: center; background-attachment: scroll;">
-      <!-- Decorative circles -->
-      <div class="absolute right-[-10%] top-[-30%] h-[600px] w-[600px] rounded-full bg-blue-500/5 blur-3xl"></div>
-      <div class="absolute bottom-[-30%] left-[-10%] h-[500px] w-[500px] rounded-full bg-cyan-500/5 blur-3xl"></div>
+    <section class="relative overflow-hidden border-b border-slate-200 bg-slate-100 min-h-[640px]">
+      <!-- Background Video -->
+      <video 
+        v-if="cmsData.hero.heroVideoUrl"
+        autoplay 
+        loop 
+        muted 
+        playsinline 
+        class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-45"
+      >
+        <source :src="cmsData.hero.heroVideoUrl" type="video/mp4" />
+      </video>
+      <!-- Fallback image background if video is not available -->
+      <div 
+        v-else 
+        class="absolute inset-0 w-full h-full bg-cover bg-center z-0" 
+        style="background-image: url('/hero_port_background.png'); opacity: 0.15;"
+      ></div>
 
-      <div class="relative mx-auto grid min-h-[640px] max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr]">
+      <!-- Color Overlay for clean typography readability -->
+      <div class="absolute inset-0 bg-gradient-to-b from-slate-50/80 via-white/85 to-white/95 z-0"></div>
+
+      <!-- Decorative circles -->
+      <div class="absolute right-[-10%] top-[-30%] h-[600px] w-[600px] rounded-full bg-blue-500/5 blur-3xl z-10"></div>
+      <div class="absolute bottom-[-30%] left-[-10%] h-[500px] w-[500px] rounded-full bg-cyan-500/5 blur-3xl z-10"></div>
+
+      <div class="relative z-20 mx-auto grid min-h-[640px] max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr]">
         <!-- Hero Left -->
         <div class="text-left">
           <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em]" style="color: #2563EB;">

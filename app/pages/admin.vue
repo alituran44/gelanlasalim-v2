@@ -420,6 +420,11 @@ function removeSubmittedBid(index: number) {
               <textarea v-model="formState.hero.description" rows="4" class="w-full rounded-xl border border-slate-800 bg-slate-900/50 p-3 text-xs text-white focus:border-blue-500 focus:outline-none"></textarea>
             </div>
 
+            <div>
+              <label class="block text-xs font-bold text-slate-400 mb-1">ARKA PLAN VİDEO URL (MP4)</label>
+              <input v-model="formState.hero.heroVideoUrl" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-900/50 p-3 text-xs text-white focus:border-blue-500 focus:outline-none" placeholder="https://..." />
+            </div>
+
             <!-- Badge list strip manager -->
             <div>
               <div class="flex justify-between items-center mb-2">

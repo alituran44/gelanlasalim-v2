@@ -13,7 +13,8 @@ export const DEFAULT_CMS_DATA = {
       'BELGE İZİ & ZAMAN DAMGASI',
       'ŞİFRELİ VERİ AKTARIMI',
       'LANSMAN DÖNEMİNDE ÜCRETSİZ'
-    ]
+    ],
+    heroVideoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-cargo-ship-entering-a-port-at-sunset-41589-large.mp4'
   },
   liveTender: {
     title: 'CNC Fason Üretim Partisi',
