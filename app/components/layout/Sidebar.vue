@@ -68,6 +68,11 @@ const menus = [
     title: "Ayarlar",
     icon: Settings,
     to: "/ayarlar"
+  },
+  {
+    title: "Entegrasyonlar",
+    icon: Database,
+    to: "/entegrasyonlar"
   }
 ]
 
