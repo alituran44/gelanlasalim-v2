@@ -14,7 +14,7 @@ export const DEFAULT_CMS_DATA = {
       'ŞİFRELİ VERİ AKTARIMI',
       'LANSMAN DÖNEMİNDE ÜCRETSİZ'
     ],
-    heroVideoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-cargo-ship-entering-a-port-at-sunset-41589-large.mp4'
+    heroVideoUrl: '/hero_video.mp4'
   },
   liveTender: {
     title: 'CNC Fason Üretim Partisi',
@@ -190,8 +190,12 @@ export function useCmsData() {
         // Ensure backward compatibility if dashboard property is missing in old localstorage
         if (!parsed.dashboard) {
           parsed.dashboard = DEFAULT_CMS_DATA.dashboard
-          localStorage.setItem('cmsData', JSON.stringify(parsed))
         }
+        // Migrate blocked third-party video URL to local hosted file
+        if (parsed.hero && parsed.hero.heroVideoUrl && parsed.hero.heroVideoUrl.includes('mixkit.co')) {
+          parsed.hero.heroVideoUrl = DEFAULT_CMS_DATA.hero.heroVideoUrl
+        }
+        localStorage.setItem('cmsData', JSON.stringify(parsed))
         cmsData.value = parsed
       } catch (e) {
         console.error('Failed to parse saved CMS data, using defaults.', e)
