@@ -86,64 +86,106 @@ const mobileMenuOpen = ref(false)
     </main>
 
     <!-- Footer -->
-    <footer class="bg-slate-900 text-slate-400 border-t border-slate-800">
-      <div class="mx-auto max-w-7xl px-6 py-12 lg:py-16">
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12">
-          <!-- Column 1: Info -->
-          <div class="md:col-span-5 flex flex-col gap-4">
+    <footer class="bg-white text-slate-600 border-t border-slate-200">
+      <div class="mx-auto max-w-7xl px-6 py-16">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
+          
+          <!-- Column 1: Brand Info -->
+          <div class="md:col-span-4 flex flex-col gap-5 text-left">
             <div class="flex items-center gap-3">
-              <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white">
+              <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-600/10">
                 <Handshake :size="20" />
               </div>
-              <span class="text-lg font-black text-white tracking-tight">GelAnlaşalım</span>
+              <div>
+                <span class="text-lg font-black text-slate-900 tracking-tight leading-none">GelAnlaşalım</span>
+                <span class="block text-[8px] font-black uppercase text-slate-400 mt-1 tracking-wider">B2B TERS İHALE PLATFORMU</span>
+              </div>
             </div>
-            <p class="text-xs leading-relaxed text-slate-400 max-w-sm">
-              GelAnlaşalım, kurumsal satın alma ihtiyaçlarınızı canlı eksiltme arenasında rekabete açarak tedarik maliyetlerinizi düşüren modern B2B ihale platformudur.
+            
+            <p class="text-xs leading-relaxed font-medium text-slate-500">
+              B2B satın alma taleplerini, tedarikçi tekliflerini ve karar kayıtlarını tek ters ihale akışında yöneten kurumsal platform.
             </p>
-            <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mt-2">
-              Mersis: 0850-222-33440001 • KEP: gelanlasalim@hs01.kep.tr
+
+            <!-- Status badges -->
+            <div class="flex flex-wrap gap-2 pt-1">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-100 px-2.5 py-1 text-[9px] font-black text-blue-700 uppercase tracking-wide">
+                <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+                KVKK Kapsamında
+              </span>
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-100 px-2.5 py-1 text-[9px] font-black text-blue-700 uppercase tracking-wide">
+                <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+                HTTPS/TLS Şifreli
+              </span>
+            </div>
+
+            <!-- Social Links -->
+            <div class="flex gap-2.5 mt-2">
+              <a href="#" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-500 transition-all text-xs font-bold">F</a>
+              <a href="#" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-500 transition-all text-xs font-bold">I</a>
+              <a href="#" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-500 transition-all text-xs font-bold">L</a>
+              <a href="#" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-500 transition-all text-xs font-bold">T</a>
             </div>
           </div>
 
-          <!-- Column 2: Quick Links -->
-          <div class="md:col-span-3 flex flex-col gap-4 text-left">
-            <h4 class="text-xs font-black uppercase text-white tracking-widest">Hızlı Bağlantılar</h4>
-            <div class="flex flex-col gap-2.5 text-xs">
-              <a href="#nasil-calisir" class="hover:text-white transition-colors">Nasıl Çalışır?</a>
-              <a href="#ihale-gezgini" class="hover:text-white transition-colors">İhale Gezgini</a>
-              <a href="#sss" class="hover:text-white transition-colors">Sıkça Sorulanlar</a>
-              <NuxtLink to="/uyelik" class="hover:text-white transition-colors">Üye Girişi / Kayıt Ol</NuxtLink>
+          <!-- Column 2: Platform Links -->
+          <div class="md:col-span-2 flex flex-col gap-4 text-left">
+            <h4 class="text-[10px] font-black uppercase text-blue-600 tracking-wider">PLATFORM</h4>
+            <div class="flex flex-col gap-3 text-[11px] font-bold text-slate-700">
+              <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors">Nasıl Çalışır</a>
+              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors">Özellikler</a>
+              <NuxtLink to="/abonelik" class="hover:text-blue-600 transition-colors">Fiyatlandırma</NuxtLink>
+              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors">Pazar Yeri</a>
+              <NuxtLink to="/entegrasyonlar" class="hover:text-blue-600 transition-colors">Entegrasyonlar</NuxtLink>
+              <a href="#sss" class="hover:text-blue-600 transition-colors">Yardım Merkezi</a>
             </div>
           </div>
 
-          <!-- Column 3: Contact -->
-          <div class="md:col-span-4 flex flex-col gap-4 text-left">
-            <h4 class="text-xs font-black uppercase text-white tracking-widest">İletişim Bilgileri</h4>
-            <div class="flex flex-col gap-3 text-xs">
-              <div class="flex items-center gap-3">
-                <Mail :size="14" class="text-blue-500 shrink-0" />
-                <span>info@gelanlasalim.com</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <Phone :size="14" class="text-blue-500 shrink-0" />
-                <span>+90 (555) 555 55 55</span>
-              </div>
-              <div class="flex items-start gap-3">
-                <MapPin :size="14" class="text-blue-500 shrink-0 mt-0.5" />
-                <span>İTÜ Teknokent, Sarıyer, İstanbul</span>
-              </div>
+          <!-- Column 3: Company Links -->
+          <div class="md:col-span-2 flex flex-col gap-4 text-left">
+            <h4 class="text-[10px] font-black uppercase text-blue-600 tracking-wider">ŞİRKET</h4>
+            <div class="flex flex-col gap-3 text-[11px] font-bold text-slate-700">
+              <a href="#" class="hover:text-blue-600 transition-colors">Hakkımızda</a>
+              <a href="#" class="hover:text-blue-600 transition-colors">Kariyer</a>
+              <a href="#" class="hover:text-blue-600 transition-colors">Blog</a>
+              <a href="#" class="hover:text-blue-600 transition-colors">Basın Odası</a>
+              <a href="#sss" class="hover:text-blue-600 transition-colors">İletişim</a>
+              <a href="#" class="hover:text-blue-600 transition-colors">İş Ortaklığı Programı</a>
             </div>
           </div>
+
+          <!-- Column 4: Contact details -->
+          <div class="md:col-span-4 flex flex-col gap-5 text-left">
+            <div class="space-y-3">
+              <h4 class="text-[10px] font-black uppercase text-blue-600 tracking-wider">İLETİŞİM</h4>
+              <p class="text-[11px] leading-relaxed text-slate-500 font-medium">
+                Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül,<br />
+                Balıkesir, Türkiye
+              </p>
+              <div class="text-[11px] font-bold text-slate-700 space-y-1.5">
+                <a href="mailto:info@gelanlasalim.com" class="block hover:text-blue-600">info@gelanlasalim.com</a>
+                <a href="#" class="block hover:text-blue-600 font-mono text-[10px]">gelanlasalim@hs01.kep.tr</a>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <h4 class="text-[9px] font-black uppercase text-slate-400 tracking-wider">DESTEK SAATLERİ</h4>
+              <p class="text-[11px] text-slate-500 font-medium leading-relaxed">
+                Pazartesi - Cuma: 09:00 - 18:00 <br />
+                Cumartesi: 10:00 - 14:00
+              </p>
+            </div>
+          </div>
+
         </div>
 
-        <hr class="border-slate-800 my-8 lg:my-10" />
+        <hr class="border-slate-200 my-10" />
 
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500 font-bold uppercase tracking-wider">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-slate-400 font-black uppercase tracking-wider">
           <div>© 2026 GelAnlaşalım. Tüm Hakları Saklıdır.</div>
           <div class="flex gap-4">
-            <a href="#" class="hover:text-slate-400 transition-colors">KVKK Metni</a>
-            <a href="#" class="hover:text-slate-400 transition-colors">Kullanım Koşulları</a>
-            <a href="#" class="hover:text-slate-400 transition-colors">Gizlilik Politikası</a>
+            <a href="#" class="hover:text-blue-600 transition-colors">KVKK Metni</a>
+            <a href="#" class="hover:text-blue-600 transition-colors">Kullanım Koşulları</a>
+            <a href="#" class="hover:text-blue-600 transition-colors">Gizlilik Politikası</a>
           </div>
         </div>
       </div>
