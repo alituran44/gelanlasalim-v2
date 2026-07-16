@@ -591,51 +591,26 @@ function toggleFilterSection(section: string) {
           </div>
         </div>
 
-        <!-- Hero Right (Live Arena Card) -->
-        <div class="relative">
-          <div class="absolute -inset-8 rounded-full bg-blue-500/5 blur-3xl"></div>
-          <div class="relative mx-auto max-w-[500px] rounded-3xl border border-slate-200 bg-white p-6 shadow-xl shadow-slate-100">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div class="text-left">
-                <span class="text-[9px] font-black uppercase tracking-wider text-blue-600">Canlı Ters İhale</span>
-                <h3 class="mt-1 text-base font-black text-slate-800">500 Paket A4 Kağıt Alımı</h3>
+        <!-- Hero Right (B2B Mockup Image) -->
+        <div class="relative group">
+          <!-- Ambient glowing background -->
+          <div class="absolute -inset-4 rounded-3xl bg-gradient-to-r from-blue-600/10 to-amber-500/10 opacity-70 blur-2xl transition duration-500 group-hover:opacity-100"></div>
+          
+          <!-- Image container -->
+          <div class="relative rounded-2xl border border-slate-200/80 bg-white p-2 shadow-2xl transition duration-500 group-hover:scale-[1.01] overflow-hidden">
+            <img 
+              src="/b2b_procurement_mockup.png" 
+              alt="GelAnlaşalım B2B İhale ve Tedarik Yönetim Paneli" 
+              class="w-full h-auto rounded-xl object-cover"
+            />
+            
+            <!-- Floating interactive mini badge -->
+            <div class="absolute bottom-6 left-6 right-6 rounded-xl border border-white/20 bg-slate-900/90 p-4 text-left text-white backdrop-blur-md shadow-xl flex items-center justify-between">
+              <div>
+                <span class="text-[9px] font-black uppercase tracking-widest text-amber-400">CANLI TERS İHALE ARENASI</span>
+                <div class="text-xs font-bold mt-1 text-slate-100">B2B Tedarik ve Fiyat Eksiltme Paneli</div>
               </div>
-              <div class="text-right">
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Kalan Süre</span>
-                <div class="mt-1 font-mono text-base font-black text-red-500 animate-pulse">02:45</div>
-              </div>
-            </div>
-
-            <!-- Price Info -->
-            <div class="py-6 text-left">
-              <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">En İyi Teklif</span>
-              <div class="mt-1 text-4xl font-black text-slate-900 tracking-tight font-mono">₺64.250</div>
-              <div class="mt-3 inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-700">
-                <TrendingDown :size="12" />
-                %8.2 Tasarruf Sağlandı
-              </div>
-            </div>
-
-            <!-- Live Competitors -->
-            <div class="rounded-2xl bg-slate-50 border border-slate-100 p-4">
-              <div class="mb-3 text-[9px] font-black uppercase tracking-widest text-slate-400 text-left">Tedarikçi Yarışı</div>
-              <div class="space-y-2">
-                <div class="flex items-center justify-between rounded-xl border border-blue-200 bg-blue-50 px-4 py-2.5">
-                  <div class="flex items-center gap-2.5 text-xs font-bold text-slate-800">
-                    <span class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white">1</span>
-                    Beta Kırtasiye Ltd.
-                    <span class="rounded bg-blue-100 px-1.5 py-0.5 text-[8px] font-black text-blue-700">LİDER</span>
-                  </div>
-                  <span class="font-mono font-black text-xs text-slate-800">₺64.250</span>
-                </div>
-                <div class="flex items-center justify-between rounded-xl bg-white border border-slate-200/60 px-4 py-2.5">
-                  <div class="flex items-center gap-2.5 text-xs font-bold text-slate-700">
-                    <span class="flex h-6 w-6 items-center justify-center rounded-full border border-slate-200 text-[10px]">2</span>
-                    Gökkuşağı Ofis
-                  </div>
-                  <span class="font-mono font-black text-xs text-slate-600">₺65.000</span>
-                </div>
-              </div>
+              <span class="rounded bg-amber-500 px-2 py-1 text-[9px] font-black text-slate-950 uppercase animate-pulse">CANLI</span>
             </div>
           </div>
         </div>

@@ -137,10 +137,13 @@ function handleLogin() {
 
       <!-- Header brand -->
       <div class="relative z-10 flex items-center gap-3">
-        <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-white">
-          <Handshake :size="18" />
-        </div>
-        <span class="text-base font-black text-white tracking-tight">GelAnlaşalım</span>
+        <!-- Inline SVG Premium Logo -->
+        <svg class="h-9 w-9 shrink-0" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect width="32" height="32" rx="9" fill="#1E3A5F"/>
+          <path d="M22 12C20.8 10.2 18.5 9 16 9C12.1 9 9 12.1 9 16C9 19.9 12.1 23 16 23C19.9 23 23 19.9 23 16H16" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="23" cy="16" r="2" fill="#FFFFFF"/>
+        </svg>
+        <span class="text-base font-black tracking-tight text-white">Gel<span style="color: #F59E0B;">Anlaşalım</span></span>
       </div>
 
       <!-- Main presentation -->

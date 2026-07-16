@@ -13,17 +13,17 @@ const mobileMenuOpen = ref(false)
 
         <!-- Sol: Logo -->
         <NuxtLink to="/" class="flex items-center gap-3 shrink-0 hover:opacity-90 transition-opacity">
-          <div
-            class="flex h-9 w-9 items-center justify-center rounded-lg text-white font-black text-sm"
-            style="background: #1E3A5F;"
-          >
-            G
-          </div>
+          <!-- Inline SVG Premium Logo -->
+          <svg class="h-9 w-9" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="32" height="32" rx="9" fill="#1E3A5F"/>
+            <path d="M22 12C20.8 10.2 18.5 9 16 9C12.1 9 9 12.1 9 16C9 19.9 12.1 23 16 23C19.9 23 23 19.9 23 16H16" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="23" cy="16" r="2" fill="#FFFFFF"/>
+          </svg>
           <div class="leading-none">
-            <div class="text-base font-black tracking-tight" style="color: #0F172A;">
+            <div class="text-base font-black tracking-tight" style="color: #1E3A5F;">
               Gel<span style="color: #F59E0B;">Anlaşalım</span>
             </div>
-            <div class="text-[9px] font-bold uppercase tracking-widest mt-0.5" style="color: #94A3B8;">
+            <div class="text-[9px] font-bold uppercase tracking-widest mt-0.5" style="color: #64748B;">
               B2B İhale Platformu
             </div>
           </div>
@@ -142,12 +142,15 @@ const mobileMenuOpen = ref(false)
           <!-- Column 1: Brand Info -->
           <div class="md:col-span-4 flex flex-col gap-5 text-left">
             <div class="flex items-center gap-3">
-              <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-md shadow-blue-600/10">
-                <Handshake :size="20" />
-              </div>
+              <!-- Inline SVG Premium Logo -->
+              <svg class="h-10 w-10 shrink-0" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect width="32" height="32" rx="9" fill="#1E3A5F"/>
+                <path d="M22 12C20.8 10.2 18.5 9 16 9C12.1 9 9 12.1 9 16C9 19.9 12.1 23 16 23C19.9 23 23 19.9 23 16H16" stroke="#F59E0B" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="23" cy="16" r="2" fill="#FFFFFF"/>
+              </svg>
               <div>
-                <span class="text-lg font-black text-slate-900 tracking-tight leading-none">GelAnlaşalım</span>
-                <span class="block text-[8px] font-black uppercase text-slate-400 mt-1 tracking-wider">B2B TERS İHALE PLATFORMU</span>
+                <span class="text-lg font-black tracking-tight leading-none" style="color: #1E3A5F;">Gel<span style="color: #F59E0B;">Anlaşalım</span></span>
+                <span class="block text-[8px] font-black uppercase mt-1 tracking-wider" style="color: #64748B;">B2B TERS İHALE PLATFORMU</span>
               </div>
             </div>
             
