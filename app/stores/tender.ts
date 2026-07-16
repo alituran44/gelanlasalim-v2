@@ -1,23 +1,17 @@
 import { defineStore } from "pinia"
 
-export const useAuthStore = defineStore("auth", {
+export const useTenderStore = defineStore("tender", {
   state: () => ({
-    user: null as any,
-    token: "",
-    authenticated: false
+    tenders: [] as any[],
+    selectedTender: null as any
   }),
 
   actions: {
-    login(user: any, token: string) {
-      this.user = user
-      this.token = token
-      this.authenticated = true
+    setTenders(tenders: any[]) {
+      this.tenders = tenders
     },
-
-    logout() {
-      this.user = null
-      this.token = ""
-      this.authenticated = false
+    selectTender(tender: any) {
+      this.selectedTender = tender
     }
   }
 })

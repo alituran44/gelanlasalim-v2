@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 
 import {
   LayoutDashboard,
@@ -16,6 +16,12 @@ import {
 } from "lucide-vue-next"
 
 const route = useRoute()
+const router = useRouter()
+
+function logout() {
+  localStorage.removeItem('userSession')
+  router.push('/')
+}
 
 const menus = [
   {
@@ -151,6 +157,7 @@ const activePath = computed(() => route.path)
       </div>
 
       <button
+        @click="logout"
         class="mt-5 flex w-full items-center justify-center gap-2 rounded-xl border border-slate-700 py-3 transition hover:bg-red-600"
       >
 

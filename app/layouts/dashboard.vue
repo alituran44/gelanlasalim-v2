@@ -1,6 +1,17 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import Sidebar from "~/components/layout/Sidebar.vue"
 import Topbar from "~/components/layout/Topbar.vue"
+
+const router = useRouter()
+
+onMounted(() => {
+  const session = localStorage.getItem('userSession')
+  if (!session) {
+    router.push('/uyelik')
+  }
+})
 </script>
 
 <template>
