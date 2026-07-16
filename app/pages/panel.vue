@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+  layout: "dashboard"
+})
+
 import StatsCards from "~/components/dashboard/StatsCards.vue"
 import DashboardChart from "~/components/dashboard/DashboardChart.vue"
 import QuickActions from "~/components/dashboard/QuickActions.vue"
