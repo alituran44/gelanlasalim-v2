@@ -8,72 +8,121 @@ const mobileMenuOpen = ref(false)
 <template>
   <div class="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-600 selection:text-white flex flex-col">
     <!-- Header -->
-    <header class="sticky top-0 z-50 border-b border-slate-200/80 bg-white/95 backdrop-blur-xl transition-all">
-      <div class="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-6">
-        <!-- Logo -->
-        <NuxtLink to="/" class="flex items-center gap-3 hover:opacity-95 transition-opacity">
-          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg shadow-blue-600/20">
-            <Handshake :size="22" />
+    <header class="sticky top-0 z-50 bg-white border-b transition-all" style="border-color: #E2E8F0; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
+      <div class="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-6">
+
+        <!-- Sol: Logo -->
+        <NuxtLink to="/" class="flex items-center gap-3 shrink-0 hover:opacity-90 transition-opacity">
+          <div
+            class="flex h-9 w-9 items-center justify-center rounded-lg text-white font-black text-sm"
+            style="background: #1E3A5F;"
+          >
+            G
           </div>
-          <div>
-            <div class="text-xl font-black tracking-tight leading-none text-slate-900">
-              Gel<span class="text-blue-600">Anlaşalım</span>
+          <div class="leading-none">
+            <div class="text-base font-black tracking-tight" style="color: #0F172A;">
+              Gel<span style="color: #F59E0B;">Anlaşalım</span>
             </div>
-            <div class="text-[9px] font-bold uppercase tracking-[0.16em] text-slate-400 mt-1">
-              İhale & Tedarik Arenası
+            <div class="text-[9px] font-bold uppercase tracking-widest mt-0.5" style="color: #94A3B8;">
+              B2B İhale Platformu
             </div>
           </div>
         </NuxtLink>
 
-        <!-- Desktop Navigation -->
-        <nav class="hidden lg:flex items-center gap-1 rounded-full border border-slate-200/80 bg-slate-50/50 p-1">
-          <a href="#nasil-calisir" class="rounded-full px-5 py-2 text-xs font-bold text-slate-600 hover:bg-white hover:text-blue-600 transition-all">
-            Nasıl Çalışır?
-          </a>
-          <a href="#ihale-gezgini" class="rounded-full px-5 py-2 text-xs font-bold text-slate-600 hover:bg-white hover:text-blue-600 transition-all">
-            İhale Gezgini
-          </a>
-          <a href="#sss" class="rounded-full px-5 py-2 text-xs font-bold text-slate-600 hover:bg-white hover:text-blue-600 transition-all">
-            Sıkça Sorulanlar
-          </a>
+        <!-- Orta: Nav Linkleri -->
+        <nav class="hidden lg:flex items-center rounded-full border p-1" style="border-color: #E2E8F0; background: #F8FAFC;">
+          <a
+            href="#nasil-calisir"
+            class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
+            style="color: #475569;"
+            onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
+            onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
+          >Nasıl Çalışır</a>
+          <a
+            href="#ozellikler"
+            class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
+            style="color: #475569;"
+            onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
+            onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
+          >Özellikler</a>
+          <a
+            href="#ihale-gezgini"
+            class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
+            style="color: #475569;"
+            onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
+            onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
+          >Market</a>
+          <NuxtLink
+            to="/abonelik"
+            class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
+            style="color: #475569;"
+            onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
+            onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
+          >Fiyatlandırma</NuxtLink>
+          <a
+            href="#sss"
+            class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
+            style="color: #475569;"
+            onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
+            onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
+          >SSS</a>
         </nav>
 
-        <!-- CTA Buttons -->
-        <div class="hidden lg:flex items-center gap-3">
-          <NuxtLink to="/uyelik" class="px-4 py-2.5 text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">
+        <!-- Sağ: CTA Butonlar -->
+        <div class="hidden lg:flex items-center gap-2">
+          <NuxtLink
+            to="/uyelik"
+            class="px-4 py-2.5 text-xs font-semibold rounded-lg transition-all"
+            style="color: #475569;"
+            onmouseover="this.style.background='#F1F5F9'; this.style.color='#1E3A5F'"
+            onmouseout="this.style.background='transparent'; this.style.color='#475569'"
+          >
             Giriş Yap
           </NuxtLink>
-          <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-3 text-xs font-black text-white shadow-lg shadow-blue-600/10 hover:bg-blue-700 hover:shadow-blue-600/20 transition-all">
-            İhale Oluştur
-            <ArrowRight :size="14" />
+          <NuxtLink
+            to="/uyelik"
+            class="flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold text-white transition-all"
+            style="background: #1E3A5F;"
+            onmouseover="this.style.background='#F59E0B'"
+            onmouseout="this.style.background='#1E3A5F'"
+          >
+            Kurumsal hesap aç
+            <ArrowRight :size="13" />
           </NuxtLink>
         </div>
 
-        <!-- Mobile Menu Toggle -->
-        <button class="lg:hidden p-2 text-slate-600 hover:text-slate-900" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Menu Toggle">
-          <X :size="22" v-if="mobileMenuOpen" />
-          <Menu :size="22" v-else />
+        <!-- Mobil Menü Butonu -->
+        <button class="lg:hidden p-2 rounded-lg transition hover:bg-slate-100" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Menü">
+          <X :size="20" v-if="mobileMenuOpen" style="color: #475569;" />
+          <Menu :size="20" v-else style="color: #475569;" />
         </button>
       </div>
 
-      <!-- Mobile Menu -->
+      <!-- Mobil Menü -->
       <transition
         enter-active-class="transition duration-150 ease-out"
-        enter-from-class="transform scale-95 opacity-0"
-        enter-to-class="transform scale-100 opacity-100"
+        enter-from-class="opacity-0 -translate-y-2"
+        enter-to-class="opacity-100 translate-y-0"
         leave-active-class="transition duration-100 ease-in"
-        leave-from-class="transform scale-100 opacity-100"
-        leave-to-class="transform scale-95 opacity-0"
+        leave-from-class="opacity-100 translate-y-0"
+        leave-to-class="opacity-0 -translate-y-2"
       >
-        <div v-if="mobileMenuOpen" class="border-t border-slate-200 bg-white p-6 lg:hidden shadow-xl">
-          <div class="flex flex-col gap-4 font-bold text-sm text-slate-700">
-            <a href="#nasil-calisir" @click="mobileMenuOpen = false" class="hover:text-blue-600 py-1">Nasıl Çalışır?</a>
-            <a href="#ihale-gezgini" @click="mobileMenuOpen = false" class="hover:text-blue-600 py-1">İhale Gezgini</a>
-            <a href="#sss" @click="mobileMenuOpen = false" class="hover:text-blue-600 py-1">Sıkça Sorulanlar</a>
-            <hr class="border-slate-100" />
-            <NuxtLink to="/uyelik" @click="mobileMenuOpen = false" class="hover:text-blue-600 py-1">Giriş Yap / Kayıt Ol</NuxtLink>
-            <NuxtLink to="/uyelik" @click="mobileMenuOpen = false" class="flex items-center justify-center gap-2 rounded-xl bg-blue-600 p-3 text-white">
-              İhale Oluştur <ArrowRight :size="14" />
+        <div v-if="mobileMenuOpen" class="border-t bg-white px-6 py-5 lg:hidden" style="border-color: #F1F5F9;">
+          <div class="flex flex-col gap-3 text-sm font-semibold" style="color: #475569;">
+            <a href="#nasil-calisir" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Nasıl Çalışır</a>
+            <a href="#ozellikler" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Özellikler</a>
+            <a href="#ihale-gezgini" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Market</a>
+            <NuxtLink to="/abonelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Fiyatlandırma</NuxtLink>
+            <a href="#sss" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">SSS</a>
+            <div class="border-t my-1" style="border-color: #F1F5F9;"></div>
+            <NuxtLink to="/uyelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Giriş Yap</NuxtLink>
+            <NuxtLink
+              to="/uyelik"
+              @click="mobileMenuOpen = false"
+              class="flex items-center justify-center gap-2 rounded-xl py-3 text-white font-bold"
+              style="background: #1E3A5F;"
+            >
+              Kurumsal hesap aç <ArrowRight :size="14" />
             </NuxtLink>
           </div>
         </div>
