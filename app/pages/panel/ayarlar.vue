@@ -110,12 +110,35 @@ const docsCount = computed(() => {
   return Object.values(uploadedDocs.value).filter(Boolean).length
 })
 
-function uploadDoc(key: string) {
-  uploadedDocs.value[key] = !uploadedDocs.value[key]
-  showToast(
-    uploadedDocs.value[key] ? "Belge sisteme yüklendi." : "Belge kaldırıldı.",
-    uploadedDocs.value[key] ? "success" : "warning"
-  )
+const fileInputRef = ref<HTMLInputElement | null>(null)
+const currentUploadKey = ref('')
+
+function triggerDocUpload(key: string) {
+  currentUploadKey.value = key
+  fileInputRef.value?.click()
+}
+
+function onFileSelected(event: Event) {
+  const target = event.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (!file) return
+
+  const key = currentUploadKey.value
+  if (key === 'kapak') {
+    showToast(`Kapak görseli olarak "${file.name}" yüklendi.`, "success")
+  } else if (key === 'profil_logo') {
+    showToast(`Profil görseli olarak "${file.name}" yüklendi.`, "success")
+  } else {
+    uploadedDocs.value[key] = true
+    showToast(`"${file.name}" belgesi başarıyla sisteme yüklendi.`, "success")
+  }
+
+  // Clear target value to allow uploading the same file again
+  target.value = ''
+}
+
+function saveCompanyInfo() {
+  showToast("Şirket ve kayıt bilgileriniz başarıyla güncellendi.")
 }
 
 // Password verification state
@@ -403,6 +426,15 @@ function saveProfile() {
 <template>
   <div class="p-6 max-w-6xl mx-auto text-left space-y-6 relative">
     
+    <!-- Hidden file input for file uploading -->
+    <input 
+      ref="fileInputRef" 
+      type="file" 
+      class="hidden" 
+      accept="image/*,.pdf" 
+      @change="onFileSelected" 
+    />
+
     <!-- Toast Popup Notifications list at top right -->
     <div class="fixed top-5 right-5 z-50 space-y-2 pointer-events-none">
       <div 
@@ -680,7 +712,7 @@ function saveProfile() {
                 <h4 class="text-xs font-bold text-slate-800">Kurumsal Profil Kalitesi</h4>
                 <p class="text-[10px] text-slate-500 mt-0.5">Profil resmi, Şirket faturası, Kategoriler ve Doğrulama adımlarına göre hesaplanır.</p>
               </div>
-              <button type="button" @click="showToast('Görsel yükleyici açıldı.')" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 transition">
+              <button type="button" @click="triggerDocUpload('profil_logo')" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 transition">
                 Görsel Yükle
               </button>
             </div>
@@ -700,89 +732,76 @@ function saveProfile() {
               <strong>Kayıt & Doğrulama Bilgileri.</strong> Kayıt ve firma doğrulama aşamasında alınan ve değiştirilemeyen yasal verileri tutar. Yerel yasalar doğrultusunda bayilik, yetkili arayan kurallar buradaki bilgilere göre denetlenmektedir.
             </p>
 
-            <!-- Editable & Locked Fields Form Grid -->
+            <!-- Editable Fields Form Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               
               <!-- Şirket Adı -->
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">ŞİRKET ADI</label>
-                <div class="relative">
-                  <input v-model="companyForm.name" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-slate-50 text-slate-500 cursor-not-allowed" disabled />
-                  <Lock :size="12" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                </div>
+                <input v-model="companyForm.name" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
               <!-- Yasal Firma Unvanı -->
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">YASAL FİRMA UNVANI</label>
-                <div class="relative">
-                  <input v-model="companyForm.legalName" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-slate-50 text-slate-500 cursor-not-allowed" disabled />
-                  <Lock :size="12" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                </div>
+                <input v-model="companyForm.legalName" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
               <!-- İrtibat İsim -->
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">İRTİBAT İSİM</label>
-                <div class="relative">
-                  <input v-model="companyForm.contactPerson" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-slate-50 text-slate-500 cursor-not-allowed" disabled />
-                  <Lock :size="12" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                </div>
+                <input v-model="companyForm.contactPerson" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
               <!-- Vergi Numarası -->
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">VERGİ NUMARASI</label>
-                <div class="relative">
-                  <input v-model="companyForm.taxNo" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-slate-50 text-slate-500 cursor-not-allowed" disabled />
-                  <Lock :size="12" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                </div>
+                <input v-model="companyForm.taxNo" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
               <!-- Faaliyet Alanları -->
               <div class="md:col-span-2">
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">FAALİYET ALANLARI</label>
-                <div class="relative">
-                  <input v-model="companyForm.sectors" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-slate-50 text-slate-500 cursor-not-allowed" disabled />
-                  <Lock :size="12" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                </div>
+                <input v-model="companyForm.sectors" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
               <!-- MERSİS No -->
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">MERSİS NO</label>
-                <input v-model="companyForm.mersis" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none border-red-500 focus:border-red-600" placeholder="0XXX-XXXX-XXXX-XXXX" />
-                <span class="text-[9px] text-red-500 block mt-1">Bu alanın doldurulması zorunludur.</span>
+                <input v-model="companyForm.mersis" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="0XXX-XXXX-XXXX-XXXX" />
               </div>
 
               <!-- Ticaret Sicil No -->
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">TİCARET SİCİL NO</label>
-                <input v-model="companyForm.sicilNo" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none border-red-500 focus:border-red-600" placeholder="Ticaret sicil numarası" />
-                <span class="text-[9px] text-red-500 block mt-1">Bu alanın doldurulması zorunludur.</span>
+                <input v-model="companyForm.sicilNo" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="Ticaret sicil numarası" />
               </div>
 
               <!-- KEP Adresi -->
               <div class="md:col-span-2">
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">KEP ADRESİ</label>
-                <input v-model="companyForm.kep" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none border-red-500 focus:border-red-600" placeholder="gelanlasalim@hs01.kep.tr" />
-                <span class="text-[9px] text-red-500 block mt-1">Bu alanın doldurulması zorunludur.</span>
+                <input v-model="companyForm.kep" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="gelanlasalim@hs01.kep.tr" />
               </div>
 
               <!-- IBAN -->
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">IBAN</label>
-                <input v-model="companyForm.iban" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none border-red-500 focus:border-red-600" placeholder="TR00 0000 0000 0000 0000 00" />
-                <span class="text-[9px] text-red-500 block mt-1">Bu alanın doldurulması zorunludur.</span>
+                <input v-model="companyForm.iban" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="TR00 0000 0000 0000 0000 00" />
               </div>
 
               <!-- Hesap Sahibi -->
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">HESAP SAHİBİ</label>
-                <input v-model="companyForm.accountHolder" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none border-red-500 focus:border-red-600" placeholder="Hesap sahibinin tam adı" />
-                <span class="text-[9px] text-red-500 block mt-1">Bu alanın doldurulması zorunludur.</span>
+                <input v-model="companyForm.accountHolder" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="Hesap sahibinin tam adı" />
               </div>
 
+            </div>
+
+            <!-- Save Company Button -->
+            <div class="flex justify-end pt-4 border-t" style="border-color: #F1F5F9;">
+              <button type="button" @click="saveCompanyInfo" class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-2.5 transition">
+                Şirket Bilgilerini Kaydet
+              </button>
             </div>
           </div>
 
@@ -791,7 +810,7 @@ function saveProfile() {
             <div class="flex items-center justify-between border-b pb-2" style="border-color: #F1F5F9;">
               <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Kapak Görseli</h3>
             </div>
-            <div class="rounded-xl border-2 border-dashed p-8 text-center space-y-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50/50 transition" @click="showToast('Kapak görseli yükleyici aktif.')" style="border-color: #E2E8F0;">
+            <div class="rounded-xl border-2 border-dashed p-8 text-center space-y-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50/50 transition" @click="triggerDocUpload('kapak')" style="border-color: #E2E8F0;">
               <Camera :size="20" class="text-slate-400" />
               <div>
                 <h4 class="text-xs font-bold text-slate-700">Kapak Görseli Yükle</h4>
@@ -842,7 +861,7 @@ function saveProfile() {
                   </span>
                   <button 
                     type="button" 
-                    @click="uploadDoc('vergi')" 
+                    @click="triggerDocUpload('vergi')" 
                     class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition"
                     :class="uploadedDocs.vergi ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white hover:bg-slate-50 text-slate-700'"
                     style="border-color: #E2E8F0;"
@@ -858,7 +877,7 @@ function saveProfile() {
                   </span>
                   <button 
                     type="button" 
-                    @click="uploadDoc('sicil')" 
+                    @click="triggerDocUpload('sicil')" 
                     class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition"
                     :class="uploadedDocs.sicil ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white hover:bg-slate-50 text-slate-700'"
                     style="border-color: #E2E8F0;"
@@ -874,7 +893,7 @@ function saveProfile() {
                   </span>
                   <button 
                     type="button" 
-                    @click="uploadDoc('imza')" 
+                    @click="triggerDocUpload('imza')" 
                     class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition"
                     :class="uploadedDocs.imza ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white hover:bg-slate-50 text-slate-700'"
                     style="border-color: #E2E8F0;"
@@ -890,7 +909,7 @@ function saveProfile() {
                   </span>
                   <button 
                     type="button" 
-                    @click="uploadDoc('faaliyet')" 
+                    @click="triggerDocUpload('faaliyet')" 
                     class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition"
                     :class="uploadedDocs.faaliyet ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white hover:bg-slate-50 text-slate-700'"
                     style="border-color: #E2E8F0;"
@@ -906,7 +925,7 @@ function saveProfile() {
                   </span>
                   <button 
                     type="button" 
-                    @click="uploadDoc('kimlikOn')" 
+                    @click="triggerDocUpload('kimlikOn')" 
                     class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition"
                     :class="uploadedDocs.kimlikOn ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white hover:bg-slate-50 text-slate-700'"
                     style="border-color: #E2E8F0;"
@@ -922,7 +941,7 @@ function saveProfile() {
                   </span>
                   <button 
                     type="button" 
-                    @click="uploadDoc('kimlikArka')" 
+                    @click="triggerDocUpload('kimlikArka')" 
                     class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition"
                     :class="uploadedDocs.kimlikArka ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white hover:bg-slate-50 text-slate-700'"
                     style="border-color: #E2E8F0;"
