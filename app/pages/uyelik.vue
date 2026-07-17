@@ -95,7 +95,7 @@ function handleRegister() {
       mailBildirimi: mailBildirimi.value,
       isPremium: false
     }))
-    router.push('/abonelik')
+    router.push('/firma-dogrulama')
   }, 1000)
 }
 
