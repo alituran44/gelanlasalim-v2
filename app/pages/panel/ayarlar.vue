@@ -29,7 +29,14 @@ import {
   Check,
   RotateCw,
   Globe,
-  FileText
+  FileText,
+  Key,
+  ShieldAlert,
+  Smartphone,
+  Eye,
+  Settings,
+  HelpCircle,
+  ArrowRight
 } from 'lucide-vue-next'
 
 definePageMeta({ 
@@ -37,7 +44,7 @@ definePageMeta({
 })
 
 // Sub-navigation tabs matching screenshot
-const activeSubTab = ref<'kisisel' | 'sirket' | 'adresler' | 'bildirimler' | 'takip' | 'ticaret' | 'uyelik' | 'ayarlar'>('kisisel')
+const activeSubTab = ref<'kisisel' | 'sirket' | 'adresler' | 'bildirimler' | 'takip' | 'ticaret' | 'uyelik' | 'ayarlar'>('ayarlar')
 
 // Personal Profile data
 const profileForm = ref({
@@ -395,7 +402,7 @@ function saveProfile() {
           </div>
         </div>
 
-        <!-- ŞİRKET & DOĞRULAMA TAB -->
+        <!-- ŞIŞRKET & DOĞRULAMA TAB -->
         <div v-if="activeSubTab === 'sirket'" class="space-y-6">
           
           <!-- Top header with profile link -->
@@ -955,7 +962,7 @@ function saveProfile() {
           
           <!-- Top Info metrics grid -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="rounded-xl border bg-white p-4 flex items-center justify-between" style="border-color: #E2E8F0;">
+            <div class="rounded-xl border bg-white p-4 flex items-center justify-between shadow-sm" style="border-color: #E2E8F0;">
               <div>
                 <span class="text-[8px] font-black text-slate-300 uppercase block">GÜVENLİK</span>
                 <span class="text-[11px] font-black text-emerald-600 block mt-1">🟢 1 aktif koruma</span>
@@ -963,7 +970,7 @@ function saveProfile() {
               <Shield :size="16" class="text-emerald-500" />
             </div>
 
-            <div class="rounded-xl border bg-white p-4 flex items-center justify-between" style="border-color: #E2E8F0;">
+            <div class="rounded-xl border bg-white p-4 flex items-center justify-between shadow-sm" style="border-color: #E2E8F0;">
               <div>
                 <span class="text-[8px] font-black text-slate-300 uppercase block">DİL</span>
                 <span class="text-[11px] font-black text-blue-600 block mt-1">🇹🇷 Türkçe</span>
@@ -971,50 +978,99 @@ function saveProfile() {
               <Globe :size="16" class="text-blue-500" />
             </div>
 
-            <div class="rounded-xl border bg-white p-4 flex items-center justify-between" style="border-color: #E2E8F0;">
+            <div class="rounded-xl border bg-white p-4 flex items-center justify-between shadow-sm" style="border-color: #E2E8F0;">
               <div>
-                <span class="text-[8px] font-black text-slate-300 uppercase block">SAAT</span>
+                <span class="text-[8px] font-black text-slate-300 uppercase block">SAAT DİLİMİ</span>
                 <span class="text-[11px] font-black text-blue-600 block mt-1">⏱️ Operasyonel</span>
               </div>
               <Clock :size="16" class="text-blue-500" />
             </div>
           </div>
 
-          <!-- Anchor sub-menus links -->
-          <div class="flex items-center gap-1.5 bg-slate-50 border p-1 rounded-xl text-[10px] font-bold text-slate-500" style="border-color: #E2E8F0;">
-            <span class="bg-white text-slate-800 shadow px-3 py-1.5 rounded-lg cursor-pointer">Uygulama tercihleri</span>
-            <span class="hover:bg-white hover:text-slate-800 px-3 py-1.5 rounded-lg cursor-pointer">Güvenlik</span>
-            <span class="hover:bg-white hover:text-slate-800 px-3 py-1.5 rounded-lg cursor-pointer">Bildirimler</span>
-            <span class="hover:bg-white hover:text-slate-800 px-3 py-1.5 rounded-lg cursor-pointer">Profil kaynağı</span>
+          <!-- Top horizontal card row (with icons on the left) -->
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <!-- Card 1 -->
+            <div class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
+              <div class="flex items-start gap-2.5">
+                <Sliders :size="14" class="text-blue-600 mt-0.5 shrink-0" />
+                <div>
+                  <h4 class="text-[11px] font-black text-slate-800 leading-tight">Uygulama tercihleri</h4>
+                  <p class="text-[9px] text-slate-400 mt-1 leading-normal">Tümü, dil ve saat biçimi.</p>
+                </div>
+              </div>
+              <span class="text-[9px] text-blue-600 font-bold mt-2 inline-flex items-center gap-0.5">Düzenle <ArrowRight :size="9" /></span>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
+              <div class="flex items-start gap-2.5">
+                <Shield :size="14" class="text-blue-600 mt-0.5 shrink-0" />
+                <div>
+                  <h4 class="text-[11px] font-black text-slate-800 leading-tight">Güvenlik</h4>
+                  <p class="text-[9px] text-slate-400 mt-1 leading-normal">Şifre, 2FA ve aktif oturumlar.</p>
+                </div>
+              </div>
+              <span class="text-[9px] text-blue-600 font-bold mt-2 inline-flex items-center gap-0.5">Yönet <ArrowRight :size="9" /></span>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
+              <div class="flex items-start gap-2.5">
+                <Bell :size="14" class="text-blue-600 mt-0.5 shrink-0" />
+                <div>
+                  <h4 class="text-[11px] font-black text-slate-800 leading-tight">Bildirimler</h4>
+                  <p class="text-[9px] text-slate-400 mt-1 leading-normal">Bildirim kanalları ve sessiz saatleri ayarlayın.</p>
+                </div>
+              </div>
+              <span class="text-[9px] text-blue-600 font-bold mt-2 inline-flex items-center gap-0.5">Aç <ArrowRight :size="9" /></span>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
+              <div class="flex items-start gap-2.5">
+                <FileText :size="14" class="text-blue-600 mt-0.5 shrink-0" />
+                <div>
+                  <h4 class="text-[11px] font-black text-slate-800 leading-tight">Profil kaynağı</h4>
+                  <p class="text-[9px] text-slate-400 mt-1 leading-normal">Profil veri korunması bilgileri tek kaynaktan düzenleyin.</p>
+                </div>
+              </div>
+              <span class="text-[9px] text-blue-600 font-bold mt-2 inline-flex items-center gap-0.5">Aç <ArrowRight :size="9" /></span>
+            </div>
           </div>
 
           <!-- Hesap ve Kurumsal Bilgiler Card -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">HESAP VE KURUMSAL BİLGİLER</h3>
+            <div class="flex items-center gap-2.5 pb-2 border-b" style="border-color: #F1F5F9;">
+              <Building :size="15" class="text-blue-600" />
+              <div>
+                <span class="text-[8px] font-black text-slate-300 block">SİTE VE İLETİŞİM</span>
+                <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Hesap ve Kurumsal Bilgiler</h3>
+              </div>
+            </div>
             <p class="text-[10px] text-slate-400 leading-normal">
               Kimlik ve kurumsal bilgiler: Önemli ve Kurumsal Kimlik sayfalarından yönetilir.
             </p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-              <div class="p-3 bg-slate-50 rounded-xl border">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span class="text-[8px] font-black text-slate-300 block">AD SOYAD</span>
                 <span class="text-slate-700 font-bold block mt-1">Ali Turan</span>
               </div>
-              <div class="p-3 bg-slate-50 rounded-xl border">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span class="text-[8px] font-black text-slate-300 block">E-POSTA ADRESİ</span>
                 <span class="font-mono text-slate-700 block mt-1">alituran88@gmail.com</span>
               </div>
-              <div class="p-3 bg-slate-50 rounded-xl border">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span class="text-[8px] font-black text-slate-300 block">UNVAN</span>
                 <span class="text-slate-700 font-bold block mt-1">Yönetici</span>
               </div>
-              <div class="p-3 bg-slate-50 rounded-xl border">
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span class="text-[8px] font-black text-slate-300 block">İLETİŞİM DURUMU</span>
-                <span class="text-emerald-600 font-bold block mt-1">🟢 Tanımlı</span>
+                <span class="text-emerald-600 font-bold block mt-1 flex items-center gap-1">🟢 Tanımlı</span>
               </div>
             </div>
 
-            <div class="flex gap-2 pt-2">
+            <div class="flex gap-2 pt-2 text-[10px] font-bold text-slate-500">
               <button @click="activeSubTab = 'kisisel'" type="button" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition" style="border-color: #E2E8F0;">
                 Profil sayfasına git
               </button>
@@ -1026,7 +1082,13 @@ function saveProfile() {
 
           <!-- Güvenlik Şifre Yönetimi Card -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">GÜVENLİK · Şifre ve Cihaz Kontrolü</h3>
+            <div class="flex items-center gap-2.5 pb-2 border-b" style="border-color: #F1F5F9;">
+              <Shield :size="15" class="text-blue-600" />
+              <div>
+                <span class="text-[8px] font-black text-slate-300 block">ŞİFRE VE YEDEK ALAN GÜVENLİĞİ</span>
+                <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Güvenlik</h3>
+              </div>
+            </div>
             
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <!-- Form left -->
@@ -1046,27 +1108,59 @@ function saveProfile() {
                     <input type="password" placeholder="••••••••" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none bg-white" style="border-color: #E2E8F0;" />
                   </div>
                 </div>
-                <button type="button" class="rounded-xl bg-slate-100 text-slate-400 font-bold text-xs px-6 py-3 cursor-not-allowed" disabled>Şifreyi Güncelle</button>
+                <div class="flex items-center justify-between pt-2">
+                  <button type="button" class="rounded-xl bg-slate-100 text-slate-400 font-bold text-xs px-6 py-3 cursor-not-allowed" disabled>Şifreyi Güncelle</button>
+                  <span class="text-[9px] text-slate-400 font-bold">Yeni şifreleri giriniz</span>
+                </div>
               </div>
 
               <!-- Rules right -->
               <div class="p-4 rounded-xl bg-slate-50 border space-y-2 text-[9px] font-bold text-slate-500" style="border-color: #F1F5F9;">
                 <span class="text-[8px] font-black text-slate-400 uppercase tracking-wider block">ŞİFRE GÜCÜ</span>
-                <div class="space-y-1.5">
-                  <div class="flex items-center gap-1.5"><Check :size="10" class="text-emerald-500" /> En az 10 karakter</div>
-                  <div class="flex items-center gap-1.5"><Check :size="10" class="text-emerald-500" /> Büyük/küçük harf</div>
-                  <div class="flex items-center gap-1.5"><Check :size="10" class="text-emerald-500" /> Rakam</div>
-                  <div class="flex items-center gap-1.5"><Check :size="10" class="text-emerald-500" /> Özel karakter</div>
-                  <div class="flex items-center gap-1.5"><Check :size="10" class="text-emerald-500" /> Yaygın parola/tekrar eden örüntü olmaması</div>
-                  <div class="flex items-center gap-1.5"><Check :size="10" class="text-emerald-500" /> Boşluk içermemesi</div>
+                <span class="text-[9px] font-bold text-slate-600 block border-b pb-1">0/8 Kriter Karşılandı</span>
+                <div class="space-y-1.5 mt-2">
+                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> En az 10 karakter</div>
+                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Büyük/küçük harf</div>
+                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Rakam</div>
+                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Özel karakter</div>
+                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Yaygın parola/tekrar eden örüntü olmaması</div>
+                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Boşluk içermemesi</div>
+                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Önceki şifreyle aynı olmaması</div>
+                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Yeni şifre eşleşiyor</div>
                 </div>
+              </div>
+            </div>
+
+            <!-- E-posta 2FA -->
+            <div class="rounded-xl border bg-amber-50/10 p-5 space-y-3" style="border-color: #FDE68A;">
+              <span class="inline-flex items-center gap-1 text-[8px] font-black uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded">2FA</span>
+              <h4 class="text-xs font-bold text-slate-800 mt-1">E-posta ile İki Aşamalı Doğrulama</h4>
+              <p class="text-[10px] text-slate-500 leading-normal">
+                Giriş ve hassas işlemler için e-posta adresinize 6 haneli doğrulama kodu gönderilir.
+              </p>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-amber-200 text-[10px] font-bold">
+                <div class="flex items-center gap-2">
+                  <span class="text-slate-400">Durum:</span>
+                  <span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Etkin</span>
+                  <span class="text-slate-500">Aktif/Kayıtlı e-posta: alituran88@gmail.com</span>
+                </div>
+                <button type="button" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-xs transition">2FA Etkinleştir</button>
               </div>
             </div>
 
             <!-- Active Sessions list -->
             <div class="space-y-3 pt-4 border-t" style="border-color: #F1F5F9;">
-              <h4 class="text-xs font-bold text-slate-800">Aktif Oturumlar</h4>
-              <div class="rounded-xl border p-4 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4" style="border-color: #E2E8F0;">
+              <div class="flex items-center justify-between">
+                <div>
+                  <h4 class="text-xs font-bold text-slate-800">Aktif Oturumlar</h4>
+                  <p class="text-[9px] text-slate-400">Hesabınızın açık olduğu cihazları yönetin.</p>
+                </div>
+                <div class="flex gap-2">
+                  <button type="button" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold text-slate-600 bg-white hover:bg-slate-50" style="border-color: #E2E8F0;">Diğer cihazlardan çıkış</button>
+                  <button type="button" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold text-red-600 bg-white hover:bg-red-50 border-red-200">Çıkış Yap</button>
+                </div>
+              </div>
+              <div class="rounded-xl border p-4 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm" style="border-color: #E2E8F0;">
                 <div class="flex items-center gap-3">
                   <div class="h-8 w-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><Laptop :size="15" /></div>
                   <div>
@@ -1076,30 +1170,65 @@ function saveProfile() {
                 </div>
                 <button type="button" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold text-slate-600 bg-white hover:bg-slate-100" style="border-color: #E2E8F0;">Oturumu Kapat</button>
               </div>
+              <p class="text-[9px] text-slate-400 leading-normal">
+                <strong>Not:</strong> Bu listedeki cihaz hareketleri ve konumlar güvenlik kayıtlarına dayanır; her girişle anında güncellenir.
+              </p>
             </div>
 
             <!-- Security History Logs -->
             <div class="space-y-3 pt-4 border-t" style="border-color: #F1F5F9;">
               <h4 class="text-xs font-bold text-slate-800">Güvenlik Geçmişi</h4>
-              <div class="rounded-xl border bg-slate-50 p-4 text-[10px] text-slate-400 text-center" style="border-color: #E2E8F0;">
-                Kritik olaylar (son 2FA kapatma, toplu çıkış, şifre değişimi) güvenlik loguna eklenmektedir.
+              <p class="text-[9px] text-slate-400">Hesabınızdaki güvenlik olayları.</p>
+              <div class="rounded-xl border bg-slate-50 p-4 space-y-4" style="border-color: #E2E8F0;">
+                <div class="p-3 bg-red-50 border border-red-200 text-red-800 text-[10px] font-bold rounded-lg">
+                  Kritik olaylar (son 2FA kapatma, toplu çıkış, şifre değişimi) güvenlik loguna eklenmektedir.
+                </div>
+                
+                <div class="flex items-center gap-3">
+                  <select class="rounded-lg border px-3 py-1.5 text-xs bg-white" style="border-color: #E2E8F0;">
+                    <option value="30">Son 30 gün</option>
+                    <option value="90">Son 90 gün</option>
+                  </select>
+                  <select class="rounded-lg border px-3 py-1.5 text-xs bg-white" style="border-color: #E2E8F0;">
+                    <option value="Tümü">Tümü</option>
+                  </select>
+                </div>
+
+                <div class="p-3 bg-white border rounded-lg flex items-center justify-between text-[10px] text-slate-600" style="border-color: #E2E8F0;">
+                  <div class="flex items-center gap-2">
+                    <span class="text-[8px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-black">LOG</span>
+                    <span>Güvenlik olayı</span>
+                  </div>
+                  <div class="flex gap-4">
+                    <span>17 Temmuz 2026 23:29</span>
+                    <span>🟢 Bilinmeyen</span>
+                    <span>Cihaz: Bilinmeyen</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Tercihler Card -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">TERCİHLER · Dil ve Bölge Ayarları</h3>
+            <div class="flex items-center gap-2.5 pb-2 border-b" style="border-color: #F1F5F9;">
+              <Sliders :size="15" class="text-blue-600" />
+              <div>
+                <span class="text-[8px] font-black text-slate-300 block">UYGULAMA TERCİHLERİ</span>
+                <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Tercihler</h3>
+              </div>
+            </div>
+            <p class="text-[10px] text-slate-400 leading-normal">Tercihlerinizi özelleştirin.</p>
             
             <!-- Theme grids -->
             <div class="space-y-3">
-              <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">Görünüm Teması</span>
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Tema değişikliği yalnızca görünümü sembolize eder</span>
               <div class="grid grid-cols-3 gap-4">
                 <button 
                   type="button" 
                   @click="activeTheme = 'sistem'"
-                  class="rounded-xl border p-4 text-center space-y-2 transition"
-                  :class="activeTheme === 'sistem' ? 'border-blue-600 bg-blue-50/10 text-blue-700' : 'border-slate-200 bg-white hover:bg-slate-50'"
+                  class="rounded-xl border p-4 text-center space-y-2 transition shadow-sm"
+                  :style="activeTheme === 'sistem' ? 'border-color: #2563EB; background: rgba(37,99,235,0.05); color: #2563EB;' : 'border-color: #E2E8F0;'"
                 >
                   <Laptop :size="16" class="mx-auto" />
                   <span class="text-xs font-bold block">Sistem</span>
@@ -1108,8 +1237,8 @@ function saveProfile() {
                 <button 
                   type="button" 
                   @click="activeTheme = 'acik'"
-                  class="rounded-xl border p-4 text-center space-y-2 transition"
-                  :class="activeTheme === 'acik' ? 'border-blue-600 bg-blue-50/10 text-blue-700' : 'border-slate-200 bg-white hover:bg-slate-50'"
+                  class="rounded-xl border p-4 text-center space-y-2 transition shadow-sm"
+                  :style="activeTheme === 'acik' ? 'border-color: #2563EB; background: rgba(37,99,235,0.05); color: #2563EB;' : 'border-color: #E2E8F0;'"
                 >
                   <Camera :size="16" class="mx-auto" />
                   <span class="text-xs font-bold block">Açık</span>
@@ -1118,8 +1247,8 @@ function saveProfile() {
                 <button 
                   type="button" 
                   @click="activeTheme = 'koyu'"
-                  class="rounded-xl border p-4 text-center space-y-2 transition"
-                  :class="activeTheme === 'koyu' ? 'border-blue-600 bg-blue-50/10 text-blue-700' : 'border-slate-200 bg-white hover:bg-slate-50'"
+                  class="rounded-xl border p-4 text-center space-y-2 transition shadow-sm"
+                  :style="activeTheme === 'koyu' ? 'border-color: #2563EB; background: rgba(37,99,235,0.05); color: #2563EB;' : 'border-color: #E2E8F0;'"
                 >
                   <Video :size="16" class="mx-auto" />
                   <span class="text-xs font-bold block">Koyu</span>
@@ -1160,9 +1289,38 @@ function saveProfile() {
             </div>
           </div>
 
+          <!-- Bildirim Tercihleri Card -->
+          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+            <div class="flex items-center justify-between pb-2 border-b" style="border-color: #F1F5F9;">
+              <div class="flex items-center gap-2.5">
+                <Bell :size="15" class="text-blue-600" />
+                <div>
+                  <span class="text-[8px] font-black text-slate-300 block">BİLDİRİM TERCİHLERİ</span>
+                  <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Bildirim Tercihleri</h3>
+                </div>
+              </div>
+              <button type="button" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold text-slate-700 bg-white hover:bg-slate-100" style="border-color: #E2E8F0;">
+                Alıcı Bildirimlerini Al
+              </button>
+            </div>
+            <p class="text-[10px] text-slate-400 leading-normal">
+              E-posta, uygulama içi ve anlık bildirim tercihlerinizi yönetin.
+            </p>
+            <div class="p-4 rounded-xl bg-slate-50 border text-[10px] text-slate-400 text-center" style="border-color: #E2E8F0;">
+              Bildirim kanalları, sessiz saatler ve kategori tercihleri için bir ekrandan yönetilir.
+            </div>
+          </div>
+
           <!-- Sözleşmeler & Onaylar Card -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">SÖZLEŞMELER & ONAYLAR</h3>
+            <div class="flex items-center gap-2.5 pb-2 border-b" style="border-color: #F1F5F9;">
+              <FileText :size="15" class="text-blue-600" />
+              <div>
+                <span class="text-[8px] font-black text-slate-300 block">YASAL ONAYLAR VE KVKK</span>
+                <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Sözleşmeler & Onaylar</h3>
+              </div>
+            </div>
+            <p class="text-[10px] text-slate-400 leading-normal">Onay yönetimi, sözleşme maddeleri ve KVKK veri talepleri.</p>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div 
@@ -1191,6 +1349,7 @@ function saveProfile() {
             <!-- KVKK Request form -->
             <div class="space-y-4 pt-4 border-t" style="border-color: #F1F5F9;">
               <h4 class="text-xs font-bold text-slate-800">Veri Talebi Oluştur (KVKK)</h4>
+              <p class="text-[9px] text-slate-400">Kimlik veya kişisel verilerinizin korunması kanunu kapsamında veri erişim, silme, düzeltme taleplerinizi oluşturabilirsiniz. Talepleriniz 30 gün içinde yanıtlanacaktır.</p>
               <div class="space-y-3">
                 <div>
                   <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Talep Türü</label>
@@ -1227,24 +1386,35 @@ function saveProfile() {
           </div>
 
           <!-- Veri ve Hesap Kapatma Card -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm grid grid-cols-1 md:grid-cols-2 gap-6" style="border-color: #E2E8F0;">
-            <div class="p-5 rounded-xl bg-slate-50 border flex flex-col justify-between h-36" style="border-color: #E2E8F0;">
+          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+            <div class="flex items-center gap-2.5 pb-2 border-b" style="border-color: #F1F5F9;">
+              <Sliders :size="15" class="text-blue-600" />
               <div>
-                <span class="text-[8px] font-black text-slate-300 uppercase block">VERİ VE RAPORLAR</span>
-                <h4 class="text-xs font-bold text-slate-800 mt-1">Veri dışa aktarma henüz hazır değil</h4>
-                <p class="text-[10px] text-slate-400 mt-1 leading-normal">Geçmiş verilerinizi ve raporlarınızı indirmek için kurumsal temsilcinizle görüşün.</p>
+                <span class="text-[8px] font-black text-slate-300 block">VERİ VE HESAP</span>
+                <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Veri ve Hesap</h3>
               </div>
             </div>
+            <p class="text-[10px] text-slate-400">KVKK veri talebi ve hesabın kapatılma durumunu buradan takip edin.</p>
 
-            <div class="p-5 rounded-xl bg-slate-50 border flex flex-col justify-between h-36" style="border-color: #E2E8F0;">
-              <div>
-                <span class="text-[8px] font-black text-slate-300 uppercase block">HESAP İŞLEMLERİ</span>
-                <h4 class="text-xs font-bold text-slate-800 mt-1">Hesap kapatma talebi manuel inceleme ile alınır</h4>
-                <p class="text-[10px] text-slate-400 mt-1 leading-normal">Hesap kapatma talebiniz incelendikten sonra verileriniz silinir.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div class="p-5 rounded-xl bg-slate-50 border flex flex-col justify-between h-36" style="border-color: #E2E8F0;">
+                <div>
+                  <span class="text-[8px] font-black text-slate-300 uppercase block">VERİ VE RAPORLAR</span>
+                  <h4 class="text-xs font-bold text-slate-800 mt-1">Veri dışa aktarma henüz hazır değil</h4>
+                  <p class="text-[10px] text-slate-400 mt-1 leading-normal">Geçmiş verilerinizi ve raporlarınızı indirmek için kurumsal temsilcinizle görüşün veya e-posta talebi oluşturun.</p>
+                </div>
               </div>
-              <div class="flex gap-2">
-                <button type="button" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold bg-white text-slate-700 hover:bg-slate-100" style="border-color: #E2E8F0;">Oturumu Sonlandır</button>
-                <button type="button" class="rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-bold text-[10px] px-3 py-1.5 transition">Hesabı Kapat</button>
+
+              <div class="p-5 rounded-xl bg-slate-50 border flex flex-col justify-between h-36" style="border-color: #E2E8F0;">
+                <div>
+                  <span class="text-[8px] font-black text-slate-300 uppercase block">HESAP İŞLEMLERİ</span>
+                  <h4 class="text-xs font-bold text-slate-800 mt-1">Hesap kapatma talebi manuel inceleme ile alınır</h4>
+                  <p class="text-[10px] text-slate-400 mt-1 leading-normal">Hesap kapatma talebiniz incelendikten sonra verileriniz silinir. Rolü devretmeniz veya silmeniz gerekebilir.</p>
+                </div>
+                <div class="flex gap-2">
+                  <button type="button" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold bg-white text-slate-700 hover:bg-slate-100" style="border-color: #E2E8F0;">Oturumu Sonlandır</button>
+                  <button type="button" class="rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-bold text-[10px] px-3 py-1.5 transition">Hesabı Kapat</button>
+                </div>
               </div>
             </div>
           </div>
