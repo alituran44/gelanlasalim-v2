@@ -580,7 +580,7 @@ function toggleFilterSection(section: string) {
       </ClientOnly>
       <!-- Fallback image background if video is not available -->
       <div 
-        v-else 
+        v-if="!cmsData.hero.heroVideoUrl" 
         class="absolute inset-0 w-full h-full bg-cover bg-center z-0" 
         style="background-image: url('/hero_port_background.png'); opacity: 0.15;"
       ></div>
