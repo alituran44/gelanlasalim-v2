@@ -5,13 +5,18 @@ import {
   LayoutDashboard,
   FilePlus2,
   ClipboardList,
+  ShoppingBag,
   Inbox,
-  SendHorizonal,
-  MessageSquare,
-  Bell,
-  CreditCard,
+  Send,
+  Package,
+  Tv,
+  BarChart3,
+  Coins,
+  Building2,
+  Users,
   Settings,
   LogOut,
+  Plus,
   ChevronRight
 } from "lucide-vue-next"
 
@@ -43,28 +48,21 @@ function logout() {
   router.push('/')
 }
 
-const buyerMenus = [
-  { title: "Dashboard", icon: LayoutDashboard, to: "/panel" },
-  { title: "İhale Oluştur", icon: FilePlus2, to: "/panel/ihale-olustur" },
-  { title: "İlanlarım", icon: ClipboardList, to: "/panel/ilanlarim" },
-  { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
-  { title: "Mesajlar", icon: MessageSquare, to: "/panel/mesajlar" },
-  { title: "Bildirimler", icon: Bell, to: "/panel/bildirimler" },
-  { title: "Abonelik", icon: CreditCard, to: "/abonelik" },
-  { title: "Ayarlar", icon: Settings, to: "/panel/ayarlar" },
+const sidebarMenus = [
+  { title: "Panel", icon: LayoutDashboard, to: "/panel" },
+  { title: "Pazar Yeri", icon: ShoppingBag, to: "/panel/pazar-yeri" },
+  { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
+  { title: "Tekliflerim", icon: Send, to: "/panel/tekliflerim" },
+  { title: "Sipariş & Teslimat", icon: Package, to: "/panel/siparis-teslimat" },
+  { title: "Canlı Etkinlikler", icon: Tv, to: "/panel/canli-etkinlikler" },
+  { title: "İstatistikler", icon: BarChart3, to: "/panel/istatistikler" },
+  { title: "Döviz Kurları", icon: Coins, to: "/panel/doviz-kurlari" },
+  { title: "Kurumsal Firmalar", icon: Building2, to: "/panel/firmalar" },
+  { title: "Ekip & Yetki", icon: Users, to: "/panel/ekip-yetki" },
+  { title: "Hesap Merkezi", icon: Settings, to: "/panel/ayarlar" },
 ]
 
-const supplierMenus = [
-  { title: "Dashboard", icon: LayoutDashboard, to: "/panel" },
-  { title: "İhale Bul", icon: ClipboardList, to: "/panel/ilanlarim" },
-  { title: "Yaptığım Teklifler", icon: SendHorizonal, to: "/panel/yaptigim-teklifler" },
-  { title: "Mesajlar", icon: MessageSquare, to: "/panel/mesajlar" },
-  { title: "Bildirimler", icon: Bell, to: "/panel/bildirimler" },
-  { title: "Abonelik", icon: CreditCard, to: "/abonelik" },
-  { title: "Ayarlar", icon: Settings, to: "/panel/ayarlar" },
-]
-
-const menus = computed(() => userRole.value === 'supplier' ? supplierMenus : buyerMenus)
+const menus = computed(() => sidebarMenus)
 
 const activePath = computed(() => route.path)
 </script>
@@ -98,6 +96,20 @@ const activePath = computed(() => route.path)
       >
         {{ userRole === 'buyer' ? '🏢 Alıcı Firma' : '🏭 Tedarikçi' }}
       </span>
+    </div>
+
+    <!-- Yeni İhale Oluştur Butonu -->
+    <div class="px-3 mb-4">
+      <NuxtLink
+        to="/panel/ihale-olustur"
+        class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white transition-all shadow-md"
+        style="background: #1E3A5F; border: 1px solid rgba(255, 255, 255, 0.15);"
+        onmouseover="this.style.background='#F59E0B'"
+        onmouseout="this.style.background='#1E3A5F'"
+      >
+        <Plus :size="14" />
+        Yeni ihale oluştur
+      </NuxtLink>
     </div>
 
     <!-- Navigasyon -->

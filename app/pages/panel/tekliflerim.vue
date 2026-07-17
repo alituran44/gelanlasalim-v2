@@ -1,26 +1,21 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight } from 'lucide-vue-next'
-import { useCmsData } from '~/composables/useCmsData'
+import { ref, onMounted } from 'vue'
+import { Plus, RotateCw, Search, LayoutGrid, List, Send, ArrowRight } from 'lucide-vue-next'
 
 definePageMeta({
   layout: "dashboard"
 })
 
-const { cmsData } = useCmsData()
 const isLoading = ref(true)
-const activeTab = ref<'aktif' | 'beklemede' | 'tamamlanan' | 'iptal'>('aktif')
-const activePeriod = ref<'7gun' | '30gun' | '90gun' | '1yil'>('30gun')
+const activeTab = ref<'aktif' | 'beklemede' | 'kazanilan' | 'kaybedilen'>('aktif')
+const activePeriod = ref<'30gun' | '7gun' | '90gun' | '1yil'>('30gun')
 const searchQuery = ref('')
+const orderBy = ref('En yeni')
 
 onMounted(() => {
   setTimeout(() => {
     isLoading.value = false
   }, 1000)
-})
-
-const tendersList = computed(() => {
-  return cmsData.value.dashboard.tenders || []
 })
 </script>
 
@@ -30,16 +25,16 @@ const tendersList = computed(() => {
     <!-- Top Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #F1F5F9;">
       <div>
-        <h1 class="text-2xl font-black text-slate-800" style="color: #0F172A;">İhalelerim</h1>
-        <p class="text-xs text-slate-500 mt-1">Oluşturduğunuz ihaleleri durum, tarih ve teklif sürecine göre yönetin.</p>
+        <h1 class="text-2xl font-black text-slate-800" style="color: #0F172A;">Tekliflerim</h1>
+        <p class="text-xs text-slate-500 mt-1">Toplam 0 teklifiniz var. Teklif hacmi: <strong>₺0</strong>. Son güncelleme: 17 Temmuz 23:34</p>
       </div>
 
       <NuxtLink 
-        to="/panel/ihale-olustur"
+        to="/panel/pazar-yeri"
         class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-3 shadow-lg shadow-blue-500/20 transition self-start sm:self-auto"
       >
         <Plus :size="14" />
-        Yeni ihale
+        Yeni teklif ver
       </NuxtLink>
     </div>
 
@@ -48,10 +43,10 @@ const tendersList = computed(() => {
       <div class="flex items-center gap-1.5">
         <button 
           v-for="period in [
-            { id: '7gun', label: 'Son 7 Gün' },
-            { id: '30gun', label: 'Son 30 Gün' },
-            { id: '90gun', label: 'Son 90 Gün' },
-            { id: '1yil', label: 'Son 1 Yıl' }
+            { id: '7gun', label: '7 Gün' },
+            { id: '30gun', label: '30 Gün' },
+            { id: '90gun', label: '90 Gün' },
+            { id: '1yil', label: '1 Yıl' }
           ]"
           :key="period.id"
           type="button"
@@ -79,10 +74,10 @@ const tendersList = computed(() => {
       <div class="flex items-center gap-2 bg-white rounded-xl border p-1" style="border-color: #E2E8F0;">
         <button 
           v-for="tab in [
-            { id: 'aktif', label: 'Aktif', count: tendersList.length },
+            { id: 'aktif', label: 'Aktif', count: 0 },
             { id: 'beklemede', label: 'Beklemede', count: 0 },
-            { id: 'tamamlanan', label: 'Tamamlanan', count: 0 },
-            { id: 'iptal', label: 'İptal', count: 0 }
+            { id: 'kazanilan', label: 'Kazanılan', count: 0 },
+            { id: 'kaybedilen', label: 'Kaybedilen', count: 0 }
           ]"
           :key="tab.id"
           type="button"
@@ -102,14 +97,14 @@ const tendersList = computed(() => {
         </button>
       </div>
 
-      <!-- Search and View Switcher -->
-      <div class="flex items-center gap-2 flex-1 md:max-w-md justify-end">
-        <div class="relative flex-1 w-full">
+      <!-- Search, view switcher and order -->
+      <div class="flex flex-wrap items-center gap-2 flex-1 md:max-w-2xl justify-end">
+        <div class="relative flex-1 w-full max-w-xs">
           <Search :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input 
             v-model="searchQuery"
             type="text"
-            placeholder="İhale adı, kategori, şehir veya durum ile ara..."
+            placeholder="İhale adı, firma, kategori veya teklif durumu ile ara..."
             class="w-full rounded-xl border pl-9 pr-4 py-2.5 text-xs outline-none bg-white transition focus:border-blue-500"
             style="border-color: #E2E8F0; color: #0F172A;"
           />
@@ -120,6 +115,17 @@ const tendersList = computed(() => {
         <button type="button" class="p-2.5 rounded-xl border bg-white text-slate-400 hover:bg-slate-50" style="border-color: #E2E8F0;">
           <LayoutGrid :size="14" />
         </button>
+        
+        <select 
+          v-model="orderBy"
+          class="rounded-xl border px-3 py-2.5 text-xs bg-white outline-none font-bold text-slate-700"
+          style="border-color: #E2E8F0;"
+        >
+          <option value="En yeni">Sırala: En yeni</option>
+          <option value="En eski">Sırala: En eski</option>
+          <option value="En yüksek teklif">Sırala: En yüksek</option>
+          <option value="En düşük teklif">Sırala: En düşük</option>
+        </select>
       </div>
 
     </div>
@@ -127,7 +133,7 @@ const tendersList = computed(() => {
     <!-- SKELETON LOADER -->
     <div v-if="isLoading" class="space-y-3">
       <div 
-        v-for="i in 6" 
+        v-for="i in 4" 
         :key="i"
         class="h-20 w-full rounded-xl border bg-white animate-pulse flex items-center justify-between px-6"
         style="border-color: #E2E8F0;"
@@ -143,39 +149,24 @@ const tendersList = computed(() => {
       </div>
     </div>
 
-    <!-- DATA LIST -->
-    <div v-else class="space-y-3">
-      <div 
-        v-for="tender in tendersList"
-        :key="tender.id"
-        class="rounded-xl border bg-white p-5 shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-        style="border-color: #E2E8F0;"
-      >
-        <div class="flex items-start gap-4">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 border border-blue-100">
-            <FileText :size="18" />
-          </div>
-          <div>
-            <h3 class="font-bold text-sm text-slate-800">{{ tender.baslik }}</h3>
-            <p class="text-xs text-slate-400 mt-1">İhale Kodu: <strong class="font-mono">{{ tender.id }}</strong> · Kategori: {{ tender.kategori }}</p>
-            
-            <div class="flex flex-wrap items-center gap-3 mt-2 text-[10px] text-slate-500">
-              <span class="rounded bg-slate-100 px-2 py-0.5 font-bold uppercase tracking-wider text-[8px]">{{ tender.olusturma }}</span>
-              <span>Bütçe: {{ tender.butce }}</span>
-              <span>Süre: {{ tender.sure }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="flex items-center gap-4 sm:justify-end">
-          <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-100">
-            {{ tender.teklifSayisi }} Teklif Alındı
-          </span>
-          <NuxtLink :to="`/panel/gelen-teklifler?ilan=${tender.id}`" class="p-2 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-50 transition border" style="border-color: #E2E8F0;">
-            <ChevronRight :size="14" />
-          </NuxtLink>
-        </div>
+    <!-- EMPTY STATE VIEW (Screenshot 2 style) -->
+    <div v-else class="rounded-2xl border bg-white py-16 px-6 text-center space-y-4" style="border-color: #E2E8F0;">
+      <div class="inline-flex h-12 w-12 items-center justify-center rounded-full bg-blue-50 text-blue-600 border border-blue-100">
+        <Send :size="20" class="rotate-45" />
       </div>
+      <div class="space-y-1">
+        <h3 class="text-sm font-bold text-slate-800">Henüz teklif vermediniz.</h3>
+        <p class="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+          Pazaryerindeki açık ihaleleri inceleyerek ilk teklifinizi oluşturabilirsiniz.
+        </p>
+      </div>
+      <NuxtLink 
+        to="/panel/pazar-yeri"
+        class="inline-flex items-center gap-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-2.5 shadow transition"
+      >
+        Pazaryeri'ne git
+        <ArrowRight :size="13" />
+      </NuxtLink>
     </div>
 
   </div>
