@@ -125,6 +125,20 @@ function handleLogin() {
     router.push('/panel')
   }, 1000)
 }
+
+function handleDemoLogin(role: 'buyer' | 'supplier') {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('userSession', JSON.stringify({
+      email: role === 'buyer' ? 'alici_demo@gelanlasalim.com' : 'tedarikci_demo@gelanlasalim.com',
+      firstName: role === 'buyer' ? 'Kemal' : 'Ahmet',
+      name: role === 'buyer' ? 'Kemal Yılmaz' : 'Ahmet Yıldız',
+      company: role === 'buyer' ? 'Yılmaz Tekstil A.Ş.' : 'Yıldız Ambalaj Sanayi',
+      role: role,
+      isPremium: true
+    }))
+  }
+  router.push('/panel')
+}
 </script>
 
 <template>
@@ -445,6 +459,29 @@ function handleLogin() {
               <ChevronRight v-if="!isSubmitting" :size="14" />
             </button>
           </form>
+
+          <!-- Hızlı Demo Girişleri -->
+          <div class="mt-6 pt-6 border-t" style="border-color: #F1F5F9;">
+            <label class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-2 text-center">HIZLI DEMO GİRİŞLERİ</label>
+            <div class="grid grid-cols-2 gap-3">
+              <button 
+                type="button" 
+                @click="handleDemoLogin('buyer')"
+                class="flex flex-col items-center justify-center p-3 rounded-xl border border-dashed border-blue-200 bg-blue-50/10 hover:bg-blue-50 text-center transition"
+              >
+                <span class="text-xs font-bold text-blue-700">🏢 Alıcı Demosu</span>
+                <span class="text-[8px] text-slate-500 mt-0.5">İhale Aç & Yönet</span>
+              </button>
+              <button 
+                type="button" 
+                @click="handleDemoLogin('supplier')"
+                class="flex flex-col items-center justify-center p-3 rounded-xl border border-dashed border-emerald-200 bg-emerald-50/10 hover:bg-emerald-50 text-center transition"
+              >
+                <span class="text-xs font-bold text-emerald-700">🏭 Tedarikçi Demosu</span>
+                <span class="text-[8px] text-slate-500 mt-0.5">Teklif Ver & Görüş</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>
