@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue"
+import { computed, ref, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import {
   LayoutDashboard,
@@ -18,12 +18,16 @@ import {
 const route = useRoute()
 const router = useRouter()
 
-// Simulated user session — replace with real auth store
-const userSession = computed(() => {
-  try {
-    return JSON.parse(localStorage.getItem('userSession') || '{}')
-  } catch {
-    return {}
+// Simulated user session — safe client-side loading
+const userSession = ref<any>({})
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    try {
+      userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch {
+      userSession.value = {}
+    }
   }
 })
 
@@ -33,7 +37,9 @@ const userCompany = computed(() => userSession.value?.company || 'Şirketiniz')
 const userInitial = computed(() => userName.value.charAt(0).toUpperCase())
 
 function logout() {
-  localStorage.removeItem('userSession')
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('userSession')
+  }
   router.push('/')
 }
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue"
+import { ref, computed, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import { Search, Bell, Plus, ChevronDown } from "lucide-vue-next"
 
@@ -17,11 +17,16 @@ function handleLogout() {
   router.push('/')
 }
 
-const userSession = computed(() => {
-  try {
-    return JSON.parse(localStorage.getItem('userSession') || '{}')
-  } catch {
-    return {}
+// Simulated user session — safe client-side loading
+const userSession = ref<any>({})
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    try {
+      userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch {
+      userSession.value = {}
+    }
   }
 })
 
