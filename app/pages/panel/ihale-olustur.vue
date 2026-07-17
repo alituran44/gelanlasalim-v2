@@ -1,7 +1,21 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { FilePlus2, ArrowLeft, CheckCircle2 } from 'lucide-vue-next'
+import { 
+  FilePlus2, 
+  ArrowLeft, 
+  CheckCircle2, 
+  UploadCloud, 
+  FileText, 
+  X, 
+  Plus, 
+  Trash2, 
+  MapPin, 
+  CreditCard,
+  FileSpreadsheet,
+  AlertCircle
+} from 'lucide-vue-next'
+import { useCmsData } from '~/composables/useCmsData'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -13,7 +27,10 @@ const form = ref({
   kategori: 'Hammadde & Metal',
   sure: '7 gün',
   butce: '',
-  aciklama: ''
+  aciklama: '',
+  teslimatAdresi: '',
+  odemeYontemi: 'Vadeli 30 Gün',
+  files: [] as { name: string; size: string; progress: number; type: string }[]
 })
 
 const categories = [
@@ -35,11 +52,60 @@ const durations = [
   '30 gün'
 ]
 
+const paymentMethods = [
+  'Vadeli 30 Gün',
+  'Vadeli 60 Gün',
+  'Vadeli 90 Gün',
+  'Peşin Ödeme / Havale',
+  'Akreditif (L/C)',
+  'Mal Mukabili'
+]
+
+const fileInputRef = ref<HTMLInputElement | null>(null)
 const showSuccess = ref(false)
 const createdId = ref('')
 
+function triggerFileSelect() {
+  fileInputRef.value?.click()
+}
+
+function handleFileChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (!target.files || target.files.length === 0) return
+
+  for (let i = 0; i < target.files.length; i++) {
+    const file = target.files[i]
+    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2) + ' MB'
+    let fileType = 'word'
+    if (file.name.endsWith('.pdf')) fileType = 'pdf'
+    else if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) fileType = 'excel'
+
+    const fileObj = {
+      name: file.name,
+      size: fileSizeMB,
+      progress: 0,
+      type: fileType
+    }
+
+    form.value.files.push(fileObj)
+
+    // Simulate progress bar upload
+    let interval = setInterval(() => {
+      if (fileObj.progress < 100) {
+        fileObj.progress += 20
+      } else {
+        clearInterval(interval)
+      }
+    }, 150)
+  }
+}
+
+function removeFile(index: number) {
+  form.value.files.splice(index, 1)
+}
+
 function handleSubmit() {
-  if (!form.value.baslik || !form.value.butce) return
+  if (!form.value.baslik || !form.value.butce || !form.value.teslimatAdresi) return
 
   // Format budget with currency sign if missing
   let budgetVal = form.value.butce.trim()
@@ -51,7 +117,7 @@ function handleSubmit() {
   const newId = 'IHC-2026-' + Math.floor(100 + Math.random() * 900)
   createdId.value = newId
 
-  // Add to active tenders
+  // Add to active tenders list
   cmsData.value.dashboard.tenders.unshift({
     id: newId,
     baslik: form.value.baslik,
@@ -83,7 +149,7 @@ function handleSubmit() {
 </script>
 
 <template>
-  <div class="p-6 max-w-2xl mx-auto text-left">
+  <div class="p-6 max-w-3xl mx-auto text-left">
     
     <!-- Geri Dönüş Linki -->
     <div class="mb-5">
@@ -110,84 +176,215 @@ function handleSubmit() {
     </div>
 
     <!-- İhale Formu -->
-    <form v-else @submit.prevent="handleSubmit" class="rounded-xl border bg-white p-6 shadow-sm space-y-5" style="border-color: #E2E8F0;">
+    <form v-else @submit.prevent="handleSubmit" class="space-y-6">
       
-      <!-- İhale Başlığı -->
-      <div>
-        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">İHALE BAŞLIĞI *</label>
-        <input 
-          v-model="form.baslik" 
-          type="text" 
-          required 
-          placeholder="Örn: 20.000 Adet Mukavva Kutu Alımı" 
-          class="w-full rounded-lg border p-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" 
-          style="border-color: #CBD5E1; color: #0F172A;"
-        />
-      </div>
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <!-- Kategori -->
+      <!-- KART 1: GENEL BİLGİLER -->
+      <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+        <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">1. İhale Genel Bilgileri</h2>
+        
+        <!-- İhale Başlığı -->
         <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">İHALE KATEGORİSİ</label>
-          <select 
-            v-model="form.kategori" 
-            class="w-full rounded-lg border p-3 text-sm outline-none bg-white transition focus:border-blue-600"
-            style="border-color: #CBD5E1; color: #0F172A;"
-          >
-            <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
-          </select>
-        </div>
-
-        <!-- Yaklaşık Bütçe -->
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">YAKLAŞIK BÜTÇE (₺) *</label>
+          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">İHALE BAŞLIĞI *</label>
           <input 
-            v-model="form.butce" 
+            v-model="form.baslik" 
             type="text" 
             required 
-            placeholder="Örn: 150.000" 
-            class="w-full rounded-lg border p-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+            placeholder="Örn: 20.000 Adet Mukavva Kutu Alımı" 
+            class="w-full rounded-lg border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" 
             style="border-color: #CBD5E1; color: #0F172A;"
           />
         </div>
-      </div>
 
-      <!-- İhale Süresi -->
-      <div>
-        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">TEKLİF TOPLAMA SÜRESİ</label>
-        <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
-          <button 
-            v-for="dur in durations" 
-            :key="dur" 
-            type="button"
-            @click="form.sure = dur"
-            class="rounded-lg border py-2 text-xs font-bold transition text-center"
-            :style="form.sure === dur 
-              ? 'background: #1E3A5F; border-color: #1E3A5F; color: white;' 
-              : 'background: white; border-color: #CBD5E1; color: #475569;'"
-          >
-            {{ dur }}
-          </button>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <!-- Kategori -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">İHALE KATEGORİSİ</label>
+            <select 
+              v-model="form.kategori" 
+              class="w-full rounded-lg border p-3 text-xs outline-none bg-white transition focus:border-blue-600"
+              style="border-color: #CBD5E1; color: #0F172A;"
+            >
+              <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+            </select>
+          </div>
+
+          <!-- Yaklaşık Bütçe -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">YAKLAŞIK BÜTÇE (₺) *</label>
+            <input 
+              v-model="form.butce" 
+              type="text" 
+              required 
+              placeholder="Örn: 150.000" 
+              class="w-full rounded-lg border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+              style="border-color: #CBD5E1; color: #0F172A;"
+            />
+          </div>
+        </div>
+
+        <!-- İhale Süresi -->
+        <div>
+          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">TEKLİF TOPLAMA SÜRESİ</label>
+          <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
+            <button 
+              v-for="dur in durations" 
+              :key="dur" 
+              type="button"
+              @click="form.sure = dur"
+              class="rounded-lg border py-2 text-xs font-bold transition text-center"
+              :style="form.sure === dur 
+                ? 'background: #1E3A5F; border-color: #1E3A5F; color: white;' 
+                : 'background: white; border-color: #CBD5E1; color: #475569;'"
+            >
+              {{ dur }}
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Teknik Açıklama & Şartname -->
-      <div>
-        <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">TEKNİK ŞARTNAME & AÇIKLAMA</label>
-        <textarea 
-          v-model="form.aciklama" 
-          rows="4" 
-          placeholder="İhale kalemlerinin miktarlarını, teslimat şartlarını ve kalite standartlarını belirtin..." 
-          class="w-full rounded-lg border p-3 text-sm outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-          style="border-color: #CBD5E1; color: #0F172A;"
-        ></textarea>
+      <!-- KART 2: LOJİSTİK VE ÖDEME ŞARTLARI -->
+      <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+        <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">2. Lojistik & Ödeme Şartları</h2>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Ödeme Yöntemi Tercihi -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">ÖDEME YÖNTEMİ TERCİHİ</label>
+            <div class="relative">
+              <CreditCard :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <select 
+                v-model="form.odemeYontemi" 
+                class="w-full pl-9 pr-4 py-3 rounded-lg border text-xs outline-none bg-white transition focus:border-blue-600"
+                style="border-color: #CBD5E1; color: #0F172A;"
+              >
+                <option v-for="method in paymentMethods" :key="method" :value="method">{{ method }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Teslimat Adresi -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">TESLİMAT / SEVK ADRESİ *</label>
+            <div class="relative">
+              <MapPin :size="14" class="absolute left-3 top-3 text-slate-400" />
+              <textarea 
+                v-model="form.teslimatAdresi" 
+                rows="1"
+                required
+                placeholder="Örn: Balıkesir OSB, 3. Yol No: 12" 
+                class="w-full pl-9 pr-4 py-2.5 rounded-lg border text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                style="border-color: #CBD5E1; color: #0F172A;"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KART 3: TEKNİK AÇIKLAMALAR -->
+      <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+        <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">3. Teknik Açıklama & Kalem Detayları</h2>
+        
+        <!-- Teknik Açıklama -->
+        <div>
+          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">TEKNİK ŞARTNAME & AÇIKLAMA</label>
+          <textarea 
+            v-model="form.aciklama" 
+            rows="4" 
+            placeholder="İhale kalemlerinin net miktarlarını, kalite gereksinimlerini ve sevkiyat şartlarını buraya yazabilirsiniz..." 
+            class="w-full rounded-lg border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+            style="border-color: #CBD5E1; color: #0F172A;"
+          ></textarea>
+        </div>
+      </div>
+
+      <!-- KART 4: DOSYA & ŞARTNAME YÜKLEME -->
+      <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+        <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">4. Şartname & Ek Belgeler Yükleme</h2>
+        
+        <!-- Drag & Drop Zone -->
+        <div 
+          @click="triggerFileSelect"
+          class="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition hover:bg-slate-50 flex flex-col items-center justify-center gap-2 group"
+          style="border-color: #CBD5E1;"
+        >
+          <UploadCloud :size="28" class="text-slate-400 group-hover:text-blue-600 transition" />
+          <div>
+            <span class="text-xs font-bold text-slate-700">Teknik veya İdari Şartname Dosyası Yükleyin</span>
+            <p class="text-[10px] text-slate-400 mt-1">PDF, Word veya Excel (Maks: 10MB)</p>
+          </div>
+          <input 
+            ref="fileInputRef"
+            type="file"
+            multiple
+            accept=".pdf,.doc,.docx,.xls,.xlsx"
+            class="hidden"
+            @change="handleFileChange"
+          />
+        </div>
+
+        <!-- Uploaded Files List -->
+        <div v-if="form.files.length > 0" class="space-y-2 mt-4">
+          <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">YÜKLENEN BELGELER</label>
+          <div 
+            v-for="(file, index) in form.files" 
+            :key="index"
+            class="flex items-center gap-3 p-3 bg-slate-50 border rounded-xl"
+            style="border-color: #E2E8F0;"
+          >
+            <!-- File Icon type -->
+            <FileText v-if="file.type === 'pdf'" :size="16" class="text-red-500 shrink-0" />
+            <FileSpreadsheet v-else-if="file.type === 'excel'" :size="16" class="text-emerald-600 shrink-0" />
+            <FileText v-else :size="16" class="text-blue-600 shrink-0" />
+
+            <!-- File details -->
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-700 truncate pr-4">{{ file.name }}</span>
+                <span class="text-[10px] text-slate-400 shrink-0 font-medium">{{ file.size }}</span>
+              </div>
+              
+              <!-- Progress Bar -->
+              <div class="w-full bg-slate-200 h-1.5 rounded-full mt-1.5 overflow-hidden">
+                <div 
+                  class="bg-blue-600 h-full rounded-full transition-all duration-300"
+                  :style="{ width: file.progress + '%' }"
+                ></div>
+              </div>
+              <div class="flex items-center justify-between mt-1">
+                <span class="text-[9px] font-bold text-blue-600">
+                  {{ file.progress < 100 ? `Yükleniyor %${file.progress}` : 'Hazır / Yüklendi ✓' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Remove file button -->
+            <button 
+              type="button"
+              @click="removeFile(index)"
+              class="p-1 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-slate-900 transition"
+            >
+              <X :size="14" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bilgi Bandı -->
+      <div 
+        class="flex items-start gap-2.5 p-4 rounded-xl border"
+        style="background: rgba(245,158,11,0.04); border-color: rgba(245,158,11,0.15);"
+      >
+        <AlertCircle :size="16" class="text-amber-500 shrink-0 mt-0.5" />
+        <p class="text-[11px] leading-relaxed text-amber-800 font-medium">
+          <strong>Önemli Bilgilendirme:</strong> İhaleyi başlattığınızda, seçili sektöre kayıtlı tüm doğrulanmış tedarikçilere otomatik olarak anlık bildirim ve e-posta gönderilir. Canlı teklif toplama süreci hemen başlar.
+        </p>
       </div>
 
       <!-- Gönder Butonu -->
       <div class="pt-2">
         <button 
           type="submit" 
-          class="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-3.5 transition shadow-lg shadow-blue-500/10"
+          class="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-4 transition shadow-lg shadow-blue-500/10 cursor-pointer"
         >
           <FilePlus2 :size="16" />
           İhaleyi Başlat ve İlan Et
