@@ -1,12 +1,21 @@
 <script setup lang="ts">
 import { ref, computed } from "vue"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import { Search, Bell, Plus, ChevronDown } from "lucide-vue-next"
 
 const route = useRoute()
+const router = useRouter()
 const search = ref("")
 const notifCount = ref(3)
 const showUserMenu = ref(false)
+
+function handleLogout() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('userSession')
+  }
+  showUserMenu.value = false
+  router.push('/')
+}
 
 const userSession = computed(() => {
   try {
@@ -121,7 +130,7 @@ const pageTitle = computed(() => {
           </NuxtLink>
           <div class="my-1 border-t" style="border-color: #F1F5F9;"></div>
           <button
-            @click="() => { localStorage.removeItem('userSession'); $router.push('/') }"
+            @click="handleLogout"
             class="block w-full px-4 py-2 text-left text-sm transition hover:bg-red-50"
             style="color: #EF4444;"
           >

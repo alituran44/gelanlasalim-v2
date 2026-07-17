@@ -12,28 +12,28 @@ const actions = [
     description: "Yeni ihale oluştur",
     icon: PlusCircle,
     color: "bg-blue-500",
-    link: "/ihale/yeni"
+    link: "/panel/ihale-olustur"
   },
   {
     title: "İhalelerim",
     description: "Tüm ihaleleri görüntüle",
     icon: FileText,
     color: "bg-emerald-500",
-    link: "/ihalelerim"
+    link: "/panel/ilanlarim"
   },
   {
-    title: "Firmalar",
-    description: "Firma listesini aç",
+    title: "Firma Ayarları",
+    description: "Firma profilini düzenle",
     icon: Users,
     color: "bg-orange-500",
-    link: "/firmalar"
+    link: "/panel/ayarlar"
   },
   {
-    title: "Raporlar",
-    description: "İstatistikleri görüntüle",
+    title: "Entegrasyonlar",
+    description: "ERP entegrasyonu",
     icon: BarChart3,
     color: "bg-purple-500",
-    link: "/raporlar"
+    link: "/entegrasyonlar"
   }
 ]
 </script>
