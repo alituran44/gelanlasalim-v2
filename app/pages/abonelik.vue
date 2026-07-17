@@ -29,16 +29,14 @@ const subscriptionPackages = ref([
     name: 'Profesyonel', 
     badge: 'ALICI EKİP AKSİYONU',
     isPromo: true,
-    price: 0,
-    oldPrice: 8000,
-    monthly: 'LANSMANA ÖZEL',
+    price: 8000,
+    monthly: '₺667,00 / ay',
     desc: 'Yılda max 36 ihale açın, tüm pazarlara kapasite arttırın.',
     features: [
       'Aylık 3 - yıllık 36 ihale açma hakkı',
       '3 segmentte yayın ve teklif akışı',
       'Ek ihale paketleriyle kapasite arttırımı'
-    ],
-    promoText: 'Lansman dönemi boyunca ücretsiz deneme hakkı tanımlanır, dönem sonunda geçerli standart paket fiyatı uygulanır.'
+    ]
   },
   { 
     id: 'kurumsal', 
@@ -149,7 +147,7 @@ function completeCheckout() {
         <span class="text-[9px] font-black uppercase tracking-widest text-slate-400">ÜYELİK PAKETLERİ</span>
         <h1 class="text-3xl font-black text-slate-800 mt-1" style="color: #0F172A;">Şeffaf Fiyat, Net Erişim</h1>
         <p class="text-xs text-slate-500 mt-2 max-w-2xl leading-relaxed">
-          Profesyonel plan lansman döneminde ücretsiz açılır; dönem sonrasında standart yıllık fiyat geçerli olur. Temel plan teklif veren firmalar, Profesyonel plan ihale açan alıcı ekipler, Kurumsal plan ise çok ekipli operasyonlar için konumlanır. Tüm fiyatlar yıllık ve KDV hariçtir.
+          Temel plan teklif veren firmalar, Profesyonel plan ihale açan alıcı ekipler, Kurumsal plan ise çok ekipli operasyonlar için konumlanır. Tüm fiyatlar yıllık ve KDV hariçtir.
         </p>
       </div>
 
@@ -158,8 +156,8 @@ function completeCheckout() {
         <div class="flex items-center gap-3">
           <span class="inline-flex items-center gap-1 text-[8px] font-black uppercase text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-1.5 rounded-lg shrink-0">DESTEK TALEBİ AÇIK</span>
           <div>
-            <h4 class="text-xs font-bold text-slate-800">Profesyonel plan lansman döneminde ücretsiz.</h4>
-            <p class="text-[10px] text-slate-400 mt-0.5">İhale açmak ve tedarikçileri tek panelde toplamak isteyen ekipler için varsayılan başlangıç yolu.</p>
+            <h4 class="text-xs font-bold text-slate-800">Profesyonel plan ile ihalelerinizi kolayca yönetin.</h4>
+            <p class="text-[10px] text-slate-400 mt-0.5">İhale açmak ve tedarikçileri tek panelde toplamak isteyen ekipler için en ideal başlangıç yolu.</p>
           </div>
         </div>
         <button 
