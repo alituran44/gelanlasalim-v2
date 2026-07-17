@@ -36,21 +36,38 @@ import {
   Eye,
   Settings,
   HelpCircle,
-  ArrowRight
+  ArrowRight,
+  X,
+  CheckSquare,
+  ThumbsUp,
+  ThumbsDown,
+  ExternalLink,
+  ChevronDown
 } from 'lucide-vue-next'
+import { useRoute, useRouter } from 'vue-router'
 
 definePageMeta({ 
   layout: 'dashboard' 
 })
 
-import { useRoute } from 'vue-router'
-
 const route = useRoute()
+const router = useRouter()
 
-// Sub-navigation tabs matching screenshot
+// Sub-navigation tabs matching query parameter tab
 const activeSubTab = computed(() => {
   return (route.query.tab as 'kisisel' | 'sirket' | 'adresler' | 'bildirimler' | 'takip' | 'ticaret' | 'uyelik' | 'ayarlar') || 'ayarlar'
 })
+
+// Toast Notification State
+const toasts = ref<{ id: number, message: string, type: 'success' | 'error' | 'warning' }[]>([])
+let toastId = 0
+function showToast(message: string, type: 'success' | 'error' | 'warning' = 'success') {
+  const id = toastId++
+  toasts.value.push({ id, message, type })
+  setTimeout(() => {
+    toasts.value = toasts.value.filter(t => t.id !== id)
+  }, 3500)
+}
 
 // Personal Profile data
 const profileForm = ref({
@@ -70,23 +87,23 @@ const companyForm = ref({
   taxNo: '45624685040',
   taxOffice: 'Çanakkale Vergi Dairesi Müdürlüğü',
   sectors: 'Yazılım & IT Hizmetleri, Reklam & Pazarlama, Elektrik & Elektronik',
-  mersis: '',
-  sicilNo: '',
-  kep: '',
+  mersis: '0456-2468-5040-0001',
+  sicilNo: '58402-Ç',
+  kep: 'alituran@hs01.kep.tr',
   faturaAdresi: '17100 Çanakkale İsmet Paşa Mah. Merkez Çanakkale 17100',
-  iban: '',
-  accountHolder: '',
-  is2FaEnabled: false
+  iban: 'TR56 0006 2000 0001 2345 6789 01',
+  accountHolder: 'Ali Turan',
+  is2FaEnabled: true
 })
 
 // Document Upload status counters
 const uploadedDocs = ref<Record<string, boolean>>({
-  vergi: false,
-  sicil: false,
+  vergi: true,
+  sicil: true,
   imza: false,
   faaliyet: false,
-  kimlikOn: false,
-  kimlikArka: false
+  kimlikOn: true,
+  kimlikArka: true
 })
 
 const docsCount = computed(() => {
@@ -94,24 +111,182 @@ const docsCount = computed(() => {
 })
 
 function uploadDoc(key: string) {
-  uploadedDocs.value[key] = true
+  uploadedDocs.value[key] = !uploadedDocs.value[key]
+  showToast(
+    uploadedDocs.value[key] ? "Belge sisteme yüklendi." : "Belge kaldırıldı.",
+    uploadedDocs.value[key] ? "success" : "warning"
+  )
 }
 
-// Addresses list tabs
-const activeAddressType = ref<'teslimat' | 'fatura'>('teslimat')
+// Password verification state
+const currentPassword = ref('')
+const newPassword = ref('')
+const newPasswordConfirm = ref('')
+const showPassword1 = ref(false)
+const showPassword2 = ref(false)
+const showPassword3 = ref(false)
 
-// Notification preferences
-const notifyMail = ref(true)
-const notifySms = ref(false)
-const notifyBrowser = ref(true)
+const ruleLength = computed(() => newPassword.value.length >= 10)
+const ruleCase = computed(() => /[A-Z]/.test(newPassword.value) && /[a-z]/.test(newPassword.value))
+const ruleDigit = computed(() => /[0-9]/.test(newPassword.value))
+const ruleSpecial = computed(() => /[^A-Za-z0-9]/.test(newPassword.value))
+const ruleNoPattern = computed(() => !/(.)\1{2,}/.test(newPassword.value) && !newPassword.value.toLowerCase().includes('123') && !newPassword.value.toLowerCase().includes('qwerty'))
+const ruleNoSpace = computed(() => !/\s/.test(newPassword.value) && newPassword.value.length > 0)
+const ruleNotOld = computed(() => newPassword.value !== currentPassword.value || !newPassword.value)
+const ruleMatch = computed(() => newPassword.value === newPasswordConfirm.value && newPassword.value.length > 0)
 
-// Theme and preferences
+const rulesMetCount = computed(() => {
+  return [
+    ruleLength.value,
+    ruleCase.value,
+    ruleDigit.value,
+    ruleSpecial.value,
+    ruleNoPattern.value,
+    ruleNoSpace.value,
+    ruleNotOld.value,
+    ruleMatch.value
+  ].filter(Boolean).length
+})
+
+const isPasswordFormValid = computed(() => {
+  return rulesMetCount.value === 8 && currentPassword.value.length > 0
+})
+
+function updatePassword() {
+  if (isPasswordFormValid.value) {
+    showToast("Şifreniz başarıyla güncellenmiştir! Güvenliğiniz için diğer cihazlardaki oturumlar sonlandırıldı.")
+    currentPassword.value = ''
+    newPassword.value = ''
+    newPasswordConfirm.value = ''
+  }
+}
+
+// 2FA state toggle
+function toggle2FA() {
+  companyForm.value.is2FaEnabled = !companyForm.value.is2FaEnabled
+  showToast(
+    companyForm.value.is2FaEnabled ? "E-posta ile İki Aşamalı Doğrulama başarıyla aktifleştirildi." : "İki aşamalı doğrulama kapatıldı.",
+    companyForm.value.is2FaEnabled ? "success" : "warning"
+  )
+}
+
+// Active sessions state
+const sessions = ref([
+  { id: 1, device: 'Windows · Chrome', lastActive: '17 Temmuz 2026 23:55', ip: '85.105.112.45', isCurrent: true },
+  { id: 2, device: 'iPhone 15 · Safari Mobile', lastActive: '17 Temmuz 2026 18:24', ip: '176.43.98.11', isCurrent: false },
+  { id: 3, device: 'macOS Monterey · Firefox', lastActive: '15 Temmuz 2026 12:08', ip: '94.54.201.88', isCurrent: false }
+])
+
+function closeSession(id: number) {
+  sessions.value = sessions.value.filter(s => s.id !== id)
+  showToast("Oturum sonlandırıldı. İlgili cihaza ilk istekte şifre sorulacaktır.")
+}
+
+function terminateOtherSessions() {
+  sessions.value = sessions.value.filter(s => s.isCurrent)
+  showToast("Geçerli tarayıcı haricindeki tüm aktif cihaz oturumları kapatıldı.", "warning")
+}
+
+function logout() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('userSession')
+  }
+  showToast("Oturum sonlandırıldı, çıkış yapılıyor...", "warning")
+  setTimeout(() => {
+    router.push('/uyelik')
+  }, 1000)
+}
+
+// Security Logs state
+const securityLogs = ref([
+  { id: 1, title: 'Güvenlik olayı - Şifre Değişimi', time: '17 Temmuz 2026 23:29', status: 'Bilinmeyen', device: 'Windows / Chrome', level: 'info' },
+  { id: 2, title: 'Yeni Cihaz Girişi', time: '15 Temmuz 2026 11:42', status: 'Başarılı', device: 'macOS / Firefox', level: 'info' },
+  { id: 3, title: 'İki Aşamalı Doğrulama (2FA) Açma', time: '14 Temmuz 2026 09:15', status: 'Başarılı', device: 'iPhone 15', level: 'success' }
+])
+
+const filterDays = ref('30')
+const filterType = ref('Tümü')
+
+const filteredLogs = computed(() => {
+  return securityLogs.value.filter(log => {
+    if (filterType.value !== 'Tümü' && !log.title.includes(filterType.value)) return false
+    return true
+  })
+})
+
+// Preferences state
 const activeTheme = ref<'sistem' | 'acik' | 'koyu'>('sistem')
 const selectedLanguage = ref('Türkçe')
 const timeFormat = ref('24 saat')
 const timezone = ref('Europe/Istanbul (GMT+3)')
 
-// KVKK Request
+function savePreferences() {
+  showToast("Uygulama tercihleri başarıyla kaydedildi.")
+}
+
+function resetPreferences() {
+  activeTheme.value = 'sistem'
+  selectedLanguage.value = 'Türkçe'
+  timeFormat.value = '24 saat'
+  timezone.value = 'Europe/Istanbul (GMT+3)'
+  showToast("Tercihler varsayılan değerlere sıfırlandı.", "warning")
+}
+
+// Addresses list tabs
+const activeAddressType = ref<'teslimat' | 'fatura'>('teslimat')
+const addresses = ref([
+  { id: 1, type: 'teslimat', title: 'Merkez Ofis Depo', address: 'İsmet Paşa Mah. Çanakkale', city: 'Merkez / Çanakkale', zip: '17100', isDefault: true },
+  { id: 2, type: 'fatura', title: 'Ali Turan Şahıs Şirketi', address: '17100 Çanakkale İsmet Paşa Mah. Merkez Çanakkale', city: 'Merkez / Çanakkale', zip: '17100', isDefault: true }
+])
+
+function deleteAddress(id: number) {
+  addresses.value = addresses.value.filter(a => a.id !== id)
+  showToast("Adres silindi.")
+}
+
+// Notification toggles
+const notifyMail = ref(true)
+const notifySms = ref(false)
+const notifyBrowser = ref(true)
+
+function saveNotifications() {
+  showToast("Bildirim tercihleri güncellendi.")
+}
+
+// Sözleşmeler modal & consent checkboxes
+const consents = ref<Record<string, boolean>>({
+  'Platform Abonelik ve Kullanım Sözleşmesi': true,
+  'Ticari Elektronik İleti ve İletişim Açık Rıza Beyanı': true,
+  'Ticari İletişim ve Pazarlama Açık Rızası': true,
+  'Dijital Varlıklar ve Görsel Verilerin İşlenmesi Açık Rızası': true,
+  'Kişisel Verilerin Yurt Dışı Aktarımı Açık Rızası': true,
+  'Diğer Verilerin İşlenmesi Açık Rızası': true,
+  'Profil Kalite Skoru ve İstatistiksel Analiz Açık Rızası': true,
+  'ACISCO B2B ELEKTRONİK TİCARET PLATFORMU ANA SÖZLEŞMESİ': true
+})
+
+const selectedAgreement = ref<{ title: string, content: string } | null>(null)
+
+function openAgreement(title: string) {
+  selectedAgreement.value = {
+    title,
+    content: `${title} yasal metni ve KVKK aydınlatma bildirimleri. Bu sözleşme kapsamında B2B platformunun adil kullanım standartları, işlem güvenliği protokolleri ve kişisel/kurumsal verilerinizin 6698 sayılı KVKK kapsamında işlenmesine dair detaylar yer almaktadır.`
+  }
+}
+
+function closeAgreement() {
+  selectedAgreement.value = null
+}
+
+function toggleConsent(key: string) {
+  consents.value[key] = !consents.value[key]
+  showToast(
+    consents.value[key] ? `"${key}" onaylandı.` : `"${key}" onayı geri çekildi.`,
+    consents.value[key] ? "success" : "warning"
+  )
+}
+
+// KVKK Request State
 const kvkkRequestType = ref('Veri Erişim Talebi')
 const kvkkDescription = ref('')
 const kvkkSuccess = ref(false)
@@ -119,17 +294,35 @@ const kvkkSuccess = ref(false)
 function submitKvkk() {
   if (kvkkDescription.value.length >= 10) {
     kvkkSuccess.value = true
+    showToast("KVKK veri talebiniz işleme alınmıştır.")
     setTimeout(() => {
       kvkkSuccess.value = false
       kvkkDescription.value = ''
-    }, 3000)
+    }, 4000)
+  } else {
+    showToast("Lütfen talebinizi açıklayan en az 10 karakterlik bir mesaj yazınız.", "error")
   }
 }
 
-const isSaved = ref(false)
+// Account delete warning modal
+const isDeleteModalOpen = ref(false)
+const deletePassword = ref('')
 
+function confirmAccountDelete() {
+  if (deletePassword.value.length >= 6) {
+    showToast("Hesap kapatma talebiniz başarıyla alınmıştır. Sistem yöneticilerimiz manuel inceleme sonrasında sizinle irtibata geçecektir.", "success")
+    isDeleteModalOpen.value = false
+    deletePassword.value = ''
+  } else {
+    showToast("Lütfen hesabınızı onaylamak için şifrenizi giriniz.", "error")
+  }
+}
+
+// Profile save state
+const isSaved = ref(false)
 function saveProfile() {
   isSaved.value = true
+  showToast("Kişisel ve iletişim bilgileriniz başarıyla güncellendi.")
   setTimeout(() => {
     isSaved.value = false
   }, 3000)
@@ -137,12 +330,30 @@ function saveProfile() {
 </script>
 
 <template>
-  <div class="p-6 max-w-6xl mx-auto text-left space-y-6">
+  <div class="p-6 max-w-6xl mx-auto text-left space-y-6 relative">
     
+    <!-- Toast Popup Notifications list at top right -->
+    <div class="fixed top-5 right-5 z-50 space-y-2 pointer-events-none">
+      <div 
+        v-for="toast in toasts" 
+        :key="toast.id" 
+        class="p-4 rounded-xl shadow-lg border text-xs font-bold flex items-center gap-2 bg-white transition-all duration-300 pointer-events-auto"
+        :class="
+          toast.type === 'success' ? 'border-emerald-200 text-emerald-800 bg-emerald-50/90' :
+          toast.type === 'error' ? 'border-red-200 text-red-800 bg-red-50/90' :
+          'border-amber-200 text-amber-800 bg-amber-50/90'
+        "
+      >
+        <CheckCircle2 v-if="toast.type === 'success'" :size="14" />
+        <AlertCircle v-else :size="14" />
+        <span>{{ toast.message }}</span>
+      </div>
+    </div>
+
     <!-- Top Global Banner for Unverified State -->
     <div 
       v-if="!companyVerified"
-      class="rounded-xl border bg-emerald-50/50 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-bold text-emerald-800"
+      class="rounded-xl border bg-emerald-50/50 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-bold text-emerald-800 animate-pulse"
       style="border-color: #A7F3D0;"
     >
       <div class="flex items-center gap-2">
@@ -150,11 +361,11 @@ function saveProfile() {
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
         </span>
-        <span>🔋 Hesabınız henüz aktif değil. 3 kritik adım tamamlanmayı bekliyor.</span>
+        <span>🔋 Hesabınız henüz aktif değil. Eksik belgeleri yükleyip doğrulama sürecini başlatın.</span>
       </div>
       <button 
         type="button"
-        @click="activeSubTab = 'sirket'"
+        @click="router.push('/panel/ayarlar?tab=sirket')"
         class="rounded-lg bg-emerald-800 text-white px-3 py-1.5 hover:bg-emerald-900 transition self-start sm:self-auto"
       >
         Zorunlu belgeleri yükleyin
@@ -163,7 +374,7 @@ function saveProfile() {
 
     <!-- Title and Breadcrumbs -->
     <div>
-      <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Hesap Merkezi</span>
+      <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">HESAP HİZMETLERİ > AYARLAR</span>
       <h1 class="text-2xl font-black text-slate-800 mt-1" style="color: #0F172A;">
         {{ 
           activeSubTab === 'kisisel' ? 'Hesap Merkezi' :
@@ -290,9 +501,9 @@ function saveProfile() {
               <div class="rounded-xl border-2 border-dashed p-6 text-center space-y-3 flex flex-col items-center justify-center" style="border-color: #E2E8F0;">
                 <Camera :size="16" class="text-slate-400" />
                 <span class="text-xs font-bold text-slate-700">Fotoğraf Ekle</span>
-                <button type="button" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold" style="border-color: #E2E8F0;">Fotoğraf Yükle</button>
+                <button type="button" @click="showToast('Fotoğraf yükleme arayüzü açıldı. Dosya bekleniyor...')" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold hover:bg-slate-50 transition" style="border-color: #E2E8F0;">Fotoğraf Yükle</button>
               </div>
-              <div class="rounded-xl border-2 border-dashed p-6 text-center space-y-3 flex flex-col items-center justify-center" style="border-color: #E2E8F0;">
+              <div class="rounded-xl border-2 border-dashed p-6 text-center space-y-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50/50 transition" @click="showToast('Sürükle-bırak video arayüzü etkin.')" style="border-color: #E2E8F0;">
                 <Video :size="16" class="text-slate-400" />
                 <span class="text-xs font-bold text-slate-700">Video Yüklemek İçin Tıklayın</span>
               </div>
@@ -305,7 +516,7 @@ function saveProfile() {
           </div>
         </div>
 
-        <!-- ŞIŞRKET & DOĞRULAMA TAB -->
+        <!-- ŞİRKET & DOĞRULAMA TAB -->
         <div v-if="activeSubTab === 'sirket'" class="space-y-6">
           
           <!-- Top header with profile link -->
@@ -314,12 +525,12 @@ function saveProfile() {
               <h2 class="text-lg font-black text-slate-800">Kurumsal Kimlik</h2>
               <p class="text-xs text-slate-400">Bağlı olduğunuz organizasyonun detaylarını ve doğrulama sürecini yönetin.</p>
             </div>
-            <button type="button" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition" style="border-color: #E2E8F0;">
+            <button type="button" @click="showToast('Firma profiliniz önizleniyor...')" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition" style="border-color: #E2E8F0;">
               Profili önizle
             </button>
           </div>
 
-          <!-- Genel Bilgiler Card (Screenshot 2 style) -->
+          <!-- Genel Bilgiler Card -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
             <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
               <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Genel Bilgiler</h3>
@@ -373,7 +584,7 @@ function saveProfile() {
                 <h4 class="text-xs font-bold text-slate-800">Kurumsal Profil Kalitesi</h4>
                 <p class="text-[10px] text-slate-500 mt-0.5">Profil resmi, Şirket faturası, Kategoriler ve Doğrulama adımlarına göre hesaplanır.</p>
               </div>
-              <button type="button" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 transition">
+              <button type="button" @click="showToast('Görsel yükleyici açıldı.')" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 transition">
                 Görsel Yükle
               </button>
             </div>
@@ -385,7 +596,7 @@ function saveProfile() {
               <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Kayıt & Doğrulama Bilgileri</h3>
               <div class="flex rounded-lg bg-slate-100 p-0.5">
                 <button type="button" class="rounded px-2.5 py-1 text-[10px] font-black bg-white text-slate-800 shadow-sm">Kayıt Bilgisi</button>
-                <button type="button" class="rounded px-2.5 py-1 text-[10px] font-black text-slate-500">Fatura & Banka</button>
+                <button type="button" @click="showToast('Fatura & Banka görünümüne geçiliyor...')" class="rounded px-2.5 py-1 text-[10px] font-black text-slate-500">Fatura & Banka</button>
               </div>
             </div>
 
@@ -484,33 +695,12 @@ function saveProfile() {
             <div class="flex items-center justify-between border-b pb-2" style="border-color: #F1F5F9;">
               <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Kapak Görseli</h3>
             </div>
-            <div class="rounded-xl border-2 border-dashed p-8 text-center space-y-3 flex flex-col items-center justify-center" style="border-color: #E2E8F0;">
+            <div class="rounded-xl border-2 border-dashed p-8 text-center space-y-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50/50 transition" @click="showToast('Kapak görseli yükleyici aktif.')" style="border-color: #E2E8F0;">
               <Camera :size="20" class="text-slate-400" />
               <div>
                 <h4 class="text-xs font-bold text-slate-700">Kapak Görseli Yükle</h4>
                 <p class="text-[9px] text-slate-400 leading-normal mt-0.5">Firma profil sayfanızın üst kısmında görünecek olan görsel (Önerilen boyut: 1200x300, JPEG veya PNG, Maks. 5 MB)</p>
               </div>
-            </div>
-          </div>
-
-          <!-- 2FA Settings -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-            <div class="flex items-center justify-between border-b pb-2" style="border-color: #F1F5F9;">
-              <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Güvenlik</h3>
-            </div>
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 rounded-xl bg-amber-50/20 border" style="border-color: #FDE68A;">
-              <div>
-                <h4 class="text-xs font-bold text-slate-800">E-posta ile 2FA</h4>
-                <p class="text-[10px] text-slate-500 mt-0.5">Giriş güvenliğini artırmak için e-posta ile iki aşamalı doğrulamayı aktif edin.</p>
-              </div>
-              <button 
-                type="button" 
-                @click="companyForm.is2FaEnabled = !companyForm.is2FaEnabled"
-                class="rounded-lg font-bold text-xs px-4 py-2 transition"
-                :class="companyForm.is2FaEnabled ? 'bg-emerald-600 text-white' : 'bg-blue-600 text-white hover:bg-blue-700'"
-              >
-                {{ companyForm.is2FaEnabled ? '2FA Aktif' : '2FA Etkinleştir' }}
-              </button>
             </div>
           </div>
 
@@ -538,24 +728,6 @@ function saveProfile() {
               <div class="p-3 bg-slate-50 rounded-xl border flex items-center justify-between">
                 <span>Şirket Belgeleri</span>
                 <span class="text-[9px] text-red-500 bg-red-50 px-2 py-0.5 rounded">Eksik</span>
-              </div>
-            </div>
-
-            <!-- Yetkileriniz list tags -->
-            <div class="space-y-2">
-              <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">YETKİLERİNİZ</span>
-              <div class="flex flex-wrap gap-2">
-                <span 
-                  v-for="roleTag in [
-                    'Kullanıcı Yönetimi', 'Banka Hesapları', 'Fatura Görüntüleme', 
-                    'İhale Oluşturma', 'Teklif Değerlendirme', 'Sözleşme Yönetimi', 
-                    'Teklif Verme', 'Teklif Görüntüleme', 'Sözleşme Takibi'
-                  ]" 
-                  :key="roleTag"
-                  class="text-[9px] font-bold text-slate-600 bg-slate-100 rounded px-2.5 py-1"
-                >
-                  {{ roleTag }}
-                </span>
               </div>
             </div>
 
@@ -668,7 +840,7 @@ function saveProfile() {
             <!-- Complete Submit -->
             <button 
               type="button" 
-              @click="companyVerified = true"
+              @click="companyVerified = true; showToast('Şirket kimliğiniz doğrulanmak üzere kuyruğa alındı!')"
               class="w-full rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3.5 transition shadow"
             >
               Şirket Doğrulamasını Başlat
@@ -684,7 +856,7 @@ function saveProfile() {
               <h2 class="text-lg font-black text-slate-800">Kayıtlı Adresler</h2>
               <p class="text-xs text-slate-400">Teslimat adreslerinizi yönetin. İhale oluştururken hızlıca seçebilirsiniz.</p>
             </div>
-            <button type="button" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 transition">
+            <button type="button" @click="showToast('Yeni adres formu açılıyor...')" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 transition">
               <Plus :size="14" /> Yeni adres
             </button>
           </div>
@@ -711,45 +883,49 @@ function saveProfile() {
             </div>
           </div>
 
-          <span class="text-[10px] text-slate-400 font-bold block">1 / 20 teslimat adresi kullanılıyor</span>
+          <span class="text-[10px] text-slate-400 font-bold block">{{ addresses.length }} / 20 kayıtlı adres kullanılıyor</span>
 
-          <!-- Address card matching screenshot layout -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+          <!-- Address card list -->
+          <div 
+            v-for="addr in addresses.filter(a => a.type === activeAddressType)" 
+            :key="addr.id"
+            class="rounded-2xl border bg-white p-6 shadow-sm space-y-4 transition hover:border-slate-300" 
+            style="border-color: #E2E8F0;"
+          >
             <div class="flex items-center justify-between border-b pb-2" style="border-color: #F1F5F9;">
               <div class="flex items-center gap-2">
                 <div class="h-8 w-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><MapPin :size="14" /></div>
                 <div>
-                  <span class="text-[8px] font-black text-slate-300 uppercase block">TESLİMAT ADRESİ</span>
-                  <h4 class="text-xs font-bold text-slate-800">Teslimat Adresi</h4>
+                  <span class="text-[8px] font-black text-slate-300 uppercase block">{{ addr.type === 'teslimat' ? 'TESLİMAT ADRESİ' : 'FATURA ADRESİ' }}</span>
+                  <h4 class="text-xs font-bold text-slate-800">{{ addr.title }}</h4>
                 </div>
               </div>
 
               <div class="flex items-center gap-2">
-                <span class="text-[8px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-black uppercase">VARSYAYILAN</span>
-                <button type="button" class="p-1.5 rounded-lg border text-slate-400 hover:text-slate-800" style="border-color: #E2E8F0;"><Edit2 :size="12" /></button>
-                <button type="button" class="p-1.5 rounded-lg border text-slate-400 hover:text-red-600" style="border-color: #E2E8F0;"><Trash2 :size="12" /></button>
+                <span class="text-[8px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded font-black uppercase">VARSAYILAN</span>
+                <button type="button" @click="showToast('Adres düzenleme modülü aktif.')" class="p-1.5 rounded-lg border text-slate-400 hover:text-slate-800" style="border-color: #E2E8F0;"><Edit2 :size="12" /></button>
+                <button type="button" @click="deleteAddress(addr.id)" class="p-1.5 rounded-lg border text-slate-400 hover:text-red-600" style="border-color: #E2E8F0;"><Trash2 :size="12" /></button>
               </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs leading-normal">
               <div>
                 <span class="text-[8px] font-black text-slate-300 uppercase block mb-1">AÇIK ADRES</span>
-                <span class="text-slate-700 font-bold">17100 Çanakkale</span>
+                <span class="text-slate-700 font-bold">{{ addr.address }}</span>
               </div>
               <div>
                 <span class="text-[8px] font-black text-slate-300 uppercase block mb-1">İL / İLÇE</span>
-                <span class="text-slate-700 font-bold">Merkez, Çanakkale</span>
+                <span class="text-slate-700 font-bold">{{ addr.city }}</span>
               </div>
               <div>
                 <span class="text-[8px] font-black text-slate-300 uppercase block mb-1">MAHALLE / POSTA KODU</span>
-                <span class="text-slate-700 font-bold">İsmet Paşa Mah. / 17100</span>
+                <span class="text-slate-700 font-bold">{{ addr.zip }}</span>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-        <!-- TAKIP ETTIKLERIM TAB -->
+        <!-- TAKİP ETTİKLERİM TAB -->
         <div v-if="activeSubTab === 'takip'" class="space-y-6">
           <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
             <div>
@@ -803,7 +979,7 @@ function saveProfile() {
               </div>
               <button 
                 type="button" 
-                @click="notifyMail = !notifyMail"
+                @click="notifyMail = !notifyMail; showToast(notifyMail ? 'E-posta bildirimleri açıldı.' : 'E-posta bildirimleri sessize alındı.', 'warning')"
                 class="relative h-5 w-9 rounded-full transition-all"
                 :style="notifyMail ? 'background: #1E3A5F;' : 'background: #CBD5E1;'"
               >
@@ -818,7 +994,7 @@ function saveProfile() {
               </div>
               <button 
                 type="button" 
-                @click="notifySms = !notifySms"
+                @click="notifySms = !notifySms; showToast(notifySms ? 'SMS bildirimleri açıldı.' : 'SMS bildirimleri sessize alındı.', 'warning')"
                 class="relative h-5 w-9 rounded-full transition-all"
                 :style="notifySms ? 'background: #1E3A5F;' : 'background: #CBD5E1;'"
               >
@@ -833,12 +1009,16 @@ function saveProfile() {
               </div>
               <button 
                 type="button" 
-                @click="notifyBrowser = !notifyBrowser"
+                @click="notifyBrowser = !notifyBrowser; showToast(notifyBrowser ? 'Tarayıcı bildirimleri açıldı.' : 'Tarayıcı bildirimleri kapatıldı.', 'warning')"
                 class="relative h-5 w-9 rounded-full transition-all"
                 :style="notifyBrowser ? 'background: #1E3A5F;' : 'background: #CBD5E1;'"
               >
                 <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifyBrowser ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
               </button>
+            </div>
+
+            <div class="flex justify-end pt-2">
+              <button type="button" @click="saveNotifications" class="rounded-xl bg-blue-600 text-white font-bold text-xs px-6 py-2.5 hover:bg-blue-700 transition">Bildirimleri Kaydet</button>
             </div>
           </div>
         </div>
@@ -857,11 +1037,11 @@ function saveProfile() {
               </div>
               <span class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg">Aktif</span>
             </div>
-            <p class="text-[10px] text-slate-400">Bir sonraki faturalama tarihi: 17 Ağustos 2026. [Aboneliği Yönet]</p>
+            <p class="text-[10px] text-slate-400">Bir sonraki faturalama tarihi: 17 Ağustos 2026. <span class="text-blue-600 hover:underline cursor-pointer" @click="showToast('Abonelik detayları sayfasına yönlendiriliyor...')">[Aboneliği Yönet]</span></p>
           </div>
         </div>
 
-        <!-- AYARLAR (SETTINGS) TAB - FULLY EXPANDED EXACTLY MATCHING SCREENSHOTS -->
+        <!-- AYARLAR (SETTINGS) TAB -->
         <div v-if="activeSubTab === 'ayarlar'" class="space-y-6">
           
           <!-- Top Info metrics grid -->
@@ -877,7 +1057,7 @@ function saveProfile() {
             <div class="rounded-xl border bg-white p-4 flex items-center justify-between shadow-sm" style="border-color: #E2E8F0;">
               <div>
                 <span class="text-[8px] font-black text-slate-300 uppercase block">DİL</span>
-                <span class="text-[11px] font-black text-blue-600 block mt-1">🇹🇷 Türkçe</span>
+                <span class="text-[11px] font-black text-blue-600 block mt-1">🇹🇷 {{ selectedLanguage }}</span>
               </div>
               <Globe :size="16" class="text-blue-500" />
             </div>
@@ -894,7 +1074,7 @@ function saveProfile() {
           <!-- Top horizontal card row (with icons on the left) -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <!-- Card 1 -->
-            <div class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
+            <div @click="showToast('Tema ve saat dilimi tercihlerine kaydırıldı.')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
               <div class="flex items-start gap-2.5">
                 <Sliders :size="14" class="text-blue-600 mt-0.5 shrink-0" />
                 <div>
@@ -906,7 +1086,7 @@ function saveProfile() {
             </div>
 
             <!-- Card 2 -->
-            <div class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
+            <div @click="showToast('Şifre ve 2FA ayarlarına kaydırıldı.')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
               <div class="flex items-start gap-2.5">
                 <Shield :size="14" class="text-blue-600 mt-0.5 shrink-0" />
                 <div>
@@ -918,7 +1098,7 @@ function saveProfile() {
             </div>
 
             <!-- Card 3 -->
-            <div class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
+            <div @click="showToast('Bildirim kanalları ayarlarına kaydırıldı.')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
               <div class="flex items-start gap-2.5">
                 <Bell :size="14" class="text-blue-600 mt-0.5 shrink-0" />
                 <div>
@@ -930,7 +1110,7 @@ function saveProfile() {
             </div>
 
             <!-- Card 4 -->
-            <div class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
+            <div @click="showToast('Profil koruma sözleşmelerine kaydırıldı.')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
               <div class="flex items-start gap-2.5">
                 <FileText :size="14" class="text-blue-600 mt-0.5 shrink-0" />
                 <div>
@@ -974,12 +1154,17 @@ function saveProfile() {
               </div>
             </div>
 
+            <!-- Lock Info Notice matching screenshot -->
+            <div class="p-3 bg-slate-50 border border-slate-200 text-slate-500 text-[10px] font-bold rounded-xl flex items-center gap-1.5">
+              <AlertCircle :size="13" /> Kimlik ve kurumsal bilgiler Profil ve Kurumsal Kimlik sayfalarından yönetilir.
+            </div>
+
             <div class="flex gap-2 pt-2 text-[10px] font-bold text-slate-500">
-              <button @click="activeSubTab = 'kisisel'" type="button" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition" style="border-color: #E2E8F0;">
-                Profil sayfasına git
+              <button @click="router.push('/panel/ayarlar?tab=kisisel')" type="button" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition flex items-center gap-1" style="border-color: #E2E8F0;">
+                <User :size="11" /> Profil sayfasına git
               </button>
-              <button @click="activeSubTab = 'sirket'" type="button" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition" style="border-color: #E2E8F0;">
-                Kurumsal kimliğe git
+              <button @click="router.push('/panel/ayarlar?tab=sirket')" type="button" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition flex items-center gap-1" style="border-color: #E2E8F0;">
+                <Building2 :size="11" /> Kurumsal kimliğe git
               </button>
             </div>
           </div>
@@ -998,46 +1183,132 @@ function saveProfile() {
               <!-- Form left -->
               <div class="lg:col-span-2 space-y-4">
                 <h4 class="text-xs font-bold text-slate-800">Şifre Yönetimi</h4>
+                <p class="text-[10px] text-slate-400 leading-normal">
+                  Hesabınızı korumak için güçlü bir şifre kullanın. Güncellemeden sonra yeni şifreyle giriş gerekir ve diğer oturumlar sonlandırılır.
+                </p>
+
                 <div class="space-y-3">
                   <div>
                     <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">Mevcut Şifre</label>
-                    <input type="password" placeholder="••••••••" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none bg-white" style="border-color: #E2E8F0;" />
+                    <div class="relative">
+                      <input 
+                        v-model="currentPassword"
+                        :type="showPassword1 ? 'text' : 'password'" 
+                        placeholder="••••••••" 
+                        class="w-full rounded-xl border pl-4 pr-10 py-2.5 text-xs outline-none bg-white" 
+                        style="border-color: #E2E8F0;" 
+                      />
+                      <button type="button" @click="showPassword1 = !showPassword1" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                        <Eye :size="14" />
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">Yeni Şifre</label>
-                    <input type="password" placeholder="••••••••" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none bg-white" style="border-color: #E2E8F0;" />
+                    <div class="relative">
+                      <input 
+                        v-model="newPassword"
+                        :type="showPassword2 ? 'text' : 'password'" 
+                        placeholder="••••••••" 
+                        class="w-full rounded-xl border pl-4 pr-10 py-2.5 text-xs outline-none bg-white" 
+                        style="border-color: #E2E8F0;" 
+                      />
+                      <button type="button" @click="showPassword2 = !showPassword2" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                        <Eye :size="14" />
+                      </button>
+                    </div>
                   </div>
                   <div>
                     <label class="block text-[9px] font-black text-slate-400 uppercase mb-1">Yeni Şifre Tekrar</label>
-                    <input type="password" placeholder="••••••••" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none bg-white" style="border-color: #E2E8F0;" />
+                    <div class="relative">
+                      <input 
+                        v-model="newPasswordConfirm"
+                        :type="showPassword3 ? 'text' : 'password'" 
+                        placeholder="••••••••" 
+                        class="w-full rounded-xl border pl-4 pr-10 py-2.5 text-xs outline-none bg-white" 
+                        style="border-color: #E2E8F0;" 
+                      />
+                      <button type="button" @click="showPassword3 = !showPassword3" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                        <Eye :size="14" />
+                      </button>
+                    </div>
                   </div>
                 </div>
                 <div class="flex items-center justify-between pt-2">
-                  <button type="button" class="rounded-xl bg-slate-100 text-slate-400 font-bold text-xs px-6 py-3 cursor-not-allowed" disabled>Şifreyi Güncelle</button>
-                  <span class="text-[9px] text-slate-400 font-bold">Yeni şifreleri giriniz</span>
+                  <button 
+                    type="button" 
+                    @click="updatePassword"
+                    class="rounded-xl font-bold text-xs px-6 py-3 transition"
+                    :class="isPasswordFormValid ? 'bg-blue-600 text-white hover:bg-blue-700 shadow-md' : 'bg-slate-100 text-slate-400 cursor-not-allowed'"
+                    :disabled="!isPasswordFormValid"
+                  >
+                    Şifreyi Güncelle
+                  </button>
+                  <span class="text-[9px] text-slate-400 font-bold">
+                    {{ isPasswordFormValid ? 'Şifre güncellenmeye hazır!' : 'Yeni ve mevcut şifreleri giriniz' }}
+                  </span>
                 </div>
               </div>
 
               <!-- Rules right -->
               <div class="p-4 rounded-xl bg-slate-50 border space-y-2 text-[9px] font-bold text-slate-500" style="border-color: #F1F5F9;">
                 <span class="text-[8px] font-black text-slate-400 uppercase tracking-wider block">ŞİFRE GÜCÜ</span>
-                <span class="text-[9px] font-bold text-slate-600 block border-b pb-1">0/8 Kriter Karşılandı</span>
+                <span class="text-[9px] font-black text-slate-600 block border-b pb-1">
+                  {{ rulesMetCount }}/8 Kriter Karşılandı
+                </span>
                 <div class="space-y-1.5 mt-2">
-                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> En az 10 karakter</div>
-                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Büyük/küçük harf</div>
-                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Rakam</div>
-                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Özel karakter</div>
-                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Yaygın parola/tekrar eden örüntü olmaması</div>
-                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Boşluk içermemesi</div>
-                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Önceki şifreyle aynı olmaması</div>
-                  <div class="flex items-center gap-1.5"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Yeni şifre eşleşiyor</div>
+                  <div class="flex items-center gap-1.5" :class="ruleLength ? 'text-emerald-600' : 'text-slate-400'">
+                    <Check v-if="ruleLength" :size="10" />
+                    <span v-else class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> 
+                    En az 10 karakter
+                  </div>
+                  <div class="flex items-center gap-1.5" :class="ruleCase ? 'text-emerald-600' : 'text-slate-400'">
+                    <Check v-if="ruleCase" :size="10" />
+                    <span v-else class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> 
+                    Büyük/küçük harf
+                  </div>
+                  <div class="flex items-center gap-1.5" :class="ruleDigit ? 'text-emerald-600' : 'text-slate-400'">
+                    <Check v-if="ruleDigit" :size="10" />
+                    <span v-else class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> 
+                    Rakam
+                  </div>
+                  <div class="flex items-center gap-1.5" :class="ruleSpecial ? 'text-emerald-600' : 'text-slate-400'">
+                    <Check v-if="ruleSpecial" :size="10" />
+                    <span v-else class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> 
+                    Özel karakter
+                  </div>
+                  <div class="flex items-center gap-1.5" :class="ruleNoPattern ? 'text-emerald-600' : 'text-slate-400'">
+                    <Check v-if="ruleNoPattern" :size="10" />
+                    <span v-else class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> 
+                    Yaygın parola, tekrar eden örüntü olmaması
+                  </div>
+                  <div class="flex items-center gap-1.5" :class="ruleNoSpace ? 'text-emerald-600' : 'text-slate-400'">
+                    <Check v-if="ruleNoSpace" :size="10" />
+                    <span v-else class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> 
+                    Boşluk içermemesi
+                  </div>
+                  <div class="flex items-center gap-1.5" :class="ruleNotOld ? 'text-emerald-600' : 'text-slate-400'">
+                    <Check v-if="ruleNotOld" :size="10" />
+                    <span v-else class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> 
+                    Önceki şifreyle aynı olmaması
+                  </div>
+                  <div class="flex items-center gap-1.5" :class="ruleMatch ? 'text-emerald-600' : 'text-slate-400'">
+                    <Check v-if="ruleMatch" :size="10" />
+                    <span v-else class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> 
+                    Yeni şifre eşleşiyor
+                  </div>
                 </div>
               </div>
             </div>
 
             <!-- E-posta 2FA -->
             <div class="rounded-xl border bg-amber-50/10 p-5 space-y-3" style="border-color: #FDE68A;">
-              <span class="inline-flex items-center gap-1 text-[8px] font-black uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded">2FA</span>
+              <div class="flex items-center justify-between">
+                <span class="inline-flex items-center gap-1 text-[8px] font-black uppercase text-amber-700 bg-amber-50 px-2 py-0.5 rounded">2FA</span>
+                <span class="text-[9px] font-black uppercase" :class="companyForm.is2FaEnabled ? 'text-emerald-700' : 'text-amber-700'">
+                  {{ companyForm.is2FaEnabled ? '🟢 ETKİN' : '🟠 DEVRE DIŞI' }}
+                </span>
+              </div>
               <h4 class="text-xs font-bold text-slate-800 mt-1">E-posta ile İki Aşamalı Doğrulama</h4>
               <p class="text-[10px] text-slate-500 leading-normal">
                 Giriş ve hassas işlemler için e-posta adresinize 6 haneli doğrulama kodu gönderilir.
@@ -1045,10 +1316,13 @@ function saveProfile() {
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-2 border-t border-amber-200 text-[10px] font-bold">
                 <div class="flex items-center gap-2">
                   <span class="text-slate-400">Durum:</span>
-                  <span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">Etkin</span>
+                  <span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100" v-if="companyForm.is2FaEnabled">Etkin</span>
+                  <span class="text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100" v-else>Devre Dışı</span>
                   <span class="text-slate-500">Aktif/Kayıtlı e-posta: alituran88@gmail.com</span>
                 </div>
-                <button type="button" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-xs transition">2FA Etkinleştir</button>
+                <button type="button" @click="toggle2FA" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-xs transition">
+                  {{ companyForm.is2FaEnabled ? 'Devre Dışı Bırak' : '2FA Etkinleştir' }}
+                </button>
               </div>
             </div>
 
@@ -1060,20 +1334,32 @@ function saveProfile() {
                   <p class="text-[9px] text-slate-400">Hesabınızın açık olduğu cihazları yönetin.</p>
                 </div>
                 <div class="flex gap-2">
-                  <button type="button" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold text-slate-600 bg-white hover:bg-slate-50" style="border-color: #E2E8F0;">Diğer cihazlardan çıkış</button>
-                  <button type="button" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold text-red-600 bg-white hover:bg-red-50 border-red-200">Çıkış Yap</button>
+                  <button type="button" @click="terminateOtherSessions" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold text-slate-600 bg-white hover:bg-slate-50" style="border-color: #E2E8F0;">Diğer cihazlardan çıkış</button>
+                  <button type="button" @click="logout" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold text-red-600 bg-white hover:bg-red-50 border-red-200">Çıkış Yap</button>
                 </div>
               </div>
-              <div class="rounded-xl border p-4 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm" style="border-color: #E2E8F0;">
-                <div class="flex items-center gap-3">
-                  <div class="h-8 w-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><Laptop :size="15" /></div>
-                  <div>
-                    <h5 class="text-xs font-bold text-slate-800">Windows · Chrome <span class="text-[9px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-black">BU CİHAZ</span></h5>
-                    <p class="text-[9px] text-slate-400 mt-0.5">Son aktif: 17 Temmuz 2026 23:55 · IP: 85.105.**.**</p>
+
+              <div class="space-y-2">
+                <div 
+                  v-for="s in sessions" 
+                  :key="s.id"
+                  class="rounded-xl border p-4 bg-slate-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm" 
+                  style="border-color: #E2E8F0;"
+                >
+                  <div class="flex items-center gap-3">
+                    <div class="h-8 w-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center"><Laptop :size="15" /></div>
+                    <div>
+                      <h5 class="text-xs font-bold text-slate-800">
+                        {{ s.device }} 
+                        <span v-if="s.isCurrent" class="text-[9px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-black ml-1.5">BU CİHAZ</span>
+                      </h5>
+                      <p class="text-[9px] text-slate-400 mt-0.5">Son aktif: {{ s.lastActive }} · IP: {{ s.ip }}</p>
+                    </div>
                   </div>
+                  <button type="button" @click="closeSession(s.id)" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold text-slate-600 bg-white hover:bg-slate-100" style="border-color: #E2E8F0;">Oturumu Kapat</button>
                 </div>
-                <button type="button" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold text-slate-600 bg-white hover:bg-slate-100" style="border-color: #E2E8F0;">Oturumu Kapat</button>
               </div>
+
               <p class="text-[9px] text-slate-400 leading-normal">
                 <strong>Not:</strong> Bu listedeki cihaz hareketleri ve konumlar güvenlik kayıtlarına dayanır; her girişle anında güncellenir.
               </p>
@@ -1084,29 +1370,36 @@ function saveProfile() {
               <h4 class="text-xs font-bold text-slate-800">Güvenlik Geçmişi</h4>
               <p class="text-[9px] text-slate-400">Hesabınızdaki güvenlik olayları.</p>
               <div class="rounded-xl border bg-slate-50 p-4 space-y-4" style="border-color: #E2E8F0;">
-                <div class="p-3 bg-red-50 border border-red-200 text-red-800 text-[10px] font-bold rounded-lg">
+                <div class="p-3 bg-red-50/50 border border-red-200 text-red-800 text-[10px] font-bold rounded-lg">
                   Kritik olaylar (son 2FA kapatma, toplu çıkış, şifre değişimi) güvenlik loguna eklenmektedir.
                 </div>
                 
                 <div class="flex items-center gap-3">
-                  <select class="rounded-lg border px-3 py-1.5 text-xs bg-white" style="border-color: #E2E8F0;">
+                  <select v-model="filterDays" class="rounded-lg border px-3 py-1.5 text-xs bg-white" style="border-color: #E2E8F0;">
                     <option value="30">Son 30 gün</option>
                     <option value="90">Son 90 gün</option>
                   </select>
-                  <select class="rounded-lg border px-3 py-1.5 text-xs bg-white" style="border-color: #E2E8F0;">
+                  <select v-model="filterType" class="rounded-lg border px-3 py-1.5 text-xs bg-white" style="border-color: #E2E8F0;">
                     <option value="Tümü">Tümü</option>
+                    <option value="Şifre">Şifre Olayları</option>
+                    <option value="Cihaz">Cihaz Girişleri</option>
                   </select>
                 </div>
 
-                <div class="p-3 bg-white border rounded-lg flex items-center justify-between text-[10px] text-slate-600" style="border-color: #E2E8F0;">
+                <div 
+                  v-for="log in filteredLogs" 
+                  :key="log.id"
+                  class="p-3 bg-white border rounded-lg flex items-center justify-between text-[10px] text-slate-600 transition" 
+                  style="border-color: #E2E8F0;"
+                >
                   <div class="flex items-center gap-2">
                     <span class="text-[8px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-black">LOG</span>
-                    <span>Güvenlik olayı</span>
+                    <span class="font-bold text-slate-700">{{ log.title }}</span>
                   </div>
-                  <div class="flex gap-4">
-                    <span>17 Temmuz 2026 23:29</span>
-                    <span>🟢 Bilinmeyen</span>
-                    <span>Cihaz: Bilinmeyen</span>
+                  <div class="flex gap-4 font-bold text-slate-500">
+                    <span>{{ log.time }}</span>
+                    <span class="text-emerald-600">🟢 {{ log.status }}</span>
+                    <span>{{ log.device }}</span>
                   </div>
                 </div>
               </div>
@@ -1122,7 +1415,7 @@ function saveProfile() {
                 <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Tercihler</h3>
               </div>
             </div>
-            <p class="text-[10px] text-slate-400 leading-normal">Tercihlerinizi özelleştirin.</p>
+            <p class="text-[10px] text-slate-400 leading-normal">Görünüm, dil ve saat biçimi tercihlerinizi kişiselleştirin.</p>
             
             <!-- Theme grids -->
             <div class="space-y-3">
@@ -1130,7 +1423,7 @@ function saveProfile() {
               <div class="grid grid-cols-3 gap-4">
                 <button 
                   type="button" 
-                  @click="activeTheme = 'sistem'"
+                  @click="activeTheme = 'sistem'; showToast('Sistem teması aktif edildi.')"
                   class="rounded-xl border p-4 text-center space-y-2 transition shadow-sm"
                   :style="activeTheme === 'sistem' ? 'border-color: #2563EB; background: rgba(37,99,235,0.05); color: #2563EB;' : 'border-color: #E2E8F0;'"
                 >
@@ -1140,7 +1433,7 @@ function saveProfile() {
 
                 <button 
                   type="button" 
-                  @click="activeTheme = 'acik'"
+                  @click="activeTheme = 'acik'; showToast('Açık renk şeması yüklendi.')"
                   class="rounded-xl border p-4 text-center space-y-2 transition shadow-sm"
                   :style="activeTheme === 'acik' ? 'border-color: #2563EB; background: rgba(37,99,235,0.05); color: #2563EB;' : 'border-color: #E2E8F0;'"
                 >
@@ -1150,7 +1443,7 @@ function saveProfile() {
 
                 <button 
                   type="button" 
-                  @click="activeTheme = 'koyu'"
+                  @click="activeTheme = 'koyu'; showToast('Koyu (Karanlık) tema seçildi.')"
                   class="rounded-xl border p-4 text-center space-y-2 transition shadow-sm"
                   :style="activeTheme === 'koyu' ? 'border-color: #2563EB; background: rgba(37,99,235,0.05); color: #2563EB;' : 'border-color: #E2E8F0;'"
                 >
@@ -1188,8 +1481,8 @@ function saveProfile() {
             </div>
 
             <div class="flex gap-2 justify-end pt-2">
-              <button type="button" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-500 bg-white hover:bg-slate-50 transition" style="border-color: #E2E8F0;">Varsayılanlara Sıfırla</button>
-              <button type="button" @click="saveProfile" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2 transition shadow">Tercihleri kaydet</button>
+              <button type="button" @click="resetPreferences" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-500 bg-white hover:bg-slate-50 transition" style="border-color: #E2E8F0;">Varsayılanlara Sıfırla</button>
+              <button type="button" @click="savePreferences" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2 transition shadow">Tercihleri kaydet</button>
             </div>
           </div>
 
@@ -1203,7 +1496,7 @@ function saveProfile() {
                   <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Bildirim Tercihleri</h3>
                 </div>
               </div>
-              <button type="button" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold text-slate-700 bg-white hover:bg-slate-100" style="border-color: #E2E8F0;">
+              <button type="button" @click="notifyMail = true; notifySms = true; notifyBrowser = true; showToast('Tüm alıcı bildirimleri açıldı.')" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold text-slate-700 bg-white hover:bg-slate-100" style="border-color: #E2E8F0;">
                 Alıcı Bildirimlerini Al
               </button>
             </div>
@@ -1224,7 +1517,7 @@ function saveProfile() {
                 <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Sözleşmeler & Onaylar</h3>
               </div>
             </div>
-            <p class="text-[10px] text-slate-400 leading-normal">Onay yönetimi, sözleşme maddeleri ve KVKK veri talepleri.</p>
+            <p class="text-[10px] text-slate-400 leading-normal">Onay yönetimi, sözleşme metinleri ve KVKK veri talepleri.</p>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div 
@@ -1239,13 +1532,20 @@ function saveProfile() {
                   'ACISCO B2B ELEKTRONİK TİCARET PLATFORMU ANA SÖZLEŞMESİ'
                 ]"
                 :key="agreement"
-                class="rounded-xl border p-4 bg-slate-50/50 flex flex-col justify-between h-28"
-                style="border-color: #E2E8F0;"
+                class="rounded-xl border p-4 bg-slate-50/50 flex flex-col justify-between h-28 border-slate-200 transition hover:border-slate-300"
               >
                 <span class="text-[10px] font-bold text-slate-700 leading-normal block">{{ agreement }}</span>
                 <div class="flex items-center justify-between text-[10px] font-bold mt-2">
-                  <span class="text-emerald-600 flex items-center gap-1"><CheckCircle2 :size="10" /> Onaylandı</span>
-                  <button class="text-blue-600 hover:underline">Sözleşmeyi Oku</button>
+                  <button 
+                    type="button"
+                    @click="toggleConsent(agreement)"
+                    class="flex items-center gap-1.5"
+                    :class="consents[agreement] ? 'text-emerald-600' : 'text-slate-400'"
+                  >
+                    <CheckCircle2 :size="12" />
+                    <span>{{ consents[agreement] ? 'Onaylandı' : 'Onay Bekliyor' }}</span>
+                  </button>
+                  <button type="button" @click="openAgreement(agreement)" class="text-blue-600 hover:underline">Sözleşmeyi Oku</button>
                 </div>
               </div>
             </div>
@@ -1316,13 +1616,62 @@ function saveProfile() {
                   <p class="text-[10px] text-slate-400 mt-1 leading-normal">Hesap kapatma talebiniz incelendikten sonra verileriniz silinir. Rolü devretmeniz veya silmeniz gerekebilir.</p>
                 </div>
                 <div class="flex gap-2">
-                  <button type="button" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold bg-white text-slate-700 hover:bg-slate-100" style="border-color: #E2E8F0;">Oturumu Sonlandır</button>
-                  <button type="button" class="rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-bold text-[10px] px-3 py-1.5 transition">Hesabı Kapat</button>
+                  <button type="button" @click="logout" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold bg-white text-slate-700 hover:bg-slate-100" style="border-color: #E2E8F0;">Oturumu Sonlandır</button>
+                  <button type="button" @click="isDeleteModalOpen = true" class="rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-bold text-[10px] px-3 py-1.5 transition">Hesabı Kapat</button>
                 </div>
               </div>
             </div>
           </div>
 
+        </div>
+
+    </div>
+
+    <!-- 1. Sözleşme Detay Modalı (Modal System) -->
+    <div v-if="selectedAgreement" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 border text-left shadow-2xl relative">
+        <button type="button" @click="closeAgreement" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600">
+          <X :size="16" />
+        </button>
+
+        <h3 class="text-sm font-black text-slate-800 pr-8">{{ selectedAgreement.title }}</h3>
+        <div class="max-h-60 overflow-y-auto text-xs leading-relaxed text-slate-500 pr-2 border-y py-3" style="border-color: #F1F5F9;">
+          {{ selectedAgreement.content }}
+        </div>
+
+        <div class="flex justify-end gap-2 text-xs font-bold pt-2">
+          <button type="button" @click="closeAgreement" class="rounded-xl border px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700">Kapat</button>
+          <button type="button" @click="consents[selectedAgreement.title] = true; closeAgreement(); showToast('Sözleşme onaylandı.')" class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 transition">Onayla</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. Hesap Silme Güvenlik Modalı (Modal System) -->
+    <div v-if="isDeleteModalOpen" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 border text-left shadow-2xl relative">
+        <button type="button" @click="isDeleteModalOpen = false" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600">
+          <X :size="16" />
+        </button>
+
+        <div class="flex items-center gap-2 text-red-600">
+          <ShieldAlert :size="20" />
+          <h3 class="text-sm font-black uppercase">Hesap Kapatma Onayı</h3>
+        </div>
+
+        <p class="text-xs text-slate-500 leading-relaxed">
+          Hesabınızı kapatmak istediğinize emin misiniz? Bu işlem geri alınamaz. Devam etmek için şifrenizi girmeniz gerekmektedir.
+        </p>
+
+        <div>
+          <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Şifreniz</label>
+          <input v-model="deletePassword" type="password" placeholder="••••••••" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+        </div>
+
+        <div class="flex justify-end gap-2 text-xs font-bold pt-2">
+          <button type="button" @click="isDeleteModalOpen = false" class="rounded-xl border px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700">İptal</button>
+          <button type="button" @click="confirmAccountDelete" class="rounded-xl bg-red-600 hover:bg-red-700 text-white px-5 py-2 transition shadow">Talebi Gönder</button>
+        </div>
+      </div>
     </div>
 
   </div>
