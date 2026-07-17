@@ -151,13 +151,7 @@ function handleDemoLogin(role: 'buyer' | 'supplier') {
 
       <!-- Header brand -->
       <div class="relative z-10 flex items-center gap-2.5">
-        <!-- Inline SVG Premium G Logo -->
-        <svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="24" height="24" rx="6" fill="#1E3A5F"/>
-          <path d="M17 9C16.1 7.6 14.4 6.7 12.5 6.7C9.5 6.7 7 9.2 7 12.2C7 15.2 9.5 17.7 12.5 17.7C15.5 17.7 17.8 15.2 17.8 12.2H12.5" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="17.8" cy="12.2" r="1.5" fill="#FFFFFF"/>
-        </svg>
-        <span class="text-base font-bold tracking-tight text-white">Gel<span style="color: #F59E0B;">Anlaşalım</span></span>
+        <img src="/logo.png" alt="GelAnlaşalım" class="h-9 w-auto brightness-0 invert" />
       </div>
 
       <!-- Main presentation -->
@@ -264,8 +258,8 @@ function handleDemoLogin(role: 'buyer' | 'supplier') {
           <form v-if="registerStep === 1" @submit.prevent="goStep2" class="space-y-4">
             <!-- Adım göstergesi -->
             <div class="flex items-center gap-2 mb-4">
-              <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white" style="background: #1E3A5F;">1</div>
-              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #1E3A5F;">Kişisel Bilgiler</span>
+              <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white" style="background: #003057;">1</div>
+              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #003057;">Kişisel Bilgiler</span>
               <div class="flex-1 h-px" style="background: #E2E8F0;"></div>
               <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold" style="background: #F1F5F9; color: #94A3B8;">2</div>
               <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">Sektörler</span>
@@ -328,7 +322,7 @@ function handleDemoLogin(role: 'buyer' | 'supplier') {
 
             <div v-if="errorMessage" class="rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-bold text-red-700">⚠️ {{ errorMessage }}</div>
 
-            <button type="submit" class="w-full flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-black text-white transition-all" style="background: #1E3A5F;">
+            <button type="submit" class="w-full flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-black text-white transition-all" style="background: #003057;">
               Devam Et — Sektör Seçimi
               <ChevronRight :size="14" />
             </button>
@@ -340,9 +334,9 @@ function handleDemoLogin(role: 'buyer' | 'supplier') {
             <div class="flex items-center gap-2 mb-4">
               <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold" style="background: #22C55E; color: white;">✓</div>
               <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">Kişisel Bilgiler</span>
-              <div class="flex-1 h-px" style="background: #1E3A5F;"></div>
-              <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white" style="background: #1E3A5F;">2</div>
-              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #1E3A5F;">Sektörler</span>
+              <div class="flex-1 h-px" style="background: #003057;"></div>
+              <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white" style="background: #003057;">2</div>
+              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #003057;">Sektörler</span>
             </div>
 
             <div>
@@ -355,7 +349,7 @@ function handleDemoLogin(role: 'buyer' | 'supplier') {
                   @click="toggleSektor(sektor.key)"
                   class="relative flex items-center gap-2 rounded-lg border px-3 py-2.5 text-xs font-medium text-left transition-all"
                   :style="seciliSektorler.includes(sektor.key)
-                    ? 'border-color: #1E3A5F; background: rgba(30,58,95,0.06); color: #1E3A5F;'
+                    ? 'border-color: #003057; background: rgba(0,48,87,0.06); color: #003057;'
                     : 'border-color: #E2E8F0; color: #64748B;'"
                 >
                   <span>{{ sektor.label }}</span>
@@ -377,7 +371,7 @@ function handleDemoLogin(role: 'buyer' | 'supplier') {
                 type="button"
                 @click="mailBildirimi = !mailBildirimi"
                 class="relative h-5 w-9 rounded-full transition-all"
-                :style="mailBildirimi ? 'background: #1E3A5F;' : 'background: #CBD5E1;'"
+                :style="mailBildirimi ? 'background: #003057;' : 'background: #CBD5E1;'"
               >
                 <span
                   class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all"
@@ -399,7 +393,7 @@ function handleDemoLogin(role: 'buyer' | 'supplier') {
               <button type="button" @click="registerStep = 1" class="rounded-xl border px-4 py-3 text-xs font-bold transition hover:bg-slate-50" style="border-color: #E2E8F0; color: #64748B;">
                 ← Geri
               </button>
-              <button type="submit" :disabled="isSubmitting" class="flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-black text-white transition-all disabled:opacity-50" style="background: #1E3A5F;">
+              <button type="submit" :disabled="isSubmitting" class="flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-black text-white transition-all disabled:opacity-50" style="background: #003057;">
                 <span>{{ isSubmitting ? 'Kayıt Yapılıyor...' : 'Kaydol ve Devam Et' }}</span>
                 <ChevronRight v-if="!isSubmitting" :size="14" />
               </button>
@@ -454,7 +448,7 @@ function handleDemoLogin(role: 'buyer' | 'supplier') {
               <a href="#" class="text-blue-600 hover:underline">Şifremi Unuttum</a>
             </div>
             <div v-if="errorMessage" class="rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-bold text-red-700">⚠️ {{ errorMessage }}</div>
-            <button type="submit" :disabled="isSubmitting" class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white transition-all disabled:opacity-50" style="background: #1E3A5F;">
+            <button type="submit" :disabled="isSubmitting" class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white transition-all disabled:opacity-50" style="background: #003057;">
               <span>{{ isSubmitting ? 'Giriş Yapılıyor...' : 'Giriş Yap' }}</span>
               <ChevronRight v-if="!isSubmitting" :size="14" />
             </button>

@@ -30,9 +30,9 @@ function toggle(id: string) {
       <!-- Kapalı Zarf Bilgi Bandı -->
       <div
         class="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium"
-        style="background: rgba(30,58,95,0.06); color: #1E3A5F; border: 1px solid rgba(30,58,95,0.12);"
+        style="background: rgba(0,48,87,0.06); color: #003057; border: 1px solid rgba(0,48,87,0.12);"
       >
-        <Shield :size="14" style="color: #F59E0B;" />
+        <Shield :size="14" style="color: #1EAE4C;" />
         Kapalı Zarf — Teklifler Gizlidir
       </div>
     </div>
@@ -93,15 +93,15 @@ function toggle(id: string) {
               <div class="flex items-center gap-3">
                 <div
                   class="flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white"
-                  style="background: #1E3A5F;"
+                  style="background: #003057;"
                 >
                   {{ teklif.firma.charAt(0) }}
                 </div>
                 <div>
                   <div class="flex items-center gap-2">
                     <span class="text-sm font-semibold" style="color: #0F172A;">{{ teklif.firma }}</span>
-                    <span class="flex items-center gap-0.5 text-xs" style="color: #F59E0B;">
-                      <Star :size="11" fill="#F59E0B" />
+                    <span class="flex items-center gap-0.5 text-xs" style="color: #1EAE4C;">
+                      <Star :size="11" fill="#1EAE4C" />
                       {{ teklif.puan }}
                     </span>
                   </div>
@@ -113,7 +113,7 @@ function toggle(id: string) {
               </div>
 
               <div class="flex items-center gap-4">
-                <span class="text-base font-bold" style="color: #1E3A5F;">{{ teklif.fiyat }}</span>
+                <span class="text-base font-bold" style="color: #003057;">{{ teklif.fiyat }}</span>
                 <span
                   class="rounded-full px-2.5 py-1 text-xs font-medium"
                   :style="teklif.durum === 'onaylandi'
@@ -125,9 +125,9 @@ function toggle(id: string) {
                 <button
                   v-if="teklif.durum !== 'onaylandi'"
                   class="rounded-lg px-3 py-1.5 text-xs font-semibold text-white transition"
-                  style="background: #1E3A5F;"
-                  onmouseover="this.style.background='#F59E0B'"
-                  onmouseout="this.style.background='#1E3A5F'"
+                  style="background: #003057;"
+                  onmouseover="this.style.background='#1EAE4C'"
+                  onmouseout="this.style.background='#003057'"
                 >
                   Onayla
                 </button>

@@ -1087,7 +1087,7 @@ function saveProfile() {
                 type="button" 
                 @click="notifyMail = !notifyMail; showToast(notifyMail ? 'E-posta bildirimleri açıldı.' : 'E-posta bildirimleri sessize alındı.', 'warning')"
                 class="relative h-5 w-9 rounded-full transition-all"
-                :style="notifyMail ? 'background: #1E3A5F;' : 'background: #CBD5E1;'"
+                :style="notifyMail ? 'background: #003057;' : 'background: #CBD5E1;'"
               >
                 <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifyMail ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
               </button>
@@ -1102,7 +1102,7 @@ function saveProfile() {
                 type="button" 
                 @click="notifySms = !notifySms; showToast(notifySms ? 'SMS bildirimleri açıldı.' : 'SMS bildirimleri sessize alındı.', 'warning')"
                 class="relative h-5 w-9 rounded-full transition-all"
-                :style="notifySms ? 'background: #1E3A5F;' : 'background: #CBD5E1;'"
+                :style="notifySms ? 'background: #003057;' : 'background: #CBD5E1;'"
               >
                 <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifySms ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
               </button>
@@ -1117,7 +1117,7 @@ function saveProfile() {
                 type="button" 
                 @click="notifyBrowser = !notifyBrowser; showToast(notifyBrowser ? 'Tarayıcı bildirimleri açıldı.' : 'Tarayıcı bildirimleri kapatıldı.', 'warning')"
                 class="relative h-5 w-9 rounded-full transition-all"
-                :style="notifyBrowser ? 'background: #1E3A5F;' : 'background: #CBD5E1;'"
+                :style="notifyBrowser ? 'background: #003057;' : 'background: #CBD5E1;'"
               >
                 <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifyBrowser ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
               </button>

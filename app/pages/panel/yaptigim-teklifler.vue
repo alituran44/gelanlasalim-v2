@@ -28,9 +28,9 @@ const durumConfig: Record<string, { label: string, icon: any, style: string }> =
     <!-- Bilgi Notu -->
     <div
       class="flex items-center gap-2 rounded-lg px-4 py-3 mb-5 text-sm"
-      style="background: rgba(30,58,95,0.05); border: 1px solid rgba(30,58,95,0.1); color: #1E3A5F;"
+      style="background: rgba(0,48,87,0.05); border: 1px solid rgba(0,48,87,0.1); color: #003057;"
     >
-      <Eye :size="15" style="color: #F59E0B;" />
+      <Eye :size="15" style="color: #1EAE4C;" />
       <span>Alıcı firma bilgileri gizlidir. Teklif kabul edildiğinde iletişim bilgileri açılır.</span>
     </div>
 
@@ -47,7 +47,7 @@ const durumConfig: Record<string, { label: string, icon: any, style: string }> =
           <div class="flex-1 min-w-0">
             <!-- İlan Başlığı -->
             <div class="flex items-center gap-2 mb-2">
-              <SendHorizonal :size="15" style="color: #F59E0B;" />
+              <SendHorizonal :size="15" style="color: #1EAE4C;" />
               <span class="font-semibold text-sm" style="color: #0F172A;">{{ teklif.ilanBaslik }}</span>
             </div>
 
@@ -78,7 +78,7 @@ const durumConfig: Record<string, { label: string, icon: any, style: string }> =
 
             <!-- Fiyat + Süre -->
             <div class="text-right">
-              <div class="text-lg font-bold" style="color: #1E3A5F;">{{ teklif.teklifFiyatim }}</div>
+              <div class="text-lg font-bold" style="color: #003057;">{{ teklif.teklifFiyatim }}</div>
               <div class="flex items-center gap-1 text-xs" style="color: #94A3B8;">
                 <Clock :size="11" />
                 {{ teklif.sure }} teslimat

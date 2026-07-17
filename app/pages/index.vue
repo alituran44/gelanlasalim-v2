@@ -595,14 +595,14 @@ function toggleFilterSection(section: string) {
       <div class="relative z-20 mx-auto grid min-h-[640px] max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr]">
         <!-- Hero Left -->
         <div class="text-left">
-          <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em]" style="color: #2563EB;">
-            <span class="h-px w-8" style="background-color: #2563EB;"></span>
+          <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em]" style="color: #1EAE4C;">
+            <span class="h-px w-8" style="background-color: #1EAE4C;"></span>
             {{ cmsData.hero.tagline }}
           </div>
           <h1 class="text-4xl font-black leading-[1.15] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
             {{ cmsData.hero.titleLine1 }}<br />
             {{ cmsData.hero.titleLine2 }}<br />
-            <span class="font-serif italic font-medium" style="color: #2563EB;">{{ cmsData.hero.titleItalic }}</span>
+            <span class="font-serif italic font-medium" style="color: #1EAE4C;">{{ cmsData.hero.titleItalic }}</span>
           </h1>
           <p class="mt-6 max-w-xl text-base leading-relaxed text-slate-600">
             {{ cmsData.hero.description }}
@@ -610,7 +610,7 @@ function toggleFilterSection(section: string) {
           
           <!-- Buttons -->
           <div class="mt-8 flex flex-wrap items-center gap-3">
-            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/10 hover:bg-blue-700 transition-all" style="background: #1D4ED8;">
+            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/10 hover:opacity-90 transition-all" style="background: #003057;">
               Ücretsiz kurumsal hesap aç
               <ArrowRight :size="15" />
             </NuxtLink>
@@ -670,7 +670,7 @@ function toggleFilterSection(section: string) {
               </div>
               
               <div class="text-right">
-                <div class="rounded-lg px-2.5 py-1 text-[9px] font-black" style="background: rgba(37,99,235,0.08); color: #2563EB;">
+                <div class="rounded-lg px-2.5 py-1 text-[9px] font-black" style="background: rgba(30,174,76,0.08); color: #1EAE4C;">
                   {{ cmsData.liveTender.savingsText }}
                 </div>
               </div>
@@ -1300,7 +1300,7 @@ function toggleFilterSection(section: string) {
     <!-- BİZİMLE İLETİŞİME GEÇİN SECTION -->
     <section class="border-b border-slate-200 bg-slate-50 py-20 relative overflow-hidden">
       <!-- Background subtle graphics -->
-      <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(circle, #2563eb 1px, transparent 1px); background-size: 24px 24px;"></div>
+      <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(circle, #1eae4c 1px, transparent 1px); background-size: 24px 24px;"></div>
       
       <div class="mx-auto max-w-7xl px-6 relative z-10">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -1308,10 +1308,10 @@ function toggleFilterSection(section: string) {
           <!-- Left Content -->
           <div class="lg:col-span-6 text-left space-y-8">
             <div class="space-y-4">
-              <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">BİZİMLE İLETİŞİME GEÇİN</span>
+              <span class="text-[10px] font-black uppercase tracking-widest" style="color: #1EAE4C;">BİZİMLE İLETİŞİME GEÇİN</span>
               <h2 class="text-3xl font-black text-slate-900 tracking-tight md:text-5xl leading-tight">
                 Satın alma süreçlerinizi <br class="hidden sm:inline" />
-                <span class="text-blue-600 italic">tek panelde toplayın.</span>
+                <span class="italic" style="color: #1EAE4C;">tek panelde toplayın.</span>
               </h2>
               <p class="text-xs sm:text-sm leading-relaxed text-slate-500 font-medium max-w-md">
                 Ekibimiz satın alma süreçlerinizde size yardımcı olmaya hazır. İletişim bilgilerinizi bırakın, en kısa sürede dönüş yapalım.

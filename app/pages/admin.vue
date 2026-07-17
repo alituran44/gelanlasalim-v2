@@ -211,13 +211,8 @@ function removeSubmittedBid(index: number) {
         
         <!-- Logo -->
         <div class="flex flex-col items-center mb-8">
-          <div class="flex items-center gap-2 border border-slate-700 rounded-xl px-3 py-1.5 bg-slate-800/40">
-            <svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect width="24" height="24" rx="6" fill="#1E3A5F"/>
-              <path d="M17 9C16.1 7.6 14.4 6.7 12.5 6.7C9.5 6.7 7 9.2 7 12.2C7 15.2 9.5 17.7 12.5 17.7C15.5 17.7 17.8 15.2 17.8 12.2H12.5" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-              <circle cx="17.8" cy="12.2" r="1.5" fill="#FFFFFF"/>
-            </svg>
-            <span class="text-base font-bold text-white">Gel<span style="color: #F59E0B;">Anlaşalım</span></span>
+          <div class="flex items-center gap-2">
+            <img src="/logo.png" alt="GelAnlaşalım" class="h-9 w-auto brightness-0 invert" />
           </div>
           <h2 class="mt-4 text-lg font-black tracking-tight text-white">CMS İçerik Kontrol Paneli</h2>
           <p class="text-xs text-slate-400 mt-1">Platform genelindeki başlıkları, fiyatları ve ihaleleri yönetin.</p>
@@ -272,12 +267,8 @@ function removeSubmittedBid(index: number) {
           <!-- Title & Brand -->
           <div class="px-6 py-6 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="24" height="24" rx="6" fill="#1E3A5F"/>
-                <path d="M17 9C16.1 7.6 14.4 6.7 12.5 6.7C9.5 6.7 7 9.2 7 12.2C7 15.2 9.5 17.7 12.5 17.7C15.5 17.7 17.8 15.2 17.8 12.2H12.5" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="17.8" cy="12.2" r="1.5" fill="#FFFFFF"/>
-              </svg>
-              <span class="text-sm font-bold text-white">Gel<span style="color: #F59E0B;">Anlaşalım</span> <span class="text-[8px] bg-blue-600/30 text-blue-400 px-1 py-0.5 rounded ml-1 font-mono">CMS</span></span>
+              <img src="/logo.png" alt="GelAnlaşalım" class="h-7 w-auto brightness-0 invert" />
+              <span class="text-[8px] bg-blue-600/30 text-blue-400 px-1 py-0.5 rounded ml-1 font-mono">CMS</span>
             </div>
           </div>
 

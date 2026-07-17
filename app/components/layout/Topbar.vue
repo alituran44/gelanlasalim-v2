@@ -68,7 +68,7 @@ const pageTitle = computed(() => {
           placeholder="İhale ara..."
           class="w-64 rounded-lg border py-2 pl-9 pr-3 text-sm outline-none transition"
           style="border-color: #E2E8F0; background: #F8FAFC; color: #0F172A;"
-          onfocus="this.style.borderColor='#F59E0B'; this.style.boxShadow='0 0 0 3px rgba(245,158,11,0.1)'"
+          onfocus="this.style.borderColor='#1EAE4C'; this.style.boxShadow='0 0 0 3px rgba(30,174,76,0.1)'"
           onblur="this.style.borderColor='#E2E8F0'; this.style.boxShadow='none'"
         />
       </div>
@@ -81,9 +81,9 @@ const pageTitle = computed(() => {
       <NuxtLink
         to="/panel/ihale-olustur"
         class="hidden md:flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
-        style="background: #1E3A5F;"
-        onmouseover="this.style.background='#F59E0B'"
-        onmouseout="this.style.background='#1E3A5F'"
+        style="background: #003057;"
+        onmouseover="this.style.background='#1EAE4C'"
+        onmouseout="this.style.background='#003057'"
       >
         <Plus :size="16" />
         Yeni İhale

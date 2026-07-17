@@ -12,14 +12,8 @@ const mobileMenuOpen = ref(false)
       <div class="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-6">
 
         <!-- Sol: Logo -->
-        <NuxtLink to="/" class="flex items-center gap-2 border border-slate-900 rounded-xl px-3 py-1.5 hover:bg-slate-50 transition shrink-0">
-          <!-- Inline SVG Premium G Logo -->
-          <svg class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="24" height="24" rx="6" fill="#1E3A5F"/>
-            <path d="M17 9C16.1 7.6 14.4 6.7 12.5 6.7C9.5 6.7 7 9.2 7 12.2C7 15.2 9.5 17.7 12.5 17.7C15.5 17.7 17.8 15.2 17.8 12.2H12.5" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-            <circle cx="17.8" cy="12.2" r="1.5" fill="#FFFFFF"/>
-          </svg>
-          <span class="text-sm font-bold tracking-tight text-slate-900">Gel<span style="color: #F59E0B;">Anlaşalım</span></span>
+        <NuxtLink to="/" class="flex items-center gap-2 hover:opacity-90 transition shrink-0">
+          <img src="/logo.png" alt="GelAnlaşalım" class="h-9 w-auto" />
         </NuxtLink>
 
         <!-- Orta: Nav Linkleri -->
@@ -28,35 +22,35 @@ const mobileMenuOpen = ref(false)
             href="/#nasil-calisir"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #475569;"
-            onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
+            onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
           >Nasıl Çalışır</a>
           <a
             href="/#ozellikler"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #475569;"
-            onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
+            onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
           >Özellikler</a>
           <a
             href="/#ihale-gezgini"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #475569;"
-            onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
+            onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
           >Market</a>
           <NuxtLink
             to="/abonelik"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #475569;"
-            onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
+            onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
           >Fiyatlandırma</NuxtLink>
           <a
             href="/#sss"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #475569;"
-            onmouseover="this.style.background='white'; this.style.color='#1E3A5F'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
+            onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
           >SSS</a>
         </nav>
@@ -67,7 +61,7 @@ const mobileMenuOpen = ref(false)
             to="/uyelik"
             class="px-4 py-2.5 text-xs font-semibold rounded-lg transition-all"
             style="color: #475569;"
-            onmouseover="this.style.background='#F1F5F9'; this.style.color='#1E3A5F'"
+            onmouseover="this.style.background='#F1F5F9'; this.style.color='#003057'"
             onmouseout="this.style.background='transparent'; this.style.color='#475569'"
           >
             Giriş Yap
@@ -75,9 +69,9 @@ const mobileMenuOpen = ref(false)
           <NuxtLink
             to="/uyelik"
             class="flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold text-white transition-all"
-            style="background: #1E3A5F;"
-            onmouseover="this.style.background='#F59E0B'"
-            onmouseout="this.style.background='#1E3A5F'"
+            style="background: #003057;"
+            onmouseover="this.style.background='#1EAE4C'"
+            onmouseout="this.style.background='#003057'"
           >
             Kurumsal hesap aç
             <ArrowRight :size="13" />
@@ -113,7 +107,7 @@ const mobileMenuOpen = ref(false)
               to="/uyelik"
               @click="mobileMenuOpen = false"
               class="flex items-center justify-center gap-2 rounded-xl py-3 text-white font-bold"
-              style="background: #1E3A5F;"
+              style="background: #003057;"
             >
               Kurumsal hesap aç <ArrowRight :size="14" />
             </NuxtLink>
@@ -135,16 +129,7 @@ const mobileMenuOpen = ref(false)
           <!-- Column 1: Brand Info -->
           <div class="md:col-span-4 flex flex-col gap-5 text-left">
             <div class="flex items-center gap-2.5">
-              <!-- Inline SVG Premium G Logo -->
-              <svg class="h-6 w-6 shrink-0" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <rect width="24" height="24" rx="6" fill="#1E3A5F"/>
-                <path d="M17 9C16.1 7.6 14.4 6.7 12.5 6.7C9.5 6.7 7 9.2 7 12.2C7 15.2 9.5 17.7 12.5 17.7C15.5 17.7 17.8 15.2 17.8 12.2H12.5" stroke="#F59E0B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="17.8" cy="12.2" r="1.5" fill="#FFFFFF"/>
-              </svg>
-              <div>
-                <span class="text-base font-bold tracking-tight leading-none text-slate-900">Gel<span style="color: #F59E0B;">Anlaşalım</span></span>
-                <span class="block text-[8px] font-black uppercase mt-1 tracking-wider" style="color: #64748B;">B2B TERS İHALE PLATFORMU</span>
-              </div>
+              <img src="/logo.png" alt="GelAnlaşalım" class="h-9 w-auto" />
             </div>
             
             <p class="text-xs leading-relaxed font-medium text-slate-500">
