@@ -107,7 +107,7 @@ const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
 </script>
 
 <template>
-  <aside class="w-64 min-h-screen flex flex-col" style="background: #0F172A;">
+  <aside class="w-64 h-screen sticky top-0 flex flex-col shrink-0" style="background: #0F172A;">
 
     <!-- Logo Alanı -->
     <div class="px-6 py-5 border-b" style="border-color: rgba(255,255,255,0.08);">

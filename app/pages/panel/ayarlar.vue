@@ -244,6 +244,77 @@ function deleteAddress(id: number) {
   showToast("Adres silindi.")
 }
 
+// New address states and actions
+const isNewAddressModalOpen = ref(false)
+const newAddressForm = ref({
+  type: 'teslimat' as 'teslimat' | 'fatura',
+  title: '',
+  address: '',
+  city: '',
+  district: '',
+  zip: '',
+  isDefault: false
+})
+
+function addAddress() {
+  if (!newAddressForm.value.title.trim()) {
+    showToast("Lütfen adres başlığı giriniz.", "error")
+    return
+  }
+  if (!newAddressForm.value.address.trim()) {
+    showToast("Lütfen açık adres giriniz.", "error")
+    return
+  }
+  if (!newAddressForm.value.city.trim()) {
+    showToast("Lütfen il giriniz.", "error")
+    return
+  }
+  if (!newAddressForm.value.district.trim()) {
+    showToast("Lütfen ilçe giriniz.", "error")
+    return
+  }
+
+  if (newAddressForm.value.isDefault) {
+    addresses.value.forEach(a => {
+      if (a.type === newAddressForm.value.type) {
+        a.isDefault = false
+      }
+    })
+  }
+
+  addresses.value.push({
+    id: Date.now(),
+    type: newAddressForm.value.type,
+    title: newAddressForm.value.title,
+    address: newAddressForm.value.address,
+    city: `${newAddressForm.value.district} / ${newAddressForm.value.city}`,
+    zip: `${newAddressForm.value.zip || '17100'}`,
+    isDefault: newAddressForm.value.isDefault
+  })
+
+  showToast("Yeni adres başarıyla eklendi.")
+  isNewAddressModalOpen.value = false
+
+  // Reset form
+  newAddressForm.value = {
+    type: 'teslimat',
+    title: '',
+    address: '',
+    city: '',
+    district: '',
+    zip: '',
+    isDefault: false
+  }
+}
+
+// Scroll Helper
+function scrollToSection(id: string) {
+  const el = document.getElementById(id)
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
 // Notification toggles
 const notifyMail = ref(true)
 const notifySms = ref(false)
@@ -856,7 +927,7 @@ function saveProfile() {
               <h2 class="text-lg font-black text-slate-800">Kayıtlı Adresler</h2>
               <p class="text-xs text-slate-400">Teslimat adreslerinizi yönetin. İhale oluştururken hızlıca seçebilirsiniz.</p>
             </div>
-            <button type="button" @click="showToast('Yeni adres formu açılıyor...')" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 transition">
+            <button type="button" @click="isNewAddressModalOpen = true" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 transition">
               <Plus :size="14" /> Yeni adres
             </button>
           </div>
@@ -870,7 +941,7 @@ function saveProfile() {
                 class="rounded-lg px-4 py-2 text-xs font-bold transition"
                 :class="activeAddressType === 'teslimat' ? 'bg-blue-600 text-white shadow' : 'text-slate-500 hover:bg-slate-50'"
               >
-                Teslimat Adresleri (1)
+                Teslimat Adresleri ({{ addresses.filter(a => a.type === 'teslimat').length }})
               </button>
               <button 
                 type="button"
@@ -878,7 +949,7 @@ function saveProfile() {
                 class="rounded-lg px-4 py-2 text-xs font-bold transition"
                 :class="activeAddressType === 'fatura' ? 'bg-blue-600 text-white shadow' : 'text-slate-500 hover:bg-slate-50'"
               >
-                Fatura Adresleri (1)
+                Fatura Adresleri ({{ addresses.filter(a => a.type === 'fatura').length }})
               </button>
             </div>
           </div>
@@ -1044,6 +1115,24 @@ function saveProfile() {
         <!-- AYARLAR (SETTINGS) TAB -->
         <div v-if="activeSubTab === 'ayarlar'" class="space-y-6">
           
+          <!-- Sticky Horizontal Navigation Bar -->
+          <div class="flex items-center gap-2 sm:gap-6 bg-slate-50 border p-2 rounded-xl sticky top-0 z-20 shadow-sm" style="background: rgba(248, 250, 252, 0.95); backdrop-filter: blur(8px); border-color: #E2E8F0;">
+            <button 
+              v-for="sec in [
+                { id: 'tercihler', label: 'Uygulama tercihleri' },
+                { id: 'guvenlik', label: 'Güvenlik' },
+                { id: 'bildirim-tercihleri', label: 'Bildirimler' },
+                { id: 'profil-kaynagi', label: 'Profil kaynağı' }
+              ]"
+              :key="sec.id"
+              type="button"
+              @click="scrollToSection(sec.id)"
+              class="text-[10px] sm:text-xs font-bold text-slate-500 hover:text-blue-600 transition px-2.5 py-1.5 rounded-lg hover:bg-slate-100"
+            >
+              {{ sec.label }}
+            </button>
+          </div>
+
           <!-- Top Info metrics grid -->
           <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="rounded-xl border bg-white p-4 flex items-center justify-between shadow-sm" style="border-color: #E2E8F0;">
@@ -1074,7 +1163,7 @@ function saveProfile() {
           <!-- Top horizontal card row (with icons on the left) -->
           <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
             <!-- Card 1 -->
-            <div @click="showToast('Tema ve saat dilimi tercihlerine kaydırıldı.')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
+            <div @click="scrollToSection('tercihler')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
               <div class="flex items-start gap-2.5">
                 <Sliders :size="14" class="text-blue-600 mt-0.5 shrink-0" />
                 <div>
@@ -1086,7 +1175,7 @@ function saveProfile() {
             </div>
 
             <!-- Card 2 -->
-            <div @click="showToast('Şifre ve 2FA ayarlarına kaydırıldı.')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
+            <div @click="scrollToSection('guvenlik')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
               <div class="flex items-start gap-2.5">
                 <Shield :size="14" class="text-blue-600 mt-0.5 shrink-0" />
                 <div>
@@ -1098,7 +1187,7 @@ function saveProfile() {
             </div>
 
             <!-- Card 3 -->
-            <div @click="showToast('Bildirim kanalları ayarlarına kaydırıldı.')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
+            <div @click="scrollToSection('bildirim-tercihleri')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
               <div class="flex items-start gap-2.5">
                 <Bell :size="14" class="text-blue-600 mt-0.5 shrink-0" />
                 <div>
@@ -1110,7 +1199,7 @@ function saveProfile() {
             </div>
 
             <!-- Card 4 -->
-            <div @click="showToast('Profil koruma sözleşmelerine kaydırıldı.')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
+            <div @click="scrollToSection('profil-kaynagi')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
               <div class="flex items-start gap-2.5">
                 <FileText :size="14" class="text-blue-600 mt-0.5 shrink-0" />
                 <div>
@@ -1170,7 +1259,7 @@ function saveProfile() {
           </div>
 
           <!-- Güvenlik Şifre Yönetimi Card -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
+          <div id="guvenlik" class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
             <div class="flex items-center gap-2.5 pb-2 border-b" style="border-color: #F1F5F9;">
               <Shield :size="15" class="text-blue-600" />
               <div>
@@ -1407,7 +1496,7 @@ function saveProfile() {
           </div>
 
           <!-- Tercihler Card -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
+          <div id="tercihler" class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
             <div class="flex items-center gap-2.5 pb-2 border-b" style="border-color: #F1F5F9;">
               <Sliders :size="15" class="text-blue-600" />
               <div>
@@ -1487,7 +1576,7 @@ function saveProfile() {
           </div>
 
           <!-- Bildirim Tercihleri Card -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+          <div id="bildirim-tercihleri" class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
             <div class="flex items-center justify-between pb-2 border-b" style="border-color: #F1F5F9;">
               <div class="flex items-center gap-2.5">
                 <Bell :size="15" class="text-blue-600" />
@@ -1509,7 +1598,7 @@ function saveProfile() {
           </div>
 
           <!-- Sözleşmeler & Onaylar Card -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
+          <div id="profil-kaynagi" class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
             <div class="flex items-center gap-2.5 pb-2 border-b" style="border-color: #F1F5F9;">
               <FileText :size="15" class="text-blue-600" />
               <div>
@@ -1670,6 +1759,85 @@ function saveProfile() {
         <div class="flex justify-end gap-2 text-xs font-bold pt-2">
           <button type="button" @click="isDeleteModalOpen = false" class="rounded-xl border px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700">İptal</button>
           <button type="button" @click="confirmAccountDelete" class="rounded-xl bg-red-600 hover:bg-red-700 text-white px-5 py-2 transition shadow">Talebi Gönder</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Yeni Adres Ekleme Modalı (Modal System) -->
+    <div v-if="isNewAddressModalOpen" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 border text-left shadow-2xl relative">
+        <button type="button" @click="isNewAddressModalOpen = false" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600">
+          <X :size="16" />
+        </button>
+
+        <h3 class="text-sm font-black text-slate-800 pr-8">Yeni Adres Ekle</h3>
+        
+        <div class="space-y-4">
+          <!-- Adres Tipi -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5">Adres Tipi</label>
+            <div class="flex items-center gap-4">
+              <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-600">
+                <input type="radio" v-model="newAddressForm.type" value="teslimat" class="text-blue-600 focus:ring-blue-500" />
+                Teslimat Adresi
+              </label>
+              <label class="inline-flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-600">
+                <input type="radio" v-model="newAddressForm.type" value="fatura" class="text-blue-600 focus:ring-blue-500" />
+                Fatura Adresi
+              </label>
+            </div>
+          </div>
+
+          <!-- Adres Başlığı -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5">Adres Başlığı *</label>
+            <input v-model="newAddressForm.title" type="text" placeholder="Örn: Merkez Depo, Fabrika, Şube" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- İl -->
+            <div>
+              <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5">İl *</label>
+              <input v-model="newAddressForm.city" type="text" placeholder="Örn: Çanakkale" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+            </div>
+
+            <!-- İlçe -->
+            <div>
+              <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5">İlçe *</label>
+              <input v-model="newAddressForm.district" type="text" placeholder="Örn: Merkez" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Mahalle -->
+            <div>
+              <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5">Mahalle</label>
+              <input v-model="newAddressForm.zip" type="text" placeholder="Örn: İsmet Paşa Mah." class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+            </div>
+            
+            <!-- Posta Kodu -->
+            <div>
+              <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5">Posta Kodu</label>
+              <input v-model="newAddressForm.zip" type="text" placeholder="Örn: 17100" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+            </div>
+          </div>
+
+          <!-- Açık Adres -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5">Açık Adres *</label>
+            <textarea v-model="newAddressForm.address" rows="3" placeholder="Sokak, bina no, daire no..." class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none resize-none" style="border-color: #E2E8F0;"></textarea>
+          </div>
+
+          <!-- Varsayılan Yap -->
+          <div class="flex items-center gap-2">
+            <input type="checkbox" v-model="newAddressForm.isDefault" id="isDefaultAddr" class="h-4.5 w-4.5 rounded text-blue-600 border-slate-300" />
+            <label for="isDefaultAddr" class="text-xs font-bold text-slate-600 cursor-pointer">Bu adresi varsayılan olarak ayarla</label>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 text-xs font-bold pt-2">
+          <button type="button" @click="isNewAddressModalOpen = false" class="rounded-xl border px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700">İptal</button>
+          <button type="button" @click="addAddress" class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 transition shadow">Adresi Kaydet</button>
         </div>
       </div>
     </div>

@@ -427,16 +427,16 @@ function saveAllAndRedirect() {
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <!-- Ad -->
             <div>
-              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Ad</label>
-              <input v-model="ad" type="text" disabled class="w-full rounded-xl border bg-slate-50 border-slate-200 px-4 py-3 text-xs text-slate-500 outline-none" />
-              <p class="text-[9px] text-slate-400 mt-1">Kayıt sırasında alındı</p>
+              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Ad *</label>
+              <input v-model="ad" type="text" class="w-full rounded-xl border border-slate-200 px-4 py-3 text-xs outline-none focus:border-blue-500" />
+              <p v-if="step2Errors.ad" class="text-[10px] text-red-500 mt-1 font-semibold">{{ step2Errors.ad }}</p>
             </div>
 
             <!-- Soyad -->
             <div>
-              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Soyad</label>
-              <input v-model="soyad" type="text" disabled class="w-full rounded-xl border bg-slate-50 border-slate-200 px-4 py-3 text-xs text-slate-500 outline-none" />
-              <p class="text-[9px] text-slate-400 mt-1">Kayıt sırasında alındı</p>
+              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Soyad *</label>
+              <input v-model="soyad" type="text" class="w-full rounded-xl border border-slate-200 px-4 py-3 text-xs outline-none focus:border-blue-500" />
+              <p v-if="step2Errors.soyad" class="text-[10px] text-red-500 mt-1 font-semibold">{{ step2Errors.soyad }}</p>
             </div>
           </div>
 
