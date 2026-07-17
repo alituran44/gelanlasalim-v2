@@ -43,8 +43,14 @@ definePageMeta({
   layout: 'dashboard' 
 })
 
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
 // Sub-navigation tabs matching screenshot
-const activeSubTab = ref<'kisisel' | 'sirket' | 'adresler' | 'bildirimler' | 'takip' | 'ticaret' | 'uyelik' | 'ayarlar'>('ayarlar')
+const activeSubTab = computed(() => {
+  return (route.query.tab as 'kisisel' | 'sirket' | 'adresler' | 'bildirimler' | 'takip' | 'ticaret' | 'uyelik' | 'ayarlar') || 'ayarlar'
+})
 
 // Personal Profile data
 const profileForm = ref({
@@ -178,111 +184,8 @@ function saveProfile() {
       </p>
     </div>
 
-    <!-- Main Grid Layout with Sub-Sidebar -->
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-      
-      <!-- Left Submenu Menu List (1 Column) -->
-      <div class="space-y-4">
-        
-        <!-- Profile Category -->
-        <div class="space-y-1">
-          <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block px-3 mb-1">PROFİL</span>
-          
-          <button 
-            type="button"
-            @click="activeSubTab = 'kisisel'"
-            class="w-full flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-bold transition text-left"
-            :class="activeSubTab === 'kisisel' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500 hover:bg-slate-50'"
-          >
-            <User :size="14" />
-            Kişisel
-          </button>
-          
-          <button 
-            type="button"
-            @click="activeSubTab = 'sirket'"
-            class="w-full flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-bold transition text-left"
-            :class="activeSubTab === 'sirket' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500 hover:bg-slate-50'"
-          >
-            <Building2 :size="14" />
-            Şirket & Doğrulama
-          </button>
-        </div>
-
-        <!-- İş Akışı Category -->
-        <div class="space-y-1">
-          <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block px-3 mb-1">İŞ AKIŞI</span>
-          
-          <button 
-            type="button"
-            @click="activeSubTab = 'adresler'"
-            class="w-full flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-bold transition text-left"
-            :class="activeSubTab === 'adresler' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500 hover:bg-slate-50'"
-          >
-            <MapPin :size="14" />
-            Kayıtlı Adresler
-          </button>
-          
-          <button 
-            type="button"
-            @click="activeSubTab = 'bildirimler'"
-            class="w-full flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-bold transition text-left"
-            :class="activeSubTab === 'bildirimler' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500 hover:bg-slate-50'"
-          >
-            <Bell :size="14" />
-            Bildirimler
-          </button>
-
-          <button 
-            type="button"
-            @click="activeSubTab = 'takip'"
-            class="w-full flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-bold transition text-left"
-            :class="activeSubTab === 'takip' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500 hover:bg-slate-50'"
-          >
-            <Heart :size="14" />
-            Takip Ettiklerim
-          </button>
-
-          <button 
-            type="button"
-            @click="activeSubTab = 'ticaret'"
-            class="w-full flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-bold transition text-left"
-            :class="activeSubTab === 'ticaret' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500 hover:bg-slate-50'"
-          >
-            <History :size="14" />
-            Geçmiş Ticaretlerim
-          </button>
-        </div>
-
-        <!-- Hesap Category -->
-        <div class="space-y-1">
-          <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block px-3 mb-1">HESAP</span>
-          
-          <button 
-            type="button"
-            @click="activeSubTab = 'uyelik'"
-            class="w-full flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-bold transition text-left"
-            :class="activeSubTab === 'uyelik' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500 hover:bg-slate-50'"
-          >
-            <Award :size="14" />
-            Üyelik
-          </button>
-
-          <button 
-            type="button"
-            @click="activeSubTab = 'ayarlar'"
-            class="w-full flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-xs font-bold transition text-left"
-            :class="activeSubTab === 'ayarlar' ? 'bg-blue-50 text-blue-700 shadow-sm' : 'text-slate-500 hover:bg-slate-50'"
-          >
-            <Sliders :size="14" />
-            Ayarlar
-          </button>
-        </div>
-
-      </div>
-
-      <!-- Right Panel details (3 Columns) -->
-      <div class="lg:col-span-3 space-y-6">
+    <!-- Main Content Area -->
+    <div class="space-y-6">
         
         <!-- KIŞISEL TAB -->
         <div v-if="activeSubTab === 'kisisel'" class="space-y-6">
@@ -844,6 +747,7 @@ function saveProfile() {
             </div>
           </div>
         </div>
+      </div>
 
         <!-- TAKIP ETTIKLERIM TAB -->
         <div v-if="activeSubTab === 'takip'" class="space-y-6">
@@ -1418,10 +1322,6 @@ function saveProfile() {
               </div>
             </div>
           </div>
-
-        </div>
-
-      </div>
 
     </div>
 

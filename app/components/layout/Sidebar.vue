@@ -18,7 +18,15 @@ import {
   LogOut,
   Plus,
   HelpCircle,
-  ChevronRight
+  ChevronRight,
+  User,
+  MapPin,
+  Bell,
+  Heart,
+  History,
+  Award,
+  Sliders,
+  Building
 } from "lucide-vue-next"
 
 const route = useRoute()
@@ -63,9 +71,39 @@ const sidebarMenus = [
   { title: "Hesap Merkezi", icon: Settings, to: "/panel/ayarlar" },
 ]
 
-const menus = computed(() => sidebarMenus)
+const isSettingsPage = computed(() => {
+  return route.path === '/panel/ayarlar' || route.path === '/panel/yardim'
+})
 
+const settingsGroups = [
+  {
+    title: "Profil",
+    items: [
+      { title: "Kişisel", icon: User, to: "/panel/ayarlar?tab=kisisel", tab: "kisisel" },
+      { title: "Şirket & Doğrulama", icon: Building2, to: "/panel/ayarlar?tab=sirket", tab: "sirket" }
+    ]
+  },
+  {
+    title: "İş akışı",
+    items: [
+      { title: "Kayıtlı Adresler", icon: MapPin, to: "/panel/ayarlar?tab=adresler", tab: "adresler" },
+      { title: "Bildirimler", icon: Bell, to: "/panel/ayarlar?tab=bildirimler", tab: "bildirimler" },
+      { title: "Takip Ettiklerim", icon: Heart, to: "/panel/ayarlar?tab=takip", tab: "takip" },
+      { title: "Geçmiş Ticaretlerim", icon: History, to: "/panel/ayarlar?tab=ticaret", tab: "ticaret" }
+    ]
+  },
+  {
+    title: "Hesap",
+    items: [
+      { title: "Üyelik", icon: Award, to: "/panel/ayarlar?tab=uyelik", tab: "uyelik" },
+      { title: "Ayarlar", icon: Sliders, to: "/panel/ayarlar?tab=ayarlar", tab: "ayarlar" }
+    ]
+  }
+]
+
+const menus = computed(() => sidebarMenus)
 const activePath = computed(() => route.path)
+const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
 </script>
 
 <template>
@@ -99,49 +137,95 @@ const activePath = computed(() => route.path)
       </span>
     </div>
 
-    <!-- Yeni İhale Oluştur Butonu -->
-    <div class="px-3 mb-4">
-      <NuxtLink
-        to="/panel/ihale-olustur"
-        class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white transition-all shadow-md"
-        style="background: #1E3A5F; border: 1px solid rgba(255, 255, 255, 0.15);"
-        onmouseover="this.style.background='#F59E0B'"
-        onmouseout="this.style.background='#1E3A5F'"
-      >
-        <Plus :size="14" />
-        Yeni ihale oluştur
-      </NuxtLink>
-    </div>
+    <!-- Conditional Navigation menus -->
+    <template v-if="isSettingsPage">
+      <!-- Firma Merkezi Butonu -->
+      <div class="px-3 mb-4">
+        <NuxtLink
+          to="/panel"
+          class="w-full flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-black text-white transition-all shadow-md"
+          style="background: #1E3A5F; border: 1px solid rgba(255, 255, 255, 0.15);"
+          onmouseover="this.style.background='#F59E0B'"
+          onmouseout="this.style.background='#1E3A5F'"
+        >
+          <LayoutDashboard :size="14" />
+          Firma Merkezi
+        </NuxtLink>
+      </div>
 
-    <!-- Navigasyon -->
-    <nav class="flex-1 px-3 pb-4 space-y-0.5">
-      <NuxtLink
-        v-for="item in menus"
-        :key="item.to"
-        :to="item.to"
-        class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 group"
-        :class="activePath === item.to
-          ? 'text-white'
-          : 'text-slate-400 hover:text-white'"
-        :style="activePath === item.to
-          ? 'background: rgba(245,158,11,0.15); color: #F59E0B;'
-          : ''"
-      >
-        <component
-          :is="item.icon"
-          :size="17"
-          :style="activePath === item.to ? 'color: #F59E0B;' : ''"
-          class="shrink-0 transition-colors"
-        />
-        <span>{{ item.title }}</span>
-        <ChevronRight
-          v-if="activePath === item.to"
-          :size="14"
-          class="ml-auto"
-          style="color: #F59E0B;"
-        />
-      </NuxtLink>
-    </nav>
+      <!-- Settings Submenu groups -->
+      <div class="flex-1 px-3 pb-4 space-y-4 overflow-y-auto">
+        <div v-for="group in settingsGroups" :key="group.title" class="space-y-1">
+          <span class="text-[9px] font-black text-slate-500 uppercase tracking-widest block px-3 mb-1.5">{{ group.title }}</span>
+          <NuxtLink
+            v-for="item in group.items"
+            :key="item.tab"
+            :to="item.to"
+            class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-bold transition-all duration-150"
+            :class="activeTabQuery === item.tab && route.path === '/panel/ayarlar'
+              ? 'text-white'
+              : 'text-slate-400 hover:text-white'"
+            :style="activeTabQuery === item.tab && route.path === '/panel/ayarlar'
+              ? 'background: rgba(245,158,11,0.15); color: #F59E0B;'
+              : ''"
+          >
+            <component
+              :is="item.icon"
+              :size="15"
+              :style="activeTabQuery === item.tab && route.path === '/panel/ayarlar' ? 'color: #F59E0B;' : ''"
+              class="shrink-0 transition-colors"
+            />
+            <span>{{ item.title }}</span>
+          </NuxtLink>
+        </div>
+      </div>
+    </template>
+
+    <template v-else>
+      <!-- Yeni İhale Oluştur Butonu -->
+      <div class="px-3 mb-4">
+        <NuxtLink
+          to="/panel/ihale-olustur"
+          class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white transition-all shadow-md"
+          style="background: #1E3A5F; border: 1px solid rgba(255, 255, 255, 0.15);"
+          onmouseover="this.style.background='#F59E0B'"
+          onmouseout="this.style.background='#1E3A5F'"
+        >
+          <Plus :size="14" />
+          Yeni ihale oluştur
+        </NuxtLink>
+      </div>
+
+      <!-- Navigasyon -->
+      <nav class="flex-1 px-3 pb-4 space-y-0.5">
+        <NuxtLink
+          v-for="item in menus"
+          :key="item.to"
+          :to="item.to"
+          class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 group"
+          :class="activePath === item.to
+            ? 'text-white'
+            : 'text-slate-400 hover:text-white'"
+          :style="activePath === item.to
+            ? 'background: rgba(245,158,11,0.15); color: #F59E0B;'
+            : ''"
+        >
+          <component
+            :is="item.icon"
+            :size="17"
+            :style="activePath === item.to ? 'color: #F59E0B;' : ''"
+            class="shrink-0 transition-colors"
+          />
+          <span>{{ item.title }}</span>
+          <ChevronRight
+            v-if="activePath === item.to"
+            :size="14"
+            class="ml-auto"
+            style="color: #F59E0B;"
+          />
+        </NuxtLink>
+      </nav>
+    </template>
 
     <!-- Yardım Merkezi Butonu -->
     <div class="px-3 mb-2 border-t pt-2" style="border-color: rgba(255,255,255,0.08);">
