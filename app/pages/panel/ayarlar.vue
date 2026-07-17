@@ -444,26 +444,62 @@ function saveProfile() {
     </div>
 
     <!-- Title and Breadcrumbs -->
-    <div>
-      <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">HESAP HİZMETLERİ > AYARLAR</span>
-      <h1 class="text-2xl font-black text-slate-800 mt-1" style="color: #0F172A;">
-        {{ 
-          activeSubTab === 'kisisel' ? 'Hesap Merkezi' :
-          activeSubTab === 'sirket' ? 'Kurumsal Kimlik' :
-          activeSubTab === 'adresler' ? 'Kayıtlı Adresler' :
-          activeSubTab === 'takip' ? 'Takip Ettiklerim' : 
-          activeSubTab === 'ayarlar' ? 'Ayarlar' : 'Ayarlar'
-        }}
-      </h1>
-      <p class="text-xs text-slate-500 mt-1">
-        {{ 
-          activeSubTab === 'kisisel' ? 'Kişisel bilgilerinizi, medya varlıklarınızı ve iletişim tercihlerinizi yönetin.' :
-          activeSubTab === 'sirket' ? 'Bağlı olduğunuz organizasyonun detaylarını ve doğrulama sürecini yönetin.' :
-          activeSubTab === 'adresler' ? 'Teslimat adreslerinizi yönetin. İhale oluştururken hızlıca seçebilirsiniz.' :
-          activeSubTab === 'takip' ? 'Takip ettiğiniz firmaları görüntüleyin ve güncellemelerini izleyin.' :
-          'Güvenlik, görünüm, bildirim ve yasal tercihlerinizi tek yerden yönetin.'
-        }}
-      </p>
+    <div class="flex flex-col md:flex-row md:items-center justify-between border-b pb-4 gap-4" style="border-color: #F1F5F9;">
+      <div>
+        <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">HESAP MERKEZİ</span>
+        <h1 class="text-2xl font-black text-slate-800 mt-1" style="color: #0F172A;">
+          {{ 
+            activeSubTab === 'kisisel' ? 'Hesap Merkezi' :
+            activeSubTab === 'sirket' ? 'Kurumsal Kimlik' :
+            activeSubTab === 'adresler' ? 'Kayıtlı Adresler' :
+            activeSubTab === 'takip' ? 'Takip Ettiklerim' : 
+            activeSubTab === 'uyelik' ? 'Üyelik Planı' :
+            activeSubTab === 'ayarlar' ? 'Ayarlar' : 'Ayarlar'
+          }}
+        </h1>
+        <p class="text-xs text-slate-500 mt-1">
+          {{ 
+            activeSubTab === 'kisisel' ? 'Kişisel bilgilerinizi, medya varlıklarınızı ve iletişim tercihlerinizi yönetin.' :
+            activeSubTab === 'sirket' ? 'Bağlı olduğunuz organizasyonun detaylarını ve doğrulama sürecini yönetin.' :
+            activeSubTab === 'adresler' ? 'Teslimat adreslerinizi yönetin. İhale oluştururken hızlıca seçebilirsiniz.' :
+            activeSubTab === 'takip' ? 'Takip ettiğiniz firmaları görüntüleyin ve güncellemelerini izleyin.' :
+            activeSubTab === 'uyelik' ? 'Paketlerinizi, ihale haklarınızı ve ek kapasite seçeneklerinizi buradan yönetin.' :
+            'Güvenlik, görünüm, bildirim ve yasal tercihlerinizi tek yerden yönetin.'
+          }}
+        </p>
+      </div>
+
+      <!-- Actions and status pills dynamically linked next to page title -->
+      <div class="flex items-center gap-2">
+        <button v-if="activeSubTab === 'adresler'" type="button" @click="isNewAddressModalOpen = true" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 transition">
+          <Plus :size="14" /> Yeni adres
+        </button>
+        <button v-if="activeSubTab === 'sirket'" type="button" @click="showToast('Firma profiliniz önizleniyor...')" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition" style="border-color: #E2E8F0;">
+          Profili önizle
+        </button>
+
+        <!-- Üyelik summary pill matching design -->
+        <div v-if="activeSubTab === 'uyelik'" class="flex gap-3 bg-white border border-slate-200 p-2.5 rounded-xl shadow-sm text-left">
+          <div class="px-2.5 border-r border-slate-100 last:border-0">
+            <span class="text-[8px] font-black text-slate-300 uppercase block">MEVCUT PLAN</span>
+            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">Profesyonel</span>
+          </div>
+          <div class="px-2.5 border-r border-slate-100 last:border-0">
+            <span class="text-[8px] font-black text-slate-300 uppercase block">YILLIK ÜCRET</span>
+            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">₺8.000 <span class="text-[8px] text-slate-400 font-medium">+ KDV</span></span>
+          </div>
+          <div class="px-2.5 border-r border-slate-100 last:border-0">
+            <span class="text-[8px] font-black text-slate-300 uppercase block">BİTİŞ TARİHİ</span>
+            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">16 Ağustos 2026</span>
+          </div>
+          <div class="px-2.5 flex flex-col justify-center">
+            <span class="text-[8px] font-black text-slate-300 uppercase block">DURUM</span>
+            <span class="inline-flex items-center gap-0.5 text-[8px] font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 mt-0.5">
+              Aktif
+            </span>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Main Content Area -->
@@ -589,17 +625,6 @@ function saveProfile() {
 
         <!-- ŞİRKET & DOĞRULAMA TAB -->
         <div v-if="activeSubTab === 'sirket'" class="space-y-6">
-          
-          <!-- Top header with profile link -->
-          <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
-            <div>
-              <h2 class="text-lg font-black text-slate-800">Kurumsal Kimlik</h2>
-              <p class="text-xs text-slate-400">Bağlı olduğunuz organizasyonun detaylarını ve doğrulama sürecini yönetin.</p>
-            </div>
-            <button type="button" @click="showToast('Firma profiliniz önizleniyor...')" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition" style="border-color: #E2E8F0;">
-              Profili önizle
-            </button>
-          </div>
 
           <!-- Genel Bilgiler Card -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
@@ -922,15 +947,6 @@ function saveProfile() {
 
         <!-- KAYITLI ADRESLER TAB -->
         <div v-if="activeSubTab === 'adresler'" class="space-y-6">
-          <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
-            <div>
-              <h2 class="text-lg font-black text-slate-800">Kayıtlı Adresler</h2>
-              <p class="text-xs text-slate-400">Teslimat adreslerinizi yönetin. İhale oluştururken hızlıca seçebilirsiniz.</p>
-            </div>
-            <button type="button" @click="isNewAddressModalOpen = true" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 transition">
-              <Plus :size="14" /> Yeni adres
-            </button>
-          </div>
 
           <!-- Tabs sub selector -->
           <div class="flex items-center justify-between bg-white border p-1 rounded-xl" style="border-color: #E2E8F0;">
@@ -1095,21 +1111,300 @@ function saveProfile() {
         </div>
 
         <!-- ÜYELİK TAB -->
-        <div v-if="activeSubTab === 'uyelik'" class="space-y-6">
-          <div class="border-b pb-3" style="border-color: #F1F5F9;">
-            <h2 class="text-lg font-black text-slate-800">Üyelik Durumu</h2>
-            <p class="text-xs text-slate-400">Platform üzerindeki aboneliğiniz ve üyelik paketi detaylarınız.</p>
-          </div>
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="text-[8px] font-black text-slate-300 uppercase block">MEVCUT PAKET</span>
-                <span class="text-sm font-bold text-slate-800 block mt-1">Profesyonel Üyelik</span>
-              </div>
-              <span class="text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 px-3 py-1 rounded-lg">Aktif</span>
+        <div v-if="activeSubTab === 'uyelik'" class="space-y-8 text-left">
+          
+          <!-- Planları karşılaştırın header with pill switcher -->
+          <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
+            <div>
+              <h3 class="text-sm font-black text-slate-800">Planları karşılaştırın</h3>
+              <p class="text-[10px] text-slate-400 font-bold">Güncel gereksinimler yıldız işareti olarak gösterilmektedir. Kapsamınızı genişletin ve tüm sınırlı yetkileri aktif edin.</p>
             </div>
-            <p class="text-[10px] text-slate-400">Bir sonraki faturalama tarihi: 17 Ağustos 2026. <span class="text-blue-600 hover:underline cursor-pointer" @click="showToast('Abonelik detayları sayfasına yönlendiriliyor...')">[Aboneliği Yönet]</span></p>
+            
+            <div class="flex items-center gap-1 bg-blue-50 border border-blue-100 rounded-xl p-1 shadow-sm">
+              <span class="text-[9px] font-black uppercase text-blue-700 px-2.5 py-1.5 rounded-lg bg-white shadow-xs">AKTİF / PROFESYONEL</span>
+              <span class="text-[9px] font-black text-blue-400 px-2">PAKET</span>
+            </div>
           </div>
+
+          <!-- The Three Side-by-Side Plans Card Grid -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <!-- Plan 1: Temel -->
+            <div class="rounded-2xl border bg-white p-6 shadow-sm flex flex-col justify-between border-slate-200 hover:border-slate-300 transition">
+              <div class="space-y-4">
+                <div>
+                  <h4 class="text-sm font-black text-slate-800">Temel</h4>
+                  <p class="text-[9px] text-slate-400 mt-1 leading-normal">Tüm segmentlerde pasif ilan, genel teklif girişi.</p>
+                </div>
+                
+                <div>
+                  <span class="text-2xl font-black text-slate-800">₺5.000</span>
+                  <span class="text-[10px] text-slate-400 font-bold ml-1">+ KDV / yıl</span>
+                </div>
+                
+                <span class="inline-block text-[9px] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded">Aylık karşılığı: ₺417</span>
+                
+                <hr class="border-slate-100" />
+                
+                <ul class="space-y-2.5 text-[10px] font-bold text-slate-600">
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Erişilen Ürün & Hizmet: 1 Üretim + Proje Parkuru</li>
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Sınırsız teklif verme</li>
+                  <li class="flex items-center gap-2 text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> İhale açma hakkı yok</li>
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Canlı etkinliklere katılabilir</li>
+                  <li class="flex items-center gap-2 text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Ekip yönetimi dahil değil</li>
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Kurumsal firmalar vitrininde görünür</li>
+                </ul>
+              </div>
+              
+              <div class="pt-6">
+                <button type="button" disabled class="w-full text-center rounded-xl border border-slate-200 text-slate-400 text-xs font-bold py-2.5 cursor-not-allowed bg-slate-50">
+                  Aktif plandan geçiş kapalı
+                </button>
+              </div>
+            </div>
+
+            <!-- Plan 2: Profesyonel (MEVCUT) -->
+            <div class="rounded-2xl border bg-white p-6 shadow-md flex flex-col justify-between border-blue-200 relative scale-102 hover:shadow-lg transition">
+              <span class="absolute -top-3 left-1/2 -translate-x-1/2 text-[8px] font-black uppercase text-blue-700 bg-blue-100 border border-blue-200 px-3 py-1 rounded-full">KULLANILAN PLAN</span>
+              
+              <div class="space-y-4 mt-1">
+                <div>
+                  <h4 class="text-sm font-black text-slate-800">Profesyonel</h4>
+                  <p class="text-[9px] text-slate-400 mt-1 leading-normal">Yılda max 36 ihale açın, tüm pazarlara kapasite arttırın.</p>
+                </div>
+                
+                <div>
+                  <span class="text-2xl font-black text-slate-800">₺8.000</span>
+                  <span class="text-[10px] text-slate-400 font-bold ml-1">+ KDV / yıl</span>
+                </div>
+                
+                <span class="inline-block text-[9px] font-bold text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded">Aylık karşılığı: ₺667</span>
+                
+                <hr class="border-slate-100" />
+                
+                <ul class="space-y-2.5 text-[10px] font-bold text-slate-600">
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Erişilen Ürün & Hizmet: 3 Üretim + Proje Parkuru</li>
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Sınırsız teklif verme</li>
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> İhale açma: <strong>36 İhale/yıl</strong></li>
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Canlı etkinliklere katılabilir</li>
+                  <li class="flex items-center gap-2 text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Ekip yönetimi dahil değil</li>
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Kurumsal firmalar vitrininde görünür</li>
+                </ul>
+              </div>
+              
+              <div class="pt-6">
+                <button type="button" class="w-full text-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 transition">
+                  Mevcut Planınız
+                </button>
+              </div>
+            </div>
+
+            <!-- Plan 3: Kurumsal -->
+            <div class="rounded-2xl border bg-white p-6 shadow-sm flex flex-col justify-between border-slate-200 hover:border-slate-300 transition">
+              <div class="space-y-4">
+                <div>
+                  <h4 class="text-sm font-black text-slate-800">Kurumsal</h4>
+                  <p class="text-[9px] text-slate-400 mt-1 leading-normal">Sınırsız kapasite, ekip yönetimi ve özel destek kurumsal güç.</p>
+                </div>
+                
+                <div>
+                  <span class="text-2xl font-black text-slate-800">₺15.000</span>
+                  <span class="text-[10px] text-slate-400 font-bold ml-1">+ KDV / yıl</span>
+                </div>
+                
+                <span class="inline-block text-[9px] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded">Aylık karşılığı: ₺1.250</span>
+                
+                <hr class="border-slate-100" />
+                
+                <ul class="space-y-2.5 text-[10px] font-bold text-slate-600">
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Erişilen Ürün & Hizmet: Sınırsız + Proje Parkuru</li>
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Sınırsız teklif verme</li>
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> İhale açma: <strong>Sınırsız</strong></li>
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Canlı etkinlik oluşturabilir</li>
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Ekip ve yetki yönetimi aktif</li>
+                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Öne çıkan temsilci vitrin görünürlüğü</li>
+                </ul>
+              </div>
+              
+              <div class="pt-6">
+                <button type="button" disabled class="w-full text-center rounded-xl border border-slate-200 text-slate-400 text-xs font-bold py-2.5 cursor-not-allowed bg-slate-50">
+                  Aktif plandan geçiş kapalı
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Paket Karşılaştırması Table Section -->
+          <div class="space-y-4 pt-4">
+            <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
+              <div>
+                <h3 class="text-sm font-black text-slate-800">Paket karşılaştırması</h3>
+                <p class="text-[10px] text-slate-400 font-bold">Tüm planların operasyonel yetkilerini, kapasitelerini ve görünürlüklerini yan yana inceleyin.</p>
+              </div>
+              
+              <div class="flex items-center gap-2 text-[9px] font-bold text-slate-400">
+                <span class="border rounded px-2 py-1 bg-white">PAKET</span>
+                <span>/</span>
+                <span class="border rounded px-2 py-1 bg-white">ÖZELLİK</span>
+              </div>
+            </div>
+
+            <!-- Custom Styled HTML Comparison Table -->
+            <div class="rounded-2xl border bg-white overflow-hidden shadow-sm text-xs" style="border-color: #E2E8F0;">
+              <table class="w-full border-collapse">
+                <thead>
+                  <tr class="bg-slate-50/70 border-b text-[10px] font-black text-slate-400 text-left" style="border-color: #E2E8F0;">
+                    <th class="p-4 w-1/4 uppercase tracking-wider">ÖZELLİK VE DETAY</th>
+                    <th class="p-4 w-1/4 uppercase tracking-wider">ÖZELLİK</th>
+                    <th class="p-4 text-center text-slate-600">TEMEL<br><span class="text-[9px] font-medium text-slate-400">₺5.000 + KDV / yıl</span></th>
+                    <th class="p-4 text-center text-blue-700 bg-blue-50/20">PROFESYONEL<br><span class="text-[9px] font-black text-blue-600">₺8.000 + KDV / yıl</span></th>
+                    <th class="p-4 text-center text-slate-600">KURUMSAL<br><span class="text-[9px] font-medium text-slate-400">₺15.000 + KDV / yıl</span></th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <!-- Row 1: Segmentler -->
+                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
+                    <td class="p-4 text-slate-300">hizmetler ve erişim</td>
+                    <td class="p-4 text-slate-700">Tüm pazar segmentlerine erişim</td>
+                    <td class="p-4 text-center text-blue-600">✓</td>
+                    <td class="p-4 text-center text-blue-600 bg-blue-50/10">✓</td>
+                    <td class="p-4 text-center text-blue-600">✓</td>
+                  </tr>
+                  
+                  <!-- Row 2: İhale açma hakkı -->
+                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
+                    <td class="p-4 text-slate-300">hizmetler ve erişim</td>
+                    <td class="p-4 text-slate-700">İhale açma hakkı</td>
+                    <td class="p-4 text-center text-slate-400">Yok</td>
+                    <td class="p-4 text-center text-slate-700 bg-blue-50/10">36 İhale / yıl</td>
+                    <td class="p-4 text-center text-slate-700">Sınırsız</td>
+                  </tr>
+
+                  <!-- Row 3: Teklif Verme -->
+                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
+                    <td class="p-4 text-slate-300">hizmetler ve erişim</td>
+                    <td class="p-4 text-slate-700">Sınırsız teklif verme</td>
+                    <td class="p-4 text-center text-blue-600">✓</td>
+                    <td class="p-4 text-center text-blue-600 bg-blue-50/10">✓</td>
+                    <td class="p-4 text-center text-blue-600">✓</td>
+                  </tr>
+
+                  <!-- Row 4: Vitrin görünürlüğü -->
+                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
+                    <td class="p-4 text-slate-300">kurumsal vitrinler</td>
+                    <td class="p-4 text-slate-700">Kurumsal firmalar vitrininde görünürlük</td>
+                    <td class="p-4 text-center text-blue-600">✓</td>
+                    <td class="p-4 text-center text-blue-600 bg-blue-50/10">✓</td>
+                    <td class="p-4 text-center text-blue-600">✓</td>
+                  </tr>
+
+                  <!-- Row 5: Firma Erişimi -->
+                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
+                    <td class="p-4 text-slate-300">kurumsal vitrinler</td>
+                    <td class="p-4 text-slate-700">Daha fazla firmaya erişim</td>
+                    <td class="p-4 text-center text-blue-600">✓</td>
+                    <td class="p-4 text-center text-blue-600 bg-blue-50/10">✓</td>
+                    <td class="p-4 text-center text-blue-600">✓</td>
+                  </tr>
+
+                  <!-- Row 6: Öncelikli Sıralama -->
+                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
+                    <td class="p-4 text-slate-300">kurumsal vitrinler</td>
+                    <td class="p-4 text-slate-700">Öncelikli olarak listelenme</td>
+                    <td class="p-4 text-center text-slate-400">-- Yok</td>
+                    <td class="p-4 text-center text-slate-400 bg-blue-50/10">-- Yok</td>
+                    <td class="p-4 text-center text-blue-600">✓</td>
+                  </tr>
+
+                  <!-- Row 7: Canlı Etkinlik katılım -->
+                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
+                    <td class="p-4 text-slate-300">operasyonel yetenekler</td>
+                    <td class="p-4 text-slate-700">Canlı etkinliğe katılım</td>
+                    <td class="p-4 text-center text-blue-600">✓</td>
+                    <td class="p-4 text-center text-blue-600 bg-blue-50/10">✓</td>
+                    <td class="p-4 text-center text-blue-600">✓</td>
+                  </tr>
+
+                  <!-- Row 8: Canlı Etkinlik oluşturma -->
+                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
+                    <td class="p-4 text-slate-300">operasyonel yetenekler</td>
+                    <td class="p-4 text-slate-700">Canlı etkinlik oluşturma</td>
+                    <td class="p-4 text-center text-slate-400">-- Yok</td>
+                    <td class="p-4 text-center text-slate-400 bg-blue-50/10">-- Yok</td>
+                    <td class="p-4 text-center text-blue-600">✓</td>
+                  </tr>
+
+                  <!-- Row 9: Ekip ve Yetki -->
+                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
+                    <td class="p-4 text-slate-300">operasyonel yetenekler</td>
+                    <td class="p-4 text-slate-700">Ekip ve yetki yönetimi</td>
+                    <td class="p-4 text-center text-slate-400">-- Yok</td>
+                    <td class="p-4 text-center text-slate-400 bg-blue-50/10">-- Yok</td>
+                    <td class="p-4 text-center text-blue-600">✓</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Ek İhale Hakları Section -->
+          <div class="space-y-4 pt-4">
+            <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
+              <div>
+                <h3 class="text-sm font-black text-slate-800">Profesyonel Paket Ek İhale Hakları</h3>
+                <p class="text-[10px] text-slate-400 font-bold">Profesyonel paket kullanımınızı ek yıllık ihaleler alarak genişletin.</p>
+              </div>
+              
+              <div class="flex items-center gap-1.5 text-[9px] font-bold text-slate-400">
+                <span class="border rounded px-2 py-1 bg-white">TOPLAM EK LİMİT: +50 İHALE</span>
+                <span>/</span>
+                <span class="border rounded px-2 py-1 bg-white">ADET</span>
+              </div>
+            </div>
+
+            <!-- The Two Horizontal Ek İhale Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <!-- Ek 50 Card -->
+              <div class="rounded-2xl border bg-white p-5 shadow-sm space-y-4 hover:border-slate-300 transition" style="border-color: #E2E8F0;">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="text-[8px] font-black text-blue-700 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded uppercase">EK PAKET</span>
+                    <h4 class="text-xs font-black text-slate-800 mt-1.5">Ek 50 İhale Hakkı</h4>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-[8px] font-black text-slate-300 block">TOPLAM EK BÜTÇE</span>
+                    <span class="text-xs font-bold text-slate-700 block mt-0.5">₺2.500,00 <span class="text-[8px] text-slate-400 font-medium">+ KDV</span></span>
+                  </div>
+                </div>
+                
+                <button type="button" @click="showToast('Ek 50 İhale ödeme ekranına yönlendiriliyorsunuz...')" class="w-full text-center rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold py-2.5 transition" style="border-color: #E2E8F0;">
+                  Ödemeye Geç
+                </button>
+              </div>
+
+              <!-- Ek 100 Card -->
+              <div class="rounded-2xl border bg-white p-5 shadow-sm space-y-4 hover:border-slate-300 transition" style="border-color: #E2E8F0;">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <span class="text-[8px] font-black text-blue-700 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded uppercase">EK PAKET</span>
+                    <h4 class="text-xs font-black text-slate-800 mt-1.5">Ek 100 İhale Hakkı</h4>
+                  </div>
+                  <div class="text-right">
+                    <span class="text-[8px] font-black text-slate-300 block">TOPLAM EK BÜTÇE</span>
+                    <span class="text-xs font-bold text-slate-700 block mt-0.5">₺4.500,00 <span class="text-[8px] text-slate-400 font-medium">+ KDV</span></span>
+                  </div>
+                </div>
+                
+                <button type="button" @click="showToast('Ek 100 İhale ödeme ekranına yönlendiriliyorsunuz...')" class="w-full text-center rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold py-2.5 transition" style="border-color: #E2E8F0;">
+                  Ödemeye Geç
+                </button>
+              </div>
+
+            </div>
+          </div>
+
         </div>
 
         <!-- AYARLAR (SETTINGS) TAB -->
