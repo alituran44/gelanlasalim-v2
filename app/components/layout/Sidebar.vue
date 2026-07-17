@@ -17,6 +17,7 @@ import {
   Settings,
   LogOut,
   Plus,
+  HelpCircle,
   ChevronRight
 } from "lucide-vue-next"
 
@@ -141,6 +142,19 @@ const activePath = computed(() => route.path)
         />
       </NuxtLink>
     </nav>
+
+    <!-- Yardım Merkezi Butonu -->
+    <div class="px-3 mb-2 border-t pt-2" style="border-color: rgba(255,255,255,0.08);">
+      <NuxtLink
+        to="/panel/yardim"
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-150"
+        :class="activePath === '/panel/yardim' ? 'text-white' : 'text-slate-400 hover:text-white'"
+        :style="activePath === '/panel/yardim' ? 'background: rgba(245,158,11,0.15); color: #F59E0B;' : ''"
+      >
+        <HelpCircle :size="17" :style="activePath === '/panel/yardim' ? 'color: #F59E0B;' : ''" />
+        <span>Yardım</span>
+      </NuxtLink>
+    </div>
 
     <!-- Kullanıcı Bilgisi -->
     <div class="px-4 py-4 border-t" style="border-color: rgba(255,255,255,0.08);">
