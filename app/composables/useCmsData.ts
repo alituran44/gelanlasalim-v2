@@ -175,6 +175,13 @@ export const DEFAULT_CMS_DATA = {
         notum: ''
       }
     ]
+  },
+  contact: {
+    address: 'Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül, Balıkesir, Türkiye',
+    email: 'info@gelanlasalim.com',
+    kep: 'gelanlasalim@hs01.kep.tr',
+    workHoursWeekdays: 'Pazartesi - Cuma: 09:00 - 18:00',
+    workHoursSaturday: 'Cumartesi: 10:00 - 14:00'
   }
 }
 
@@ -190,6 +197,9 @@ export function useCmsData() {
         // Ensure backward compatibility if dashboard property is missing in old localstorage
         if (!parsed.dashboard) {
           parsed.dashboard = DEFAULT_CMS_DATA.dashboard
+        }
+        if (!parsed.contact) {
+          parsed.contact = DEFAULT_CMS_DATA.contact
         }
         // Migrate blocked third-party video URL or local big file to CDN video
         if (parsed.hero && parsed.hero.heroVideoUrl && (parsed.hero.heroVideoUrl.includes('mixkit.co') || parsed.hero.heroVideoUrl === '/hero_video.mp4')) {

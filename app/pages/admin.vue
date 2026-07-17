@@ -17,7 +17,8 @@ import {
   Folder,
   Download,
   Upload,
-  AlertCircle
+  AlertCircle,
+  Phone
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 
@@ -36,7 +37,7 @@ const password = ref('')
 const authError = ref('')
 
 // Tabs
-const activeTab = ref<'hero' | 'tender' | 'plans' | 'features' | 'db_tenders' | 'db_received' | 'db_submitted'>('hero')
+const activeTab = ref<'hero' | 'tender' | 'plans' | 'features' | 'contact' | 'db_tenders' | 'db_received' | 'db_submitted'>('hero')
 
 // Local copy for editing
 const formState = reactive(JSON.parse(JSON.stringify(cmsData.value)))
@@ -312,6 +313,15 @@ function removeSubmittedBid(index: number) {
               Özellikler Listesi
             </button>
 
+            <button 
+              @click="activeTab = 'contact'" 
+              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left"
+              :class="activeTab === 'contact' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+            >
+              <Phone :size="15" />
+              İletişim & Destek Saatleri
+            </button>
+
             <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest px-4 pt-4 mb-2">B2B KULLANICI PANELİ VERİTABANI</div>
 
             <button 
@@ -366,6 +376,7 @@ function removeSubmittedBid(index: number) {
               <span v-else-if="activeTab === 'tender'">Temsili Canlı İhale Kartı Verileri</span>
               <span v-else-if="activeTab === 'plans'">Abonelik & Fiyat Planları</span>
               <span v-else-if="activeTab === 'features'">Detaylı Özellik Listesi</span>
+              <span v-else-if="activeTab === 'contact'">İletişim & Destek Saatleri</span>
               <span v-else-if="activeTab === 'db_tenders'">Kullanıcı Paneli: İlanlarım (Tenders)</span>
               <span v-else-if="activeTab === 'db_received'">Kullanıcı Paneli: Gelen Teklifler (Bids)</span>
               <span v-else>Kullanıcı Paneli: Yaptığım Teklifler</span>
@@ -559,6 +570,41 @@ function removeSubmittedBid(index: number) {
                       <Trash2 :size="12" />
                     </button>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: İletişim & Destek Saatleri -->
+          <div v-if="activeTab === 'contact'" class="space-y-6">
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 space-y-4">
+              <h3 class="text-sm font-bold text-white mb-2">İletişim Bilgileri</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[9px] font-bold text-slate-500 mb-1">FİRMA E-POSTA ADRESİ</label>
+                  <input v-model="formState.contact.email" type="email" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[9px] font-bold text-slate-500 mb-1">KEP ADRESİ</label>
+                  <input v-model="formState.contact.kep" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                </div>
+              </div>
+              <div>
+                <label class="block text-[9px] font-bold text-slate-500 mb-1">FİRMA ADRESİ</label>
+                <textarea v-model="formState.contact.address" rows="3" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none"></textarea>
+              </div>
+            </div>
+
+            <div class="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 space-y-4">
+              <h3 class="text-sm font-bold text-white mb-2">Destek Saatleri</h3>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-[9px] font-bold text-slate-500 mb-1">HAFTA İÇİ SAATLERİ (PAZARTESİ - CUMA)</label>
+                  <input v-model="formState.contact.workHoursWeekdays" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                </div>
+                <div>
+                  <label class="block text-[9px] font-bold text-slate-500 mb-1">CUMARTESİ SAATLERİ</label>
+                  <input v-model="formState.contact.workHoursSaturday" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none" />
                 </div>
               </div>
             </div>

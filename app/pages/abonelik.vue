@@ -73,12 +73,17 @@ const showSuccessScreen = ref(false)
 const vatAmount = computed(() => {
   if (!selectedPackage.value) return 0
   if (selectedPackage.value.price === 0) return 0
-  return Math.round(selectedPackage.value.price * 0.1667) // 20% included tax formula: Price - (Price / 1.20)
+  return Math.round(selectedPackage.value.price * 0.20) // 20% tax on top
 })
 
 const netAmount = computed(() => {
   if (!selectedPackage.value) return 0
-  return selectedPackage.value.price - vatAmount.value
+  return selectedPackage.value.price
+})
+
+const totalAmount = computed(() => {
+  if (!selectedPackage.value) return 0
+  return netAmount.value + vatAmount.value
 })
 
 function openCheckout(pkg: typeof subscriptionPackages.value[0]) {
@@ -297,7 +302,7 @@ function completeCheckout() {
                     <p class="text-[11px] text-slate-500 mt-0.5">{{ selectedPackage?.desc }}</p>
                   </div>
                   <div class="text-right">
-                    <span class="text-base font-black text-slate-900 font-mono">₺{{ selectedPackage?.price.toLocaleString('tr-TR') }}</span>
+                    <span class="text-base font-black text-slate-900 font-mono">₺{{ selectedPackage?.price.toLocaleString('tr-TR') }} <span class="text-[10px] text-slate-500 font-bold">+KDV</span></span>
                   </div>
                 </div>
                 
@@ -315,7 +320,7 @@ function completeCheckout() {
                   </div>
                   <div class="flex justify-between text-slate-800 font-bold border-t border-slate-200/60 pt-1.5 mt-1.5">
                     <span>Toplam Ödeme:</span>
-                    <span class="font-mono text-blue-600">₺{{ selectedPackage?.price.toLocaleString('tr-TR') }}</span>
+                    <span class="font-mono text-blue-600">₺{{ totalAmount.toLocaleString('tr-TR') }}</span>
                   </div>
                 </div>
               </div>

@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Handshake, Menu, X, ArrowRight, Mail, Phone, MapPin } from 'lucide-vue-next'
+import { Handshake, Menu, X, ArrowRight, Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Twitter } from 'lucide-vue-next'
+import { useCmsData } from '~/composables/useCmsData'
 
+const { cmsData } = useCmsData()
 const mobileMenuOpen = ref(false)
 </script>
 
@@ -150,10 +152,18 @@ const mobileMenuOpen = ref(false)
 
             <!-- Social Links -->
             <div class="flex gap-2.5 mt-2">
-              <a href="#" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-500 transition-all text-xs font-bold">F</a>
-              <a href="#" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-500 transition-all text-xs font-bold">I</a>
-              <a href="#" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-500 transition-all text-xs font-bold">L</a>
-              <a href="#" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-500 transition-all text-xs font-bold">T</a>
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#1EAE4C] hover:border-[#1EAE4C] transition-all">
+                <Facebook :size="14" />
+              </a>
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#1EAE4C] hover:border-[#1EAE4C] transition-all">
+                <Instagram :size="14" />
+              </a>
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#1EAE4C] hover:border-[#1EAE4C] transition-all">
+                <Linkedin :size="14" />
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#1EAE4C] hover:border-[#1EAE4C] transition-all">
+                <Twitter :size="14" />
+              </a>
             </div>
           </div>
 
@@ -186,22 +196,25 @@ const mobileMenuOpen = ref(false)
           <!-- Column 4: Contact details -->
           <div class="md:col-span-4 flex flex-col gap-5 text-left">
             <div class="space-y-3">
-              <h4 class="text-[10px] font-black uppercase text-blue-600 tracking-wider">İLETİŞİM</h4>
-              <p class="text-[11px] leading-relaxed text-slate-500 font-medium">
-                Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül,<br />
-                Balıkesir, Türkiye
+              <h4 class="text-[10px] font-black uppercase tracking-wider" style="color: #003057;">İLETİŞİM</h4>
+              <p class="text-[11px] leading-relaxed text-slate-500 font-medium whitespace-pre-line">
+                {{ cmsData.contact ? cmsData.contact.address : 'Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül,\nBalıkesir, Türkiye' }}
               </p>
               <div class="text-[11px] font-bold text-slate-700 space-y-1.5">
-                <a href="mailto:info@gelanlasalim.com" class="block hover:text-blue-600">info@gelanlasalim.com</a>
-                <a href="#" class="block hover:text-blue-600 font-mono text-[10px]">gelanlasalim@hs01.kep.tr</a>
+                <a :href="'mailto:' + (cmsData.contact ? cmsData.contact.email : 'info@gelanlasalim.com')" class="block hover:text-[#1EAE4C]">
+                  {{ cmsData.contact ? cmsData.contact.email : 'info@gelanlasalim.com' }}
+                </a>
+                <a href="#" class="block hover:text-[#1EAE4C] font-mono text-[10px]">
+                  {{ cmsData.contact ? cmsData.contact.kep : 'gelanlasalim@hs01.kep.tr' }}
+                </a>
               </div>
             </div>
 
             <div class="space-y-1.5">
               <h4 class="text-[9px] font-black uppercase text-slate-400 tracking-wider">DESTEK SAATLERİ</h4>
               <p class="text-[11px] text-slate-500 font-medium leading-relaxed">
-                Pazartesi - Cuma: 09:00 - 18:00 <br />
-                Cumartesi: 10:00 - 14:00
+                {{ cmsData.contact ? cmsData.contact.workHoursWeekdays : 'Pazartesi - Cuma: 09:00 - 18:00' }} <br />
+                {{ cmsData.contact ? cmsData.contact.workHoursSaturday : 'Cumartesi: 10:00 - 14:00' }}
               </p>
             </div>
           </div>
