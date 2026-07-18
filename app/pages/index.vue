@@ -737,7 +737,7 @@ function toggleFilterSection(section: string) {
         <div class="relative">
           <div class="absolute -inset-8 rounded-full bg-blue-500/5 blur-3xl"></div>
           
-          <div class="relative mx-auto max-w-[460px] rounded-3xl border border-slate-200/80 bg-white/95 p-6 shadow-2xl backdrop-blur-sm text-left">
+          <div class="relative mx-auto max-w-[460px] rounded-3xl border border-slate-200/80 bg-white/95 p-6 premium-shadow backdrop-blur-sm text-left">
             <div class="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
                 <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-slate-400">
@@ -862,7 +862,7 @@ function toggleFilterSection(section: string) {
         <!-- Explorer Main Grid -->
         <div class="grid grid-cols-1 xl:grid-cols-[330px_1fr] gap-8">
           <!-- Sol Filtre Paneli -->
-          <aside class="h-fit overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col text-left">
+          <aside class="h-fit overflow-hidden rounded-2xl border border-slate-200 bg-white premium-shadow flex flex-col text-left">
             <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-4 py-4">
               <div class="flex items-center gap-2 font-black text-slate-800 text-xs uppercase tracking-wider">
                 <SlidersHorizontal :size="16" class="text-blue-600" /> Filtreleme Seçenekleri
@@ -970,7 +970,7 @@ function toggleFilterSection(section: string) {
           <!-- Sağ Sonuçlar Paneli -->
           <div class="flex flex-col gap-4 text-left">
             <!-- Keyword search -->
-            <div class="p-4 bg-white border border-slate-200 rounded-2xl shadow-sm">
+            <div class="p-4 bg-white border border-slate-200 rounded-2xl premium-shadow">
               <div class="flex gap-2">
                 <div class="flex-1 relative">
                   <Search :size="16" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -1007,9 +1007,8 @@ function toggleFilterSection(section: string) {
               </div>
             </div>
 
-            <!-- Tenders List -->
             <div class="space-y-4">
-              <div v-for="res in filteredTenders" :key="res.id" class="p-6 rounded-2xl bg-white border border-slate-200 hover:border-blue-500/40 hover:shadow-lg transition-all flex flex-col text-left">
+              <div v-for="res in filteredTenders" :key="res.id" class="p-6 rounded-2xl bg-white border premium-shadow flex flex-col text-left">
                 <div class="flex flex-col lg:flex-row lg:justify-between gap-6">
                   <div class="min-w-0 flex-1">
                     <div class="flex flex-wrap items-center gap-2">
@@ -1173,7 +1172,7 @@ function toggleFilterSection(section: string) {
           <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Yıllık satın alma hacminizi belirleyin, GelAnlaşalım B2B tersine ihale arenası ile elde edeceğiniz tahmini kazancı anında görün.</p>
         </div>
 
-        <div class="mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-8 md:p-12 shadow-xl shadow-slate-100 flex flex-col gap-8 md:gap-12 text-left">
+        <div class="mx-auto max-w-4xl rounded-3xl border bg-white p-8 md:p-12 premium-shadow flex flex-col gap-8 md:gap-12 text-left">
           <!-- Slider area -->
           <div class="space-y-4">
             <div class="flex justify-between items-baseline">
@@ -1294,7 +1293,7 @@ function toggleFilterSection(section: string) {
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
           <!-- ERP Card 1: SAP -->
-          <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between min-h-[220px]">
+          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
             <div>
               <div class="text-sm font-black text-slate-800 tracking-tight mb-2">SAP Entegrasyonu</div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
@@ -1305,7 +1304,7 @@ function toggleFilterSection(section: string) {
           </div>
 
           <!-- ERP Card 2: Logo -->
-          <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between min-h-[220px]">
+          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
             <div>
               <div class="text-sm font-black text-slate-800 tracking-tight mb-2">Logo & Netsis Entegrasyonu</div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
@@ -1316,7 +1315,7 @@ function toggleFilterSection(section: string) {
           </div>
 
           <!-- ERP Card 3: MS Dynamics -->
-          <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between min-h-[220px]">
+          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
             <div>
               <div class="text-sm font-black text-slate-800 tracking-tight mb-2">Microsoft Dynamics 365</div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
@@ -1327,7 +1326,7 @@ function toggleFilterSection(section: string) {
           </div>
 
           <!-- ERP Card 4: Excel & REST API -->
-          <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm flex flex-col justify-between min-h-[220px]">
+          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
             <div>
               <div class="text-sm font-black text-slate-800 tracking-tight mb-2">REST API & Excel Entegrasyonu</div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
@@ -1361,7 +1360,7 @@ function toggleFilterSection(section: string) {
 
         <!-- Steps Grid -->
         <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3 text-left">
-          <div v-for="step in activeSteps" :key="step.number" class="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col gap-4">
+          <div v-for="step in activeSteps" :key="step.number" class="p-6 rounded-2xl bg-white border premium-shadow flex flex-col gap-4">
             <div class="text-3xl font-serif font-black text-blue-600/30">{{ step.number }}</div>
             <h3 class="text-base font-black text-slate-900">{{ step.title }}</h3>
             <p class="text-xs leading-relaxed text-slate-500 font-medium">{{ step.text }}</p>
@@ -1407,7 +1406,7 @@ function toggleFilterSection(section: string) {
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
           <!-- Expert 1 -->
-          <div class="group rounded-2xl border border-slate-200 p-6 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:border-blue-200 transition-all duration-200 text-left">
+          <div class="group rounded-2xl border premium-shadow p-6 bg-white text-left">
             <div class="flex items-center gap-4 mb-4">
               <div class="h-12 w-12 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600 font-bold shrink-0 text-xs">
                 AT
@@ -1427,7 +1426,7 @@ function toggleFilterSection(section: string) {
           </div>
 
           <!-- Expert 2 -->
-          <div class="group rounded-2xl border border-slate-200 p-6 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:border-blue-200 transition-all duration-200 text-left">
+          <div class="group rounded-2xl border premium-shadow p-6 bg-white text-left">
             <div class="flex items-center gap-4 mb-4">
               <div class="h-12 w-12 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold shrink-0 text-xs">
                 SK
@@ -1447,7 +1446,7 @@ function toggleFilterSection(section: string) {
           </div>
 
           <!-- Expert 3 -->
-          <div class="group rounded-2xl border border-slate-200 p-6 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:border-blue-200 transition-all duration-200 text-left">
+          <div class="group rounded-2xl border premium-shadow p-6 bg-white text-left">
             <div class="flex items-center gap-4 mb-4">
               <div class="h-12 w-12 rounded-full bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-700 font-bold shrink-0 text-xs">
                 ZD
@@ -1521,7 +1520,7 @@ function toggleFilterSection(section: string) {
 
           <!-- Right Form Card -->
           <div class="lg:col-span-6">
-            <div class="bg-white border border-slate-200 rounded-3xl p-8 shadow-xl shadow-slate-100/50 space-y-6 text-left">
+            <div class="bg-white border rounded-3xl p-8 premium-shadow space-y-6 text-left">
               <div class="space-y-1">
                 <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">SİZİNLE İLETİŞİME GEÇELİM</span>
                 <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">BİZE NASIL ULAŞALIM?</h3>
