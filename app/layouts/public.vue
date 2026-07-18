@@ -61,37 +61,37 @@ const activeTenders = ref([
           <a
             href="/#nasil-calisir"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
-            style="color: #475569;"
+            style="color: #0F172A;"
             onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
-            onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
+            onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
           >Nasıl Çalışır</a>
           <a
             href="/#ozellikler"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
-            style="color: #475569;"
+            style="color: #0F172A;"
             onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
-            onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
+            onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
           >Özellikler</a>
           <a
             href="/#ihale-gezgini"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
-            style="color: #475569;"
+            style="color: #0F172A;"
             onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
-            onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
+            onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
           >Market</a>
           <NuxtLink
             to="/abonelik"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
-            style="color: #475569;"
+            style="color: #0F172A;"
             onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
-            onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
+            onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
           >Fiyatlandırma</NuxtLink>
           <a
             href="/#sss"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
-            style="color: #475569;"
+            style="color: #0F172A;"
             onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
-            onmouseout="this.style.background='transparent'; this.style.color='#475569'; this.style.boxShadow='none'"
+            onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
           >SSS</a>
         </nav>
 
@@ -100,9 +100,9 @@ const activeTenders = ref([
           <NuxtLink
             to="/uyelik"
             class="px-4 py-2.5 text-xs font-semibold rounded-lg transition-all"
-            style="color: #475569;"
+            style="color: #0F172A;"
             onmouseover="this.style.background='#F1F5F9'; this.style.color='#003057'"
-            onmouseout="this.style.background='transparent'; this.style.color='#475569'"
+            onmouseout="this.style.background='transparent'; this.style.color='#0F172A'"
           >
             Giriş Yap
           </NuxtLink>
@@ -210,49 +210,49 @@ const activeTenders = ref([
 
           <!-- Column 2: Platform Links -->
           <div class="md:col-span-2 flex flex-col gap-4 text-left">
-            <h4 class="text-[10px] font-black uppercase text-blue-600 tracking-wider">PLATFORM</h4>
-            <div class="flex flex-col gap-3 text-[11px] font-bold text-slate-700">
-              <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors">Nasıl Çalışır</a>
-              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors">Özellikler</a>
-              <NuxtLink to="/abonelik" class="hover:text-blue-600 transition-colors">Fiyatlandırma</NuxtLink>
-              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors">Pazar Yeri</a>
-              <NuxtLink to="/entegrasyonlar" class="hover:text-blue-600 transition-colors">Entegrasyonlar</NuxtLink>
-              <a href="#sss" class="hover:text-blue-600 transition-colors">Yardım Merkezi</a>
+            <h4 class="text-xs font-black uppercase text-blue-600 tracking-wider">PLATFORM</h4>
+            <div class="flex flex-col gap-4 sm:gap-3 text-[11px] font-bold text-slate-700">
+              <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors py-1">Nasıl Çalışır</a>
+              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors py-1">Özellikler</a>
+              <NuxtLink to="/abonelik" class="hover:text-blue-600 transition-colors py-1">Fiyatlandırma</NuxtLink>
+              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors py-1">Pazar Yeri</a>
+              <NuxtLink to="/entegrasyonlar" class="hover:text-blue-600 transition-colors py-1">Entegrasyonlar</NuxtLink>
+              <a href="#sss" class="hover:text-blue-600 transition-colors py-1">Yardım Merkezi</a>
             </div>
           </div>
 
           <!-- Column 3: Company Links -->
           <div class="md:col-span-2 flex flex-col gap-4 text-left">
-            <h4 class="text-[10px] font-black uppercase text-blue-600 tracking-wider">ŞİRKET</h4>
-            <div class="flex flex-col gap-3 text-[11px] font-bold text-slate-700">
-              <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="hover:text-blue-600 transition-colors">Hakkımızda</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=kariyer" class="hover:text-blue-600 transition-colors">Kariyer</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors">Blog</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors">Basın Odası</NuxtLink>
-              <a href="#sss" class="hover:text-blue-600 transition-colors">İletişim</a>
-              <NuxtLink to="/sozlesmeler?tab=is-ortakligi" class="hover:text-blue-600 transition-colors">İş Ortaklığı Programı</NuxtLink>
+            <h4 class="text-xs font-black uppercase text-blue-600 tracking-wider">ŞİRKET</h4>
+            <div class="flex flex-col gap-4 sm:gap-3 text-[11px] font-bold text-slate-700">
+              <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="hover:text-blue-600 transition-colors py-1">Hakkımızda</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=kariyer" class="hover:text-blue-600 transition-colors py-1">Kariyer</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors py-1">Blog</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors py-1">Basın Odası</NuxtLink>
+              <a href="#sss" class="hover:text-blue-600 transition-colors py-1">İletişim</a>
+              <NuxtLink to="/sozlesmeler?tab=is-ortakligi" class="hover:text-blue-600 transition-colors py-1">İş Ortaklığı Programı</NuxtLink>
             </div>
           </div>
 
           <!-- Column 4: Contact details -->
           <div class="md:col-span-4 flex flex-col gap-5 text-left">
             <div class="space-y-3">
-              <h4 class="text-[10px] font-black uppercase tracking-wider" style="color: #003057;">İLETİŞİM</h4>
+              <h4 class="text-xs font-black uppercase tracking-wider" style="color: #003057;">İLETİŞİM</h4>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium whitespace-pre-line">
                 {{ cmsData.contact ? cmsData.contact.address : 'Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül,\nBalıkesir, Türkiye' }}
               </p>
-              <div class="text-[11px] font-bold text-slate-700 space-y-1.5">
-                <a :href="'mailto:' + (cmsData.contact ? cmsData.contact.email : 'info@gelanlasalim.com')" class="block hover:text-[#1EAE4C]">
+              <div class="text-[11px] font-bold text-slate-700 space-y-3">
+                <a :href="'mailto:' + (cmsData.contact ? cmsData.contact.email : 'info@gelanlasalim.com')" class="block hover:text-[#1EAE4C] py-1">
                   {{ cmsData.contact ? cmsData.contact.email : 'info@gelanlasalim.com' }}
                 </a>
-                <a :href="'mailto:' + (cmsData.contact ? cmsData.contact.kep : 'gelanlasalim@hs01.kep.tr')" class="block hover:text-[#1EAE4C] font-mono text-[10px]">
+                <a :href="'mailto:' + (cmsData.contact ? cmsData.contact.kep : 'gelanlasalim@hs01.kep.tr')" class="block hover:text-[#1EAE4C] font-mono text-[10px] py-1">
                   {{ cmsData.contact ? cmsData.contact.kep : 'gelanlasalim@hs01.kep.tr' }}
                 </a>
               </div>
             </div>
 
-            <div class="space-y-1.5">
-              <h4 class="text-[9px] font-black uppercase text-slate-400 tracking-wider">DESTEK SAATLERİ</h4>
+            <div class="space-y-2">
+              <h4 class="text-xs font-black uppercase text-[#003057] tracking-wider">DESTEK SAATLERİ</h4>
               <p class="text-[11px] text-slate-500 font-medium leading-relaxed">
                 {{ cmsData.contact ? cmsData.contact.workHoursWeekdays : 'Pazartesi - Cuma: 09:00 - 18:00' }} <br />
                 {{ cmsData.contact ? cmsData.contact.workHoursSaturday : 'Cumartesi: 10:00 - 14:00' }}
@@ -264,12 +264,12 @@ const activeTenders = ref([
 
         <hr class="border-slate-200 my-10" />
 
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-slate-400 font-black uppercase tracking-wider">
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-6 text-[10px] text-slate-400 font-black uppercase tracking-wider">
           <div>© 2026 GelAnlaşalım. Tüm Hakları Saklıdır.</div>
-          <div class="flex gap-4">
-            <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors">KVKK Metni</NuxtLink>
-            <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors">Kullanım Koşulları</NuxtLink>
-            <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors">Gizlilik Politikası</NuxtLink>
+          <div class="flex flex-wrap gap-x-6 gap-y-3 justify-center sm:justify-end">
+            <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors py-1">KVKK Metni</NuxtLink>
+            <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors py-1">Kullanım Koşulları</NuxtLink>
+            <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors py-1">Gizlilik Politikası</NuxtLink>
           </div>
         </div>
       </div>

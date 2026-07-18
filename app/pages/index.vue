@@ -17,6 +17,7 @@ import {
   Globe2,
   Handshake,
   CheckCircle2,
+  AlertCircle,
   Plus
 } from 'lucide-vue-next'
 
@@ -167,25 +168,29 @@ const contactPhone = ref('')
 const contactMessage = ref('')
 const contactSubmitted = ref(false)
 const contactError = ref('')
+const contactSuccess = ref(false)
 
 function submitContactForm() {
+  contactError.value = ''
+  contactSuccess.value = false
+  
   if (contactMethod.value === 'email' && !contactEmail.value) {
-    contactError.value = 'Lütfen kurumsal e-posta adresinizi girin.'
+    contactError.value = 'Lütfen geçerli bir kurumsal e-posta adresi girin.'
     return
   }
   if (contactMethod.value === 'phone' && !contactPhone.value) {
-    contactError.value = 'Lütfen telefon numaranızı girin.'
+    contactError.value = 'Lütfen geçerli bir telefon numarası girin.'
     return
   }
+  
   contactSubmitted.value = true
-  contactError.value = ''
   
   setTimeout(() => {
     contactSubmitted.value = false
+    contactSuccess.value = true
     contactEmail.value = ''
     contactPhone.value = ''
     contactMessage.value = ''
-    alert('Mesajınız başarıyla iletildi. Ekibimiz en kısa sürede dönüş yapacaktır.')
   }, 1200)
 }
 
@@ -1144,7 +1149,7 @@ function toggleFilterSection(section: string) {
                       <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-2 flex items-center gap-2">
                         <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Güncel Teklif Eksiltme Günlüğü (Audit Trail)
                       </h4>
-                      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 font-mono text-[10px] text-slate-400">
+                      <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 font-mono text-[11px] sm:text-xs text-slate-400">
                         <div class="flex justify-between">
                           <span>[15:42:01] Tedarikçi #8 (Demir A.Ş.)</span>
                           <span class="text-red-400 font-semibold">- 8.500 ₺ indirim yaptı</span>
@@ -1481,6 +1486,40 @@ function toggleFilterSection(section: string) {
       </div>
     </section>
 
+    <!-- REGISTER CALL TO ACTION SECTION (Selin Şahin Feedback) -->
+    <section class="py-16 bg-[#001D36] text-white relative overflow-hidden">
+      <!-- Glow background -->
+      <div class="absolute top-0 right-0 h-[300px] w-[300px] rounded-full bg-blue-500/10 blur-3xl z-10"></div>
+      <div class="absolute bottom-0 left-0 h-[300px] w-[300px] rounded-full bg-emerald-500/10 blur-3xl z-10"></div>
+      
+      <div class="relative z-20 mx-auto max-w-5xl px-6 text-center space-y-6">
+        <span class="bg-[#1EAE4C]/10 border border-[#1EAE4C]/20 text-[#1EAE4C] text-[9px] font-black uppercase px-3 py-1 rounded-full tracking-wider inline-block animate-pulse">
+          ⚡ ÜCRETSİZ LANSMAN DÖNEMİ
+        </span>
+        <h2 class="text-3xl font-black tracking-tight sm:text-4xl">
+          Tedarik Süreçlerinizi Bugün Dijitalleştirin
+        </h2>
+        <p class="max-w-xl mx-auto text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+          Ters ihale arenamıza katılın, malzeme ve lojistik maliyetlerinizi canlı eksiltme ile düşürün. Satın alma taleplerinizi tek merkezden yönetmeye hemen başlayın.
+        </p>
+        <div class="pt-4 flex flex-wrap justify-center gap-4">
+          <NuxtLink 
+            to="/uyelik" 
+            class="flex items-center gap-2 rounded-xl px-8 py-4 text-xs font-black text-white bg-[#1EAE4C] shadow-lg shadow-[#1EAE4C]/20 hover:bg-[#158f3d] transition-all"
+          >
+            Hemen Ücretsiz Katılın
+            <ArrowRight :size="15" />
+          </NuxtLink>
+          <a 
+            href="#sss" 
+            class="flex items-center gap-2 rounded-xl border border-slate-700 bg-transparent px-8 py-4 text-xs font-black text-white hover:bg-slate-800 transition-all"
+          >
+            Sıkça Sorulan Sorular
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- BİZİMLE İLETİŞİME GEÇİN SECTION -->
     <section class="border-b border-slate-200 bg-slate-50 py-20 relative overflow-hidden">
       <!-- Background subtle graphics -->
@@ -1533,91 +1572,116 @@ function toggleFilterSection(section: string) {
 
           <!-- Right Form Card -->
           <div class="lg:col-span-6">
-            <div class="bg-white border rounded-3xl p-8 premium-shadow space-y-6 text-left">
-              <div class="space-y-1">
-                <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">SİZİNLE İLETİŞİME GEÇELİM</span>
-                <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">BİZE NASIL ULAŞALIM?</h3>
-              </div>
-
-              <!-- Contact Method Toggle Tabs -->
-              <div class="grid grid-cols-2 rounded-xl bg-slate-100 p-1 border">
-                <button
-                  type="button"
-                  @click="contactMethod = 'email'"
-                  class="rounded-lg py-2.5 text-xs font-bold text-center transition-all"
-                  :class="contactMethod === 'email' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'"
+            <div class="bg-white border rounded-3xl p-8 premium-shadow space-y-6 text-left min-h-[360px] flex flex-col justify-center">
+              
+              <!-- Success State (Premium feedback card) -->
+              <div v-if="contactSuccess" class="py-6 text-center space-y-5">
+                <div class="inline-flex h-14 w-14 items-center justify-center rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600 animate-bounce">
+                  <CheckCircle2 :size="28" />
+                </div>
+                <div class="space-y-2">
+                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">TALEBİNİZ ALINDI!</h3>
+                  <p class="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed font-medium">
+                    Mesajınız başarıyla iletildi. Uzman ekibimiz en kısa sürede sizinle iletişime geçecektir.
+                  </p>
+                </div>
+                <button 
+                  type="button" 
+                  @click="contactSuccess = false" 
+                  class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:underline"
                 >
-                  E-posta
-                </button>
-                <button
-                  type="button"
-                  @click="contactMethod = 'phone'"
-                  class="rounded-lg py-2.5 text-xs font-bold text-center transition-all"
-                  :class="contactMethod === 'phone' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'"
-                >
-                  Telefon
+                  Yeni Mesaj Gönder
                 </button>
               </div>
 
-              <!-- Inputs -->
-              <div class="space-y-4">
-                <!-- E-posta field -->
-                <div v-if="contactMethod === 'email'">
-                  <label for="contactEmailInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">E-posta Adresiniz</label>
-                  <input
-                    v-model="contactEmail"
-                    type="email"
-                    id="contactEmailInput"
-                    placeholder="ornek@sirket.com.tr"
-                    class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all"
-                  />
+              <!-- Form State -->
+              <div v-else class="space-y-6">
+                <div class="space-y-1">
+                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">SİZİNLE İLETİŞİME GEÇELİM</span>
+                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">BİZE NASIL ULAŞALIM?</h3>
                 </div>
 
-                <!-- Telefon field -->
-                <div v-else>
-                  <label for="contactPhoneInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">Telefon Numaranız</label>
-                  <input
-                    v-model="contactPhone"
-                    type="tel"
-                    id="contactPhoneInput"
-                    placeholder="+90 (555) 555 55 55"
-                    class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all"
-                  />
+                <!-- Contact Method Toggle Tabs -->
+                <div class="grid grid-cols-2 rounded-xl bg-slate-100 p-1 border">
+                  <button
+                    type="button"
+                    @click="contactMethod = 'email'"
+                    class="rounded-lg py-2.5 text-xs font-bold text-center transition-all"
+                    :class="contactMethod === 'email' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'"
+                  >
+                    E-posta
+                  </button>
+                  <button
+                    type="button"
+                    @click="contactMethod = 'phone'"
+                    class="rounded-lg py-2.5 text-xs font-bold text-center transition-all"
+                    :class="contactMethod === 'phone' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'"
+                  >
+                    Telefon
+                  </button>
                 </div>
 
-                <!-- Message field -->
-                <div>
-                  <label for="contactMessageInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">Size nasıl yardımcı olabiliriz?</label>
-                  <textarea
-                    v-model="contactMessage"
-                    rows="3"
-                    id="contactMessageInput"
-                    placeholder="Taleplerinizi belirtin..."
-                    class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all resize-none"
-                  ></textarea>
+                <!-- Inputs -->
+                <div class="space-y-4">
+                  <!-- E-posta field -->
+                  <div v-if="contactMethod === 'email'">
+                    <label for="contactEmailInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">E-posta Adresiniz</label>
+                    <input
+                      v-model="contactEmail"
+                      type="email"
+                      id="contactEmailInput"
+                      placeholder="ornek@sirket.com.tr"
+                      class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all"
+                    />
+                  </div>
+
+                  <!-- Telefon field -->
+                  <div v-else>
+                    <label for="contactPhoneInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">Telefon Numaranız</label>
+                    <input
+                      v-model="contactPhone"
+                      type="tel"
+                      id="contactPhoneInput"
+                      placeholder="+90 (555) 555 55 55"
+                      class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all"
+                    />
+                  </div>
+
+                  <!-- Message field -->
+                  <div>
+                    <label for="contactMessageInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">Size nasıl yardımcı olabiliriz?</label>
+                    <textarea
+                      v-model="contactMessage"
+                      rows="3"
+                      id="contactMessageInput"
+                      placeholder="Taleplerinizi belirtin..."
+                      class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all resize-none"
+                    ></textarea>
+                  </div>
                 </div>
-              </div>
 
-              <!-- Error Display -->
-              <div v-if="contactError" class="text-[11px] font-bold text-red-600 flex items-center gap-1">
-                <AlertTriangle :size="12" /> {{ contactError }}
-              </div>
+                <!-- Error Display (Premium Alert Box) -->
+                <div v-if="contactError" class="p-3 rounded-xl bg-rose-50 border border-rose-100 text-rose-800 text-[11px] font-bold flex items-center gap-2">
+                  <AlertCircle :size="14" class="text-rose-600 shrink-0" />
+                  <span>{{ contactError }}</span>
+                </div>
 
-              <!-- Submit button -->
-              <button
-                type="button"
-                @click="submitContactForm"
-                :disabled="contactSubmitted"
-                class="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-black text-white hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/10 disabled:opacity-60"
-              >
-                <span v-if="contactSubmitted">Gönderiliyor...</span>
-                <span v-else class="flex items-center gap-1">Gönder <ArrowRight :size="14" /></span>
-              </button>
+                <!-- Submit button -->
+                <button
+                  type="button"
+                  @click="submitContactForm"
+                  :disabled="contactSubmitted"
+                  class="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-black text-white hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/10 disabled:opacity-60"
+                >
+                  <span v-if="contactSubmitted">Gönderiliyor...</span>
+                  <span v-else class="flex items-center gap-1">Gönder <ArrowRight :size="14" /></span>
+                </button>
 
-              <!-- Footer Sublinks -->
-              <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-400 pt-2">
-                <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors">Önce nasıl çalıştığını inceleyin →</a>
-                <NuxtLink to="/uyelik" class="hover:text-blue-600 transition-colors">Kurumsal hesap aç →</NuxtLink>
+                <!-- Footer Sublinks -->
+                <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-400 pt-2">
+                  <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors">Önce nasıl çalıştığını inceleyin →</a>
+                  <NuxtLink to="/uyelik" class="hover:text-blue-600 transition-colors">Kurumsal hesap aç →</NuxtLink>
+                </div>
               </div>
 
             </div>
