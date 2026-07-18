@@ -182,7 +182,31 @@ export const DEFAULT_CMS_DATA = {
     kep: 'gelanlasalim@hs01.kep.tr',
     workHoursWeekdays: 'Pazartesi - Cuma: 09:00 - 18:00',
     workHoursSaturday: 'Cumartesi: 10:00 - 14:00'
-  }
+  },
+  payments: [
+    {
+      id: 'ORD-894210',
+      referenceCode: 'GA-9B432',
+      userName: 'Ahmet Yılmaz',
+      companyName: 'Yılmaz Lojistik A.Ş.',
+      packageName: 'Profesyonel',
+      amount: '₺9.600',
+      paymentMethod: 'Havale/EFT',
+      status: 'bekliyor',
+      date: '17 Temmuz 2026'
+    },
+    {
+      id: 'ORD-761234',
+      referenceCode: '-',
+      userName: 'Elif Kaya',
+      companyName: 'Kaya Mimarlık Ltd. Şti.',
+      packageName: 'Kurumsal',
+      amount: '₺18.000',
+      paymentMethod: 'PayTR',
+      status: 'onaylandi',
+      date: '16 Temmuz 2026'
+    }
+  ]
 }
 
 export function useCmsData() {
@@ -200,6 +224,9 @@ export function useCmsData() {
         }
         if (!parsed.contact) {
           parsed.contact = DEFAULT_CMS_DATA.contact
+        }
+        if (!parsed.payments) {
+          parsed.payments = DEFAULT_CMS_DATA.payments
         }
         // Migrate blocked third-party video URL or local big file to CDN video
         if (parsed.hero && parsed.hero.heroVideoUrl && (parsed.hero.heroVideoUrl.includes('mixkit.co') || parsed.hero.heroVideoUrl === '/hero_video.mp4')) {

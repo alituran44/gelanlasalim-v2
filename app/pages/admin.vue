@@ -37,7 +37,7 @@ const password = ref('')
 const authError = ref('')
 
 // Tabs
-const activeTab = ref<'hero' | 'tender' | 'plans' | 'features' | 'contact' | 'db_tenders' | 'db_received' | 'db_submitted'>('hero')
+const activeTab = ref<'hero' | 'tender' | 'plans' | 'features' | 'contact' | 'db_payments' | 'db_tenders' | 'db_received' | 'db_submitted'>('hero')
 
 // Local copy for editing
 const formState = reactive(JSON.parse(JSON.stringify(cmsData.value)))
@@ -201,6 +201,32 @@ function addSubmittedBid() {
 function removeSubmittedBid(index: number) {
   formState.dashboard.submittedBids.splice(index, 1)
 }
+
+// Gelen Ödemeler (Payments) Helpers
+function addPaymentRecord() {
+  const newId = 'ORD-' + Math.floor(100000 + Math.random() * 900000)
+  if (!formState.payments) {
+    formState.payments = []
+  }
+  formState.payments.unshift({
+    id: newId,
+    referenceCode: 'GA-' + Math.floor(100000 + Math.random() * 900000).toString(16).toUpperCase().substring(0, 5),
+    userName: 'Örnek Kullanıcı',
+    companyName: 'Örnek Anonim Şirketi',
+    packageName: 'Profesyonel',
+    amount: '₺9.600',
+    paymentMethod: 'Havale/EFT',
+    status: 'bekliyor',
+    date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
+  })
+}
+function removePaymentRecord(index: number) {
+  formState.payments.splice(index, 1)
+}
+function togglePaymentStatus(index: number) {
+  const payment = formState.payments[index]
+  payment.status = payment.status === 'onaylandi' ? 'bekliyor' : 'onaylandi'
+}
 </script>
 
 <template>
@@ -350,6 +376,15 @@ function removeSubmittedBid(index: number) {
               <Upload :size="15" />
               Yaptığım Teklifler
             </button>
+
+            <button 
+              @click="activeTab = 'db_payments'" 
+              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left"
+              :class="activeTab === 'db_payments' ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/10' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+            >
+              <CreditCard :size="15" />
+              Gelen Ödemeler (B2B)
+            </button>
           </nav>
         </div>
 
@@ -377,6 +412,7 @@ function removeSubmittedBid(index: number) {
               <span v-else-if="activeTab === 'plans'">Abonelik & Fiyat Planları</span>
               <span v-else-if="activeTab === 'features'">Detaylı Özellik Listesi</span>
               <span v-else-if="activeTab === 'contact'">İletişim & Destek Saatleri</span>
+              <span v-else-if="activeTab === 'db_payments'">Gelen Ödemeler & Üyelik Başvuruları</span>
               <span v-else-if="activeTab === 'db_tenders'">Kullanıcı Paneli: İlanlarım (Tenders)</span>
               <span v-else-if="activeTab === 'db_received'">Kullanıcı Paneli: Gelen Teklifler (Bids)</span>
               <span v-else>Kullanıcı Paneli: Yaptığım Teklifler</span>
@@ -605,6 +641,79 @@ function removeSubmittedBid(index: number) {
                 <div>
                   <label class="block text-[9px] font-bold text-slate-500 mb-1">CUMARTESİ SAATLERİ</label>
                   <input v-model="formState.contact.workHoursSaturday" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tab: Gelen Ödemeler (Payments) -->
+          <div v-if="activeTab === 'db_payments'" class="space-y-4">
+            <div class="flex justify-between items-center mb-2">
+              <label class="block text-xs font-bold text-slate-400">GELEN ÖDEME VE ÜYELİK BAŞVURU VERİTABANI</label>
+              <button @click="addPaymentRecord" class="flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition">
+                <Plus :size="14" /> Ödeme Kaydı Ekle
+              </button>
+            </div>
+
+            <div class="space-y-4">
+              <div v-if="!formState.payments || formState.payments.length === 0" class="text-xs text-slate-500 py-6 italic text-center border border-dashed border-slate-800 rounded-2xl">
+                Kayıtlı ödeme işlemi bulunmamaktadır.
+              </div>
+              <div v-for="(payment, index) in (formState.payments || [])" :key="payment.id" class="p-4 rounded-xl border border-slate-800 bg-slate-900/30 space-y-3 text-left">
+                <div class="flex justify-between items-center">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-mono text-blue-400 font-bold bg-blue-950/30 px-2 py-0.5 rounded">{{ payment.id }}</span>
+                    <span class="text-[10px] text-slate-500 font-bold">Ref: {{ payment.referenceCode }}</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button 
+                      @click="togglePaymentStatus(index)" 
+                      class="px-2.5 py-1 rounded text-[10px] font-black uppercase transition-all"
+                      :class="payment.status === 'onaylandi' ? 'bg-emerald-950/40 text-emerald-400 border border-emerald-800/60' : 'bg-amber-950/40 text-amber-400 border border-amber-800/60'"
+                    >
+                      {{ payment.status === 'onaylandi' ? 'ONAYLANDI' : 'BEKLİYOR (Tıkla Onayla)' }}
+                    </button>
+                    <button @click="removePaymentRecord(index)" class="p-2 bg-red-950/20 hover:bg-red-950 text-red-400 rounded-lg transition">
+                      <Trash2 :size="14" />
+                    </button>
+                  </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div class="space-y-3">
+                    <div>
+                      <label class="block text-[9px] font-bold text-slate-500 mb-0.5">KULLANICI ADI SOYADI</label>
+                      <input v-model="payment.userName" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                    </div>
+                    <div>
+                      <label class="block text-[9px] font-bold text-slate-500 mb-0.5">FİRMA / ŞİRKET ADI</label>
+                      <input v-model="payment.companyName" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                    </div>
+                  </div>
+
+                  <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-2">
+                      <div>
+                        <label class="block text-[9px] font-bold text-slate-500 mb-0.5">PAKET</label>
+                        <input v-model="payment.packageName" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                      </div>
+                      <div>
+                        <label class="block text-[9px] font-bold text-slate-500 mb-0.5">ÖDEME TUTARI</label>
+                        <input v-model="payment.amount" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                      </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                      <div>
+                        <label class="block text-[9px] font-bold text-slate-500 mb-0.5">ÖDEME YÖNTEMİ</label>
+                        <input v-model="payment.paymentMethod" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                      </div>
+                      <div>
+                        <label class="block text-[9px] font-bold text-slate-500 mb-0.5">İŞLEM TARİHİ</label>
+                        <input v-model="payment.date" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

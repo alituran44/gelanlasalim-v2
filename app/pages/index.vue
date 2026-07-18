@@ -25,6 +25,66 @@ definePageMeta({
   layout: 'public'
 })
 
+useSeoMeta({
+  title: 'GelAnlaşalım - B2B Tersine İhale & Tedarikçi Teklif Platformu',
+  ogTitle: 'GelAnlaşalım - B2B Tersine İhale & Tedarikçi Teklif Platformu',
+  description: 'Satın alma maliyetlerinizi tersine canlı eksiltme ihaleleriyle düşürün. Doğrulanmış kurumsal tedarikçilerden anlık belgeli teklif toplayın.',
+  ogDescription: 'Satın alma maliyetlerinizi tersine canlı eksiltme ihaleleriyle düşürün. Doğrulanmış kurumsal tedarikçilerden anlık belgeli teklif toplayın.',
+  ogImage: 'https://gelanlasalim-v2.vercel.app/logo.png',
+  twitterCard: 'summary_large_image',
+  twitterTitle: 'GelAnlaşalım - B2B Canlı İhale & Tedarikçi Platformu',
+  twitterDescription: 'Tedarik maliyetlerinizi %14\'e varan oranlarda azaltın. Şeffaf ve şifreli B2B eksiltme ihaleleri dakikalar içinde yayında.',
+  twitterImage: 'https://gelanlasalim-v2.vercel.app/logo.png'
+})
+
+useHead({
+  htmlAttrs: {
+    lang: 'tr'
+  },
+  link: [
+    { rel: 'icon', type: 'image/png', href: '/logo.png' }
+  ],
+  meta: [
+    { name: 'keywords', content: 'b2b ihale, tersine ihale, eksiltme ihalesi, teklif toplama, kurumsal satın alma, tedarikçi yönetimi, ekap ihale, kik, doğrudan temin' },
+    { name: 'author', content: 'GelAnlaşalım Bilişim A.Ş.' },
+    { name: 'robots', content: 'index, follow' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        'name': 'GelAnlaşalım',
+        'url': 'https://gelanlasalim-v2.vercel.app',
+        'description': 'B2B Tersine İhale, Eksiltme ve Kurumsal Satın Alma Platformu',
+        'potentialAction': {
+          '@type': 'SearchAction',
+          'target': 'https://gelanlasalim-v2.vercel.app/?q={search_term_string}',
+          'query-input': 'required name=search_term_string'
+        }
+      })
+    },
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        'name': 'GelAnlaşalım Bilişim A.Ş.',
+        'url': 'https://gelanlasalim-v2.vercel.app',
+        'logo': 'https://gelanlasalim-v2.vercel.app/logo.png',
+        'contactPoint': {
+          '@type': 'ContactPoint',
+          'telephone': '+90-555-555-55-55',
+          'contactType': 'customer service',
+          'email': 'info@gelanlasalim.com',
+          'availableLanguage': 'Turkish'
+        }
+      })
+    }
+  ]
+})
+
 import { onMounted } from 'vue'
 
 const { cmsData } = useCmsData()
@@ -482,7 +542,7 @@ const faqs = [
   },
   {
     question: 'İhale oluşturmak ücretli mi?',
-    answer: 'Ücretlendirme modeli üyelik planına göre belirlenir. Lansman döneminde kurumsal ve profesyonel planlar tamamen ücretsiz olarak sunulmaktadır.'
+    answer: 'Ücretlendirme modeli seçilen plana göre belirlenir. Temel planımız ile ücretsiz deneme yapabilir, profesyonel veya kurumsal paketlerimiz için lansmana özel indirimli fiyatlardan yararlanabilirsiniz.'
   },
   {
     question: 'Ters ihale (Eksiltme) nedir?',
@@ -611,7 +671,7 @@ function toggleFilterSection(section: string) {
           <!-- Buttons -->
           <div class="mt-8 flex flex-wrap items-center gap-3">
             <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/10 hover:opacity-90 transition-all" style="background: #003057;">
-              Ücretsiz kurumsal hesap aç
+              Hemen kurumsal hesap aç
               <ArrowRight :size="15" />
             </NuxtLink>
             <a href="#nasil-calisir" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-6 py-4 text-xs font-black text-slate-700 hover:bg-white transition-all">
@@ -1324,7 +1384,7 @@ function toggleFilterSection(section: string) {
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">
                   <CheckCircle2 :size="16" />
                 </div>
-                <span class="text-xs font-black text-slate-800 tracking-wide">Ücretsiz kurumsal hesap</span>
+                <span class="text-xs font-black text-slate-800 tracking-wide">Hızlı kurumsal kurulum</span>
               </div>
               <div class="flex items-center gap-3">
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Handshake, Menu, X, ArrowRight, Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Twitter } from 'lucide-vue-next'
+import { Handshake, Menu, X, ArrowRight, Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 
 const { cmsData } = useCmsData()
@@ -161,8 +161,10 @@ const mobileMenuOpen = ref(false)
               <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#1EAE4C] hover:border-[#1EAE4C] transition-all">
                 <Linkedin :size="14" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#1EAE4C] hover:border-[#1EAE4C] transition-all">
-                <Twitter :size="14" />
+              <a href="https://x.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-[#1EAE4C] hover:border-[#1EAE4C] transition-all">
+                <svg viewBox="0 0 24 24" class="h-3.5 w-3.5 fill-current" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
               </a>
             </div>
           </div>
@@ -184,12 +186,12 @@ const mobileMenuOpen = ref(false)
           <div class="md:col-span-2 flex flex-col gap-4 text-left">
             <h4 class="text-[10px] font-black uppercase text-blue-600 tracking-wider">ŞİRKET</h4>
             <div class="flex flex-col gap-3 text-[11px] font-bold text-slate-700">
-              <a href="#" class="hover:text-blue-600 transition-colors">Hakkımızda</a>
-              <a href="#" class="hover:text-blue-600 transition-colors">Kariyer</a>
-              <a href="#" class="hover:text-blue-600 transition-colors">Blog</a>
-              <a href="#" class="hover:text-blue-600 transition-colors">Basın Odası</a>
+              <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="hover:text-blue-600 transition-colors">Hakkımızda</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=kariyer" class="hover:text-blue-600 transition-colors">Kariyer</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors">Blog</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors">Basın Odası</NuxtLink>
               <a href="#sss" class="hover:text-blue-600 transition-colors">İletişim</a>
-              <a href="#" class="hover:text-blue-600 transition-colors">İş Ortaklığı Programı</a>
+              <NuxtLink to="/sozlesmeler?tab=is-ortakligi" class="hover:text-blue-600 transition-colors">İş Ortaklığı Programı</NuxtLink>
             </div>
           </div>
 
@@ -204,7 +206,7 @@ const mobileMenuOpen = ref(false)
                 <a :href="'mailto:' + (cmsData.contact ? cmsData.contact.email : 'info@gelanlasalim.com')" class="block hover:text-[#1EAE4C]">
                   {{ cmsData.contact ? cmsData.contact.email : 'info@gelanlasalim.com' }}
                 </a>
-                <a href="#" class="block hover:text-[#1EAE4C] font-mono text-[10px]">
+                <a :href="'mailto:' + (cmsData.contact ? cmsData.contact.kep : 'gelanlasalim@hs01.kep.tr')" class="block hover:text-[#1EAE4C] font-mono text-[10px]">
                   {{ cmsData.contact ? cmsData.contact.kep : 'gelanlasalim@hs01.kep.tr' }}
                 </a>
               </div>
@@ -226,9 +228,9 @@ const mobileMenuOpen = ref(false)
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] text-slate-400 font-black uppercase tracking-wider">
           <div>© 2026 GelAnlaşalım. Tüm Hakları Saklıdır.</div>
           <div class="flex gap-4">
-            <a href="#" class="hover:text-blue-600 transition-colors">KVKK Metni</a>
-            <a href="#" class="hover:text-blue-600 transition-colors">Kullanım Koşulları</a>
-            <a href="#" class="hover:text-blue-600 transition-colors">Gizlilik Politikası</a>
+            <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors">KVKK Metni</NuxtLink>
+            <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors">Kullanım Koşulları</NuxtLink>
+            <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors">Gizlilik Politikası</NuxtLink>
           </div>
         </div>
       </div>

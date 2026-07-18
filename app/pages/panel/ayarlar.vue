@@ -456,22 +456,24 @@ function saveProfile() {
     <!-- Top Global Banner for Unverified State -->
     <div 
       v-if="!companyVerified"
-      class="rounded-xl border bg-emerald-50/50 p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-bold text-emerald-800 animate-pulse"
-      style="border-color: #A7F3D0;"
+      class="rounded-xl border p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-bold animate-pulse"
+      :class="docsCount === 6 ? 'bg-blue-50/50 text-blue-800 border-blue-200' : 'bg-emerald-50/50 text-emerald-800 border-[#A7F3D0]'"
     >
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 font-medium">
         <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="docsCount === 6 ? 'bg-blue-400' : 'bg-emerald-400'"></span>
+          <span class="relative inline-flex rounded-full h-2 w-2" :class="docsCount === 6 ? 'bg-blue-500' : 'bg-emerald-500'"></span>
         </span>
-        <span>🔋 Hesabınız henüz aktif değil. Eksik belgeleri yükleyip doğrulama sürecini başlatın.</span>
+        <span v-if="docsCount === 6">🍀 Tüm belgeleriniz yüklendi. Doğrulama süreci tamamlanmak üzere inceleniyor.</span>
+        <span v-else>🏢 Şirket kimliği ve fatura bilgileriniz hazır. Tam hesap aktivasyonu için kalan eksik belgeleri ({{ 6 - docsCount }} adet) yükleyin.</span>
       </div>
       <button 
         type="button"
-        @click="router.push('/panel/ayarlar?tab=sirket')"
-        class="rounded-lg bg-emerald-800 text-white px-3 py-1.5 hover:bg-emerald-900 transition self-start sm:self-auto"
+        @click="activeSubTab = 'sirket'"
+        class="rounded-lg text-white px-3 py-1.5 transition self-start sm:self-auto font-bold"
+        :class="docsCount === 6 ? 'bg-blue-800 hover:bg-blue-900' : 'bg-emerald-800 hover:bg-emerald-900'"
       >
-        Zorunlu belgeleri yükleyin
+        {{ docsCount === 6 ? 'Belgeleri İncele' : 'Kalan Belgeleri Yükle' }}
       </button>
     </div>
 

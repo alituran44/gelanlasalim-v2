@@ -90,13 +90,18 @@ const pageTitle = computed(() => {
       </NuxtLink>
 
       <!-- Bildirim -->
-      <button class="relative flex h-9 w-9 items-center justify-center rounded-lg border transition hover:bg-slate-50"
-        style="border-color: #E2E8F0;">
+      <button 
+        class="relative flex h-9 w-9 items-center justify-center rounded-lg border transition hover:bg-slate-50"
+        style="border-color: #E2E8F0;"
+        title="Okunmamış Bildirimler"
+        aria-label="3 Okunmamış Bildirim"
+      >
         <Bell :size="17" style="color: #475569;" />
         <span
           v-if="notifCount > 0"
           class="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold text-white"
           style="background: #EF4444;"
+          title="3 Okunmamış Bildirim"
         >
           {{ notifCount }}
         </span>

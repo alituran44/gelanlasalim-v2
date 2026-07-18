@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Check, ArrowRight, ShieldCheck, CreditCard, Building, CheckCircle, X, ShoppingCart, Lock, Sparkles, Building2, Eye, Laptop, Camera, Video, AlertCircle } from 'lucide-vue-next'
+import { useCmsData } from '~/composables/useCmsData'
 
 definePageMeta({
   layout: 'public'
@@ -54,9 +55,29 @@ const subscriptionPackages = ref([
 ])
 
 // Interactive States
+const { cmsData, saveCmsData } = useCmsData()
+const userSession = ref<any>({})
+
 const selectedPackage = ref<typeof subscriptionPackages.value[0] | null>(null)
 const isCheckoutOpen = ref(false)
 const activePaymentMethod = ref<'paytr' | 'iyzigo' | 'bank_transfer'>('paytr')
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem('userSession')
+      if (saved) {
+        userSession.value = JSON.parse(saved)
+        // Auto-fill user's name
+        const fullName = (userSession.value.firstName || '') + ' ' + (userSession.value.lastName || '')
+        transferName.value = fullName.trim()
+        cardName.value = fullName.trim()
+      }
+    } catch (e) {
+      console.error('Failed to load user session', e)
+    }
+  }
+})
 
 // Payment Form Fields
 const cardName = ref('')
@@ -135,6 +156,25 @@ function upgradeSession() {
     parsed.plan = selectedPackage.value?.name || 'Premium Üyelik'
     localStorage.setItem('userSession', JSON.stringify(parsed))
   }
+
+  // Create payment record and save to CMS
+  const paymentObj = {
+    id: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
+    referenceCode: activePaymentMethod.value === 'bank_transfer' ? 'GA-3M485' : '-',
+    userName: activePaymentMethod.value === 'bank_transfer' ? transferName.value : cardName.value,
+    companyName: userSession.value.company || 'Bireysel Kullanıcı',
+    packageName: selectedPackage.value?.name || 'Temel',
+    amount: `₺${totalAmount.value.toLocaleString('tr-TR')}`,
+    paymentMethod: activePaymentMethod.value === 'bank_transfer' ? 'Havale/EFT' : (activePaymentMethod.value === 'paytr' ? 'PayTR' : 'iyzigo'),
+    status: 'bekliyor',
+    date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
+  }
+  
+  if (!cmsData.value.payments) {
+    cmsData.value.payments = []
+  }
+  cmsData.value.payments.unshift(paymentObj)
+  saveCmsData(cmsData.value)
 }
 
 function completeCheckout() {
@@ -383,6 +423,9 @@ function completeCheckout() {
                       placeholder="John Doe" 
                       class="w-full rounded-lg border border-slate-200 p-2.5 text-xs focus:border-blue-500 focus:outline-none" 
                     />
+                    <div class="text-[10px] text-slate-500 mt-1 font-bold">
+                      Kayıtlı Şirket: <span class="text-[#003057] font-black uppercase">{{ userSession?.company || 'Bilinmeyen Şirket' }}</span>
+                    </div>
                   </div>
 
                   <div>
@@ -454,6 +497,9 @@ function completeCheckout() {
                       placeholder="Adınız Soyadınız" 
                       class="w-full rounded-lg border border-slate-200 p-2.5 text-xs focus:border-blue-500 focus:outline-none" 
                     />
+                    <div class="text-[10px] text-slate-500 mt-1 font-bold">
+                      Kayıtlı Şirket: <span class="text-[#003057] font-black uppercase">{{ userSession?.company || 'Bilinmeyen Şirket' }}</span>
+                    </div>
                   </div>
                 </div>
               </div>

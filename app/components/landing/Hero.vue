@@ -66,7 +66,7 @@ import AppButton from "~/components/ui/AppButton.vue"
 
               <AppButton size="lg">
 
-                Ücretsiz Başla
+                Hemen Başla
 
               </AppButton>
 

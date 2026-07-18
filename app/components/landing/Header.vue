@@ -76,7 +76,7 @@ const menu = [
 
         <NuxtLink to="/register">
           <AppButton>
-            Ücretsiz Başla
+            Hemen Başla
           </AppButton>
         </NuxtLink>
       </div>
