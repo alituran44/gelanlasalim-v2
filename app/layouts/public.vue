@@ -5,10 +5,46 @@ import { useCmsData } from '~/composables/useCmsData'
 
 const { cmsData } = useCmsData()
 const mobileMenuOpen = ref(false)
+
+const activeTenders = ref([
+  { title: "Metro Lojistik A.Ş. - 10.000 Litre Motorin Alımı", time: "Kalan: 2 Saat", savings: "Hedef Tasarruf: %15" },
+  { title: "Özgür İnşaat - 120 Ton Hazır Beton Tedariki", time: "Kalan: 1 Gün", savings: "Hedef Tasarruf: %12" },
+  { title: "Tekstil Sanayi Ltd. - 5.000 Metre Dokuma Kumaş", time: "Kalan: 5 Saat", savings: "Hedef Tasarruf: %18" },
+  { title: "Mega Gıda A.Ş. - 50.000 Adet Oluklu Mukavva Kutu", time: "Kalan: 7 Saat", savings: "Hedef Tasarruf: %20" }
+])
 </script>
 
 <template>
   <div class="min-h-screen bg-slate-50 font-sans text-slate-900 selection:bg-blue-600 selection:text-white flex flex-col">
+    <!-- Announcement Banner -->
+    <div class="w-full bg-[#001D36] text-white py-2.5 px-6 overflow-hidden border-b border-blue-900/40 relative z-50 text-[11px] font-bold">
+      <div class="mx-auto max-w-7xl flex items-center justify-between gap-4">
+        <span class="bg-[#1EAE4C] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-wider flex items-center gap-1 shrink-0 animate-pulse">
+          ⚡ YAYINDAKİ İHALELER
+        </span>
+        <div class="relative w-full overflow-hidden h-4 flex items-center mx-4">
+          <div class="absolute whitespace-nowrap flex gap-12 animate-marquee hover:pause-animation">
+            <span v-for="(tender, idx) in activeTenders" :key="idx" class="flex items-center gap-2">
+              <span class="text-slate-400">#{{ idx + 1 }}</span>
+              <span class="text-white">{{ tender.title }}</span>
+              <span class="text-[#1EAE4C] bg-[#1EAE4C]/10 border border-[#1EAE4C]/20 px-1.5 py-0.2 rounded text-[9px]">{{ tender.time }}</span>
+              <span class="text-blue-300 bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.2 rounded text-[9px]">{{ tender.savings }}</span>
+            </span>
+            <!-- Duplicate for seamless scroll loop -->
+            <span v-for="(tender, idx) in activeTenders" :key="'dup-' + idx" class="flex items-center gap-2">
+              <span class="text-slate-400">#{{ idx + 1 }}</span>
+              <span class="text-white">{{ tender.title }}</span>
+              <span class="text-[#1EAE4C] bg-[#1EAE4C]/10 border border-[#1EAE4C]/20 px-1.5 py-0.2 rounded text-[9px]">{{ tender.time }}</span>
+              <span class="text-blue-300 bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.2 rounded text-[9px]">{{ tender.savings }}</span>
+            </span>
+          </div>
+        </div>
+        <a href="/#ihale-gezgini" class="text-[#1EAE4C] hover:underline flex items-center gap-0.5 text-[10px] shrink-0 font-black">
+          İncele <ArrowRight :size="12" />
+        </a>
+      </div>
+    </div>
+
     <!-- Header -->
     <header class="sticky top-0 z-50 bg-white border-b transition-all" style="border-color: #E2E8F0; box-shadow: 0 1px 3px rgba(0,0,0,0.04);">
       <div class="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-6">
@@ -237,3 +273,24 @@ const mobileMenuOpen = ref(false)
     </footer>
   </div>
 </template>
+
+<style scoped>
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+
+.hover\:pause-animation:hover {
+  animation-play-state: paused;
+}
+</style>
