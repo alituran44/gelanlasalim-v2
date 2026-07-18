@@ -26,8 +26,8 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'GelAnlaşalım - B2B Tersine İhale & Tedarikçi Teklif Platformu',
-  ogTitle: 'GelAnlaşalım - B2B Tersine İhale & Tedarikçi Teklif Platformu',
+  title: 'GelAnlaşalım - B2B Tersine İhale Platformu',
+  ogTitle: 'GelAnlaşalım - B2B Tersine İhale Platformu',
   description: 'Satın alma maliyetlerinizi tersine canlı eksiltme ihaleleriyle düşürün. Doğrulanmış kurumsal tedarikçilerden anlık belgeli teklif toplayın.',
   ogDescription: 'Satın alma maliyetlerinizi tersine canlı eksiltme ihaleleriyle düşürün. Doğrulanmış kurumsal tedarikçilerden anlık belgeli teklif toplayın.',
   ogImage: 'https://gelanlasalim-v2.vercel.app/logo.png',
@@ -42,7 +42,8 @@ useHead({
     lang: 'tr'
   },
   link: [
-    { rel: 'icon', type: 'image/png', href: '/logo.png' }
+    { rel: 'icon', type: 'image/png', href: '/logo.png' },
+    { rel: 'canonical', href: 'https://gelanlasalim-v2.vercel.app' }
   ],
   meta: [
     { name: 'keywords', content: 'b2b ihale, tersine ihale, eksiltme ihalesi, teklif toplama, kurumsal satın alma, tedarikçi yönetimi, ekap ihale, kik, doğrudan temin' },
@@ -52,7 +53,7 @@ useHead({
   script: [
     {
       type: 'application/ld+json',
-      children: JSON.stringify({
+      innerHTML: JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'WebSite',
         'name': 'GelAnlaşalım',
@@ -67,7 +68,7 @@ useHead({
     },
     {
       type: 'application/ld+json',
-      children: JSON.stringify({
+      innerHTML: JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'Organization',
         'name': 'GelAnlaşalım Bilişim A.Ş.',
@@ -80,6 +81,39 @@ useHead({
           'email': 'info@gelanlasalim.com',
           'availableLanguage': 'Turkish'
         }
+      })
+    },
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        'mainEntity': [
+          {
+            '@type': 'Question',
+            'name': 'Tersine ihale (eksiltme) sistemi nasıl çalışır?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Alıcı firma satın almak istediği malzeme veya hizmet için detaylı şartname ve miktar belirterek bir ihale açar. Doğrulanmış tedarikçiler belirlenen süre içinde canlı eksiltme arenasında birbirlerinin tekliflerini görerek tekliflerini düşürürler.'
+            }
+          },
+          {
+            '@type': 'Question',
+            'name': 'Firmaların doğrulanması nasıl sağlanıyor?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Platforma üye olan her şirketin vergi levhası, ticaret sicil gazetesi, imza sirküleri ve faaliyet belgeleri gibi resmi evrakları ekibimiz tarafından titizlikle kontrol edilir. Sadece doğrulanmış kurumsal firmalar teklif verebilir ve ihale açabilir.'
+            }
+          },
+          {
+            '@type': 'Question',
+            'name': 'Ödeme ve teslimat süreçleri güvenli mi?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Evet. Alıcı ihale bedelini güvenli hesaba aktarır. Tedarikçi şartnameye uygun şekilde teslimat yaptığında ve alıcı onay verdiğinde ödeme tedarikçiye aktarılır. Süreç boyunca tüm belgeler ve işlem adımları zaman damgasıyla kayıt altına alınır.'
+            }
+          }
+        ]
       })
     }
   ]
@@ -940,7 +974,7 @@ function toggleFilterSection(section: string) {
               <div class="flex gap-2">
                 <div class="flex-1 relative">
                   <Search :size="16" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="explorerSearch" type="text" placeholder="İlan başlığı, malzeme veya firma adı ile arayın..." class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                  <input v-model="explorerSearch" type="text" id="explorerSearchInput" aria-label="İlan Arama" placeholder="İlan başlığı, malzeme veya firma adı ile arayın..." class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
                 </div>
               </div>
             </div>
@@ -1059,7 +1093,7 @@ function toggleFilterSection(section: string) {
                             <td class="p-2.5 font-medium text-slate-800 text-left">{{ line.split('-')[0]?.trim() }}</td>
                             <td class="p-2.5 text-center font-bold text-slate-500">{{ line.split('-')[1]?.trim() || '1 Adet' }}</td>
                             <td class="p-2.5 text-right">
-                              <input type="number" placeholder="0.00" class="w-32 text-right bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-blue-600" />
+                              <input type="number" aria-label="Birim Teklif Fiyatı" placeholder="0.00" class="w-32 text-right bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-blue-600" />
                             </td>
                           </tr>
                         </tbody>
@@ -1143,11 +1177,12 @@ function toggleFilterSection(section: string) {
           <!-- Slider area -->
           <div class="space-y-4">
             <div class="flex justify-between items-baseline">
-              <label class="text-xs font-black text-slate-800 uppercase tracking-wider font-sans">Yıllık Satın Alma Hacminiz</label>
+              <label for="annualVolumeInput" class="text-xs font-black text-slate-800 uppercase tracking-wider font-sans">Yıllık Satın Alma Hacminiz</label>
               <span class="font-mono text-xl font-black text-blue-600">{{ annualVolume.toLocaleString('tr-TR') }} ₺</span>
             </div>
             <input
               type="range"
+              id="annualVolumeInput"
               min="500000"
               max="50000000"
               step="500000"
@@ -1439,10 +1474,11 @@ function toggleFilterSection(section: string) {
               <div class="space-y-4">
                 <!-- E-posta field -->
                 <div v-if="contactMethod === 'email'">
-                  <label class="text-[9px] font-black uppercase text-slate-400 block mb-1">E-posta Adresiniz</label>
+                  <label for="contactEmailInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">E-posta Adresiniz</label>
                   <input
                     v-model="contactEmail"
                     type="email"
+                    id="contactEmailInput"
                     placeholder="ornek@sirket.com.tr"
                     class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all"
                   />
@@ -1450,10 +1486,11 @@ function toggleFilterSection(section: string) {
 
                 <!-- Telefon field -->
                 <div v-else>
-                  <label class="text-[9px] font-black uppercase text-slate-400 block mb-1">Telefon Numaranız</label>
+                  <label for="contactPhoneInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">Telefon Numaranız</label>
                   <input
                     v-model="contactPhone"
                     type="tel"
+                    id="contactPhoneInput"
                     placeholder="+90 (555) 555 55 55"
                     class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all"
                   />
@@ -1461,10 +1498,11 @@ function toggleFilterSection(section: string) {
 
                 <!-- Message field -->
                 <div>
-                  <label class="text-[9px] font-black uppercase text-slate-400 block mb-1">Size nasıl yardımcı olabiliriz?</label>
+                  <label for="contactMessageInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">Size nasıl yardımcı olabiliriz?</label>
                   <textarea
                     v-model="contactMessage"
                     rows="3"
+                    id="contactMessageInput"
                     placeholder="Taleplerinizi belirtin..."
                     class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all resize-none"
                   ></textarea>
