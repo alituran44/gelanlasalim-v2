@@ -1392,6 +1392,83 @@ function toggleFilterSection(section: string) {
       </div>
     </section>
 
+    <!-- E-E-A-T EDITORIAL & EXPERT VALIDATION SECTION -->
+    <section class="border-b border-slate-200 bg-white py-20">
+      <div class="mx-auto max-w-7xl px-6">
+        <div class="text-center mb-16 max-w-2xl mx-auto">
+          <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100">
+            <BadgeCheck :size="12" /> E-E-A-T DOĞRULANMIŞ PLATFORM
+          </span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Uzman Ekibimiz ve Editöryal Standartlarımız</h2>
+          <p class="mt-3 text-xs sm:text-sm text-slate-500 font-medium leading-relaxed font-sans">
+            Platformumuzdaki tüm tasarruf oranları, canlı eksiltme kuralları ve tedarik süreçleri, sektör profesyonelleri tarafından denetlenerek doğrulanır.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <!-- Expert 1 -->
+          <div class="group rounded-2xl border border-slate-200 p-6 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:border-blue-200 transition-all duration-200 text-left">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="h-12 w-12 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600 font-bold shrink-0 text-xs">
+                AT
+              </div>
+              <div>
+                <h4 class="text-xs font-black text-slate-800 uppercase tracking-wide">Ali Turan</h4>
+                <p class="text-[10px] text-blue-600 font-bold">Kıdemli Satın Alma Direktörü</p>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed font-medium">
+              15 yılı aşkın global tedarik ve kurumsal B2B satın alma yönetimi tecrübesine sahiptir. Canlı eksiltme ve tersine ihale süreçlerinin platform entegrasyonuna liderlik etmektedir.
+            </p>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[9px] font-black uppercase text-slate-400">
+              <span>Uzmanlık: Tedarik Yönetimi</span>
+              <span class="text-blue-600 flex items-center gap-0.5"><ShieldCheck :size="10" /> Doğrulandı</span>
+            </div>
+          </div>
+
+          <!-- Expert 2 -->
+          <div class="group rounded-2xl border border-slate-200 p-6 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:border-blue-200 transition-all duration-200 text-left">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="h-12 w-12 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold shrink-0 text-xs">
+                SK
+              </div>
+              <div>
+                <h4 class="text-xs font-black text-slate-800 uppercase tracking-wide">Prof. Dr. Selim Kaya</h4>
+                <p class="text-[10px] text-emerald-600 font-bold">Tedarik Zinciri Danışmanı</p>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed font-medium font-sans">
+              E-tedarik sistemleri, akıllı ihale algoritmaları ve tedarikçi derecelendirme metodolojileri üzerine akademik araştırmalar yürüten lojistik bilimcidir.
+            </p>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[9px] font-black uppercase text-slate-400">
+              <span>Uzmanlık: İhale Algoritmaları</span>
+              <span class="text-emerald-600 flex items-center gap-0.5"><ShieldCheck :size="10" /> Akademik</span>
+            </div>
+          </div>
+
+          <!-- Expert 3 -->
+          <div class="group rounded-2xl border border-slate-200 p-6 bg-slate-50/50 hover:bg-white hover:shadow-xl hover:border-blue-200 transition-all duration-200 text-left">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="h-12 w-12 rounded-full bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-700 font-bold shrink-0 text-xs">
+                ZD
+              </div>
+              <div>
+                <h4 class="text-xs font-black text-slate-800 uppercase tracking-wide">Zeynep Demir</h4>
+                <p class="text-[10px] text-amber-600 font-bold">Finans & Mevzuat Editörü</p>
+              </div>
+            </div>
+            <p class="text-xs text-slate-500 leading-relaxed font-medium">
+              B2B vergilendirme, doğrudan temin, faturalandırma, KDV muafiyetleri ve KVKK kurumsal veri güvenliği süreçlerinde platform içeriklerinin doğruluğunu denetler.
+            </p>
+            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[9px] font-black uppercase text-slate-400">
+              <span>Uzmanlık: Mevzuat & Uyum</span>
+              <span class="text-amber-600 flex items-center gap-0.5"><ShieldCheck :size="10" /> Hukuki</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- BİZİMLE İLETİŞİME GEÇİN SECTION -->
     <section class="border-b border-slate-200 bg-slate-50 py-20 relative overflow-hidden">
       <!-- Background subtle graphics -->
