@@ -131,7 +131,20 @@ onMounted(() => {
       console.warn('Autoplay prevented:', err)
     })
   }
+  if (typeof window !== 'undefined') {
+    const accepted = localStorage.getItem('cookieConsentAccepted')
+    if (accepted === 'true') {
+      showCookieConsent.value = false
+    }
+  }
 })
+
+function acceptCookieConsent() {
+  showCookieConsent.value = false
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('cookieConsentAccepted', 'true')
+  }
+}
 
 /* =========================================================
    GENEL DURUMLAR & TABLAR
@@ -1624,7 +1637,7 @@ function toggleFilterSection(section: string) {
           Platform kullanım deneyiminizi optimize etmek ve güvenli bir B2B ihale süreci sağlamak adına çerezleri kullanıyoruz.
         </p>
         <div class="flex gap-2 justify-end">
-          <button @click="showCookieConsent = false" class="rounded-lg bg-blue-600 px-4 py-2 text-[10px] font-black text-white hover:bg-blue-700 transition-colors">
+          <button @click="acceptCookieConsent" class="rounded-lg bg-blue-600 px-4 py-2 text-[10px] font-black text-white hover:bg-blue-700 transition-colors">
             Kabul Et
           </button>
         </div>
