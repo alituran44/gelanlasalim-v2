@@ -96,7 +96,6 @@ const allFeatures = computed(() => [
   { text: t('feat_ekap_results'), col: 1 },
   { text: t('feat_direct_proc'), col: 1 },
   { text: t('feat_sales_leases'), col: 1 },
-  { text: t('feat_kik_decisions'), col: 1 },
   { text: t('feat_limit_calc'), col: 1 },
   // Column 2
   { text: t('feat_search_suggest'), col: 2 },
@@ -351,13 +350,6 @@ function completeCheckout() {
         >
           {{ t('pricing_renewal_btn') }} <ArrowRight :size="14" />
         </button>
-      </div>
-
-      <!-- DISCLAIMER TEXT (Kırmızı uyarı yazısı) -->
-      <div class="text-center pt-4">
-        <p class="text-[10px] font-semibold leading-relaxed max-w-4xl mx-auto text-red-500">
-          {{ t('pricing_disclaimer') }}
-        </p>
       </div>
 
     </div>
