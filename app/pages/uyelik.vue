@@ -151,7 +151,7 @@ function handleDemoLogin(role: 'buyer' | 'supplier') {
 
       <!-- Header brand -->
       <div class="relative z-10 flex items-center gap-2.5">
-        <img src="/logo.png" alt="GelAnlaşalım" class="h-9 w-auto brightness-0 invert" />
+        <img src="/logo.png" alt="GelAnlaşalım Üyelik ve Kayıt Sayfası Logosu" class="h-9 w-auto brightness-0 invert" />
       </div>
 
       <!-- Main presentation -->

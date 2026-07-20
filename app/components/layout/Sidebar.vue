@@ -111,7 +111,7 @@ const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
 
     <!-- Logo Alanı -->
     <div class="px-6 py-5 border-b flex justify-start" style="border-color: rgba(255,255,255,0.08);">
-      <img src="/logo.png" alt="GelAnlaşalım" class="h-8 w-auto brightness-0 invert" />
+      <img src="/logo.png" alt="GelAnlaşalım B2B Kurumsal Logo" class="h-8 w-auto brightness-0 invert" />
     </div>
 
     <!-- Rol Etiketi -->

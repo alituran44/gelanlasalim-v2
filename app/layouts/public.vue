@@ -53,7 +53,7 @@ const activeTenders = ref([
 
         <!-- Sol: Logo -->
         <NuxtLink to="/" class="flex items-center gap-2 hover:opacity-90 transition shrink-0">
-          <img src="/logo.png" alt="GelAnlaşalım" class="h-9 w-auto" />
+          <img src="/logo.png" alt="GelAnlaşalım B2B Tersine İhale Platformu Logo" class="h-9 w-auto" />
         </NuxtLink>
 
         <!-- Orta: Nav Linkleri -->
@@ -170,7 +170,7 @@ const activeTenders = ref([
           <!-- Column 1: Brand Info -->
           <div class="md:col-span-4 flex flex-col gap-5 text-left">
             <div class="flex items-center gap-2.5">
-              <img src="/logo.png" alt="GelAnlaşalım" class="h-9 w-auto" />
+              <img src="/logo.png" alt="GelAnlaşalım B2B Platformu Logo" class="h-9 w-auto" />
             </div>
             
             <p class="text-xs leading-relaxed font-medium text-slate-500">
