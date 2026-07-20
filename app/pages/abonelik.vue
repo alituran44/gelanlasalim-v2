@@ -20,7 +20,7 @@ const subscriptionPackages = computed(() => {
         name: 'Membership application - 1 month', 
         price: 25, 
         monthly: '$25.00 / month',
-        desc: '1 Month uninterrupted EKAP and tender monitoring membership.',
+        desc: '1 month subscription fee',
         isPromo: false
       },
       { 
@@ -28,7 +28,7 @@ const subscriptionPackages = computed(() => {
         name: 'Membership application - 3 months', 
         price: 70, 
         monthly: '$23.33 / month',
-        desc: '3 Months uninterrupted EKAP and tender monitoring membership.',
+        desc: '3 months subscription fee',
         isPromo: true
       },
       { 
@@ -36,15 +36,15 @@ const subscriptionPackages = computed(() => {
         name: 'Membership application - 6 months', 
         price: 135, 
         monthly: '$22.50 / month',
-        desc: '6 Months uninterrupted EKAP and tender monitoring membership.',
+        desc: '6 months subscription fee',
         isPromo: false
       },
       { 
         id: '9-ay', 
         name: 'Membership application - 9 months', 
-        price: 210, 
-        monthly: '$23.33 / month',
-        desc: '9 Months uninterrupted EKAP and tender monitoring membership.',
+        price: 190, 
+        monthly: '$21.11 / month',
+        desc: '9 months subscription fee',
         isPromo: false
       }
     ]
@@ -55,7 +55,7 @@ const subscriptionPackages = computed(() => {
         name: 'Üyelik başvurusu - 1 ay', 
         price: 900, 
         monthly: '₺900,00 / ay',
-        desc: '1 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
+        desc: '1 aylık abonelik bedeli',
         isPromo: false
       },
       { 
@@ -63,7 +63,7 @@ const subscriptionPackages = computed(() => {
         name: 'Üyelik başvurusu - 3 ay', 
         price: 1800, 
         monthly: '₺600,00 / ay',
-        desc: '3 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
+        desc: '3 aylık abonelik bedeli',
         isPromo: true
       },
       { 
@@ -71,7 +71,7 @@ const subscriptionPackages = computed(() => {
         name: 'Üyelik başvurusu - 6 ay', 
         price: 2700, 
         monthly: '₺450,00 / ay',
-        desc: '6 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
+        desc: '6 aylık abonelik bedeli',
         isPromo: false
       },
       { 
@@ -79,7 +79,7 @@ const subscriptionPackages = computed(() => {
         name: 'Üyelik başvurusu - 9 ay', 
         price: 3600, 
         monthly: '₺400,00 / ay',
-        desc: '9 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
+        desc: '9 aylık abonelik bedeli',
         isPromo: false
       }
     ]
