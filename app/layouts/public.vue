@@ -199,18 +199,18 @@ const activeTenders = ref([
             </div>
             
             <p class="text-xs leading-relaxed font-medium text-slate-500">
-              B2B satın alma taleplerini, tedarikçi tekliflerini ve karar kayıtlarını tek ters ihale akışında yöneten kurumsal platform.
+              {{ locale === 'tr' ? 'B2B satın alma taleplerini, tedarikçi tekliflerini ve karar kayıtlarını tek ters ihale akışında yöneten kurumsal platform.' : 'Enterprise platform managing B2B procurement requests, supplier bids, and decision records in a single reverse auction workflow.' }}
             </p>
 
             <!-- Status badges -->
             <div class="flex flex-wrap gap-2 pt-1">
               <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-100 px-2.5 py-1 text-[9px] font-black text-blue-700 uppercase tracking-wide">
                 <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-                KVKK Kapsamında
+                {{ locale === 'tr' ? 'KVKK Kapsamında' : 'KVKK Compliant' }}
               </span>
               <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-100 px-2.5 py-1 text-[9px] font-black text-blue-700 uppercase tracking-wide">
                 <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-                HTTPS/TLS Şifreli
+                {{ locale === 'tr' ? 'HTTPS/TLS Şifreli' : 'HTTPS/TLS Encrypted' }}
               </span>
             </div>
 
@@ -235,36 +235,36 @@ const activeTenders = ref([
 
           <!-- Column 2: Platform Links -->
           <div class="md:col-span-2 flex flex-col gap-4 text-left">
-            <h4 class="text-xs font-black uppercase text-blue-600 tracking-wider">PLATFORM</h4>
+            <h4 class="text-xs font-black uppercase text-blue-600 tracking-wider">{{ locale === 'tr' ? 'PLATFORM' : 'PLATFORM' }}</h4>
             <div class="flex flex-col gap-4 sm:gap-3 text-[11px] font-bold text-slate-700">
-              <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors py-1">Nasıl Çalışır</a>
-              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors py-1">Özellikler</a>
-              <NuxtLink to="/abonelik" class="hover:text-blue-600 transition-colors py-1">Fiyatlandırma</NuxtLink>
-              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors py-1">Pazar Yeri</a>
-              <NuxtLink to="/entegrasyonlar" class="hover:text-blue-600 transition-colors py-1">Entegrasyonlar</NuxtLink>
-              <a href="#sss" class="hover:text-blue-600 transition-colors py-1">Yardım Merkezi</a>
+              <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Nasıl Çalışır' : 'How it Works' }}</a>
+              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Özellikler' : 'Features' }}</a>
+              <NuxtLink to="/abonelik" class="hover:text-blue-600 transition-colors py-1">{{ t('pricing') }}</NuxtLink>
+              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Pazar Yeri' : 'Marketplace' }}</a>
+              <NuxtLink to="/entegrasyonlar" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Entegrasyonlar' : 'Integrations' }}</NuxtLink>
+              <a href="#sss" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Yardım Merkezi' : 'Help Center' }}</a>
             </div>
           </div>
 
           <!-- Column 3: Company Links -->
           <div class="md:col-span-2 flex flex-col gap-4 text-left">
-            <h4 class="text-xs font-black uppercase text-blue-600 tracking-wider">ŞİRKET</h4>
+            <h4 class="text-xs font-black uppercase text-blue-600 tracking-wider">{{ locale === 'tr' ? 'ŞİRKET' : 'COMPANY' }}</h4>
             <div class="flex flex-col gap-4 sm:gap-3 text-[11px] font-bold text-slate-700">
-              <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="hover:text-blue-600 transition-colors py-1">Hakkımızda</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=kariyer" class="hover:text-blue-600 transition-colors py-1">Kariyer</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors py-1">Blog</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors py-1">Basın Odası</NuxtLink>
-              <a href="#sss" class="hover:text-blue-600 transition-colors py-1">İletişim</a>
-              <NuxtLink to="/sozlesmeler?tab=is-ortakligi" class="hover:text-blue-600 transition-colors py-1">İş Ortaklığı Programı</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Hakkımızda' : 'About Us' }}</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=kariyer" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Kariyer' : 'Careers' }}</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Blog' : 'Blog' }}</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Basın Odası' : 'Press Room' }}</NuxtLink>
+              <a href="#sss" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'İletişim' : 'Contact' }}</a>
+              <NuxtLink to="/sozlesmeler?tab=is-ortakligi" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'İş Ortaklığı Programı' : 'Partnership Program' }}</NuxtLink>
             </div>
           </div>
 
           <!-- Column 4: Contact details -->
           <div class="md:col-span-4 flex flex-col gap-5 text-left">
             <div class="space-y-3">
-              <h4 class="text-xs font-black uppercase tracking-wider" style="color: #003057;">İLETİŞİM</h4>
+              <h4 class="text-xs font-black uppercase tracking-wider" style="color: #003057;">{{ locale === 'tr' ? 'İLETİŞİM' : 'CONTACT' }}</h4>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium whitespace-pre-line">
-                {{ cmsData.contact ? cmsData.contact.address : 'Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül,\nBalıkesir, Türkiye' }}
+                {{ locale === 'tr' ? (cmsData.contact ? cmsData.contact.address : 'Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül,\nBalıkesir, Türkiye') : 'Bahcelievler District 5083 Street, No:11/A Altieylul,\nBalikesir, Turkey' }}
               </p>
               <div class="text-[11px] font-bold text-slate-700 space-y-3">
                 <a :href="'mailto:' + (cmsData.contact ? cmsData.contact.email : 'info@gelanlasalim.com')" class="block hover:text-[#1EAE4C] py-1">
@@ -277,10 +277,10 @@ const activeTenders = ref([
             </div>
 
             <div class="space-y-2">
-              <h4 class="text-xs font-black uppercase text-[#003057] tracking-wider">DESTEK SAATLERİ</h4>
+              <h4 class="text-xs font-black uppercase text-[#003057] tracking-wider">{{ locale === 'tr' ? 'DESTEK SAATLERİ' : 'SUPPORT HOURS' }}</h4>
               <p class="text-[11px] text-slate-500 font-medium leading-relaxed">
-                {{ cmsData.contact ? cmsData.contact.workHoursWeekdays : 'Pazartesi - Cuma: 09:00 - 18:00' }} <br />
-                {{ cmsData.contact ? cmsData.contact.workHoursSaturday : 'Cumartesi: 10:00 - 14:00' }}
+                {{ locale === 'tr' ? (cmsData.contact ? cmsData.contact.workHoursWeekdays : 'Pazartesi - Cuma: 09:00 - 18:00') : 'Monday - Friday: 09:00 - 18:00' }} <br />
+                {{ locale === 'tr' ? (cmsData.contact ? cmsData.contact.workHoursSaturday : 'Cumartesi: 10:00 - 14:00') : 'Saturday: 10:00 - 14:00' }}
               </p>
             </div>
           </div>
@@ -290,11 +290,11 @@ const activeTenders = ref([
         <hr class="border-slate-200 my-10" />
 
         <div class="flex flex-col sm:flex-row items-center justify-between gap-6 text-[10px] text-slate-400 font-black uppercase tracking-wider">
-          <div>© 2026 GelAnlaşalım. Tüm Hakları Saklıdır.</div>
+          <div>© 2026 {{ locale === 'tr' ? 'GelAnlaşalım. Tüm Hakları Saklıdır.' : 'GelAnlasalim. All Rights Reserved.' }}</div>
           <div class="flex flex-wrap gap-x-6 gap-y-3 justify-center sm:justify-end">
-            <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors py-1">KVKK Metni</NuxtLink>
-            <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors py-1">Kullanım Koşulları</NuxtLink>
-            <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors py-1">Gizlilik Politikası</NuxtLink>
+            <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'KVKK Metni' : 'KVKK Policy' }}</NuxtLink>
+            <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Kullanım Koşulları' : 'Terms of Use' }}</NuxtLink>
+            <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy' }}</NuxtLink>
           </div>
         </div>
       </div>
