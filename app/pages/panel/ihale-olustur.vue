@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
   FilePlus2, 
@@ -24,23 +24,150 @@ const { cmsData, saveCmsData } = useCmsData()
 
 const form = ref({
   baslik: '',
-  kategori: 'Hammadde & Metal',
+  kategori: 'İnşaat ve Yapı',
   sure: '7 gün',
   butce: '',
   aciklama: '',
+  sehir: 'Balıkesir',
   teslimatAdresi: '',
   odemeYontemi: 'Vadeli 30 Gün',
   files: [] as { name: string; size: string; progress: number; type: string }[]
 })
 
-const categories = [
-  'Hammadde & Metal',
-  'Lojistik & Nakliye',
-  'Kırtasiye & Ofis',
-  'Teknoloji & Yazılım',
-  'İnşaat & Taahhüt',
-  'Enerji & Yakıt',
-  'Pazarlama & Reklam'
+// Subcategory Map (Photo 4 Alt Kategoriler)
+const categoryMap = {
+  'İnşaat ve Yapı': [
+    'Anahtar Teslim İnşaat', 'Konut İnşaatı', 'Ticari Bina İnşaatı', 'Fabrika İnşaatı', 'Yol Yapımı',
+    'Köprü Yapımı', 'Altyapı Çalışmaları', 'Kanalizasyon', 'İçme Suyu Hatları', 'Doğalgaz Hatları',
+    'Elektrik Altyapısı', 'Çatı İşleri', 'Cephe Kaplama', 'Mantolama', 'Boya Badana',
+    'Seramik Döşeme', 'Mermer İşleri', 'Demir-Çelik İşleri', 'Kalıp ve İskele', 'Beton İşleri',
+    'Asfalt', 'Parke', 'Peyzaj', 'Yıkım İşleri', 'Restorasyon'
+  ],
+  'Gayrimenkul': [
+    'Arsa', 'Tarla', 'Bağ', 'Bahçe', 'Konut', 'Villa', 'Daire', 'Ofis', 'Dükkan', 'Plaza',
+    'Fabrika', 'Depo', 'AVM', 'Otel', 'Turistik Tesis', 'Kiralık Gayrimenkul', 'Satılık Gayrimenkul'
+  ],
+  'Araç ve İş Makineleri': [
+    'Otomobil', 'Ticari Araç', 'Kamyon', 'Tır', 'Otobüs', 'Minibüs', 'Traktör', 'İş Makinesi',
+    'Ekskavatör', 'Loder', 'Greyder', 'Silindir', 'Forklift', 'Vinç', 'Jeneratör', 'Römork',
+    'Araç Kiralama', 'İş Makinesi Kiralama'
+  ],
+  'Sanayi ve Makine': [
+    'Üretim Makineleri', 'CNC', 'Torna', 'Freze', 'Pres', 'Kompresör', 'Konveyör', 'Paketleme Makinesi',
+    'Gıda Makinesi', 'Plastik Makinesi', 'Tekstil Makinesi', 'Ahşap İşleme', 'Kaynak Makinesi',
+    'Robotik Sistemler', 'Endüstriyel Otomasyon'
+  ],
+  'Bilgisayar ve Teknoloji': [
+    'Masaüstü Bilgisayar', 'Laptop', 'Sunucu', 'Veri Depolama', 'Ağ Sistemleri', 'Firewall',
+    'Yazıcı', 'Tarayıcı', 'Yazılım Lisansları', 'ERP', 'CRM', 'Web Yazılımı', 'Mobil Uygulama',
+    'Bulut Hizmetleri', 'Siber Güvenlik', 'Yapay Zeka', 'SEO', 'GEO', 'Veri Analizi'
+  ],
+  'Elektronik': [
+    'Telefon', 'Tablet', 'Kamera', 'Güvenlik Kamerası', 'Alarm Sistemleri', 'Televizyon',
+    'Ses Sistemleri', 'Projektör', 'UPS', 'Elektronik Kartlar', 'Akıllı Ev Sistemleri'
+  ],
+  'Mobilya ve Ofis': [
+    'Büro Mobilyası', 'Okul Mobilyası', 'Hastane Mobilyası', 'Otel Mobilyası', 'Raf Sistemleri',
+    'Dosyalama Sistemleri', 'Toplantı Masaları', 'Ofis Sandalyeleri', 'Bekleme Koltukları'
+  ],
+  'Sağlık ve Medikal': [
+    'Tıbbi Cihazlar', 'Laboratuvar Cihazları', 'Sarf Malzemeleri', 'Hastane Mobilyaları',
+    'Ambulans', 'Medikal Gaz Sistemleri', 'Röntgen', 'MR', 'Ultrason', 'Dental Ürünler'
+  ],
+  'Eğitim': [
+    'Akıllı Tahta', 'Bilgisayar Laboratuvarı', 'Eğitim Yazılımları', 'Online Eğitim',
+    'Eğitim Danışmanlığı', 'Kurs Hizmetleri', 'Kitap', 'Kırtasiye', 'Laboratuvar Malzemeleri'
+  ],
+  'Gıda ve Catering': [
+    'Hazır Yemek', 'Catering', 'Personel Yemeği', 'Kumanya', 'Et Ürünleri', 'Süt Ürünleri',
+    'Sebze Meyve', 'Unlu Mamuller', 'İçecek', 'Kuru Gıda'
+  ],
+  'Tekstil ve Giyim': [
+    'İş Elbiseleri', 'Okul Kıyafetleri', 'Güvenlik Kıyafetleri', 'Promosyon Tekstil',
+    'Ayakkabı', 'Bot', 'Eldiven', 'Kişisel Koruyucu Donanım'
+  ],
+  'Tarım ve Hayvancılık': [
+    'Gübre', 'Tohum', 'Sulama Sistemleri', 'Tarım Makinaları', 'Traktör', 'Sera', 'Hayvan Yemi',
+    'Veteriner Ürünleri', 'Büyükbaş', 'Küçükbaş', 'Kanatlı Hayvan'
+  ],
+  'Enerji': [
+    'Güneş Enerjisi', 'Rüzgar Enerjisi', 'Jeneratör', 'Elektrik Malzemeleri', 'Trafo',
+    'LED Aydınlatma', 'Enerji Verimliliği', 'Şarj İstasyonları'
+  ],
+  'Çevre ve Geri Dönüşüm': [
+    'Atık Yönetimi', 'Geri Dönüşüm', 'Hurda', 'Çevre Danışmanlığı', 'Arıtma Tesisi',
+    'Tehlikeli Atık', 'Sıfır Atık', 'Temizlik Araçları'
+  ],
+  'Lojistik ve Taşımacılık': [
+    'Karayolu Taşımacılığı', 'Denizyolu', 'Havayolu', 'Demiryolu', 'Depolama', 'Soğuk Zincir',
+    'Kargo', 'Kurye', 'Nakliye'
+  ],
+  'Güvenlik Sistemleri': [
+    'Kamera Sistemleri', 'Alarm Sistemleri', 'Yangın Alarmı', 'Kartlı Geçiş', 'Turnike',
+    'X-Ray', 'Bariyer', 'Bekçi Tur Sistemi'
+  ],
+  'Temizlik Hizmetleri': [
+    'Bina Temizliği', 'Hastane Temizliği', 'Okul Temizliği', 'Fabrika Temizliği', 'Cam Temizliği',
+    'Halı Yıkama', 'İlaçlama', 'Çöp Toplama'
+  ],
+  'Turizm ve Konaklama': [
+    'Otel Hizmeti', 'Konaklama', 'Uçak Bileti', 'Araç Kiralama', 'Organizasyon', 'Rehberlik',
+    'Tur Paketleri'
+  ],
+  'Reklam ve Medya': [
+    'Dijital Pazarlama', 'SEO', 'GEO', 'Google Ads', 'Sosyal Medya Yönetimi', 'Grafik Tasarım',
+    'Logo Tasarımı', 'Baskı Hizmetleri', 'Video Prodüksiyon', 'Fotoğraf Çekimi', 'Tanıtım Filmi'
+  ],
+  'Ambalaj ve Baskı': [
+    'Karton Kutu', 'Etiket', 'Poşet', 'Koli', 'Promosyon Ürünleri', 'Matbaa', 'Dijital Baskı',
+    'Ofset Baskı'
+  ],
+  'Telekomünikasyon': [
+    'Fiber Altyapı', 'IP Telefon', 'Santral', 'İnternet Hizmeti', 'GSM Hizmetleri', 'Baz İstasyonu'
+  ],
+  'Danışmanlık': [
+    'Hukuk Danışmanlığı', 'Mali Müşavirlik', 'İnsan Kaynakları', 'Kalite Yönetimi',
+    'ISO Belgelendirme', 'Proje Danışmanlığı', 'Eğitim Danışmanlığı'
+  ],
+  'Sigorta': [
+    'Araç Sigortası', 'Sağlık Sigortası', 'İş Yeri Sigortası', 'Nakliyat Sigortası',
+    'İnşaat Sigortası', 'Hayat Sigortası'
+  ],
+  'Finans': [
+    'Finansal Danışmanlık', 'Leasing', 'Faktoring', 'Kredi Hizmetleri', 'POS Hizmetleri',
+    'Ödeme Sistemleri'
+  ],
+  'Hukuk Hizmetleri': [
+    'Avukatlık', 'Arabuluculuk', 'İcra Takibi', 'Sözleşme Hazırlama', 'Marka Tescili',
+    'Patent İşlemleri'
+  ],
+  'Bakım ve Onarım': [
+    'Elektrik Bakımı', 'Mekanik Bakım', 'Asansör Bakımı', 'Klima Bakımı', 'Makine Bakımı',
+    'Bilgisayar Bakımı', 'Sunucu Bakımı'
+  ],
+  'Organizasyon ve Etkinlik': [
+    'Fuar Organizasyonu', 'Kongre', 'Seminer', 'Konser', 'Festival', 'Catering',
+    'Sahne Sistemleri', 'Ses ve Işık Sistemleri'
+  ],
+  'Diğer': [
+    'Muhtelif Alımlar', 'Karma İhaleler', 'Özel Projeler', 'Açık Artırmalar', 'Tasfiye Satışları',
+    'Hurda Satışları', 'İkinci El Ürünler'
+  ]
+}
+
+const categories = Object.keys(categoryMap)
+
+const cities = [
+  'Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Aksaray', 'Amasya', 'Ankara', 'Antalya',
+  'Ardahan', 'Artvin', 'Aydın', 'Balıkesir', 'Bartın', 'Batman', 'Bayburt', 'Bilecik',
+  'Bingöl', 'Bitlis', 'Bolu', 'Burdur', 'Bursa', 'Çanakkale', 'Çankırı', 'Çorum',
+  'Denizli', 'Diyarbakır', 'Düzce', 'Edirne', 'Elazığ', 'Erzincan', 'Erzurum', 'Eskişehir',
+  'Gaziantep', 'Giresun', 'Gümüşhane', 'Hakkari', 'Hatay', 'Iğdır', 'Isparta', 'İstanbul',
+  'İzmir', 'Kahramanmaraş', 'Karabük', 'Karaman', 'Kars', 'Kastamonu', 'Kayseri', 'Kırıkkale',
+  'Kırklareli', 'Kırşehir', 'Kilis', 'Kocaeli', 'Konya', 'Kütahya', 'Malatya', 'Manisa',
+  'Mardin', 'Mersin', 'Muğla', 'Muş', 'Nevşehir', 'Niğde', 'Ordu', 'Osmaniye', 'Rize',
+  'Sakarya', 'Samsun', 'Siirt', 'Sinop', 'Sivas', 'Şanlıurfa', 'Şırnak', 'Tekirdağ',
+  'Tokat', 'Trabzon', 'Tunceli', 'Uşak', 'Van', 'Yalova', 'Yozgat', 'Zonguldak'
 ]
 
 const durations = [
@@ -117,15 +244,18 @@ function handleSubmit() {
   const newId = 'IHC-2026-' + Math.floor(100 + Math.random() * 900)
   createdId.value = newId
 
+  const combinedCategory = `${form.value.kategori} / ${selectedSubcategory.value}`
+
   // Add to active tenders list
   cmsData.value.dashboard.tenders.unshift({
     id: newId,
     baslik: form.value.baslik,
-    kategori: form.value.kategori,
+    kategori: combinedCategory,
     sure: form.value.sure,
     teklifSayisi: 0,
     durum: 'active',
     butce: budgetVal,
+    city: form.value.sehir,
     olusturma: 'Bugün'
   })
 
@@ -133,7 +263,7 @@ function handleSubmit() {
   cmsData.value.dashboard.receivedBids.unshift({
     id: newId,
     baslik: form.value.baslik,
-    kategori: form.value.kategori,
+    kategori: combinedCategory,
     bitis: form.value.sure,
     teklifler: []
   })
@@ -195,16 +325,28 @@ function handleSubmit() {
           />
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <!-- Kategori -->
           <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">İHALE KATEGORİSİ</label>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">ANA KATEGORİ</label>
             <select 
               v-model="form.kategori" 
               class="w-full rounded-lg border p-3 text-xs outline-none bg-white transition focus:border-blue-600"
               style="border-color: #CBD5E1; color: #0F172A;"
             >
               <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+            </select>
+          </div>
+
+          <!-- Alt Kategori (Photo 4 Alt Kategoriler) -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">ALT KATEGORİ *</label>
+            <select 
+              v-model="selectedSubcategory" 
+              class="w-full rounded-lg border p-3 text-xs outline-none bg-white transition focus:border-blue-600"
+              style="border-color: #CBD5E1; color: #0F172A;"
+            >
+              <option v-for="sub in currentSubcategories" :key="sub" :value="sub">{{ sub }}</option>
             </select>
           </div>
 
@@ -246,7 +388,7 @@ function handleSubmit() {
       <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
         <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">2. Lojistik & Ödeme Şartları</h2>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- Ödeme Yöntemi Tercihi -->
           <div>
             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">ÖDEME YÖNTEMİ TERCİHİ</label>
@@ -258,6 +400,21 @@ function handleSubmit() {
                 style="border-color: #CBD5E1; color: #0F172A;"
               >
                 <option v-for="method in paymentMethods" :key="method" :value="method">{{ method }}</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- İl / Bölge Seçimi -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">TESLİMAT İLİ / BÖLGESİ *</label>
+            <div class="relative">
+              <MapPin :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <select 
+                v-model="form.sehir" 
+                class="w-full pl-9 pr-4 py-3 rounded-lg border text-xs outline-none bg-white transition focus:border-blue-600 font-bold"
+                style="border-color: #CBD5E1; color: #0F172A;"
+              >
+                <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
               </select>
             </div>
           </div>
@@ -277,6 +434,18 @@ function handleSubmit() {
               ></textarea>
             </div>
           </div>
+        </div>
+
+        <!-- Kategori Öner Modülü (Photo 3 Kategori Öner) -->
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
+          <span>Aradığınız sektörel kategoriyi listede bulamadınız mı?</span>
+          <button 
+            type="button" 
+            @click="showSuggestModal = true" 
+            class="text-blue-600 hover:text-blue-700 font-bold flex items-center gap-1 hover:underline"
+          >
+            🚀 Yeni Kategori Öner
+          </button>
         </div>
       </div>
 
@@ -392,5 +561,55 @@ function handleSubmit() {
       </div>
 
     </form>
+
+    <!-- Kategori Öneri Modalı (Photo 3 Kategori Öner) -->
+    <div v-if="showSuggestModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 max-w-md w-full shadow-2xl text-left space-y-4">
+        <div class="flex justify-between items-start">
+          <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">YENİ KATEGORİ ÖNER</h3>
+          <button @click="showSuggestModal = false" class="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition">
+            <X :size="16" />
+          </button>
+        </div>
+        
+        <p class="text-xs text-slate-500 leading-relaxed font-medium">
+          Platformumuzda ihale açarken veya teklif verirken görmek istediğiniz sektörel kategorileri önerin, hemen ekleyelim.
+        </p>
+
+        <div v-if="suggestSuccess" class="p-3 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-800 text-xs font-bold text-center">
+          Kategori öneriniz alınmıştır, teşekkür ederiz!
+        </div>
+
+        <div v-else class="space-y-3">
+          <div>
+            <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">ÖNERİLEN KATEGORİ ADI *</label>
+            <input 
+              v-model="suggestedCategory" 
+              type="text" 
+              required
+              placeholder="Örn: Medikal Cihaz Yedek Parçaları" 
+              class="w-full rounded-xl border p-3 text-xs outline-none focus:border-blue-600 text-slate-800"
+              style="border-color: #E2E8F0;"
+            />
+          </div>
+          <div>
+            <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-1">AÇIKLAMA (OPSİYONEL)</label>
+            <textarea 
+              v-model="suggestedDesc" 
+              rows="2" 
+              placeholder="Neden bu kategoriye ihtiyaç duyduğunuzu kısaca açıklayabilirsiniz..." 
+              class="w-full rounded-xl border p-3 text-xs outline-none focus:border-blue-600 resize-none text-slate-800"
+              style="border-color: #E2E8F0;"
+            ></textarea>
+          </div>
+        </div>
+        
+        <div class="flex gap-2 justify-end pt-2">
+          <button type="button" @click="showSuggestModal = false" class="rounded-xl border px-4 py-2.5 text-xs font-bold text-slate-500 hover:bg-slate-50" style="border-color: #E2E8F0;">İptal</button>
+          <button type="button" @click="submitCategorySuggestion" class="rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-blue-700 transition">Öneriyi Gönder</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>

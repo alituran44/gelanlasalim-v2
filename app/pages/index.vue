@@ -18,7 +18,9 @@ import {
   Handshake,
   CheckCircle2,
   AlertCircle,
-  Plus
+  Plus,
+  Star,
+  X
 } from 'lucide-vue-next'
 
 // Nuxt Layout Meta
@@ -194,6 +196,120 @@ function submitContactForm() {
   }, 1200)
 }
 
+// Firma Profilleri ve Yorumlar Veritabanı (Photo 2 / 4 / 5 Feedbacks)
+const companyProfiles: Record<string, {
+  name: string
+  verified: boolean
+  sector: string
+  phone: string
+  email: string
+  address: string
+  kep: string
+  mersis: string
+  rating: number
+  reviews: Array<{ author: string, company: string, rating: number, comment: string, date: string }>
+}> = {
+  'Anadolu E-Ticaret A.Ş.': {
+    name: 'Anadolu E-Ticaret A.Ş.',
+    verified: true,
+    sector: 'Matbaa, Kırtasiye ve Ambalaj / Bilişim',
+    phone: '+90 (312) 444 0 262',
+    email: 'info@anadoluecommerce.com',
+    address: 'Çankaya, Ankara, Türkiye',
+    kep: 'anadoluecommerce@hs01.kep.tr',
+    mersis: '0086-0442-9910-0015',
+    rating: 4.9,
+    reviews: [
+      { author: 'Kemal Yılmaz', company: 'Yılmaz Lojistik A.Ş.', rating: 5, comment: 'Süreç yönetimi ve ambalaj kalitesinden son derece memnun kaldık. Zamanında teslimat.', date: '12 Haz 2026' },
+      { author: 'Derya Bulut', company: 'Grafik Tasarım Ofisi', rating: 4.8, comment: 'Canlı ihale aşamasında çok profesyonel davrandılar. Güvenilir iş ortağı.', date: '28 May 2026' },
+      { author: 'Can Demir', company: 'Demir İnşaat Ltd.', rating: 5, comment: 'Kurumsal satıcı şartnamelerine tam uyum sağlayan mükemmel bir operasyon.', date: '10 Nis 2026' }
+    ]
+  },
+  'Marmara Teknoloji Yatırımları A.Ş.': {
+    name: 'Marmara Teknoloji Yatırımları A.Ş.',
+    verified: true,
+    sector: 'Teknoloji, Donanım ve Entegrasyon',
+    phone: '+90 (212) 222 34 56',
+    email: 'contact@marmaratech.com',
+    address: 'Levent, İstanbul, Türkiye',
+    kep: 'marmaratech@hs01.kep.tr',
+    mersis: '0612-0894-3310-0022',
+    rating: 4.7,
+    reviews: [
+      { author: 'Ahmet Yıldız', company: 'Yıldız Ambalaj Sanayi', rating: 4.5, comment: 'Entegrasyon süreçlerinde teknik ekipleri son derece destekleyiciydi.', date: '04 Tem 2026' },
+      { author: 'Elif Kaya', company: 'Kaya Mimarlık', rating: 5, comment: 'Teknoloji donanım ihalemizde en rekabetçi ve şeffaf teklifleri sundular.', date: '15 Haz 2026' }
+    ]
+  },
+  'Bursa Endüstri Üretim A.Ş.': {
+    name: 'Bursa Endüstri Üretim A.Ş.',
+    verified: true,
+    sector: 'Sanayi, Yedek Parça ve Makine',
+    phone: '+90 (224) 444 16 16',
+    email: 'info@bursaindustry.com.tr',
+    address: 'Nilüfer OSB, Bursa, Türkiye',
+    kep: 'bursaindustry@hs01.kep.tr',
+    mersis: '0188-0234-9912-0048',
+    rating: 4.8,
+    reviews: [
+      { author: 'Selin Şahin', company: 'Pazarlama Acentesi', rating: 4.8, comment: 'Fason yedek parça üretim standartları yüksek. Denetim süreçlerinden başarıyla geçtiler.', date: '19 Haz 2026' }
+    ]
+  },
+  'Ege Gıda Sanayi Ltd. Şti.': {
+    name: 'Ege Gıda Sanayi Ltd. Şti.',
+    verified: true,
+    sector: 'Tarım, Gıda ve Paketleme',
+    phone: '+90 (232) 777 88 99',
+    email: 'satis@egefood.com',
+    address: 'Bornova, İzmir, Türkiye',
+    kep: 'egegida@hs01.kep.tr',
+    mersis: '0344-0125-7734-0019',
+    rating: 4.6,
+    reviews: [
+      { author: 'Mehmet Öz', company: 'Mali Müşavirlik', rating: 4.6, comment: 'Gıda tedarik sözleşmelerinde şartname kriterlerine tam sadakat gösteriyorlar.', date: '01 Tem 2026' }
+    ]
+  },
+  'Atlas Holding A.Ş.': {
+    name: 'Atlas Holding A.Ş.',
+    verified: true,
+    sector: 'Lojistik, Taşımacılık ve Depolama',
+    phone: '+90 (216) 555 12 34',
+    email: 'operasyon@atlasholding.com.tr',
+    address: 'Ataşehir, İstanbul, Türkiye',
+    kep: 'atlasholding@hs01.kep.tr',
+    mersis: '0077-0941-2245-0012',
+    rating: 4.9,
+    reviews: [
+      { author: 'Onur Koç', company: 'E-Ticaret Danışmanlığı', rating: 5, comment: 'Lojistik ve sevkiyat takip sistemleri çok gelişmiş. Güven veren işleyiş.', date: '10 Tem 2026' }
+    ]
+  }
+}
+
+const showCompanyModal = ref(false)
+const selectedCompany = ref<any>(null)
+
+function openCompanyModal(companyName: string) {
+  const profile = companyProfiles[companyName]
+  if (profile) {
+    selectedCompany.value = profile
+  } else {
+    selectedCompany.value = {
+      name: companyName,
+      verified: false,
+      sector: 'Genel B2B Tedarik ve Hizmet',
+      phone: '+90 (850) 888 00 00',
+      email: 'info@' + companyName.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '') + '.com',
+      address: 'Türkiye',
+      kep: companyName.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '') + '@hs01.kep.tr',
+      mersis: '0XXX-XXXX-XXXX-XXXX',
+      rating: 4.5,
+      reviews: [
+        { author: 'Sistem Yöneticisi', company: 'GelAnlaşalım Platformu', rating: 5, comment: 'B2B platform üyesi kurumsal satıcı.', date: 'Temmuz 2026' }
+      ]
+    }
+  }
+  showCompanyModal.value = true
+}
+
 /* =========================================================
    FİLTRE STATE'LERİ
 ========================================================= */
@@ -230,169 +346,233 @@ const cities = [
 
 const detailedCategories = [
   {
-    name: 'İnşaat, Altyapı ve Yapı İşleri',
+    name: 'İnşaat ve Yapı',
     count: 248,
-    children: ['İnşaat Malzemeleri', 'Tadilat ve Renovasyon', 'Taahhüt İşleri', 'Yapı ve Yıkım İşleri']
+    children: [
+      'Anahtar Teslim İnşaat', 'Konut İnşaatı', 'Ticari Bina İnşaatı', 'Fabrika İnşaatı', 'Yol Yapımı',
+      'Köprü Yapımı', 'Altyapı Çalışmaları', 'Kanalizasyon', 'İçme Suyu Hatları', 'Doğalgaz Hatları',
+      'Elektrik Altyapısı', 'Çatı İşleri', 'Cephe Kaplama', 'Mantolama', 'Boya Badana',
+      'Seramik Döşeme', 'Mermer İşleri', 'Demir-Çelik İşleri', 'Kalıp ve İskele', 'Beton İşleri',
+      'Asfalt', 'Parke', 'Peyzaj', 'Yıkım İşleri', 'Restorasyon'
+    ]
   },
   {
-    name: 'Kanalizasyon, Boru ve Tesisat',
-    count: 61,
-    children: ['Boru ve Bağlantı Elemanları', 'Su Tesisatı', 'Doğalgaz Tesisatı', 'Sıhhi Tesisat']
+    name: 'Gayrimenkul',
+    count: 122,
+    children: [
+      'Arsa', 'Tarla', 'Bağ', 'Bahçe', 'Konut', 'Villa', 'Daire', 'Ofis', 'Dükkan', 'Plaza',
+      'Fabrika', 'Depo', 'AVM', 'Otel', 'Turistik Tesis', 'Kiralık Gayrimenkul', 'Satılık Gayrimenkul'
+    ]
   },
   {
-    name: 'Kent Mobilyaları ve Prefabrik Yapılar',
-    count: 40,
-    children: ['Kent Mobilyaları', 'Prefabrik Yapılar', 'Konteyner', 'Doğramacılık']
-  },
-  {
-    name: 'Mühendislik, Mimarlık ve Danışmanlık',
-    count: 95,
-    children: ['Mimarlık Hizmetleri', 'Mühendislik Hizmetleri', 'Proje ve Çizim', 'Teknik Danışmanlık']
-  },
-  {
-    name: 'Madencilik, Sondaj ve Doğal Kaynaklar',
-    count: 24,
-    children: ['Madencilik', 'Sondaj', 'Doğal Kaynaklar', 'Hammadde']
-  },
-  {
-    name: 'Hırdavat, Metal ve Plastik Ürünler',
-    count: 106,
-    children: ['Hırdavat', 'Nalbur Malzemeleri', 'Metal Ürünler', 'Plastik Ürünler']
-  },
-  {
-    name: 'Enerji, Elektrik ve Aydınlatma',
-    count: 117,
-    children: ['Elektrik Malzemeleri', 'Aydınlatma', 'Güneş Enerjisi', 'Elektrik Tesisatı']
-  },
-  {
-    name: 'Yangın ve Güvenlik Sistemleri',
-    count: 94,
-    children: ['Yangın Algılama', 'Yangın Söndürme', 'Alarm Sistemleri', 'Güvenlik Ekipmanları']
-  },
-  {
-    name: 'Asansör ve Yapı Otomasyonu',
-    count: 75,
-    children: ['Asansör', 'Yürüyen Merdiven', 'Bina Otomasyonu', 'Geçiş Sistemleri']
-  },
-  {
-    name: 'Klima, Isıtma ve Havalandırma',
-    count: 207,
-    children: ['Klima', 'Soğutma', 'Isıtma', 'Havalandırma']
-  },
-  {
-    name: 'Endüstriyel Makine ve Üretim',
-    count: 323,
-    children: ['Endüstriyel Makine', 'Motor ve Redüktör', 'Konveyör', 'Üretim Ekipmanları']
-  },
-  {
-    name: 'Taşıt, İş Makinesi ve Yedek Parça',
+    name: 'Araç ve İş Makineleri',
     count: 271,
-    children: ['Otomobil', 'Ticari Araç', 'İş Makinesi', 'Yedek Parça']
+    children: [
+      'Otomobil', 'Ticari Araç', 'Kamyon', 'Tır', 'Otobüs', 'Minibüs', 'Traktör', 'İş Makinesi',
+      'Ekskavatör', 'Loder', 'Greyder', 'Silindir', 'Forklift', 'Vinç', 'Jeneratör', 'Römork',
+      'Araç Kiralama', 'İş Makinesi Kiralama'
+    ]
   },
   {
-    name: 'Nakliye, Lojistik ve Taşımacılık',
-    count: 169,
-    children: ['Kara Taşımacılığı', 'Personel Taşıma', 'Depolama', 'Dağıtım']
+    name: 'Sanayi ve Makine',
+    count: 323,
+    children: [
+      'Üretim Makineleri', 'CNC', 'Torna', 'Freze', 'Pres', 'Kompresör', 'Konveyör', 'Paketleme Makinesi',
+      'Gıda Makinesi', 'Plastik Makinesi', 'Tekstil Makinesi', 'Ahşap İşleme', 'Kaynak Makinesi',
+      'Robotik Sistemler', 'Endüstriyel Otomasyon'
+    ]
   },
   {
-    name: 'Turizm ve Organizasyon',
-    count: 68,
-    children: ['Otel Hizmetleri', 'Organizasyon', 'Seyahat', 'Etkinlik']
-  },
-  {
-    name: 'Reklam, Tanıtım ve Pazarlama',
-    count: 142,
-    children: ['Dijital Reklam', 'Tabela ve Baskı', 'Organizasyon', 'Promosyon']
-  },
-  {
-    name: 'Matbaa, Kırtasiye ve Ambalaj',
-    count: 337,
-    children: ['Matbaa', 'Kırtasiye', 'Toner ve Kartuş', 'Ambalaj']
-  },
-  {
-    name: 'Peyzaj, Bahçe ve Ormancılık',
-    count: 165,
-    children: ['Peyzaj', 'Bahçe Bakımı', 'Bitki ve Fidan', 'Ormancılık']
-  },
-  {
-    name: 'Sağlık, Medikal ve Tıbbi Cihaz',
-    count: 251,
-    children: ['Medikal Ürünler', 'Tıbbi Cihazlar', 'Laboratuvar Ekipmanları', 'Sarf Malzemeleri']
-  },
-  {
-    name: 'Akaryakıt, Yakıt ve Madeni Yağ',
-    count: 123,
-    children: ['Akaryakıt', 'Madeni Yağ', 'Endüstriyel Yağ', 'Yakıt Ürünleri']
-  },
-  {
-    name: 'Gıda, Tarım ve Catering',
-    count: 337,
-    children: ['Gıda Ürünleri', 'Tarım Ürünleri', 'Hazır Yemek', 'Catering']
-  },
-  {
-    name: 'Elektronik, Bilgisayar ve İletişim',
+    name: 'Bilgisayar ve Teknoloji',
     count: 352,
-    children: ['Bilgisayar ve Laptop', 'Sunucu ve Veri Merkezi', 'Network Ürünleri', 'Elektronik Ekipmanlar']
+    children: [
+      'Masaüstü Bilgisayar', 'Laptop', 'Sunucu', 'Veri Depolama', 'Ağ Sistemleri', 'Firewall',
+      'Yazıcı', 'Tarayıcı', 'Yazılım Lisansları', 'ERP', 'CRM', 'Web Yazılımı', 'Mobil Uygulama',
+      'Bulut Hizmetleri', 'Siber Güvenlik', 'Yapay Zeka', 'SEO', 'GEO', 'Veri Analizi'
+    ]
   },
   {
-    name: 'Yazılım, Bilişim ve Dijital Hizmetler',
-    count: 149,
-    children: ['Web Yazılım', 'Mobil Uygulama', 'Kurumsal Yazılım', 'Bulut Hizmetleri']
-  },
-  {
-    name: 'Kamera, Otomasyon ve Haberleşme',
+    name: 'Elektronik',
     count: 122,
-    children: ['Kamera Sistemleri', 'Otomasyon', 'Takip Sistemleri', 'Haberleşme']
+    children: [
+      'Telefon', 'Tablet', 'Kamera', 'Güvenlik Kamerası', 'Alarm Sistemleri', 'Televizyon',
+      'Ses Sistemleri', 'Projektör', 'UPS', 'Elektronik Kartlar', 'Akıllı Ev Sistemleri'
+    ]
   },
   {
-    name: 'Temizlik, İlaçlama ve Geri Dönüşüm',
-    count: 247,
-    children: ['Temizlik Hizmetleri', 'Temizlik Malzemeleri', 'İlaçlama', 'Geri Dönüşüm']
-  },
-  {
-    name: 'Kimyasal Maddeler ve Endüstriyel Ürünler',
-    count: 225,
-    children: ['Endüstriyel Kimyasallar', 'Dezenfektan', 'Boya ve Kaplama', 'Hammadde']
-  },
-  {
-    name: 'Tekstil, Giyim ve İş Kıyafetleri',
-    count: 273,
-    children: ['Tekstil', 'Personel Kıyafeti', 'İş Elbiseleri', 'Ayakkabı']
-  },
-  {
-    name: 'İş Sağlığı ve Güvenliği',
-    count: 131,
-    children: ['İSG Ekipmanları', 'Koruyucu Ekipman', 'İSG Hizmetleri', 'İş Güvenliği Eğitimi']
-  },
-  {
-    name: 'Mobilya, Ofis ve Dekorasyon',
+    name: 'Mobilya ve Ofis',
     count: 208,
-    children: ['Ofis Mobilyaları', 'Ev Mobilyaları', 'Dekorasyon', 'Mutfak Ekipmanları']
+    children: [
+      'Büro Mobilyası', 'Okul Mobilyası', 'Hastane Mobilyası', 'Otel Mobilyası', 'Raf Sistemleri',
+      'Dosyalama Sistemleri', 'Toplantı Masaları', 'Ofis Sandalyeleri', 'Bekleme Koltukları'
+    ]
   },
   {
-    name: 'Özel Güvenlik ve Koruma',
-    count: 85,
-    children: ['Özel Güvenlik', 'Koruma Hizmetleri', 'Bekçilik', 'Güvenlik Danışmanlığı']
+    name: 'Sağlık ve Medikal',
+    count: 251,
+    children: [
+      'Tıbbi Cihazlar', 'Laboratuvar Cihazları', 'Sarf Malzemeleri', 'Hastane Mobilyaları',
+      'Ambulans', 'Medikal Gaz Sistemleri', 'Röntgen', 'MR', 'Ultrason', 'Dental Ürünler'
+    ]
   },
   {
-    name: 'Eğitim ve Kurumsal Gelişim',
+    name: 'Eğitim',
     count: 76,
-    children: ['Kurumsal Eğitim', 'Online Eğitim', 'Eğitim Materyalleri', 'Danışmanlık']
+    children: [
+      'Akıllı Tahta', 'Bilgisayar Laboratuvarı', 'Eğitim Yazılımları', 'Online Eğitim',
+      'Eğitim Danışmanlığı', 'Kurs Hizmetleri', 'Kitap', 'Kırtasiye', 'Laboratuvar Malzemeleri'
+    ]
   },
   {
-    name: 'İnsan Kaynakları ve Sosyal Hizmetler',
-    count: 163,
-    children: ['İnsan Kaynakları', 'Personel Temini', 'Bordrolama', 'Kurumsal Hizmetler']
+    name: 'Gıda ve Catering',
+    count: 337,
+    children: [
+      'Hazır Yemek', 'Catering', 'Personel Yemeği', 'Kumanya', 'Et Ürünleri', 'Süt Ürünleri',
+      'Sebze Meyve', 'Unlu Mamuller', 'İçecek', 'Kuru Gıda'
+    ]
   },
   {
-    name: 'Sigorta, Mali ve Hukuki Hizmetler',
-    count: 56,
-    children: ['Sigorta', 'Mali Müşavirlik', 'Hukuk', 'Finansal Danışmanlık']
+    name: 'Tekstil ve Giyim',
+    count: 273,
+    children: [
+      'İş Elbiseleri', 'Okul Kıyafetleri', 'Güvenlik Kıyafetleri', 'Promosyon Tekstil',
+      'Ayakkabı', 'Bot', 'Eldiven', 'Kişisel Koruyucu Donanım'
+    ]
   },
   {
-    name: 'Gayrimenkul ve İşyeri Hizmetleri',
+    name: 'Tarım ve Hayvancılık',
+    count: 84,
+    children: [
+      'Gübre', 'Tohum', 'Sulama Sistemleri', 'Tarım Makinaları', 'Traktör', 'Sera', 'Hayvan Yemi',
+      'Veteriner Ürünleri', 'Büyükbaş', 'Küçükbaş', 'Kanatlı Hayvan'
+    ]
+  },
+  {
+    name: 'Enerji',
+    count: 117,
+    children: [
+      'Güneş Enerjisi', 'Rüzgar Enerjisi', 'Jeneratör', 'Elektrik Malzemeleri', 'Trafo',
+      'LED Aydınlatma', 'Enerji Verimliliği', 'Şarj İstasyonları'
+    ]
+  },
+  {
+    name: 'Çevre ve Geri Dönüşüm',
+    count: 247,
+    children: [
+      'Atık Yönetimi', 'Geri Dönüşüm', 'Hurda', 'Çevre Danışmanlığı', 'Arıtma Tesisi',
+      'Tehlikeli Atık', 'Sıfır Atık', 'Temizlik Araçları'
+    ]
+  },
+  {
+    name: 'Lojistik ve Taşımacılık',
+    count: 169,
+    children: [
+      'Karayolu Taşımacılığı', 'Denizyolu', 'Havayolu', 'Demiryolu', 'Depolama', 'Soğuk Zincir',
+      'Kargo', 'Kurye', 'Nakliye'
+    ]
+  },
+  {
+    name: 'Güvenlik Sistemleri',
+    count: 94,
+    children: [
+      'Kamera Sistemleri', 'Alarm Sistemleri', 'Yangın Alarmı', 'Kartlı Geçiş', 'Turnike',
+      'X-Ray', 'Bariyer', 'Bekçi Tur Sistemi'
+    ]
+  },
+  {
+    name: 'Temizlik Hizmetleri',
+    count: 247,
+    children: [
+      'Bina Temizliği', 'Hastane Temizliği', 'Okul Temizliği', 'Fabrika Temizliği', 'Cam Temizliği',
+      'Halı Yıkama', 'İlaçlama', 'Çöp Toplama'
+    ]
+  },
+  {
+    name: 'Turizm ve Konaklama',
+    count: 68,
+    children: [
+      'Otel Hizmeti', 'Konaklama', 'Uçak Bileti', 'Araç Kiralama', 'Organizasyon', 'Rehberlik',
+      'Tur Paketleri'
+    ]
+  },
+  {
+    name: 'Reklam ve Medya',
+    count: 142,
+    children: [
+      'Dijital Pazarlama', 'SEO', 'GEO', 'Google Ads', 'Sosyal Medya Yönetimi', 'Grafik Tasarım',
+      'Logo Tasarımı', 'Baskı Hizmetleri', 'Video Prodüksiyon', 'Fotoğraf Çekimi', 'Tanıtım Filmi'
+    ]
+  },
+  {
+    name: 'Ambalaj ve Baskı',
+    count: 337,
+    children: [
+      'Karton Kutu', 'Etiket', 'Poşet', 'Koli', 'Promosyon Ürünleri', 'Matbaa', 'Dijital Baskı',
+      'Ofset Baskı'
+    ]
+  },
+  {
+    name: 'Telekomünikasyon',
     count: 122,
-    children: ['Gayrimenkul', 'İşyeri Kiralama', 'Tesis Yönetimi', 'Emlak Hizmetleri']
+    children: [
+      'Fiber Altyapı', 'IP Telefon', 'Santral', 'İnternet Hizmeti', 'GSM Hizmetleri', 'Baz İstasyonu'
+    ]
+  },
+  {
+    name: 'Danışmanlık',
+    count: 163,
+    children: [
+      'Hukuk Danışmanlığı', 'Mali Müşavirlik', 'İnsan Kaynakları', 'Kalite Yönetimi',
+      'ISO Belgelendirme', 'Proje Danışmanlığı', 'Eğitim Danışmanlığı'
+    ]
+  },
+  {
+    name: 'Sigorta',
+    count: 56,
+    children: [
+      'Araç Sigortası', 'Sağlık Sigortası', 'İş Yeri Sigortası', 'Nakliyat Sigortası',
+      'İnşaat Sigortası', 'Hayat Sigortası'
+    ]
+  },
+  {
+    name: 'Finans',
+    count: 115,
+    children: [
+      'Finansal Danışmanlık', 'Leasing', 'Faktoring', 'Kredi Hizmetleri', 'POS Hizmetleri',
+      'Ödeme Sistemleri'
+    ]
+  },
+  {
+    name: 'Hukuk Hizmetleri',
+    count: 76,
+    children: [
+      'Avukatlık', 'Arabuluculuk', 'İcra Takibi', 'Sözleşme Hazırlama', 'Marka Tescili',
+      'Patent İşlemleri'
+    ]
+  },
+  {
+    name: 'Bakım ve Onarım',
+    count: 118,
+    children: [
+      'Elektrik Bakımı', 'Mekanik Bakım', 'Asansör Bakımı', 'Klima Bakımı', 'Makine Bakımı',
+      'Bilgisayar Bakımı', 'Sunucu Bakımı'
+    ]
+  },
+  {
+    name: 'Organizasyon ve Etkinlik',
+    count: 76,
+    children: [
+      'Fuar Organizasyonu', 'Kongre', 'Seminer', 'Konser', 'Festival', 'Catering',
+      'Sahne Sistemleri', 'Ses ve Işık Sistemleri'
+    ]
+  },
+  {
+    name: 'Diğer',
+    count: 109,
+    children: [
+      'Muhtelif Alımlar', 'Karma İhaleler', 'Özel Projeler', 'Açık Artırmalar', 'Tasfiye Satışları',
+      'Hurda Satışları', 'İkinci El Ürünler'
+    ]
   }
 ]
 
@@ -1037,10 +1217,12 @@ function toggleFilterSection(section: string) {
                     </div>
 
                     <h3 class="mt-4 text-base font-black text-slate-800 hover:text-blue-600 transition-colors leading-snug">{{ res.title }}</h3>
-                    <div class="mt-2.5 flex items-center gap-2 text-xs font-bold text-slate-500">
+                    <div @click="openCompanyModal(res.company)" class="mt-2.5 flex items-center gap-2 text-xs font-bold text-slate-500 cursor-pointer hover:text-blue-600 transition-colors select-none" title="Firma profilini ve yorumları gör">
                       <Building2 :size="14" class="text-slate-400" />
-                      <span>{{ res.company }}</span>
-                      <span v-if="res.verified" class="rounded-full bg-blue-50 px-1 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100">ONAYLI ÜYE</span>
+                      <span class="underline decoration-slate-300 decoration-dashed hover:decoration-solid">{{ res.company }}</span>
+                      <span v-if="res.verified" class="rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100 uppercase tracking-wider flex items-center gap-0.5">
+                        <ShieldCheck :size="10" /> ONAYLI ÜYE
+                      </span>
                     </div>
                     <p class="mt-3 text-xs leading-relaxed text-slate-500 font-medium">{{ res.description }}</p>
 
@@ -1690,6 +1872,91 @@ function toggleFilterSection(section: string) {
         </div>
       </div>
     </section>
+
+    <!-- FİRMA DETAY VE YORUM MODALI (Photo 2 / 5 Feedbacks) -->
+    <div v-if="showCompanyModal && selectedCompany" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
+      <div class="bg-white rounded-3xl border border-slate-200 p-6 max-w-2xl w-full shadow-2xl text-left space-y-6 max-h-[90vh] overflow-y-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-start border-b pb-4" style="border-color: #F1F5F9;">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-black text-slate-800 uppercase tracking-wider">{{ selectedCompany.name }}</h3>
+              <span v-if="selectedCompany.verified" class="rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100 uppercase tracking-wider">
+                ✓ ONAYLI
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1 font-bold">{{ selectedCompany.sector }}</p>
+          </div>
+          <button @click="showCompanyModal = false" class="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition">
+            <X :size="18" />
+          </button>
+        </div>
+
+        <!-- Details Info -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="space-y-3">
+            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">İLETİŞİM BİLGİLERİ</h4>
+            <div class="text-xs text-slate-600 space-y-2">
+              <div><strong class="text-slate-400">Telefon:</strong> {{ selectedCompany.phone }}</div>
+              <div><strong class="text-slate-400">E-Posta:</strong> {{ selectedCompany.email }}</div>
+              <div><strong class="text-slate-400">Adres:</strong> {{ selectedCompany.address }}</div>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">RESMİ BİLGİLER</h4>
+            <div class="text-xs text-slate-600 space-y-2">
+              <div><strong class="text-slate-400">KEP Adresi:</strong> {{ selectedCompany.kep }}</div>
+              <div><strong class="text-slate-400">MERSİS No:</strong> {{ selectedCompany.mersis }}</div>
+              <div class="flex items-center gap-1">
+                <strong class="text-slate-400">Puanlama:</strong>
+                <span class="font-bold text-amber-500 font-mono text-xs">{{ selectedCompany.rating }} / 5.0</span>
+                <div class="flex text-amber-400">
+                  <Star v-for="i in 5" :key="i" :size="12" :fill="i <= Math.round(selectedCompany.rating) ? 'currentColor' : 'none'" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comments & Reviews -->
+        <div class="space-y-3 pt-4 border-t" style="border-color: #F1F5F9;">
+          <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">FİRMA HAKKINDA YORUMLAR ({{ selectedCompany.reviews.length }})</h4>
+          
+          <div class="space-y-3">
+            <div 
+              v-for="(review, rIdx) in selectedCompany.reviews" 
+              :key="rIdx"
+              class="rounded-2xl border p-4 bg-slate-50/50 space-y-2"
+              style="border-color: #E2E8F0;"
+            >
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="text-xs font-bold text-slate-700 block">{{ review.author }}</span>
+                  <span class="text-[9px] text-slate-400 font-medium block">{{ review.company }}</span>
+                </div>
+                <div class="text-right">
+                  <div class="flex text-amber-400 justify-end">
+                    <Star v-for="i in 5" :key="i" :size="10" :fill="i <= review.rating ? 'currentColor' : 'none'" />
+                  </div>
+                  <span class="text-[9px] text-slate-400 font-mono">{{ review.date }}</span>
+                </div>
+              </div>
+              <p class="text-xs leading-relaxed text-slate-600 font-medium">
+                {{ review.comment }}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end pt-3 border-t" style="border-color: #F1F5F9;">
+          <button @click="showCompanyModal = false" class="rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-5 py-3 transition shadow-lg">
+            Kapat
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- COOKIES CONSENT BANNER -->
     <transition name="fade">

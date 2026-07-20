@@ -45,7 +45,7 @@ onMounted(() => {
   }
 })
 
-const userRole = computed(() => userSession.value?.role || 'buyer')
+const userRole = computed(() => userSession.value?.role || 'company')
 const userName = computed(() => userSession.value?.firstName || 'Kullanıcı')
 const userCompany = computed(() => userSession.value?.company || 'Şirketiniz')
 const userInitial = computed(() => userName.value.charAt(0).toUpperCase())
@@ -117,12 +117,12 @@ const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
     <!-- Rol Etiketi -->
     <div class="px-6 py-3">
       <span
-        class="inline-flex items-center rounded-md px-2 py-1 text-xs font-medium"
-        :style="userRole === 'buyer'
+        class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium"
+        :style="userRole === 'company'
           ? 'background: rgba(30,174,76,0.12); color: #1EAE4C;'
-          : 'background: rgba(34,197,94,0.12); color: #22C55E;'"
+          : 'background: rgba(37,99,235,0.12); color: #2563EB;'"
       >
-        {{ userRole === 'buyer' ? '🏢 Alıcı Firma' : '🏭 Tedarikçi' }}
+        {{ userRole === 'company' ? '🏢 Firma Kaydı' : '👤 Bireysel Üye' }}
       </span>
     </div>
 

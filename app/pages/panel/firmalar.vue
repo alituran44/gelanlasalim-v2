@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Plus, Search, SlidersHorizontal, Download, LayoutGrid, List, MapPin, Building2, User } from 'lucide-vue-next'
+import { Plus, Search, SlidersHorizontal, Download, LayoutGrid, List, MapPin, Building2, User, Star, X } from 'lucide-vue-next'
 
 definePageMeta({
   layout: "dashboard"
@@ -23,6 +23,75 @@ const firms = [
   { name: 'Furkan Şahin', city: 'Kocaeli', district: 'İzmit', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'FŞ' },
   { name: 'Makks Villas A.Ş.', city: 'İstanbul', district: 'Pendik', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'MA' }
 ]
+
+// Shared Mock Company Profiles Database (Photo 2 / 5 Feedbacks)
+const companyProfiles: Record<string, {
+  name: string
+  verified: boolean
+  sector: string
+  phone: string
+  email: string
+  address: string
+  kep: string
+  mersis: string
+  rating: number
+  reviews: Array<{ author: string, company: string, rating: number, comment: string, date: string }>
+}> = {
+  'İSTFA GLOBAL TEDARİK YAPI BİLİŞİM DIŞ TİCARET LİMİTED ŞİRKETİ': {
+    name: 'İSTFA GLOBAL TEDARİK YAPI BİLİŞİM DIŞ TİCARET LİMİTED ŞİRKETİ',
+    verified: true,
+    sector: 'Yapı, Bilişim ve Dış Ticaret Tedariği',
+    phone: '+90 (212) 654 32 10',
+    email: 'info@istfaglobal.com',
+    address: 'Başakşehir, İstanbul, Türkiye',
+    kep: 'istfaglobal@hs01.kep.tr',
+    mersis: '0481-0899-7712-0021',
+    rating: 4.8,
+    reviews: [
+      { author: 'Caner Aksoy', company: 'Aksoy Holding', rating: 5, comment: 'Bilişim ve altyapı malzemesi tedariğinde son derece güvenilirlikler.', date: '11 Tem 2026' }
+    ]
+  },
+  'Makks Villas A.Ş.': {
+    name: 'Makks Villas A.Ş.',
+    verified: false,
+    sector: 'İnşaat, Gayrimenkul ve Villa Yapımı',
+    phone: '+90 (216) 333 44 55',
+    email: 'satis@makksvillas.com',
+    address: 'Pendik, İstanbul, Türkiye',
+    kep: 'makksvillas@hs01.kep.tr',
+    mersis: '0612-0941-0024-0012',
+    rating: 4.5,
+    reviews: [
+      { author: 'Gökhan Tan', company: 'Tan İnşaat Geliştirme', rating: 4.5, comment: 'Şantiye tadilat süreçlerini çok titiz yönettiler.', date: '01 Haz 2026' }
+    ]
+  }
+}
+
+const showCompanyModal = ref(false)
+const selectedCompany = ref<any>(null)
+
+function openCompanyModal(firm: any) {
+  const profile = companyProfiles[firm.name]
+  if (profile) {
+    selectedCompany.value = profile
+  } else {
+    selectedCompany.value = {
+      name: firm.name,
+      verified: firm.status === 'Doğrulanmış',
+      sector: firm.sector + ' Sektörü Tedarikçisi',
+      phone: '+90 (850) 888 00 00',
+      email: 'info@' + firm.name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '') + '.com',
+      address: `${firm.district}, ${firm.city}, Türkiye`,
+      kep: firm.name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '') + '@hs01.kep.tr',
+      mersis: '0XXX-XXXX-XXXX-XXXX',
+      rating: 4.5,
+      reviews: [
+        { author: 'Sistem Yöneticisi', company: 'GelAnlaşalım Platformu', rating: 5, comment: 'Doğrulanmış B2B platform üyesi kurumsal satıcı.', date: 'Temmuz 2026' }
+      ]
+    }
+  }
+  showCompanyModal.value = true
+}
 </script>
 
 <template>
@@ -154,7 +223,7 @@ const firms = [
         <!-- Footer link -->
         <div class="flex items-center justify-between pt-3 border-t border-slate-50 mt-3 text-[10px] font-bold text-slate-400">
           <span>Üye: Tem 2026</span>
-          <button class="text-blue-600 hover:underline">Detayları görüntüle ↗</button>
+          <button @click="openCompanyModal(firm)" class="text-blue-600 hover:underline">Detayları görüntüle ↗</button>
         </div>
 
       </div>
@@ -177,5 +246,90 @@ const firms = [
       </div>
     </div>
 
+  </div>
+
+  <!-- FİRMA DETAY VE YORUM MODALI (Photo 2 / 5 Feedbacks) -->
+  <div v-if="showCompanyModal && selectedCompany" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
+    <div class="bg-white rounded-3xl border border-slate-200 p-6 max-w-2xl w-full shadow-2xl text-left space-y-6 max-h-[90vh] overflow-y-auto">
+      <!-- Header -->
+      <div class="flex justify-between items-start border-b pb-4" style="border-color: #F1F5F9;">
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="text-base font-black text-slate-800 uppercase tracking-wider">{{ selectedCompany.name }}</h3>
+            <span v-if="selectedCompany.verified" class="rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100 uppercase tracking-wider">
+              ✓ ONAYLI
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1 font-bold">{{ selectedCompany.sector }}</p>
+        </div>
+        <button @click="showCompanyModal = false" class="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition">
+          <X :size="18" />
+        </button>
+      </div>
+
+      <!-- Details Info -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="space-y-3">
+          <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">İLETİŞİM BİLGİLERİ</h4>
+          <div class="text-xs text-slate-600 space-y-2">
+            <div><strong class="text-slate-400">Telefon:</strong> {{ selectedCompany.phone }}</div>
+            <div><strong class="text-slate-400">E-Posta:</strong> {{ selectedCompany.email }}</div>
+            <div><strong class="text-slate-400">Adres:</strong> {{ selectedCompany.address }}</div>
+          </div>
+        </div>
+
+        <div class="space-y-3">
+          <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">RESMİ BİLGİLER</h4>
+          <div class="text-xs text-slate-600 space-y-2">
+            <div><strong class="text-slate-400">KEP Adresi:</strong> {{ selectedCompany.kep }}</div>
+            <div><strong class="text-slate-400">MERSİS No:</strong> {{ selectedCompany.mersis }}</div>
+            <div class="flex items-center gap-1">
+              <strong class="text-slate-400">Puanlama:</strong>
+              <span class="font-bold text-amber-500 font-mono text-xs">{{ selectedCompany.rating }} / 5.0</span>
+              <div class="flex text-amber-400">
+                <Star v-for="i in 5" :key="i" :size="12" :fill="i <= Math.round(selectedCompany.rating) ? 'currentColor' : 'none'" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comments & Reviews -->
+      <div class="space-y-3 pt-4 border-t" style="border-color: #F1F5F9;">
+        <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">FİRMA HAKKINDA YORUMLAR ({{ selectedCompany.reviews.length }})</h4>
+        
+        <div class="space-y-3">
+          <div 
+            v-for="(review, rIdx) in selectedCompany.reviews" 
+            :key="rIdx"
+            class="rounded-2xl border p-4 bg-slate-50/50 space-y-2"
+            style="border-color: #E2E8F0;"
+          >
+            <div class="flex items-center justify-between">
+              <div>
+                <span class="text-xs font-bold text-slate-700 block">{{ review.author }}</span>
+                <span class="text-[9px] text-slate-400 font-medium block">{{ review.company }}</span>
+              </div>
+              <div class="text-right">
+                <div class="flex text-amber-400 justify-end">
+                  <Star v-for="i in 5" :key="i" :size="10" :fill="i <= review.rating ? 'currentColor' : 'none'" />
+                </div>
+                <span class="text-[9px] text-slate-400 font-mono">{{ review.date }}</span>
+              </div>
+            </div>
+            <p class="text-xs leading-relaxed text-slate-600 font-medium">
+              {{ review.comment }}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex justify-end pt-3 border-t" style="border-color: #F1F5F9;">
+        <button @click="showCompanyModal = false" class="rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-5 py-3 transition shadow-lg">
+          Kapat
+        </button>
+      </div>
+    </div>
   </div>
 </template>

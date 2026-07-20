@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Check, ArrowRight, ShieldCheck, CreditCard, Building, CheckCircle, X, ShoppingCart, Lock, Sparkles, Building2, Eye, Laptop, Camera, Video, AlertCircle } from 'lucide-vue-next'
+import { Check, ArrowRight, ShieldCheck, CreditCard, Building, CheckCircle, X, ShoppingCart, Lock, Sparkles, Building2, HelpCircle } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 
 definePageMeta({
@@ -10,49 +10,65 @@ definePageMeta({
 
 const router = useRouter()
 
-// Pricing Packages from Screenshot
+// Pricing Packages from EKAP Screenshot
 const subscriptionPackages = ref([
   { 
-    id: 'temel', 
-    name: 'Temel', 
-    badge: 'TEDARİKÇİ TABANI',
-    price: 5000, 
-    monthly: '₺417,00 / ay',
-    desc: 'Tüm segmentlerde pasif ilan, genel teklif girişi.',
-    features: [
-      '1 segmentte teklif erişimi',
-      'Sınırsız teklif verme ve katılım',
-      'Firma vitrininde temel görünürlük'
-    ]
+    id: '1-ay', 
+    name: 'Üyelik başvurusu - 1 ay', 
+    price: 900, 
+    monthly: '₺900,00 / ay',
+    desc: '1 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
+    isPromo: false
   },
   { 
-    id: 'profesyonel', 
-    name: 'Profesyonel', 
-    badge: 'ALICI EKİP AKSİYONU',
-    isPromo: true,
-    price: 8000,
-    monthly: '₺667,00 / ay',
-    desc: 'Yılda max 36 ihale açın, tüm pazarlara kapasite arttırın.',
-    features: [
-      'Aylık 3 - yıllık 36 ihale açma hakkı',
-      '3 segmentte yayın ve teklif akışı',
-      'Ek ihale paketleriyle kapasite arttırımı'
-    ]
+    id: '3-ay', 
+    name: 'Üyelik başvurusu - 3 ay', 
+    price: 1800, 
+    monthly: '₺600,00 / ay',
+    desc: '3 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
+    isPromo: true
   },
   { 
-    id: 'kurumsal', 
-    name: 'Kurumsal', 
-    badge: 'ÇOK EKİPLİ OPERASYON',
-    price: 15000, 
-    monthly: '₺1.250,00 / ay',
-    desc: 'Sınırsız kapasite, ekip yönetimi ve özel destek kurumsal güç.',
-    features: [
-      'Sınırsız ihale açma ve yönetim',
-      'Ekip yönetimi ve eş zamanlı ihale oturumları',
-      'Öncelikli firma görünürlüğü ve doğrulanmış kimlik etiketi'
-    ]
+    id: '6-ay', 
+    name: 'Üyelik başvurusu - 6 ay', 
+    price: 2700, 
+    monthly: '₺450,00 / ay',
+    desc: '6 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
+    isPromo: false
+  },
+  { 
+    id: '9-ay', 
+    name: 'Üyelik başvurusu - 9 ay', 
+    price: 3600, 
+    monthly: '₺400,00 / ay',
+    desc: '9 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
+    isPromo: false
   }
 ])
+
+// Features list from EKAP Screenshot
+const allFeatures = [
+  // Column 1
+  { text: 'Ekap ihaleleri', col: 1 },
+  { text: 'Ekap ihale sonuçları', col: 1 },
+  { text: 'Doğrudan teminler', col: 1 },
+  { text: 'Satış ve Kiralamalar', col: 1 },
+  { text: 'K Kik Kararları', col: 1 },
+  { text: 'Sınır değer hesaplama', col: 1 },
+  // Column 2
+  { text: 'Arama önerileri', col: 2 },
+  { text: 'Yaklaşan ihale bildirimleri', col: 2 },
+  { text: 'Kazanılan ihale bildirimleri', col: 2 },
+  { text: 'İptal-Düzeltme-Sonuç bildirimleri', col: 2 },
+  { text: 'Sınırsız bildirim (Sms+Email)', col: 2 },
+  { text: 'Sınırsız raporlama (Excel)', col: 2 },
+  // Column 3
+  { text: 'Yüklenici analizleri', col: 3 },
+  { text: 'İdare analizleri', col: 3 },
+  { text: 'Sektör analizleri', col: 3 },
+  { text: 'Rakip analizleri', col: 3 },
+  { text: 'Mobil uyumluluk', col: 3 }
+]
 
 // Interactive States
 const { cmsData, saveCmsData } = useCmsData()
@@ -90,21 +106,20 @@ const transferName = ref('')
 const isProcessing = ref(false)
 const showSuccessScreen = ref(false)
 
-// Calculated Values
-const vatAmount = computed(() => {
-  if (!selectedPackage.value) return 0
-  if (selectedPackage.value.price === 0) return 0
-  return Math.round(selectedPackage.value.price * 0.20) // 20% tax on top
-})
-
-const netAmount = computed(() => {
+// Calculated Values (VAT inclusive calculation)
+const totalAmount = computed(() => {
   if (!selectedPackage.value) return 0
   return selectedPackage.value.price
 })
 
-const totalAmount = computed(() => {
+const vatAmount = computed(() => {
   if (!selectedPackage.value) return 0
-  return netAmount.value + vatAmount.value
+  return Math.round(selectedPackage.value.price - (selectedPackage.value.price / 1.2))
+})
+
+const netAmount = computed(() => {
+  if (!selectedPackage.value) return 0
+  return totalAmount.value - vatAmount.value
 })
 
 function openCheckout(pkg: typeof subscriptionPackages.value[0]) {
@@ -114,18 +129,12 @@ function openCheckout(pkg: typeof subscriptionPackages.value[0]) {
   isProcessing.value = false
 }
 
-function handlePayment() {
-  if (selectedPackage.value?.price === 0) {
-    // Free launch package directly registers
-    isProcessing.value = true
-    setTimeout(() => {
-      isProcessing.value = false
-      showSuccessScreen.value = true
-      upgradeSession()
-    }, 1000)
-    return
-  }
+function handleRenewalClick() {
+  // Trigger checkout for renewal with 3-Month package by default
+  openCheckout(subscriptionPackages.value[1])
+}
 
+function handlePayment() {
   if (activePaymentMethod.value !== 'bank_transfer') {
     if (!cardName.value || !cardNumber.value || !cardExpiry.value || !cardCvc.value) {
       alert('Lütfen tüm kart bilgilerini doldurun.')
@@ -140,7 +149,7 @@ function handlePayment() {
 
   isProcessing.value = true
 
-  // Simulate gateway request
+  // Simulate payment gateway request
   setTimeout(() => {
     isProcessing.value = false
     showSuccessScreen.value = true
@@ -160,10 +169,10 @@ function upgradeSession() {
   // Create payment record and save to CMS
   const paymentObj = {
     id: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
-    referenceCode: activePaymentMethod.value === 'bank_transfer' ? 'GA-3M485' : '-',
+    referenceCode: activePaymentMethod.value === 'bank_transfer' ? 'GA-EKAP' : '-',
     userName: activePaymentMethod.value === 'bank_transfer' ? transferName.value : cardName.value,
     companyName: userSession.value.company || 'Bireysel Kullanıcı',
-    packageName: selectedPackage.value?.name || 'Temel',
+    packageName: selectedPackage.value?.name || 'Üyelik başvurusu - 1 ay',
     amount: `₺${totalAmount.value.toLocaleString('tr-TR')}`,
     paymentMethod: activePaymentMethod.value === 'bank_transfer' ? 'Havale/EFT' : (activePaymentMethod.value === 'paytr' ? 'PayTR' : 'iyzigo'),
     status: 'bekliyor',
@@ -184,121 +193,128 @@ function completeCheckout() {
 </script>
 
 <template>
-  <div class="min-h-[calc(100vh-76px)] bg-slate-50 py-16 px-4 sm:px-6 lg:px-8 text-left">
-    <div class="max-w-7xl mx-auto space-y-12">
+  <div class="min-h-[calc(100vh-76px)] bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 text-left animate-fadeIn">
+    <div class="max-w-7xl mx-auto space-y-8">
       
-      <!-- HEADER -->
+      <!-- H1 / HEADER BLOCK -->
       <div>
-        <span class="text-[9px] font-black uppercase tracking-widest text-slate-400">ÜYELİK PAKETLERİ</span>
-        <h1 class="text-3xl font-black text-slate-800 mt-1" style="color: #0F172A;">Şeffaf Fiyat, Net Erişim</h1>
-        <p class="text-xs text-slate-500 mt-2 max-w-2xl leading-relaxed">
-          Temel plan teklif veren firmalar, Profesyonel plan ihale açan alıcı ekipler, Kurumsal plan ise çok ekipli operasyonlar için konumlanır. Tüm fiyatlar yıllık ve KDV hariçtir.
+        <h1 class="text-2xl font-black tracking-tight" style="color: #003057; font-family: 'Outfit', sans-serif;">Platform Üyeliği ve Erişim Paketleri</h1>
+        <p class="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
+          GelAnlaşalım platformunun gelişmiş ihale arama, KİK analizleri ve anlık sms/e-posta bildirim servislerinden yararlanmak için üyeliğinizi hemen başlatın.
         </p>
       </div>
 
-      <!-- Horizontal Lanse Card (Screenshot middle segment) -->
-      <div class="rounded-2xl border border-blue-200 bg-white p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
-        <div class="flex items-center gap-3">
-          <span class="inline-flex items-center gap-1 text-[8px] font-black uppercase text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-1.5 rounded-lg shrink-0">DESTEK TALEBİ AÇIK</span>
-          <div>
-            <h4 class="text-xs font-bold text-slate-800">Profesyonel plan ile ihalelerinizi kolayca yönetin.</h4>
-            <p class="text-[10px] text-slate-400 mt-0.5">İhale açmak ve tedarikçileri tek panelde toplamak isteyen ekipler için en ideal başlangıç yolu.</p>
-          </div>
-        </div>
-        <button 
-          type="button" 
-          @click="router.push('/uyelik?tab=register&role=buyer')"
-          class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-3 transition shrink-0 shadow-sm"
-        >
-          Kurumsal hesap aç ->
-        </button>
+      <!-- >> ÜYE KAYIT SECTION HEADER -->
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center rounded-md bg-[#003057]/5 border border-[#003057]/10 px-3 py-1.5 text-xs font-black" style="color: #003057; font-family: 'Outfit', sans-serif;">
+          &gt;&gt; Üye kayıt
+        </span>
+        <div class="flex-1 h-px bg-slate-200"></div>
       </div>
 
-      <!-- The Three Side-by-Side Plans Card Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        
-        <!-- Loop over packages -->
+      <!-- FOUR COLUMNS PACKAGE GRID -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <div 
-          v-for="pkg in subscriptionPackages"
-          :key="pkg.id"
-          class="rounded-2xl border bg-white p-6 shadow-sm flex flex-col justify-between transition hover:shadow-md animate-fadeIn"
-          :class="pkg.isPromo ? 'border-blue-300 ring-2 ring-blue-500/5 relative scale-102 shadow-md' : 'border-slate-200'"
+          v-for="pkg in subscriptionPackages" 
+          :key="pkg.id" 
+          class="border rounded-2xl bg-white overflow-hidden transition-all duration-300 flex flex-col justify-between hover:shadow-lg shadow-sm"
+          :style="pkg.isPromo ? 'border-color: #F59E0B; ring: 2px; ring-color: #F59E0B;' : 'border-color: #E2E8F0;'"
         >
-          <!-- Selected badge on top for promo -->
-          <span v-if="pkg.isPromo" class="absolute -top-3 left-1/2 -translate-x-1/2 text-[8px] font-black uppercase text-blue-700 bg-blue-100 border border-blue-200 px-3 py-1 rounded-full">POPÜLER</span>
-
-          <div class="space-y-5">
-            <div>
-              <span class="text-[8px] font-black text-slate-300 uppercase tracking-wider block">{{ pkg.badge }}</span>
-              <h4 class="text-base font-black text-slate-800 mt-1.5">{{ pkg.name }}</h4>
-              <p class="text-[10px] text-slate-400 mt-1 leading-normal">{{ pkg.desc }}</p>
-            </div>
-            
-            <div>
-              <!-- Old price display -->
-              <div v-if="pkg.oldPrice" class="text-xs text-slate-300 font-bold line-through">
-                ₺{{ pkg.oldPrice.toLocaleString('tr-TR') }},00
-              </div>
-              <div class="flex items-baseline gap-1 mt-0.5">
-                <span class="text-3xl font-black text-slate-800">{{ pkg.price === 0 ? 'Ücretsiz' : `₺${pkg.price.toLocaleString('tr-TR')},00` }}</span>
-                <span class="text-[9px] text-slate-400 font-bold" v-if="pkg.price > 0">/ yıl + KDV</span>
-                <span class="text-[9px] text-slate-400 font-bold" v-else>lansman erişimi</span>
-              </div>
-            </div>
-            
-            <!-- Monthly Equivalent Pill -->
-            <div>
-              <span 
-                class="inline-block text-[9px] font-bold px-2.5 py-1 rounded"
-                :class="pkg.isPromo ? 'text-blue-700 bg-blue-50 border border-blue-100' : 'text-slate-500 bg-slate-50 border border-slate-100'"
-              >
-                {{ pkg.price === 0 ? 'LANSMANA ÖZEL' : `Aylık karşılığı: ${pkg.monthly}` }}
-              </span>
-            </div>
-
-            <!-- Promo Text Block -->
-            <p v-if="pkg.promoText" class="text-[9px] text-slate-400 leading-normal bg-slate-50 p-3 rounded-lg border border-slate-100">
-              {{ pkg.promoText }}
-            </p>
-            
-            <hr class="border-slate-100" />
-            
-            <!-- Features list -->
-            <ul class="space-y-3 text-[10px] font-bold text-slate-600">
-              <li v-for="feat in pkg.features" :key="feat" class="flex items-start gap-2">
-                <Check :size="12" class="text-blue-600 shrink-0 mt-0.5" />
-                <span>{{ feat }}</span>
-              </li>
-            </ul>
+          <!-- Package Title Bar -->
+          <div class="py-3 px-4 text-center font-bold text-xs text-white uppercase tracking-wider transition-colors relative" :style="pkg.isPromo ? 'background-color: #F59E0B;' : 'background-color: #003057;'">
+            {{ pkg.name }}
+            <span v-if="pkg.isPromo" class="absolute -top-2 right-2 rounded-full px-1.5 py-0.5 text-[8px] bg-white font-black text-amber-700">EN POPÜLER</span>
           </div>
           
-          <div class="pt-6">
+          <!-- Price Content Area -->
+          <div class="p-6 text-center flex-grow flex flex-col justify-center bg-white border-b border-slate-100">
+            <div class="text-3xl font-black tracking-tight font-mono text-slate-800">
+              ₺{{ pkg.price.toLocaleString('tr-TR') }}
+            </div>
+            <div class="text-[10px] text-slate-400 font-bold mt-1.5 uppercase tracking-wide">
+              {{ pkg.monthly }}
+            </div>
+            <p class="text-[10px] text-slate-400 mt-2 leading-relaxed px-2">{{ pkg.desc }}</p>
+          </div>
+
+          <!-- Action Button Bar -->
+          <div class="p-4 bg-slate-50/50">
             <button 
-              type="button" 
               @click="openCheckout(pkg)"
-              class="w-full text-center rounded-xl font-bold text-xs py-3 transition shadow-sm"
-              :class="pkg.isPromo ? 'bg-blue-600 hover:bg-blue-700 text-white' : 'border border-slate-200 hover:bg-slate-50 text-slate-700'"
+              class="w-full text-center rounded-xl font-bold text-xs py-3 transition shadow-xs flex items-center justify-center gap-1.5 text-white"
+              :style="pkg.isPromo ? 'background-color: #F59E0B;' : 'background-color: #003057;'"
             >
-              Hemen Başla ->
+              Seç <ArrowRight :size="12" />
             </button>
           </div>
         </div>
-
       </div>
 
-      <!-- Bottom banner -->
-      <div class="rounded-2xl border border-slate-200 bg-white p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs text-xs font-bold text-slate-500">
-        <div class="flex items-center gap-2">
-          <span class="h-2 w-2 rounded-full bg-blue-600 animate-ping"></span>
-          <span>Ticari ekosistem erişimi ile tedarik ağınızı genişletin. Tüm planlar KVKK ilkeleri ve ticari denetim süreçlerine göre işletilir.</span>
+      <!-- TAX NOTICE BAR -->
+      <div class="rounded-xl border border-slate-200 bg-slate-100/50 py-2.5 px-4 text-center text-xs font-bold text-slate-500">
+        Fiyatlara %20 KDV dahildir.
+      </div>
+
+      <!-- >> ÖZELLİKLER SECTION HEADER -->
+      <div class="flex items-center gap-2 pt-4">
+        <span class="inline-flex items-center rounded-md bg-[#003057]/5 border border-[#003057]/10 px-3 py-1.5 text-xs font-black" style="color: #003057; font-family: 'Outfit', sans-serif;">
+          &gt;&gt; Özellikler
+        </span>
+        <div class="flex-1 h-px bg-slate-200"></div>
+      </div>
+
+      <!-- FEATURES BOX -->
+      <div class="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+        <!-- Banner Title -->
+        <div class="py-2.5 px-4 text-center text-xs font-black tracking-wide text-slate-700 bg-slate-50 border-b border-slate-200">
+          Tüm paketler için geçerlidir
+        </div>
+
+        <!-- 3 Column Grid -->
+        <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+          <!-- Col 1 -->
+          <div class="space-y-3">
+            <div v-for="feat in allFeatures.filter(f => f.col === 1)" :key="feat.text" class="flex items-center gap-2">
+              <Check :size="14" class="text-emerald-500 shrink-0" />
+              <span class="text-xs font-semibold text-slate-700">{{ feat.text }}</span>
+            </div>
+          </div>
+          <!-- Col 2 -->
+          <div class="space-y-3">
+            <div v-for="feat in allFeatures.filter(f => f.col === 2)" :key="feat.text" class="flex items-center gap-2">
+              <Check :size="14" class="text-emerald-500 shrink-0" />
+              <span class="text-xs font-semibold text-slate-700">{{ feat.text }}</span>
+            </div>
+          </div>
+          <!-- Col 3 -->
+          <div class="space-y-3">
+            <div v-for="feat in allFeatures.filter(f => f.col === 3)" :key="feat.text" class="flex items-center gap-2">
+              <Check :size="14" class="text-emerald-500 shrink-0" />
+              <span class="text-xs font-semibold text-slate-700">{{ feat.text }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RENEWAL BANNER -->
+      <div class="rounded-2xl border border-blue-100 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs" style="background-color: #E0F2FE;">
+        <div>
+          <h4 class="text-xs font-bold text-blue-900">Eğer üyeliğiniz varsa aşağıdaki bağlantıya tıklayıp %20 indirimli fiyatlarla üyeliğinizi uzatabilirsiniz.</h4>
         </div>
         <button 
           type="button" 
-          @click="router.push('/uyelik?tab=register&role=buyer')"
-          class="text-blue-600 hover:underline inline-flex items-center gap-1"
+          @click="handleRenewalClick"
+          class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-3.5 transition shrink-0 shadow-xs flex items-center gap-1.5"
         >
-          Kurumsal Hesap aç ->
+          Üyelik uzat <ArrowRight :size="14" />
         </button>
+      </div>
+
+      <!-- DISCLAIMER TEXT (Kırmızı uyarı yazısı) -->
+      <div class="text-center pt-4">
+        <p class="text-[10px] font-semibold leading-relaxed max-w-4xl mx-auto text-red-500">
+          Bu hizmet Özgürsoft Bilişim A.Ş. tarafından sunulmaktadır. Şirketimizin Kamu İhale Kurumu (EKAP) veya başka bir kamu kurumu ile herhangi bir bağlantısı bulunmamaktadır.
+        </p>
       </div>
 
     </div>
@@ -322,7 +338,7 @@ function completeCheckout() {
           <!-- Header -->
           <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
             <div class="flex items-center gap-2">
-              <ShoppingCart :size="18" class="text-blue-600" />
+              <ShoppingCart :size="18" class="text-[#003057]" />
               <h2 class="text-sm font-bold text-slate-800">Sipariş & Ödeme Sepeti</h2>
             </div>
             <button @click="isCheckoutOpen = false" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition">
@@ -342,7 +358,7 @@ function completeCheckout() {
                     <p class="text-[11px] text-slate-500 mt-0.5">{{ selectedPackage?.desc }}</p>
                   </div>
                   <div class="text-right">
-                    <span class="text-base font-black text-slate-900 font-mono">₺{{ selectedPackage?.price.toLocaleString('tr-TR') }} <span class="text-[10px] text-slate-500 font-bold">+KDV</span></span>
+                    <span class="text-base font-black text-slate-900 font-mono">₺{{ selectedPackage?.price.toLocaleString('tr-TR') }}</span>
                   </div>
                 </div>
                 
@@ -355,7 +371,7 @@ function completeCheckout() {
                     <span class="font-mono">₺{{ netAmount.toLocaleString('tr-TR') }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>KDV (%20):</span>
+                    <span>KDV (%20 - Dahil):</span>
                     <span class="font-mono">₺{{ vatAmount.toLocaleString('tr-TR') }}</span>
                   </div>
                   <div class="flex justify-between text-slate-800 font-bold border-t border-slate-200/60 pt-1.5 mt-1.5">
@@ -365,15 +381,8 @@ function completeCheckout() {
                 </div>
               </div>
 
-              <!-- Lansmana Özel Ücretsiz Package Display -->
-              <div v-if="selectedPackage?.price === 0" class="rounded-xl border border-emerald-100 bg-emerald-50/50 p-5 space-y-2 text-emerald-800">
-                <span class="inline-flex items-center gap-1 text-[8px] font-black uppercase text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">LANSMAN PROMOSYONU</span>
-                <h4 class="text-xs font-bold mt-1">Ödeme Yapmanız Gerekmez!</h4>
-                <p class="text-[10px] leading-relaxed">Lansman dönemine özel bu paketi hiçbir ücret ödemeden hemen başlatabilir, ihalelerinizi yayına alabilirsiniz.</p>
-              </div>
-
-              <!-- Payment Method Tabs for Paid Packages -->
-              <div v-else class="space-y-6">
+              <!-- Payment Method Tabs -->
+              <div class="space-y-6">
                 <div>
                   <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">ÖDEME KANALI SEÇİN</label>
                   <div class="grid grid-cols-3 gap-2">
@@ -424,7 +433,7 @@ function completeCheckout() {
                       class="w-full rounded-lg border border-slate-200 p-2.5 text-xs focus:border-blue-500 focus:outline-none" 
                     />
                     <div class="text-[10px] text-slate-500 mt-1 font-bold">
-                      Kayıtlı Şirket: <span class="text-[#003057] font-black uppercase">{{ userSession?.company || 'Bilinmeyen Şirket' }}</span>
+                      Kayıtlı Şirket: <span class="text-[#003057] font-black uppercase">{{ userSession?.company || 'Bireysel Kullanıcı' }}</span>
                     </div>
                   </div>
 
@@ -485,7 +494,7 @@ function completeCheckout() {
                     </div>
                     <div class="flex justify-between items-center text-xs font-semibold text-slate-500">
                       <span>Referans Kodu:</span>
-                      <span class="font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-bold">GA-3M485</span>
+                      <span class="font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-bold">GA-EKAP</span>
                     </div>
                   </div>
 
@@ -498,7 +507,7 @@ function completeCheckout() {
                       class="w-full rounded-lg border border-slate-200 p-2.5 text-xs focus:border-blue-500 focus:outline-none" 
                     />
                     <div class="text-[10px] text-slate-500 mt-1 font-bold">
-                      Kayıtlı Şirket: <span class="text-[#003057] font-black uppercase">{{ userSession?.company || 'Bilinmeyen Şirket' }}</span>
+                      Kayıtlı Şirket: <span class="text-[#003057] font-black uppercase">{{ userSession?.company || 'Bireysel Kullanıcı' }}</span>
                     </div>
                   </div>
                 </div>
@@ -520,8 +529,7 @@ function completeCheckout() {
                 <div class="space-y-1.5 text-xs text-slate-600 font-medium text-left mt-3">
                   <div class="flex justify-between">
                     <span>Ödeme Tipi:</span>
-                    <span class="font-semibold text-slate-800 uppercase" v-if="selectedPackage?.price > 0">{{ activePaymentMethod }} Gateway</span>
-                    <span class="font-semibold text-slate-800 uppercase" v-else>Promosyon Aktivasyonu</span>
+                    <span class="font-semibold text-slate-800 uppercase">{{ activePaymentMethod }} Gateway</span>
                   </div>
                   <div class="flex justify-between">
                     <span>Sipariş No:</span>
@@ -532,8 +540,8 @@ function completeCheckout() {
                     <span class="font-semibold text-slate-800">{{ selectedPackage?.name }}</span>
                   </div>
                   <div class="flex justify-between border-t border-slate-200/60 pt-1.5 mt-1.5 text-slate-800 font-bold">
-                    <span>Tutar:</span>
-                    <span class="font-mono text-blue-600">₺{{ selectedPackage?.price.toLocaleString('tr-TR') }}</span>
+                    <span>Tutar (KDV Dahil):</span>
+                    <span class="font-mono text-[#003057]">₺{{ selectedPackage?.price.toLocaleString('tr-TR') }}</span>
                   </div>
                 </div>
               </div>
@@ -546,10 +554,10 @@ function completeCheckout() {
               v-if="!showSuccessScreen"
               @click="handlePayment"
               :disabled="isProcessing"
-              class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white shadow-lg transition-all bg-blue-600 hover:bg-blue-700 shadow-blue-600/15 disabled:opacity-50"
+              class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white shadow-lg transition-all disabled:opacity-50"
+              style="background-color: #003057;"
             >
               <span v-if="isProcessing">Güvenli Ödeme Doğrulanıyor...</span>
-              <span v-else-if="selectedPackage?.price === 0">Ücretsiz Üyeliği Hemen Başlat</span>
               <span v-else>₺{{ selectedPackage?.price.toLocaleString('tr-TR') }} Güvenli Ödeme Yap</span>
               <ArrowRight v-if="!isProcessing" :size="14" />
             </button>
@@ -566,6 +574,5 @@ function completeCheckout() {
         </div>
       </div>
     </transition>
-
   </div>
 </template>

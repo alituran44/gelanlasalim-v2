@@ -1,10 +1,25 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import Sidebar from "~/components/layout/Sidebar.vue"
 import Topbar from "~/components/layout/Topbar.vue"
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  ClipboardList,
+  Send,
+  Package,
+  Tv,
+  BarChart3,
+  Coins,
+  Building2,
+  Users,
+  Settings,
+  ArrowLeft
+} from "lucide-vue-next"
 
 const router = useRouter()
+const route = useRoute()
 
 onMounted(() => {
   const session = localStorage.getItem('userSession')
@@ -12,20 +27,74 @@ onMounted(() => {
     router.push('/uyelik')
   }
 })
+
+const sidebarMenus = [
+  { title: "Panel", icon: LayoutDashboard, to: "/panel" },
+  { title: "Pazar Yeri", icon: ShoppingBag, to: "/panel/pazar-yeri" },
+  { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
+  { title: "Tekliflerim", icon: Send, to: "/panel/tekliflerim" },
+  { title: "Sipariş & Teslimat", icon: Package, to: "/panel/siparis-teslimat" },
+  { title: "Canlı Etkinlikler", icon: Tv, to: "/panel/canli-etkinlikler" },
+  { title: "İstatistikler", icon: BarChart3, to: "/panel/istatistikler" },
+  { title: "Döviz Kurları", icon: Coins, to: "/panel/doviz-kurlari" },
+  { title: "Kurumsal Firmalar", icon: Building2, to: "/panel/firmalar" },
+  { title: "Ekip & Yetki", icon: Users, to: "/panel/ekip-yetki" },
+  { title: "Hesap", icon: Settings, to: "/panel/ayarlar" },
+]
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-100">
-    <div class="flex">
-      <Sidebar />
+  <div class="min-h-screen bg-slate-100 flex">
+    <!-- Left Sidebar (Collapsible/Hidden on mobile if needed, but sticky on desktop) -->
+    <Sidebar class="hidden md:flex" />
 
-      <div class="flex min-h-screen flex-1 flex-col">
-        <Topbar />
+    <div class="flex min-h-screen flex-1 flex-col overflow-hidden">
+      <!-- Topbar Header -->
+      <Topbar />
 
-        <main class="flex-1 p-8">
-          <slot />
-        </main>
+      <!-- Horizontal Navigation Bar (Menus at the top, scrollable on small screens) -->
+      <div class="bg-white border-b border-slate-200 px-6 py-2.5 flex items-center justify-between overflow-x-auto gap-4 scrollbar-none shrink-0 shadow-sm">
+        <div class="flex items-center gap-1 shrink-0">
+          <NuxtLink
+            v-for="item in sidebarMenus"
+            :key="item.to"
+            :to="item.to"
+            class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all border border-transparent"
+            :class="route.path === item.to 
+              ? 'bg-[#1EAE4C]/10 text-[#1EAE4C] border-[#1EAE4C]/25' 
+              : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+          >
+            <component :is="item.icon" :size="13" />
+            <span>{{ item.title }}</span>
+          </NuxtLink>
+        </div>
+        
+        <!-- Go to Homepage Link -->
+        <NuxtLink
+          to="/"
+          class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all shrink-0 uppercase tracking-wider"
+        >
+          <ArrowLeft :size="13" />
+          Ana Sayfaya Git
+        </NuxtLink>
       </div>
+
+      <!-- Main Layout Body -->
+      <main class="flex-1 p-8 overflow-y-auto">
+        <slot />
+      </main>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Hide scrollbars for chrome, safari and opera */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+/* Hide scrollbars for IE, Edge and Firefox */
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+</style>

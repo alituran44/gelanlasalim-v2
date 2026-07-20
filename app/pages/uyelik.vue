@@ -30,7 +30,8 @@ const lastName = ref('')
 const email = ref('')
 const phone = ref('')
 const password = ref('')
-const userRole = ref<'buyer' | 'supplier'>('buyer')
+const userRole = ref<'company' | 'individual'>('company')
+const companyName = ref('')
 const agreeKvkk = ref(false)
 
 const loginEmail = ref('')
@@ -63,8 +64,12 @@ function toggleSektor(key: string) {
 }
 
 function goStep2() {
-  if (!email.value || !password.value || !firstName.value || !lastName.value) {
+  if (!email.value || !password.value || !firstName.value || !lastName.value || !phone.value) {
     errorMessage.value = 'Lütfen tüm zorunlu alanları doldurun.'
+    return
+  }
+  if (userRole.value === 'company' && !companyName.value) {
+    errorMessage.value = 'Lütfen firma adını girin.'
     return
   }
   errorMessage.value = ''
@@ -90,6 +95,7 @@ function handleRegister() {
       email: email.value,
       firstName: firstName.value,
       name: `${firstName.value} ${lastName.value}`,
+      company: userRole.value === 'company' ? companyName.value : 'Bireysel Üye',
       role: userRole.value,
       sektorler: seciliSektorler.value,
       mailBildirimi: mailBildirimi.value,
@@ -126,13 +132,13 @@ function handleLogin() {
   }, 1000)
 }
 
-function handleDemoLogin(role: 'buyer' | 'supplier') {
+function handleDemoLogin(role: 'company' | 'individual') {
   if (typeof window !== 'undefined') {
     localStorage.setItem('userSession', JSON.stringify({
-      email: role === 'buyer' ? 'alici_demo@gelanlasalim.com' : 'tedarikci_demo@gelanlasalim.com',
-      firstName: role === 'buyer' ? 'Kemal' : 'Ahmet',
-      name: role === 'buyer' ? 'Kemal Yılmaz' : 'Ahmet Yıldız',
-      company: role === 'buyer' ? 'Yılmaz Tekstil A.Ş.' : 'Yıldız Ambalaj Sanayi',
+      email: role === 'company' ? 'firma_demo@gelanlasalim.com' : 'kullanici_demo@gelanlasalim.com',
+      firstName: role === 'company' ? 'Kemal' : 'Ahmet',
+      name: role === 'company' ? 'Kemal Yılmaz' : 'Ahmet Yıldız',
+      company: role === 'company' ? 'Yılmaz Tekstil A.Ş.' : 'Bireysel Üye',
       role: role,
       isPremium: true
     }))
@@ -265,6 +271,21 @@ function handleDemoLogin(role: 'buyer' | 'supplier') {
               <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">Sektörler</span>
             </div>
 
+            <!-- ROL SEÇİMİ (Şimdi Üstte - Dinamik Alan Tetikleyici) -->
+            <div>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Üyelik Türü / Rolünüz *</label>
+              <div class="grid grid-cols-2 gap-3 mt-1">
+                <button type="button" @click="userRole = 'company'" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 text-center transition-all" :class="userRole === 'company' ? 'border-blue-600 bg-blue-50/20 text-blue-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'">
+                  <span class="text-xs font-bold">🏢 Firma Kaydı</span>
+                  <span class="text-[8px] mt-0.5 font-medium">Şirketler İçin</span>
+                </button>
+                <button type="button" @click="userRole = 'individual'" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 text-center transition-all" :class="userRole === 'individual' ? 'border-blue-600 bg-blue-50/20 text-blue-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'">
+                  <span class="text-xs font-bold">👤 Kullanıcı Kaydı</span>
+                  <span class="text-[8px] mt-0.5 font-medium">Bireysel Kullanıcı</span>
+                </button>
+              </div>
+            </div>
+
             <div class="grid grid-cols-2 gap-4">
               <div>
                 <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Ad *</label>
@@ -282,11 +303,24 @@ function handleDemoLogin(role: 'buyer' | 'supplier') {
               </div>
             </div>
 
+            <!-- Firma Adı (Sadece Firma Kaydı durumunda gösterilir) -->
+            <transition name="fade">
+              <div v-if="userRole === 'company'">
+                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Firma / Şirket Adı *</label>
+                <div class="relative">
+                  <Building2 :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input v-model="companyName" type="text" :required="userRole === 'company'" placeholder="Örn: Yılmaz Ambalaj Sanayi A.Ş." class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                </div>
+              </div>
+            </transition>
+
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Kurumsal E-Posta *</label>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+                {{ userRole === 'company' ? 'Kurumsal E-Posta *' : 'E-Posta Adresi *' }}
+              </label>
               <div class="relative">
                 <Mail :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="email" type="email" required placeholder="isim@sirketiniz.com" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                <input v-model="email" type="email" required :placeholder="userRole === 'company' ? 'isim@sirketiniz.com' : 'isim@adresiniz.com'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
               </div>
             </div>
 
@@ -303,20 +337,6 @@ function handleDemoLogin(role: 'buyer' | 'supplier') {
               <div class="relative">
                 <LockKeyhole :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input v-model="password" type="password" required placeholder="Minimum 6 karakter" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
-              </div>
-            </div>
-
-            <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">Platform Rolünüz *</label>
-              <div class="grid grid-cols-2 gap-3 mt-1">
-                <button type="button" @click="userRole = 'buyer'" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 text-center transition-all" :class="userRole === 'buyer' ? 'border-blue-600 bg-blue-50/20 text-blue-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'">
-                  <span class="text-xs font-bold">Alıcı Firma</span>
-                  <span class="text-[8px] mt-0.5 font-medium">İhale Yayınlar</span>
-                </button>
-                <button type="button" @click="userRole = 'supplier'" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 text-center transition-all" :class="userRole === 'supplier' ? 'border-blue-600 bg-blue-50/20 text-blue-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'">
-                  <span class="text-xs font-bold">Tedarikçi Firma</span>
-                  <span class="text-[8px] mt-0.5 font-medium">Teklif Verir</span>
-                </button>
               </div>
             </div>
 
@@ -460,19 +480,19 @@ function handleDemoLogin(role: 'buyer' | 'supplier') {
             <div class="grid grid-cols-2 gap-3">
               <button 
                 type="button" 
-                @click="handleDemoLogin('buyer')"
+                @click="handleDemoLogin('company')"
                 class="flex flex-col items-center justify-center p-3 rounded-xl border border-dashed border-blue-200 bg-blue-50/10 hover:bg-blue-50 text-center transition"
               >
-                <span class="text-xs font-bold text-blue-700">🏢 Alıcı Demosu</span>
+                <span class="text-xs font-bold text-blue-700">🏢 Firma Demosu</span>
                 <span class="text-[8px] text-slate-500 mt-0.5">İhale Aç & Yönet</span>
               </button>
               <button 
                 type="button" 
-                @click="handleDemoLogin('supplier')"
+                @click="handleDemoLogin('individual')"
                 class="flex flex-col items-center justify-center p-3 rounded-xl border border-dashed border-emerald-200 bg-emerald-50/10 hover:bg-emerald-50 text-center transition"
               >
-                <span class="text-xs font-bold text-emerald-700">🏭 Tedarikçi Demosu</span>
-                <span class="text-[8px] text-slate-500 mt-0.5">Teklif Ver & Görüş</span>
+                <span class="text-xs font-bold text-emerald-700">👤 Kullanıcı Demosu</span>
+                <span class="text-[8px] text-slate-500 mt-0.5">Bireysel İlan & Teklif</span>
               </button>
             </div>
           </div>
