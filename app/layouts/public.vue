@@ -1,10 +1,15 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Handshake, Menu, X, ArrowRight, Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
+import { locale, setLocale, detectLocale, t } from '~/composables/useLocale'
 
 const { cmsData } = useCmsData()
 const mobileMenuOpen = ref(false)
+
+onMounted(() => {
+  detectLocale()
+})
 
 const activeTenders = ref([
   { title: "Metro Lojistik A.Ş. - 10.000 Litre Motorin Alımı", time: "Kalan: 2 Saat", savings: "Hedef Tasarruf: %15" },
@@ -22,7 +27,7 @@ const activeTenders = ref([
       <div class="w-full bg-[#001D36] text-white py-2.5 px-6 overflow-hidden border-b border-blue-900/40 relative z-50 text-[11px] font-bold">
         <div class="mx-auto max-w-7xl flex items-center justify-between gap-4">
           <span class="bg-[#1EAE4C] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-wider flex items-center gap-1 shrink-0 animate-pulse">
-            ⚡ YAYINDAKİ İHALELER
+            ⚡ {{ locale === 'tr' ? 'YAYINDAKİ İHALELER' : 'ACTIVE TENDERS' }}
           </span>
           <div class="relative w-full overflow-hidden h-4 flex items-center mx-4">
             <div class="absolute whitespace-nowrap flex gap-12 animate-marquee hover:pause-animation">
@@ -42,7 +47,7 @@ const activeTenders = ref([
             </div>
           </div>
           <a href="/#ihale-gezgini" class="text-[#1EAE4C] hover:underline flex items-center gap-0.5 text-[10px] shrink-0 font-black">
-            İncele <ArrowRight :size="12" />
+            {{ locale === 'tr' ? 'İncele' : 'Review' }} <ArrowRight :size="12" />
           </a>
         </div>
       </div>
@@ -64,39 +69,48 @@ const activeTenders = ref([
             style="color: #0F172A;"
             onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
-          >Nasıl Çalışır</a>
+          >{{ locale === 'tr' ? 'Nasıl Çalışır' : 'How it Works' }}</a>
           <a
             href="/#ozellikler"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #0F172A;"
             onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
-          >Özellikler</a>
+          >{{ locale === 'tr' ? 'Özellikler' : 'Features' }}</a>
           <a
             href="/#ihale-gezgini"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #0F172A;"
             onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
-          >Market</a>
+          >{{ locale === 'tr' ? 'Market' : 'Market' }}</a>
           <NuxtLink
             to="/abonelik"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #0F172A;"
             onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
-          >Fiyatlandırma</NuxtLink>
+          >{{ t('pricing') }}</NuxtLink>
           <a
             href="/#sss"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #0F172A;"
             onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
-          >SSS</a>
+          >{{ locale === 'tr' ? 'SSS' : 'FAQ' }}</a>
         </nav>
 
         <!-- Sağ: CTA Butonlar -->
         <div class="hidden lg:flex items-center gap-2">
+          <!-- Dil Seçimi (Dropdown) -->
+          <button 
+            type="button" 
+            @click="setLocale(locale === 'tr' ? 'en' : 'tr')"
+            class="flex items-center gap-1.5 hover:bg-slate-100 px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-600 transition"
+          >
+            🌐 {{ locale === 'tr' ? 'EN' : 'TR' }}
+          </button>
+
           <NuxtLink
             to="/uyelik"
             class="px-4 py-2.5 text-xs font-semibold rounded-lg transition-all"
@@ -104,7 +118,7 @@ const activeTenders = ref([
             onmouseover="this.style.background='#F1F5F9'; this.style.color='#003057'"
             onmouseout="this.style.background='transparent'; this.style.color='#0F172A'"
           >
-            Giriş Yap
+            {{ t('login') }}
           </NuxtLink>
           <NuxtLink
             to="/uyelik"
@@ -113,16 +127,27 @@ const activeTenders = ref([
             onmouseover="this.style.background='#1EAE4C'"
             onmouseout="this.style.background='#003057'"
           >
-            Kurumsal hesap aç
+            {{ locale === 'tr' ? 'Kurumsal hesap aç' : 'Open business account' }}
             <ArrowRight :size="13" />
           </NuxtLink>
         </div>
 
-        <!-- Mobil Menü Butonu -->
-        <button class="lg:hidden p-2 rounded-lg transition hover:bg-slate-100" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Menü">
-          <X :size="20" v-if="mobileMenuOpen" style="color: #475569;" />
-          <Menu :size="20" v-else style="color: #475569;" />
-        </button>
+        <!-- Mobil Menü Butonu ve Dil Seçimi -->
+        <div class="flex items-center gap-2 lg:hidden">
+          <button 
+            type="button" 
+            @click="setLocale(locale === 'tr' ? 'en' : 'tr')"
+            class="text-[10px] font-black p-2 rounded-lg border uppercase hover:bg-slate-50 transition"
+            style="border-color: #E2E8F0; color: #475569;"
+          >
+            🌐 {{ locale === 'tr' ? 'EN' : 'TR' }}
+          </button>
+          
+          <button class="p-2 rounded-lg transition hover:bg-slate-100" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Menü">
+            <X :size="20" v-if="mobileMenuOpen" style="color: #475569;" />
+            <Menu :size="20" v-else style="color: #475569;" />
+          </button>
+        </div>
       </div>
 
       <!-- Mobil Menü -->
@@ -136,20 +161,20 @@ const activeTenders = ref([
       >
         <div v-if="mobileMenuOpen" class="border-t bg-white px-6 py-5 lg:hidden" style="border-color: #F1F5F9;">
           <div class="flex flex-col gap-3 text-sm font-semibold" style="color: #475569;">
-            <a href="/#nasil-calisir" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Nasıl Çalışır</a>
-            <a href="/#ozellikler" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Özellikler</a>
-            <a href="/#ihale-gezgini" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Market</a>
-            <NuxtLink to="/abonelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Fiyatlandırma</NuxtLink>
-            <a href="/#sss" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">SSS</a>
+            <a href="/#nasil-calisir" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Nasıl Çalışır' : 'How it Works' }}</a>
+            <a href="/#ozellikler" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Özellikler' : 'Features' }}</a>
+            <a href="/#ihale-gezgini" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Market' : 'Market' }}</a>
+            <NuxtLink to="/abonelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ t('pricing') }}</NuxtLink>
+            <a href="/#sss" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'SSS' : 'FAQ' }}</a>
             <div class="border-t my-1" style="border-color: #F1F5F9;"></div>
-            <NuxtLink to="/uyelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Giriş Yap</NuxtLink>
+            <NuxtLink to="/uyelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ t('login') }}</NuxtLink>
             <NuxtLink
               to="/uyelik"
               @click="mobileMenuOpen = false"
               class="flex items-center justify-center gap-2 rounded-xl py-3 text-white font-bold"
               style="background: #003057;"
             >
-              Kurumsal hesap aç <ArrowRight :size="14" />
+              {{ locale === 'tr' ? 'Kurumsal hesap aç' : 'Open business account' }} <ArrowRight :size="14" />
             </NuxtLink>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { Check, ArrowRight, ShieldCheck, CreditCard, Building, CheckCircle, X, ShoppingCart, Lock, Sparkles, Building2, HelpCircle } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
+import { locale, t } from '~/composables/useLocale'
 
 definePageMeta({
   layout: 'public'
@@ -10,71 +11,113 @@ definePageMeta({
 
 const router = useRouter()
 
-// Pricing Packages from EKAP Screenshot
-const subscriptionPackages = ref([
-  { 
-    id: '1-ay', 
-    name: 'Üyelik başvurusu - 1 ay', 
-    price: 900, 
-    monthly: '₺900,00 / ay',
-    desc: '1 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
-    isPromo: false
-  },
-  { 
-    id: '3-ay', 
-    name: 'Üyelik başvurusu - 3 ay', 
-    price: 1800, 
-    monthly: '₺600,00 / ay',
-    desc: '3 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
-    isPromo: true
-  },
-  { 
-    id: '6-ay', 
-    name: 'Üyelik başvurusu - 6 ay', 
-    price: 2700, 
-    monthly: '₺450,00 / ay',
-    desc: '6 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
-    isPromo: false
-  },
-  { 
-    id: '9-ay', 
-    name: 'Üyelik başvurusu - 9 ay', 
-    price: 3600, 
-    monthly: '₺400,00 / ay',
-    desc: '9 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
-    isPromo: false
+// Pricing Packages with auto-currency and localizations
+const subscriptionPackages = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { 
+        id: '1-ay', 
+        name: 'Membership application - 1 month', 
+        price: 25, 
+        monthly: '$25.00 / month',
+        desc: '1 Month uninterrupted EKAP and tender monitoring membership.',
+        isPromo: false
+      },
+      { 
+        id: '3-ay', 
+        name: 'Membership application - 3 months', 
+        price: 70, 
+        monthly: '$23.33 / month',
+        desc: '3 Months uninterrupted EKAP and tender monitoring membership.',
+        isPromo: true
+      },
+      { 
+        id: '6-ay', 
+        name: 'Membership application - 6 months', 
+        price: 135, 
+        monthly: '$22.50 / month',
+        desc: '6 Months uninterrupted EKAP and tender monitoring membership.',
+        isPromo: false
+      },
+      { 
+        id: '9-ay', 
+        name: 'Membership application - 9 months', 
+        price: 210, 
+        monthly: '$23.33 / month',
+        desc: '9 Months uninterrupted EKAP and tender monitoring membership.',
+        isPromo: false
+      }
+    ]
+  } else {
+    return [
+      { 
+        id: '1-ay', 
+        name: 'Üyelik başvurusu - 1 ay', 
+        price: 900, 
+        monthly: '₺900,00 / ay',
+        desc: '1 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
+        isPromo: false
+      },
+      { 
+        id: '3-ay', 
+        name: 'Üyelik başvurusu - 3 ay', 
+        price: 1800, 
+        monthly: '₺600,00 / ay',
+        desc: '3 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
+        isPromo: true
+      },
+      { 
+        id: '6-ay', 
+        name: 'Üyelik başvurusu - 6 ay', 
+        price: 2700, 
+        monthly: '₺450,00 / ay',
+        desc: '6 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
+        isPromo: false
+      },
+      { 
+        id: '9-ay', 
+        name: 'Üyelik başvurusu - 9 ay', 
+        price: 3600, 
+        monthly: '₺400,00 / ay',
+        desc: '9 Aylık kesintisiz EKAP ve ihale izleme üyeliği.',
+        isPromo: false
+      }
+    ]
   }
-])
+})
 
-// Features list from EKAP Screenshot
-const allFeatures = [
+// Currency symbol selection helper
+const currencySymbol = computed(() => locale.value === 'en' ? '$' : '₺')
+
+// Features list from EKAP Screenshot, dynamically translated
+const allFeatures = computed(() => [
   // Column 1
-  { text: 'Ekap ihaleleri', col: 1 },
-  { text: 'Ekap ihale sonuçları', col: 1 },
-  { text: 'Doğrudan teminler', col: 1 },
-  { text: 'Satış ve Kiralamalar', col: 1 },
-  { text: 'K Kik Kararları', col: 1 },
-  { text: 'Sınır değer hesaplama', col: 1 },
+  { text: t('feat_ekap_tenders'), col: 1 },
+  { text: t('feat_ekap_results'), col: 1 },
+  { text: t('feat_direct_proc'), col: 1 },
+  { text: t('feat_sales_leases'), col: 1 },
+  { text: t('feat_kik_decisions'), col: 1 },
+  { text: t('feat_limit_calc'), col: 1 },
   // Column 2
-  { text: 'Arama önerileri', col: 2 },
-  { text: 'Yaklaşan ihale bildirimleri', col: 2 },
-  { text: 'Kazanılan ihale bildirimleri', col: 2 },
-  { text: 'İptal-Düzeltme-Sonuç bildirimleri', col: 2 },
-  { text: 'Sınırsız bildirim (Sms+Email)', col: 2 },
-  { text: 'Sınırsız raporlama (Excel)', col: 2 },
+  { text: t('feat_search_suggest'), col: 2 },
+  { text: t('feat_upcoming_notif'), col: 2 },
+  { text: t('feat_won_notif'), col: 2 },
+  { text: t('feat_cancel_notif'), col: 2 },
+  { text: t('feat_unlimit_notif'), col: 2 },
+  { text: t('feat_unlimit_report'), col: 2 },
   // Column 3
-  { text: 'Yüklenici analizleri', col: 3 },
-  { text: 'İdare analizleri', col: 3 },
-  { text: 'Sektör analizleri', col: 3 },
-  { text: 'Rakip analizleri', col: 3 },
-  { text: 'Mobil uyumluluk', col: 3 }
-]
+  { text: t('feat_contractor_anal'), col: 3 },
+  { text: t('feat_admin_anal'), col: 3 },
+  { text: t('feat_sector_anal'), col: 3 },
+  { text: t('feat_competitor_anal'), col: 3 },
+  { text: t('feat_mobile_compat'), col: 3 }
+])
 
 // Interactive States
 const { cmsData, saveCmsData } = useCmsData()
 const userSession = ref<any>({})
 
-const selectedPackage = ref<typeof subscriptionPackages.value[0] | null>(null)
+const selectedPackage = ref<any>(null)
 const isCheckoutOpen = ref(false)
 const activePaymentMethod = ref<'paytr' | 'iyzigo' | 'bank_transfer'>('paytr')
 
@@ -173,7 +216,7 @@ function upgradeSession() {
     userName: activePaymentMethod.value === 'bank_transfer' ? transferName.value : cardName.value,
     companyName: userSession.value.company || 'Bireysel Kullanıcı',
     packageName: selectedPackage.value?.name || 'Üyelik başvurusu - 1 ay',
-    amount: `₺${totalAmount.value.toLocaleString('tr-TR')}`,
+    amount: `${currencySymbol.value}${totalAmount.value.toLocaleString(locale.value === 'tr' ? 'tr-TR' : 'en-US')}`,
     paymentMethod: activePaymentMethod.value === 'bank_transfer' ? 'Havale/EFT' : (activePaymentMethod.value === 'paytr' ? 'PayTR' : 'iyzigo'),
     status: 'bekliyor',
     date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -198,16 +241,16 @@ function completeCheckout() {
       
       <!-- H1 / HEADER BLOCK -->
       <div>
-        <h1 class="text-2xl font-black tracking-tight" style="color: #003057; font-family: 'Outfit', sans-serif;">Platform Üyeliği ve Erişim Paketleri</h1>
+        <h1 class="text-2xl font-black tracking-tight" style="color: #003057; font-family: 'Outfit', sans-serif;">{{ t('pricing_title') }}</h1>
         <p class="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
-          GelAnlaşalım platformunun gelişmiş ihale arama, KİK analizleri ve anlık sms/e-posta bildirim servislerinden yararlanmak için üyeliğinizi hemen başlatın.
+          {{ t('pricing_desc') }}
         </p>
       </div>
 
       <!-- >> ÜYE KAYIT SECTION HEADER -->
       <div class="flex items-center gap-2">
         <span class="inline-flex items-center rounded-md bg-[#003057]/5 border border-[#003057]/10 px-3 py-1.5 text-xs font-black" style="color: #003057; font-family: 'Outfit', sans-serif;">
-          &gt;&gt; Üye kayıt
+          &gt;&gt; {{ locale === 'tr' ? 'Üye kayıt' : 'Member signup' }}
         </span>
         <div class="flex-1 h-px bg-slate-200"></div>
       </div>
@@ -223,13 +266,13 @@ function completeCheckout() {
           <!-- Package Title Bar -->
           <div class="py-3 px-4 text-center font-bold text-xs text-white uppercase tracking-wider transition-colors relative" :style="pkg.isPromo ? 'background-color: #F59E0B;' : 'background-color: #003057;'">
             {{ pkg.name }}
-            <span v-if="pkg.isPromo" class="absolute -top-2 right-2 rounded-full px-1.5 py-0.5 text-[8px] bg-white font-black text-amber-700">EN POPÜLER</span>
+            <span v-if="pkg.isPromo" class="absolute -top-2 right-2 rounded-full px-1.5 py-0.5 text-[8px] bg-white font-black text-amber-700">{{ t('pricing_popular') }}</span>
           </div>
           
           <!-- Price Content Area -->
           <div class="p-6 text-center flex-grow flex flex-col justify-center bg-white border-b border-slate-100">
             <div class="text-3xl font-black tracking-tight font-mono text-slate-800">
-              ₺{{ pkg.price.toLocaleString('tr-TR') }}
+              {{ currencySymbol }}{{ pkg.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
             </div>
             <div class="text-[10px] text-slate-400 font-bold mt-1.5 uppercase tracking-wide">
               {{ pkg.monthly }}
@@ -241,10 +284,10 @@ function completeCheckout() {
           <div class="p-4 bg-slate-50/50">
             <button 
               @click="openCheckout(pkg)"
-              class="w-full text-center rounded-xl font-bold text-xs py-3 transition shadow-xs flex items-center justify-center gap-1.5 text-white"
+              class="w-full text-center rounded-xl font-bold text-xs py-3 transition shadow-xs flex items-center justify-center gap-1.5 text-white animate-pulse"
               :style="pkg.isPromo ? 'background-color: #F59E0B;' : 'background-color: #003057;'"
             >
-              Seç <ArrowRight :size="12" />
+              {{ t('pricing_select') }} <ArrowRight :size="12" />
             </button>
           </div>
         </div>
@@ -252,13 +295,13 @@ function completeCheckout() {
 
       <!-- TAX NOTICE BAR -->
       <div class="rounded-xl border border-slate-200 bg-slate-100/50 py-2.5 px-4 text-center text-xs font-bold text-slate-500">
-        Fiyatlara %20 KDV dahildir.
+        {{ t('pricing_vat_notice') }}
       </div>
 
       <!-- >> ÖZELLİKLER SECTION HEADER -->
       <div class="flex items-center gap-2 pt-4">
         <span class="inline-flex items-center rounded-md bg-[#003057]/5 border border-[#003057]/10 px-3 py-1.5 text-xs font-black" style="color: #003057; font-family: 'Outfit', sans-serif;">
-          &gt;&gt; Özellikler
+          &gt;&gt; {{ locale === 'tr' ? 'Özellikler' : 'Features' }}
         </span>
         <div class="flex-1 h-px bg-slate-200"></div>
       </div>
@@ -267,7 +310,7 @@ function completeCheckout() {
       <div class="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
         <!-- Banner Title -->
         <div class="py-2.5 px-4 text-center text-xs font-black tracking-wide text-slate-700 bg-slate-50 border-b border-slate-200">
-          Tüm paketler için geçerlidir
+          {{ t('pricing_features_title') }}
         </div>
 
         <!-- 3 Column Grid -->
@@ -299,21 +342,21 @@ function completeCheckout() {
       <!-- RENEWAL BANNER -->
       <div class="rounded-2xl border border-blue-100 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs" style="background-color: #E0F2FE;">
         <div>
-          <h4 class="text-xs font-bold text-blue-900">Eğer üyeliğiniz varsa aşağıdaki bağlantıya tıklayıp %20 indirimli fiyatlarla üyeliğinizi uzatabilirsiniz.</h4>
+          <h4 class="text-xs font-bold text-blue-900">{{ t('pricing_renewal') }}</h4>
         </div>
         <button 
           type="button" 
           @click="handleRenewalClick"
           class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-3.5 transition shrink-0 shadow-xs flex items-center gap-1.5"
         >
-          Üyelik uzat <ArrowRight :size="14" />
+          {{ t('pricing_renewal_btn') }} <ArrowRight :size="14" />
         </button>
       </div>
 
       <!-- DISCLAIMER TEXT (Kırmızı uyarı yazısı) -->
       <div class="text-center pt-4">
         <p class="text-[10px] font-semibold leading-relaxed max-w-4xl mx-auto text-red-500">
-          Bu hizmet Özgürsoft Bilişim A.Ş. tarafından sunulmaktadır. Şirketimizin Kamu İhale Kurumu (EKAP) veya başka bir kamu kurumu ile herhangi bir bağlantısı bulunmamaktadır.
+          {{ t('pricing_disclaimer') }}
         </p>
       </div>
 
@@ -339,7 +382,7 @@ function completeCheckout() {
           <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
             <div class="flex items-center gap-2">
               <ShoppingCart :size="18" class="text-[#003057]" />
-              <h2 class="text-sm font-bold text-slate-800">Sipariş & Ödeme Sepeti</h2>
+              <h2 class="text-sm font-bold text-slate-800">{{ locale === 'tr' ? 'Sipariş & Ödeme Sepeti' : 'Order & Payment Cart' }}</h2>
             </div>
             <button @click="isCheckoutOpen = false" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition">
               <X :size="18" />
@@ -351,14 +394,14 @@ function completeCheckout() {
             <div v-if="!showSuccessScreen">
               <!-- Order Summary Card -->
               <div class="rounded-xl border border-slate-200 bg-slate-50/50 p-4 mb-6">
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">SEÇİLEN PAKET</div>
+                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{{ locale === 'tr' ? 'SEÇİLEN PAKET' : 'SELECTED PACKAGE' }}</div>
                 <div class="flex justify-between items-start">
                   <div>
                     <h3 class="text-sm font-bold text-slate-800">{{ selectedPackage?.name }}</h3>
                     <p class="text-[11px] text-slate-500 mt-0.5">{{ selectedPackage?.desc }}</p>
                   </div>
                   <div class="text-right">
-                    <span class="text-base font-black text-slate-900 font-mono">₺{{ selectedPackage?.price.toLocaleString('tr-TR') }}</span>
+                    <span class="text-base font-black text-slate-900 font-mono">{{ currencySymbol }}{{ selectedPackage?.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
                   </div>
                 </div>
                 
@@ -367,16 +410,16 @@ function completeCheckout() {
                 <!-- Pricing breakdown -->
                 <div class="space-y-1.5 text-xs text-slate-500 font-medium">
                   <div class="flex justify-between">
-                    <span>Net Tutar:</span>
-                    <span class="font-mono">₺{{ netAmount.toLocaleString('tr-TR') }}</span>
+                    <span>{{ locale === 'tr' ? 'Net Tutar:' : 'Net Amount:' }}</span>
+                    <span class="font-mono">{{ currencySymbol }}{{ netAmount.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
                   </div>
                   <div class="flex justify-between">
-                    <span>KDV (%20 - Dahil):</span>
-                    <span class="font-mono">₺{{ vatAmount.toLocaleString('tr-TR') }}</span>
+                    <span>{{ locale === 'tr' ? 'KDV (%20 - Dahil):' : 'VAT (20% - Incl.):' }}</span>
+                    <span class="font-mono">{{ currencySymbol }}{{ vatAmount.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
                   </div>
                   <div class="flex justify-between text-slate-800 font-bold border-t border-slate-200/60 pt-1.5 mt-1.5">
-                    <span>Toplam Ödeme:</span>
-                    <span class="font-mono text-blue-600">₺{{ totalAmount.toLocaleString('tr-TR') }}</span>
+                    <span>{{ locale === 'tr' ? 'Toplam Ödeme:' : 'Total Payment:' }}</span>
+                    <span class="font-mono text-blue-600">{{ currencySymbol }}{{ totalAmount.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
                   </div>
                 </div>
               </div>
@@ -384,7 +427,7 @@ function completeCheckout() {
               <!-- Payment Method Tabs -->
               <div class="space-y-6">
                 <div>
-                  <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">ÖDEME KANALI SEÇİN</label>
+                  <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">{{ locale === 'tr' ? 'ÖDEME KANALI SEÇİN' : 'CHOOSE PAYMENT CHANNEL' }}</label>
                   <div class="grid grid-cols-3 gap-2">
                     <button 
                       @click="activePaymentMethod = 'paytr'"
@@ -410,7 +453,7 @@ function completeCheckout() {
                       :class="activePaymentMethod === 'bank_transfer' ? 'border-blue-600 bg-blue-50/20 text-blue-600' : 'border-slate-200 hover:bg-slate-50 text-slate-600'"
                     >
                       <Building :size="16" />
-                      <span class="text-[10px] font-bold">Havale/EFT</span>
+                      <span class="text-[10px] font-bold">{{ locale === 'tr' ? 'Havale/EFT' : 'Bank Transfer' }}</span>
                     </button>
                   </div>
                 </div>
@@ -540,8 +583,8 @@ function completeCheckout() {
                     <span class="font-semibold text-slate-800">{{ selectedPackage?.name }}</span>
                   </div>
                   <div class="flex justify-between border-t border-slate-200/60 pt-1.5 mt-1.5 text-slate-800 font-bold">
-                    <span>Tutar (KDV Dahil):</span>
-                    <span class="font-mono text-[#003057]">₺{{ selectedPackage?.price.toLocaleString('tr-TR') }}</span>
+                    <span>{{ locale === 'tr' ? 'Tutar (KDV Dahil):' : 'Amount (VAT Incl.):' }}</span>
+                    <span class="font-mono text-[#003057]">{{ currencySymbol }}{{ selectedPackage?.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
                   </div>
                 </div>
               </div>
@@ -557,8 +600,8 @@ function completeCheckout() {
               class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white shadow-lg transition-all disabled:opacity-50"
               style="background-color: #003057;"
             >
-              <span v-if="isProcessing">Güvenli Ödeme Doğrulanıyor...</span>
-              <span v-else>₺{{ selectedPackage?.price.toLocaleString('tr-TR') }} Güvenli Ödeme Yap</span>
+              <span v-if="isProcessing">{{ locale === 'tr' ? 'Güvenli Ödeme Doğrulanıyor...' : 'Verifying Secure Payment...' }}</span>
+              <span v-else>{{ currencySymbol }}{{ selectedPackage?.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }} {{ locale === 'tr' ? 'Güvenli Ödeme Yap' : 'Pay Securely' }}</span>
               <ArrowRight v-if="!isProcessing" :size="14" />
             </button>
             <button 
@@ -566,7 +609,7 @@ function completeCheckout() {
               @click="completeCheckout"
               class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white shadow-lg transition-all bg-slate-900 hover:bg-slate-800 shadow-slate-900/15"
             >
-              Paneli Başlat
+              {{ locale === 'tr' ? 'Paneli Başlat' : 'Launch Dashboard' }}
               <ArrowRight :size="14" />
             </button>
           </div>

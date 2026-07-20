@@ -123,12 +123,14 @@ useHead({
 })
 
 import { onMounted } from 'vue'
+import { locale, detectLocale, t } from '~/composables/useLocale'
 
 const { cmsData } = useCmsData()
 
 const heroVideoRef = ref<HTMLVideoElement | null>(null)
 
 onMounted(() => {
+  detectLocale()
   if (heroVideoRef.value) {
     heroVideoRef.value.play().catch(err => {
       console.warn('Autoplay prevented:', err)
@@ -139,6 +141,46 @@ onMounted(() => {
     if (accepted === 'true') {
       showCookieConsent.value = false
     }
+  }
+})
+
+const currencySymbol = computed(() => locale.value === 'en' ? '$' : '₺')
+
+const localizedHero = computed(() => {
+  if (locale.value === 'en') {
+    return {
+      tagline: t('hero_tagline'),
+      titleLine1: 'Start Tenders,',
+      titleLine2: 'Get Bids.',
+      titleItalic: "Let's Agree.",
+      description: t('hero_desc'),
+      badgeStrip: [
+        'KVKK COMPLIANT',
+        'DOCUMENT TRACKING & TIMESTAMP',
+        'ENCRYPTED DATA TRANSFER',
+        'FREE DURING LAUNCH'
+      ]
+    }
+  } else {
+    return cmsData.value.hero
+  }
+})
+
+const localizedLiveTender = computed(() => {
+  if (locale.value === 'en') {
+    return {
+      title: 'CNC Custom Manufacturing Batch',
+      remainingTime: cmsData.value.liveTender.remainingTime,
+      bestBid: 12500,
+      openingPrice: 13000,
+      savingsText: 'SAVINGS 3.8%',
+      competitors: [
+        { name: 'Supplier #A47', price: 12500, leader: true },
+        { name: 'Supplier #D08', price: 12800, leader: false }
+      ]
+    }
+  } else {
+    return cmsData.value.liveTender
   }
 })
 
@@ -889,34 +931,34 @@ function toggleFilterSection(section: string) {
         <div class="text-left">
           <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em]" style="color: #1EAE4C;">
             <span class="h-px w-8" style="background-color: #1EAE4C;"></span>
-            {{ cmsData.hero.tagline }}
+            {{ localizedHero.tagline }}
           </div>
           <h1 class="text-4xl font-black leading-[1.15] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-            {{ cmsData.hero.titleLine1 }}<br />
-            {{ cmsData.hero.titleLine2 }}<br />
-            <span class="font-serif italic font-medium" style="color: #1EAE4C;">{{ cmsData.hero.titleItalic }}</span>
+            {{ localizedHero.titleLine1 }}<br />
+            {{ localizedHero.titleLine2 }}<br />
+            <span class="font-serif italic font-medium" style="color: #1EAE4C;">{{ localizedHero.titleItalic }}</span>
           </h1>
           <p class="mt-6 max-w-xl text-base leading-relaxed text-slate-600">
-            {{ cmsData.hero.description }}
+            {{ localizedHero.description }}
           </p>
           
           <!-- Buttons -->
           <div class="mt-8 flex flex-wrap items-center gap-3">
             <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/10 hover:opacity-90 transition-all" style="background: #003057;">
-              Hemen kurumsal hesap aç
+              {{ locale === 'tr' ? 'Hemen kurumsal hesap aç' : 'Open business account' }}
               <ArrowRight :size="15" />
             </NuxtLink>
             <a href="#nasil-calisir" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-6 py-4 text-xs font-black text-slate-700 hover:bg-white transition-all">
-              Nasıl çalışır
+              {{ locale === 'tr' ? 'Nasıl çalışır' : 'How it works' }}
               <ArrowRight :size="15" />
             </a>
           </div>
 
           <!-- Bottom Features Strip -->
           <div class="mt-8 text-[9px] font-bold text-slate-500 uppercase tracking-widest flex flex-wrap gap-x-4 gap-y-2">
-            <template v-for="(badge, index) in cmsData.hero.badgeStrip" :key="index">
+            <template v-for="(badge, index) in localizedHero.badgeStrip" :key="index">
               <span>{{ badge }}</span>
-              <span v-if="index < cmsData.hero.badgeStrip.length - 1" class="text-slate-300">•</span>
+              <span v-if="index < localizedHero.badgeStrip.length - 1" class="text-slate-300">•</span>
             </template>
           </div>
 
@@ -926,7 +968,7 @@ function toggleFilterSection(section: string) {
               <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
                 <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
               </span>
-              Video rehberlerini izle
+              {{ locale === 'tr' ? 'Video rehberlerini izle' : 'Watch video guides' }}
             </button>
           </div>
         </div>
@@ -939,31 +981,31 @@ function toggleFilterSection(section: string) {
             <div class="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
                 <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-slate-400">
-                  <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> TEMSİLİ CANLI İHALE
+                  <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> {{ locale === 'tr' ? 'TEMSİLİ CANLI İHALE' : 'LIVE AUCTION PREVIEW' }}
                 </span>
-                <h3 class="mt-1.5 text-base font-black text-slate-800">{{ cmsData.liveTender.title }}</h3>
+                <h3 class="mt-1.5 text-base font-black text-slate-800">{{ localizedLiveTender.title }}</h3>
               </div>
               <div class="text-right">
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">KALAN SÜRE</span>
-                <div class="mt-1 font-mono text-sm font-black text-slate-800">{{ cmsData.liveTender.remainingTime }}</div>
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">{{ locale === 'tr' ? 'KALAN SÜRE' : 'TIME REMAINING' }}</span>
+                <div class="mt-1 font-mono text-sm font-black text-slate-800">{{ localizedLiveTender.remainingTime }}</div>
               </div>
             </div>
 
             <!-- Price and Savings info -->
             <div class="py-6 flex justify-between items-start">
               <div>
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">GÜNCEL EN İYİ TEKLİF</span>
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">{{ locale === 'tr' ? 'GÜNCEL EN İYİ TEKLİF' : 'CURRENT BEST BID' }}</span>
                 <div class="mt-1 text-4xl font-black text-slate-900 tracking-tight font-mono">
-                  ₺{{ cmsData.liveTender.bestBid.toLocaleString('tr-TR') }}
+                  {{ currencySymbol }}{{ localizedLiveTender.bestBid.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
                 </div>
                 <div class="mt-2 text-[10px] text-slate-400 font-bold">
-                  AÇILIŞ FİYATI <span class="font-mono text-slate-600 line-through">₺{{ cmsData.liveTender.openingPrice.toLocaleString('tr-TR') }}</span>
+                  {{ locale === 'tr' ? 'AÇILIŞ FİYATI' : 'OPENING PRICE' }} <span class="font-mono text-slate-600 line-through">{{ currencySymbol }}{{ localizedLiveTender.openingPrice.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
                 </div>
               </div>
               
               <div class="text-right">
                 <div class="rounded-lg px-2.5 py-1 text-[9px] font-black" style="background: rgba(30,174,76,0.08); color: #1EAE4C;">
-                  {{ cmsData.liveTender.savingsText }}
+                  {{ localizedLiveTender.savingsText }}
                 </div>
               </div>
             </div>
@@ -971,11 +1013,11 @@ function toggleFilterSection(section: string) {
             <!-- Competitor List -->
             <div class="space-y-2 border-t border-slate-100 pt-5">
               <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                {{ cmsData.liveTender.competitors.length }} TEDARİKÇİ YARIŞIYOR
+                {{ localizedLiveTender.competitors.length }} {{ locale === 'tr' ? 'TEDARİKÇİ YARIŞIYOR' : 'SUPPLIERS BIDDING' }}
               </div>
               
               <div 
-                v-for="comp in cmsData.liveTender.competitors" 
+                v-for="comp in localizedLiveTender.competitors" 
                 :key="comp.name" 
                 class="flex items-center justify-between rounded-xl px-4 py-2.5"
                 :class="comp.leader ? 'border border-blue-200/60 bg-blue-50/40' : 'bg-white border border-slate-200/60'"
@@ -983,24 +1025,24 @@ function toggleFilterSection(section: string) {
                 <div class="flex items-center gap-2.5 text-xs font-bold" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
                   <span class="h-1.5 w-1.5 rounded-full" :class="comp.leader ? 'bg-blue-600' : 'bg-slate-300'"></span>
                   {{ comp.name }}
-                  <span v-if="comp.leader" class="rounded bg-blue-100 px-1.5 py-0.5 text-[8px] font-black text-blue-700">ÖNDE</span>
+                  <span v-if="comp.leader" class="rounded bg-blue-100 px-1.5 py-0.5 text-[8px] font-black text-blue-700">{{ locale === 'tr' ? 'ÖNDE' : 'LEADER' }}</span>
                 </div>
                 <span class="font-mono font-bold text-xs" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
-                  ₺{{ comp.price.toLocaleString('tr-TR') }}
+                  {{ currencySymbol }}{{ comp.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
                 </span>
               </div>
             </div>
 
             <!-- Bottom Tabs Inside Card -->
             <div class="grid grid-cols-4 gap-1 mt-6 border-t border-slate-100 pt-4 text-center">
-              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">TALEP</span>
-              <span class="text-[8px] font-black text-blue-600 py-1 border-b-2 border-blue-600">+ TEKLİF</span>
-              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">KARAR</span>
-              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">TESLİMAT</span>
+              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ locale === 'tr' ? 'TALEP' : 'REQUEST' }}</span>
+              <span class="text-[8px] font-black text-blue-600 py-1 border-b-2 border-blue-600">+ {{ locale === 'tr' ? 'TEKLİF' : 'BIDS' }}</span>
+              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ locale === 'tr' ? 'KARAR' : 'DECISION' }}</span>
+              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ locale === 'tr' ? 'TESLİMAT' : 'DELIVERY' }}</span>
             </div>
 
             <div class="mt-4 text-center text-[9px] italic text-slate-400">
-              Temsili veridir - Gerçek teklif değildir
+              {{ locale === 'tr' ? 'Temsili veridir - Gerçek teklif değildir' : 'Mock data - Not a real bid' }}
             </div>
           </div>
         </div>
