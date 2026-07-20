@@ -18,32 +18,32 @@ const subscriptionPackages = computed(() => {
       { 
         id: '1-ay', 
         name: 'Membership application - 1 month', 
-        price: 25, 
-        monthly: '$25.00 / month',
+        price: 29, 
+        monthly: '$29.00 / month',
         desc: '1 month subscription fee',
         isPromo: false
       },
       { 
         id: '3-ay', 
         name: 'Membership application - 3 months', 
-        price: 70, 
-        monthly: '$23.33 / month',
+        price: 79, 
+        monthly: '$26.33 / month',
         desc: '3 months subscription fee',
         isPromo: true
       },
       { 
         id: '6-ay', 
         name: 'Membership application - 6 months', 
-        price: 135, 
-        monthly: '$22.50 / month',
+        price: 149, 
+        monthly: '$24.83 / month',
         desc: '6 months subscription fee',
         isPromo: false
       },
       { 
         id: '9-ay', 
         name: 'Membership application - 9 months', 
-        price: 190, 
-        monthly: '$21.11 / month',
+        price: 199, 
+        monthly: '$22.11 / month',
         desc: '9 months subscription fee',
         isPromo: false
       }
