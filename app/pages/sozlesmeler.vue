@@ -2,6 +2,7 @@
 import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { FileText, Shield, Info, Briefcase, Award, Users, BookOpen, ArrowLeft } from 'lucide-vue-next'
+import { locale, detectLocale, t } from '~/composables/useLocale'
 
 definePageMeta({
   layout: 'public'
@@ -15,6 +16,7 @@ type TabKey = 'hakkimizda' | 'kvkk' | 'kullanim' | 'gizlilik' | 'kariyer' | 'is-
 const activeTab = ref<TabKey>('kvkk')
 
 onMounted(() => {
+  detectLocale()
   if (route.query.tab) {
     activeTab.value = route.query.tab as TabKey
   }
@@ -39,7 +41,7 @@ function setTab(tab: TabKey) {
       <!-- Back button -->
       <NuxtLink to="/" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-slate-900 transition mb-6">
         <ArrowLeft :size="14" />
-        Ana Sayfaya Dön
+        {{ locale === 'tr' ? 'Ana Sayfaya Dön' : 'Back to Home' }}
       </NuxtLink>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -47,7 +49,7 @@ function setTab(tab: TabKey) {
         <!-- Sidebar Navigation (3 cols) -->
         <div class="lg:col-span-3 space-y-2">
           <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-1 shadow-sm">
-            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 mb-2">BİLGİ MERKEZİ</div>
+            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 mb-2">{{ locale === 'tr' ? 'BİLGİ MERKEZİ' : 'INFORMATION CENTER' }}</div>
             
             <button 
               @click="setTab('hakkimizda')"
@@ -55,7 +57,7 @@ function setTab(tab: TabKey) {
               :class="activeTab === 'hakkimizda' ? 'bg-[#003057] text-white' : 'text-slate-600 hover:bg-slate-100'"
             >
               <Info :size="14" />
-              Hakkımızda
+              {{ locale === 'tr' ? 'Hakkımızda' : 'About Us' }}
             </button>
 
             <button 
@@ -64,7 +66,7 @@ function setTab(tab: TabKey) {
               :class="activeTab === 'kvkk' ? 'bg-[#003057] text-white' : 'text-slate-600 hover:bg-slate-100'"
             >
               <Shield :size="14" />
-              KVKK Aydınlatma
+              {{ locale === 'tr' ? 'KVKK Aydınlatma' : 'Privacy & KVKK' }}
             </button>
 
             <button 
@@ -73,7 +75,7 @@ function setTab(tab: TabKey) {
               :class="activeTab === 'kullanim' ? 'bg-[#003057] text-white' : 'text-slate-600 hover:bg-slate-100'"
             >
               <FileText :size="14" />
-              Kullanım Koşulları
+              {{ locale === 'tr' ? 'Kullanım Koşulları' : 'Terms of Service' }}
             </button>
 
             <button 
@@ -82,7 +84,7 @@ function setTab(tab: TabKey) {
               :class="activeTab === 'gizlilik' ? 'bg-[#003057] text-white' : 'text-slate-600 hover:bg-slate-100'"
             >
               <Shield :size="14" />
-              Gizlilik Politikası
+              {{ locale === 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy' }}
             </button>
 
             <button 
@@ -91,7 +93,7 @@ function setTab(tab: TabKey) {
               :class="activeTab === 'kariyer' ? 'bg-[#003057] text-white' : 'text-slate-600 hover:bg-slate-100'"
             >
               <Briefcase :size="14" />
-              Kariyer Fırsatları
+              {{ locale === 'tr' ? 'Kariyer Fırsatları' : 'Careers' }}
             </button>
 
             <button 
@@ -100,7 +102,7 @@ function setTab(tab: TabKey) {
               :class="activeTab === 'is-ortakligi' ? 'bg-[#003057] text-white' : 'text-slate-600 hover:bg-slate-100'"
             >
               <Award :size="14" />
-              İş Ortaklığı
+              {{ locale === 'tr' ? 'İş Ortaklığı' : 'Partnership' }}
             </button>
 
             <button 
@@ -109,7 +111,7 @@ function setTab(tab: TabKey) {
               :class="activeTab === 'blog' ? 'bg-[#003057] text-white' : 'text-slate-600 hover:bg-slate-100'"
             >
               <BookOpen :size="14" />
-              Blog & Basın
+              {{ locale === 'tr' ? 'Blog & Basın' : 'Blog & Press' }}
             </button>
           </div>
         </div>

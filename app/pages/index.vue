@@ -184,6 +184,102 @@ const localizedLiveTender = computed(() => {
   }
 })
 
+const localizedTrustStrip = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { title: 'Company Verification', desc: 'Verified and approved B2B supply chain' },
+      { title: 'Secure Workflow', desc: 'KVKK compliant, timestamped audit logs' },
+      { title: 'Transparent Comparison', desc: 'Technical & administrative specs on one screen' },
+      { title: 'Nationwide Service', desc: 'Supply network across all 81 provinces of Turkey' }
+    ]
+  } else {
+    return [
+      { title: 'Firma Doğrulama', desc: 'Güvenli ve onaylı ticaret zinciri' },
+      { title: 'Güvenli İşlem Akışı', desc: 'KVKK uyumlu, time-stamped kayıt izleri' },
+      { title: 'Şeffaf Karşılaştırma', desc: 'Teknik & idari detaylar tek ekranda' },
+      { title: '81 İlde Hizmet', desc: 'Tüm Türkiye sınırlarında tedarik ağı' }
+    ]
+  }
+})
+
+const localizedStats = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { value: '$420K+', label: 'Total Trade Volume' },
+      { value: '150+', label: 'Verified B2B Manufacturers' },
+      { value: '14.2%', label: 'Average Savings' },
+      { value: '$0', label: 'Buyer Membership Commission' }
+    ]
+  } else {
+    return cmsData.value.stats
+  }
+})
+
+const localizedVideoGuides = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { title: 'How to Register?', desc: 'Step-by-step membership guide', videoUrl: '' },
+      { title: 'How to Launch a Tender?', desc: 'Create your first reverse auction in minutes', videoUrl: '' },
+      { title: 'How to Submit a Bid?', desc: 'Supplier bidding process step-by-step', videoUrl: '' },
+      { title: 'Control Panel Guide', desc: 'Mastering the administrative dashboard', videoUrl: '' }
+    ]
+  } else {
+    return cmsData.value.videoGuides
+  }
+})
+
+const localizedFeatures = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { title: 'Reverse Auction System', desc: 'Live price reductions in real-time instead of sealed bid envelopes.' },
+      { title: 'Qualified Supplier Stream', desc: 'Verified business profiles with document checking.' },
+      { title: 'Documented Bid Flow', desc: 'Upload specifications, receive structured bids.' },
+      { title: 'Detailed Analytics', desc: 'Bid comparison, cost history tracking, and decision exports.' }
+    ]
+  } else {
+    return cmsData.value.features
+  }
+})
+
+const localizedTrustStandards = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { title: 'TLS 1.2+', subtitle: 'ENCRYPTED DATA', desc: 'HTTPS/SSL encryption for all data transmissions.' },
+      { title: 'KVKK & GDPR', subtitle: 'DATA PROTECTION', desc: 'Strict compliance with data privacy regulations.' },
+      { title: 'Audit Trail', subtitle: 'TRANSACTION LOGS', desc: 'Time-stamped logging for every action and bid.' },
+      { title: 'TR · EN', subtitle: 'MULTI-LANGUAGE', desc: 'Turkish and English dual interface support.' }
+    ]
+  } else {
+    return cmsData.value.trustStandards
+  }
+})
+
+const localizedProblems = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { title: 'Specifications & bids remain scattered.', desc: 'Separate forms sent to suppliers create chaos.' },
+      { title: 'Price comparison is manual and error-prone.', desc: 'Lost in endless Excel sheets and email threads.' },
+      { title: 'Supplier qualification lacks verification.', desc: 'Contracts made without thorough background checks.' }
+    ]
+  } else {
+    return cmsData.value.problems
+  }
+})
+
+const localizedFaqs = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { question: 'How does the reverse auction system work?', answer: 'The buyer opens a tender specifying quantities and technical specs. Verified suppliers compete in real time by lowering their bids before the clock expires.' },
+      { question: 'How are companies verified on the platform?', answer: 'Tax registration, signature circulars, and trade registry documents are verified by our team. Only approved corporate accounts can open tenders and place bids.' },
+      { question: 'Are payment and delivery processes secure?', answer: 'Yes. The buyer deposits funds into a secure account. Payment is released to the supplier only after inspection and approval.' },
+      { question: 'Do buyers pay any commission fee?', answer: 'No. GelAnlaşalım is free for buyers.' },
+      { question: 'Which industries can I open tenders in?', answer: 'Agriculture, construction, healthcare, technology, logistics, packaging, and more.' }
+    ]
+  } else {
+    return cmsData.value.faqs.map(f => ({ question: f.q, answer: f.a }))
+  }
+})
+
 function acceptCookieConsent() {
   showCookieConsent.value = false
   if (typeof window !== 'undefined') {
@@ -663,30 +759,67 @@ const sectors = [
   { name: 'Kültür, Rekreasyon ve Spor Hizmetleri', count: 38 }
 ]
 
-const tenderTypes = [
-  { name: 'Mal Alımı', count: 578 },
-  { name: 'Hizmet Alımı', count: 207 },
-  { name: 'Yapım İşi', count: 180 },
-  { name: 'Fason Üretim', count: 92 },
-  { name: 'Kiralama', count: 85 },
-  { name: 'Satış Talebi', count: 39 }
-]
+const tenderTypes = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { name: 'Goods Procurement', count: 578 },
+      { name: 'Service Procurement', count: 207 },
+      { name: 'Construction Work', count: 180 },
+      { name: 'Contract Manufacturing', count: 92 },
+      { name: 'Leasing / Rental', count: 85 },
+      { name: 'Sales Request', count: 39 }
+    ]
+  } else {
+    return [
+      { name: 'Mal Alımı', count: 578 },
+      { name: 'Hizmet Alımı', count: 207 },
+      { name: 'Yapım İşi', count: 180 },
+      { name: 'Fason Üretim', count: 92 },
+      { name: 'Kiralama', count: 85 },
+      { name: 'Satış Talebi', count: 39 }
+    ]
+  }
+})
 
-const offerMethods = [
-  { name: 'Açık Teklif', count: 546 },
-  { name: 'Kapalı Teklif', count: 395 },
-  { name: 'Davetli İhale', count: 151 },
-  { name: 'Ters İhale', count: 98 },
-  { name: 'Fiyat Araştırması', count: 68 },
-  { name: 'Doğrudan Teklif Talebi', count: 57 }
-]
+const offerMethods = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { name: 'Open Bidding', count: 546 },
+      { name: 'Sealed Bidding', count: 395 },
+      { name: 'Invited Tender', count: 151 },
+      { name: 'Reverse Auction', count: 98 },
+      { name: 'Price Research', count: 68 },
+      { name: 'Direct RFQ', count: 57 }
+    ]
+  } else {
+    return [
+      { name: 'Açık Teklif', count: 546 },
+      { name: 'Kapalı Teklif', count: 395 },
+      { name: 'Davetli İhale', count: 151 },
+      { name: 'Ters İhale', count: 98 },
+      { name: 'Fiyat Araştırması', count: 68 },
+      { name: 'Doğrudan Teklif Talebi', count: 57 }
+    ]
+  }
+})
 
-const pricingTypes = [
-  { name: 'Toplam / Götürü Bedel', count: 214 },
-  { name: 'Birim Fiyat', count: 323 },
-  { name: 'Kısmi Teklif Verilebilir', count: 115 },
-  { name: 'Kısmi Teklif Verilemez', count: 277 }
-]
+const pricingTypes = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { name: 'Lump Sum / Total Price', count: 214 },
+      { name: 'Unit Price', count: 323 },
+      { name: 'Partial Bids Allowed', count: 115 },
+      { name: 'Partial Bids Not Allowed', count: 277 }
+    ]
+  } else {
+    return [
+      { name: 'Toplam / Götürü Bedel', count: 214 },
+      { name: 'Birim Fiyat', count: 323 },
+      { name: 'Kısmi Teklif Verilebilir', count: 115 },
+      { name: 'Kısmi Teklif Verilemez', count: 277 }
+    ]
+  }
+})
 
 const tenders = [
   {
@@ -824,25 +957,69 @@ const faqs = [
   }
 ]
 
-const buyerSteps = [
-  { number: '01', title: 'İhtiyacını Yayınla', text: 'Ürün veya hizmet ihtiyacını oluştur. Teknik ve idari şartname belgelerini yükle.' },
-  { number: '02', title: 'Rekabet Arenasını İzle', text: 'Tedarikçilerin anlık fiyat kırarak yarıştığı tersine ihale arenasını canlı takip et.' },
-  { number: '03', title: 'En Uygun Teklifle Anlaş', text: 'Fiyat, kalite ve teslimat şartlarına göre en doğru kararı ver ve anlaşmayı kilitlesin.' }
-]
+const buyerSteps = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { number: '01', title: 'Publish Request', text: 'Define your product or service requirement. Upload technical and administrative specifications.' },
+      { number: '02', title: 'Watch Competition Arena', text: 'Track the live reverse auction arena where verified suppliers compete with instant price cuts.' },
+      { number: '03', title: 'Finalize Deal with Best Bid', text: 'Select the optimal proposal based on price, quality, and delivery terms, and lock the deal.' }
+    ]
+  } else {
+    return [
+      { number: '01', title: 'İhtiyacını Yayınla', text: 'Ürün veya hizmet ihtiyacını oluştur. Teknik ve idari şartname belgelerini yükle.' },
+      { number: '02', title: 'Rekabet Arenasını İzle', text: 'Tedarikçilerin anlık fiyat kırarak yarıştığı tersine ihale arenasını canlı takip et.' },
+      { number: '03', title: 'En Uygun Teklifle Anlaş', text: 'Fiyat, kalite ve teslimat şartlarına göre en doğru kararı ver ve anlaşmayı kilitlesin.' }
+    ]
+  }
+})
 
-const supplierSteps = [
-  { number: '01', title: 'İş Fırsatlarını Keşfet', text: 'Sektörüne ve uzmanlık alanına uygun güncel kurumsal ihaleleri saniyeler içinde bul.' },
-  { number: '02', title: 'Teklifini Gönder', text: 'Teknik şartları incele, malzeme bazlı birim fiyat teklifini güvenle ilet.' },
-  { number: '03', title: 'Yeni Portföy Kazan', text: 'Doğrulanmış B2B alıcılar ile doğrudan iş anlaşmaları yap ve ticaret hacmini büyüt.' }
-]
+const supplierSteps = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { number: '01', title: 'Explore Opportunities', text: 'Find active corporate tenders tailored to your sector and expertise in seconds.' },
+      { number: '02', title: 'Submit Proposal', text: 'Review technical specifications and securely submit your itemized unit price proposal.' },
+      { number: '03', title: 'Grow Client Portfolio', text: 'Close direct B2B deals with verified buyers and expand your corporate sales volume.' }
+    ]
+  } else {
+    return [
+      { number: '01', title: 'İş Fırsatlarını Keşfet', text: 'Sektörüne ve uzmanlık alanına uygun güncel kurumsal ihaleleri saniyeler içinde bul.' },
+      { number: '02', title: 'Teklifini Gönder', text: 'Teknik şartları incele, malzeme bazlı birim fiyat teklifini güvenle ilet.' },
+      { number: '03', title: 'Yeni Portföy Kazan', text: 'Doğrulanmış B2B alıcılar ile doğrudan iş anlaşmaları yap ve ticaret hacmini büyüt.' }
+    ]
+  }
+})
 
-const activeSteps = computed(() => activeAudience.value === 'buyer' ? buyerSteps : supplierSteps)
+const activeSteps = computed(() => activeAudience.value === 'buyer' ? buyerSteps.value : supplierSteps.value)
+
+const localizedTenders = computed(() => {
+  if (locale.value === 'en') {
+    return tenders.map(t => ({
+      ...t,
+      title: t.title === '500 Adet Kurumsal Dizüstü Bilgisayar Alımı' ? '500 Units Corporate Laptop Procurement' :
+             t.title === 'Üretim Tesisi Çatı ve İzolasyon Yenileme İşi' ? 'Manufacturing Facility Roof & Insulation Renovation' :
+             t.title === '12 Aylık Personel Taşıma Hizmeti' ? '12-Month Staff Shuttle Transportation Service' :
+             t.title === '100.000 Adet Özel Tasarım Ürün Kutusu Üretimi' ? '100,000 Units Custom Box Manufacturing' :
+             t.title === 'Kurumsal Web Yazılım ve Mobil Uygulama Projesi' ? 'Corporate Web Software & Mobile App Project' : t.title,
+      type: t.type === 'Mal Alımı' ? 'Goods Procurement' : t.type === 'Yapım İşi' ? 'Construction Work' : t.type === 'Hizmet Alımı' ? 'Service Procurement' : t.type === 'Fason Üretim' ? 'Contract Manufacturing' : t.type,
+      method: t.method === 'Kapalı Teklif' ? 'Sealed Bidding' : t.method === 'Açık Teklif' ? 'Open Bidding' : t.method === 'Ters İhale' ? 'Reverse Auction' : t.method === 'Davetli İhale' ? 'Invited Tender' : t.method,
+      pricing: t.pricing === 'Birim Fiyat' ? 'Unit Price' : t.pricing === 'Toplam / Götürü Bedel' ? 'Lump Sum / Total Price' : t.pricing,
+      value: t.value.replace('₺', '$').replace('5.500.000', '180,000').replace('1.250.000', '42,000').replace('840.000', '28,000').replace('350.000', '11,500').replace('2.800.000', '92,000'),
+      description: t.id === 1 ? 'Procurement of 500 corporate laptop computers in accordance with technical specs.' :
+                   t.id === 2 ? 'Roof cladding and thermal insulation renovation for factory production facility.' :
+                   t.id === 3 ? '12-month employee shuttle service for production plant staff.' :
+                   t.id === 4 ? 'Contract production of custom printed packaging boxes.' :
+                   'Development of corporate portal, mobile app, and admin control panel.'
+    }))
+  } else {
+    return tenders
+  }
+})
 
 /* =========================================================
    İN-MEMORY FİLTRELEME MANTIĞI
 ========================================================= */
 const filteredTenders = computed(() => {
-  return tenders.filter((t) => {
+  return localizedTenders.value.filter((t) => {
     const q = explorerSearch.value.toLocaleLowerCase('tr')
     const searchMatch = !explorerSearch.value || 
       t.title.toLocaleLowerCase('tr').includes(q) ||
@@ -1051,32 +1228,14 @@ function toggleFilterSection(section: string) {
       <!-- Trust Strip -->
       <div class="relative border-t border-slate-200/80 bg-white/60 py-6 backdrop-blur-md">
         <div class="mx-auto grid max-w-7xl gap-6 px-6 sm:grid-cols-2 lg:grid-cols-4 text-left">
-          <div class="flex items-center gap-3">
-            <ShieldCheck class="text-blue-600 shrink-0" :size="22" />
+          <div v-for="(item, idx) in localizedTrustStrip" :key="idx" class="flex items-center gap-3">
+            <ShieldCheck v-if="idx === 0" class="text-blue-600 shrink-0" :size="22" />
+            <LockKeyhole v-else-if="idx === 1" class="text-blue-600 shrink-0" :size="22" />
+            <Scale v-else-if="idx === 2" class="text-blue-600 shrink-0" :size="22" />
+            <Globe2 v-else class="text-blue-600 shrink-0" :size="22" />
             <div>
-              <div class="text-xs font-black text-slate-800">Firma Doğrulama</div>
-              <div class="text-[10px] text-slate-500">Güvenli ve onaylı ticaret zinciri</div>
-            </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <LockKeyhole class="text-blue-600 shrink-0" :size="22" />
-            <div>
-              <div class="text-xs font-black text-slate-800">Güvenli İşlem Akışı</div>
-              <div class="text-[10px] text-slate-500">KVKK uyumlu, time-stamped kayıt izleri</div>
-            </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <Scale class="text-blue-600 shrink-0" :size="22" />
-            <div>
-              <div class="text-xs font-black text-slate-800">Şeffaf Karşılaştırma</div>
-              <div class="text-[10px] text-slate-500">Teknik & idari detaylar tek ekranda</div>
-            </div>
-          </div>
-          <div class="flex items-center gap-3">
-            <Globe2 class="text-blue-600 shrink-0" :size="22" />
-            <div>
-              <div class="text-xs font-black text-slate-800">81 İlde Hizmet</div>
-              <div class="text-[10px] text-slate-500">Tüm Türkiye sınırlarında tedarik ağı</div>
+              <div class="text-xs font-black text-slate-800">{{ item.title }}</div>
+              <div class="text-[10px] text-slate-500">{{ item.desc }}</div>
             </div>
           </div>
         </div>
@@ -1615,12 +1774,12 @@ function toggleFilterSection(section: string) {
     <section id="sss" class="border-b border-slate-200 bg-white py-20">
       <div class="mx-auto max-w-4xl px-6">
         <div class="text-center mb-12">
-          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">SIKÇA SORULANLAR</span>
-          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Merak Edilen Konular</h2>
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'SIKÇA SORULANLAR' : 'FREQUENTLY ASKED QUESTIONS' }}</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Merak Edilen Konular' : 'Frequently Asked Questions' }}</h2>
         </div>
 
         <div class="space-y-4">
-          <div v-for="(faq, idx) in faqs" :key="idx" class="border border-slate-200 rounded-2xl bg-slate-50/50 overflow-hidden">
+          <div v-for="(faq, idx) in localizedFaqs" :key="idx" class="border border-slate-200 rounded-2xl bg-slate-50/50 overflow-hidden">
             <button @click="openFaq = openFaq === idx ? null : idx" class="flex w-full items-center justify-between p-5 text-left font-bold text-slate-800 text-xs sm:text-sm">
               <span>{{ faq.question }}</span>
               <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': openFaq === idx }" />
