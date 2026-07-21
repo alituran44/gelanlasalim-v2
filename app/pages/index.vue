@@ -20,7 +20,17 @@ import {
   AlertCircle,
   Plus,
   Star,
-  X
+  X,
+  Folder,
+  Briefcase,
+  Volume2,
+  Settings,
+  Hourglass,
+  Cookie,
+  ListTodo,
+  Sparkles,
+  Check,
+  Info
 } from 'lucide-vue-next'
 
 // Nuxt Layout Meta
@@ -454,6 +464,7 @@ function openCompanyModal(companyName: string) {
 const explorerSearch = ref('')
 const selectedCity = ref('')
 const selectedCat = ref('')
+const showAdvancedFilters = ref(false)
 const selectedSubcategory = ref('')
 const selectedSector = ref('')
 const selectedType = ref('')
@@ -1050,6 +1061,7 @@ function clearFilters() {
   selectedType.value = ''
   selectedMethod.value = ''
   selectedPricingType.value = ''
+  showAdvancedFilters.value = false
 }
 
 function toggleCategory(catName: string) {
@@ -1258,156 +1270,170 @@ function toggleFilterSection(section: string) {
           </div>
         </div>
 
-        <!-- Explorer Main Grid -->
-        <div class="grid grid-cols-1 xl:grid-cols-[330px_1fr] gap-8">
-          <!-- Sol Filtre Paneli -->
-          <aside class="h-fit overflow-hidden rounded-2xl border border-slate-200 bg-white premium-shadow flex flex-col text-left">
-            <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-4 py-4">
-              <div class="flex items-center gap-2 font-black text-slate-800 text-xs uppercase tracking-wider">
-                <SlidersHorizontal :size="16" class="text-blue-600" /> Filtreleme Seçenekleri
+        <!-- Explorer Main Layout -->
+        <div class="space-y-6">
+          <!-- Sleek Horizontal Filter Bar -->
+          <div class="bg-white border border-slate-200/80 rounded-3xl p-5 premium-shadow text-left space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+              <!-- Search query input (6 cols) -->
+              <div class="md:col-span-6 relative">
+                <Search :size="16" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input 
+                  v-model="explorerSearch" 
+                  type="text" 
+                  id="explorerSearchInput" 
+                  aria-label="İlan Arama" 
+                  :placeholder="locale === 'tr' ? 'İlan başlığı, malzeme veya firma adı ile arayın...' : 'Search by title, item, or company...'" 
+                  class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all font-medium" 
+                />
               </div>
-              <button @click="clearFilters" class="text-[10px] font-black text-blue-600 hover:text-blue-700 uppercase">Temizle</button>
-            </div>
 
-            <!-- Kategoriler Filtresi -->
-            <div class="border-b border-slate-200">
-              <button @click="toggleFilterSection('categories')" class="flex w-full items-center justify-between px-4 py-3.5 font-bold text-slate-700 text-xs">
-                <span>📂 Kategoriler</span>
-                <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': expandedFilterSection === 'categories' }" />
-              </button>
-              <div v-if="expandedFilterSection === 'categories'" class="max-h-[300px] overflow-y-auto border-t border-slate-100">
-                <div v-for="category in detailedCategories" :key="category.name" class="border-b border-slate-100 last:border-0">
-                  <div class="flex items-center gap-2 px-3 py-2.5 hover:bg-slate-50" :class="{ 'bg-blue-50/50': selectedCat === category.name }">
-                    <button @click="toggleCategory(category.name)" class="flex h-5 w-5 shrink-0 items-center justify-center text-slate-400 hover:text-blue-600">
-                      <ChevronDown :size="12" class="transition-transform" :class="{ '-rotate-90': expandedCategory !== category.name }" />
-                    </button>
-                    <button @click="selectMainCategory(category.name)" class="min-w-0 flex-1 text-left text-[11px] font-bold text-slate-700 hover:text-blue-600 leading-4">
-                      {{ category.name }}
-                    </button>
-                    <span class="shrink-0 rounded bg-slate-100 border border-slate-200 px-1.5 py-0.5 text-[9px] font-black text-slate-500">{{ category.count }}</span>
-                  </div>
-                  <div v-if="expandedCategory === category.name" class="bg-slate-50 border-t border-slate-100/50">
-                    <button v-for="sub in category.children" :key="sub" @click="selectSubcategory(category.name, sub)" class="flex w-full items-center gap-1.5 px-8 py-2 text-left text-[11px] font-semibold text-slate-600 hover:bg-white hover:text-blue-600" :class="{ 'bg-white text-blue-600 font-bold': selectedSubcategory === sub }">
-                      <span class="text-slate-300">└</span> {{ sub }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Sektörler Filtresi -->
-            <div class="border-b border-slate-200">
-              <button @click="toggleFilterSection('sectors')" class="flex w-full items-center justify-between px-4 py-3.5 font-bold text-slate-700 text-xs">
-                <span>🏭 Sektörler</span>
-                <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': expandedFilterSection === 'sectors' }" />
-              </button>
-              <div v-if="expandedFilterSection === 'sectors'" class="max-h-[300px] overflow-y-auto border-t border-slate-100">
-                <button v-for="sector in sectors" :key="sector.name" @click="selectedSector = sector.name" class="flex w-full items-center justify-between gap-3 border-b border-slate-100 px-4 py-2.5 text-left hover:bg-slate-50" :class="{ 'bg-blue-50/50 text-blue-600 font-bold': selectedSector === sector.name }">
-                  <span class="min-w-0 text-[11px] font-bold text-slate-700 leading-4">{{ sector.name }}</span>
-                  <span class="shrink-0 rounded border bg-white px-1.5 py-0.5 text-[9px] font-black text-slate-500">{{ sector.count }}</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- İhale Türü -->
-            <div class="border-b border-slate-200">
-              <button @click="toggleFilterSection('types')" class="flex w-full items-center justify-between px-4 py-3.5 font-bold text-slate-700 text-xs">
-                <span>🛠 İhale Türleri</span>
-                <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': expandedFilterSection === 'types' }" />
-              </button>
-              <div v-if="expandedFilterSection === 'types'" class="border-t border-slate-100 p-3">
-                <button v-for="t in tenderTypes" :key="t.name" @click="selectedType = t.name" class="mb-2 flex w-full items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-left hover:bg-slate-50" :class="{ 'border-blue-500 bg-blue-50/50 text-blue-600 font-bold': selectedType === t.name }">
-                  <span class="text-xs font-semibold text-slate-700">{{ t.name }}</span>
-                  <span class="text-[9px] font-black text-slate-500">{{ t.count }}</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Teklif Yöntemleri -->
-            <div class="border-b border-slate-200">
-              <button @click="toggleFilterSection('methods')" class="flex w-full items-center justify-between px-4 py-3.5 font-bold text-slate-700 text-xs">
-                <span>🔄 Teklif Yöntemleri</span>
-                <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': expandedFilterSection === 'methods' }" />
-              </button>
-              <div v-if="expandedFilterSection === 'methods'" class="border-t border-slate-100 p-3">
-                <button v-for="m in offerMethods" :key="m.name" @click="selectedMethod = m.name" class="mb-2 flex w-full items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-left hover:bg-slate-50" :class="{ 'border-blue-500 bg-blue-50/50 text-blue-600 font-bold': selectedMethod === m.name }">
-                  <span class="text-xs font-semibold text-slate-700">{{ m.name }}</span>
-                  <span class="text-[9px] font-black text-slate-500">{{ m.count }}</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Fiyatlandırma Türleri -->
-            <div class="border-b border-slate-200">
-              <button @click="toggleFilterSection('pricing')" class="flex w-full items-center justify-between px-4 py-3.5 font-bold text-slate-700 text-xs">
-                <span>📋 Fiyatlandırma Türleri</span>
-                <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': expandedFilterSection === 'pricing' }" />
-              </button>
-              <div v-if="expandedFilterSection === 'pricing'" class="border-t border-slate-100 p-3">
-                <button v-for="p in pricingTypes" :key="p.name" @click="selectedPricingType = p.name" class="mb-2 flex w-full items-center justify-between rounded-lg border border-slate-200 px-3 py-2 text-left hover:bg-slate-50" :class="{ 'border-blue-500 bg-blue-50/50 text-blue-600 font-bold': selectedPricingType === p.name }">
-                  <span class="text-xs font-semibold text-slate-700">{{ p.name }}</span>
-                  <span class="text-[9px] font-black text-slate-500">{{ p.count }}</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Teslim Yeri (İl) -->
-            <div>
-              <button @click="toggleFilterSection('cities')" class="flex w-full items-center justify-between px-4 py-3.5 font-bold text-slate-700 text-xs">
-                <span>📍 İş / Teslim Yeri</span>
-                <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': expandedFilterSection === 'cities' }" />
-              </button>
-              <div v-if="expandedFilterSection === 'cities'" class="border-t border-slate-100 p-3">
-                <select v-model="selectedCity" class="w-full rounded-xl border border-slate-200 bg-white p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500">
-                  <option value="">Tüm Türkiye</option>
+              <!-- City Select (3 cols) -->
+              <div class="md:col-span-3 relative">
+                <MapPin :size="16" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                <select 
+                  v-model="selectedCity" 
+                  class="w-full pl-11 pr-8 py-3 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white appearance-none transition-all cursor-pointer"
+                >
+                  <option value="">{{ locale === 'tr' ? 'Tüm Türkiye' : 'All Turkey' }}</option>
                   <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
+                </select>
+                <ChevronDown :size="14" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              </div>
+
+              <!-- Category Select (3 cols) -->
+              <div class="md:col-span-3 relative">
+                <Folder :size="16" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                <select 
+                  v-model="selectedCat" 
+                  class="w-full pl-11 pr-8 py-3 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white appearance-none transition-all cursor-pointer"
+                >
+                  <option value="">{{ locale === 'tr' ? 'Tüm Kategoriler' : 'All Categories' }}</option>
+                  <option v-for="cat in detailedCategories" :key="cat.name" :value="cat.name">{{ cat.name }}</option>
+                </select>
+                <ChevronDown :size="14" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              </div>
+            </div>
+
+            <!-- Advanced Filters Trigger & Clear Button -->
+            <div class="flex items-center justify-between border-t border-slate-100 pt-4 flex-wrap gap-3">
+              <button 
+                @click="showAdvancedFilters = !showAdvancedFilters" 
+                class="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600 transition"
+              >
+                <SlidersHorizontal :size="14" class="text-blue-600" />
+                {{ locale === 'tr' ? 'Gelişmiş Filtreler' : 'Advanced Filters' }}
+                <ChevronDown :size="12" class="transition-transform" :class="{ 'rotate-180': showAdvancedFilters }" />
+              </button>
+
+              <button 
+                v-if="selectedCat || selectedSubcategory || selectedSector || selectedCity || selectedType || selectedMethod || selectedPricingType || explorerSearch"
+                @click="clearFilters" 
+                class="text-[10px] font-black text-rose-600 hover:text-rose-700 uppercase flex items-center gap-1"
+              >
+                <X :size="12" />
+                {{ locale === 'tr' ? 'Filtreleri Temizle' : 'Clear Filters' }}
+              </button>
+            </div>
+
+            <!-- Advanced Filters Grid -->
+            <div 
+              v-if="showAdvancedFilters" 
+              class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 border-t border-slate-100 pt-4"
+            >
+              <!-- Sectors -->
+              <div class="space-y-1.5">
+                <label class="text-[9px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
+                  <Building2 :size="11" class="text-blue-600" />
+                  {{ locale === 'tr' ? 'Sektör' : 'Sector' }}
+                </label>
+                <select 
+                  v-model="selectedSector" 
+                  class="w-full p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
+                >
+                  <option value="">{{ locale === 'tr' ? 'Tüm Sektörler' : 'All Sectors' }}</option>
+                  <option v-for="sec in sectors" :key="sec.name" :value="sec.name">{{ sec.name }}</option>
+                </select>
+              </div>
+
+              <!-- Tender Type -->
+              <div class="space-y-1.5">
+                <label class="text-[9px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
+                  <Briefcase :size="11" class="text-blue-600" />
+                  {{ locale === 'tr' ? 'İhale Türü' : 'Tender Type' }}
+                </label>
+                <select 
+                  v-model="selectedType" 
+                  class="w-full p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
+                >
+                  <option value="">{{ locale === 'tr' ? 'Tüm Türler' : 'All Types' }}</option>
+                  <option v-for="t in tenderTypes" :key="t.name" :value="t.name">{{ t.name }}</option>
+                </select>
+              </div>
+
+              <!-- Bidding Method -->
+              <div class="space-y-1.5">
+                <label class="text-[9px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
+                  <SlidersHorizontal :size="11" class="text-blue-600" />
+                  {{ locale === 'tr' ? 'Teklif Yöntemi' : 'Bidding Method' }}
+                </label>
+                <select 
+                  v-model="selectedMethod" 
+                  class="w-full p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
+                >
+                  <option value="">{{ locale === 'tr' ? 'Tüm Yöntemler' : 'All Methods' }}</option>
+                  <option v-for="m in offerMethods" :key="m.name" :value="m.name">{{ m.name }}</option>
+                </select>
+              </div>
+
+              <!-- Pricing Type -->
+              <div class="space-y-1.5">
+                <label class="text-[9px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
+                  <FileText :size="11" class="text-blue-600" />
+                  {{ locale === 'tr' ? 'Fiyatlandırma Türü' : 'Pricing Type' }}
+                </label>
+                <select 
+                  v-model="selectedPricingType" 
+                  class="w-full p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
+                >
+                  <option value="">{{ locale === 'tr' ? 'Tüm Türler' : 'All Types' }}</option>
+                  <option v-for="p in pricingTypes" :key="p.name" :value="p.name">{{ p.name }}</option>
                 </select>
               </div>
             </div>
-          </aside>
+          </div>
 
-          <!-- Sağ Sonuçlar Paneli -->
-          <div class="flex flex-col gap-4 text-left">
-            <!-- Keyword search -->
-            <div class="p-4 bg-white border border-slate-200 rounded-2xl premium-shadow">
-              <div class="flex gap-2">
-                <div class="flex-1 relative">
-                  <Search :size="16" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="explorerSearch" type="text" id="explorerSearchInput" aria-label="İlan Arama" placeholder="İlan başlığı, malzeme veya firma adı ile arayın..." class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
-                </div>
-              </div>
+          <!-- Active Filter Badges -->
+          <div v-if="selectedCat || selectedSubcategory || selectedSector || selectedCity || selectedType || selectedMethod || selectedPricingType" class="rounded-2xl border border-blue-100 bg-blue-50/50 p-4 text-left">
+            <div class="text-[9px] font-black uppercase tracking-wider text-blue-600 mb-2">{{ locale === 'tr' ? 'Aktif Filtreler' : 'Active Filters' }}</div>
+            <div class="flex flex-wrap gap-2">
+              <button v-if="selectedCat" @click="selectedCat = ''; selectedSubcategory = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Kategori: {{ selectedCat }} <span class="text-slate-400">×</span>
+              </button>
+              <button v-if="selectedSubcategory" @click="selectedSubcategory = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Alt Kategori: {{ selectedSubcategory }} <span class="text-slate-400">×</span>
+              </button>
+              <button v-if="selectedSector" @click="selectedSector = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Sektör: {{ selectedSector }} <span class="text-slate-400">×</span>
+              </button>
+              <button v-if="selectedCity" @click="selectedCity = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Şehir: {{ selectedCity }} <span class="text-slate-400">×</span>
+              </button>
+              <button v-if="selectedType" @click="selectedType = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Tür: {{ selectedType }} <span class="text-slate-400">×</span>
+              </button>
+              <button v-if="selectedMethod" @click="selectedMethod = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Yöntem: {{ selectedMethod }} <span class="text-slate-400">×</span>
+              </button>
+              <button v-if="selectedPricingType" @click="selectedPricingType = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Fiyatlandırma: {{ selectedPricingType }} <span class="text-slate-400">×</span>
+              </button>
             </div>
+          </div>
 
-            <!-- Aktif Filtre Rozetleri -->
-            <div v-if="selectedCat || selectedSubcategory || selectedSector || selectedCity || selectedType || selectedMethod || selectedPricingType" class="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
-              <div class="text-[9px] font-black uppercase tracking-wider text-blue-600 mb-2">Aktif Filtreler</div>
-              <div class="flex flex-wrap gap-2">
-                <button v-if="selectedCat" @click="selectedCat = ''; selectedSubcategory = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Kategori: {{ selectedCat }} <span class="text-slate-400">×</span>
-                </button>
-                <button v-if="selectedSubcategory" @click="selectedSubcategory = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Alt Kategori: {{ selectedSubcategory }} <span class="text-slate-400">×</span>
-                </button>
-                <button v-if="selectedSector" @click="selectedSector = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Sektör: {{ selectedSector }} <span class="text-slate-400">×</span>
-                </button>
-                <button v-if="selectedCity" @click="selectedCity = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Şehir: {{ selectedCity }} <span class="text-slate-400">×</span>
-                </button>
-                <button v-if="selectedType" @click="selectedType = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Tür: {{ selectedType }} <span class="text-slate-400">×</span>
-                </button>
-                <button v-if="selectedMethod" @click="selectedMethod = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Yöntem: {{ selectedMethod }} <span class="text-slate-400">×</span>
-                </button>
-                <button v-if="selectedPricingType" @click="selectedPricingType = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Fiyatlandırma: {{ selectedPricingType }} <span class="text-slate-400">×</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="space-y-4">
-              <div v-for="res in filteredTenders" :key="res.id" class="p-6 rounded-2xl bg-white border premium-shadow flex flex-col text-left">
+          <!-- Tenders Feed -->
+          <div class="space-y-4">
+            <div v-for="res in filteredTenders" :key="res.id" class="p-6 rounded-2xl bg-white border premium-shadow flex flex-col text-left">
                 <div class="flex flex-col lg:flex-row lg:justify-between gap-6">
                   <div class="min-w-0 flex-1">
                     <div class="flex flex-wrap items-center gap-2">
@@ -1470,8 +1496,33 @@ function toggleFilterSection(section: string) {
 
                   <!-- Sekmeler -->
                   <div class="border-t border-sky-100 pt-3 flex flex-wrap gap-2">
-                    <button v-for="tab in ['malzeme', 'ilan', 'idari', 'teknik', 'benzer']" :key="tab" @click="activeDetailTab = tab" class="px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all uppercase tracking-wider" :class="activeDetailTab === tab ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'">
-                      {{ tab === 'malzeme' ? '📋 Malzeme Listesi' : tab === 'ilan' ? '📣 İhale İlanı' : tab === 'idari' ? '🛡 İdari Şartname' : tab === 'teknik' ? '⚙ Teknik Şartname' : '⏳ Canlı Eksiltme' }}
+                    <button 
+                      v-for="tab in ['malzeme', 'ilan', 'idari', 'teknik', 'benzer']" 
+                      :key="tab" 
+                      @click="activeDetailTab = tab" 
+                      class="px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all uppercase tracking-wider flex items-center gap-1.5" 
+                      :class="activeDetailTab === tab ? 'bg-blue-600 border-blue-600 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'"
+                    >
+                      <template v-if="tab === 'malzeme'">
+                        <ListTodo :size="12" />
+                        <span>{{ locale === 'tr' ? 'Malzeme Listesi' : 'Material List' }}</span>
+                      </template>
+                      <template v-else-if="tab === 'ilan'">
+                        <Volume2 :size="12" />
+                        <span>{{ locale === 'tr' ? 'İhale İlanı' : 'Tender Announcement' }}</span>
+                      </template>
+                      <template v-else-if="tab === 'idari'">
+                        <ShieldCheck :size="12" />
+                        <span>{{ locale === 'tr' ? 'İdari Şartname' : 'Administrative Spec' }}</span>
+                      </template>
+                      <template v-else-if="tab === 'teknik'">
+                        <Settings :size="12" />
+                        <span>{{ locale === 'tr' ? 'Teknik Şartname' : 'Technical Spec' }}</span>
+                      </template>
+                      <template v-else-if="tab === 'benzer'">
+                        <Hourglass :size="12" />
+                        <span>{{ locale === 'tr' ? 'Canlı Eksiltme' : 'Live Reverse Auction' }}</span>
+                      </template>
                     </button>
                   </div>
 
@@ -1561,8 +1612,7 @@ function toggleFilterSection(section: string) {
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
     <!-- TASARRUF HESAPLAMA ARACI (ROI) -->
     <section id="ozellikler" class="border-b border-slate-200 bg-slate-50 py-20">
@@ -1793,76 +1843,34 @@ function toggleFilterSection(section: string) {
     </section>
 
     <!-- E-E-A-T EDITORIAL & EXPERT VALIDATION SECTION -->
-    <section class="border-b border-slate-200 bg-white py-20">
+    <section class="border-b border-slate-200 bg-slate-50 py-16">
       <div class="mx-auto max-w-7xl px-6">
-        <div class="text-center mb-16 max-w-2xl mx-auto">
-          <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100">
-            <BadgeCheck :size="12" /> E-E-A-T DOĞRULANMIŞ PLATFORM
-          </span>
-          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Uzman Ekibimiz ve Editöryal Standartlarımız</h2>
-          <p class="mt-3 text-xs sm:text-sm text-slate-500 font-medium leading-relaxed font-sans">
-            Platformumuzdaki tüm tasarruf oranları, canlı eksiltme kuralları ve tedarik süreçleri, sektör profesyonelleri tarafından denetlenerek doğrulanır.
-          </p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- Expert 1 -->
-          <div class="group rounded-2xl border premium-shadow p-6 bg-white text-left">
-            <div class="flex items-center gap-4 mb-4">
-              <div class="h-12 w-12 rounded-full bg-blue-100 border border-blue-200 flex items-center justify-center text-blue-600 font-bold shrink-0 text-xs">
-                AT
-              </div>
-              <div>
-                <h4 class="text-xs font-black text-slate-800 uppercase tracking-wide">Ali Turan</h4>
-                <p class="text-[10px] text-blue-600 font-bold">Kıdemli Satın Alma Direktörü</p>
-              </div>
-            </div>
-            <p class="text-xs text-slate-500 leading-relaxed font-medium">
-              15 yılı aşkın global tedarik ve kurumsal B2B satın alma yönetimi tecrübesine sahiptir. Canlı eksiltme ve tersine ihale süreçlerinin platform entegrasyonuna liderlik etmektedir.
+        <div class="bg-white border border-slate-200 rounded-3xl p-8 premium-shadow text-left md:flex md:items-center md:justify-between gap-8">
+          <div class="space-y-3 max-w-2xl">
+            <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100">
+              <BadgeCheck :size="12" /> E-E-A-T {{ locale === 'tr' ? 'DOĞRULANMIŞ PLATFORM' : 'VERIFIED PLATFORM' }}
+            </span>
+            <h2 class="text-xl font-black text-slate-900 tracking-tight md:text-2xl">
+              {{ locale === 'tr' ? 'Editöryal Standartlar ve Güvenli Tedarik Güvencesi' : 'Editorial Standards & Secure Procurement Guarantee' }}
+            </h2>
+            <p class="text-xs text-slate-500 font-medium leading-relaxed font-sans">
+              {{ locale === 'tr' ? 'Platformumuzdaki canlı eksiltme kuralları, B2B tasarruf verileri ve sözleşme şablonları, satın alma profesyonelleri ve hukuk müşavirleri tarafından denetlenerek onaylanmaktadır.' : 'Live auction rules, B2B savings telemetry, and contract templates across our platform are reviewed and certified by seasoned procurement directors and legal advisors.' }}
             </p>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[9px] font-black uppercase text-slate-400">
-              <span>Uzmanlık: Tedarik Yönetimi</span>
-              <span class="text-blue-600 flex items-center gap-0.5"><ShieldCheck :size="10" /> Doğrulandı</span>
-            </div>
           </div>
-
-          <!-- Expert 2 -->
-          <div class="group rounded-2xl border premium-shadow p-6 bg-white text-left">
-            <div class="flex items-center gap-4 mb-4">
-              <div class="h-12 w-12 rounded-full bg-emerald-100 border border-emerald-200 flex items-center justify-center text-emerald-700 font-bold shrink-0 text-xs">
-                SK
-              </div>
-              <div>
-                <h4 class="text-xs font-black text-slate-800 uppercase tracking-wide">Prof. Dr. Selim Kaya</h4>
-                <p class="text-[10px] text-emerald-600 font-bold">Tedarik Zinciri Danışmanı</p>
-              </div>
+          
+          <div class="mt-6 md:mt-0 flex items-center gap-3 shrink-0">
+            <div class="flex -space-x-3 overflow-hidden">
+              <div class="inline-block h-9 w-9 rounded-full ring-2 ring-white bg-blue-100 border border-blue-200 flex items-center justify-center text-[10px] font-bold text-blue-700">AT</div>
+              <div class="inline-block h-9 w-9 rounded-full ring-2 ring-white bg-emerald-100 border border-emerald-200 flex items-center justify-center text-[10px] font-bold text-emerald-700">SK</div>
+              <div class="inline-block h-9 w-9 rounded-full ring-2 ring-white bg-amber-100 border border-amber-200 flex items-center justify-center text-[10px] font-bold text-amber-700">ZD</div>
             </div>
-            <p class="text-xs text-slate-500 leading-relaxed font-medium font-sans">
-              E-tedarik sistemleri, akıllı ihale algoritmaları ve tedarikçi derecelendirme metodolojileri üzerine akademik araştırmalar yürüten lojistik bilimcidir.
-            </p>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[9px] font-black uppercase text-slate-400">
-              <span>Uzmanlık: İhale Algoritmaları</span>
-              <span class="text-emerald-600 flex items-center gap-0.5"><ShieldCheck :size="10" /> Akademik</span>
-            </div>
-          </div>
-
-          <!-- Expert 3 -->
-          <div class="group rounded-2xl border premium-shadow p-6 bg-white text-left">
-            <div class="flex items-center gap-4 mb-4">
-              <div class="h-12 w-12 rounded-full bg-amber-100 border border-amber-200 flex items-center justify-center text-amber-700 font-bold shrink-0 text-xs">
-                ZD
+            <div class="text-left">
+              <div class="text-[10px] font-black text-slate-800 uppercase tracking-wide">
+                {{ locale === 'tr' ? 'Uzman Kurulu Tarafından Onaylandı' : 'Certified by Expert Board' }}
               </div>
-              <div>
-                <h4 class="text-xs font-black text-slate-800 uppercase tracking-wide">Zeynep Demir</h4>
-                <p class="text-[10px] text-amber-600 font-bold">Finans & Mevzuat Editörü</p>
+              <div class="text-[9px] text-slate-400 font-bold mt-0.5">
+                {{ locale === 'tr' ? 'Son İnceleme: Temmuz 2026' : 'Last Review: July 2026' }}
               </div>
-            </div>
-            <p class="text-xs text-slate-500 leading-relaxed font-medium">
-              B2B vergilendirme, doğrudan temin, faturalandırma, KDV muafiyetleri ve KVKK kurumsal veri güvenliği süreçlerinde platform içeriklerinin doğruluğunu denetler.
-            </p>
-            <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-[9px] font-black uppercase text-slate-400">
-              <span>Uzmanlık: Mevzuat & Uyum</span>
-              <span class="text-amber-600 flex items-center gap-0.5"><ShieldCheck :size="10" /> Hukuki</span>
             </div>
           </div>
         </div>
@@ -2163,14 +2171,15 @@ function toggleFilterSection(section: string) {
     <transition name="fade">
       <div v-if="showCookieConsent" class="fixed bottom-6 right-6 z-50 max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl text-left flex flex-col gap-3">
         <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
-          🍪 Çerez Onayı & KVKK
+          <Cookie :size="16" class="text-blue-600" />
+          {{ locale === 'tr' ? 'Çerez Onayı & KVKK' : 'Cookie Consent & Privacy' }}
         </h4>
         <p class="text-[11px] leading-relaxed text-slate-500 font-medium">
-          Platform kullanım deneyiminizi optimize etmek ve güvenli bir B2B ihale süreci sağlamak adına çerezleri kullanıyoruz.
+          {{ locale === 'tr' ? 'Platform kullanım deneyiminizi optimize etmek ve güvenli bir B2B ihale süreci sağlamak adına çerezleri kullanıyoruz.' : 'We use cookies to optimize your platform experience and guarantee secure B2B tender operations.' }}
         </p>
         <div class="flex gap-2 justify-end">
           <button @click="acceptCookieConsent" class="rounded-lg bg-blue-600 px-4 py-2 text-[10px] font-black text-white hover:bg-blue-700 transition-colors">
-            Kabul Et
+            {{ locale === 'tr' ? 'Kabul Et' : 'Accept' }}
           </button>
         </div>
       </div>
