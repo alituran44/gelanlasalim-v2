@@ -221,7 +221,12 @@ const localizedStats = computed(() => {
       { value: '$0', label: 'Buyer Membership Commission' }
     ]
   } else {
-    return cmsData.value.stats
+    return cmsData.value?.stats || [
+      { value: '12.4M ₺+', label: 'Toplam Ticaret Hacmi' },
+      { value: '150+', label: 'Doğrulanmış B2B Üretici' },
+      { value: '%14.2', label: 'Ortalama Tedarik Tasarrufu' },
+      { value: '0 ₺', label: 'Alıcı Üyelik Komisyonu' }
+    ]
   }
 })
 
@@ -234,7 +239,12 @@ const localizedVideoGuides = computed(() => {
       { title: 'Control Panel Guide', desc: 'Mastering the administrative dashboard', videoUrl: '' }
     ]
   } else {
-    return cmsData.value.videoGuides
+    return cmsData.value?.videoGuides || [
+      { title: 'Nasıl Kayıt Olunur?', desc: 'Adım adım üyelik rehberi', videoUrl: '' },
+      { title: 'Nasıl İhale Açılır?', desc: 'İlk ihalenizi dakikalar içinde oluşturun', videoUrl: '' },
+      { title: 'Nasıl Teklif Verilir?', desc: 'Tedarikçi olarak teklif verme süreci', videoUrl: '' },
+      { title: 'Yönetim Paneli', desc: 'Kontrol panelini etkin kullanma', videoUrl: '' }
+    ]
   }
 })
 
@@ -247,7 +257,12 @@ const localizedFeatures = computed(() => {
       { title: 'Detailed Analytics', desc: 'Bid comparison, cost history tracking, and decision exports.' }
     ]
   } else {
-    return cmsData.value.features
+    return cmsData.value?.features || [
+      { title: 'Ters İhale Sistemi', desc: 'Kapalı zarf usulü yerine...' },
+      { title: 'Nitelikli Tedarikçi Akışı', desc: 'Belge bazlı firma profili...' },
+      { title: 'Belgeli Teklif Akışı', desc: 'Şartname yükleme, teklif gelişi...' },
+      { title: 'Detaylı Analitik', desc: 'Teklif karşılaştırma, maliyet izi...' }
+    ]
   }
 })
 
@@ -260,7 +275,12 @@ const localizedTrustStandards = computed(() => {
       { title: 'TR · EN', subtitle: 'MULTI-LANGUAGE', desc: 'Turkish and English dual interface support.' }
     ]
   } else {
-    return cmsData.value.trustStandards
+    return cmsData.value?.trustStandards || [
+      { title: 'TLS 1.2+', subtitle: 'ŞİFRELİ İLETİŞİM', desc: 'HTTPS/SSL ile şifreli veri iletimi...' },
+      { title: 'KVKK', subtitle: 'KİŞİSEL VERİ KORUMA', desc: '6698 sayılı kanuna uygun...' },
+      { title: 'Kayıt İzi', subtitle: 'İŞLEM GÜNLÜKLERİ', desc: 'Her işlem zaman damgalı...' },
+      { title: 'TR · EN', subtitle: 'ÇOK DİL DESTEĞİ', desc: 'Türkçe ve İngilizce arayüz...' }
+    ]
   }
 })
 
@@ -272,7 +292,11 @@ const localizedProblems = computed(() => {
       { title: 'Supplier qualification lacks verification.', desc: 'Contracts made without thorough background checks.' }
     ]
   } else {
-    return cmsData.value.problems
+    return cmsData.value?.problems || [
+      { title: 'Şartname ve teklif penceresi herkes için ayrı zeminde kalır.', desc: 'Tedarikçilere ayrı teklif formları gönderilir...' },
+      { title: 'Fiyat kıyaslaması manuel ve hataya açıktır.', desc: 'Excel tabloları ve e-posta zincirleri...' },
+      { title: 'Tedarikçi kalifikasyonu belgesizdir.', desc: 'Referans kontrolü yapılmadan...' }
+    ]
   }
 })
 
@@ -286,7 +310,16 @@ const localizedFaqs = computed(() => {
       { question: 'Which industries can I open tenders in?', answer: 'Agriculture, construction, healthcare, technology, logistics, packaging, and more.' }
     ]
   } else {
-    return cmsData.value.faqs.map(f => ({ question: f.q, answer: f.a }))
+    if (cmsData.value?.faqs && Array.isArray(cmsData.value.faqs)) {
+      return cmsData.value.faqs.map(f => ({ question: f.q || (f as any).question, answer: f.a || (f as any).answer }))
+    }
+    return [
+      { question: 'GelAnlaşalım nedir?', answer: 'GelAnlaşalım, özel sektördeki firmaların satın alma taleplerini yayınlayabildiği, tedarikçilerin ise bu taleplere teklif verebildiği dijital ihale ve iş fırsatları platformudur.' },
+      { question: 'Kimler GelAnlaşalım kullanabilir?', answer: 'Satın alma yapan şirketler, KOBİ’ler, üreticiler, hizmet sağlayıcılar, tedarikçiler ve yeni müşterilere ulaşmak isteyen tüm işletmeler platformu kullanabilir.' },
+      { question: 'Platformda kamu ihaleleri var mı?', answer: 'Hayır. GelAnlaşalım özel sektör odaklıdır. Platformun temel amacı şirketler arasındaki satın alma, teklif toplama ve tedarik süreçlerini B2B tersine ihale modeliyle dijitalleştirmektir.' },
+      { question: 'İhale oluşturmak ücretli mi?', answer: 'Ücretlendirme modeli seçilen plana göre belirlenir. Temel planımız ile ücretsiz deneme yapabilir, profesyonel veya kurumsal paketlerimiz için lansmana özel indirimli fiyatlardan yararlanabilirsiniz.' },
+      { question: 'Ters ihale (Eksiltme) nedir?', answer: 'Tersine ihalede satıcılar belirlenen süre içerisinde en rekabetçi teklifleri sunar. Fiyatların anlık düştüğü şeffaf rekabet arenasıyla alıcı firma en optimum ticari koşullara ulaşır.' }
+    ]
   }
 })
 
