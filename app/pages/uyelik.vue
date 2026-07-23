@@ -85,11 +85,11 @@ function toggleSektor(key: string) {
 
 function goStep2() {
   if (!email.value || !password.value || !firstName.value || !lastName.value || !phone.value) {
-    errorMessage.value = 'Lütfen tüm zorunlu alanları doldurun.'
+    errorMessage.value = locale.value === 'tr' ? 'Lütfen tüm zorunlu alanları doldurun.' : 'Please fill in all required fields.'
     return
   }
   if (userRole.value === 'company' && !companyName.value) {
-    errorMessage.value = 'Lütfen firma adını girin.'
+    errorMessage.value = locale.value === 'tr' ? 'Lütfen firma adını girin.' : 'Please enter your company name.'
     return
   }
   errorMessage.value = ''
@@ -98,11 +98,11 @@ function goStep2() {
 
 function handleRegister() {
   if (!agreeKvkk.value) {
-    errorMessage.value = 'Lütfen KVKK ve Üyelik Sözleşmesini kabul edin.'
+    errorMessage.value = locale.value === 'tr' ? 'Lütfen KVKK ve Üyelik Sözleşmesini kabul edin.' : 'Please accept the KVKK Policy and Terms of Use.'
     return
   }
   if (seciliSektorler.value.length === 0) {
-    errorMessage.value = 'Lütfen en az bir sektör seçin.'
+    errorMessage.value = locale.value === 'tr' ? 'Lütfen en az bir sektör seçin.' : 'Please select at least one sector.'
     return
   }
 
@@ -126,13 +126,13 @@ function handleRegister() {
 }
 
 function handleOAuth(provider: 'google' | 'facebook') {
-  // UI placeholder — backend OAuth entegrasyonu ayrı sprint'te yapılacak
-  alert(`${provider === 'google' ? 'Google' : 'Facebook'} OAuth entegrasyonu yakında aktif olacak!`)
+  // UI placeholder — backend OAuth integration
+  alert(locale.value === 'tr' ? `${provider === 'google' ? 'Google' : 'Facebook'} OAuth entegrasyonu yakında aktif olacak!` : `${provider === 'google' ? 'Google' : 'Facebook'} OAuth sign-in will be available soon!`)
 }
 
 function handleLogin() {
   if (!loginEmail.value || !loginPassword.value) {
-    errorMessage.value = 'Lütfen e-posta ve şifrenizi girin.'
+    errorMessage.value = locale.value === 'tr' ? 'Lütfen e-posta ve şifrenizi girin.' : 'Please enter your email and password.'
     return
   }
 

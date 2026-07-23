@@ -2128,7 +2128,7 @@ function toggleFilterSection(section: string) {
             <div class="flex items-center gap-2">
               <h3 class="text-base font-black text-slate-800 uppercase tracking-wider">{{ selectedCompany.name }}</h3>
               <span v-if="selectedCompany.verified" class="rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100 uppercase tracking-wider">
-                ✓ ONAYLI
+                ✓ {{ locale === 'tr' ? 'ONAYLI' : 'VERIFIED' }}
               </span>
             </div>
             <p class="text-xs text-slate-400 mt-1 font-bold">{{ selectedCompany.sector }}</p>
@@ -2141,21 +2141,21 @@ function toggleFilterSection(section: string) {
         <!-- Details Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-3">
-            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">İLETİŞİM BİLGİLERİ</h4>
+            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">{{ locale === 'tr' ? 'İLETİŞİM BİLGİLERİ' : 'CONTACT INFORMATION' }}</h4>
             <div class="text-xs text-slate-600 space-y-2">
-              <div><strong class="text-slate-400">Telefon:</strong> {{ selectedCompany.phone }}</div>
-              <div><strong class="text-slate-400">E-Posta:</strong> {{ selectedCompany.email }}</div>
-              <div><strong class="text-slate-400">Adres:</strong> {{ selectedCompany.address }}</div>
+              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'Telefon:' : 'Phone:' }}</strong> {{ selectedCompany.phone }}</div>
+              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'E-Posta:' : 'Email:' }}</strong> {{ selectedCompany.email }}</div>
+              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'Adres:' : 'Address:' }}</strong> {{ selectedCompany.address }}</div>
             </div>
           </div>
 
           <div class="space-y-3">
-            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">RESMİ BİLGİLER</h4>
+            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">{{ locale === 'tr' ? 'RESMİ BİLGİLER' : 'OFFICIAL DETAILS' }}</h4>
             <div class="text-xs text-slate-600 space-y-2">
-              <div><strong class="text-slate-400">KEP Adresi:</strong> {{ selectedCompany.kep }}</div>
-              <div><strong class="text-slate-400">MERSİS No:</strong> {{ selectedCompany.mersis }}</div>
+              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'KEP Adresi:' : 'KEP Address:' }}</strong> {{ selectedCompany.kep }}</div>
+              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'MERSİS No:' : 'MERSIS No:' }}</strong> {{ selectedCompany.mersis }}</div>
               <div class="flex items-center gap-1">
-                <strong class="text-slate-400">Puanlama:</strong>
+                <strong class="text-slate-400">{{ locale === 'tr' ? 'Puanlama:' : 'Rating:' }}</strong>
                 <span class="font-bold text-amber-500 font-mono text-xs">{{ selectedCompany.rating }} / 5.0</span>
                 <div class="flex text-amber-400">
                   <Star v-for="i in 5" :key="i" :size="12" :fill="i <= Math.round(selectedCompany.rating) ? 'currentColor' : 'none'" />
@@ -2167,7 +2167,7 @@ function toggleFilterSection(section: string) {
 
         <!-- Comments & Reviews -->
         <div class="space-y-3 pt-4 border-t" style="border-color: #F1F5F9;">
-          <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">FİRMA HAKKINDA YORUMLAR ({{ selectedCompany.reviews.length }})</h4>
+          <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">{{ locale === 'tr' ? 'FİRMA HAKKINDA YORUMLAR' : 'COMPANY REVIEWS' }} ({{ selectedCompany.reviews.length }})</h4>
           
           <div class="space-y-3">
             <div 
@@ -2198,7 +2198,7 @@ function toggleFilterSection(section: string) {
         <!-- Footer -->
         <div class="flex justify-end pt-3 border-t" style="border-color: #F1F5F9;">
           <button @click="showCompanyModal = false" class="rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-5 py-3 transition shadow-lg">
-            Kapat
+            {{ locale === 'tr' ? 'Kapat' : 'Close' }}
           </button>
         </div>
       </div>
