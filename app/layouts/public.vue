@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { Handshake, Menu, X, ArrowRight, Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale, setLocale, detectLocale, t } from '~/composables/useLocale'
@@ -17,6 +17,19 @@ const activeTenders = ref([
   { title: "Tekstil Sanayi Ltd. - 5.000 Metre Dokuma Kumaş", time: "Kalan: 5 Saat", savings: "Hedef Tasarruf: %18" },
   { title: "Mega Gıda A.Ş. - 50.000 Adet Oluklu Mukavva Kutu", time: "Kalan: 7 Saat", savings: "Hedef Tasarruf: %20" }
 ])
+
+const localizedActiveTenders = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      { title: "Metro Logistics Corp. - 10,000 Liters Diesel Procurement", time: "2 Hours Left", savings: "Target Savings: 15%" },
+      { title: "Ozgur Construction - 120 Tons Ready Mix Concrete Supply", time: "1 Day Left", savings: "Target Savings: 12%" },
+      { title: "Tekstil Industries Ltd. - 5,000 Meters Woven Fabric", time: "5 Hours Left", savings: "Target Savings: 18%" },
+      { title: "Mega Food Corp. - 50,000 Pcs Corrugated Cardboard Boxes", time: "7 Hours Left", savings: "Target Savings: 20%" }
+    ]
+  } else {
+    return activeTenders.value
+  }
+})
 </script>
 
 <template>
@@ -31,14 +44,14 @@ const activeTenders = ref([
           </span>
           <div class="relative w-full overflow-hidden h-4 flex items-center mx-4">
             <div class="absolute whitespace-nowrap flex gap-12 animate-marquee hover:pause-animation">
-              <span v-for="(tender, idx) in activeTenders" :key="idx" class="flex items-center gap-2">
+              <span v-for="(tender, idx) in localizedActiveTenders" :key="idx" class="flex items-center gap-2">
                 <span class="text-slate-400">#{{ idx + 1 }}</span>
                 <span class="text-white">{{ tender.title }}</span>
                 <span class="text-[#1EAE4C] bg-[#1EAE4C]/10 border border-[#1EAE4C]/20 px-1.5 py-0.2 rounded text-[9px]">{{ tender.time }}</span>
                 <span class="text-blue-300 bg-blue-500/10 border border-blue-500/20 px-1.5 py-0.2 rounded text-[9px]">{{ tender.savings }}</span>
               </span>
               <!-- Duplicate for seamless scroll loop -->
-              <span v-for="(tender, idx) in activeTenders" :key="'dup-' + idx" class="flex items-center gap-2">
+              <span v-for="(tender, idx) in localizedActiveTenders" :key="'dup-' + idx" class="flex items-center gap-2">
                 <span class="text-slate-400">#{{ idx + 1 }}</span>
                 <span class="text-white">{{ tender.title }}</span>
                 <span class="text-[#1EAE4C] bg-[#1EAE4C]/10 border border-[#1EAE4C]/20 px-1.5 py-0.2 rounded text-[9px]">{{ tender.time }}</span>

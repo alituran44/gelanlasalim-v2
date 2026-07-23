@@ -358,11 +358,11 @@ function submitContactForm() {
   contactSuccess.value = false
   
   if (contactMethod.value === 'email' && !contactEmail.value) {
-    contactError.value = 'Lütfen geçerli bir kurumsal e-posta adresi girin.'
+    contactError.value = locale.value === 'tr' ? 'Lütfen geçerli bir kurumsal e-posta adresi girin.' : 'Please enter a valid corporate email address.'
     return
   }
   if (contactMethod.value === 'phone' && !contactPhone.value) {
-    contactError.value = 'Lütfen geçerli bir telefon numarası girin.'
+    contactError.value = locale.value === 'tr' ? 'Lütfen geçerli bir telefon numarası girin.' : 'Please enter a valid phone number.'
     return
   }
   
@@ -1660,17 +1660,17 @@ function toggleFilterSection(section: string) {
     <section id="ozellikler" class="border-b border-slate-200 bg-slate-50 py-20">
       <div class="mx-auto max-w-7xl px-6">
         <div class="text-center mb-12">
-          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">VERİMLİLİK & ROI</span>
-          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Tedarik Tasarrufunuzu Hesaplayın</h2>
-          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Yıllık satın alma hacminizi belirleyin, GelAnlaşalım B2B tersine ihale arenası ile elde edeceğiniz tahmini kazancı anında görün.</p>
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'VERİMLİLİK & ROI' : 'EFFICIENCY & ROI' }}</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Tedarik Tasarrufunuzu Hesaplayın' : 'Calculate Your Procurement Savings' }}</h2>
+          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ locale === 'tr' ? 'Yıllık satın alma hacminizi belirleyin, GelAnlaşalım B2B tersine ihale arenası ile elde edeceğiniz tahmini kazancı anında görün.' : 'Set your annual procurement volume and instantly see the estimated savings you will achieve with GelAnlasalim B2B reverse auction arena.' }}</p>
         </div>
 
         <div class="mx-auto max-w-4xl rounded-3xl border bg-white p-8 md:p-12 premium-shadow flex flex-col gap-8 md:gap-12 text-left">
           <!-- Slider area -->
           <div class="space-y-4">
             <div class="flex justify-between items-baseline">
-              <label for="annualVolumeInput" class="text-xs font-black text-slate-800 uppercase tracking-wider font-sans">Yıllık Satın Alma Hacminiz</label>
-              <span class="font-mono text-xl font-black text-blue-600">{{ annualVolume.toLocaleString('tr-TR') }} ₺</span>
+              <label for="annualVolumeInput" class="text-xs font-black text-slate-800 uppercase tracking-wider font-sans">{{ locale === 'tr' ? 'Yıllık Satın Alma Hacminiz' : 'Your Annual Procurement Volume' }}</label>
+              <span class="font-mono text-xl font-black text-blue-600">{{ annualVolume.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }} {{ locale === 'tr' ? '₺' : '$' }}</span>
             </div>
             <input
               type="range"
@@ -1682,9 +1682,9 @@ function toggleFilterSection(section: string) {
               class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
             <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              <span>500 Bin ₺</span>
-              <span>25 Milyon ₺</span>
-              <span>50 Milyon ₺</span>
+              <span>{{ locale === 'tr' ? '500 Bin ₺' : '$500K' }}</span>
+              <span>{{ locale === 'tr' ? '25 Milyon ₺' : '$25M' }}</span>
+              <span>{{ locale === 'tr' ? '50 Milyon ₺' : '$50M' }}</span>
             </div>
           </div>
 
@@ -1692,23 +1692,23 @@ function toggleFilterSection(section: string) {
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Col 1: Net Savings -->
             <div class="p-6 rounded-2xl bg-blue-50/50 border border-blue-100 flex flex-col gap-1.5">
-              <span class="text-[9px] font-black uppercase text-blue-600 tracking-wider">Tahmini Yıllık Tasarruf (%14.2)</span>
-              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ calculatedSavings.toLocaleString('tr-TR') }} ₺</span>
-              <span class="text-[10px] text-slate-400">Canlı eksiltme arenaları ortalama verisidir.</span>
+              <span class="text-[9px] font-black uppercase text-blue-600 tracking-wider">{{ locale === 'tr' ? 'Tahmini Yıllık Tasarruf (%14.2)' : 'Estimated Annual Savings (14.2%)' }}</span>
+              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ calculatedSavings.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }} {{ locale === 'tr' ? '₺' : '$' }}</span>
+              <span class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'Canlı eksiltme arenaları ortalama verisidir.' : 'Average telemetry data from live auctions.' }}</span>
             </div>
 
             <!-- Col 2: Labor hours saved -->
             <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col gap-1.5">
-              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">Kazanılan İş Gücü</span>
-              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ Math.round(savedHours) }} Adam/Ay</span>
-              <span class="text-[10px] text-slate-400">Excel kıyaslama ve e-posta takibi elenir.</span>
+              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">{{ locale === 'tr' ? 'Kazanılan İş Gücü' : 'Labor Hours Saved' }}</span>
+              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ Math.round(savedHours) }} {{ locale === 'tr' ? 'Adam/Ay' : 'Man/Month' }}</span>
+              <span class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'Excel kıyaslama ve e-posta takibi elenir.' : 'Eliminates tedious Excel comparison and email tracking.' }}</span>
             </div>
 
             <!-- Col 3: Qualified suppliers reached -->
             <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col gap-1.5">
-              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">Nitelikli Tedarikçi Erişimi</span>
-              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ connectedSuppliersCount }} Firma</span>
-              <span class="text-[10px] text-slate-400">İhalelerinize katılım sağlayacak hazır ağ.</span>
+              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">{{ locale === 'tr' ? 'Nitelikli Tedarikçi Erişimi' : 'Qualified Supplier Access' }}</span>
+              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ connectedSuppliersCount }} {{ locale === 'tr' ? 'Firma' : 'Companies' }}</span>
+              <span class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'İhalelerinize katılım sağlayacak hazır ağ.' : 'Ready supply network to join your tenders.' }}</span>
             </div>
           </div>
         </div>
@@ -1719,9 +1719,9 @@ function toggleFilterSection(section: string) {
     <section class="border-b border-slate-200 bg-white py-20">
       <div class="mx-auto max-w-7xl px-6">
         <div class="text-center mb-16">
-          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">ŞEFFAFLIK & GÜVENLİK</span>
-          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Kriptografik ve Damgalı İşlem Takibi</h2>
-          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Satın alma süreçleriniz, KVKK ve Türk Ticaret Kanunu uyumlu, TLS 1.2+ şifreli ve zaman damgalı değişmez bir log günlüğünde saklanır.</p>
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'ŞEFFAFLIK & GÜVENLİK' : 'TRANSPARENCY & SECURITY' }}</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Kriptografik ve Damgalı İşlem Takibi' : 'Cryptographic & Timestamped Transaction Tracking' }}</h2>
+          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ locale === 'tr' ? 'Satın alma süreçleriniz, KVKK ve Türk Ticaret Kanunu uyumlu, TLS 1.2+ şifreli ve zaman damgalı değişmez bir log günlüğünde saklanır.' : 'Your procurement processes are stored in an immutable log compliant with privacy regulations, secured with TLS 1.2+ encryption, and timestamped.' }}</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 relative text-left">
@@ -1732,9 +1732,9 @@ function toggleFilterSection(section: string) {
           <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
             <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">1</div>
             <div>
-              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Şartname Damgalama</h4>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'Şartname Damgalama' : 'Specification Timestamping' }}</h4>
               <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
-                Yayınladığınız şartname dosyalarının kriptografik hash kodları çıkarılarak sisteme damgalanır. Dosya değişmezliği garanti altındadır.
+                {{ locale === 'tr' ? 'Yayınladığınız şartname dosyalarının kriptografik hash kodları çıkarılarak sisteme damgalanır. Dosya değişmezliği garanti altındadır.' : 'Cryptographic hashes of your published specification files are stamped into the system. File immutability is guaranteed.' }}
               </p>
             </div>
           </div>
@@ -1743,9 +1743,9 @@ function toggleFilterSection(section: string) {
           <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
             <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">2</div>
             <div>
-              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">TLS 1.2+ Şifreli Teklifler</h4>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'TLS 1.2+ Şifreli Teklifler' : 'TLS 1.2+ Encrypted Bids' }}</h4>
               <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
-                Tedarikçilerin gönderdiği fiyat ve belgeler SSL/TLS katmanında şifrelenir. Son teklif tarihine kadar kimse tarafından deşifre edilemez.
+                {{ locale === 'tr' ? 'Tedarikçilerin gönderdiği fiyat ve belgeler SSL/TLS katmanında şifrelenir. Son teklif tarihine kadar kimse tarafından deşifre edilemez.' : 'Supplier pricing and documents are encrypted at the SSL/TLS layer. Bids remain sealed and undecryptable until the deadline.' }}
               </p>
             </div>
           </div>
@@ -1754,9 +1754,9 @@ function toggleFilterSection(section: string) {
           <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
             <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">3</div>
             <div>
-              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Canlı Eksiltme Günlüğü</h4>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'Canlı Eksiltme Günlüğü' : 'Live Auction Audit Trail' }}</h4>
               <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
-                Ters ihale arenalarındaki her fiyat düşüşü, zaman damgasıyla değişmez denetim izine (audit trail) yazılır. Rekabet şeffaftır.
+                {{ locale === 'tr' ? 'Ters ihale arenalarındaki her fiyat düşüşü, zaman damgasıyla değişmez denetim izine (audit trail) yazılır. Rekabet şeffaftır.' : 'Every price drop in reverse auction arenas is written to an immutable audit trail with a secure timestamp. Competition is fully transparent.' }}
               </p>
             </div>
           </div>
@@ -1765,9 +1765,9 @@ function toggleFilterSection(section: string) {
           <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
             <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">4</div>
             <div>
-              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">KVKK Uyumlu Arşivleme</h4>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'KVKK Uyumlu Arşivleme' : 'Regulatory Compliant Archiving' }}</h4>
               <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
-                Sonuçlanan ihaleler yasal saklama sürelerine uygun olarak güvenli sunucularda saklanır. Şirket içi denetimlere (audit) anında hazırdır.
+                {{ locale === 'tr' ? 'Sonuçlanan ihaleler yasal saklama sürelerine uygun olarak güvenli sunucularda saklanır. Şirket içi denetimlere (audit) anında hazırdır.' : 'Concluded tenders are preserved on secure servers in compliance with statutory retention periods, ready for internal/external audits.' }}
               </p>
             </div>
           </div>
@@ -1779,18 +1779,18 @@ function toggleFilterSection(section: string) {
     <section class="border-b border-slate-200 bg-slate-50 py-20">
       <div class="mx-auto max-w-7xl px-6">
         <div class="text-center mb-12">
-          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">ERP BAĞLANTILARI</span>
-          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Kurumsal Sistemlerinizle Tam Entegrasyon</h2>
-          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Satın alma, teklif, sipariş ve tedarikçi verilerinizi mevcut ERP, CRM ve finans sistemlerinize kontrollü API entegrasyonu ile bağlayın.</p>
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'ERP BAĞLANTILARI' : 'ERP INTEGRATIONS' }}</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Kurumsal Sistemlerinizle Tam Entegrasyon' : 'Full Integration with Enterprise Systems' }}</h2>
+          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ locale === 'tr' ? 'Satın alma, teklif, sipariş ve tedarikçi verilerinizi mevcut ERP, CRM ve finans sistemlerinize kontrollü API entegrasyonu ile bağlayın.' : 'Connect your procurement, bidding, order, and supplier data to your current ERP, CRM, and financial systems via managed APIs.' }}</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
           <!-- ERP Card 1: SAP -->
           <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">SAP Entegrasyonu</div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ locale === 'tr' ? 'SAP Entegrasyonu' : 'SAP Integration' }}</div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
-                Satın alma taleplerinizi (Purchase Requisitions) SAP üzerinden otomatik çekin; ihale sonuçlarını SAP sipariş fişi (Purchase Order) olarak geri aktarın.
+                {{ locale === 'tr' ? 'Satın alma taleplerinizi (Purchase Requisitions) SAP üzerinden otomatik çekin; ihale sonuçlarını SAP sipariş fişi (Purchase Order) olarak geri aktarın.' : 'Pull Purchase Requisitions automatically from SAP; write back bidding results directly as SAP Purchase Orders.' }}
               </p>
             </div>
             <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">ERP CONNECTED</span>
@@ -1799,9 +1799,9 @@ function toggleFilterSection(section: string) {
           <!-- ERP Card 2: Logo -->
           <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">Logo & Netsis Entegrasyonu</div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ locale === 'tr' ? 'Logo & Netsis Entegrasyonu' : 'Logo & Netsis Integration' }}</div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
-                Logo Tiger, Go3 veya Netsis sistemlerinizdeki malzeme kartlarını, birimlerini ve tedarikçi cari hesaplarını anlık olarak platformla senkronize edin.
+                {{ locale === 'tr' ? 'Logo Tiger, Go3 veya Netsis sistemlerinizdeki malzeme kartlarını, birimlerini ve tedarikçi cari hesaplarını anlık olarak platformla senkronize edin.' : 'Synchronize item cards, units of measure, and supplier current accounts from Logo Tiger, Go3, or Netsis systems in real-time.' }}
               </p>
             </div>
             <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">API READY</span>
@@ -1810,9 +1810,9 @@ function toggleFilterSection(section: string) {
           <!-- ERP Card 3: MS Dynamics -->
           <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">Microsoft Dynamics 365</div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ locale === 'tr' ? 'Microsoft Dynamics 365' : 'Microsoft Dynamics 365' }}</div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
-                Dynamics 365 Supply Chain Management modülüyle iki yönlü canlı veri eşleştirmesi sağlayarak teklif toplama süreçlerinizi hızlandırın.
+                {{ locale === 'tr' ? 'Dynamics 365 Supply Chain Management modülüyle iki yönlü canlı veri eşleştirmesi sağlayarak teklif toplama süreçlerinizi hızlandırın.' : 'Enable bidirectional live data mapping with Dynamics 365 Supply Chain Management to accelerate bid collection cycles.' }}
               </p>
             </div>
             <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">AUTOMATED SYNC</span>
@@ -1821,9 +1821,9 @@ function toggleFilterSection(section: string) {
           <!-- ERP Card 4: Excel & REST API -->
           <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">REST API & Excel Entegrasyonu</div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ locale === 'tr' ? 'REST API & Excel Entegrasyonu' : 'REST API & Excel Integration' }}</div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
-                Özel şirket içi yazılımlarınız için RESTful API uç noktaları. Veya tek tıkla gelişmiş Excel tablosu yükleme ve karşılaştırma aracı.
+                {{ locale === 'tr' ? 'Özel şirket içi yazılımlarınız için RESTful API uç noktaları. Veya tek tıkla gelişmiş Excel tablosu yükleme ve karşılaştırma aracı.' : 'RESTful API endpoints for proprietary in-house systems, or a one-click advanced Excel sheet upload and comparison utility.' }}
               </p>
             </div>
             <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">RESTFUL API / XLS</span>
@@ -1832,35 +1832,35 @@ function toggleFilterSection(section: string) {
       </div>
     </section>
 
-    <!-- NASIL ÇALIŞIR SECTION -->
-    <section id="nasil-calisir" class="border-b border-slate-200 bg-slate-50 py-20">
-      <div class="mx-auto max-w-7xl px-6 text-center">
-        <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">SÜREÇ REHBERİ</span>
-        <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Platform Nasıl Çalışıyor?</h2>
-        <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Alıcı veya tedarikçi rolünüze uygun adımları takip ederek süreci başlatın.</p>
+            <!-- NASIL ÇALIŞIR SECTION -->
+            <section id="nasil-calisir" class="border-b border-slate-200 bg-slate-50 py-20">
+              <div class="mx-auto max-w-7xl px-6 text-center">
+                <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'SÜREÇ REHBERİ' : 'PROCESS GUIDE' }}</span>
+                <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Platform Nasıl Çalışıyor?' : 'How the Platform Works' }}</h2>
+                <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ locale === 'tr' ? 'Alıcı veya tedarikçi rolünüze uygun adımları takip ederek süreci başlatın.' : 'Follow the steps matching your role as a buyer or supplier to get started.' }}</p>
 
-        <!-- Tab switcher -->
-        <div class="mt-8 flex justify-center">
-          <div class="inline-flex rounded-full border border-slate-200 bg-white p-1">
-            <button @click="activeAudience = 'buyer'" class="rounded-full px-6 py-2.5 text-xs font-bold transition-all" :class="activeAudience === 'buyer' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:text-slate-900'">
-              Alıcı Şirketler İçin
-            </button>
-            <button @click="activeAudience = 'supplier'" class="rounded-full px-6 py-2.5 text-xs font-bold transition-all" :class="activeAudience === 'supplier' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:text-slate-900'">
-              Tedarikçi Firmalar İçin
-            </button>
-          </div>
-        </div>
+                <!-- Tab switcher -->
+                <div class="mt-8 flex justify-center">
+                  <div class="inline-flex rounded-full border border-slate-200 bg-white p-1">
+                    <button @click="activeAudience = 'buyer'" class="rounded-full px-6 py-2.5 text-xs font-bold transition-all" :class="activeAudience === 'buyer' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:text-slate-900'">
+                      {{ locale === 'tr' ? 'Alıcı Şirketler İçin' : 'For Buyer Companies' }}
+                    </button>
+                    <button @click="activeAudience = 'supplier'" class="rounded-full px-6 py-2.5 text-xs font-bold transition-all" :class="activeAudience === 'supplier' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:text-slate-900'">
+                      {{ locale === 'tr' ? 'Tedarikçi Firmalar İçin' : 'For Supplier Companies' }}
+                    </button>
+                  </div>
+                </div>
 
-        <!-- Steps Grid -->
-        <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3 text-left">
-          <div v-for="step in activeSteps" :key="step.number" class="p-6 rounded-2xl bg-white border premium-shadow flex flex-col gap-4">
-            <div class="text-3xl font-serif font-black text-blue-600/30">{{ step.number }}</div>
-            <h3 class="text-base font-black text-slate-900">{{ step.title }}</h3>
-            <p class="text-xs leading-relaxed text-slate-500 font-medium">{{ step.text }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
+                <!-- Steps Grid -->
+                <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3 text-left">
+                  <div v-for="step in activeSteps" :key="step.number" class="p-6 rounded-2xl bg-white border premium-shadow flex flex-col gap-4">
+                    <div class="text-3xl font-serif font-black text-blue-600/30">{{ step.number }}</div>
+                    <h3 class="text-base font-black text-slate-900">{{ step.title }}</h3>
+                    <p class="text-xs leading-relaxed text-slate-500 font-medium">{{ step.text }}</p>
+                  </div>
+                </div>
+              </div>
+            </section>
 
     <!-- FAQ SECTION -->
     <section id="sss" class="border-b border-slate-200 bg-white py-20">
@@ -1927,10 +1927,10 @@ function toggleFilterSection(section: string) {
       
       <div class="relative z-20 mx-auto max-w-5xl px-6 text-center space-y-6">
         <span class="bg-[#1EAE4C]/10 border border-[#1EAE4C]/20 text-[#1EAE4C] text-[9px] font-black uppercase px-3 py-1 rounded-full tracking-wider inline-block animate-pulse">
-          ⚡ ÜCRETSİZ LANSMAN DÖNEMİ
+          ⚡ {{ locale === 'tr' ? 'ÜCRETSİZ LANSMAN DÖNEMİ' : 'FREE LAUNCH PERIOD' }}
         </span>
         <h2 class="text-3xl font-black tracking-tight sm:text-4xl">
-          Tedarik Süreçlerinizi Bugün Dijitalleştirin
+          {{ locale === 'tr' ? 'Tedarik Süreçlerinizi Bugün Dijitalleştirin' : 'Digitalize Your Procurement Processes Today' }}
         </h2>
         <p class="max-w-xl mx-auto text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
           Ters ihale arenamıza katılın, malzeme ve lojistik maliyetlerinizi canlı eksiltme ile düşürün. Satın alma taleplerinizi tek merkezden yönetmeye hemen başlayın.
@@ -1964,13 +1964,13 @@ function toggleFilterSection(section: string) {
           <!-- Left Content -->
           <div class="lg:col-span-6 text-left space-y-8">
             <div class="space-y-4">
-              <span class="text-[10px] font-black uppercase tracking-widest" style="color: #1EAE4C;">BİZİMLE İLETİŞİME GEÇİN</span>
+              <span class="text-[10px] font-black uppercase tracking-widest" style="color: #1EAE4C;">{{ locale === 'tr' ? 'BİZİMLE İLETİŞİME GEÇİN' : 'CONTACT US' }}</span>
               <h2 class="text-3xl font-black text-slate-900 tracking-tight md:text-5xl leading-tight">
-                Satın alma süreçlerinizi <br class="hidden sm:inline" />
-                <span class="italic" style="color: #1EAE4C;">tek panelde toplayın.</span>
+                {{ locale === 'tr' ? 'Satın alma süreçlerinizi' : 'Gather your procurement' }} <br class="hidden sm:inline" />
+                <span class="italic" style="color: #1EAE4C;">{{ locale === 'tr' ? 'tek panelde toplayın.' : 'in a single panel.' }}</span>
               </h2>
               <p class="text-xs sm:text-sm leading-relaxed text-slate-500 font-medium max-w-md">
-                Ekibimiz satın alma süreçlerinizde size yardımcı olmaya hazır. İletişim bilgilerinizi bırakın, en kısa sürede dönüş yapalım.
+                {{ locale === 'tr' ? 'Ekibimiz satın alma süreçlerinizde size yardımcı olmaya hazır. İletişim bilgilerinizi bırakın, en kısa sürede dönüş yapalım.' : 'Our team is ready to help you with your procurement processes. Leave your contact info and we will reach out as soon as possible.' }}
               </p>
             </div>
 
@@ -1980,25 +1980,25 @@ function toggleFilterSection(section: string) {
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">
                   <CheckCircle2 :size="16" />
                 </div>
-                <span class="text-xs font-black text-slate-800 tracking-wide">Hızlı kurumsal kurulum</span>
+                <span class="text-xs font-black text-slate-800 tracking-wide">{{ locale === 'tr' ? 'Hızlı kurumsal kurulum' : 'Fast enterprise setup' }}</span>
               </div>
               <div class="flex items-center gap-3">
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">
                   <CheckCircle2 :size="16" />
                 </div>
-                <span class="text-xs font-black text-slate-800 tracking-wide">KVKK kapsamında altyapı</span>
+                <span class="text-xs font-black text-slate-800 tracking-wide">{{ locale === 'tr' ? 'KVKK kapsamında altyapı' : 'Regulatory compliant infrastructure' }}</span>
               </div>
               <div class="flex items-center gap-3">
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">
                   <CheckCircle2 :size="16" />
                 </div>
-                <span class="text-xs font-black text-slate-800 tracking-wide">Hızlı onboarding</span>
+                <span class="text-xs font-black text-slate-800 tracking-wide">{{ locale === 'tr' ? 'Hızlı onboarding' : 'Fast onboarding' }}</span>
               </div>
               <div class="flex items-center gap-3">
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">
                   <CheckCircle2 :size="16" />
                 </div>
-                <span class="text-xs font-black text-slate-800 tracking-wide">Yerli destek ekibi</span>
+                <span class="text-xs font-black text-slate-800 tracking-wide">{{ locale === 'tr' ? 'Yerli destek ekibi' : 'Dedicated support team' }}</span>
               </div>
             </div>
           </div>
@@ -2013,9 +2013,9 @@ function toggleFilterSection(section: string) {
                   <CheckCircle2 :size="28" />
                 </div>
                 <div class="space-y-2">
-                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">TALEBİNİZ ALINDI!</h3>
+                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">{{ locale === 'tr' ? 'TALEBİNİZ ALINDI!' : 'REQUEST RECEIVED!' }}</h3>
                   <p class="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed font-medium">
-                    Mesajınız başarıyla iletildi. Uzman ekibimiz en kısa sürede sizinle iletişime geçecektir.
+                    {{ locale === 'tr' ? 'Mesajınız başarıyla iletildi. Uzman ekibimiz en kısa sürede sizinle iletişime geçecektir.' : 'Your message has been sent. Our team will contact you shortly.' }}
                   </p>
                 </div>
                 <button 
@@ -2023,15 +2023,15 @@ function toggleFilterSection(section: string) {
                   @click="contactSuccess = false" 
                   class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:underline"
                 >
-                  Yeni Mesaj Gönder
+                  {{ locale === 'tr' ? 'Yeni Mesaj Gönder' : 'Send New Message' }}
                 </button>
               </div>
 
               <!-- Form State -->
               <div v-else class="space-y-6">
                 <div class="space-y-1">
-                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">SİZİNLE İLETİŞİME GEÇELİM</span>
-                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">BİZE NASIL ULAŞALIM?</h3>
+                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">{{ locale === 'tr' ? 'SİZİNLE İLETİŞİME GEÇELİM' : 'LET US CONTACT YOU' }}</span>
+                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">{{ locale === 'tr' ? 'BİZE NASIL ULAŞALIM?' : 'HOW SHOULD WE REACH YOU?' }}</h3>
                 </div>
 
                 <!-- Contact Method Toggle Tabs -->
@@ -2042,7 +2042,7 @@ function toggleFilterSection(section: string) {
                     class="rounded-lg py-2.5 text-xs font-bold text-center transition-all"
                     :class="contactMethod === 'email' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'"
                   >
-                    E-posta
+                    {{ locale === 'tr' ? 'E-posta' : 'Email' }}
                   </button>
                   <button
                     type="button"
@@ -2050,7 +2050,7 @@ function toggleFilterSection(section: string) {
                     class="rounded-lg py-2.5 text-xs font-bold text-center transition-all"
                     :class="contactMethod === 'phone' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'"
                   >
-                    Telefon
+                    {{ locale === 'tr' ? 'Telefon' : 'Phone' }}
                   </button>
                 </div>
 
@@ -2058,7 +2058,7 @@ function toggleFilterSection(section: string) {
                 <div class="space-y-4">
                   <!-- E-posta field -->
                   <div v-if="contactMethod === 'email'">
-                    <label for="contactEmailInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">E-posta Adresiniz</label>
+                    <label for="contactEmailInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">{{ locale === 'tr' ? 'E-posta Adresiniz' : 'Your Email Address' }}</label>
                     <input
                       v-model="contactEmail"
                       type="email"
@@ -2070,7 +2070,7 @@ function toggleFilterSection(section: string) {
 
                   <!-- Telefon field -->
                   <div v-else>
-                    <label for="contactPhoneInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">Telefon Numaranız</label>
+                    <label for="contactPhoneInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">{{ locale === 'tr' ? 'Telefon Numaranız' : 'Your Phone Number' }}</label>
                     <input
                       v-model="contactPhone"
                       type="tel"
@@ -2082,12 +2082,12 @@ function toggleFilterSection(section: string) {
 
                   <!-- Message field -->
                   <div>
-                    <label for="contactMessageInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">Size nasıl yardımcı olabiliriz?</label>
+                    <label for="contactMessageInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">{{ locale === 'tr' ? 'Size nasıl yardımcı olabiliriz?' : 'How can we help you?' }}</label>
                     <textarea
                       v-model="contactMessage"
                       rows="3"
                       id="contactMessageInput"
-                      placeholder="Taleplerinizi belirtin..."
+                      :placeholder="locale === 'tr' ? 'Taleplerinizi belirtin...' : 'Describe your requests...'"
                       class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all resize-none"
                     ></textarea>
                   </div>
@@ -2106,14 +2106,14 @@ function toggleFilterSection(section: string) {
                   :disabled="contactSubmitted"
                   class="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-black text-white hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/10 disabled:opacity-60"
                 >
-                  <span v-if="contactSubmitted">Gönderiliyor...</span>
-                  <span v-else class="flex items-center gap-1">Gönder <ArrowRight :size="14" /></span>
+                  <span v-if="contactSubmitted">{{ locale === 'tr' ? 'Gönderiyor...' : 'Sending...' }}</span>
+                  <span v-else class="flex items-center gap-1">{{ locale === 'tr' ? 'Gönder' : 'Send' }} <ArrowRight :size="14" /></span>
                 </button>
 
                 <!-- Footer Sublinks -->
                 <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-400 pt-2">
-                  <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors">Önce nasıl çalıştığını inceleyin →</a>
-                  <NuxtLink to="/uyelik" class="hover:text-blue-600 transition-colors">Kurumsal hesap aç →</NuxtLink>
+                  <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Önce nasıl çalıştığını inceleyin →' : 'See how it works first →' }}</a>
+                  <NuxtLink to="/uyelik" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Kurumsal hesap aç →' : 'Create corporate account →' }}</NuxtLink>
                 </div>
               </div>
 
