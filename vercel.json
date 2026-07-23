@@ -9,7 +9,7 @@
         },
         {
           "key": "Content-Security-Policy",
-          "value": "default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; media-src 'self' data: https:; connect-src 'self' https:; font-src 'self' https: data:; style-src 'self' 'unsafe-inline' https: fonts.googleapis.com; font-src 'self' https: data: fonts.gstatic.com;"
+          "value": "default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; media-src 'self' data: https:; connect-src 'self' https:; style-src 'self' 'unsafe-inline' https: fonts.googleapis.com; font-src 'self' https: data: fonts.gstatic.com;"
         },
         {
           "key": "X-Content-Type-Options",
