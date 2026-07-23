@@ -1185,15 +1185,7 @@ function toggleFilterSection(section: string) {
             </template>
           </div>
 
-          <!-- Video Button -->
-          <div class="mt-8">
-            <button class="flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              </span>
-              {{ locale === 'tr' ? 'Video rehberlerini izle' : 'Watch video guides' }}
-            </button>
-          </div>
+
         </div>
 
         <!-- Hero Right (Live Card styled like the screenshot) -->
