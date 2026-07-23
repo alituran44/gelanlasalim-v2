@@ -51,9 +51,6 @@ useSeoMeta({
 })
 
 useHead({
-  htmlAttrs: {
-    lang: 'tr'
-  },
   link: [
     { rel: 'icon', type: 'image/png', href: '/logo.png' },
     { rel: 'canonical', href: 'https://gelanlasalim-v2.vercel.app' }
@@ -62,73 +59,6 @@ useHead({
     { name: 'keywords', content: 'b2b ihale, tersine ihale, eksiltme ihalesi, teklif toplama, kurumsal satın alma, tedarikçi yönetimi, ekap ihale, kik, doğrudan temin' },
     { name: 'author', content: 'GelAnlaşalım Bilişim A.Ş.' },
     { name: 'robots', content: 'index, follow' }
-  ],
-  script: [
-    {
-      type: 'application/ld+json',
-      innerHTML: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'WebSite',
-        'name': 'GelAnlaşalım',
-        'url': 'https://gelanlasalim-v2.vercel.app',
-        'description': 'B2B Tersine İhale, Eksiltme ve Kurumsal Satın Alma Platformu',
-        'potentialAction': {
-          '@type': 'SearchAction',
-          'target': 'https://gelanlasalim-v2.vercel.app/?q={search_term_string}',
-          'query-input': 'required name=search_term_string'
-        }
-      })
-    },
-    {
-      type: 'application/ld+json',
-      innerHTML: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Organization',
-        'name': 'GelAnlaşalım Bilişim A.Ş.',
-        'url': 'https://gelanlasalim-v2.vercel.app',
-        'logo': 'https://gelanlasalim-v2.vercel.app/logo.png',
-        'contactPoint': {
-          '@type': 'ContactPoint',
-          'telephone': '+90-555-555-55-55',
-          'contactType': 'customer service',
-          'email': 'info@gelanlasalim.com',
-          'availableLanguage': 'Turkish'
-        }
-      })
-    },
-    {
-      type: 'application/ld+json',
-      innerHTML: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'FAQPage',
-        'mainEntity': [
-          {
-            '@type': 'Question',
-            'name': 'Tersine ihale (eksiltme) sistemi nasıl çalışır?',
-            'acceptedAnswer': {
-              '@type': 'Answer',
-              'text': 'Alıcı firma satın almak istediği malzeme veya hizmet için detaylı şartname ve miktar belirterek bir ihale açar. Doğrulanmış tedarikçiler belirlenen süre içinde canlı eksiltme arenasında birbirlerinin tekliflerini görerek tekliflerini düşürürler.'
-            }
-          },
-          {
-            '@type': 'Question',
-            'name': 'Firmaların doğrulanması nasıl sağlanıyor?',
-            'acceptedAnswer': {
-              '@type': 'Answer',
-              'text': 'Platforma üye olan her şirketin vergi levhası, ticaret sicil gazetesi, imza sirküleri ve faaliyet belgeleri gibi resmi evrakları ekibimiz tarafından titizlikle kontrol edilir. Sadece doğrulanmış kurumsal firmalar teklif verebilir ve ihale açabilir.'
-            }
-          },
-          {
-            '@type': 'Question',
-            'name': 'Ödeme ve teslimat süreçleri güvenli mi?',
-            'acceptedAnswer': {
-              '@type': 'Answer',
-              'text': 'Evet. Alıcı ihale bedelini güvenli hesaba aktarır. Tedarikçi şartnameye uygun şekilde teslimat yaptığında ve alıcı onay verdiğinde ödeme tedarikçiye aktarılır. Süreç boyunca tüm belgeler ve işlem adımları zaman damgasıyla kayıt altına alınır.'
-            }
-          }
-        ]
-      })
-    }
   ]
 })
 
@@ -1118,6 +1048,77 @@ function toggleFilterSection(section: string) {
 
 <template>
   <div class="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
+    <!-- JSON-LD SEO Schemas -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "GelAnlaşalım",
+        "url": "https://gelanlasalim-v2.vercel.app",
+        "description": "B2B Tersine İhale, Eksiltme ve Kurumsal Satın Alma Platformu"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "GelAnlaşalım Bilişim A.Ş.",
+        "url": "https://gelanlasalim-v2.vercel.app",
+        "logo": "https://gelanlasalim-v2.vercel.app/logo.png"
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "Tersine ihale (eksiltme) sistemi nasıl çalışır?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Alıcı firma satın almak istediği malzeme veya hizmet için detaylı şartname ve miktar belirterek bir ihale açar. Doğrulanmış tedarikçiler belirlenen süre içinde canlı eksiltme arenasında birbirlerinin tekliflerini görerek tekliflerini düşürürler."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Firmaların doğrulanması nasıl sağlanıyor?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Platforma üye olan her şirketin vergi levhası, ticaret sicil gazetesi, imza sirküleri ve faaliyet belgeleri gibi resmi evrakları ekibimiz tarafından titizlikle kontrol edilir. Sadece doğrulanmış kurumsal firmalar teklif verebilir ve ihale açabilir."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Ödeme ve teslimat süreçleri güvenli mi?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Evet. Alıcı ihale bedelini güvenli hesaba aktarır. Tedarikçi şartnameye uygun şekilde teslimat yaptığında ve alıcı onay verdiğinde ödeme tedarikçiye aktarılır."
+            }
+          }
+        ]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": "GelAnlaşalım B2B Tersine İhale Arenası",
+        "description": "Kurumsal alıcıların canlı eksiltmeli ters ihaleler düzenleyerek malzeme ve lojistik tedarik maliyetlerini düşürdüğü yeni nesil B2B platformu.",
+        "brand": {
+          "@type": "Brand",
+          "name": "GelAnlaşalım"
+        },
+        "offers": {
+          "@type": "AggregateOffer",
+          "priceCurrency": "USD",
+          "lowPrice": "29",
+          "highPrice": "199",
+          "offerCount": "4"
+        }
+      }
+    </script>
+
     <!-- HERO SECTION -->
     <section class="relative overflow-hidden border-b border-slate-200 bg-slate-100 min-h-[640px]">
       <!-- Background Video -->
@@ -1424,7 +1425,8 @@ function toggleFilterSection(section: string) {
                 <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': expandedFilterSection === 'cities' }" />
               </button>
               <div v-if="expandedFilterSection === 'cities'" class="border-t border-slate-100 p-3">
-                <select v-model="selectedCity" class="w-full rounded-xl border border-slate-200 bg-white p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500">
+                <label for="citySelect" class="sr-only">{{ locale === 'tr' ? 'İş / Teslim Yeri' : 'Delivery Location' }}</label>
+                <select id="citySelect" v-model="selectedCity" class="w-full rounded-xl border border-slate-200 bg-white p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500">
                   <option value="">{{ locale === 'tr' ? 'Tüm Türkiye' : 'All Turkey' }}</option>
                   <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
                 </select>
@@ -1439,6 +1441,7 @@ function toggleFilterSection(section: string) {
               <div class="flex gap-2">
                 <div class="flex-1 relative">
                   <Search :size="16" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <label for="explorerSearchInput" class="sr-only">{{ locale === 'tr' ? 'İlan Arama' : 'Search Tenders' }}</label>
                   <input v-model="explorerSearch" type="text" id="explorerSearchInput" aria-label="İlan Arama" :placeholder="locale === 'tr' ? 'İlan başlığı, malzeme veya firma adı ile arayın...' : 'Search by title, item, or company...'" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
                 </div>
               </div>
