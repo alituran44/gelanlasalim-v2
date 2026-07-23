@@ -1837,10 +1837,10 @@ function toggleFilterSection(section: string) {
 
             <!-- NASIL ÇALIŞIR SECTION -->
             <section id="nasil-calisir" class="border-b border-slate-200 bg-slate-50 py-20">
-              <div class="mx-auto max-w-7xl px-6 text-center">
-                <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'SÜREÇ REHBERİ' : 'PROCESS GUIDE' }}</span>
-                <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Platform Nasıl Çalışıyor?' : 'How the Platform Works' }}</h2>
-                <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ locale === 'tr' ? 'Alıcı veya tedarikçi rolünüze uygun adımları takip ederek süreci başlatın.' : 'Follow the steps matching your role as a buyer or supplier to get started.' }}</p>
+              <div class="mx-auto max-w-7xl px-6 text-center flex flex-col items-center">
+                <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest block text-center w-full">{{ locale === 'tr' ? 'SÜREÇ REHBERİ' : 'PROCESS GUIDE' }}</span>
+                <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl text-center w-full">{{ locale === 'tr' ? 'Platform Nasıl Çalışıyor?' : 'How the Platform Works' }}</h2>
+                <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500 text-center w-full">{{ locale === 'tr' ? 'Alıcı veya tedarikçi rolünüze uygun adımları takip ederek süreci başlatın.' : 'Follow the steps matching your role as a buyer or supplier to get started.' }}</p>
 
                 <!-- Tab switcher -->
                 <div class="mt-8 flex justify-center">
@@ -1889,27 +1889,27 @@ function toggleFilterSection(section: string) {
 
     <!-- E-E-A-T EDITORIAL & EXPERT VALIDATION SECTION -->
     <section class="border-b border-slate-200 bg-slate-50 py-16">
-      <div class="mx-auto max-w-7xl px-6">
-        <div class="bg-white border border-slate-200 rounded-3xl p-8 premium-shadow text-left md:flex md:items-center md:justify-between gap-8">
-          <div class="space-y-3 max-w-2xl">
+      <div class="mx-auto max-w-3xl px-6">
+        <div class="bg-white border border-slate-200 rounded-3xl p-8 premium-shadow text-center flex flex-col items-center justify-center gap-6">
+          <div class="space-y-3 max-w-2xl text-center flex flex-col items-center">
             <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100">
               <BadgeCheck :size="12" /> E-E-A-T {{ locale === 'tr' ? 'DOĞRULANMIŞ PLATFORM' : 'VERIFIED PLATFORM' }}
             </span>
-            <h2 class="text-xl font-black text-slate-900 tracking-tight md:text-2xl">
+            <h2 class="text-xl font-black text-slate-900 tracking-tight md:text-2xl text-center w-full">
               {{ locale === 'tr' ? 'Editöryal Standartlar ve Güvenli Tedarik Güvencesi' : 'Editorial Standards & Secure Procurement Guarantee' }}
             </h2>
-            <p class="text-xs text-slate-500 font-medium leading-relaxed font-sans">
+            <p class="text-xs text-slate-500 font-medium leading-relaxed font-sans text-center">
               {{ locale === 'tr' ? 'Platformumuzdaki canlı eksiltme kuralları, B2B tasarruf verileri ve sözleşme şablonları, satın alma profesyonelleri ve hukuk müşavirleri tarafından denetlenerek onaylanmaktadır.' : 'Live auction rules, B2B savings telemetry, and contract templates across our platform are reviewed and certified by seasoned procurement directors and legal advisors.' }}
             </p>
           </div>
           
-          <div class="mt-6 md:mt-0 flex items-center gap-3 shrink-0">
-            <div class="flex -space-x-3 overflow-hidden">
+          <div class="flex flex-col sm:flex-row items-center gap-3 justify-center">
+            <div class="flex -space-x-3 overflow-hidden justify-center">
               <div class="inline-block h-9 w-9 rounded-full ring-2 ring-white bg-blue-100 border border-blue-200 flex items-center justify-center text-[10px] font-bold text-blue-700">AT</div>
               <div class="inline-block h-9 w-9 rounded-full ring-2 ring-white bg-emerald-100 border border-emerald-200 flex items-center justify-center text-[10px] font-bold text-emerald-700">SK</div>
               <div class="inline-block h-9 w-9 rounded-full ring-2 ring-white bg-amber-100 border border-amber-200 flex items-center justify-center text-[10px] font-bold text-amber-700">ZD</div>
             </div>
-            <div class="text-left">
+            <div class="text-center sm:text-left">
               <div class="text-[10px] font-black text-slate-800 uppercase tracking-wide">
                 {{ locale === 'tr' ? 'Uzman Kurulu Tarafından Onaylandı' : 'Certified by Expert Board' }}
               </div>
