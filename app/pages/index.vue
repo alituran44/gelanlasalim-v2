@@ -1652,7 +1652,7 @@ function toggleFilterSection(section: string) {
     </section>
 
     <!-- TASARRUF HESAPLAMA ARACI (ROI) -->
-    <section id="ozellikler" class="border-b border-slate-200 bg-slate-50 py-20">
+    <section id="ozellikler" class="border-b border-slate-200 bg-white py-24">
       <div class="mx-auto max-w-7xl px-6">
         <div class="text-center mb-12">
           <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'VERİMLİLİK & ROI' : 'EFFICIENCY & ROI' }}</span>
@@ -1660,7 +1660,7 @@ function toggleFilterSection(section: string) {
           <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ locale === 'tr' ? 'Yıllık satın alma hacminizi belirleyin, GelAnlaşalım B2B tersine ihale arenası ile elde edeceğiniz tahmini kazancı anında görün.' : 'Set your annual procurement volume and instantly see the estimated savings you will achieve with GelAnlasalim B2B reverse auction arena.' }}</p>
         </div>
 
-        <div class="mx-auto max-w-4xl rounded-3xl border bg-white p-8 md:p-12 premium-shadow flex flex-col gap-8 md:gap-12 text-left">
+        <div class="mx-auto max-w-4xl rounded-3xl border bg-slate-50/70 p-8 md:p-12 premium-shadow flex flex-col gap-8 md:gap-12 text-left">
           <!-- Slider area -->
           <div class="space-y-4">
             <div class="flex justify-between items-baseline">
@@ -1693,14 +1693,14 @@ function toggleFilterSection(section: string) {
             </div>
 
             <!-- Col 2: Labor hours saved -->
-            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col gap-1.5">
+            <div class="p-6 rounded-2xl bg-white border border-slate-200/60 flex flex-col gap-1.5">
               <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">{{ locale === 'tr' ? 'Kazanılan İş Gücü' : 'Labor Hours Saved' }}</span>
               <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ Math.round(savedHours) }} {{ locale === 'tr' ? 'Adam/Ay' : 'Man/Month' }}</span>
               <span class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'Excel kıyaslama ve e-posta takibi elenir.' : 'Eliminates tedious Excel comparison and email tracking.' }}</span>
             </div>
 
             <!-- Col 3: Qualified suppliers reached -->
-            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col gap-1.5">
+            <div class="p-6 rounded-2xl bg-white border border-slate-200/60 flex flex-col gap-1.5">
               <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">{{ locale === 'tr' ? 'Nitelikli Tedarikçi Erişimi' : 'Qualified Supplier Access' }}</span>
               <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ connectedSuppliersCount }} {{ locale === 'tr' ? 'Firma' : 'Companies' }}</span>
               <span class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'İhalelerinize katılım sağlayacak hazır ağ.' : 'Ready supply network to join your tenders.' }}</span>
@@ -1711,7 +1711,7 @@ function toggleFilterSection(section: string) {
     </section>
 
     <!-- KRİPTOGRAFİK ZAMAN DAMGASI & GÜVENLİK (AUDIT TRAIL TIMELINE) -->
-    <section class="border-b border-slate-200 bg-white py-20">
+    <section class="border-b border-slate-200 bg-slate-50 py-24">
       <div class="mx-auto max-w-7xl px-6">
         <div class="text-center mb-16">
           <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'ŞEFFAFLIK & GÜVENLİK' : 'TRANSPARENCY & SECURITY' }}</span>
@@ -1724,7 +1724,7 @@ function toggleFilterSection(section: string) {
           <div class="hidden lg:block absolute top-[40px] left-[12%] right-[12%] h-[1px] bg-slate-200 z-0"></div>
 
           <!-- Step 1 -->
-          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+          <div class="relative z-10 p-6 bg-white border border-slate-200/80 rounded-2xl flex flex-col gap-4">
             <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">1</div>
             <div>
               <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'Şartname Damgalama' : 'Specification Timestamping' }}</h4>
@@ -1735,7 +1735,7 @@ function toggleFilterSection(section: string) {
           </div>
 
           <!-- Step 2 -->
-          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+          <div class="relative z-10 p-6 bg-white border border-slate-200/80 rounded-2xl flex flex-col gap-4">
             <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">2</div>
             <div>
               <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'TLS 1.2+ Şifreli Teklifler' : 'TLS 1.2+ Encrypted Bids' }}</h4>
@@ -1746,7 +1746,7 @@ function toggleFilterSection(section: string) {
           </div>
 
           <!-- Step 3 -->
-          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+          <div class="relative z-10 p-6 bg-white border border-slate-200/80 rounded-2xl flex flex-col gap-4">
             <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">3</div>
             <div>
               <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'Canlı Eksiltme Günlüğü' : 'Live Auction Audit Trail' }}</h4>
@@ -1757,7 +1757,7 @@ function toggleFilterSection(section: string) {
           </div>
 
           <!-- Step 4 -->
-          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+          <div class="relative z-10 p-6 bg-white border border-slate-200/80 rounded-2xl flex flex-col gap-4">
             <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">4</div>
             <div>
               <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'KVKK Uyumlu Arşivleme' : 'Regulatory Compliant Archiving' }}</h4>
@@ -1771,7 +1771,7 @@ function toggleFilterSection(section: string) {
     </section>
 
     <!-- ERP & SİSTEM ENTEGRASYONLARI -->
-    <section class="border-b border-slate-200 bg-slate-50 py-20">
+    <section class="border-b border-slate-200 bg-white py-24">
       <div class="mx-auto max-w-7xl px-6">
         <div class="text-center mb-12">
           <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'ERP BAĞLANTILARI' : 'ERP INTEGRATIONS' }}</span>
@@ -1828,7 +1828,7 @@ function toggleFilterSection(section: string) {
     </section>
 
             <!-- NASIL ÇALIŞIR SECTION -->
-            <section id="nasil-calisir" class="border-b border-slate-200 bg-slate-50 py-20">
+            <section id="nasil-calisir" class="border-b border-slate-200 bg-slate-50 py-24">
               <div class="mx-auto max-w-7xl px-6 text-center flex flex-col items-center">
                 <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest block text-center w-full">{{ locale === 'tr' ? 'SÜREÇ REHBERİ' : 'PROCESS GUIDE' }}</span>
                 <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl text-center w-full">{{ locale === 'tr' ? 'Platform Nasıl Çalışıyor?' : 'How the Platform Works' }}</h2>
@@ -1858,7 +1858,7 @@ function toggleFilterSection(section: string) {
             </section>
 
     <!-- FAQ SECTION -->
-    <section id="sss" class="border-b border-slate-200 bg-white py-20">
+    <section id="sss" class="border-b border-slate-200 bg-white py-24">
       <div class="mx-auto max-w-4xl px-6">
         <div class="text-center mb-12">
           <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'SIKÇA SORULANLAR' : 'FREQUENTLY ASKED QUESTIONS' }}</span>
@@ -1880,7 +1880,7 @@ function toggleFilterSection(section: string) {
     </section>
 
     <!-- E-E-A-T EDITORIAL & EXPERT VALIDATION SECTION -->
-    <section class="border-b border-slate-200 bg-slate-50 py-16">
+    <section class="border-b border-slate-200 bg-slate-50 py-24">
       <div class="mx-auto max-w-3xl px-6">
         <div class="bg-white border border-slate-200 rounded-3xl p-8 premium-shadow text-center flex flex-col items-center justify-center gap-6">
           <div class="space-y-3 max-w-2xl text-center flex flex-col items-center">
