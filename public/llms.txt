@@ -1,23 +1,14 @@
-# GelAnlaşalım B2B E-İhale ve Tersine İhale Platformu
+# GelAnlasalim B2B Procurement and Live Reverse Auction Arena
 
-GelAnlaşalım; özel sektörün satın alma operasyonlarını, tersine ihale (eksiltme) süreçlerini ve teklif toplama aşamalarını tek bir platformda birleştiren yeni nesil bir B2B platformudur.
+GelAnlasalim is a next-generation B2B procurement marketplace where corporate buyers run live reverse auctions to purchase materials, logistics, and professional services from verified suppliers at the lowest bids.
 
-## Temel Özellikler
-- **Ters İhale (Eksiltme) Arenası:** Alıcı firmaların ihaleler açıp tedarikçilerden canlı eksiltme usulüyle teklifler topladığı dinamik pazar yeri.
-- **Akıllı Tasarruf Hesaplayıcı:** Yıllık satın alma hacmine göre tasarruf oranı ve zaman kazanımı simüle eden entegre modül.
-- **Şeffaf Üyelik & KDV Hesaplama:** Farklı üye paketleri ve havale / iyzigo / PayTR ödeme simülasyonları.
-- **KVKK & Belge Güvenliği:** Evrak yükleme, zaman damgası ve şifreli veri aktarım entegrasyonu.
-- **CMS Yönetici Paneli:** Tüm landing page içeriklerini, teklifleri ve üyelik ödemelerini düzenleyen bağımsız yönetim arayüzü.
+## Core Features
+- **Live Reverse Auctions:** Buyers set up specifications and launch auctions; suppliers compete live by submitting lower bids in real-time.
+- **Verified Supplier Network:** Document-based supplier profiles checked for corporate credentials.
+- **Detailed Analytics:** Bid tracking, comparison charts, and savings logs.
 
-## Site Haritası ve Yollar (Routes)
-- **Ana Sayfa (`/`):** Akıllı ters ihale akışı, pazar yeri ihale gezgini, tasarruf hesaplayıcı, referanslar ve SSS.
-- **Abonelikler (`/abonelik`):** Temel, Profesyonel ve Kurumsal üyelik paketleri ve KDV dahil ödeme alma adımları.
-- **Üyelik & Giriş (`/uyelik`):** B2B kayıt olma, giriş yapma ve kurumsal profil oluşturma ekranı.
-- **Yönetim Paneli (`/admin`):** Landing page verileri ile gelen ödeme/başvuru kayıtlarını düzenleyen CMS kontrol paneli.
-- **Kullanıcı Paneli (`/panel`):** Açılan ihaleler, gelen teklifler ve verilen teklifleri yöneten B2B kontrol merkezi.
-- **Sözleşmeler (`/sozlesmeler`):** KVKK Aydınlatma, Kullanım Koşulları, Gizlilik Politikası ve Hakkımızda sayfalarını içeren bilgi merkezi.
-
-## Teknoloji Altyapısı
-- **Core:** Nuxt 3 (SSR/SPA) & Vue 3 Composition API
-- **Styling:** Tailwind CSS & Custom Design System
-- **Security:** Content Security Policy (CSP), Strict-Transport-Security (HSTS), X-Frame-Options, X-Content-Type-Options
+## Important Pages & Routes
+- [Homepage (/)](https://gelanlasalim-v2.vercel.app/): Main landing page with trust badge, live active auctions, and FAQ section.
+- [Abonelik (/abonelik)](https://gelanlasalim-v2.vercel.app/abonelik): Premium subscription packages, features, and USD pricing tables.
+- [Entegrasyonlar (/entegrasyonlar)](https://gelanlasalim-v2.vercel.app/entegrasyonlar): Integrations catalog with ERP, SAP, and payment gateways.
+- [Sozlesmeler (/sozlesmeler)](https://gelanlasalim-v2.vercel.app/sozlesmeler): Platform user agreement, KVKK policies, and legal frameworks.
