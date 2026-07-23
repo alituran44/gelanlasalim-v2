@@ -1949,7 +1949,7 @@ function toggleFilterSection(section: string) {
     </section>
 
     <!-- BİZİMLE İLETİŞİME GEÇİN SECTION -->
-    <section class="border-b border-slate-200 bg-slate-50 py-20 relative overflow-hidden">
+    <section class="border-b border-slate-200 bg-slate-50 py-24 lg:py-32 relative overflow-hidden">
       <!-- Background subtle graphics -->
       <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(circle, #1eae4c 1px, transparent 1px); background-size: 24px 24px;"></div>
       
@@ -2000,7 +2000,7 @@ function toggleFilterSection(section: string) {
 
           <!-- Right Form Card -->
           <div class="lg:col-span-6">
-            <div class="bg-white border rounded-3xl p-8 premium-shadow space-y-6 text-left min-h-[360px] flex flex-col justify-center">
+            <div class="bg-white border rounded-3xl p-8 sm:p-10 premium-shadow space-y-8 text-left min-h-[380px] flex flex-col justify-center">
               
               <!-- Success State (Premium feedback card) -->
               <div v-if="contactSuccess" class="py-6 text-center space-y-5">
@@ -2023,8 +2023,8 @@ function toggleFilterSection(section: string) {
               </div>
 
               <!-- Form State -->
-              <div v-else class="space-y-6">
-                <div class="space-y-1">
+              <div v-else class="space-y-7">
+                <div class="space-y-2">
                   <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">{{ locale === 'tr' ? 'SİZİNLE İLETİŞİME GEÇELİM' : 'LET US CONTACT YOU' }}</span>
                   <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">{{ locale === 'tr' ? 'BİZE NASIL ULAŞALIM?' : 'HOW SHOULD WE REACH YOU?' }}</h3>
                 </div>
@@ -2050,10 +2050,10 @@ function toggleFilterSection(section: string) {
                 </div>
 
                 <!-- Inputs -->
-                <div class="space-y-4">
+                <div class="space-y-5">
                   <!-- E-posta field -->
                   <div v-if="contactMethod === 'email'">
-                    <label for="contactEmailInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">{{ locale === 'tr' ? 'E-posta Adresiniz' : 'Your Email Address' }}</label>
+                    <label for="contactEmailInput" class="text-[9px] font-black uppercase text-slate-400 block mb-2">{{ locale === 'tr' ? 'E-posta Adresiniz' : 'Your Email Address' }}</label>
                     <input
                       v-model="contactEmail"
                       type="email"
@@ -2065,7 +2065,7 @@ function toggleFilterSection(section: string) {
 
                   <!-- Telefon field -->
                   <div v-else>
-                    <label for="contactPhoneInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">{{ locale === 'tr' ? 'Telefon Numaranız' : 'Your Phone Number' }}</label>
+                    <label for="contactPhoneInput" class="text-[9px] font-black uppercase text-slate-400 block mb-2">{{ locale === 'tr' ? 'Telefon Numaranız' : 'Your Phone Number' }}</label>
                     <input
                       v-model="contactPhone"
                       type="tel"
@@ -2077,7 +2077,7 @@ function toggleFilterSection(section: string) {
 
                   <!-- Message field -->
                   <div>
-                    <label for="contactMessageInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">{{ locale === 'tr' ? 'Size nasıl yardımcı olabiliriz?' : 'How can we help you?' }}</label>
+                    <label for="contactMessageInput" class="text-[9px] font-black uppercase text-slate-400 block mb-2">{{ locale === 'tr' ? 'Size nasıl yardımcı olabiliriz?' : 'How can we help you?' }}</label>
                     <textarea
                       v-model="contactMessage"
                       rows="3"
@@ -2106,7 +2106,7 @@ function toggleFilterSection(section: string) {
                 </button>
 
                 <!-- Footer Sublinks -->
-                <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-400 pt-2">
+                <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-400 pt-4">
                   <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Önce nasıl çalıştığını inceleyin →' : 'See how it works first →' }}</a>
                   <NuxtLink to="/uyelik" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Kurumsal hesap aç →' : 'Create corporate account →' }}</NuxtLink>
                 </div>
