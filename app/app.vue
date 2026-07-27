@@ -54,22 +54,4 @@ h1, h2, h3, h4, h5, h6 {
   box-shadow: 0 20px 40px -15px rgba(0, 48, 87, 0.15), 0 0 0 1px rgba(30, 174, 76, 0.25) !important;
   transform: translateY(-3px);
 }
-
-/* WCAG AA / AAA Contrast Accessibility Overrides for Light Backgrounds */
-body .text-slate-500 {
-  color: #475569 !important; /* Raised to slate-600 */
-}
-body .text-slate-400 {
-  color: #5b6878 !important; /* Raised to dark slate-500 */
-}
-
-/* Retain visibility in dark sections */
-.bg-[#001D36] .text-slate-300,
-.bg-[#001D36] .text-slate-400,
-.bg-slate-900 .text-slate-300,
-.bg-slate-900 .text-slate-400,
-.bg-[#070a13] .text-slate-300,
-.bg-[#070a13] .text-slate-400 {
-  color: #cbd5e1 !important;
-}
 </style>

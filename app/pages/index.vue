@@ -1156,10 +1156,9 @@ function toggleFilterSection(section: string) {
             {{ localizedHero.tagline }}
           </div>
           
-          <h1 class="font-heading text-4xl font-black leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl drop-shadow-md">
-            {{ localizedHero.titleLine1 }}<br />
-            {{ localizedHero.titleLine2 }}<br />
-            <span class="text-emerald-400 italic font-serif font-medium">{{ localizedHero.titleItalic }}</span>
+          <h1 class="font-heading text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.15] tracking-tight text-white drop-shadow-md">
+            {{ localizedHero.titleLine1 }} {{ localizedHero.titleLine2 }}
+            <span class="block text-emerald-400 italic font-serif font-medium mt-1">{{ localizedHero.titleItalic }}</span>
           </h1>
 
           <p class="max-w-xl text-sm md:text-base leading-relaxed text-slate-200 font-medium drop-shadow">
@@ -1172,8 +1171,8 @@ function toggleFilterSection(section: string) {
               {{ locale === 'tr' ? 'Hemen Kurumsal Hesap Aç' : 'Open Business Account' }}
               <ArrowRight :size="16" />
             </NuxtLink>
-            <a href="#nasil-calisir" class="flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-900/90 px-8 py-4 text-xs font-black text-white hover:bg-slate-800 hover:border-slate-500 transition-all">
-              {{ locale === 'tr' ? 'Nasıl Çalışır' : 'How It Works' }}
+            <a href="#ihale-gezgini" class="flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-900/90 px-8 py-4 text-xs font-black text-white hover:bg-slate-800 hover:border-slate-500 transition-all">
+              {{ locale === 'tr' ? 'İhaleleri İncele' : 'Explore Tenders' }}
               <ArrowRight :size="16" />
             </a>
           </div>
