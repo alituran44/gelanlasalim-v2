@@ -1120,8 +1120,8 @@ function toggleFilterSection(section: string) {
     </script>
 
     <!-- HERO SECTION (Executive YC B2B SaaS Aesthetic) -->
-    <section class="relative overflow-hidden border-b border-slate-800 bg-[#070A13] text-white min-h-[660px]">
-      <!-- Background Video -->
+    <section class="relative overflow-hidden border-b border-slate-800 bg-[#060911] text-white min-h-[660px]">
+      <!-- Background Video / High-Tech B2B Logistics Image -->
       <ClientOnly>
         <video 
           v-if="cmsData.hero.heroVideoUrl"
@@ -1130,128 +1130,130 @@ function toggleFilterSection(section: string) {
           loop 
           muted 
           playsinline 
-          class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-25"
+          class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-20"
         >
           <source :src="cmsData.hero.heroVideoUrl" type="video/mp4" />
         </video>
       </ClientOnly>
-      <!-- Fallback image background if video is not available -->
+      <!-- Premium Generated B2B Supply Chain & Logistics Background -->
       <div 
-        v-if="!cmsData.hero.heroVideoUrl" 
         class="absolute inset-0 w-full h-full bg-cover bg-center z-0" 
-        style="background-image: url('/hero_port_background.png'); opacity: 0.12;"
+        style="background-image: url('/hero_bg_new.jpg'); opacity: 0.30;"
       ></div>
 
-      <!-- Ambient Glows -->
-      <div class="absolute right-[-5%] top-[-20%] h-[550px] w-[550px] rounded-full bg-[#1EAE4C]/15 blur-3xl z-10 pointer-events-none"></div>
-      <div class="absolute bottom-[-20%] left-[-5%] h-[450px] w-[450px] rounded-full bg-blue-600/10 blur-3xl z-10 pointer-events-none"></div>
+      <!-- Color Overlay Gradient for maximum text readability -->
+      <div class="absolute inset-0 bg-gradient-to-r from-[#060911]/95 via-[#060911]/85 to-[#060911]/60 z-0"></div>
+
+      <!-- Ambient Radial Glows -->
+      <div class="absolute right-[-5%] top-[-20%] h-[550px] w-[550px] rounded-full bg-[#1EAE4C]/20 blur-3xl z-10 pointer-events-none"></div>
+      <div class="absolute bottom-[-20%] left-[-5%] h-[450px] w-[450px] rounded-full bg-blue-600/15 blur-3xl z-10 pointer-events-none"></div>
 
       <div class="relative z-20 mx-auto grid min-h-[660px] max-w-7xl items-center gap-12 px-6 py-20 lg:grid-cols-[1.15fr_0.85fr]">
         <!-- Hero Left -->
         <div class="text-left space-y-6">
-          <div class="inline-flex items-center gap-2 rounded-full border border-[#1EAE4C]/30 bg-[#1EAE4C]/10 px-3.5 py-1 text-[10px] font-black uppercase tracking-widest text-[#1EAE4C]">
-            <span class="h-2 w-2 rounded-full bg-[#1EAE4C] animate-pulse"></span>
+          <div class="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-950/80 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-emerald-400 shadow-sm backdrop-blur-md">
+            <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
             {{ localizedHero.tagline }}
           </div>
           
-          <h1 class="font-heading text-4xl font-black leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl">
+          <h1 class="font-heading text-4xl font-black leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl drop-shadow-md">
             {{ localizedHero.titleLine1 }}<br />
             {{ localizedHero.titleLine2 }}<br />
-            <span class="text-[#1EAE4C] italic font-serif font-medium">{{ localizedHero.titleItalic }}</span>
+            <span class="text-emerald-400 italic font-serif font-medium">{{ localizedHero.titleItalic }}</span>
           </h1>
 
-          <p class="max-w-xl text-sm leading-relaxed text-slate-300 font-medium">
+          <p class="max-w-xl text-sm md:text-base leading-relaxed text-slate-200 font-medium drop-shadow">
             {{ localizedHero.description }}
           </p>
           
           <!-- Buttons -->
           <div class="pt-2 flex flex-wrap items-center gap-4">
-            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-7 py-4 text-xs font-black text-white bg-[#1EAE4C] shadow-lg shadow-[#1EAE4C]/25 hover:bg-[#158f3d] active:scale-[0.98] transition-all">
+            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-8 py-4 text-xs font-black text-white bg-[#1EAE4C] shadow-lg shadow-[#1EAE4C]/30 hover:bg-[#169b40] active:scale-[0.98] transition-all">
               {{ locale === 'tr' ? 'Hemen Kurumsal Hesap Aç' : 'Open Business Account' }}
-              <ArrowRight :size="15" />
+              <ArrowRight :size="16" />
             </NuxtLink>
-            <a href="#nasil-calisir" class="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/80 px-7 py-4 text-xs font-black text-slate-200 hover:bg-slate-800 hover:text-white transition-all">
+            <a href="#nasil-calisir" class="flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-900/90 px-8 py-4 text-xs font-black text-white hover:bg-slate-800 hover:border-slate-500 transition-all">
               {{ locale === 'tr' ? 'Nasıl Çalışır' : 'How It Works' }}
-              <ArrowRight :size="15" />
+              <ArrowRight :size="16" />
             </a>
           </div>
 
           <!-- Bottom Compliance Micro-Strip -->
-          <div class="pt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest flex flex-wrap gap-x-4 gap-y-2">
+          <div class="pt-4 text-xs font-semibold text-slate-300 uppercase tracking-widest flex flex-wrap gap-x-4 gap-y-2">
             <template v-for="(badge, index) in localizedHero.badgeStrip" :key="index">
-              <span class="flex items-center gap-1.5"><Check :size="12" class="text-[#1EAE4C]" /> {{ badge }}</span>
-              <span v-if="index < localizedHero.badgeStrip.length - 1" class="text-slate-700">•</span>
+              <span class="flex items-center gap-1.5"><Check :size="13" class="text-emerald-400" /> {{ badge }}</span>
+              <span v-if="index < localizedHero.badgeStrip.length - 1" class="text-slate-600">•</span>
             </template>
           </div>
         </div>
 
-        <!-- Hero Right (Live Card styled like YC B2B Dashboard) -->
+        <!-- Hero Right (Live Card styled with High-Contrast Dark Glassmorphism) -->
         <div class="relative">
-          <div class="absolute -inset-4 rounded-3xl bg-[#1EAE4C]/10 blur-2xl pointer-events-none"></div>
+          <div class="absolute -inset-4 rounded-3xl bg-emerald-500/10 blur-2xl pointer-events-none"></div>
           
-          <div class="relative mx-auto max-w-[460px] rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-2xl backdrop-blur-xl text-left space-y-6">
+          <div class="relative mx-auto max-w-[460px] rounded-3xl border border-slate-700/80 bg-slate-900/95 p-6 shadow-2xl backdrop-blur-xl text-left space-y-6">
             <!-- Header Bar -->
             <div class="flex items-center justify-between border-b border-slate-800 pb-4">
               <div>
-                <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-[#1EAE4C]">
-                  <span class="h-2 w-2 rounded-full bg-[#1EAE4C] animate-pulse"></span> {{ locale === 'tr' ? 'TEMSİLİ CANLI İHALE' : 'LIVE AUCTION PREVIEW' }}
+                <span class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-400">
+                  <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> {{ locale === 'tr' ? 'TEMSİLİ CANLI İHALE' : 'LIVE AUCTION PREVIEW' }}
                 </span>
-                <h3 class="mt-1 font-heading text-sm font-black text-white">{{ localizedLiveTender.title }}</h3>
+                <h3 class="mt-1.5 font-heading text-base font-black text-white leading-snug">{{ localizedLiveTender.title }}</h3>
               </div>
               <div class="text-right">
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">{{ locale === 'tr' ? 'KALAN SÜRE' : 'TIME REMAINING' }}</span>
-                <div class="mt-1 font-mono text-xs font-bold text-slate-200 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">{{ localizedLiveTender.remainingTime }}</div>
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">{{ locale === 'tr' ? 'KALAN SÜRE' : 'TIME REMAINING' }}</span>
+                <div class="mt-1 font-mono text-xs font-bold text-emerald-400 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">{{ localizedLiveTender.remainingTime }}</div>
               </div>
             </div>
 
             <!-- Price & Savings Meter -->
-            <div class="flex justify-between items-end bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80">
+            <div class="flex justify-between items-end bg-slate-950/80 p-4.5 rounded-2xl border border-slate-800">
               <div>
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">{{ locale === 'tr' ? 'GÜNCEL EN İYİ TEKLİF' : 'CURRENT BEST BID' }}</span>
-                <div class="mt-1 text-3xl font-black text-white tracking-tight font-mono">
+                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">{{ locale === 'tr' ? 'GÜNCEL EN İYİ TEKLİF' : 'CURRENT BEST BID' }}</span>
+                <div class="mt-1 text-3xl md:text-4xl font-black text-white tracking-tight font-mono">
                   {{ currencySymbol }}{{ localizedLiveTender.bestBid.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
                 </div>
-                <div class="mt-1 text-[10px] text-slate-400 font-bold">
-                  {{ locale === 'tr' ? 'AÇILIŞ FİYATI' : 'OPENING PRICE' }} <span class="font-mono text-slate-500 line-through">{{ currencySymbol }}{{ localizedLiveTender.openingPrice.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
+                <div class="mt-1.5 text-xs text-slate-300 font-medium">
+                  {{ locale === 'tr' ? 'AÇILIŞ FİYATI' : 'OPENING PRICE' }} <span class="font-mono text-slate-400 line-through">{{ currencySymbol }}{{ localizedLiveTender.openingPrice.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
                 </div>
               </div>
               
               <div class="text-right">
-                <div class="rounded-xl px-3 py-1.5 text-[10px] font-black border border-[#1EAE4C]/30 bg-[#1EAE4C]/10 text-[#1EAE4C] flex items-center gap-1">
-                  <TrendingDown :size="13" />
+                <div class="rounded-xl px-3 py-1.5 text-xs font-black border border-emerald-500/40 bg-emerald-950/80 text-emerald-400 flex items-center gap-1">
+                  <TrendingDown :size="14" />
                   {{ localizedLiveTender.savingsText }}
                 </div>
               </div>
             </div>
 
             <!-- Competitor Stream -->
-            <div class="space-y-2 border-t border-slate-800 pt-4">
-              <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 flex justify-between">
+            <div class="space-y-2.5 border-t border-slate-800 pt-4">
+              <div class="text-[10px] font-black uppercase tracking-widest text-slate-300 mb-2 flex justify-between">
                 <span>{{ localizedLiveTender.competitors.length }} {{ locale === 'tr' ? 'TEDARİKÇİ YARIŞIYOR' : 'SUPPLIERS BIDDING' }}</span>
-                <span class="text-[#1EAE4C] font-mono">[AUDIT LOG ACTIVE]</span>
+                <span class="text-emerald-400 font-mono text-[9px]">[AUDIT LOG ACTIVE]</span>
               </div>
               
               <div 
                 v-for="comp in localizedLiveTender.competitors" 
                 :key="comp.name" 
-                class="flex items-center justify-between rounded-xl px-4 py-2.5 transition-colors"
-                :class="comp.leader ? 'border border-[#1EAE4C]/40 bg-[#1EAE4C]/10 text-white' : 'bg-slate-950/40 border border-slate-800 text-slate-400'"
+                class="flex items-center justify-between rounded-xl px-4 py-3 transition-colors"
+                :class="comp.leader ? 'border border-emerald-500/50 bg-emerald-950/40 text-white shadow-sm' : 'bg-slate-950/60 border border-slate-800 text-slate-300'"
               >
                 <div class="flex items-center gap-2 text-xs font-bold">
-                  <span class="h-1.5 w-1.5 rounded-full" :class="comp.leader ? 'bg-[#1EAE4C]' : 'bg-slate-600'"></span>
+                  <span class="h-2 w-2 rounded-full" :class="comp.leader ? 'bg-emerald-400' : 'bg-slate-500'"></span>
                   {{ comp.name }}
-                  <span v-if="comp.leader" class="rounded bg-[#1EAE4C]/20 border border-[#1EAE4C]/30 px-1.5 py-0.5 text-[8px] font-black text-[#1EAE4C]">{{ locale === 'tr' ? 'LİDER' : 'LEADER' }}</span>
+                  <span v-if="comp.leader" class="rounded bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 text-[9px] font-black text-emerald-400">{{ locale === 'tr' ? 'LİDER' : 'LEADER' }}</span>
                 </div>
-                <span class="font-mono font-bold text-xs" :class="comp.leader ? 'text-white' : 'text-slate-400'">
+                <span class="font-mono font-bold text-xs" :class="comp.leader ? 'text-white' : 'text-slate-300'">
                   {{ currencySymbol }}{{ comp.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
                 </span>
               </div>
             </div>
 
             <!-- Card Bottom Bar -->
-            <div class="grid grid-cols-4 gap-1 border-t border-slate-800 pt-3 text-center text-[9px] font-bold text-slate-400">
+            <div class="grid grid-cols-4 gap-1 border-t border-slate-800 pt-3 text-center text-[10px] font-bold text-slate-300">
               <span class="py-1 hover:text-white cursor-pointer">{{ locale === 'tr' ? 'TALEP' : 'REQUEST' }}</span>
-              <span class="py-1 text-[#1EAE4C] border-b-2 border-[#1EAE4C] font-black">+ {{ locale === 'tr' ? 'TEKLİF' : 'BIDS' }}</span>
+              <span class="py-1 text-emerald-400 border-b-2 border-emerald-400 font-black">+ {{ locale === 'tr' ? 'TEKLİF' : 'BIDS' }}</span>
               <span class="py-1 hover:text-white cursor-pointer">{{ locale === 'tr' ? 'KARAR' : 'DECISION' }}</span>
               <span class="py-1 hover:text-white cursor-pointer">{{ locale === 'tr' ? 'TESLİMAT' : 'DELIVERY' }}</span>
             </div>
@@ -1260,18 +1262,18 @@ function toggleFilterSection(section: string) {
       </div>
 
       <!-- Trust & Compliance Strip -->
-      <div class="relative border-t border-slate-800/80 bg-slate-950/90 py-7 backdrop-blur-md">
+      <div class="relative border-t border-slate-800 bg-slate-950/95 py-8 backdrop-blur-md">
         <div class="mx-auto grid max-w-7xl gap-6 px-6 sm:grid-cols-2 lg:grid-cols-4 text-left">
-          <div v-for="(item, idx) in localizedTrustStrip" :key="idx" class="flex items-center gap-3.5 p-3 rounded-2xl border border-slate-800/50 bg-slate-900/40 hover:border-slate-700 transition-colors">
-            <div class="h-10 w-10 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center shrink-0">
-              <ShieldCheck v-if="idx === 0" class="text-[#1EAE4C]" :size="20" />
-              <LockKeyhole v-else-if="idx === 1" class="text-[#1EAE4C]" :size="20" />
-              <Scale v-else-if="idx === 2" class="text-[#1EAE4C]" :size="20" />
-              <Globe2 v-else class="text-[#1EAE4C]" :size="20" />
+          <div v-for="(item, idx) in localizedTrustStrip" :key="idx" class="flex items-center gap-4 p-3.5 rounded-2xl border border-slate-800/80 bg-slate-900/60 hover:border-slate-700 transition-colors">
+            <div class="h-11 w-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 shadow-inner">
+              <ShieldCheck v-if="idx === 0" class="text-emerald-400" :size="22" />
+              <LockKeyhole v-else-if="idx === 1" class="text-emerald-400" :size="22" />
+              <Scale v-else-if="idx === 2" class="text-emerald-400" :size="22" />
+              <Globe2 v-else class="text-emerald-400" :size="22" />
             </div>
             <div>
-              <div class="font-heading text-xs font-black text-white">{{ item.title }}</div>
-              <div class="text-[10px] text-slate-400 font-medium mt-0.5 leading-tight">{{ item.desc }}</div>
+              <div class="font-heading text-xs md:text-sm font-black text-white leading-tight">{{ item.title }}</div>
+              <div class="text-xs text-slate-300 font-medium mt-1 leading-snug">{{ item.desc }}</div>
             </div>
           </div>
         </div>
