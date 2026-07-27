@@ -1119,8 +1119,8 @@ function toggleFilterSection(section: string) {
       }
     </script>
 
-    <!-- HERO SECTION -->
-    <section class="relative overflow-hidden border-b border-slate-200 bg-slate-100 min-h-[640px]">
+    <!-- HERO SECTION (Executive YC B2B SaaS Aesthetic) -->
+    <section class="relative overflow-hidden border-b border-slate-800 bg-[#070A13] text-white min-h-[660px]">
       <!-- Background Video -->
       <ClientOnly>
         <video 
@@ -1130,7 +1130,7 @@ function toggleFilterSection(section: string) {
           loop 
           muted 
           playsinline 
-          class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-45"
+          class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-25"
         >
           <source :src="cmsData.hero.heroVideoUrl" type="video/mp4" />
         </video>
@@ -1139,141 +1139,139 @@ function toggleFilterSection(section: string) {
       <div 
         v-if="!cmsData.hero.heroVideoUrl" 
         class="absolute inset-0 w-full h-full bg-cover bg-center z-0" 
-        style="background-image: url('/hero_port_background.png'); opacity: 0.15;"
+        style="background-image: url('/hero_port_background.png'); opacity: 0.12;"
       ></div>
 
-      <!-- Color Overlay for clean typography readability -->
-      <div class="absolute inset-0 bg-gradient-to-b from-slate-50/80 via-white/85 to-white/95 z-0"></div>
+      <!-- Ambient Glows -->
+      <div class="absolute right-[-5%] top-[-20%] h-[550px] w-[550px] rounded-full bg-[#1EAE4C]/15 blur-3xl z-10 pointer-events-none"></div>
+      <div class="absolute bottom-[-20%] left-[-5%] h-[450px] w-[450px] rounded-full bg-blue-600/10 blur-3xl z-10 pointer-events-none"></div>
 
-      <!-- Decorative circles -->
-      <div class="absolute right-[-10%] top-[-30%] h-[600px] w-[600px] rounded-full bg-blue-500/5 blur-3xl z-10"></div>
-      <div class="absolute bottom-[-30%] left-[-10%] h-[500px] w-[500px] rounded-full bg-cyan-500/5 blur-3xl z-10"></div>
-
-      <div class="relative z-20 mx-auto grid min-h-[640px] max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr]">
+      <div class="relative z-20 mx-auto grid min-h-[660px] max-w-7xl items-center gap-12 px-6 py-20 lg:grid-cols-[1.15fr_0.85fr]">
         <!-- Hero Left -->
-        <div class="text-left">
-          <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em]" style="color: #1EAE4C;">
-            <span class="h-px w-8" style="background-color: #1EAE4C;"></span>
+        <div class="text-left space-y-6">
+          <div class="inline-flex items-center gap-2 rounded-full border border-[#1EAE4C]/30 bg-[#1EAE4C]/10 px-3.5 py-1 text-[10px] font-black uppercase tracking-widest text-[#1EAE4C]">
+            <span class="h-2 w-2 rounded-full bg-[#1EAE4C] animate-pulse"></span>
             {{ localizedHero.tagline }}
           </div>
-          <h1 class="text-4xl font-black leading-[1.15] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+          
+          <h1 class="font-heading text-4xl font-black leading-[1.1] tracking-tight text-white sm:text-5xl lg:text-6xl">
             {{ localizedHero.titleLine1 }}<br />
             {{ localizedHero.titleLine2 }}<br />
-            <span class="font-serif italic font-medium" style="color: #1EAE4C;">{{ localizedHero.titleItalic }}</span>
+            <span class="text-[#1EAE4C] italic font-serif font-medium">{{ localizedHero.titleItalic }}</span>
           </h1>
-          <p class="mt-6 max-w-xl text-base leading-relaxed text-slate-600">
+
+          <p class="max-w-xl text-sm leading-relaxed text-slate-300 font-medium">
             {{ localizedHero.description }}
           </p>
           
           <!-- Buttons -->
-          <div class="mt-8 flex flex-wrap items-center gap-3">
-            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/10 hover:opacity-90 transition-all" style="background: #003057;">
-              {{ locale === 'tr' ? 'Hemen kurumsal hesap aç' : 'Open business account' }}
+          <div class="pt-2 flex flex-wrap items-center gap-4">
+            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-7 py-4 text-xs font-black text-white bg-[#1EAE4C] shadow-lg shadow-[#1EAE4C]/25 hover:bg-[#158f3d] active:scale-[0.98] transition-all">
+              {{ locale === 'tr' ? 'Hemen Kurumsal Hesap Aç' : 'Open Business Account' }}
               <ArrowRight :size="15" />
             </NuxtLink>
-            <a href="#nasil-calisir" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-6 py-4 text-xs font-black text-slate-700 hover:bg-white transition-all">
-              {{ locale === 'tr' ? 'Nasıl çalışır' : 'How it works' }}
+            <a href="#nasil-calisir" class="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900/80 px-7 py-4 text-xs font-black text-slate-200 hover:bg-slate-800 hover:text-white transition-all">
+              {{ locale === 'tr' ? 'Nasıl Çalışır' : 'How It Works' }}
               <ArrowRight :size="15" />
             </a>
           </div>
 
-          <!-- Bottom Features Strip -->
-          <div class="mt-8 text-[9px] font-bold text-slate-500 uppercase tracking-widest flex flex-wrap gap-x-4 gap-y-2">
+          <!-- Bottom Compliance Micro-Strip -->
+          <div class="pt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest flex flex-wrap gap-x-4 gap-y-2">
             <template v-for="(badge, index) in localizedHero.badgeStrip" :key="index">
-              <span>{{ badge }}</span>
-              <span v-if="index < localizedHero.badgeStrip.length - 1" class="text-slate-300">•</span>
+              <span class="flex items-center gap-1.5"><Check :size="12" class="text-[#1EAE4C]" /> {{ badge }}</span>
+              <span v-if="index < localizedHero.badgeStrip.length - 1" class="text-slate-700">•</span>
             </template>
           </div>
-
-
         </div>
 
-        <!-- Hero Right (Live Card styled like the screenshot) -->
+        <!-- Hero Right (Live Card styled like YC B2B Dashboard) -->
         <div class="relative">
-          <div class="absolute -inset-8 rounded-full bg-blue-500/5 blur-3xl"></div>
+          <div class="absolute -inset-4 rounded-3xl bg-[#1EAE4C]/10 blur-2xl pointer-events-none"></div>
           
-          <div class="relative mx-auto max-w-[460px] rounded-3xl border border-slate-200/80 bg-white/95 p-6 premium-shadow backdrop-blur-sm text-left">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+          <div class="relative mx-auto max-w-[460px] rounded-3xl border border-slate-800 bg-slate-900/90 p-6 shadow-2xl backdrop-blur-xl text-left space-y-6">
+            <!-- Header Bar -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
               <div>
-                <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-slate-400">
-                  <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> {{ locale === 'tr' ? 'TEMSİLİ CANLI İHALE' : 'LIVE AUCTION PREVIEW' }}
+                <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-[#1EAE4C]">
+                  <span class="h-2 w-2 rounded-full bg-[#1EAE4C] animate-pulse"></span> {{ locale === 'tr' ? 'TEMSİLİ CANLI İHALE' : 'LIVE AUCTION PREVIEW' }}
                 </span>
-                <h3 class="mt-1.5 text-base font-black text-slate-800">{{ localizedLiveTender.title }}</h3>
+                <h3 class="mt-1 font-heading text-sm font-black text-white">{{ localizedLiveTender.title }}</h3>
               </div>
               <div class="text-right">
                 <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">{{ locale === 'tr' ? 'KALAN SÜRE' : 'TIME REMAINING' }}</span>
-                <div class="mt-1 font-mono text-sm font-black text-slate-800">{{ localizedLiveTender.remainingTime }}</div>
+                <div class="mt-1 font-mono text-xs font-bold text-slate-200 bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">{{ localizedLiveTender.remainingTime }}</div>
               </div>
             </div>
 
-            <!-- Price and Savings info -->
-            <div class="py-6 flex justify-between items-start">
+            <!-- Price & Savings Meter -->
+            <div class="flex justify-between items-end bg-slate-950/60 p-4 rounded-2xl border border-slate-800/80">
               <div>
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">{{ locale === 'tr' ? 'GÜNCEL EN İYİ TEKLİF' : 'CURRENT BEST BID' }}</span>
-                <div class="mt-1 text-4xl font-black text-slate-900 tracking-tight font-mono">
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400 block">{{ locale === 'tr' ? 'GÜNCEL EN İYİ TEKLİF' : 'CURRENT BEST BID' }}</span>
+                <div class="mt-1 text-3xl font-black text-white tracking-tight font-mono">
                   {{ currencySymbol }}{{ localizedLiveTender.bestBid.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
                 </div>
-                <div class="mt-2 text-[10px] text-slate-400 font-bold">
-                  {{ locale === 'tr' ? 'AÇILIŞ FİYATI' : 'OPENING PRICE' }} <span class="font-mono text-slate-600 line-through">{{ currencySymbol }}{{ localizedLiveTender.openingPrice.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
+                <div class="mt-1 text-[10px] text-slate-400 font-bold">
+                  {{ locale === 'tr' ? 'AÇILIŞ FİYATI' : 'OPENING PRICE' }} <span class="font-mono text-slate-500 line-through">{{ currencySymbol }}{{ localizedLiveTender.openingPrice.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
                 </div>
               </div>
               
               <div class="text-right">
-                <div class="rounded-lg px-2.5 py-1 text-[9px] font-black" style="background: rgba(30,174,76,0.08); color: #1EAE4C;">
+                <div class="rounded-xl px-3 py-1.5 text-[10px] font-black border border-[#1EAE4C]/30 bg-[#1EAE4C]/10 text-[#1EAE4C] flex items-center gap-1">
+                  <TrendingDown :size="13" />
                   {{ localizedLiveTender.savingsText }}
                 </div>
               </div>
             </div>
 
-            <!-- Competitor List -->
-            <div class="space-y-2 border-t border-slate-100 pt-5">
-              <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                {{ localizedLiveTender.competitors.length }} {{ locale === 'tr' ? 'TEDARİKÇİ YARIŞIYOR' : 'SUPPLIERS BIDDING' }}
+            <!-- Competitor Stream -->
+            <div class="space-y-2 border-t border-slate-800 pt-4">
+              <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2 flex justify-between">
+                <span>{{ localizedLiveTender.competitors.length }} {{ locale === 'tr' ? 'TEDARİKÇİ YARIŞIYOR' : 'SUPPLIERS BIDDING' }}</span>
+                <span class="text-[#1EAE4C] font-mono">[AUDIT LOG ACTIVE]</span>
               </div>
               
               <div 
                 v-for="comp in localizedLiveTender.competitors" 
                 :key="comp.name" 
-                class="flex items-center justify-between rounded-xl px-4 py-2.5"
-                :class="comp.leader ? 'border border-blue-200/60 bg-blue-50/40' : 'bg-white border border-slate-200/60'"
+                class="flex items-center justify-between rounded-xl px-4 py-2.5 transition-colors"
+                :class="comp.leader ? 'border border-[#1EAE4C]/40 bg-[#1EAE4C]/10 text-white' : 'bg-slate-950/40 border border-slate-800 text-slate-400'"
               >
-                <div class="flex items-center gap-2.5 text-xs font-bold" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
-                  <span class="h-1.5 w-1.5 rounded-full" :class="comp.leader ? 'bg-blue-600' : 'bg-slate-300'"></span>
+                <div class="flex items-center gap-2 text-xs font-bold">
+                  <span class="h-1.5 w-1.5 rounded-full" :class="comp.leader ? 'bg-[#1EAE4C]' : 'bg-slate-600'"></span>
                   {{ comp.name }}
-                  <span v-if="comp.leader" class="rounded bg-blue-100 px-1.5 py-0.5 text-[8px] font-black text-blue-700">{{ locale === 'tr' ? 'ÖNDE' : 'LEADER' }}</span>
+                  <span v-if="comp.leader" class="rounded bg-[#1EAE4C]/20 border border-[#1EAE4C]/30 px-1.5 py-0.5 text-[8px] font-black text-[#1EAE4C]">{{ locale === 'tr' ? 'LİDER' : 'LEADER' }}</span>
                 </div>
-                <span class="font-mono font-bold text-xs" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
+                <span class="font-mono font-bold text-xs" :class="comp.leader ? 'text-white' : 'text-slate-400'">
                   {{ currencySymbol }}{{ comp.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
                 </span>
               </div>
             </div>
 
-            <!-- Bottom Tabs Inside Card -->
-            <div class="grid grid-cols-4 gap-1 mt-6 border-t border-slate-100 pt-4 text-center">
-              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ locale === 'tr' ? 'TALEP' : 'REQUEST' }}</span>
-              <span class="text-[8px] font-black text-blue-600 py-1 border-b-2 border-blue-600">+ {{ locale === 'tr' ? 'TEKLİF' : 'BIDS' }}</span>
-              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ locale === 'tr' ? 'KARAR' : 'DECISION' }}</span>
-              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ locale === 'tr' ? 'TESLİMAT' : 'DELIVERY' }}</span>
-            </div>
-
-            <div class="mt-4 text-center text-[9px] italic text-slate-400">
-              {{ locale === 'tr' ? 'Temsili veridir - Gerçek teklif değildir' : 'Mock data - Not a real bid' }}
+            <!-- Card Bottom Bar -->
+            <div class="grid grid-cols-4 gap-1 border-t border-slate-800 pt-3 text-center text-[9px] font-bold text-slate-400">
+              <span class="py-1 hover:text-white cursor-pointer">{{ locale === 'tr' ? 'TALEP' : 'REQUEST' }}</span>
+              <span class="py-1 text-[#1EAE4C] border-b-2 border-[#1EAE4C] font-black">+ {{ locale === 'tr' ? 'TEKLİF' : 'BIDS' }}</span>
+              <span class="py-1 hover:text-white cursor-pointer">{{ locale === 'tr' ? 'KARAR' : 'DECISION' }}</span>
+              <span class="py-1 hover:text-white cursor-pointer">{{ locale === 'tr' ? 'TESLİMAT' : 'DELIVERY' }}</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Trust Strip -->
-      <div class="relative border-t border-slate-200/80 bg-white/60 py-6 backdrop-blur-md">
+      <!-- Trust & Compliance Strip -->
+      <div class="relative border-t border-slate-800/80 bg-slate-950/90 py-7 backdrop-blur-md">
         <div class="mx-auto grid max-w-7xl gap-6 px-6 sm:grid-cols-2 lg:grid-cols-4 text-left">
-          <div v-for="(item, idx) in localizedTrustStrip" :key="idx" class="flex items-center gap-3">
-            <ShieldCheck v-if="idx === 0" class="text-blue-600 shrink-0" :size="22" />
-            <LockKeyhole v-else-if="idx === 1" class="text-blue-600 shrink-0" :size="22" />
-            <Scale v-else-if="idx === 2" class="text-blue-600 shrink-0" :size="22" />
-            <Globe2 v-else class="text-blue-600 shrink-0" :size="22" />
+          <div v-for="(item, idx) in localizedTrustStrip" :key="idx" class="flex items-center gap-3.5 p-3 rounded-2xl border border-slate-800/50 bg-slate-900/40 hover:border-slate-700 transition-colors">
+            <div class="h-10 w-10 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center justify-center shrink-0">
+              <ShieldCheck v-if="idx === 0" class="text-[#1EAE4C]" :size="20" />
+              <LockKeyhole v-else-if="idx === 1" class="text-[#1EAE4C]" :size="20" />
+              <Scale v-else-if="idx === 2" class="text-[#1EAE4C]" :size="20" />
+              <Globe2 v-else class="text-[#1EAE4C]" :size="20" />
+            </div>
             <div>
-              <div class="text-xs font-black text-slate-800">{{ item.title }}</div>
-              <div class="text-[10px] text-slate-500">{{ item.desc }}</div>
+              <div class="font-heading text-xs font-black text-white">{{ item.title }}</div>
+              <div class="text-[10px] text-slate-400 font-medium mt-0.5 leading-tight">{{ item.desc }}</div>
             </div>
           </div>
         </div>
@@ -1770,58 +1768,82 @@ function toggleFilterSection(section: string) {
       </div>
     </section>
 
-    <!-- ERP & SİSTEM ENTEGRASYONLARI -->
+    <!-- ERP & SİSTEM ENTEGRASYONLARI (Bento Grid Layout) -->
     <section class="border-b border-slate-200 bg-white py-24">
       <div class="mx-auto max-w-7xl px-6">
         <div class="text-center mb-12">
           <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'ERP BAĞLANTILARI' : 'ERP INTEGRATIONS' }}</span>
-          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Kurumsal Sistemlerinizle Tam Entegrasyon' : 'Full Integration with Enterprise Systems' }}</h2>
-          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ locale === 'tr' ? 'Satın alma, teklif, sipariş ve tedarikçi verilerinizi mevcut ERP, CRM ve finans sistemlerinize kontrollü API entegrasyonu ile bağlayın.' : 'Connect your procurement, bidding, order, and supplier data to your current ERP, CRM, and financial systems via managed APIs.' }}</p>
+          <h2 class="mt-3 font-heading text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Kurumsal Sistemlerinizle Tam Entegrasyon' : 'Full Integration with Enterprise Systems' }}</h2>
+          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500 font-medium">{{ locale === 'tr' ? 'Satın alma, teklif, sipariş ve tedarikçi verilerinizi mevcut ERP, CRM ve finans sistemlerinize kontrollü API entegrasyonu ile bağlayın.' : 'Connect your procurement, bidding, order, and supplier data to your current ERP, CRM, and financial systems via managed APIs.' }}</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
           <!-- ERP Card 1: SAP -->
-          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
+          <div class="p-7 bg-slate-50/70 border border-slate-200 rounded-3xl flex flex-col justify-between min-h-[240px] hover:border-slate-300 hover:shadow-lg transition-all group">
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ locale === 'tr' ? 'SAP Entegrasyonu' : 'SAP Integration' }}</div>
-              <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
+              <div class="flex items-center justify-between mb-4">
+                <span class="font-heading text-base font-black text-slate-900 tracking-tight">{{ locale === 'tr' ? 'SAP Entegrasyonu' : 'SAP Integration' }}</span>
+                <span class="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 text-[9px] font-black text-blue-600 uppercase tracking-wider">ERP CONNECTED</span>
+              </div>
+              <p class="text-xs leading-relaxed text-slate-600 font-medium">
                 {{ locale === 'tr' ? 'Satın alma taleplerinizi (Purchase Requisitions) SAP üzerinden otomatik çekin; ihale sonuçlarını SAP sipariş fişi (Purchase Order) olarak geri aktarın.' : 'Pull Purchase Requisitions automatically from SAP; write back bidding results directly as SAP Purchase Orders.' }}
               </p>
             </div>
-            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">ERP CONNECTED</span>
+            <div class="pt-4 border-t border-slate-200/60 text-[10px] font-bold text-slate-400 flex items-center justify-between group-hover:text-blue-600 transition-colors">
+              <span>SAP S/4HANA & ECC 6.0</span>
+              <ArrowRight :size="13" />
+            </div>
           </div>
 
           <!-- ERP Card 2: Logo -->
-          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
+          <div class="p-7 bg-slate-50/70 border border-slate-200 rounded-3xl flex flex-col justify-between min-h-[240px] hover:border-slate-300 hover:shadow-lg transition-all group">
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ locale === 'tr' ? 'Logo & Netsis Entegrasyonu' : 'Logo & Netsis Integration' }}</div>
-              <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
+              <div class="flex items-center justify-between mb-4">
+                <span class="font-heading text-base font-black text-slate-900 tracking-tight">{{ locale === 'tr' ? 'Logo & Netsis' : 'Logo & Netsis' }}</span>
+                <span class="rounded-full bg-emerald-50 border border-emerald-100 px-2.5 py-0.5 text-[9px] font-black text-emerald-700 uppercase tracking-wider">API READY</span>
+              </div>
+              <p class="text-xs leading-relaxed text-slate-600 font-medium">
                 {{ locale === 'tr' ? 'Logo Tiger, Go3 veya Netsis sistemlerinizdeki malzeme kartlarını, birimlerini ve tedarikçi cari hesaplarını anlık olarak platformla senkronize edin.' : 'Synchronize item cards, units of measure, and supplier current accounts from Logo Tiger, Go3, or Netsis systems in real-time.' }}
               </p>
             </div>
-            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">API READY</span>
+            <div class="pt-4 border-t border-slate-200/60 text-[10px] font-bold text-slate-400 flex items-center justify-between group-hover:text-blue-600 transition-colors">
+              <span>Logo Tiger / Netsis</span>
+              <ArrowRight :size="13" />
+            </div>
           </div>
 
           <!-- ERP Card 3: MS Dynamics -->
-          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
+          <div class="p-7 bg-slate-50/70 border border-slate-200 rounded-3xl flex flex-col justify-between min-h-[240px] hover:border-slate-300 hover:shadow-lg transition-all group">
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ locale === 'tr' ? 'Microsoft Dynamics 365' : 'Microsoft Dynamics 365' }}</div>
-              <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
+              <div class="flex items-center justify-between mb-4">
+                <span class="font-heading text-base font-black text-slate-900 tracking-tight">Dynamics 365</span>
+                <span class="rounded-full bg-purple-50 border border-purple-100 px-2.5 py-0.5 text-[9px] font-black text-purple-700 uppercase tracking-wider">AUTO SYNC</span>
+              </div>
+              <p class="text-xs leading-relaxed text-slate-600 font-medium">
                 {{ locale === 'tr' ? 'Dynamics 365 Supply Chain Management modülüyle iki yönlü canlı veri eşleştirmesi sağlayarak teklif toplama süreçlerinizi hızlandırın.' : 'Enable bidirectional live data mapping with Dynamics 365 Supply Chain Management to accelerate bid collection cycles.' }}
               </p>
             </div>
-            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">AUTOMATED SYNC</span>
+            <div class="pt-4 border-t border-slate-200/60 text-[10px] font-bold text-slate-400 flex items-center justify-between group-hover:text-blue-600 transition-colors">
+              <span>Supply Chain & Finance</span>
+              <ArrowRight :size="13" />
+            </div>
           </div>
 
           <!-- ERP Card 4: Excel & REST API -->
-          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
+          <div class="p-7 bg-slate-50/70 border border-slate-200 rounded-3xl flex flex-col justify-between min-h-[240px] hover:border-slate-300 hover:shadow-lg transition-all group">
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ locale === 'tr' ? 'REST API & Excel Entegrasyonu' : 'REST API & Excel Integration' }}</div>
-              <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
+              <div class="flex items-center justify-between mb-4">
+                <span class="font-heading text-base font-black text-slate-900 tracking-tight">{{ locale === 'tr' ? 'REST API & Excel' : 'REST API & Excel' }}</span>
+                <span class="rounded-full bg-amber-50 border border-amber-100 px-2.5 py-0.5 text-[9px] font-black text-amber-700 uppercase tracking-wider">REST / XLS</span>
+              </div>
+              <p class="text-xs leading-relaxed text-slate-600 font-medium">
                 {{ locale === 'tr' ? 'Özel şirket içi yazılımlarınız için RESTful API uç noktaları. Veya tek tıkla gelişmiş Excel tablosu yükleme ve karşılaştırma aracı.' : 'RESTful API endpoints for proprietary in-house systems, or a one-click advanced Excel sheet upload and comparison utility.' }}
               </p>
             </div>
-            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">RESTFUL API / XLS</span>
+            <div class="pt-4 border-t border-slate-200/60 text-[10px] font-bold text-slate-400 flex items-center justify-between group-hover:text-blue-600 transition-colors">
+              <span>JSON / OpenAPI 3.0</span>
+              <ArrowRight :size="13" />
+            </div>
           </div>
         </div>
       </div>
@@ -2225,6 +2247,12 @@ function toggleFilterSection(section: string) {
 </template>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
+
+.font-heading {
+  font-family: 'Outfit', sans-serif;
+}
+
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.3s ease;
 }
