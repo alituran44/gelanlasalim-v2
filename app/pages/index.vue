@@ -1772,35 +1772,7 @@ function toggleFilterSection(section: string) {
 
 
 
-            <!-- NASIL ÇALIŞIR SECTION -->
-            <section id="nasil-calisir" class="border-b border-slate-200 bg-slate-50 py-24">
-              <div class="mx-auto max-w-7xl px-6 text-center flex flex-col items-center">
-                <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest block text-center w-full">{{ locale === 'tr' ? 'SÜREÇ REHBERİ' : 'PROCESS GUIDE' }}</span>
-                <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl text-center w-full">{{ locale === 'tr' ? 'Platform Nasıl Çalışıyor?' : 'How the Platform Works' }}</h2>
-                <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500 text-center w-full">{{ locale === 'tr' ? 'Alıcı veya tedarikçi rolünüze uygun adımları takip ederek süreci başlatın.' : 'Follow the steps matching your role as a buyer or supplier to get started.' }}</p>
 
-                <!-- Tab switcher -->
-                <div class="mt-8 flex justify-center">
-                  <div class="inline-flex rounded-full border border-slate-200 bg-white p-1">
-                    <button @click="activeAudience = 'buyer'" class="rounded-full px-6 py-2.5 text-xs font-bold transition-all" :class="activeAudience === 'buyer' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:text-slate-900'">
-                      {{ locale === 'tr' ? 'Alıcı Şirketler İçin' : 'For Buyer Companies' }}
-                    </button>
-                    <button @click="activeAudience = 'supplier'" class="rounded-full px-6 py-2.5 text-xs font-bold transition-all" :class="activeAudience === 'supplier' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:text-slate-900'">
-                      {{ locale === 'tr' ? 'Tedarikçi Firmalar İçin' : 'For Supplier Companies' }}
-                    </button>
-                  </div>
-                </div>
-
-                <!-- Steps Grid -->
-                <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3 text-left">
-                  <div v-for="step in activeSteps" :key="step.number" class="p-6 rounded-2xl bg-white border premium-shadow flex flex-col gap-4">
-                    <div class="text-3xl font-serif font-black text-blue-600/30">{{ step.number }}</div>
-                    <h3 class="text-base font-black text-slate-900">{{ step.title }}</h3>
-                    <p class="text-xs leading-relaxed text-slate-500 font-medium">{{ step.text }}</p>
-                  </div>
-                </div>
-              </div>
-            </section>
 
     <!-- FAQ SECTION -->
     <section id="sss" class="border-b border-slate-200 bg-white py-24">

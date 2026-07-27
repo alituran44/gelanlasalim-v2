@@ -77,12 +77,12 @@ const localizedActiveTenders = computed(() => {
         <!-- Orta: Nav Linkleri -->
         <nav class="hidden lg:flex items-center rounded-full border p-1" style="border-color: #E2E8F0; background: #F8FAFC;">
           <a
-            href="/#nasil-calisir"
+            href="/yardim"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #0F172A;"
             onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
-          >{{ locale === 'tr' ? 'Nasıl Çalışır' : 'How it Works' }}</a>
+          >{{ locale === 'tr' ? 'Rehber & Yardım' : 'Guide & Help' }}</a>
           <a
             href="/#ozellikler"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
