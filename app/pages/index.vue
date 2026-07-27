@@ -1709,65 +1709,7 @@ function toggleFilterSection(section: string) {
       </div>
     </section>
 
-    <!-- KRİPTOGRAFİK ZAMAN DAMGASI & GÜVENLİK (AUDIT TRAIL TIMELINE) -->
-    <section class="border-b border-slate-200 bg-slate-50 py-24">
-      <div class="mx-auto max-w-7xl px-6">
-        <div class="text-center mb-16">
-          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'ŞEFFAFLIK & GÜVENLİK' : 'TRANSPARENCY & SECURITY' }}</span>
-          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Kriptografik ve Damgalı İşlem Takibi' : 'Cryptographic & Timestamped Transaction Tracking' }}</h2>
-          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ locale === 'tr' ? 'Satın alma süreçleriniz, KVKK ve Türk Ticaret Kanunu uyumlu, TLS 1.2+ şifreli ve zaman damgalı değişmez bir log günlüğünde saklanır.' : 'Your procurement processes are stored in an immutable log compliant with privacy regulations, secured with TLS 1.2+ encryption, and timestamped.' }}</p>
-        </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 relative text-left">
-          <!-- Connector line for desktop -->
-          <div class="hidden lg:block absolute top-[40px] left-[12%] right-[12%] h-[1px] bg-slate-200 z-0"></div>
-
-          <!-- Step 1 -->
-          <div class="relative z-10 p-6 bg-white border border-slate-200/80 rounded-2xl flex flex-col gap-4">
-            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">1</div>
-            <div>
-              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'Şartname Damgalama' : 'Specification Timestamping' }}</h4>
-              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
-                {{ locale === 'tr' ? 'Yayınladığınız şartname dosyalarının kriptografik hash kodları çıkarılarak sisteme damgalanır. Dosya değişmezliği garanti altındadır.' : 'Cryptographic hashes of your published specification files are stamped into the system. File immutability is guaranteed.' }}
-              </p>
-            </div>
-          </div>
-
-          <!-- Step 2 -->
-          <div class="relative z-10 p-6 bg-white border border-slate-200/80 rounded-2xl flex flex-col gap-4">
-            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">2</div>
-            <div>
-              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'TLS 1.2+ Şifreli Teklifler' : 'TLS 1.2+ Encrypted Bids' }}</h4>
-              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
-                {{ locale === 'tr' ? 'Tedarikçilerin gönderdiği fiyat ve belgeler SSL/TLS katmanında şifrelenir. Son teklif tarihine kadar kimse tarafından deşifre edilemez.' : 'Supplier pricing and documents are encrypted at the SSL/TLS layer. Bids remain sealed and undecryptable until the deadline.' }}
-              </p>
-            </div>
-          </div>
-
-          <!-- Step 3 -->
-          <div class="relative z-10 p-6 bg-white border border-slate-200/80 rounded-2xl flex flex-col gap-4">
-            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">3</div>
-            <div>
-              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'Canlı Eksiltme Günlüğü' : 'Live Auction Audit Trail' }}</h4>
-              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
-                {{ locale === 'tr' ? 'Ters ihale arenalarındaki her fiyat düşüşü, zaman damgasıyla değişmez denetim izine (audit trail) yazılır. Rekabet şeffaftır.' : 'Every price drop in reverse auction arenas is written to an immutable audit trail with a secure timestamp. Competition is fully transparent.' }}
-              </p>
-            </div>
-          </div>
-
-          <!-- Step 4 -->
-          <div class="relative z-10 p-6 bg-white border border-slate-200/80 rounded-2xl flex flex-col gap-4">
-            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">4</div>
-            <div>
-              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'KVKK Uyumlu Arşivleme' : 'Regulatory Compliant Archiving' }}</h4>
-              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
-                {{ locale === 'tr' ? 'Sonuçlanan ihaleler yasal saklama sürelerine uygun olarak güvenli sunucularda saklanır. Şirket içi denetimlere (audit) anında hazırdır.' : 'Concluded tenders are preserved on secure servers in compliance with statutory retention periods, ready for internal/external audits.' }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
 
 
 
