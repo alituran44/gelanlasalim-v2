@@ -174,7 +174,7 @@ const localizedActiveTenders = computed(() => {
       >
         <div v-if="mobileMenuOpen" class="border-t bg-white px-6 py-5 lg:hidden" style="border-color: #F1F5F9;">
           <div class="flex flex-col gap-3 text-sm font-semibold" style="color: #475569;">
-            <a href="/#nasil-calisir" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Nasıl Çalışır' : 'How it Works' }}</a>
+            <NuxtLink to="/yardim" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Rehber & Yardım' : 'Guide & Help' }}</NuxtLink>
             <a href="/#ozellikler" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Özellikler' : 'Features' }}</a>
             <a href="/#ihale-gezgini" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Market' : 'Market' }}</a>
             <NuxtLink to="/abonelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ t('pricing') }}</NuxtLink>
@@ -250,7 +250,7 @@ const localizedActiveTenders = computed(() => {
           <div class="md:col-span-2 flex flex-col gap-4 text-left">
             <h4 class="text-xs font-black uppercase text-blue-600 tracking-wider">{{ locale === 'tr' ? 'PLATFORM' : 'PLATFORM' }}</h4>
             <div class="flex flex-col gap-4 sm:gap-3 text-[11px] font-bold text-slate-700">
-              <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Nasıl Çalışır' : 'How it Works' }}</a>
+              <NuxtLink to="/yardim" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Rehber & Yardım' : 'Guide & Help' }}</NuxtLink>
               <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Özellikler' : 'Features' }}</a>
               <NuxtLink to="/abonelik" class="hover:text-blue-600 transition-colors py-1">{{ t('pricing') }}</NuxtLink>
               <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Pazar Yeri' : 'Marketplace' }}</a>

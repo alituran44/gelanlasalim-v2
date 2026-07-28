@@ -1772,40 +1772,6 @@ function toggleFilterSection(section: string) {
       </div>
     </section>
 
-    <!-- REGISTER CALL TO ACTION SECTION (Selin Şahin Feedback) -->
-    <section class="py-16 bg-[#001D36] text-white relative overflow-hidden">
-      <!-- Glow background -->
-      <div class="absolute top-0 right-0 h-[300px] w-[300px] rounded-full bg-blue-500/10 blur-3xl z-10"></div>
-      <div class="absolute bottom-0 left-0 h-[300px] w-[300px] rounded-full bg-emerald-500/10 blur-3xl z-10"></div>
-      
-      <div class="relative z-20 mx-auto max-w-5xl px-6 text-center space-y-6">
-        <span class="bg-[#1EAE4C]/10 border border-[#1EAE4C]/20 text-[#1EAE4C] text-[9px] font-black uppercase px-3 py-1 rounded-full tracking-wider inline-block animate-pulse">
-          ⚡ {{ locale === 'tr' ? 'ÜCRETSİZ LANSMAN DÖNEMİ' : 'FREE LAUNCH PERIOD' }}
-        </span>
-        <h2 class="text-3xl font-black tracking-tight sm:text-4xl">
-          {{ locale === 'tr' ? 'Tedarik Süreçlerinizi Bugün Dijitalleştirin' : 'Digitalize Your Procurement Processes Today' }}
-        </h2>
-        <p class="max-w-xl mx-auto text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
-          Ters ihale arenamıza katılın, malzeme ve lojistik maliyetlerinizi canlı eksiltme ile düşürün. Satın alma taleplerinizi tek merkezden yönetmeye hemen başlayın.
-        </p>
-        <div class="pt-4 flex flex-wrap justify-center gap-4">
-          <NuxtLink 
-            to="/uyelik" 
-            class="flex items-center gap-2 rounded-xl px-8 py-4 text-xs font-black text-white bg-[#1EAE4C] shadow-lg shadow-[#1EAE4C]/20 hover:bg-[#158f3d] transition-all"
-          >
-            Hemen Ücretsiz Katılın
-            <ArrowRight :size="15" />
-          </NuxtLink>
-          <a 
-            href="#sss" 
-            class="flex items-center gap-2 rounded-xl border border-slate-700 bg-transparent px-8 py-4 text-xs font-black text-white hover:bg-slate-800 transition-all"
-          >
-            Sıkça Sorulan Sorular
-          </a>
-        </div>
-      </div>
-    </section>
-
     <!-- BİZİMLE İLETİŞİME GEÇİN SECTION -->
     <section class="border-b border-slate-200 bg-slate-50 py-24 lg:py-32 relative overflow-hidden">
       <!-- Background subtle graphics -->
@@ -1965,7 +1931,7 @@ function toggleFilterSection(section: string) {
 
                 <!-- Footer Sublinks -->
                 <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-400 pt-4">
-                  <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Önce nasıl çalıştığını inceleyin →' : 'See how it works first →' }}</a>
+                  <NuxtLink to="/yardim" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Rehber & Yardım Sayfası →' : 'Guide & Help Page →' }}</NuxtLink>
                   <NuxtLink to="/uyelik" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Kurumsal hesap aç →' : 'Create corporate account →' }}</NuxtLink>
                 </div>
               </div>
