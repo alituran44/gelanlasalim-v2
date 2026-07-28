@@ -59,9 +59,9 @@ const localizedActiveTenders = computed(() => {
               </span>
             </div>
           </div>
-          <a href="/#ihale-gezgini" class="text-[#1EAE4C] hover:underline flex items-center gap-0.5 text-[10px] shrink-0 font-black">
+          <NuxtLink to="/pazar-yeri" class="text-[#1EAE4C] hover:underline flex items-center gap-0.5 text-[10px] shrink-0 font-black">
             {{ locale === 'tr' ? 'İncele' : 'Review' }} <ArrowRight :size="12" />
-          </a>
+          </NuxtLink>
         </div>
       </div>
 
@@ -90,13 +90,13 @@ const localizedActiveTenders = computed(() => {
             onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
           >{{ locale === 'tr' ? 'Özellikler' : 'Features' }}</a>
-          <a
-            href="/#ihale-gezgini"
+          <NuxtLink
+            to="/pazar-yeri"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
             style="color: #0F172A;"
             onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
             onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
-          >{{ locale === 'tr' ? 'Market' : 'Market' }}</a>
+          >{{ locale === 'tr' ? 'Pazar Yeri' : 'Marketplace' }}</NuxtLink>
           <NuxtLink
             to="/abonelik"
             class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
@@ -176,7 +176,7 @@ const localizedActiveTenders = computed(() => {
           <div class="flex flex-col gap-3 text-sm font-semibold" style="color: #475569;">
             <NuxtLink to="/yardim" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Rehber & Yardım' : 'Guide & Help' }}</NuxtLink>
             <a href="/#ozellikler" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Özellikler' : 'Features' }}</a>
-            <a href="/#ihale-gezgini" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Market' : 'Market' }}</a>
+            <NuxtLink to="/pazar-yeri" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Pazar Yeri' : 'Marketplace' }}</NuxtLink>
             <NuxtLink to="/abonelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ t('pricing') }}</NuxtLink>
             <a href="/#sss" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'SSS' : 'FAQ' }}</a>
             <div class="border-t my-1" style="border-color: #F1F5F9;"></div>
