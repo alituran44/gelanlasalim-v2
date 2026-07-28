@@ -1148,115 +1148,42 @@ function toggleFilterSection(section: string) {
       <div class="absolute right-[-5%] top-[-20%] h-[550px] w-[550px] rounded-full bg-[#1EAE4C]/20 blur-3xl z-10 pointer-events-none"></div>
       <div class="absolute bottom-[-20%] left-[-5%] h-[450px] w-[450px] rounded-full bg-blue-600/15 blur-3xl z-10 pointer-events-none"></div>
 
-      <div class="relative z-20 mx-auto grid min-h-[660px] max-w-7xl items-center gap-12 px-6 py-20 lg:grid-cols-[1.15fr_0.85fr]">
-        <!-- Hero Left -->
-        <div class="text-left space-y-6">
-          <div class="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-950/80 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-emerald-400 shadow-sm backdrop-blur-md">
-            <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            {{ localizedHero.tagline }}
-          </div>
-          
-          <h1 class="font-heading text-3xl sm:text-5xl lg:text-6xl font-black leading-[1.15] tracking-tight text-white drop-shadow-md">
-            {{ localizedHero.titleLine1 }} {{ localizedHero.titleLine2 }}
-            <span class="block text-emerald-400 italic font-serif font-medium mt-1">{{ localizedHero.titleItalic }}</span>
-          </h1>
+      <div class="relative z-20 mx-auto max-w-4xl px-6 py-24 text-center space-y-8">
+        <!-- Hero Tagline -->
+        <div class="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-950/80 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-emerald-400 shadow-sm backdrop-blur-md">
+          <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          {{ localizedHero.tagline }}
+        </div>
+        
+        <!-- Hero Title -->
+        <h1 class="font-heading text-4xl sm:text-6xl lg:text-7xl font-black leading-[1.12] tracking-tight text-white drop-shadow-md">
+          {{ localizedHero.titleLine1 }} {{ localizedHero.titleLine2 }}
+          <span class="block text-emerald-400 italic font-serif font-medium mt-2">{{ localizedHero.titleItalic }}</span>
+        </h1>
 
-          <p class="max-w-xl text-sm md:text-base leading-relaxed text-slate-200 font-medium drop-shadow">
-            {{ localizedHero.description }}
-          </p>
-          
-          <!-- Buttons -->
-          <div class="pt-2 flex flex-wrap items-center gap-4">
-            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-8 py-4 text-xs font-black text-white bg-[#1EAE4C] shadow-lg shadow-[#1EAE4C]/30 hover:bg-[#169b40] active:scale-[0.98] transition-all">
-              {{ locale === 'tr' ? 'Hemen Kurumsal Hesap Aç' : 'Open Business Account' }}
-              <ArrowRight :size="16" />
-            </NuxtLink>
-            <a href="#ihale-gezgini" class="flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-900/90 px-8 py-4 text-xs font-black text-white hover:bg-slate-800 hover:border-slate-500 transition-all">
-              {{ locale === 'tr' ? 'İhaleleri İncele' : 'Explore Tenders' }}
-              <ArrowRight :size="16" />
-            </a>
-          </div>
-
-          <!-- Bottom Compliance Micro-Strip -->
-          <div class="pt-4 text-xs font-semibold text-slate-300 uppercase tracking-widest flex flex-wrap gap-x-4 gap-y-2">
-            <template v-for="(badge, index) in localizedHero.badgeStrip" :key="index">
-              <span class="flex items-center gap-1.5"><Check :size="13" class="text-emerald-400" /> {{ badge }}</span>
-              <span v-if="index < localizedHero.badgeStrip.length - 1" class="text-slate-600">•</span>
-            </template>
-          </div>
+        <!-- Hero Description -->
+        <p class="max-w-2xl mx-auto text-base sm:text-lg leading-relaxed text-slate-200 font-medium drop-shadow">
+          {{ localizedHero.description }}
+        </p>
+        
+        <!-- Action Buttons -->
+        <div class="pt-4 flex flex-wrap items-center justify-center gap-4">
+          <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-8 py-4 text-sm font-black text-white bg-[#1EAE4C] shadow-lg shadow-[#1EAE4C]/30 hover:bg-[#169b40] active:scale-[0.98] transition-all">
+            {{ locale === 'tr' ? 'Hemen Kurumsal Hesap Aç' : 'Open Business Account' }}
+            <ArrowRight :size="18" />
+          </NuxtLink>
+          <a href="#ihale-gezgini" class="flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-900/90 px-8 py-4 text-sm font-black text-white hover:bg-slate-800 hover:border-slate-500 transition-all">
+            {{ locale === 'tr' ? 'İhaleleri İncele' : 'Explore Tenders' }}
+            <ArrowRight :size="18" />
+          </a>
         </div>
 
-        <!-- Hero Right (Live Card styled with High-Contrast Dark Glassmorphism) -->
-        <div class="relative">
-          <div class="absolute -inset-4 rounded-3xl bg-emerald-500/10 blur-2xl pointer-events-none"></div>
-          
-          <div class="relative mx-auto max-w-[460px] rounded-3xl border border-slate-700/80 bg-slate-900/95 p-6 shadow-2xl backdrop-blur-xl text-left space-y-6">
-            <!-- Header Bar -->
-            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-              <div>
-                <span class="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-400">
-                  <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span> {{ locale === 'tr' ? 'TEMSİLİ CANLI İHALE' : 'LIVE AUCTION PREVIEW' }}
-                </span>
-                <h3 class="mt-1.5 font-heading text-base font-black text-white leading-snug">{{ localizedLiveTender.title }}</h3>
-              </div>
-              <div class="text-right">
-                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">{{ locale === 'tr' ? 'KALAN SÜRE' : 'TIME REMAINING' }}</span>
-                <div class="mt-1 font-mono text-xs font-bold text-emerald-400 bg-slate-950 px-3 py-1 rounded-lg border border-slate-800">{{ localizedLiveTender.remainingTime }}</div>
-              </div>
-            </div>
-
-            <!-- Price & Savings Meter -->
-            <div class="flex justify-between items-end bg-slate-950/80 p-4.5 rounded-2xl border border-slate-800">
-              <div>
-                <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">{{ locale === 'tr' ? 'GÜNCEL EN İYİ TEKLİF' : 'CURRENT BEST BID' }}</span>
-                <div class="mt-1 text-3xl md:text-4xl font-black text-white tracking-tight font-mono">
-                  {{ currencySymbol }}{{ localizedLiveTender.bestBid.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
-                </div>
-                <div class="mt-1.5 text-xs text-slate-300 font-medium">
-                  {{ locale === 'tr' ? 'AÇILIŞ FİYATI' : 'OPENING PRICE' }} <span class="font-mono text-slate-400 line-through">{{ currencySymbol }}{{ localizedLiveTender.openingPrice.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
-                </div>
-              </div>
-              
-              <div class="text-right">
-                <div class="rounded-xl px-3 py-1.5 text-xs font-black border border-emerald-500/40 bg-emerald-950/80 text-emerald-400 flex items-center gap-1">
-                  <TrendingDown :size="14" />
-                  {{ localizedLiveTender.savingsText }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Competitor Stream -->
-            <div class="space-y-2.5 border-t border-slate-800 pt-4">
-              <div class="text-[10px] font-black uppercase tracking-widest text-slate-300 mb-2 flex justify-between">
-                <span>{{ localizedLiveTender.competitors.length }} {{ locale === 'tr' ? 'TEDARİKÇİ YARIŞIYOR' : 'SUPPLIERS BIDDING' }}</span>
-                <span class="text-emerald-400 font-mono text-[9px]">[AUDIT LOG ACTIVE]</span>
-              </div>
-              
-              <div 
-                v-for="comp in localizedLiveTender.competitors" 
-                :key="comp.name" 
-                class="flex items-center justify-between rounded-xl px-4 py-3 transition-colors"
-                :class="comp.leader ? 'border border-emerald-500/50 bg-emerald-950/40 text-white shadow-sm' : 'bg-slate-950/60 border border-slate-800 text-slate-300'"
-              >
-                <div class="flex items-center gap-2 text-xs font-bold">
-                  <span class="h-2 w-2 rounded-full" :class="comp.leader ? 'bg-emerald-400' : 'bg-slate-500'"></span>
-                  {{ comp.name }}
-                  <span v-if="comp.leader" class="rounded bg-emerald-500/20 border border-emerald-500/40 px-2 py-0.5 text-[9px] font-black text-emerald-400">{{ locale === 'tr' ? 'LİDER' : 'LEADER' }}</span>
-                </div>
-                <span class="font-mono font-bold text-xs" :class="comp.leader ? 'text-white' : 'text-slate-300'">
-                  {{ currencySymbol }}{{ comp.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Card Bottom Bar -->
-            <div class="grid grid-cols-4 gap-1 border-t border-slate-800 pt-3 text-center text-[10px] font-bold text-slate-300">
-              <span class="py-1 hover:text-white cursor-pointer">{{ locale === 'tr' ? 'TALEP' : 'REQUEST' }}</span>
-              <span class="py-1 text-emerald-400 border-b-2 border-emerald-400 font-black">+ {{ locale === 'tr' ? 'TEKLİF' : 'BIDS' }}</span>
-              <span class="py-1 hover:text-white cursor-pointer">{{ locale === 'tr' ? 'KARAR' : 'DECISION' }}</span>
-              <span class="py-1 hover:text-white cursor-pointer">{{ locale === 'tr' ? 'TESLİMAT' : 'DELIVERY' }}</span>
-            </div>
-          </div>
+        <!-- Compliance Micro-Strip -->
+        <div class="pt-6 text-xs font-semibold text-slate-300 uppercase tracking-widest flex flex-wrap justify-center gap-x-6 gap-y-3">
+          <template v-for="(badge, index) in localizedHero.badgeStrip" :key="index">
+            <span class="flex items-center gap-1.5"><Check :size="14" class="text-emerald-400" /> {{ badge }}</span>
+            <span v-if="index < localizedHero.badgeStrip.length - 1" class="text-slate-600">•</span>
+          </template>
         </div>
       </div>
 
