@@ -111,16 +111,18 @@ function handleRegister() {
 
   setTimeout(() => {
     isSubmitting.value = false
-    localStorage.setItem('userSession', JSON.stringify({
-      email: email.value,
-      firstName: firstName.value,
-      name: `${firstName.value} ${lastName.value}`,
-      company: userRole.value === 'company' ? companyName.value : 'Bireysel Üye',
-      role: userRole.value,
-      sektorler: seciliSektorler.value,
-      mailBildirimi: mailBildirimi.value,
-      isPremium: false
-    }))
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userSession', JSON.stringify({
+        email: email.value,
+        firstName: firstName.value,
+        name: `${firstName.value} ${lastName.value}`,
+        company: userRole.value === 'company' ? companyName.value : 'Bireysel Üye',
+        role: userRole.value,
+        sektorler: seciliSektorler.value,
+        mailBildirimi: mailBildirimi.value,
+        isPremium: false
+      }))
+    }
     router.push('/firma-dogrulama')
   }, 1000)
 }
@@ -141,13 +143,15 @@ function handleLogin() {
 
   setTimeout(() => {
     isSubmitting.value = false
-    localStorage.setItem('userSession', JSON.stringify({
-      email: loginEmail.value,
-      firstName: 'Ali',
-      name: 'Ali Turan',
-      role: 'buyer',
-      isPremium: true
-    }))
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userSession', JSON.stringify({
+        email: loginEmail.value,
+        firstName: 'Ali',
+        name: 'Ali Turan',
+        role: 'buyer',
+        isPremium: true
+      }))
+    }
     router.push('/panel')
   }, 1000)
 }

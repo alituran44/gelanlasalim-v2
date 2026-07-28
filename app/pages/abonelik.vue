@@ -200,12 +200,14 @@ function handlePayment() {
 }
 
 function upgradeSession() {
-  const currentSession = localStorage.getItem('userSession')
-  if (currentSession) {
-    const parsed = JSON.parse(currentSession)
-    parsed.isPremium = true
-    parsed.plan = selectedPackage.value?.name || 'Premium Üyelik'
-    localStorage.setItem('userSession', JSON.stringify(parsed))
+  if (typeof window !== 'undefined') {
+    const currentSession = localStorage.getItem('userSession')
+    if (currentSession) {
+      const parsed = JSON.parse(currentSession)
+      parsed.isPremium = true
+      parsed.plan = selectedPackage.value?.name || 'Premium Üyelik'
+      localStorage.setItem('userSession', JSON.stringify(parsed))
+    }
   }
 
   // Create payment record and save to CMS

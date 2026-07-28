@@ -22,9 +22,11 @@ const router = useRouter()
 const route = useRoute()
 
 onMounted(() => {
-  const session = localStorage.getItem('userSession')
-  if (!session) {
-    router.push('/uyelik')
+  if (typeof window !== 'undefined') {
+    const session = localStorage.getItem('userSession')
+    if (!session) {
+      router.push('/uyelik')
+    }
   }
 })
 
