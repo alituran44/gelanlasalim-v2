@@ -286,7 +286,7 @@ const localizedFaqs = computed(() => {
       { question: 'Which industries can I open tenders in?', answer: 'Agriculture, construction, healthcare, technology, logistics, packaging, and more.' }
     ]
   } else {
-    return cmsData.value.faqs.map(f => ({ question: f.q, answer: f.a }))
+    return (cmsData.value?.faqs || []).map(f => ({ question: f?.q || f?.question || '', answer: f?.a || f?.answer || '' }))
   }
 })
 
@@ -1004,7 +1004,7 @@ const activeSteps = computed(() => activeAudience.value === 'buyer' ? buyerSteps
 
 const localizedTenders = computed(() => {
   if (locale.value === 'en') {
-    return tenders.map(t => ({
+    return (tenders || []).map(t => ({
       ...t,
       title: t.title === '500 Adet Kurumsal Dizüstü Bilgisayar Alımı' ? '500 Units Corporate Laptop Procurement' :
              t.title === 'Üretim Tesisi Çatı ve İzolasyon Yenileme İşi' ? 'Manufacturing Facility Roof & Insulation Renovation' :
@@ -1014,7 +1014,7 @@ const localizedTenders = computed(() => {
       type: t.type === 'Mal Alımı' ? 'Goods Procurement' : t.type === 'Yapım İşi' ? 'Construction Work' : t.type === 'Hizmet Alımı' ? 'Service Procurement' : t.type === 'Fason Üretim' ? 'Contract Manufacturing' : t.type,
       method: t.method === 'Kapalı Teklif' ? 'Sealed Bidding' : t.method === 'Açık Teklif' ? 'Open Bidding' : t.method === 'Ters İhale' ? 'Reverse Auction' : t.method === 'Davetli İhale' ? 'Invited Tender' : t.method,
       pricing: t.pricing === 'Birim Fiyat' ? 'Unit Price' : t.pricing === 'Toplam / Götürü Bedel' ? 'Lump Sum / Total Price' : t.pricing,
-      value: t.value.replace('₺', '$').replace('5.500.000', '180,000').replace('1.250.000', '42,000').replace('840.000', '28,000').replace('350.000', '11,500').replace('2.800.000', '92,000'),
+      value: (t.value || '').replace('₺', '$').replace('5.500.000', '180,000').replace('1.250.000', '42,000').replace('840.000', '28,000').replace('350.000', '11,500').replace('2.800.000', '92,000'),
       description: t.id === 1 ? 'Procurement of 500 corporate laptop computers in accordance with technical specs.' :
                    t.id === 2 ? 'Roof cladding and thermal insulation renovation for factory production facility.' :
                    t.id === 3 ? '12-month employee shuttle service for production plant staff.' :
@@ -1022,7 +1022,7 @@ const localizedTenders = computed(() => {
                    'Development of corporate portal, mobile app, and admin control panel.'
     }))
   } else {
-    return tenders
+    return tenders || []
   }
 })
 
