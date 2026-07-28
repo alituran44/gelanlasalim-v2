@@ -62,6 +62,42 @@ export const DEFAULT_CMS_DATA = {
       ]
     ]
   },
+  faqs: [
+    { q: "Tersine ihale (eksiltme) sistemi nasıl çalışır?", a: "Alıcı firma satın almak istediği ürün veya hizmet için şartname ve bütçesini belirler. Tedarikçiler canlı sürede teklif vererek fiyat eksiltir; en uygun teklif sahibi ihaleyi kazanır." },
+    { q: "Firmaların doğrulanması nasıl sağlanıyor?", a: "Platforma üye olan her şirketin vergi kimlik numarası, MERSİS/KEP adresleri ve kurumsal belgeleri kontrol edilerek 'Onaylı Üye' rozeti tanımlanır." },
+    { q: "Ödeme ve teslimat süreçleri güvenli mi?", a: "Evet. Alıcı ihale bedelini güvenli hesaba yatırır. Teslimat onaylandıktan sonra ödeme tedarikçiye aktarılır." },
+    { q: "Alıcı olarak komisyon ödemem gerekiyor mu?", a: "Hayır. GelAnlaşalım platformunda alıcı şirketler için üyelik ve ihale açma tamamen ücretsizdir." },
+    { q: "Hangi sektörlerde ihale açabilirim?", a: "İnşaat, teknoloji, lojistik, tarım, ambalaj, medikal, otomotiv ve tüm kurumsal tedarik alanlarında ihale açabilirsiniz." }
+  ],
+  problems: [
+    { title: "Şartname ve teklif penceresi herkes için ayrı zeminde kalır.", desc: "Tedarikçilere ayrı e-postalar gönderilmesi karmaşaya neden olur." },
+    { title: "Fiyat kıyaslaması manuel ve hataya açıktır.", desc: "Excel tabloları ve e-posta zincirlerinde zaman kaybolur." },
+    { title: "Tedarikçi kalifikasyonu belgesizdir.", desc: "Referans ve belge kontrolü yapılmadan anlaşma riski doğar." }
+  ],
+  features: [
+    { title: "Ters İhale Sistemi", desc: "Kapalı zarf yerine canlı fiyatta rekabetçi eksiltme arenası." },
+    { title: "Nitelikli Tedarikçi Akışı", desc: "Vergi ve belge onaylı kurumsal firma profilleri." },
+    { title: "Belgeli Teklif Akışı", desc: "Şartname yükleme ve standart formatta teklif alma." },
+    { title: "Detaylı Analitik", desc: "Maliyet takibi, teklif kıyaslama ve karar raporları." }
+  ],
+  trustStandards: [
+    { title: "TLS 1.2+", subtitle: "ŞİFRELİ İLETİŞİM", desc: "HTTPS/SSL ile şifreli veri iletimi." },
+    { title: "KVKK", subtitle: "KİŞİSEL VERİ KORUMA", desc: "6698 sayılı kanuna tam uyumluluk." },
+    { title: "Kayıt İzi", subtitle: "İŞLEM GÜNLÜKLERİ", desc: "Her işlem zaman damgalı günlüklerde saklanır." },
+    { title: "TR · EN", subtitle: "ÇOK DİL DESTEĞİ", desc: "Türkçe ve İngilizce tam arayüz desteği." }
+  ],
+  stats: [
+    { value: '12.4M ₺+', label: 'Toplam Ticaret Hacmi' },
+    { value: '150+', label: 'Doğrulanmış B2B Üretici' },
+    { value: '%14.2', label: 'Ortalama Tedarik Tasarrufu' },
+    { value: '0 ₺', label: 'Alıcı Üyelik Komisyonu' }
+  ],
+  videoGuides: [
+    { title: 'Nasıl Kayıt Olunur?', desc: 'Adım adım üyelik rehberi', videoUrl: '' },
+    { title: 'Nasıl İhale Açılır?', desc: 'İlk ihalenizi dakikalar içinde oluşturun', videoUrl: '' },
+    { title: 'Nasıl Teklif Verilir?', desc: 'Tedarikçi olarak teklif verme süreci', videoUrl: '' },
+    { title: 'Yönetim Paneli', desc: 'Kontrol panelini etkin kullanma', videoUrl: '' }
+  ],
   dashboard: {
     tenders: [
       {
@@ -210,7 +246,7 @@ export const DEFAULT_CMS_DATA = {
 }
 
 export function useCmsData() {
-  const cmsData = ref(DEFAULT_CMS_DATA)
+  const cmsData = ref({ ...DEFAULT_CMS_DATA })
 
   // Initialize and load data on client side
   if (typeof window !== 'undefined') {
@@ -218,24 +254,25 @@ export function useCmsData() {
     if (saved) {
       try {
         const parsed = JSON.parse(saved)
-        // Ensure backward compatibility if dashboard property is missing in old localstorage
-        if (!parsed.dashboard) {
-          parsed.dashboard = DEFAULT_CMS_DATA.dashboard
+        const merged = {
+          ...DEFAULT_CMS_DATA,
+          ...parsed,
+          faqs: (parsed && Array.isArray(parsed.faqs) && parsed.faqs.length > 0) ? parsed.faqs : DEFAULT_CMS_DATA.faqs,
+          problems: (parsed && Array.isArray(parsed.problems) && parsed.problems.length > 0) ? parsed.problems : DEFAULT_CMS_DATA.problems,
+          features: (parsed && Array.isArray(parsed.features) && parsed.features.length > 0) ? parsed.features : DEFAULT_CMS_DATA.features,
+          trustStandards: (parsed && Array.isArray(parsed.trustStandards) && parsed.trustStandards.length > 0) ? parsed.trustStandards : DEFAULT_CMS_DATA.trustStandards,
+          stats: (parsed && Array.isArray(parsed.stats) && parsed.stats.length > 0) ? parsed.stats : DEFAULT_CMS_DATA.stats,
+          videoGuides: (parsed && Array.isArray(parsed.videoGuides) && parsed.videoGuides.length > 0) ? parsed.videoGuides : DEFAULT_CMS_DATA.videoGuides,
+          hero: { ...DEFAULT_CMS_DATA.hero, ...((parsed && parsed.hero) || {}) },
+          dashboard: { ...DEFAULT_CMS_DATA.dashboard, ...((parsed && parsed.dashboard) || {}) },
+          contact: { ...DEFAULT_CMS_DATA.contact, ...((parsed && parsed.contact) || {}) },
+          payments: (parsed && Array.isArray(parsed.payments) && parsed.payments.length > 0) ? parsed.payments : DEFAULT_CMS_DATA.payments
         }
-        if (!parsed.contact) {
-          parsed.contact = DEFAULT_CMS_DATA.contact
-        }
-        if (!parsed.payments) {
-          parsed.payments = DEFAULT_CMS_DATA.payments
-        }
-        // Migrate blocked third-party video URL or local big file to CDN video
-        if (parsed.hero && parsed.hero.heroVideoUrl && (parsed.hero.heroVideoUrl.includes('mixkit.co') || parsed.hero.heroVideoUrl === '/hero_video.mp4')) {
-          parsed.hero.heroVideoUrl = DEFAULT_CMS_DATA.hero.heroVideoUrl
-        }
-        localStorage.setItem('cmsData', JSON.stringify(parsed))
-        cmsData.value = parsed
+        localStorage.setItem('cmsData', JSON.stringify(merged))
+        cmsData.value = merged
       } catch (e) {
         console.error('Failed to parse saved CMS data, using defaults.', e)
+        cmsData.value = { ...DEFAULT_CMS_DATA }
       }
     } else {
       localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
