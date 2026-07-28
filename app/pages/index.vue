@@ -51,6 +51,9 @@ useSeoMeta({
 })
 
 useHead({
+  htmlAttrs: {
+    lang: 'tr'
+  },
   link: [
     { rel: 'icon', type: 'image/png', href: '/logo.png' },
     { rel: 'canonical', href: 'https://gelanlasalim-v2.vercel.app' }
@@ -59,6 +62,73 @@ useHead({
     { name: 'keywords', content: 'b2b ihale, tersine ihale, eksiltme ihalesi, teklif toplama, kurumsal satın alma, tedarikçi yönetimi, ekap ihale, kik, doğrudan temin' },
     { name: 'author', content: 'GelAnlaşalım Bilişim A.Ş.' },
     { name: 'robots', content: 'index, follow' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'WebSite',
+        'name': 'GelAnlaşalım',
+        'url': 'https://gelanlasalim-v2.vercel.app',
+        'description': 'B2B Tersine İhale, Eksiltme ve Kurumsal Satın Alma Platformu',
+        'potentialAction': {
+          '@type': 'SearchAction',
+          'target': 'https://gelanlasalim-v2.vercel.app/?q={search_term_string}',
+          'query-input': 'required name=search_term_string'
+        }
+      })
+    },
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        'name': 'GelAnlaşalım Bilişim A.Ş.',
+        'url': 'https://gelanlasalim-v2.vercel.app',
+        'logo': 'https://gelanlasalim-v2.vercel.app/logo.png',
+        'contactPoint': {
+          '@type': 'ContactPoint',
+          'telephone': '+90-555-555-55-55',
+          'contactType': 'customer service',
+          'email': 'info@gelanlasalim.com',
+          'availableLanguage': 'Turkish'
+        }
+      })
+    },
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        'mainEntity': [
+          {
+            '@type': 'Question',
+            'name': 'Tersine ihale (eksiltme) sistemi nasıl çalışır?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Alıcı firma satın almak istediği malzeme veya hizmet için detaylı şartname ve miktar belirterek bir ihale açar. Doğrulanmış tedarikçiler belirlenen süre içinde canlı eksiltme arenasında birbirlerinin tekliflerini görerek tekliflerini düşürürler.'
+            }
+          },
+          {
+            '@type': 'Question',
+            'name': 'Firmaların doğrulanması nasıl sağlanıyor?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Platforma üye olan her şirketin vergi levhası, ticaret sicil gazetesi, imza sirküleri ve faaliyet belgeleri gibi resmi evrakları ekibimiz tarafından titizlikle kontrol edilir. Sadece doğrulanmış kurumsal firmalar teklif verebilir ve ihale açabilir.'
+            }
+          },
+          {
+            '@type': 'Question',
+            'name': 'Ödeme ve teslimat süreçleri güvenli mi?',
+            'acceptedAnswer': {
+              '@type': 'Answer',
+              'text': 'Evet. Alıcı ihale bedelini güvenli hesaba aktarır. Tedarikçi şartnameye uygun şekilde teslimat yaptığında ve alıcı onay verdiğinde ödeme tedarikçiye aktarılır. Süreç boyunca tüm belgeler ve işlem adımları zaman damgasıyla kayıt altına alınır.'
+            }
+          }
+        ]
+      })
+    }
   ]
 })
 
@@ -151,12 +221,7 @@ const localizedStats = computed(() => {
       { value: '$0', label: 'Buyer Membership Commission' }
     ]
   } else {
-    return cmsData.value?.stats || [
-      { value: '12.4M ₺+', label: 'Toplam Ticaret Hacmi' },
-      { value: '150+', label: 'Doğrulanmış B2B Üretici' },
-      { value: '%14.2', label: 'Ortalama Tedarik Tasarrufu' },
-      { value: '0 ₺', label: 'Alıcı Üyelik Komisyonu' }
-    ]
+    return cmsData.value.stats
   }
 })
 
@@ -169,12 +234,7 @@ const localizedVideoGuides = computed(() => {
       { title: 'Control Panel Guide', desc: 'Mastering the administrative dashboard', videoUrl: '' }
     ]
   } else {
-    return cmsData.value?.videoGuides || [
-      { title: 'Nasıl Kayıt Olunur?', desc: 'Adım adım üyelik rehberi', videoUrl: '' },
-      { title: 'Nasıl İhale Açılır?', desc: 'İlk ihalenizi dakikalar içinde oluşturun', videoUrl: '' },
-      { title: 'Nasıl Teklif Verilir?', desc: 'Tedarikçi olarak teklif verme süreci', videoUrl: '' },
-      { title: 'Yönetim Paneli', desc: 'Kontrol panelini etkin kullanma', videoUrl: '' }
-    ]
+    return cmsData.value.videoGuides
   }
 })
 
@@ -187,12 +247,7 @@ const localizedFeatures = computed(() => {
       { title: 'Detailed Analytics', desc: 'Bid comparison, cost history tracking, and decision exports.' }
     ]
   } else {
-    return cmsData.value?.features || [
-      { title: 'Ters İhale Sistemi', desc: 'Kapalı zarf usulü yerine...' },
-      { title: 'Nitelikli Tedarikçi Akışı', desc: 'Belge bazlı firma profili...' },
-      { title: 'Belgeli Teklif Akışı', desc: 'Şartname yükleme, teklif gelişi...' },
-      { title: 'Detaylı Analitik', desc: 'Teklif karşılaştırma, maliyet izi...' }
-    ]
+    return cmsData.value.features
   }
 })
 
@@ -205,12 +260,7 @@ const localizedTrustStandards = computed(() => {
       { title: 'TR · EN', subtitle: 'MULTI-LANGUAGE', desc: 'Turkish and English dual interface support.' }
     ]
   } else {
-    return cmsData.value?.trustStandards || [
-      { title: 'TLS 1.2+', subtitle: 'ŞİFRELİ İLETİŞİM', desc: 'HTTPS/SSL ile şifreli veri iletimi...' },
-      { title: 'KVKK', subtitle: 'KİŞİSEL VERİ KORUMA', desc: '6698 sayılı kanuna uygun...' },
-      { title: 'Kayıt İzi', subtitle: 'İŞLEM GÜNLÜKLERİ', desc: 'Her işlem zaman damgalı...' },
-      { title: 'TR · EN', subtitle: 'ÇOK DİL DESTEĞİ', desc: 'Türkçe ve İngilizce arayüz...' }
-    ]
+    return cmsData.value.trustStandards
   }
 })
 
@@ -222,11 +272,7 @@ const localizedProblems = computed(() => {
       { title: 'Supplier qualification lacks verification.', desc: 'Contracts made without thorough background checks.' }
     ]
   } else {
-    return cmsData.value?.problems || [
-      { title: 'Şartname ve teklif penceresi herkes için ayrı zeminde kalır.', desc: 'Tedarikçilere ayrı teklif formları gönderilir...' },
-      { title: 'Fiyat kıyaslaması manuel ve hataya açıktır.', desc: 'Excel tabloları ve e-posta zincirleri...' },
-      { title: 'Tedarikçi kalifikasyonu belgesizdir.', desc: 'Referans kontrolü yapılmadan...' }
-    ]
+    return cmsData.value.problems
   }
 })
 
@@ -240,16 +286,7 @@ const localizedFaqs = computed(() => {
       { question: 'Which industries can I open tenders in?', answer: 'Agriculture, construction, healthcare, technology, logistics, packaging, and more.' }
     ]
   } else {
-    if (cmsData.value?.faqs && Array.isArray(cmsData.value.faqs)) {
-      return cmsData.value.faqs.map(f => ({ question: f.q || (f as any).question, answer: f.a || (f as any).answer }))
-    }
-    return [
-      { question: 'GelAnlaşalım nedir?', answer: 'GelAnlaşalım, özel sektördeki firmaların satın alma taleplerini yayınlayabildiği, tedarikçilerin ise bu taleplere teklif verebildiği dijital ihale ve iş fırsatları platformudur.' },
-      { question: 'Kimler GelAnlaşalım kullanabilir?', answer: 'Satın alma yapan şirketler, KOBİ’ler, üreticiler, hizmet sağlayıcılar, tedarikçiler ve yeni müşterilere ulaşmak isteyen tüm işletmeler platformu kullanabilir.' },
-      { question: 'Platformda kamu ihaleleri var mı?', answer: 'Hayır. GelAnlaşalım özel sektör odaklıdır. Platformun temel amacı şirketler arasındaki satın alma, teklif toplama ve tedarik süreçlerini B2B tersine ihale modeliyle dijitalleştirmektir.' },
-      { question: 'İhale oluşturmak ücretli mi?', answer: 'Ücretlendirme modeli seçilen plana göre belirlenir. Temel planımız ile ücretsiz deneme yapabilir, profesyonel veya kurumsal paketlerimiz için lansmana özel indirimli fiyatlardan yararlanabilirsiniz.' },
-      { question: 'Ters ihale (Eksiltme) nedir?', answer: 'Tersine ihalede satıcılar belirlenen süre içerisinde en rekabetçi teklifleri sunar. Fiyatların anlık düştüğü şeffaf rekabet arenasıyla alıcı firma en optimum ticari koşullara ulaşır.' }
-    ]
+    return cmsData.value.faqs.map(f => ({ question: f.q, answer: f.a }))
   }
 })
 
@@ -288,11 +325,11 @@ function submitContactForm() {
   contactSuccess.value = false
   
   if (contactMethod.value === 'email' && !contactEmail.value) {
-    contactError.value = locale.value === 'tr' ? 'Lütfen geçerli bir kurumsal e-posta adresi girin.' : 'Please enter a valid corporate email address.'
+    contactError.value = 'Lütfen geçerli bir kurumsal e-posta adresi girin.'
     return
   }
   if (contactMethod.value === 'phone' && !contactPhone.value) {
-    contactError.value = locale.value === 'tr' ? 'Lütfen geçerli bir telefon numarası girin.' : 'Please enter a valid phone number.'
+    contactError.value = 'Lütfen geçerli bir telefon numarası girin.'
     return
   }
   
@@ -1048,80 +1085,9 @@ function toggleFilterSection(section: string) {
 
 <template>
   <div class="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
-    <!-- JSON-LD SEO Schemas -->
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "GelAnlaşalım",
-        "url": "https://gelanlasalim-v2.vercel.app",
-        "description": "B2B Tersine İhale, Eksiltme ve Kurumsal Satın Alma Platformu"
-      }
-    </script>
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "GelAnlaşalım Bilişim A.Ş.",
-        "url": "https://gelanlasalim-v2.vercel.app",
-        "logo": "https://gelanlasalim-v2.vercel.app/logo.png"
-      }
-    </script>
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "FAQPage",
-        "mainEntity": [
-          {
-            "@type": "Question",
-            "name": "Tersine ihale (eksiltme) sistemi nasıl çalışır?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Alıcı firma satın almak istediği malzeme veya hizmet için detaylı şartname ve miktar belirterek bir ihale açar. Doğrulanmış tedarikçiler belirlenen süre içinde canlı eksiltme arenasında birbirlerinin tekliflerini görerek tekliflerini düşürürler."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Firmaların doğrulanması nasıl sağlanıyor?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Platforma üye olan her şirketin vergi levhası, ticaret sicil gazetesi, imza sirküleri ve faaliyet belgeleri gibi resmi evrakları ekibimiz tarafından titizlikle kontrol edilir. Sadece doğrulanmış kurumsal firmalar teklif verebilir ve ihale açabilir."
-            }
-          },
-          {
-            "@type": "Question",
-            "name": "Ödeme ve teslimat süreçleri güvenli mi?",
-            "acceptedAnswer": {
-              "@type": "Answer",
-              "text": "Evet. Alıcı ihale bedelini güvenli hesaba aktarır. Tedarikçi şartnameye uygun şekilde teslimat yaptığında ve alıcı onay verdiğinde ödeme tedarikçiye aktarılır."
-            }
-          }
-        ]
-      }
-    </script>
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Product",
-        "name": "GelAnlaşalım B2B Tersine İhale Arenası",
-        "description": "Kurumsal alıcıların canlı eksiltmeli ters ihaleler düzenleyerek malzeme ve lojistik tedarik maliyetlerini düşürdüğü yeni nesil B2B platformu.",
-        "brand": {
-          "@type": "Brand",
-          "name": "GelAnlaşalım"
-        },
-        "offers": {
-          "@type": "AggregateOffer",
-          "priceCurrency": "USD",
-          "lowPrice": "29",
-          "highPrice": "199",
-          "offerCount": "4"
-        }
-      }
-    </script>
-
-    <!-- HERO SECTION (Executive YC B2B SaaS Aesthetic) -->
-    <section class="relative overflow-hidden border-b border-slate-800 bg-[#060911] text-white min-h-[660px]">
-      <!-- Background Video / High-Tech B2B Logistics Image -->
+    <!-- HERO SECTION -->
+    <section class="relative overflow-hidden border-b border-slate-200 bg-slate-100 min-h-[640px]">
+      <!-- Background Video -->
       <ClientOnly>
         <video 
           v-if="cmsData.hero.heroVideoUrl"
@@ -1130,76 +1096,158 @@ function toggleFilterSection(section: string) {
           loop 
           muted 
           playsinline 
-          class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-20"
+          class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-45"
         >
           <source :src="cmsData.hero.heroVideoUrl" type="video/mp4" />
         </video>
       </ClientOnly>
-      <!-- Premium Generated B2B Supply Chain & Logistics Background -->
+      <!-- Fallback image background if video is not available -->
       <div 
+        v-if="!cmsData.hero.heroVideoUrl" 
         class="absolute inset-0 w-full h-full bg-cover bg-center z-0" 
-        style="background-image: url('/hero_bg_new.jpg'); opacity: 0.30;"
+        style="background-image: url('/hero_port_background.png'); opacity: 0.15;"
       ></div>
 
-      <!-- Color Overlay Gradient for maximum text readability -->
-      <div class="absolute inset-0 bg-gradient-to-r from-[#060911]/95 via-[#060911]/85 to-[#060911]/60 z-0"></div>
+      <!-- Color Overlay for clean typography readability -->
+      <div class="absolute inset-0 bg-gradient-to-b from-slate-50/80 via-white/85 to-white/95 z-0"></div>
 
-      <!-- Ambient Radial Glows -->
-      <div class="absolute right-[-5%] top-[-20%] h-[550px] w-[550px] rounded-full bg-[#1EAE4C]/20 blur-3xl z-10 pointer-events-none"></div>
-      <div class="absolute bottom-[-20%] left-[-5%] h-[450px] w-[450px] rounded-full bg-blue-600/15 blur-3xl z-10 pointer-events-none"></div>
+      <!-- Decorative circles -->
+      <div class="absolute right-[-10%] top-[-30%] h-[600px] w-[600px] rounded-full bg-blue-500/5 blur-3xl z-10"></div>
+      <div class="absolute bottom-[-30%] left-[-10%] h-[500px] w-[500px] rounded-full bg-cyan-500/5 blur-3xl z-10"></div>
 
-      <div class="relative z-20 mx-auto max-w-4xl px-6 py-24 text-center space-y-8">
-        <!-- Hero Tagline -->
-        <div class="inline-flex items-center gap-2 rounded-full border border-emerald-500/40 bg-emerald-950/80 px-4 py-1.5 text-xs font-black uppercase tracking-widest text-emerald-400 shadow-sm backdrop-blur-md">
-          <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
-          {{ localizedHero.tagline }}
+      <div class="relative z-20 mx-auto grid min-h-[640px] max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr]">
+        <!-- Hero Left -->
+        <div class="text-left">
+          <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em]" style="color: #1EAE4C;">
+            <span class="h-px w-8" style="background-color: #1EAE4C;"></span>
+            {{ localizedHero.tagline }}
+          </div>
+          <h1 class="text-4xl font-black leading-[1.15] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+            {{ localizedHero.titleLine1 }}<br />
+            {{ localizedHero.titleLine2 }}<br />
+            <span class="font-serif italic font-medium" style="color: #1EAE4C;">{{ localizedHero.titleItalic }}</span>
+          </h1>
+          <p class="mt-6 max-w-xl text-base leading-relaxed text-slate-600">
+            {{ localizedHero.description }}
+          </p>
+          
+          <!-- Buttons -->
+          <div class="mt-8 flex flex-wrap items-center gap-3">
+            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/10 hover:opacity-90 transition-all" style="background: #003057;">
+              {{ locale === 'tr' ? 'Hemen kurumsal hesap aç' : 'Open business account' }}
+              <ArrowRight :size="15" />
+            </NuxtLink>
+            <a href="#nasil-calisir" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-6 py-4 text-xs font-black text-slate-700 hover:bg-white transition-all">
+              {{ locale === 'tr' ? 'Nasıl çalışır' : 'How it works' }}
+              <ArrowRight :size="15" />
+            </a>
+          </div>
+
+          <!-- Bottom Features Strip -->
+          <div class="mt-8 text-[9px] font-bold text-slate-500 uppercase tracking-widest flex flex-wrap gap-x-4 gap-y-2">
+            <template v-for="(badge, index) in localizedHero.badgeStrip" :key="index">
+              <span>{{ badge }}</span>
+              <span v-if="index < localizedHero.badgeStrip.length - 1" class="text-slate-300">•</span>
+            </template>
+          </div>
+
+          <!-- Video Button -->
+          <div class="mt-8">
+            <button class="flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </span>
+              {{ locale === 'tr' ? 'Video rehberlerini izle' : 'Watch video guides' }}
+            </button>
+          </div>
         </div>
-        
-        <!-- Hero Title -->
-        <h1 class="font-heading text-4xl sm:text-6xl lg:text-7xl font-black leading-[1.12] tracking-tight text-white drop-shadow-md">
-          {{ localizedHero.titleLine1 }} {{ localizedHero.titleLine2 }}
-          <span class="block text-emerald-400 italic font-serif font-medium mt-2">{{ localizedHero.titleItalic }}</span>
-        </h1>
 
-        <!-- Hero Description -->
-        <p class="max-w-2xl mx-auto text-base sm:text-lg leading-relaxed text-slate-200 font-medium drop-shadow">
-          {{ localizedHero.description }}
-        </p>
-        
-        <!-- Action Buttons -->
-        <div class="pt-4 flex flex-wrap items-center justify-center gap-4">
-          <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-8 py-4 text-sm font-black text-white bg-[#1EAE4C] shadow-lg shadow-[#1EAE4C]/30 hover:bg-[#169b40] active:scale-[0.98] transition-all">
-            {{ locale === 'tr' ? 'Hemen Kurumsal Hesap Aç' : 'Open Business Account' }}
-            <ArrowRight :size="18" />
-          </NuxtLink>
-          <a href="#ihale-gezgini" class="flex items-center gap-2 rounded-xl border border-slate-600 bg-slate-900/90 px-8 py-4 text-sm font-black text-white hover:bg-slate-800 hover:border-slate-500 transition-all">
-            {{ locale === 'tr' ? 'İhaleleri İncele' : 'Explore Tenders' }}
-            <ArrowRight :size="18" />
-          </a>
-        </div>
+        <!-- Hero Right (Live Card styled like the screenshot) -->
+        <div class="relative">
+          <div class="absolute -inset-8 rounded-full bg-blue-500/5 blur-3xl"></div>
+          
+          <div class="relative mx-auto max-w-[460px] rounded-3xl border border-slate-200/80 bg-white/95 p-6 premium-shadow backdrop-blur-sm text-left">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-slate-400">
+                  <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> {{ locale === 'tr' ? 'TEMSİLİ CANLI İHALE' : 'LIVE AUCTION PREVIEW' }}
+                </span>
+                <h3 class="mt-1.5 text-base font-black text-slate-800">{{ localizedLiveTender.title }}</h3>
+              </div>
+              <div class="text-right">
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">{{ locale === 'tr' ? 'KALAN SÜRE' : 'TIME REMAINING' }}</span>
+                <div class="mt-1 font-mono text-sm font-black text-slate-800">{{ localizedLiveTender.remainingTime }}</div>
+              </div>
+            </div>
 
-        <!-- Compliance Micro-Strip -->
-        <div class="pt-6 text-xs font-semibold text-slate-300 uppercase tracking-widest flex flex-wrap justify-center gap-x-6 gap-y-3">
-          <template v-for="(badge, index) in localizedHero.badgeStrip" :key="index">
-            <span class="flex items-center gap-1.5"><Check :size="14" class="text-emerald-400" /> {{ badge }}</span>
-            <span v-if="index < localizedHero.badgeStrip.length - 1" class="text-slate-600">•</span>
-          </template>
+            <!-- Price and Savings info -->
+            <div class="py-6 flex justify-between items-start">
+              <div>
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">{{ locale === 'tr' ? 'GÜNCEL EN İYİ TEKLİF' : 'CURRENT BEST BID' }}</span>
+                <div class="mt-1 text-4xl font-black text-slate-900 tracking-tight font-mono">
+                  {{ currencySymbol }}{{ localizedLiveTender.bestBid.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
+                </div>
+                <div class="mt-2 text-[10px] text-slate-400 font-bold">
+                  {{ locale === 'tr' ? 'AÇILIŞ FİYATI' : 'OPENING PRICE' }} <span class="font-mono text-slate-600 line-through">{{ currencySymbol }}{{ localizedLiveTender.openingPrice.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
+                </div>
+              </div>
+              
+              <div class="text-right">
+                <div class="rounded-lg px-2.5 py-1 text-[9px] font-black" style="background: rgba(30,174,76,0.08); color: #1EAE4C;">
+                  {{ localizedLiveTender.savingsText }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Competitor List -->
+            <div class="space-y-2 border-t border-slate-100 pt-5">
+              <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                {{ localizedLiveTender.competitors.length }} {{ locale === 'tr' ? 'TEDARİKÇİ YARIŞIYOR' : 'SUPPLIERS BIDDING' }}
+              </div>
+              
+              <div 
+                v-for="comp in localizedLiveTender.competitors" 
+                :key="comp.name" 
+                class="flex items-center justify-between rounded-xl px-4 py-2.5"
+                :class="comp.leader ? 'border border-blue-200/60 bg-blue-50/40' : 'bg-white border border-slate-200/60'"
+              >
+                <div class="flex items-center gap-2.5 text-xs font-bold" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
+                  <span class="h-1.5 w-1.5 rounded-full" :class="comp.leader ? 'bg-blue-600' : 'bg-slate-300'"></span>
+                  {{ comp.name }}
+                  <span v-if="comp.leader" class="rounded bg-blue-100 px-1.5 py-0.5 text-[8px] font-black text-blue-700">{{ locale === 'tr' ? 'ÖNDE' : 'LEADER' }}</span>
+                </div>
+                <span class="font-mono font-bold text-xs" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
+                  {{ currencySymbol }}{{ comp.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Bottom Tabs Inside Card -->
+            <div class="grid grid-cols-4 gap-1 mt-6 border-t border-slate-100 pt-4 text-center">
+              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ locale === 'tr' ? 'TALEP' : 'REQUEST' }}</span>
+              <span class="text-[8px] font-black text-blue-600 py-1 border-b-2 border-blue-600">+ {{ locale === 'tr' ? 'TEKLİF' : 'BIDS' }}</span>
+              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ locale === 'tr' ? 'KARAR' : 'DECISION' }}</span>
+              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ locale === 'tr' ? 'TESLİMAT' : 'DELIVERY' }}</span>
+            </div>
+
+            <div class="mt-4 text-center text-[9px] italic text-slate-400">
+              {{ locale === 'tr' ? 'Temsili veridir - Gerçek teklif değildir' : 'Mock data - Not a real bid' }}
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- Trust & Compliance Strip -->
-      <div class="relative border-t border-slate-800 bg-slate-950/95 py-8 backdrop-blur-md">
+      <!-- Trust Strip -->
+      <div class="relative border-t border-slate-200/80 bg-white/60 py-6 backdrop-blur-md">
         <div class="mx-auto grid max-w-7xl gap-6 px-6 sm:grid-cols-2 lg:grid-cols-4 text-left">
-          <div v-for="(item, idx) in localizedTrustStrip" :key="idx" class="flex items-center gap-4 p-3.5 rounded-2xl border border-slate-800/80 bg-slate-900/60 hover:border-slate-700 transition-colors">
-            <div class="h-11 w-11 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shrink-0 shadow-inner">
-              <ShieldCheck v-if="idx === 0" class="text-emerald-400" :size="22" />
-              <LockKeyhole v-else-if="idx === 1" class="text-emerald-400" :size="22" />
-              <Scale v-else-if="idx === 2" class="text-emerald-400" :size="22" />
-              <Globe2 v-else class="text-emerald-400" :size="22" />
-            </div>
+          <div v-for="(item, idx) in localizedTrustStrip" :key="idx" class="flex items-center gap-3">
+            <ShieldCheck v-if="idx === 0" class="text-blue-600 shrink-0" :size="22" />
+            <LockKeyhole v-else-if="idx === 1" class="text-blue-600 shrink-0" :size="22" />
+            <Scale v-else-if="idx === 2" class="text-blue-600 shrink-0" :size="22" />
+            <Globe2 v-else class="text-blue-600 shrink-0" :size="22" />
             <div>
-              <div class="font-heading text-xs md:text-sm font-black text-white leading-tight">{{ item.title }}</div>
-              <div class="text-xs text-slate-300 font-medium mt-1 leading-snug">{{ item.desc }}</div>
+              <div class="text-xs font-black text-slate-800">{{ item.title }}</div>
+              <div class="text-[10px] text-slate-500">{{ item.desc }}</div>
             </div>
           </div>
         </div>
@@ -1222,184 +1270,174 @@ function toggleFilterSection(section: string) {
           </div>
         </div>
 
-        <!-- Explorer Main Grid -->
-        <div class="grid grid-cols-1 xl:grid-cols-[320px_1fr] gap-8">
-          <!-- Sol Filtre Paneli -->
-          <aside class="h-fit overflow-hidden rounded-3xl border border-slate-200 bg-white premium-shadow flex flex-col text-left">
-            <div class="flex items-center justify-between border-b border-slate-200 bg-slate-50/80 px-5 py-4">
-              <div class="flex items-center gap-2 font-black text-slate-800 text-xs uppercase tracking-wider">
-                <SlidersHorizontal :size="16" class="text-blue-600" />
-                {{ locale === 'tr' ? 'Filtreleme Seçenekleri' : 'Filter Options' }}
+        <!-- Explorer Main Layout -->
+        <div class="space-y-6">
+          <!-- Sleek Horizontal Filter Bar -->
+          <div class="bg-white border border-slate-200/80 rounded-3xl p-5 premium-shadow text-left space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+              <!-- Search query input (6 cols) -->
+              <div class="md:col-span-6 relative">
+                <Search :size="16" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input 
+                  v-model="explorerSearch" 
+                  type="text" 
+                  id="explorerSearchInput" 
+                  aria-label="İlan Arama" 
+                  :placeholder="locale === 'tr' ? 'İlan başlığı, malzeme veya firma adı ile arayın...' : 'Search by title, item, or company...'" 
+                  class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all font-medium" 
+                />
               </div>
-              <button @click="clearFilters" class="text-[10px] font-black text-blue-600 hover:text-blue-700 uppercase">
-                {{ locale === 'tr' ? 'Temizle' : 'Clear' }}
-              </button>
-            </div>
 
-            <!-- Kategoriler Filtresi -->
-            <div class="border-b border-slate-200">
-              <button @click="toggleFilterSection('categories')" class="flex w-full items-center justify-between px-5 py-3.5 font-bold text-slate-700 text-xs">
-                <span class="flex items-center gap-2">
-                  <Folder :size="15" class="text-blue-600" />
-                  {{ locale === 'tr' ? 'Kategoriler' : 'Categories' }}
-                </span>
-                <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': expandedFilterSection === 'categories' }" />
-              </button>
-              <div v-if="expandedFilterSection === 'categories'" class="max-h-[300px] overflow-y-auto border-t border-slate-100">
-                <div v-for="category in detailedCategories" :key="category.name" class="border-b border-slate-100 last:border-0">
-                  <div class="flex items-center gap-2 px-4 py-2.5 hover:bg-slate-50" :class="{ 'bg-blue-50/50': selectedCat === category.name }">
-                    <button @click="toggleCategory(category.name)" class="flex h-5 w-5 shrink-0 items-center justify-center text-slate-400 hover:text-blue-600">
-                      <ChevronDown :size="12" class="transition-transform" :class="{ '-rotate-90': expandedCategory !== category.name }" />
-                    </button>
-                    <button @click="selectMainCategory(category.name)" class="min-w-0 flex-1 text-left text-[11px] font-bold text-slate-700 hover:text-blue-600 leading-4">
-                      {{ category.name }}
-                    </button>
-                    <span class="shrink-0 rounded bg-slate-100 border border-slate-200 px-1.5 py-0.5 text-[9px] font-black text-slate-500">{{ category.count }}</span>
-                  </div>
-                  <div v-if="expandedCategory === category.name" class="bg-slate-50 border-t border-slate-100/50">
-                    <button v-for="sub in category.children" :key="sub" @click="selectSubcategory(category.name, sub)" class="flex w-full items-center gap-1.5 px-8 py-2 text-left text-[11px] font-semibold text-slate-600 hover:bg-white hover:text-blue-600" :class="{ 'bg-white text-blue-600 font-bold': selectedSubcategory === sub }">
-                      <span class="text-slate-300">└</span> {{ sub }}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Sektörler Filtresi -->
-            <div class="border-b border-slate-200">
-              <button @click="toggleFilterSection('sectors')" class="flex w-full items-center justify-between px-5 py-3.5 font-bold text-slate-700 text-xs">
-                <span class="flex items-center gap-2">
-                  <Building2 :size="15" class="text-blue-600" />
-                  {{ locale === 'tr' ? 'Sektörler' : 'Sectors' }}
-                </span>
-                <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': expandedFilterSection === 'sectors' }" />
-              </button>
-              <div v-if="expandedFilterSection === 'sectors'" class="max-h-[300px] overflow-y-auto border-t border-slate-100">
-                <button v-for="sector in sectors" :key="sector.name" @click="selectedSector = sector.name" class="flex w-full items-center justify-between gap-3 border-b border-slate-100 px-5 py-2.5 text-left hover:bg-slate-50" :class="{ 'bg-blue-50/50 text-blue-600 font-bold': selectedSector === sector.name }">
-                  <span class="min-w-0 text-[11px] font-bold text-slate-700 leading-4">{{ sector.name }}</span>
-                  <span class="shrink-0 rounded border bg-white px-1.5 py-0.5 text-[9px] font-black text-slate-500">{{ sector.count }}</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- İhale Türü -->
-            <div class="border-b border-slate-200">
-              <button @click="toggleFilterSection('types')" class="flex w-full items-center justify-between px-5 py-3.5 font-bold text-slate-700 text-xs">
-                <span class="flex items-center gap-2">
-                  <Briefcase :size="15" class="text-blue-600" />
-                  {{ locale === 'tr' ? 'İhale Türleri' : 'Tender Types' }}
-                </span>
-                <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': expandedFilterSection === 'types' }" />
-              </button>
-              <div v-if="expandedFilterSection === 'types'" class="border-t border-slate-100 p-3">
-                <button v-for="t in tenderTypes" :key="t.name" @click="selectedType = t.name" class="mb-2 flex w-full items-center justify-between rounded-xl border border-slate-200 px-3 py-2 text-left hover:bg-slate-50" :class="{ 'border-blue-500 bg-blue-50/50 text-blue-600 font-bold': selectedType === t.name }">
-                  <span class="text-xs font-semibold text-slate-700">{{ t.name }}</span>
-                  <span class="text-[9px] font-black text-slate-500">{{ t.count }}</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Teklif Yöntemleri -->
-            <div class="border-b border-slate-200">
-              <button @click="toggleFilterSection('methods')" class="flex w-full items-center justify-between px-5 py-3.5 font-bold text-slate-700 text-xs">
-                <span class="flex items-center gap-2">
-                  <SlidersHorizontal :size="15" class="text-blue-600" />
-                  {{ locale === 'tr' ? 'Teklif Yöntemleri' : 'Bidding Methods' }}
-                </span>
-                <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': expandedFilterSection === 'methods' }" />
-              </button>
-              <div v-if="expandedFilterSection === 'methods'" class="border-t border-slate-100 p-3">
-                <button v-for="m in offerMethods" :key="m.name" @click="selectedMethod = m.name" class="mb-2 flex w-full items-center justify-between rounded-xl border border-slate-200 px-3 py-2 text-left hover:bg-slate-50" :class="{ 'border-blue-500 bg-blue-50/50 text-blue-600 font-bold': selectedMethod === m.name }">
-                  <span class="text-xs font-semibold text-slate-700">{{ m.name }}</span>
-                  <span class="text-[9px] font-black text-slate-500">{{ m.count }}</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Fiyatlandırma Türleri -->
-            <div class="border-b border-slate-200">
-              <button @click="toggleFilterSection('pricing')" class="flex w-full items-center justify-between px-5 py-3.5 font-bold text-slate-700 text-xs">
-                <span class="flex items-center gap-2">
-                  <FileText :size="15" class="text-blue-600" />
-                  {{ locale === 'tr' ? 'Fiyatlandırma Türleri' : 'Pricing Types' }}
-                </span>
-                <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': expandedFilterSection === 'pricing' }" />
-              </button>
-              <div v-if="expandedFilterSection === 'pricing'" class="border-t border-slate-100 p-3">
-                <button v-for="p in pricingTypes" :key="p.name" @click="selectedPricingType = p.name" class="mb-2 flex w-full items-center justify-between rounded-xl border border-slate-200 px-3 py-2 text-left hover:bg-slate-50" :class="{ 'border-blue-500 bg-blue-50/50 text-blue-600 font-bold': selectedPricingType === p.name }">
-                  <span class="text-xs font-semibold text-slate-700">{{ p.name }}</span>
-                  <span class="text-[9px] font-black text-slate-500">{{ p.count }}</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- Teslim Yeri (İl) -->
-            <div>
-              <button @click="toggleFilterSection('cities')" class="flex w-full items-center justify-between px-5 py-3.5 font-bold text-slate-700 text-xs">
-                <span class="flex items-center gap-2">
-                  <MapPin :size="15" class="text-blue-600" />
-                  {{ locale === 'tr' ? 'İş / Teslim Yeri' : 'Delivery Location' }}
-                </span>
-                <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': expandedFilterSection === 'cities' }" />
-              </button>
-              <div v-if="expandedFilterSection === 'cities'" class="border-t border-slate-100 p-3">
-                <label for="citySelect" class="sr-only">{{ locale === 'tr' ? 'İş / Teslim Yeri' : 'Delivery Location' }}</label>
-                <select id="citySelect" v-model="selectedCity" class="w-full rounded-xl border border-slate-200 bg-white p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500">
+              <!-- City Select (3 cols) -->
+              <div class="md:col-span-3 relative">
+                <MapPin :size="16" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                <select 
+                  v-model="selectedCity" 
+                  class="w-full pl-11 pr-8 py-3 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white appearance-none transition-all cursor-pointer"
+                >
                   <option value="">{{ locale === 'tr' ? 'Tüm Türkiye' : 'All Turkey' }}</option>
                   <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
                 </select>
+                <ChevronDown :size="14" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
-            </div>
-          </aside>
 
-          <!-- Sağ Sonuçlar Paneli -->
-          <div class="flex flex-col gap-4 text-left">
-            <!-- Keyword search bar -->
-            <div class="p-4 bg-white border border-slate-200 rounded-2xl premium-shadow">
-              <div class="flex gap-2">
-                <div class="flex-1 relative">
-                  <Search :size="16" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <label for="explorerSearchInput" class="sr-only">{{ locale === 'tr' ? 'İlan Arama' : 'Search Tenders' }}</label>
-                  <input v-model="explorerSearch" type="text" id="explorerSearchInput" aria-label="İlan Arama" :placeholder="locale === 'tr' ? 'İlan başlığı, malzeme veya firma adı ile arayın...' : 'Search by title, item, or company...'" class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
-                </div>
-              </div>
-            </div>
-
-            <!-- Aktif Filtre Rozetleri -->
-            <div v-if="selectedCat || selectedSubcategory || selectedSector || selectedCity || selectedType || selectedMethod || selectedPricingType" class="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
-              <div class="text-[9px] font-black uppercase tracking-wider text-blue-600 mb-2">{{ locale === 'tr' ? 'Aktif Filtreler' : 'Active Filters' }}</div>
-              <div class="flex flex-wrap gap-2">
-                <button v-if="selectedCat" @click="selectedCat = ''; selectedSubcategory = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Kategori: {{ selectedCat }} <span class="text-slate-400">×</span>
-                </button>
-                <button v-if="selectedSubcategory" @click="selectedSubcategory = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Alt Kategori: {{ selectedSubcategory }} <span class="text-slate-400">×</span>
-                </button>
-                <button v-if="selectedSector" @click="selectedSector = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Sektör: {{ selectedSector }} <span class="text-slate-400">×</span>
-                </button>
-                <button v-if="selectedCity" @click="selectedCity = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Şehir: {{ selectedCity }} <span class="text-slate-400">×</span>
-                </button>
-                <button v-if="selectedType" @click="selectedType = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Tür: {{ selectedType }} <span class="text-slate-400">×</span>
-                </button>
-                <button v-if="selectedMethod" @click="selectedMethod = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Yöntem: {{ selectedMethod }} <span class="text-slate-400">×</span>
-                </button>
-                <button v-if="selectedPricingType" @click="selectedPricingType = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
-                  Fiyatlandırma: {{ selectedPricingType }} <span class="text-slate-400">×</span>
-                </button>
+              <!-- Category Select (3 cols) -->
+              <div class="md:col-span-3 relative">
+                <Folder :size="16" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                <select 
+                  v-model="selectedCat" 
+                  class="w-full pl-11 pr-8 py-3 bg-slate-50 border border-slate-200/80 rounded-2xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white appearance-none transition-all cursor-pointer"
+                >
+                  <option value="">{{ locale === 'tr' ? 'Tüm Kategoriler' : 'All Categories' }}</option>
+                  <option v-for="cat in detailedCategories" :key="cat.name" :value="cat.name">{{ cat.name }}</option>
+                </select>
+                <ChevronDown :size="14" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               </div>
             </div>
 
-            <!-- Tenders Feed -->
-            <div class="space-y-4">
+            <!-- Advanced Filters Trigger & Clear Button -->
+            <div class="flex items-center justify-between border-t border-slate-100 pt-4 flex-wrap gap-3">
+              <button 
+                @click="showAdvancedFilters = !showAdvancedFilters" 
+                class="flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-blue-600 transition"
+              >
+                <SlidersHorizontal :size="14" class="text-blue-600" />
+                {{ locale === 'tr' ? 'Gelişmiş Filtreler' : 'Advanced Filters' }}
+                <ChevronDown :size="12" class="transition-transform" :class="{ 'rotate-180': showAdvancedFilters }" />
+              </button>
+
+              <button 
+                v-if="selectedCat || selectedSubcategory || selectedSector || selectedCity || selectedType || selectedMethod || selectedPricingType || explorerSearch"
+                @click="clearFilters" 
+                class="text-[10px] font-black text-rose-600 hover:text-rose-700 uppercase flex items-center gap-1"
+              >
+                <X :size="12" />
+                {{ locale === 'tr' ? 'Filtreleri Temizle' : 'Clear Filters' }}
+              </button>
+            </div>
+
+            <!-- Advanced Filters Grid -->
+            <div 
+              v-if="showAdvancedFilters" 
+              class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 border-t border-slate-100 pt-4"
+            >
+              <!-- Sectors -->
+              <div class="space-y-1.5">
+                <label class="text-[9px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
+                  <Building2 :size="11" class="text-blue-600" />
+                  {{ locale === 'tr' ? 'Sektör' : 'Sector' }}
+                </label>
+                <select 
+                  v-model="selectedSector" 
+                  class="w-full p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
+                >
+                  <option value="">{{ locale === 'tr' ? 'Tüm Sektörler' : 'All Sectors' }}</option>
+                  <option v-for="sec in sectors" :key="sec.name" :value="sec.name">{{ sec.name }}</option>
+                </select>
+              </div>
+
+              <!-- Tender Type -->
+              <div class="space-y-1.5">
+                <label class="text-[9px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
+                  <Briefcase :size="11" class="text-blue-600" />
+                  {{ locale === 'tr' ? 'İhale Türü' : 'Tender Type' }}
+                </label>
+                <select 
+                  v-model="selectedType" 
+                  class="w-full p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
+                >
+                  <option value="">{{ locale === 'tr' ? 'Tüm Türler' : 'All Types' }}</option>
+                  <option v-for="t in tenderTypes" :key="t.name" :value="t.name">{{ t.name }}</option>
+                </select>
+              </div>
+
+              <!-- Bidding Method -->
+              <div class="space-y-1.5">
+                <label class="text-[9px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
+                  <SlidersHorizontal :size="11" class="text-blue-600" />
+                  {{ locale === 'tr' ? 'Teklif Yöntemi' : 'Bidding Method' }}
+                </label>
+                <select 
+                  v-model="selectedMethod" 
+                  class="w-full p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
+                >
+                  <option value="">{{ locale === 'tr' ? 'Tüm Yöntemler' : 'All Methods' }}</option>
+                  <option v-for="m in offerMethods" :key="m.name" :value="m.name">{{ m.name }}</option>
+                </select>
+              </div>
+
+              <!-- Pricing Type -->
+              <div class="space-y-1.5">
+                <label class="text-[9px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
+                  <FileText :size="11" class="text-blue-600" />
+                  {{ locale === 'tr' ? 'Fiyatlandırma Türü' : 'Pricing Type' }}
+                </label>
+                <select 
+                  v-model="selectedPricingType" 
+                  class="w-full p-2.5 bg-slate-50 border border-slate-200/80 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
+                >
+                  <option value="">{{ locale === 'tr' ? 'Tüm Türler' : 'All Types' }}</option>
+                  <option v-for="p in pricingTypes" :key="p.name" :value="p.name">{{ p.name }}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Filter Badges -->
+          <div v-if="selectedCat || selectedSubcategory || selectedSector || selectedCity || selectedType || selectedMethod || selectedPricingType" class="rounded-2xl border border-blue-100 bg-blue-50/50 p-4 text-left">
+            <div class="text-[9px] font-black uppercase tracking-wider text-blue-600 mb-2">{{ locale === 'tr' ? 'Aktif Filtreler' : 'Active Filters' }}</div>
+            <div class="flex flex-wrap gap-2">
+              <button v-if="selectedCat" @click="selectedCat = ''; selectedSubcategory = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Kategori: {{ selectedCat }} <span class="text-slate-400">×</span>
+              </button>
+              <button v-if="selectedSubcategory" @click="selectedSubcategory = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Alt Kategori: {{ selectedSubcategory }} <span class="text-slate-400">×</span>
+              </button>
+              <button v-if="selectedSector" @click="selectedSector = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Sektör: {{ selectedSector }} <span class="text-slate-400">×</span>
+              </button>
+              <button v-if="selectedCity" @click="selectedCity = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Şehir: {{ selectedCity }} <span class="text-slate-400">×</span>
+              </button>
+              <button v-if="selectedType" @click="selectedType = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Tür: {{ selectedType }} <span class="text-slate-400">×</span>
+              </button>
+              <button v-if="selectedMethod" @click="selectedMethod = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Yöntem: {{ selectedMethod }} <span class="text-slate-400">×</span>
+              </button>
+              <button v-if="selectedPricingType" @click="selectedPricingType = ''" class="bg-white px-3 py-1.5 rounded-full text-[10px] font-bold text-slate-700 border border-slate-200 hover:text-blue-600 shadow-sm flex items-center gap-1">
+                Fiyatlandırma: {{ selectedPricingType }} <span class="text-slate-400">×</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Tenders Feed -->
+          <div class="space-y-4">
             <div v-for="res in filteredTenders" :key="res.id" class="p-6 rounded-2xl bg-white border premium-shadow flex flex-col text-left">
                 <div class="flex flex-col lg:flex-row lg:justify-between gap-6">
                   <div class="min-w-0 flex-1">
                     <div class="flex flex-wrap items-center gap-2">
-                      <span v-if="res.featured" class="rounded-full bg-orange-50 border border-orange-200 px-2.5 py-0.5 text-[9px] font-black text-orange-700 uppercase">{{ locale === 'tr' ? '🔥 Öne Çıkan' : '🔥 Featured' }}</span>
+                      <span v-if="res.featured" class="rounded-full bg-orange-50 border border-orange-200 px-2.5 py-0.5 text-[9px] font-black text-orange-700 uppercase">🔥 Öne Çıkan</span>
                       <span class="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 text-[9px] font-black text-blue-700 uppercase">{{ res.type }}</span>
                       <span class="rounded-full bg-slate-50 border border-slate-200 px-2.5 py-0.5 text-[9px] font-black text-slate-600 uppercase">{{ res.method }}</span>
                       <span class="rounded-full bg-slate-50 border border-slate-200 px-2.5 py-0.5 text-[9px] font-black text-slate-600 uppercase">{{ res.pricing }}</span>
@@ -1410,26 +1448,26 @@ function toggleFilterSection(section: string) {
                       <Building2 :size="14" class="text-slate-400" />
                       <span class="underline decoration-slate-300 decoration-dashed hover:decoration-solid">{{ res.company }}</span>
                       <span v-if="res.verified" class="rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100 uppercase tracking-wider flex items-center gap-0.5">
-                        <ShieldCheck :size="10" /> {{ locale === 'tr' ? 'ONAYLI ÜYE' : 'VERIFIED MEMBER' }}
+                        <ShieldCheck :size="10" /> ONAYLI ÜYE
                       </span>
                     </div>
                     <p class="mt-3 text-xs leading-relaxed text-slate-500 font-medium">{{ res.description }}</p>
 
                     <div class="mt-5 flex flex-wrap gap-4 text-xs font-bold text-slate-400">
                       <span class="flex items-center gap-1.5"><MapPin :size="14" /> {{ res.city }}</span>
-                      <span class="flex items-center gap-1.5"><Clock3 :size="14" /> {{ res.offers }} {{ locale === 'tr' ? 'teklif toplandı' : 'bids collected' }}</span>
+                      <span class="flex items-center gap-1.5"><Clock3 :size="14" /> {{ res.offers }} teklif toplandı</span>
                     </div>
                   </div>
 
                   <!-- Right panel within card -->
                   <div class="flex min-w-[200px] flex-col justify-between border-t border-slate-100 pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
                     <div>
-                      <div class="text-[9px] font-black uppercase text-slate-400">{{ locale === 'tr' ? 'Son Teklif Tarihi' : 'Deadline' }}</div>
+                      <div class="text-[9px] font-black uppercase text-slate-400">Son Teklif Tarihi</div>
                       <div class="mt-1 text-sm font-black text-slate-800">{{ res.deadline }}</div>
-                      <div class="mt-1 text-xs font-black text-red-500">{{ res.daysLeft }} {{ locale === 'tr' ? 'gün kaldı' : 'days left' }}</div>
+                      <div class="mt-1 text-xs font-black text-red-500">{{ res.daysLeft }} gün kaldı</div>
                     </div>
                     <button @click="expandedTenderId = expandedTenderId === res.id ? null : res.id; activeDetailTab = 'malzeme'" class="mt-6 w-full flex items-center justify-center rounded-xl bg-slate-900 py-3 text-xs font-black text-white hover:bg-blue-600 transition-all">
-                      {{ expandedTenderId === res.id ? (locale === 'tr' ? 'Detayları Gizle' : 'Hide Details') : (locale === 'tr' ? 'Detayları Gör' : 'View Details') }}
+                      {{ expandedTenderId === res.id ? 'Detayları Gizle' : 'Detayları Gör' }}
                     </button>
                   </div>
                 </div>
@@ -1437,21 +1475,21 @@ function toggleFilterSection(section: string) {
                 <!-- Detay Kartı Açılımı (EKAP Stili) -->
                 <div v-if="expandedTenderId === res.id" class="w-full mt-6 p-4 rounded-xl bg-sky-50/30 text-slate-700 border border-sky-200 text-xs flex flex-col gap-4 shadow-sm">
                   <div class="flex items-center gap-2 pb-2 border-b border-sky-100">
-                    <span class="bg-blue-50 text-blue-600 border border-blue-200 text-[9px] font-extrabold px-1.5 py-0.5 rounded"># {{ locale === 'tr' ? 'İHALE NO' : 'TENDER NO' }}</span>
+                    <span class="bg-blue-50 text-blue-600 border border-blue-200 text-[9px] font-extrabold px-1.5 py-0.5 rounded"># İHALE NO</span>
                     <span class="font-bold text-slate-800 text-xs">2026/{{ 100000 + res.id }} - {{ res.title }}</span>
                   </div>
 
                   <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
                     <div class="md:col-span-6">
-                      <span class="font-bold text-slate-500 uppercase text-[9px] block">{{ locale === 'tr' ? 'İşin Niteliği' : 'Work Description' }}</span>
+                      <span class="font-bold text-slate-500 uppercase text-[9px] block">İşin Niteliği</span>
                       <p class="mt-1 text-slate-700 leading-relaxed">{{ res.description }}</p>
                     </div>
                     <div class="md:col-span-3">
-                      <span class="font-bold text-slate-500 uppercase text-[9px] block">{{ locale === 'tr' ? 'Teslim Yeri' : 'Delivery Place' }}</span>
-                      <p class="mt-1 text-slate-700 font-bold">{{ res.city }} / {{ locale === 'tr' ? 'Türkiye' : 'Turkey' }}</p>
+                      <span class="font-bold text-slate-500 uppercase text-[9px] block">Teslim Yeri</span>
+                      <p class="mt-1 text-slate-700 font-bold">{{ res.city }} / Türkiye</p>
                     </div>
                     <div class="md:col-span-3">
-                      <span class="font-bold text-slate-500 uppercase text-[9px] block">{{ locale === 'tr' ? 'Yaklaşık Maliyet Hacmi' : 'Estimated Cost Volume' }}</span>
+                      <span class="font-bold text-slate-500 uppercase text-[9px] block">Yaklaşık Maliyet Hacmi</span>
                       <p class="mt-1 text-slate-900 font-mono font-black text-sm">{{ res.value }}</p>
                     </div>
                   </div>
@@ -1492,19 +1530,19 @@ function toggleFilterSection(section: string) {
                   <div class="bg-white border border-slate-200 rounded-xl p-4 mt-2">
                     <!-- Malzeme Listesi -->
                     <div v-if="activeDetailTab === 'malzeme'">
-                      <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-3">{{ locale === 'tr' ? 'Malzeme & Birim Fiyat Teklif Formu' : 'Material & Unit Price Quotation Form' }}</h4>
+                      <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-3">Malzeme & Birim Fiyat Teklif Formu</h4>
                       <table class="w-full text-xs text-slate-600 border-collapse">
                         <thead>
                           <tr class="bg-slate-50 border-b border-slate-200">
-                            <th class="p-2.5 text-left font-bold text-slate-700">{{ locale === 'tr' ? 'Malzeme/Hizmet Kalemi' : 'Material/Service Item' }}</th>
-                            <th class="p-2.5 text-center font-bold text-slate-700 w-24">{{ locale === 'tr' ? 'Birim' : 'Unit' }}</th>
-                            <th class="p-2.5 text-right font-bold text-slate-700 w-36">{{ locale === 'tr' ? 'Birim Fiyat Teklifi (₺)' : 'Unit Price Offer ($)' }}</th>
+                            <th class="p-2.5 text-left font-bold text-slate-700">Malzeme/Hizmet Kalemi</th>
+                            <th class="p-2.5 text-center font-bold text-slate-700 w-24">Birim</th>
+                            <th class="p-2.5 text-right font-bold text-slate-700 w-36">Birim Fiyat Teklifi (₺)</th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr v-for="(line, idx) in res.material_list.split('\n')" :key="idx" class="border-b border-slate-100 last:border-0 hover:bg-slate-50/50">
                             <td class="p-2.5 font-medium text-slate-800 text-left">{{ line.split('-')[0]?.trim() }}</td>
-                            <td class="p-2.5 text-center font-bold text-slate-500">{{ line.split('-')[1]?.trim() || (locale === 'tr' ? '1 Adet' : '1 Pcs') }}</td>
+                            <td class="p-2.5 text-center font-bold text-slate-500">{{ line.split('-')[1]?.trim() || '1 Adet' }}</td>
                             <td class="p-2.5 text-right">
                               <input type="number" aria-label="Birim Teklif Fiyatı" placeholder="0.00" class="w-32 text-right bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs focus:outline-none focus:border-blue-600" />
                             </td>
@@ -1512,51 +1550,51 @@ function toggleFilterSection(section: string) {
                         </tbody>
                       </table>
                       <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3">
-                        <span class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'Teklif vermek ve eksiltmeye katılmak için alıcı/satıcı portal girişi yapmalısınız.' : 'You must sign in to submit bids and participate in the auction.' }}</span>
+                        <span class="text-[10px] text-slate-400">Teklif vermek ve eksiltmeye katılmak için alıcı/satıcı portal girişi yapmalısınız.</span>
                         <NuxtLink to="/uyelik" class="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 text-xs flex items-center gap-1.5 shadow-sm">
-                          {{ locale === 'tr' ? 'Teklif Gönder ve Arenaya Katıl' : 'Submit Bid & Join Arena' }}
+                          Teklif Gönder ve Arenaya Katıl
                         </NuxtLink>
                       </div>
                     </div>
 
                     <!-- İhale İlanı -->
                     <div v-if="activeDetailTab === 'ilan'" class="text-left text-xs leading-relaxed text-slate-600">
-                      <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-2">{{ locale === 'tr' ? 'Resmi İlan Özeti' : 'Official Notice Summary' }}</h4>
-                      <p>{{ res.description }} {{ locale === 'tr' ? 'Bu ihale özel sektör satın alma kurallarına uygun olarak gelanlasalim.com altyapısında canlı eksiltme usulüyle yapılmaktadır.' : 'This tender is conducted via real-time reverse auction protocol on gelanlasalim.com in accordance with private sector procurement rules.' }}</p>
+                      <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-2">Resmi İlan Özeti</h4>
+                      <p>{{ res.description }} Bu ihale özel sektör satın alma kurallarına uygun olarak gelanlasalim.com altyapısında canlı eksiltme usulüyle yapılmaktadır.</p>
                     </div>
 
                     <!-- İdari Şartname -->
                     <div v-if="activeDetailTab === 'idari'" class="text-left text-xs leading-relaxed text-slate-600">
-                      <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-2">{{ locale === 'tr' ? 'İdari Şartname Maddeleri' : 'Administrative Specification Articles' }}</h4>
+                      <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-2">İdari Şartname Maddeleri</h4>
                       <pre class="whitespace-pre-line font-sans">{{ res.admin_spec }}</pre>
                     </div>
 
                     <!-- Teknik Şartname -->
                     <div v-if="activeDetailTab === 'teknik'" class="text-left text-xs leading-relaxed text-slate-600">
-                      <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-2">{{ locale === 'tr' ? 'Teknik Şartname & Yeterlilik' : 'Technical Specifications & Qualifications' }}</h4>
+                      <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-2">Teknik Şartname & Yeterlilik</h4>
                       <pre class="whitespace-pre-line font-sans">{{ res.tech_spec }}</pre>
                     </div>
 
                     <!-- Benzer İhale Geçmişi / Canlı Eksiltme -->
                     <div v-if="activeDetailTab === 'benzer'" class="text-left text-xs leading-relaxed text-slate-600">
-                      <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-2">{{ locale === 'tr' ? 'Sektör Geçmiş Sonuçları' : 'Historical Industry Outcomes' }}</h4>
+                      <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-2">Sektör Geçmiş Sonuçları</h4>
                       <pre class="whitespace-pre-line font-sans text-emerald-600 font-bold mb-4">{{ res.similar_history }}</pre>
 
                       <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-2 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> {{ locale === 'tr' ? 'Güncel Teklif Eksiltme Günlüğü (Audit Trail)' : 'Live Bidding Reduction Log (Audit Trail)' }}
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Güncel Teklif Eksiltme Günlüğü (Audit Trail)
                       </h4>
                       <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 font-mono text-[11px] sm:text-xs text-slate-400">
                         <div class="flex justify-between">
-                          <span>[15:42:01] {{ locale === 'tr' ? 'Tedarikçi #8 (Demir A.Ş.)' : 'Supplier #8 (Demir Corp.)' }}</span>
-                          <span class="text-red-400 font-semibold">- {{ currencySymbol }}{{ locale === 'tr' ? '8.500 ₺' : '8,500' }} {{ locale === 'tr' ? 'indirim yaptı' : 'reduction applied' }}</span>
+                          <span>[15:42:01] Tedarikçi #8 (Demir A.Ş.)</span>
+                          <span class="text-red-400 font-semibold">- 8.500 ₺ indirim yaptı</span>
                         </div>
                         <div class="flex justify-between">
-                          <span>[15:39:12] {{ locale === 'tr' ? 'Tedarikçi #3 (Öz Yapı)' : 'Supplier #3 (Oz Yapi)' }}</span>
-                          <span class="text-red-400 font-semibold">- {{ currencySymbol }}{{ locale === 'tr' ? '12.000 ₺' : '12,000' }} {{ locale === 'tr' ? 'indirim yaptı' : 'reduction applied' }}</span>
+                          <span>[15:39:12] Tedarikçi #3 (Öz Yapı)</span>
+                          <span class="text-red-400 font-semibold">- 12.000 ₺ indirim yaptı</span>
                         </div>
                         <div class="flex justify-between">
-                          <span>[15:35:50] {{ locale === 'tr' ? 'Sistem' : 'System' }}</span>
-                          <span class="text-slate-500">{{ locale === 'tr' ? 'İhale canlı eksiltme aşamasına geçti' : 'Tender entered live reverse auction phase' }}</span>
+                          <span>[15:35:50] Sistem</span>
+                          <span class="text-slate-500">İhale canlı eksiltme aşamasına geçti</span>
                         </div>
                       </div>
                     </div>
@@ -1574,24 +1612,23 @@ function toggleFilterSection(section: string) {
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
     <!-- TASARRUF HESAPLAMA ARACI (ROI) -->
-    <section id="ozellikler" class="border-b border-slate-200 bg-white py-24">
+    <section id="ozellikler" class="border-b border-slate-200 bg-slate-50 py-20">
       <div class="mx-auto max-w-7xl px-6">
         <div class="text-center mb-12">
-          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'VERİMLİLİK & ROI' : 'EFFICIENCY & ROI' }}</span>
-          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Tedarik Tasarrufunuzu Hesaplayın' : 'Calculate Your Procurement Savings' }}</h2>
-          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ locale === 'tr' ? 'Yıllık satın alma hacminizi belirleyin, GelAnlaşalım B2B tersine ihale arenası ile elde edeceğiniz tahmini kazancı anında görün.' : 'Set your annual procurement volume and instantly see the estimated savings you will achieve with GelAnlasalim B2B reverse auction arena.' }}</p>
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">VERİMLİLİK & ROI</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Tedarik Tasarrufunuzu Hesaplayın</h2>
+          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Yıllık satın alma hacminizi belirleyin, GelAnlaşalım B2B tersine ihale arenası ile elde edeceğiniz tahmini kazancı anında görün.</p>
         </div>
 
-        <div class="mx-auto max-w-4xl rounded-3xl border bg-slate-50/70 p-8 md:p-12 premium-shadow flex flex-col gap-8 md:gap-12 text-left">
+        <div class="mx-auto max-w-4xl rounded-3xl border bg-white p-8 md:p-12 premium-shadow flex flex-col gap-8 md:gap-12 text-left">
           <!-- Slider area -->
           <div class="space-y-4">
             <div class="flex justify-between items-baseline">
-              <label for="annualVolumeInput" class="text-xs font-black text-slate-800 uppercase tracking-wider font-sans">{{ locale === 'tr' ? 'Yıllık Satın Alma Hacminiz' : 'Your Annual Procurement Volume' }}</label>
-              <span class="font-mono text-xl font-black text-blue-600">{{ annualVolume.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }} {{ locale === 'tr' ? '₺' : '$' }}</span>
+              <label for="annualVolumeInput" class="text-xs font-black text-slate-800 uppercase tracking-wider font-sans">Yıllık Satın Alma Hacminiz</label>
+              <span class="font-mono text-xl font-black text-blue-600">{{ annualVolume.toLocaleString('tr-TR') }} ₺</span>
             </div>
             <input
               type="range"
@@ -1603,9 +1640,9 @@ function toggleFilterSection(section: string) {
               class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
             <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              <span>{{ locale === 'tr' ? '500 Bin ₺' : '$500K' }}</span>
-              <span>{{ locale === 'tr' ? '25 Milyon ₺' : '$25M' }}</span>
-              <span>{{ locale === 'tr' ? '50 Milyon ₺' : '$50M' }}</span>
+              <span>500 Bin ₺</span>
+              <span>25 Milyon ₺</span>
+              <span>50 Milyon ₺</span>
             </div>
           </div>
 
@@ -1613,37 +1650,178 @@ function toggleFilterSection(section: string) {
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Col 1: Net Savings -->
             <div class="p-6 rounded-2xl bg-blue-50/50 border border-blue-100 flex flex-col gap-1.5">
-              <span class="text-[9px] font-black uppercase text-blue-600 tracking-wider">{{ locale === 'tr' ? 'Tahmini Yıllık Tasarruf (%14.2)' : 'Estimated Annual Savings (14.2%)' }}</span>
-              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ calculatedSavings.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }} {{ locale === 'tr' ? '₺' : '$' }}</span>
-              <span class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'Canlı eksiltme arenaları ortalama verisidir.' : 'Average telemetry data from live auctions.' }}</span>
+              <span class="text-[9px] font-black uppercase text-blue-600 tracking-wider">Tahmini Yıllık Tasarruf (%14.2)</span>
+              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ calculatedSavings.toLocaleString('tr-TR') }} ₺</span>
+              <span class="text-[10px] text-slate-400">Canlı eksiltme arenaları ortalama verisidir.</span>
             </div>
 
             <!-- Col 2: Labor hours saved -->
-            <div class="p-6 rounded-2xl bg-white border border-slate-200/60 flex flex-col gap-1.5">
-              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">{{ locale === 'tr' ? 'Kazanılan İş Gücü' : 'Labor Hours Saved' }}</span>
-              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ Math.round(savedHours) }} {{ locale === 'tr' ? 'Adam/Ay' : 'Man/Month' }}</span>
-              <span class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'Excel kıyaslama ve e-posta takibi elenir.' : 'Eliminates tedious Excel comparison and email tracking.' }}</span>
+            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col gap-1.5">
+              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">Kazanılan İş Gücü</span>
+              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ Math.round(savedHours) }} Adam/Ay</span>
+              <span class="text-[10px] text-slate-400">Excel kıyaslama ve e-posta takibi elenir.</span>
             </div>
 
             <!-- Col 3: Qualified suppliers reached -->
-            <div class="p-6 rounded-2xl bg-white border border-slate-200/60 flex flex-col gap-1.5">
-              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">{{ locale === 'tr' ? 'Nitelikli Tedarikçi Erişimi' : 'Qualified Supplier Access' }}</span>
-              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ connectedSuppliersCount }} {{ locale === 'tr' ? 'Firma' : 'Companies' }}</span>
-              <span class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'İhalelerinize katılım sağlayacak hazır ağ.' : 'Ready supply network to join your tenders.' }}</span>
+            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col gap-1.5">
+              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">Nitelikli Tedarikçi Erişimi</span>
+              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ connectedSuppliersCount }} Firma</span>
+              <span class="text-[10px] text-slate-400">İhalelerinize katılım sağlayacak hazır ağ.</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- KRİPTOGRAFİK ZAMAN DAMGASI & GÜVENLİK (AUDIT TRAIL TIMELINE) -->
+    <section class="border-b border-slate-200 bg-white py-20">
+      <div class="mx-auto max-w-7xl px-6">
+        <div class="text-center mb-16">
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">ŞEFFAFLIK & GÜVENLİK</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Kriptografik ve Damgalı İşlem Takibi</h2>
+          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Satın alma süreçleriniz, KVKK ve Türk Ticaret Kanunu uyumlu, TLS 1.2+ şifreli ve zaman damgalı değişmez bir log günlüğünde saklanır.</p>
+        </div>
 
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 relative text-left">
+          <!-- Connector line for desktop -->
+          <div class="hidden lg:block absolute top-[40px] left-[12%] right-[12%] h-[1px] bg-slate-200 z-0"></div>
 
+          <!-- Step 1 -->
+          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">1</div>
+            <div>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Şartname Damgalama</h4>
+              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
+                Yayınladığınız şartname dosyalarının kriptografik hash kodları çıkarılarak sisteme damgalanır. Dosya değişmezliği garanti altındadır.
+              </p>
+            </div>
+          </div>
 
+          <!-- Step 2 -->
+          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">2</div>
+            <div>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">TLS 1.2+ Şifreli Teklifler</h4>
+              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
+                Tedarikçilerin gönderdiği fiyat ve belgeler SSL/TLS katmanında şifrelenir. Son teklif tarihine kadar kimse tarafından deşifre edilemez.
+              </p>
+            </div>
+          </div>
 
+          <!-- Step 3 -->
+          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">3</div>
+            <div>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Canlı Eksiltme Günlüğü</h4>
+              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
+                Ters ihale arenalarındaki her fiyat düşüşü, zaman damgasıyla değişmez denetim izine (audit trail) yazılır. Rekabet şeffaftır.
+              </p>
+            </div>
+          </div>
 
+          <!-- Step 4 -->
+          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">4</div>
+            <div>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">KVKK Uyumlu Arşivleme</h4>
+              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
+                Sonuçlanan ihaleler yasal saklama sürelerine uygun olarak güvenli sunucularda saklanır. Şirket içi denetimlere (audit) anında hazırdır.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ERP & SİSTEM ENTEGRASYONLARI -->
+    <section class="border-b border-slate-200 bg-slate-50 py-20">
+      <div class="mx-auto max-w-7xl px-6">
+        <div class="text-center mb-12">
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">ERP BAĞLANTILARI</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Kurumsal Sistemlerinizle Tam Entegrasyon</h2>
+          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Satın alma, teklif, sipariş ve tedarikçi verilerinizi mevcut ERP, CRM ve finans sistemlerinize kontrollü API entegrasyonu ile bağlayın.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+          <!-- ERP Card 1: SAP -->
+          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
+            <div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">SAP Entegrasyonu</div>
+              <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
+                Satın alma taleplerinizi (Purchase Requisitions) SAP üzerinden otomatik çekin; ihale sonuçlarını SAP sipariş fişi (Purchase Order) olarak geri aktarın.
+              </p>
+            </div>
+            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">ERP CONNECTED</span>
+          </div>
+
+          <!-- ERP Card 2: Logo -->
+          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
+            <div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">Logo & Netsis Entegrasyonu</div>
+              <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
+                Logo Tiger, Go3 veya Netsis sistemlerinizdeki malzeme kartlarını, birimlerini ve tedarikçi cari hesaplarını anlık olarak platformla senkronize edin.
+              </p>
+            </div>
+            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">API READY</span>
+          </div>
+
+          <!-- ERP Card 3: MS Dynamics -->
+          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
+            <div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">Microsoft Dynamics 365</div>
+              <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
+                Dynamics 365 Supply Chain Management modülüyle iki yönlü canlı veri eşleştirmesi sağlayarak teklif toplama süreçlerinizi hızlandırın.
+              </p>
+            </div>
+            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">AUTOMATED SYNC</span>
+          </div>
+
+          <!-- ERP Card 4: Excel & REST API -->
+          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
+            <div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">REST API & Excel Entegrasyonu</div>
+              <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
+                Özel şirket içi yazılımlarınız için RESTful API uç noktaları. Veya tek tıkla gelişmiş Excel tablosu yükleme ve karşılaştırma aracı.
+              </p>
+            </div>
+            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">RESTFUL API / XLS</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NASIL ÇALIŞIR SECTION -->
+    <section id="nasil-calisir" class="border-b border-slate-200 bg-slate-50 py-20">
+      <div class="mx-auto max-w-7xl px-6 text-center">
+        <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">SÜREÇ REHBERİ</span>
+        <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Platform Nasıl Çalışıyor?</h2>
+        <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Alıcı veya tedarikçi rolünüze uygun adımları takip ederek süreci başlatın.</p>
+
+        <!-- Tab switcher -->
+        <div class="mt-8 flex justify-center">
+          <div class="inline-flex rounded-full border border-slate-200 bg-white p-1">
+            <button @click="activeAudience = 'buyer'" class="rounded-full px-6 py-2.5 text-xs font-bold transition-all" :class="activeAudience === 'buyer' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:text-slate-900'">
+              Alıcı Şirketler İçin
+            </button>
+            <button @click="activeAudience = 'supplier'" class="rounded-full px-6 py-2.5 text-xs font-bold transition-all" :class="activeAudience === 'supplier' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:text-slate-900'">
+              Tedarikçi Firmalar İçin
+            </button>
+          </div>
+        </div>
+
+        <!-- Steps Grid -->
+        <div class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3 text-left">
+          <div v-for="step in activeSteps" :key="step.number" class="p-6 rounded-2xl bg-white border premium-shadow flex flex-col gap-4">
+            <div class="text-3xl font-serif font-black text-blue-600/30">{{ step.number }}</div>
+            <h3 class="text-base font-black text-slate-900">{{ step.title }}</h3>
+            <p class="text-xs leading-relaxed text-slate-500 font-medium">{{ step.text }}</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <!-- FAQ SECTION -->
-    <section id="sss" class="border-b border-slate-200 bg-white py-24">
+    <section id="sss" class="border-b border-slate-200 bg-white py-20">
       <div class="mx-auto max-w-4xl px-6">
         <div class="text-center mb-12">
           <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'SIKÇA SORULANLAR' : 'FREQUENTLY ASKED QUESTIONS' }}</span>
@@ -1665,28 +1843,28 @@ function toggleFilterSection(section: string) {
     </section>
 
     <!-- E-E-A-T EDITORIAL & EXPERT VALIDATION SECTION -->
-    <section class="border-b border-slate-200 bg-slate-50 py-24">
-      <div class="mx-auto max-w-3xl px-6">
-        <div class="bg-white border border-slate-200 rounded-3xl p-8 premium-shadow text-center flex flex-col items-center justify-center gap-6">
-          <div class="space-y-3 max-w-2xl text-center flex flex-col items-center">
+    <section class="border-b border-slate-200 bg-slate-50 py-16">
+      <div class="mx-auto max-w-7xl px-6">
+        <div class="bg-white border border-slate-200 rounded-3xl p-8 premium-shadow text-left md:flex md:items-center md:justify-between gap-8">
+          <div class="space-y-3 max-w-2xl">
             <span class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-100">
               <BadgeCheck :size="12" /> E-E-A-T {{ locale === 'tr' ? 'DOĞRULANMIŞ PLATFORM' : 'VERIFIED PLATFORM' }}
             </span>
-            <h2 class="text-xl font-black text-slate-900 tracking-tight md:text-2xl text-center w-full">
+            <h2 class="text-xl font-black text-slate-900 tracking-tight md:text-2xl">
               {{ locale === 'tr' ? 'Editöryal Standartlar ve Güvenli Tedarik Güvencesi' : 'Editorial Standards & Secure Procurement Guarantee' }}
             </h2>
-            <p class="text-xs text-slate-500 font-medium leading-relaxed font-sans text-center">
+            <p class="text-xs text-slate-500 font-medium leading-relaxed font-sans">
               {{ locale === 'tr' ? 'Platformumuzdaki canlı eksiltme kuralları, B2B tasarruf verileri ve sözleşme şablonları, satın alma profesyonelleri ve hukuk müşavirleri tarafından denetlenerek onaylanmaktadır.' : 'Live auction rules, B2B savings telemetry, and contract templates across our platform are reviewed and certified by seasoned procurement directors and legal advisors.' }}
             </p>
           </div>
           
-          <div class="flex flex-col sm:flex-row items-center gap-3 justify-center">
-            <div class="flex -space-x-3 overflow-hidden justify-center">
+          <div class="mt-6 md:mt-0 flex items-center gap-3 shrink-0">
+            <div class="flex -space-x-3 overflow-hidden">
               <div class="inline-block h-9 w-9 rounded-full ring-2 ring-white bg-blue-100 border border-blue-200 flex items-center justify-center text-[10px] font-bold text-blue-700">AT</div>
               <div class="inline-block h-9 w-9 rounded-full ring-2 ring-white bg-emerald-100 border border-emerald-200 flex items-center justify-center text-[10px] font-bold text-emerald-700">SK</div>
               <div class="inline-block h-9 w-9 rounded-full ring-2 ring-white bg-amber-100 border border-amber-200 flex items-center justify-center text-[10px] font-bold text-amber-700">ZD</div>
             </div>
-            <div class="text-center sm:text-left">
+            <div class="text-left">
               <div class="text-[10px] font-black text-slate-800 uppercase tracking-wide">
                 {{ locale === 'tr' ? 'Uzman Kurulu Tarafından Onaylandı' : 'Certified by Expert Board' }}
               </div>
@@ -1699,8 +1877,42 @@ function toggleFilterSection(section: string) {
       </div>
     </section>
 
+    <!-- REGISTER CALL TO ACTION SECTION (Selin Şahin Feedback) -->
+    <section class="py-16 bg-[#001D36] text-white relative overflow-hidden">
+      <!-- Glow background -->
+      <div class="absolute top-0 right-0 h-[300px] w-[300px] rounded-full bg-blue-500/10 blur-3xl z-10"></div>
+      <div class="absolute bottom-0 left-0 h-[300px] w-[300px] rounded-full bg-emerald-500/10 blur-3xl z-10"></div>
+      
+      <div class="relative z-20 mx-auto max-w-5xl px-6 text-center space-y-6">
+        <span class="bg-[#1EAE4C]/10 border border-[#1EAE4C]/20 text-[#1EAE4C] text-[9px] font-black uppercase px-3 py-1 rounded-full tracking-wider inline-block animate-pulse">
+          ⚡ ÜCRETSİZ LANSMAN DÖNEMİ
+        </span>
+        <h2 class="text-3xl font-black tracking-tight sm:text-4xl">
+          Tedarik Süreçlerinizi Bugün Dijitalleştirin
+        </h2>
+        <p class="max-w-xl mx-auto text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+          Ters ihale arenamıza katılın, malzeme ve lojistik maliyetlerinizi canlı eksiltme ile düşürün. Satın alma taleplerinizi tek merkezden yönetmeye hemen başlayın.
+        </p>
+        <div class="pt-4 flex flex-wrap justify-center gap-4">
+          <NuxtLink 
+            to="/uyelik" 
+            class="flex items-center gap-2 rounded-xl px-8 py-4 text-xs font-black text-white bg-[#1EAE4C] shadow-lg shadow-[#1EAE4C]/20 hover:bg-[#158f3d] transition-all"
+          >
+            Hemen Ücretsiz Katılın
+            <ArrowRight :size="15" />
+          </NuxtLink>
+          <a 
+            href="#sss" 
+            class="flex items-center gap-2 rounded-xl border border-slate-700 bg-transparent px-8 py-4 text-xs font-black text-white hover:bg-slate-800 transition-all"
+          >
+            Sıkça Sorulan Sorular
+          </a>
+        </div>
+      </div>
+    </section>
+
     <!-- BİZİMLE İLETİŞİME GEÇİN SECTION -->
-    <section class="border-b border-slate-200 bg-slate-50 py-24 lg:py-32 relative overflow-hidden">
+    <section class="border-b border-slate-200 bg-slate-50 py-20 relative overflow-hidden">
       <!-- Background subtle graphics -->
       <div class="absolute inset-0 opacity-[0.03] pointer-events-none" style="background-image: radial-gradient(circle, #1eae4c 1px, transparent 1px); background-size: 24px 24px;"></div>
       
@@ -1710,13 +1922,13 @@ function toggleFilterSection(section: string) {
           <!-- Left Content -->
           <div class="lg:col-span-6 text-left space-y-8">
             <div class="space-y-4">
-              <span class="text-[10px] font-black uppercase tracking-widest" style="color: #1EAE4C;">{{ locale === 'tr' ? 'BİZİMLE İLETİŞİME GEÇİN' : 'CONTACT US' }}</span>
+              <span class="text-[10px] font-black uppercase tracking-widest" style="color: #1EAE4C;">BİZİMLE İLETİŞİME GEÇİN</span>
               <h2 class="text-3xl font-black text-slate-900 tracking-tight md:text-5xl leading-tight">
-                {{ locale === 'tr' ? 'Satın alma süreçlerinizi' : 'Gather your procurement' }} <br class="hidden sm:inline" />
-                <span class="italic" style="color: #1EAE4C;">{{ locale === 'tr' ? 'tek panelde toplayın.' : 'in a single panel.' }}</span>
+                Satın alma süreçlerinizi <br class="hidden sm:inline" />
+                <span class="italic" style="color: #1EAE4C;">tek panelde toplayın.</span>
               </h2>
               <p class="text-xs sm:text-sm leading-relaxed text-slate-500 font-medium max-w-md">
-                {{ locale === 'tr' ? 'Ekibimiz satın alma süreçlerinizde size yardımcı olmaya hazır. İletişim bilgilerinizi bırakın, en kısa sürede dönüş yapalım.' : 'Our team is ready to help you with your procurement processes. Leave your contact info and we will reach out as soon as possible.' }}
+                Ekibimiz satın alma süreçlerinizde size yardımcı olmaya hazır. İletişim bilgilerinizi bırakın, en kısa sürede dönüş yapalım.
               </p>
             </div>
 
@@ -1726,32 +1938,32 @@ function toggleFilterSection(section: string) {
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">
                   <CheckCircle2 :size="16" />
                 </div>
-                <span class="text-xs font-black text-slate-800 tracking-wide">{{ locale === 'tr' ? 'Hızlı kurumsal kurulum' : 'Fast enterprise setup' }}</span>
+                <span class="text-xs font-black text-slate-800 tracking-wide">Hızlı kurumsal kurulum</span>
               </div>
               <div class="flex items-center gap-3">
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">
                   <CheckCircle2 :size="16" />
                 </div>
-                <span class="text-xs font-black text-slate-800 tracking-wide">{{ locale === 'tr' ? 'KVKK kapsamında altyapı' : 'Regulatory compliant infrastructure' }}</span>
+                <span class="text-xs font-black text-slate-800 tracking-wide">KVKK kapsamında altyapı</span>
               </div>
               <div class="flex items-center gap-3">
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">
                   <CheckCircle2 :size="16" />
                 </div>
-                <span class="text-xs font-black text-slate-800 tracking-wide">{{ locale === 'tr' ? 'Hızlı onboarding' : 'Fast onboarding' }}</span>
+                <span class="text-xs font-black text-slate-800 tracking-wide">Hızlı onboarding</span>
               </div>
               <div class="flex items-center gap-3">
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">
                   <CheckCircle2 :size="16" />
                 </div>
-                <span class="text-xs font-black text-slate-800 tracking-wide">{{ locale === 'tr' ? 'Yerli destek ekibi' : 'Dedicated support team' }}</span>
+                <span class="text-xs font-black text-slate-800 tracking-wide">Yerli destek ekibi</span>
               </div>
             </div>
           </div>
 
           <!-- Right Form Card -->
           <div class="lg:col-span-6">
-            <div class="bg-white border rounded-3xl p-8 sm:p-10 premium-shadow space-y-8 text-left min-h-[380px] flex flex-col justify-center">
+            <div class="bg-white border rounded-3xl p-8 premium-shadow space-y-6 text-left min-h-[360px] flex flex-col justify-center">
               
               <!-- Success State (Premium feedback card) -->
               <div v-if="contactSuccess" class="py-6 text-center space-y-5">
@@ -1759,9 +1971,9 @@ function toggleFilterSection(section: string) {
                   <CheckCircle2 :size="28" />
                 </div>
                 <div class="space-y-2">
-                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">{{ locale === 'tr' ? 'TALEBİNİZ ALINDI!' : 'REQUEST RECEIVED!' }}</h3>
+                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">TALEBİNİZ ALINDI!</h3>
                   <p class="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed font-medium">
-                    {{ locale === 'tr' ? 'Mesajınız başarıyla iletildi. Uzman ekibimiz en kısa sürede sizinle iletişime geçecektir.' : 'Your message has been sent. Our team will contact you shortly.' }}
+                    Mesajınız başarıyla iletildi. Uzman ekibimiz en kısa sürede sizinle iletişime geçecektir.
                   </p>
                 </div>
                 <button 
@@ -1769,15 +1981,15 @@ function toggleFilterSection(section: string) {
                   @click="contactSuccess = false" 
                   class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:underline"
                 >
-                  {{ locale === 'tr' ? 'Yeni Mesaj Gönder' : 'Send New Message' }}
+                  Yeni Mesaj Gönder
                 </button>
               </div>
 
               <!-- Form State -->
-              <div v-else class="space-y-7">
-                <div class="space-y-2">
-                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">{{ locale === 'tr' ? 'SİZİNLE İLETİŞİME GEÇELİM' : 'LET US CONTACT YOU' }}</span>
-                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">{{ locale === 'tr' ? 'BİZE NASIL ULAŞALIM?' : 'HOW SHOULD WE REACH YOU?' }}</h3>
+              <div v-else class="space-y-6">
+                <div class="space-y-1">
+                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">SİZİNLE İLETİŞİME GEÇELİM</span>
+                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">BİZE NASIL ULAŞALIM?</h3>
                 </div>
 
                 <!-- Contact Method Toggle Tabs -->
@@ -1788,7 +2000,7 @@ function toggleFilterSection(section: string) {
                     class="rounded-lg py-2.5 text-xs font-bold text-center transition-all"
                     :class="contactMethod === 'email' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'"
                   >
-                    {{ locale === 'tr' ? 'E-posta' : 'Email' }}
+                    E-posta
                   </button>
                   <button
                     type="button"
@@ -1796,15 +2008,15 @@ function toggleFilterSection(section: string) {
                     class="rounded-lg py-2.5 text-xs font-bold text-center transition-all"
                     :class="contactMethod === 'phone' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'"
                   >
-                    {{ locale === 'tr' ? 'Telefon' : 'Phone' }}
+                    Telefon
                   </button>
                 </div>
 
                 <!-- Inputs -->
-                <div class="space-y-5">
+                <div class="space-y-4">
                   <!-- E-posta field -->
                   <div v-if="contactMethod === 'email'">
-                    <label for="contactEmailInput" class="text-[9px] font-black uppercase text-slate-400 block mb-2">{{ locale === 'tr' ? 'E-posta Adresiniz' : 'Your Email Address' }}</label>
+                    <label for="contactEmailInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">E-posta Adresiniz</label>
                     <input
                       v-model="contactEmail"
                       type="email"
@@ -1816,7 +2028,7 @@ function toggleFilterSection(section: string) {
 
                   <!-- Telefon field -->
                   <div v-else>
-                    <label for="contactPhoneInput" class="text-[9px] font-black uppercase text-slate-400 block mb-2">{{ locale === 'tr' ? 'Telefon Numaranız' : 'Your Phone Number' }}</label>
+                    <label for="contactPhoneInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">Telefon Numaranız</label>
                     <input
                       v-model="contactPhone"
                       type="tel"
@@ -1828,12 +2040,12 @@ function toggleFilterSection(section: string) {
 
                   <!-- Message field -->
                   <div>
-                    <label for="contactMessageInput" class="text-[9px] font-black uppercase text-slate-400 block mb-2">{{ locale === 'tr' ? 'Size nasıl yardımcı olabiliriz?' : 'How can we help you?' }}</label>
+                    <label for="contactMessageInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">Size nasıl yardımcı olabiliriz?</label>
                     <textarea
                       v-model="contactMessage"
                       rows="3"
                       id="contactMessageInput"
-                      :placeholder="locale === 'tr' ? 'Taleplerinizi belirtin...' : 'Describe your requests...'"
+                      placeholder="Taleplerinizi belirtin..."
                       class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all resize-none"
                     ></textarea>
                   </div>
@@ -1852,14 +2064,14 @@ function toggleFilterSection(section: string) {
                   :disabled="contactSubmitted"
                   class="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-black text-white hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/10 disabled:opacity-60"
                 >
-                  <span v-if="contactSubmitted">{{ locale === 'tr' ? 'Gönderiyor...' : 'Sending...' }}</span>
-                  <span v-else class="flex items-center gap-1">{{ locale === 'tr' ? 'Gönder' : 'Send' }} <ArrowRight :size="14" /></span>
+                  <span v-if="contactSubmitted">Gönderiliyor...</span>
+                  <span v-else class="flex items-center gap-1">Gönder <ArrowRight :size="14" /></span>
                 </button>
 
                 <!-- Footer Sublinks -->
-                <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-400 pt-4">
-                  <NuxtLink to="/yardim" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Rehber & Yardım Sayfası →' : 'Guide & Help Page →' }}</NuxtLink>
-                  <NuxtLink to="/uyelik" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Kurumsal hesap aç →' : 'Create corporate account →' }}</NuxtLink>
+                <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-400 pt-2">
+                  <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors">Önce nasıl çalıştığını inceleyin →</a>
+                  <NuxtLink to="/uyelik" class="hover:text-blue-600 transition-colors">Kurumsal hesap aç →</NuxtLink>
                 </div>
               </div>
 
@@ -1879,7 +2091,7 @@ function toggleFilterSection(section: string) {
             <div class="flex items-center gap-2">
               <h3 class="text-base font-black text-slate-800 uppercase tracking-wider">{{ selectedCompany.name }}</h3>
               <span v-if="selectedCompany.verified" class="rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100 uppercase tracking-wider">
-                ✓ {{ locale === 'tr' ? 'ONAYLI' : 'VERIFIED' }}
+                ✓ ONAYLI
               </span>
             </div>
             <p class="text-xs text-slate-400 mt-1 font-bold">{{ selectedCompany.sector }}</p>
@@ -1892,21 +2104,21 @@ function toggleFilterSection(section: string) {
         <!-- Details Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-3">
-            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">{{ locale === 'tr' ? 'İLETİŞİM BİLGİLERİ' : 'CONTACT INFORMATION' }}</h4>
+            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">İLETİŞİM BİLGİLERİ</h4>
             <div class="text-xs text-slate-600 space-y-2">
-              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'Telefon:' : 'Phone:' }}</strong> {{ selectedCompany.phone }}</div>
-              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'E-Posta:' : 'Email:' }}</strong> {{ selectedCompany.email }}</div>
-              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'Adres:' : 'Address:' }}</strong> {{ selectedCompany.address }}</div>
+              <div><strong class="text-slate-400">Telefon:</strong> {{ selectedCompany.phone }}</div>
+              <div><strong class="text-slate-400">E-Posta:</strong> {{ selectedCompany.email }}</div>
+              <div><strong class="text-slate-400">Adres:</strong> {{ selectedCompany.address }}</div>
             </div>
           </div>
 
           <div class="space-y-3">
-            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">{{ locale === 'tr' ? 'RESMİ BİLGİLER' : 'OFFICIAL DETAILS' }}</h4>
+            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">RESMİ BİLGİLER</h4>
             <div class="text-xs text-slate-600 space-y-2">
-              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'KEP Adresi:' : 'KEP Address:' }}</strong> {{ selectedCompany.kep }}</div>
-              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'MERSİS No:' : 'MERSIS No:' }}</strong> {{ selectedCompany.mersis }}</div>
+              <div><strong class="text-slate-400">KEP Adresi:</strong> {{ selectedCompany.kep }}</div>
+              <div><strong class="text-slate-400">MERSİS No:</strong> {{ selectedCompany.mersis }}</div>
               <div class="flex items-center gap-1">
-                <strong class="text-slate-400">{{ locale === 'tr' ? 'Puanlama:' : 'Rating:' }}</strong>
+                <strong class="text-slate-400">Puanlama:</strong>
                 <span class="font-bold text-amber-500 font-mono text-xs">{{ selectedCompany.rating }} / 5.0</span>
                 <div class="flex text-amber-400">
                   <Star v-for="i in 5" :key="i" :size="12" :fill="i <= Math.round(selectedCompany.rating) ? 'currentColor' : 'none'" />
@@ -1918,7 +2130,7 @@ function toggleFilterSection(section: string) {
 
         <!-- Comments & Reviews -->
         <div class="space-y-3 pt-4 border-t" style="border-color: #F1F5F9;">
-          <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">{{ locale === 'tr' ? 'FİRMA HAKKINDA YORUMLAR' : 'COMPANY REVIEWS' }} ({{ selectedCompany.reviews.length }})</h4>
+          <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">FİRMA HAKKINDA YORUMLAR ({{ selectedCompany.reviews.length }})</h4>
           
           <div class="space-y-3">
             <div 
@@ -1949,7 +2161,7 @@ function toggleFilterSection(section: string) {
         <!-- Footer -->
         <div class="flex justify-end pt-3 border-t" style="border-color: #F1F5F9;">
           <button @click="showCompanyModal = false" class="rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-5 py-3 transition shadow-lg">
-            {{ locale === 'tr' ? 'Kapat' : 'Close' }}
+            Kapat
           </button>
         </div>
       </div>
@@ -1976,12 +2188,6 @@ function toggleFilterSection(section: string) {
 </template>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap');
-
-.font-heading {
-  font-family: 'Outfit', sans-serif;
-}
-
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.3s ease;
 }

@@ -239,7 +239,7 @@ function togglePaymentStatus(index: number) {
         <!-- Logo -->
         <div class="flex flex-col items-center mb-8">
           <div class="flex items-center gap-2">
-            <img src="/logo.png" alt="GelAnlasalim Yonetici Giris Logosu" class="h-9 w-auto brightness-0 invert" />
+            <img src="/logo.png" alt="GelAnlaşalım Yönetici Giriş Logosu" class="h-9 w-auto brightness-0 invert" />
           </div>
           <h2 class="mt-4 text-lg font-black tracking-tight text-white">CMS İçerik Kontrol Paneli</h2>
           <p class="text-xs text-slate-400 mt-1">Platform genelindeki başlıkları, fiyatları ve ihaleleri yönetin.</p>
@@ -294,7 +294,7 @@ function togglePaymentStatus(index: number) {
           <!-- Title & Brand -->
           <div class="px-6 py-6 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <img src="/logo.png" alt="GelAnlasalim CMS Yonetim Paneli Logosu" class="h-7 w-auto brightness-0 invert" />
+              <img src="/logo.png" alt="GelAnlaşalım CMS Yönetim Paneli Logosu" class="h-7 w-auto brightness-0 invert" />
               <span class="text-[8px] bg-blue-600/30 text-blue-400 px-1 py-0.5 rounded ml-1 font-mono">CMS</span>
             </div>
           </div>

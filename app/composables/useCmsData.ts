@@ -27,42 +27,6 @@ export const DEFAULT_CMS_DATA = {
       { name: 'Tedarikçi #D08', price: 404500, leader: false }
     ]
   },
-  stats: [
-    { value: '12.4M ₺+', label: 'Toplam Ticaret Hacmi' },
-    { value: '150+', label: 'Doğrulanmış B2B Üretici' },
-    { value: '%14.2', label: 'Ortalama Tedarik Tasarrufu' },
-    { value: '0 ₺', label: 'Alıcı Üyelik Komisyonu' }
-  ],
-  videoGuides: [
-    { title: 'Nasıl Kayıt Olunur?', desc: 'Adım adım üyelik rehberi', videoUrl: '' },
-    { title: 'Nasıl İhale Açılır?', desc: 'İlk ihalenizi dakikalar içinde oluşturun', videoUrl: '' },
-    { title: 'Nasıl Teklif Verilir?', desc: 'Tedarikçi olarak teklif verme süreci', videoUrl: '' },
-    { title: 'Yönetim Paneli', desc: 'Kontrol panelini etkin kullanma', videoUrl: '' }
-  ],
-  features: [
-    { title: 'Ters İhale Sistemi', desc: 'Kapalı zarf usulü yerine...' },
-    { title: 'Nitelikli Tedarikçi Akışı', desc: 'Belge bazlı firma profili...' },
-    { title: 'Belgeli Teklif Akışı', desc: 'Şartname yükleme, teklif gelişi...' },
-    { title: 'Detaylı Analitik', desc: 'Teklif karşılaştırma, maliyet izi...' }
-  ],
-  trustStandards: [
-    { title: 'TLS 1.2+', subtitle: 'ŞİFRELİ İLETİŞİM', desc: 'HTTPS/SSL ile şifreli veri iletimi...' },
-    { title: 'KVKK', subtitle: 'KİŞİSEL VERİ KORUMA', desc: '6698 sayılı kanuna uygun...' },
-    { title: 'Kayıt İzi', subtitle: 'İŞLEM GÜNLÜKLERİ', desc: 'Her işlem zaman damgalı...' },
-    { title: 'TR · EN', subtitle: 'ÇOK DİL DESTEĞİ', desc: 'Türkçe ve İngilizce arayüz...' }
-  ],
-  problems: [
-    { title: 'Şartname ve teklif penceresi herkes için ayrı zeminde kalır.', desc: 'Tedarikçilere ayrı teklif formları gönderilir...' },
-    { title: 'Fiyat kıyaslaması manuel ve hataya açıktır.', desc: 'Excel tabloları ve e-posta zincirleri...' },
-    { title: 'Tedarikçi kalifikasyonu belgesizdir.', desc: 'Referans kontrolü yapılmadan...' }
-  ],
-  faqs: [
-    { q: 'GelAnlaşalım nedir?', a: 'GelAnlaşalım, özel sektördeki firmaların satın alma taleplerini yayınlayabildiği, tedarikçilerin ise bu taleplere teklif verebildiği dijital ihale platformudur.' },
-    { q: 'Kimler GelAnlaşalım kullanabilir?', a: 'Satın alma yapan şirketler, KOBİ’ler, üreticiler ve tedarikçiler platformu kullanabilir.' },
-    { q: 'Platformda kamu ihaleleri var mı?', a: 'Hayır. GelAnlaşalım özel sektör B2B odaklıdır.' },
-    { q: 'İhale oluşturmak ücretli mi?', a: 'Alıcı şirketler için temel düzeyde ücretsizdir.' },
-    { q: 'Ters ihale (Eksiltme) nedir?', a: 'Tersine ihalede satıcılar en rekabetçi teklifleri sunarak fiyat indirir.' }
-  ],
   pricing: {
     vatNotice: 'Fiyatlara %20 KDV dahildir.',
     disclaimer: 'Bu hizmet GelAnlaşalım Bilişim A.Ş. tarafından sunulmaktadır. Şirketimizin Kamu İhale Kurumu (EKAP) veya başka bir kamu kurumu ile herhangi bir bağlantısı bulunmamaktadır.',

@@ -85,11 +85,11 @@ function toggleSektor(key: string) {
 
 function goStep2() {
   if (!email.value || !password.value || !firstName.value || !lastName.value || !phone.value) {
-    errorMessage.value = locale.value === 'tr' ? 'Lütfen tüm zorunlu alanları doldurun.' : 'Please fill in all required fields.'
+    errorMessage.value = 'Lütfen tüm zorunlu alanları doldurun.'
     return
   }
   if (userRole.value === 'company' && !companyName.value) {
-    errorMessage.value = locale.value === 'tr' ? 'Lütfen firma adını girin.' : 'Please enter your company name.'
+    errorMessage.value = 'Lütfen firma adını girin.'
     return
   }
   errorMessage.value = ''
@@ -98,11 +98,11 @@ function goStep2() {
 
 function handleRegister() {
   if (!agreeKvkk.value) {
-    errorMessage.value = locale.value === 'tr' ? 'Lütfen KVKK ve Üyelik Sözleşmesini kabul edin.' : 'Please accept the KVKK Policy and Terms of Use.'
+    errorMessage.value = 'Lütfen KVKK ve Üyelik Sözleşmesini kabul edin.'
     return
   }
   if (seciliSektorler.value.length === 0) {
-    errorMessage.value = locale.value === 'tr' ? 'Lütfen en az bir sektör seçin.' : 'Please select at least one sector.'
+    errorMessage.value = 'Lütfen en az bir sektör seçin.'
     return
   }
 
@@ -126,13 +126,13 @@ function handleRegister() {
 }
 
 function handleOAuth(provider: 'google' | 'facebook') {
-  // UI placeholder — backend OAuth integration
-  alert(locale.value === 'tr' ? `${provider === 'google' ? 'Google' : 'Facebook'} OAuth entegrasyonu yakında aktif olacak!` : `${provider === 'google' ? 'Google' : 'Facebook'} OAuth sign-in will be available soon!`)
+  // UI placeholder — backend OAuth entegrasyonu ayrı sprint'te yapılacak
+  alert(`${provider === 'google' ? 'Google' : 'Facebook'} OAuth entegrasyonu yakında aktif olacak!`)
 }
 
 function handleLogin() {
   if (!loginEmail.value || !loginPassword.value) {
-    errorMessage.value = locale.value === 'tr' ? 'Lütfen e-posta ve şifrenizi girin.' : 'Please enter your email and password.'
+    errorMessage.value = 'Lütfen e-posta ve şifrenizi girin.'
     return
   }
 
@@ -177,7 +177,7 @@ function handleDemoLogin(role: 'company' | 'individual') {
 
       <!-- Header brand -->
       <div class="relative z-10 flex items-center gap-2.5">
-        <img src="/logo.png" alt="GelAnlasalim Uyelik ve Kayit Sayfasi Logosu" class="h-9 w-auto brightness-0 invert" />
+        <img src="/logo.png" alt="GelAnlaşalım Üyelik ve Kayıt Sayfası Logosu" class="h-9 w-auto brightness-0 invert" />
       </div>
 
       <!-- Main presentation -->

@@ -1,5 +1,2 @@
 User-Agent: *
 Disallow:
-
-Sitemap: https://gelanlasalim-v2.vercel.app/sitemap.xml
-Sitemap: https://gelanlasalim-v2.vercel.app/llms.txt

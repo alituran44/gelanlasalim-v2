@@ -1,34 +1,3 @@
-<script setup lang="ts">
-import { computed } from 'vue'
-import { locale } from '~/composables/useLocale'
-
-useHead({
-  htmlAttrs: {
-    lang: computed(() => locale.value)
-  },
-  title: computed(() => locale.value === 'tr' 
-    ? 'GelAnlaşalım | Canlı Eksiltmeli B2B Satın Alma ve Ters İhale Arenası' 
-    : 'GelAnlasalim | Live Reverse Auction B2B Procurement Arena'
-  ),
-  meta: [
-    { 
-      name: 'description', 
-      content: computed(() => locale.value === 'tr' 
-        ? 'GelAnlaşalım, kurumsal alıcıların canlı eksiltmeli ters ihaleler düzenleyerek malzeme ve lojistik tedarik maliyetlerini düşürdüğü yeni nesil B2B pazaryeridir.' 
-        : 'GelAnlasalim is a next-generation B2B marketplace where corporate buyers reduce material and logistics procurement costs by running live reverse auctions.'
-      ) 
-    },
-    {
-      name: 'keywords',
-      content: computed(() => locale.value === 'tr'
-        ? 'ters ihale, canlı eksiltme, B2B satın alma, tedarik zinciri, teklif toplama, kurumsal satıcı, e-ihale'
-        : 'reverse auction, live bidding, B2B procurement, supply chain, request for quote, enterprise supplier, e-procurement'
-      )
-    }
-  ]
-})
-</script>
-
 <template>
   <NuxtLayout>
     <NuxtPage />
