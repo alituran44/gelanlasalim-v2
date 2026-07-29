@@ -39,28 +39,28 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'GelAnlaşalım - B2B Tersine İhale Platformu',
-  ogTitle: 'GelAnlaşalım - B2B Tersine İhale Platformu',
-  description: 'Satın alma maliyetlerinizi tersine canlı eksiltme ihaleleriyle düşürün. Doğrulanmış kurumsal tedarikçilerden anlık belgeli teklif toplayın.',
-  ogDescription: 'Satın alma maliyetlerinizi tersine canlı eksiltme ihaleleriyle düşürün. Doğrulanmış kurumsal tedarikçilerden anlık belgeli teklif toplayın.',
+  title: 'GelAnlaşalım - B2B Reverse Auction & Procurement Platform',
+  ogTitle: 'GelAnlaşalım - B2B Reverse Auction & Procurement Platform',
+  description: 'Lower your procurement costs with live reverse auctions. Gather instant documented bids from verified corporate suppliers.',
+  ogDescription: 'Lower your procurement costs with live reverse auctions. Gather instant documented bids from verified corporate suppliers.',
   ogImage: 'https://gelanlasalim-v2.vercel.app/logo.png',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'GelAnlaşalım - B2B Canlı İhale & Tedarikçi Platformu',
-  twitterDescription: 'Tedarik maliyetlerinizi %14\'e varan oranlarda azaltın. Şeffaf ve şifreli B2B eksiltme ihaleleri dakikalar içinde yayında.',
+  twitterTitle: 'GelAnlaşalım - B2B Live Auction & Supplier Platform',
+  twitterDescription: 'Reduce procurement costs by up to 14%. Transparent and encrypted B2B reverse auctions live in minutes.',
   twitterImage: 'https://gelanlasalim-v2.vercel.app/logo.png'
 })
 
 useHead({
   htmlAttrs: {
-    lang: 'tr'
+    lang: 'en'
   },
   link: [
     { rel: 'icon', type: 'image/png', href: '/logo.png' },
     { rel: 'canonical', href: 'https://gelanlasalim-v2.vercel.app' }
   ],
   meta: [
-    { name: 'keywords', content: 'b2b ihale, tersine ihale, eksiltme ihalesi, teklif toplama, kurumsal satın alma, tedarikçi yönetimi, ekap ihale, kik, doğrudan temin' },
-    { name: 'author', content: 'GelAnlaşalım Bilişim A.Ş.' },
+    { name: 'keywords', content: 'b2b auction, reverse auction, corporate procurement, supplier management, live bidding, rfq' },
+    { name: 'author', content: 'GelAnlaşalım Inc.' },
     { name: 'robots', content: 'index, follow' }
   ],
   script: [
@@ -71,7 +71,7 @@ useHead({
         '@type': 'WebSite',
         'name': 'GelAnlaşalım',
         'url': 'https://gelanlasalim-v2.vercel.app',
-        'description': 'B2B Tersine İhale, Eksiltme ve Kurumsal Satın Alma Platformu',
+        'description': 'B2B Reverse Auction & Corporate Procurement Platform',
         'potentialAction': {
           '@type': 'SearchAction',
           'target': 'https://gelanlasalim-v2.vercel.app/?q={search_term_string}',
@@ -84,7 +84,7 @@ useHead({
       innerHTML: JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        'name': 'GelAnlaşalım Bilişim A.Ş.',
+        'name': 'GelAnlaşalım Inc.',
         'url': 'https://gelanlasalim-v2.vercel.app',
         'logo': 'https://gelanlasalim-v2.vercel.app/logo.png',
         'contactPoint': {
@@ -92,7 +92,7 @@ useHead({
           'telephone': '+90-555-555-55-55',
           'contactType': 'customer service',
           'email': 'info@gelanlasalim.com',
-          'availableLanguage': 'Turkish'
+          'availableLanguage': 'English'
         }
       })
     },
@@ -104,26 +104,26 @@ useHead({
         'mainEntity': [
           {
             '@type': 'Question',
-            'name': 'Tersine ihale (eksiltme) sistemi nasıl çalışır?',
+            'name': 'How does the reverse auction system work?',
             'acceptedAnswer': {
               '@type': 'Answer',
-              'text': 'Alıcı firma satın almak istediği malzeme veya hizmet için detaylı şartname ve miktar belirterek bir ihale açar. Doğrulanmış tedarikçiler belirlenen süre içinde canlı eksiltme arenasında birbirlerinin tekliflerini görerek tekliflerini düşürürler.'
+              'text': 'The buyer opens a tender specifying quantities and technical specs. Verified suppliers compete in real time by lowering their bids before the clock expires.'
             }
           },
           {
             '@type': 'Question',
-            'name': 'Firmaların doğrulanması nasıl sağlanıyor?',
+            'name': 'How are companies verified on the platform?',
             'acceptedAnswer': {
               '@type': 'Answer',
-              'text': 'Platforma üye olan her şirketin vergi levhası, ticaret sicil gazetesi, imza sirküleri ve faaliyet belgeleri gibi resmi evrakları ekibimiz tarafından titizlikle kontrol edilir. Sadece doğrulanmış kurumsal firmalar teklif verebilir ve ihale açabilir.'
+              'text': 'Tax registration, signature circulars, and trade registry documents are verified by our team. Only approved corporate accounts can open tenders and place bids.'
             }
           },
           {
             '@type': 'Question',
-            'name': 'Ödeme ve teslimat süreçleri güvenli mi?',
+            'name': 'Are payment and delivery processes secure?',
             'acceptedAnswer': {
               '@type': 'Answer',
-              'text': 'Evet. Alıcı ihale bedelini güvenli hesaba aktarır. Tedarikçi şartnameye uygun şekilde teslimat yaptığında ve alıcı onay verdiğinde ödeme tedarikçiye aktarılır. Süreç boyunca tüm belgeler ve işlem adımları zaman damgasıyla kayıt altına alınır.'
+              'text': 'Yes. The buyer deposits funds into a secure account. Payment is released to the supplier only after inspection and approval.'
             }
           }
         ]
@@ -1737,18 +1737,18 @@ function toggleFilterSection(section: string) {
     <section class="border-b border-slate-200 bg-slate-50 py-20">
       <div class="mx-auto max-w-7xl px-6">
         <div class="text-center mb-12">
-          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">ERP BAĞLANTILARI</span>
-          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Kurumsal Sistemlerinizle Tam Entegrasyon</h2>
-          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Satın alma, teklif, sipariş ve tedarikçi verilerinizi mevcut ERP, CRM ve finans sistemlerinize kontrollü API entegrasyonu ile bağlayın.</p>
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'ERP BAĞLANTILARI' : 'ERP INTEGRATIONS' }}</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Kurumsal Sistemlerinizle Tam Entegrasyon' : 'Full Integration with Enterprise Systems' }}</h2>
+          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ locale === 'tr' ? 'Satın alma, teklif, sipariş ve tedarikçi verilerinizi mevcut ERP, CRM ve finans sistemlerinize kontrollü API entegrasyonu ile bağlayın.' : 'Connect purchase requisitions, bids, orders, and supplier master data directly into your existing ERP, CRM, and finance tools via APIs.' }}</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
           <!-- ERP Card 1: SAP -->
           <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">SAP Entegrasyonu</div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ locale === 'tr' ? 'SAP Entegrasyonu' : 'SAP Integration' }}</div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
-                Satın alma taleplerinizi (Purchase Requisitions) SAP üzerinden otomatik çekin; ihale sonuçlarını SAP sipariş fişi (Purchase Order) olarak geri aktarın.
+                {{ locale === 'tr' ? 'Satın alma taleplerinizi (Purchase Requisitions) SAP üzerinden otomatik çekin; ihale sonuçlarını SAP sipariş fişi (Purchase Order) olarak geri aktarın.' : 'Automatically sync Purchase Requisitions from SAP and export winning bids back as Purchase Orders.' }}
               </p>
             </div>
             <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">ERP CONNECTED</span>
@@ -1757,9 +1757,9 @@ function toggleFilterSection(section: string) {
           <!-- ERP Card 2: Logo -->
           <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">Logo & Netsis Entegrasyonu</div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ locale === 'tr' ? 'Logo & Netsis Entegrasyonu' : 'Logo & Netsis Integration' }}</div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
-                Logo Tiger, Go3 veya Netsis sistemlerinizdeki malzeme kartlarını, birimlerini ve tedarikçi cari hesaplarını anlık olarak platformla senkronize edin.
+                {{ locale === 'tr' ? 'Logo Tiger, Go3 veya Netsis sistemlerinizdeki malzeme kartlarını, birimlerini ve tedarikçi cari hesaplarını anlık olarak platformla senkronize edin.' : 'Instantly synchronize item catalogs, units of measure, and supplier ledgers from Logo & Netsis.' }}
               </p>
             </div>
             <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">API READY</span>
@@ -1770,7 +1770,7 @@ function toggleFilterSection(section: string) {
             <div>
               <div class="text-sm font-black text-slate-800 tracking-tight mb-2">Microsoft Dynamics 365</div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
-                Dynamics 365 Supply Chain Management modülüyle iki yönlü canlı veri eşleştirmesi sağlayarak teklif toplama süreçlerinizi hızlandırın.
+                {{ locale === 'tr' ? 'Dynamics 365 Supply Chain Management modülüyle iki yönlü canlı veri eşleştirmesi sağlayarak teklif toplama süreçlerinizi hızlandırın.' : 'Accelerate bidding cycles with two-way real-time data mapping with Dynamics 365 Supply Chain.' }}
               </p>
             </div>
             <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">AUTOMATED SYNC</span>
@@ -1779,9 +1779,9 @@ function toggleFilterSection(section: string) {
           <!-- ERP Card 4: Excel & REST API -->
           <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">REST API & Excel Entegrasyonu</div>
+              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ locale === 'tr' ? 'REST API & Excel Entegrasyonu' : 'REST API & Excel Integration' }}</div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
-                Özel şirket içi yazılımlarınız için RESTful API uç noktaları. Veya tek tıkla gelişmiş Excel tablosu yükleme ve karşılaştırma aracı.
+                {{ locale === 'tr' ? 'Özel şirket içi yazılımlarınız için RESTful API uç noktaları. Veya tek tıkla gelişmiş Excel tablosu yükleme ve karşılaştırma aracı.' : 'RESTful API endpoints for custom internal software, plus one-click bulk Excel upload and matrix analysis.' }}
               </p>
             </div>
             <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">RESTFUL API / XLS</span>
@@ -1793,18 +1793,18 @@ function toggleFilterSection(section: string) {
     <!-- NASIL ÇALIŞIR SECTION -->
     <section id="nasil-calisir" class="border-b border-slate-200 bg-slate-50 py-20">
       <div class="mx-auto max-w-7xl px-6 text-center">
-        <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">SÜREÇ REHBERİ</span>
-        <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Platform Nasıl Çalışıyor?</h2>
-        <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Alıcı veya tedarikçi rolünüze uygun adımları takip ederek süreci başlatın.</p>
+        <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'SÜREÇ REHBERİ' : 'PROCESS GUIDE' }}</span>
+        <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Platform Nasıl Çalışıyor?' : 'How Does the Platform Work?' }}</h2>
+        <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ locale === 'tr' ? 'Alıcı veya tedarikçi rolünüze uygun adımları takip ederek süreci başlatın.' : 'Follow the step-by-step workflow tailored to your role as a buyer or supplier.' }}</p>
 
         <!-- Tab switcher -->
         <div class="mt-8 flex justify-center">
           <div class="inline-flex rounded-full border border-slate-200 bg-white p-1">
             <button @click="activeAudience = 'buyer'" class="rounded-full px-6 py-2.5 text-xs font-bold transition-all" :class="activeAudience === 'buyer' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:text-slate-900'">
-              Alıcı Şirketler İçin
+              {{ locale === 'tr' ? 'Alıcı Şirketler İçin' : 'For Buyers' }}
             </button>
             <button @click="activeAudience = 'supplier'" class="rounded-full px-6 py-2.5 text-xs font-bold transition-all" :class="activeAudience === 'supplier' ? 'bg-blue-600 text-white' : 'text-slate-600 hover:text-slate-900'">
-              Tedarikçi Firmalar İçin
+              {{ locale === 'tr' ? 'Tedarikçi Firmalar İçin' : 'For Suppliers' }}
             </button>
           </div>
         </div>
@@ -1971,9 +1971,9 @@ function toggleFilterSection(section: string) {
                   <CheckCircle2 :size="28" />
                 </div>
                 <div class="space-y-2">
-                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">TALEBİNİZ ALINDI!</h3>
+                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">{{ locale === 'tr' ? 'TALEBİNİZ ALINDI!' : 'REQUEST RECEIVED!' }}</h3>
                   <p class="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed font-medium">
-                    Mesajınız başarıyla iletildi. Uzman ekibimiz en kısa sürede sizinle iletişime geçecektir.
+                    {{ locale === 'tr' ? 'Mesajınız başarıyla iletildi. Uzman ekibimiz en kısa sürede sizinle iletişime geçecektir.' : 'Your message has been sent successfully. Our team will contact you shortly.' }}
                   </p>
                 </div>
                 <button 
@@ -1981,15 +1981,15 @@ function toggleFilterSection(section: string) {
                   @click="contactSuccess = false" 
                   class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:underline"
                 >
-                  Yeni Mesaj Gönder
+                  {{ locale === 'tr' ? 'Yeni Mesaj Gönder' : 'Send New Message' }}
                 </button>
               </div>
 
               <!-- Form State -->
               <div v-else class="space-y-6">
                 <div class="space-y-1">
-                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">SİZİNLE İLETİŞİME GEÇELİM</span>
-                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">BİZE NASIL ULAŞALIM?</h3>
+                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block">{{ locale === 'tr' ? 'SİZİNLE İLETİŞİME GEÇELİM' : 'LET US REACH OUT TO YOU' }}</span>
+                  <h3 class="text-sm font-black text-slate-800 uppercase tracking-wider">{{ locale === 'tr' ? 'BİZE NASIL ULAŞALIM?' : 'HOW SHOULD WE CONNECT?' }}</h3>
                 </div>
 
                 <!-- Contact Method Toggle Tabs -->
@@ -2000,7 +2000,7 @@ function toggleFilterSection(section: string) {
                     class="rounded-lg py-2.5 text-xs font-bold text-center transition-all"
                     :class="contactMethod === 'email' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'"
                   >
-                    E-posta
+                    {{ locale === 'tr' ? 'E-posta' : 'Email' }}
                   </button>
                   <button
                     type="button"
@@ -2008,7 +2008,7 @@ function toggleFilterSection(section: string) {
                     class="rounded-lg py-2.5 text-xs font-bold text-center transition-all"
                     :class="contactMethod === 'phone' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-500 hover:text-slate-900'"
                   >
-                    Telefon
+                    {{ locale === 'tr' ? 'Telefon' : 'Phone' }}
                   </button>
                 </div>
 
@@ -2016,36 +2016,36 @@ function toggleFilterSection(section: string) {
                 <div class="space-y-4">
                   <!-- E-posta field -->
                   <div v-if="contactMethod === 'email'">
-                    <label for="contactEmailInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">E-posta Adresiniz</label>
+                    <label for="contactEmailInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">{{ locale === 'tr' ? 'E-posta Adresiniz' : 'Your Email Address' }}</label>
                     <input
                       v-model="contactEmail"
                       type="email"
                       id="contactEmailInput"
-                      placeholder="ornek@sirket.com.tr"
+                      :placeholder="locale === 'tr' ? 'ornek@sirket.com.tr' : 'name@company.com'"
                       class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all"
                     />
                   </div>
 
                   <!-- Telefon field -->
                   <div v-else>
-                    <label for="contactPhoneInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">Telefon Numaranız</label>
+                    <label for="contactPhoneInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">{{ locale === 'tr' ? 'Telefon Numaranız' : 'Your Phone Number' }}</label>
                     <input
                       v-model="contactPhone"
                       type="tel"
                       id="contactPhoneInput"
-                      placeholder="+90 (555) 555 55 55"
+                      placeholder="+1 (555) 000-0000"
                       class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all"
                     />
                   </div>
 
                   <!-- Message field -->
                   <div>
-                    <label for="contactMessageInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">Size nasıl yardımcı olabiliriz?</label>
+                    <label for="contactMessageInput" class="text-[9px] font-black uppercase text-slate-400 block mb-1">{{ locale === 'tr' ? 'Size nasıl yardımcı olabiliriz?' : 'How can we help you?' }}</label>
                     <textarea
                       v-model="contactMessage"
                       rows="3"
                       id="contactMessageInput"
-                      placeholder="Taleplerinizi belirtin..."
+                      :placeholder="locale === 'tr' ? 'Taleplerinizi belirtin...' : 'Tell us about your requirements...'"
                       class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-3 text-xs font-bold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all resize-none"
                     ></textarea>
                   </div>
@@ -2064,14 +2064,14 @@ function toggleFilterSection(section: string) {
                   :disabled="contactSubmitted"
                   class="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-xs font-black text-white hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/10 disabled:opacity-60"
                 >
-                  <span v-if="contactSubmitted">Gönderiliyor...</span>
-                  <span v-else class="flex items-center gap-1">Gönder <ArrowRight :size="14" /></span>
+                  <span v-if="contactSubmitted">{{ locale === 'tr' ? 'Gönderiliyor...' : 'Sending...' }}</span>
+                  <span v-else class="flex items-center gap-1">{{ locale === 'tr' ? 'Gönder' : 'Submit' }} <ArrowRight :size="14" /></span>
                 </button>
 
                 <!-- Footer Sublinks -->
                 <div class="flex justify-between items-center text-[10px] font-black uppercase tracking-wider text-slate-400 pt-2">
-                  <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors">Önce nasıl çalıştığını inceleyin →</a>
-                  <NuxtLink to="/uyelik" class="hover:text-blue-600 transition-colors">Kurumsal hesap aç →</NuxtLink>
+                  <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Önce nasıl çalıştığını inceleyin →' : 'See how it works first →' }}</a>
+                  <NuxtLink to="/uyelik" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Kurumsal hesap aç →' : 'Create business account →' }}</NuxtLink>
                 </div>
               </div>
 
@@ -2091,7 +2091,7 @@ function toggleFilterSection(section: string) {
             <div class="flex items-center gap-2">
               <h3 class="text-base font-black text-slate-800 uppercase tracking-wider">{{ selectedCompany.name }}</h3>
               <span v-if="selectedCompany.verified" class="rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100 uppercase tracking-wider">
-                ✓ ONAYLI
+                ✓ {{ locale === 'tr' ? 'ONAYLI' : 'VERIFIED' }}
               </span>
             </div>
             <p class="text-xs text-slate-400 mt-1 font-bold">{{ selectedCompany.sector }}</p>
@@ -2104,21 +2104,21 @@ function toggleFilterSection(section: string) {
         <!-- Details Info -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-3">
-            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">İLETİŞİM BİLGİLERİ</h4>
+            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">{{ locale === 'tr' ? 'İLETİŞİM BİLGİLERİ' : 'CONTACT DETAILS' }}</h4>
             <div class="text-xs text-slate-600 space-y-2">
-              <div><strong class="text-slate-400">Telefon:</strong> {{ selectedCompany.phone }}</div>
-              <div><strong class="text-slate-400">E-Posta:</strong> {{ selectedCompany.email }}</div>
-              <div><strong class="text-slate-400">Adres:</strong> {{ selectedCompany.address }}</div>
+              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'Telefon:' : 'Phone:' }}</strong> {{ selectedCompany.phone }}</div>
+              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'E-Posta:' : 'Email:' }}</strong> {{ selectedCompany.email }}</div>
+              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'Adres:' : 'Address:' }}</strong> {{ selectedCompany.address }}</div>
             </div>
           </div>
 
           <div class="space-y-3">
-            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">RESMİ BİLGİLER</h4>
+            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">{{ locale === 'tr' ? 'RESMİ BİLGİLER' : 'OFFICIAL DETAILS' }}</h4>
             <div class="text-xs text-slate-600 space-y-2">
-              <div><strong class="text-slate-400">KEP Adresi:</strong> {{ selectedCompany.kep }}</div>
-              <div><strong class="text-slate-400">MERSİS No:</strong> {{ selectedCompany.mersis }}</div>
+              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'KEP Adresi:' : 'KEP Mail:' }}</strong> {{ selectedCompany.kep }}</div>
+              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'MERSİS No:' : 'Tax / Reg No:' }}</strong> {{ selectedCompany.mersis }}</div>
               <div class="flex items-center gap-1">
-                <strong class="text-slate-400">Puanlama:</strong>
+                <strong class="text-slate-400">{{ locale === 'tr' ? 'Puanlama:' : 'Rating:' }}</strong>
                 <span class="font-bold text-amber-500 font-mono text-xs">{{ selectedCompany.rating }} / 5.0</span>
                 <div class="flex text-amber-400">
                   <Star v-for="i in 5" :key="i" :size="12" :fill="i <= Math.round(selectedCompany.rating) ? 'currentColor' : 'none'" />
@@ -2130,7 +2130,7 @@ function toggleFilterSection(section: string) {
 
         <!-- Comments & Reviews -->
         <div class="space-y-3 pt-4 border-t" style="border-color: #F1F5F9;">
-          <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">FİRMA HAKKINDA YORUMLAR ({{ selectedCompany.reviews.length }})</h4>
+          <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">{{ locale === 'tr' ? 'FİRMA HAKKINDA YORUMLAR' : 'REVIEWS & FEEDBACK' }} ({{ selectedCompany.reviews.length }})</h4>
           
           <div class="space-y-3">
             <div 
@@ -2161,7 +2161,7 @@ function toggleFilterSection(section: string) {
         <!-- Footer -->
         <div class="flex justify-end pt-3 border-t" style="border-color: #F1F5F9;">
           <button @click="showCompanyModal = false" class="rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-5 py-3 transition shadow-lg">
-            Kapat
+            {{ locale === 'tr' ? 'Kapat' : 'Close' }}
           </button>
         </div>
       </div>
