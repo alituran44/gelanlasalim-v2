@@ -2,7 +2,7 @@ import { ref } from 'vue'
 
 export type Locale = 'tr' | 'en'
 
-export const locale = ref<Locale>('tr')
+export const locale = ref<Locale>('en')
 
 // Translations dictionary
 export const translations: Record<Locale, Record<string, string>> = {
@@ -157,12 +157,8 @@ export function detectLocale() {
       locale.value = saved
       return
     }
-    const browserLang = navigator.language || ''
-    if (browserLang.toLowerCase().includes('tr')) {
-      locale.value = 'tr'
-    } else {
-      locale.value = 'en'
-    }
+    locale.value = 'en'
+    localStorage.setItem('user_locale', 'en')
   }
 }
 

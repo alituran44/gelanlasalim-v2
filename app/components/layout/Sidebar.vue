@@ -46,8 +46,8 @@ onMounted(() => {
 })
 
 const userRole = computed(() => userSession.value?.role || 'company')
-const userName = computed(() => userSession.value?.firstName || 'Kullanıcı')
-const userCompany = computed(() => userSession.value?.company || 'Şirketiniz')
+const userName = computed(() => userSession.value?.firstName || 'User')
+const userCompany = computed(() => userSession.value?.company || 'Your Company')
 const userInitial = computed(() => userName.value.charAt(0).toUpperCase())
 
 function logout() {
@@ -58,17 +58,17 @@ function logout() {
 }
 
 const sidebarMenus = [
-  { title: "Panel", icon: LayoutDashboard, to: "/panel" },
-  { title: "Pazar Yeri", icon: ShoppingBag, to: "/panel/pazar-yeri" },
-  { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
-  { title: "Tekliflerim", icon: Send, to: "/panel/tekliflerim" },
-  { title: "Sipariş & Teslimat", icon: Package, to: "/panel/siparis-teslimat" },
-  { title: "Canlı Etkinlikler", icon: Tv, to: "/panel/canli-etkinlikler" },
-  { title: "İstatistikler", icon: BarChart3, to: "/panel/istatistikler" },
-  { title: "Döviz Kurları", icon: Coins, to: "/panel/doviz-kurlari" },
-  { title: "Kurumsal Firmalar", icon: Building2, to: "/panel/firmalar" },
-  { title: "Ekip & Yetki", icon: Users, to: "/panel/ekip-yetki" },
-  { title: "Hesap Merkezi", icon: Settings, to: "/panel/ayarlar" },
+  { title: "Dashboard", icon: LayoutDashboard, to: "/panel" },
+  { title: "Marketplace", icon: ShoppingBag, to: "/panel/pazar-yeri" },
+  { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
+  { title: "My Bids", icon: Send, to: "/panel/tekliflerim" },
+  { title: "Orders & Shipping", icon: Package, to: "/panel/siparis-teslimat" },
+  { title: "Live Auctions", icon: Tv, to: "/panel/canli-etkinlikler" },
+  { title: "Analytics", icon: BarChart3, to: "/panel/istatistikler" },
+  { title: "Exchange Rates", icon: Coins, to: "/panel/doviz-kurlari" },
+  { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
+  { title: "Team & Permissions", icon: Users, to: "/panel/ekip-yetki" },
+  { title: "Account Center", icon: Settings, to: "/panel/ayarlar" },
 ]
 
 const isSettingsPage = computed(() => {

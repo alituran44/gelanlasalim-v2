@@ -12,10 +12,10 @@ onMounted(() => {
 })
 
 const activeTenders = ref([
-  { title: "Metro Lojistik A.Ş. - 10.000 Litre Motorin Alımı", time: "Kalan: 2 Saat", savings: "Hedef Tasarruf: %15" },
-  { title: "Özgür İnşaat - 120 Ton Hazır Beton Tedariki", time: "Kalan: 1 Gün", savings: "Hedef Tasarruf: %12" },
-  { title: "Tekstil Sanayi Ltd. - 5.000 Metre Dokuma Kumaş", time: "Kalan: 5 Saat", savings: "Hedef Tasarruf: %18" },
-  { title: "Mega Gıda A.Ş. - 50.000 Adet Oluklu Mukavva Kutu", time: "Kalan: 7 Saat", savings: "Hedef Tasarruf: %20" }
+  { title: "Metro Logistics Inc. - 10,000 Liters Diesel Fuel Procurement", time: "2 Hours Left", savings: "Target Savings: 15%" },
+  { title: "Ozgur Construction - 120 Tons Ready-Mix Concrete Supply", time: "1 Day Left", savings: "Target Savings: 12%" },
+  { title: "Textile Industries Ltd. - 5,000 Meters Woven Fabric", time: "5 Hours Left", savings: "Target Savings: 18%" },
+  { title: "Mega Food Corp. - 50,000 Units Corrugated Packaging Boxes", time: "7 Hours Left", savings: "Target Savings: 20%" }
 ])
 </script>
 
