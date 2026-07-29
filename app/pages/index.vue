@@ -1260,13 +1260,13 @@ function toggleFilterSection(section: string) {
         <!-- Explorer Header -->
         <div class="mb-12 flex flex-col justify-between gap-6 lg:flex-row lg:items-end text-left">
           <div>
-            <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">İHALE PAZARI</span>
-            <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Doğru Firmayla Doğru Şartlarda Anlaşın</h2>
-            <p class="mt-3 max-w-2xl text-xs text-slate-500">Sektörünüze özel ihaleleri sol panelden filtreleyin; teklif süreçlerini canlı takip edin.</p>
+            <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'İHALE PAZARI' : 'TENDER MARKETPLACE' }}</span>
+            <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Doğru Firmayla Doğru Şartlarda Anlaşın' : 'Agree on the Right Terms with the Right Partner' }}</h2>
+            <p class="mt-3 max-w-2xl text-xs text-slate-500">{{ locale === 'tr' ? 'Sektörünüze özel ihaleleri sol panelden filtreleyin; teklif süreçlerini canlı takip edin.' : 'Filter tenders tailored to your industry; follow bidding workflows live in real-time.' }}</p>
           </div>
           <div class="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-3.5 flex flex-col gap-1 items-start">
-            <span class="text-xs font-black text-blue-900">{{ filteredTenders.length }} Aktif Sonuç</span>
-            <span class="text-[10px] text-blue-600">Kriterlere göre anlık güncellenir</span>
+            <span class="text-xs font-black text-blue-900">{{ filteredTenders.length }} {{ locale === 'tr' ? 'Aktif Sonuç' : 'Active Results' }}</span>
+            <span class="text-[10px] text-blue-600">{{ locale === 'tr' ? 'Kriterlere göre anlık güncellenir' : 'Updated live based on criteria' }}</span>
           </div>
         </div>
 
@@ -1437,7 +1437,7 @@ function toggleFilterSection(section: string) {
                 <div class="flex flex-col lg:flex-row lg:justify-between gap-6">
                   <div class="min-w-0 flex-1">
                     <div class="flex flex-wrap items-center gap-2">
-                      <span v-if="res.featured" class="rounded-full bg-orange-50 border border-orange-200 px-2.5 py-0.5 text-[9px] font-black text-orange-700 uppercase">🔥 Öne Çıkan</span>
+                      <span v-if="res.featured" class="rounded-full bg-orange-50 border border-orange-200 px-2.5 py-0.5 text-[9px] font-black text-orange-700 uppercase">🔥 {{ locale === 'tr' ? 'Öne Çıkan' : 'Featured' }}</span>
                       <span class="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 text-[9px] font-black text-blue-700 uppercase">{{ res.type }}</span>
                       <span class="rounded-full bg-slate-50 border border-slate-200 px-2.5 py-0.5 text-[9px] font-black text-slate-600 uppercase">{{ res.method }}</span>
                       <span class="rounded-full bg-slate-50 border border-slate-200 px-2.5 py-0.5 text-[9px] font-black text-slate-600 uppercase">{{ res.pricing }}</span>
@@ -1448,26 +1448,26 @@ function toggleFilterSection(section: string) {
                       <Building2 :size="14" class="text-slate-400" />
                       <span class="underline decoration-slate-300 decoration-dashed hover:decoration-solid">{{ res.company }}</span>
                       <span v-if="res.verified" class="rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100 uppercase tracking-wider flex items-center gap-0.5">
-                        <ShieldCheck :size="10" /> ONAYLI ÜYE
+                        <ShieldCheck :size="10" /> {{ locale === 'tr' ? 'ONAYLI ÜYE' : 'VERIFIED MEMBER' }}
                       </span>
                     </div>
                     <p class="mt-3 text-xs leading-relaxed text-slate-500 font-medium">{{ res.description }}</p>
 
                     <div class="mt-5 flex flex-wrap gap-4 text-xs font-bold text-slate-400">
                       <span class="flex items-center gap-1.5"><MapPin :size="14" /> {{ res.city }}</span>
-                      <span class="flex items-center gap-1.5"><Clock3 :size="14" /> {{ res.offers }} teklif toplandı</span>
+                      <span class="flex items-center gap-1.5"><Clock3 :size="14" /> {{ res.offers }} {{ locale === 'tr' ? 'teklif toplandı' : 'bids submitted' }}</span>
                     </div>
                   </div>
 
                   <!-- Right panel within card -->
                   <div class="flex min-w-[200px] flex-col justify-between border-t border-slate-100 pt-5 lg:border-l lg:border-t-0 lg:pl-6 lg:pt-0">
                     <div>
-                      <div class="text-[9px] font-black uppercase text-slate-400">Son Teklif Tarihi</div>
+                      <div class="text-[9px] font-black uppercase text-slate-400">{{ locale === 'tr' ? 'Son Teklif Tarihi' : 'Deadline' }}</div>
                       <div class="mt-1 text-sm font-black text-slate-800">{{ res.deadline }}</div>
-                      <div class="mt-1 text-xs font-black text-red-500">{{ res.daysLeft }} gün kaldı</div>
+                      <div class="mt-1 text-xs font-black text-red-500">{{ res.daysLeft }} {{ locale === 'tr' ? 'gün kaldı' : 'days left' }}</div>
                     </div>
                     <button @click="expandedTenderId = expandedTenderId === res.id ? null : res.id; activeDetailTab = 'malzeme'" class="mt-6 w-full flex items-center justify-center rounded-xl bg-slate-900 py-3 text-xs font-black text-white hover:bg-blue-600 transition-all">
-                      {{ expandedTenderId === res.id ? 'Detayları Gizle' : 'Detayları Gör' }}
+                      {{ expandedTenderId === res.id ? (locale === 'tr' ? 'Detayları Gizle' : 'Hide Details') : (locale === 'tr' ? 'Detayları Gör' : 'View Details') }}
                     </button>
                   </div>
                 </div>
@@ -1475,21 +1475,21 @@ function toggleFilterSection(section: string) {
                 <!-- Detay Kartı Açılımı (EKAP Stili) -->
                 <div v-if="expandedTenderId === res.id" class="w-full mt-6 p-4 rounded-xl bg-sky-50/30 text-slate-700 border border-sky-200 text-xs flex flex-col gap-4 shadow-sm">
                   <div class="flex items-center gap-2 pb-2 border-b border-sky-100">
-                    <span class="bg-blue-50 text-blue-600 border border-blue-200 text-[9px] font-extrabold px-1.5 py-0.5 rounded"># İHALE NO</span>
+                    <span class="bg-blue-50 text-blue-600 border border-blue-200 text-[9px] font-extrabold px-1.5 py-0.5 rounded"># {{ locale === 'tr' ? 'İHALE NO' : 'TENDER NO' }}</span>
                     <span class="font-bold text-slate-800 text-xs">2026/{{ 100000 + res.id }} - {{ res.title }}</span>
                   </div>
 
                   <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
                     <div class="md:col-span-6">
-                      <span class="font-bold text-slate-500 uppercase text-[9px] block">İşin Niteliği</span>
+                      <span class="font-bold text-slate-500 uppercase text-[9px] block">{{ locale === 'tr' ? 'İşin Niteliği' : 'Scope of Work' }}</span>
                       <p class="mt-1 text-slate-700 leading-relaxed">{{ res.description }}</p>
                     </div>
                     <div class="md:col-span-3">
-                      <span class="font-bold text-slate-500 uppercase text-[9px] block">Teslim Yeri</span>
-                      <p class="mt-1 text-slate-700 font-bold">{{ res.city }} / Türkiye</p>
+                      <span class="font-bold text-slate-500 uppercase text-[9px] block">{{ locale === 'tr' ? 'Teslim Yeri' : 'Delivery Location' }}</span>
+                      <p class="mt-1 text-slate-700 font-bold">{{ res.city }} / Turkey</p>
                     </div>
                     <div class="md:col-span-3">
-                      <span class="font-bold text-slate-500 uppercase text-[9px] block">Yaklaşık Maliyet Hacmi</span>
+                      <span class="font-bold text-slate-500 uppercase text-[9px] block">{{ locale === 'tr' ? 'Yaklaşık Maliyet Hacmi' : 'Estimated Budget' }}</span>
                       <p class="mt-1 text-slate-900 font-mono font-black text-sm">{{ res.value }}</p>
                     </div>
                   </div>
