@@ -1581,12 +1581,40 @@ function toggleFilterSection(section: string) {
                       <pre class="whitespace-pre-line font-sans text-emerald-600 font-bold mb-4">{{ res.similar_history }}</pre>
 
                       <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-2 flex items-center gap-2">
-                        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> Güncel Teklif Eksiltme Günlüğü (Audit Trail)
+                        <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span> {{ locale === 'tr' ? 'Güncel Teklif Eksiltme Günlüğü (Audit Trail)' : 'Live Bidding Log (Audit Trail)' }}
                       </h4>
                       <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 font-mono text-[11px] sm:text-xs text-slate-400">
                         <div class="flex justify-between">
-                          <span>[15:42:01] Tedarikçi #8 (Demir A.Ş.)</span>
-                          <span class="text-red-400 font-semibold">- 8.500 ₺ i    <!-- TASARRUF HESAPLAMA ARACI (ROI) -->
+                          <span>[15:42:01] {{ locale === 'tr' ? 'Tedarikçi #8 (Demir A.Ş.)' : 'Supplier #8 (Demir Inc.)' }}</span>
+                          <span class="text-red-400 font-semibold">- {{ currencySymbol }}8,500 {{ locale === 'tr' ? 'indirim yaptı' : 'discounted' }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span>[15:39:12] {{ locale === 'tr' ? 'Tedarikçi #3 (Öz Yapı)' : 'Supplier #3 (Oz Construction)' }}</span>
+                          <span class="text-red-400 font-semibold">- {{ currencySymbol }}12,000 {{ locale === 'tr' ? 'indirim yaptı' : 'discounted' }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                          <span>[15:35:50] {{ locale === 'tr' ? 'Sistem' : 'System' }}</span>
+                          <span class="text-slate-500">{{ locale === 'tr' ? 'İhale canlı eksiltme aşamasına geçti' : 'Tender transitioned to live bidding stage' }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Sonuç Yok -->
+              <div v-if="filteredTenders.length === 0" class="rounded-2xl border border-slate-200 bg-white p-12 text-center">
+                <Search :size="32" class="mx-auto text-slate-300 mb-3" />
+                <h3 class="text-sm font-black text-slate-800">{{ locale === 'tr' ? 'Arama Kriterlerine Uygun İhale Bulunamadı' : 'No Tenders Matching Search Criteria' }}</h3>
+                <p class="text-xs text-slate-500 mt-1">{{ locale === 'tr' ? 'Lütfen filtre seçeneklerini değiştirerek yeniden arayın.' : 'Please adjust your search filters and try again.' }}</p>
+                <button @click="clearFilters" class="mt-4 px-4 py-2 border border-slate-200 hover:bg-slate-50 text-xs font-bold rounded-xl transition-all">{{ locale === 'tr' ? 'Filtreleri Temizle' : 'Clear Filters' }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    <!-- TASARRUF HESAPLAMA ARACI (ROI) -->
     <section id="ozellikler" class="border-b border-slate-200 bg-slate-50 py-20">
       <div class="mx-auto max-w-7xl px-6">
         <div class="text-center mb-12">
@@ -1698,34 +1726,6 @@ function toggleFilterSection(section: string) {
               <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'KVKK Uyumlu Arşivleme' : 'GDPR Compliant Archiving' }}</h4>
               <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
                 {{ locale === 'tr' ? 'Sonuçlanan ihaleler yasal saklama sürelerine uygun olarak güvenli sunucularda saklanır.' : 'Completed tenders are archived on secure servers in compliance with data protection laws.' }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>.
-              </p>
-            </div>
-          </div>
-
-          <!-- Step 3 -->
-          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
-            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">3</div>
-            <div>
-              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Canlı Eksiltme Günlüğü</h4>
-              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
-                Ters ihale arenalarındaki her fiyat düşüşü, zaman damgasıyla değişmez denetim izine (audit trail) yazılır. Rekabet şeffaftır.
-              </p>
-            </div>
-          </div>
-
-          <!-- Step 4 -->
-          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
-            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">4</div>
-            <div>
-              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">KVKK Uyumlu Arşivleme</h4>
-              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
-                Sonuçlanan ihaleler yasal saklama sürelerine uygun olarak güvenli sunucularda saklanır. Şirket içi denetimlere (audit) anında hazırdır.
               </p>
             </div>
           </div>
