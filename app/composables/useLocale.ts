@@ -151,13 +151,8 @@ export const translations: Record<Locale, Record<string, string>> = {
 }
 
 export function detectLocale() {
+  locale.value = 'en'
   if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('user_locale')
-    if (saved === 'tr' || saved === 'en') {
-      locale.value = saved
-      return
-    }
-    locale.value = 'en'
     localStorage.setItem('user_locale', 'en')
   }
 }

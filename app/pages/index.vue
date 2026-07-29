@@ -1586,49 +1586,21 @@ function toggleFilterSection(section: string) {
                       <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 font-mono text-[11px] sm:text-xs text-slate-400">
                         <div class="flex justify-between">
                           <span>[15:42:01] Tedarikçi #8 (Demir A.Ş.)</span>
-                          <span class="text-red-400 font-semibold">- 8.500 ₺ indirim yaptı</span>
-                        </div>
-                        <div class="flex justify-between">
-                          <span>[15:39:12] Tedarikçi #3 (Öz Yapı)</span>
-                          <span class="text-red-400 font-semibold">- 12.000 ₺ indirim yaptı</span>
-                        </div>
-                        <div class="flex justify-between">
-                          <span>[15:35:50] Sistem</span>
-                          <span class="text-slate-500">İhale canlı eksiltme aşamasına geçti</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Sonuç Yok -->
-              <div v-if="filteredTenders.length === 0" class="rounded-2xl border border-slate-200 bg-white p-12 text-center">
-                <Search :size="32" class="mx-auto text-slate-300 mb-3" />
-                <h3 class="text-sm font-black text-slate-800">Arama Kriterlerine Uygun İhale Bulunamadı</h3>
-                <p class="text-xs text-slate-500 mt-1">Lütfen filtre seçeneklerini değiştirerek yeniden arayın.</p>
-                <button @click="clearFilters" class="mt-4 px-4 py-2 border border-slate-200 hover:bg-slate-50 text-xs font-bold rounded-xl transition-all">Filtreleri Temizle</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-    <!-- TASARRUF HESAPLAMA ARACI (ROI) -->
+                          <span class="text-red-400 font-semibold">- 8.500 ₺ i    <!-- TASARRUF HESAPLAMA ARACI (ROI) -->
     <section id="ozellikler" class="border-b border-slate-200 bg-slate-50 py-20">
       <div class="mx-auto max-w-7xl px-6">
         <div class="text-center mb-12">
-          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">VERİMLİLİK & ROI</span>
-          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Tedarik Tasarrufunuzu Hesaplayın</h2>
-          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Yıllık satın alma hacminizi belirleyin, GelAnlaşalım B2B tersine ihale arenası ile elde edeceğiniz tahmini kazancı anında görün.</p>
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'VERİMLİLİK & ROI' : 'EFFICIENCY & ROI' }}</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Tedarik Tasarrufunuzu Hesaplayın' : 'Calculate Your Procurement Savings' }}</h2>
+          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ locale === 'tr' ? 'Yıllık satın alma hacminizi belirleyin, GelAnlaşalım B2B tersine ihale arenası ile elde edeceğiniz tahmini kazancı anında görün.' : 'Set your annual procurement volume to instantly estimate your potential savings in the reverse auction arena.' }}</p>
         </div>
 
         <div class="mx-auto max-w-4xl rounded-3xl border bg-white p-8 md:p-12 premium-shadow flex flex-col gap-8 md:gap-12 text-left">
           <!-- Slider area -->
           <div class="space-y-4">
             <div class="flex justify-between items-baseline">
-              <label for="annualVolumeInput" class="text-xs font-black text-slate-800 uppercase tracking-wider font-sans">Yıllık Satın Alma Hacminiz</label>
-              <span class="font-mono text-xl font-black text-blue-600">{{ annualVolume.toLocaleString('tr-TR') }} ₺</span>
+              <label for="annualVolumeInput" class="text-xs font-black text-slate-800 uppercase tracking-wider font-sans">{{ locale === 'tr' ? 'Yıllık Satın Alma Hacminiz' : 'Annual Procurement Volume' }}</label>
+              <span class="font-mono text-xl font-black text-blue-600">{{ currencySymbol }}{{ annualVolume.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
             </div>
             <input
               type="range"
@@ -1640,9 +1612,9 @@ function toggleFilterSection(section: string) {
               class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
             <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              <span>500 Bin ₺</span>
-              <span>25 Milyon ₺</span>
-              <span>50 Milyon ₺</span>
+              <span>{{ currencySymbol }}500K</span>
+              <span>{{ currencySymbol }}25M</span>
+              <span>{{ currencySymbol }}50M</span>
             </div>
           </div>
 
@@ -1650,23 +1622,23 @@ function toggleFilterSection(section: string) {
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <!-- Col 1: Net Savings -->
             <div class="p-6 rounded-2xl bg-blue-50/50 border border-blue-100 flex flex-col gap-1.5">
-              <span class="text-[9px] font-black uppercase text-blue-600 tracking-wider">Tahmini Yıllık Tasarruf (%14.2)</span>
-              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ calculatedSavings.toLocaleString('tr-TR') }} ₺</span>
-              <span class="text-[10px] text-slate-400">Canlı eksiltme arenaları ortalama verisidir.</span>
+              <span class="text-[9px] font-black uppercase text-blue-600 tracking-wider">{{ locale === 'tr' ? 'Tahmini Yıllık Tasarruf (%14.2)' : 'Estimated Annual Savings (14.2%)' }}</span>
+              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ currencySymbol }}{{ calculatedSavings.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
+              <span class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'Canlı eksiltme arenaları ortalama verisidir.' : 'Based on average reverse auction results.' }}</span>
             </div>
 
             <!-- Col 2: Labor hours saved -->
             <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col gap-1.5">
-              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">Kazanılan İş Gücü</span>
-              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ Math.round(savedHours) }} Adam/Ay</span>
-              <span class="text-[10px] text-slate-400">Excel kıyaslama ve e-posta takibi elenir.</span>
+              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">{{ locale === 'tr' ? 'Kazanılan İş Gücü' : 'Labor Hours Saved' }}</span>
+              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ Math.round(savedHours) }} {{ locale === 'tr' ? 'Adam/Ay' : 'Man/Months' }}</span>
+              <span class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'Excel kıyaslama ve e-posta takibi elenir.' : 'Eliminates Excel comparison & email chaos.' }}</span>
             </div>
 
             <!-- Col 3: Qualified suppliers reached -->
             <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col gap-1.5">
-              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">Nitelikli Tedarikçi Erişimi</span>
-              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ connectedSuppliersCount }} Firma</span>
-              <span class="text-[10px] text-slate-400">İhalelerinize katılım sağlayacak hazır ağ.</span>
+              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">{{ locale === 'tr' ? 'Nitelikli Tedarikçi Erişimi' : 'Qualified Supplier Access' }}</span>
+              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ connectedSuppliersCount }} {{ locale === 'tr' ? 'Firma' : 'Vendors' }}</span>
+              <span class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'İhalelerinize katılım sağlayacak hazır ağ.' : 'Ready network participating in your tenders.' }}</span>
             </div>
           </div>
         </div>
@@ -1677,9 +1649,9 @@ function toggleFilterSection(section: string) {
     <section class="border-b border-slate-200 bg-white py-20">
       <div class="mx-auto max-w-7xl px-6">
         <div class="text-center mb-16">
-          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">ŞEFFAFLIK & GÜVENLİK</span>
-          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Kriptografik ve Damgalı İşlem Takibi</h2>
-          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">Satın alma süreçleriniz, KVKK ve Türk Ticaret Kanunu uyumlu, TLS 1.2+ şifreli ve zaman damgalı değişmez bir log günlüğünde saklanır.</p>
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ locale === 'tr' ? 'ŞEFFAFLIK & GÜVENLİK' : 'TRANSPARENCY & SECURITY' }}</span>
+          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ locale === 'tr' ? 'Kriptografik ve Damgalı İşlem Takibi' : 'Cryptographic & Timestamped Action Tracking' }}</h2>
+          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ locale === 'tr' ? 'Satın alma süreçleriniz, KVKK ve Türk Ticaret Kanunu uyumlu, TLS 1.2+ şifreli ve zaman damgalı değişmez bir log günlüğünde saklanır.' : 'Your procurement workflows are secured with TLS 1.2+ encryption, GDPR compliance, and timestamped immutable audit logs.' }}</p>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8 relative text-left">
@@ -1690,9 +1662,9 @@ function toggleFilterSection(section: string) {
           <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
             <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">1</div>
             <div>
-              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">Şartname Damgalama</h4>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'Şartname Damgalama' : 'Specification Timestamping' }}</h4>
               <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
-                Yayınladığınız şartname dosyalarının kriptografik hash kodları çıkarılarak sisteme damgalanır. Dosya değişmezliği garanti altındadır.
+                {{ locale === 'tr' ? 'Yayınladığınız şartname dosyalarının kriptografik hash kodları çıkarılarak sisteme damgalanır.' : 'Cryptographic hash codes of your specification documents are timestamped to ensure file integrity.' }}
               </p>
             </div>
           </div>
@@ -1701,9 +1673,37 @@ function toggleFilterSection(section: string) {
           <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
             <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">2</div>
             <div>
-              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">TLS 1.2+ Şifreli Teklifler</h4>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'TLS 1.2+ Şifreli Teklifler' : 'TLS 1.2+ Encrypted Bids' }}</h4>
               <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
-                Tedarikçilerin gönderdiği fiyat ve belgeler SSL/TLS katmanında şifrelenir. Son teklif tarihine kadar kimse tarafından deşifre edilemez.
+                {{ locale === 'tr' ? 'Tedarikçilerin gönderdiği fiyat ve belgeler SSL/TLS katmanında şifrelenir.' : 'Bids and documents submitted by vendors are encrypted via SSL/TLS layers.' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">3</div>
+            <div>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'Canlı Eksiltme Günlüğü' : 'Live Auction Audit Log' }}</h4>
+              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
+                {{ locale === 'tr' ? 'Ters ihale arenalarındaki her fiyat düşüşü, zaman damgasıyla denetim izine yazılır.' : 'Every price reduction in reverse auctions is logged with a timestamp into an immutable audit trail.' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="relative z-10 p-6 bg-slate-50 border border-slate-200/80 rounded-2xl flex flex-col gap-4">
+            <div class="h-12 w-12 rounded-xl bg-blue-600 text-white flex items-center justify-center font-black text-lg shadow-lg shadow-blue-600/10">4</div>
+            <div>
+              <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider">{{ locale === 'tr' ? 'KVKK Uyumlu Arşivleme' : 'GDPR Compliant Archiving' }}</h4>
+              <p class="mt-2 text-[11px] text-slate-500 leading-relaxed font-medium">
+                {{ locale === 'tr' ? 'Sonuçlanan ihaleler yasal saklama sürelerine uygun olarak güvenli sunucularda saklanır.' : 'Completed tenders are archived on secure servers in compliance with data protection laws.' }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>.
               </p>
             </div>
           </div>
@@ -1877,7 +1877,7 @@ function toggleFilterSection(section: string) {
       </div>
     </section>
 
-    <!-- REGISTER CALL TO ACTION SECTION (Selin Şahin Feedback) -->
+    <!-- REGISTER CALL TO ACTION SECTION -->
     <section class="py-16 bg-[#001D36] text-white relative overflow-hidden">
       <!-- Glow background -->
       <div class="absolute top-0 right-0 h-[300px] w-[300px] rounded-full bg-blue-500/10 blur-3xl z-10"></div>
@@ -1885,27 +1885,27 @@ function toggleFilterSection(section: string) {
       
       <div class="relative z-20 mx-auto max-w-5xl px-6 text-center space-y-6">
         <span class="bg-[#1EAE4C]/10 border border-[#1EAE4C]/20 text-[#1EAE4C] text-[9px] font-black uppercase px-3 py-1 rounded-full tracking-wider inline-block animate-pulse">
-          ⚡ ÜCRETSİZ LANSMAN DÖNEMİ
+          ⚡ {{ locale === 'tr' ? 'ÜCRETSİZ LANSMAN DÖNEMİ' : 'FREE LAUNCH PERIOD' }}
         </span>
         <h2 class="text-3xl font-black tracking-tight sm:text-4xl">
-          Tedarik Süreçlerinizi Bugün Dijitalleştirin
+          {{ locale === 'tr' ? 'Tedarik Süreçlerinizi Bugün Dijitalleştirin' : 'Digitalize Your Procurement Workflows Today' }}
         </h2>
         <p class="max-w-xl mx-auto text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
-          Ters ihale arenamıza katılın, malzeme ve lojistik maliyetlerinizi canlı eksiltme ile düşürün. Satın alma taleplerinizi tek merkezden yönetmeye hemen başlayın.
+          {{ locale === 'tr' ? 'Ters ihale arenamıza katılın, malzeme ve lojistik maliyetlerinizi canlı eksiltme ile düşürün. Satın alma taleplerinizi tek merkezden yönetmeye hemen başlayın.' : 'Join our reverse auction arena, cut material and logistics costs with live bidding, and manage all RFQs centrally.' }}
         </p>
         <div class="pt-4 flex flex-wrap justify-center gap-4">
           <NuxtLink 
             to="/uyelik" 
             class="flex items-center gap-2 rounded-xl px-8 py-4 text-xs font-black text-white bg-[#1EAE4C] shadow-lg shadow-[#1EAE4C]/20 hover:bg-[#158f3d] transition-all"
           >
-            Hemen Ücretsiz Katılın
+            {{ locale === 'tr' ? 'Hemen Ücretsiz Katılın' : 'Join Free Now' }}
             <ArrowRight :size="15" />
           </NuxtLink>
           <a 
             href="#sss" 
             class="flex items-center gap-2 rounded-xl border border-slate-700 bg-transparent px-8 py-4 text-xs font-black text-white hover:bg-slate-800 transition-all"
           >
-            Sıkça Sorulan Sorular
+            {{ locale === 'tr' ? 'Sıkça Sorulan Sorular' : 'Frequently Asked Questions' }}
           </a>
         </div>
       </div>
@@ -1922,13 +1922,13 @@ function toggleFilterSection(section: string) {
           <!-- Left Content -->
           <div class="lg:col-span-6 text-left space-y-8">
             <div class="space-y-4">
-              <span class="text-[10px] font-black uppercase tracking-widest" style="color: #1EAE4C;">BİZİMLE İLETİŞİME GEÇİN</span>
+              <span class="text-[10px] font-black uppercase tracking-widest" style="color: #1EAE4C;">{{ locale === 'tr' ? 'BİZİMLE İLETİŞİME GEÇİN' : 'GET IN TOUCH' }}</span>
               <h2 class="text-3xl font-black text-slate-900 tracking-tight md:text-5xl leading-tight">
-                Satın alma süreçlerinizi <br class="hidden sm:inline" />
-                <span class="italic" style="color: #1EAE4C;">tek panelde toplayın.</span>
+                {{ locale === 'tr' ? 'Satın alma süreçlerinizi' : 'Consolidate your procurement' }} <br class="hidden sm:inline" />
+                <span class="italic" style="color: #1EAE4C;">{{ locale === 'tr' ? 'tek panelde toplayın.' : 'into a single dashboard.' }}</span>
               </h2>
               <p class="text-xs sm:text-sm leading-relaxed text-slate-500 font-medium max-w-md">
-                Ekibimiz satın alma süreçlerinizde size yardımcı olmaya hazır. İletişim bilgilerinizi bırakın, en kısa sürede dönüş yapalım.
+                {{ locale === 'tr' ? 'Ekibimiz satın alma süreçlerinizde size yardımcı olmaya hazır. İletişim bilgilerinizi bırakın, en kısa sürede dönüş yapalım.' : 'Our team is ready to assist your business. Leave your contact information and we will reach out promptly.' }}
               </p>
             </div>
 
@@ -1938,25 +1938,25 @@ function toggleFilterSection(section: string) {
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">
                   <CheckCircle2 :size="16" />
                 </div>
-                <span class="text-xs font-black text-slate-800 tracking-wide">Hızlı kurumsal kurulum</span>
+                <span class="text-xs font-black text-slate-800 tracking-wide">{{ locale === 'tr' ? 'Hızlı kurumsal kurulum' : 'Fast enterprise setup' }}</span>
               </div>
               <div class="flex items-center gap-3">
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">
                   <CheckCircle2 :size="16" />
                 </div>
-                <span class="text-xs font-black text-slate-800 tracking-wide">KVKK kapsamında altyapı</span>
+                <span class="text-xs font-black text-slate-800 tracking-wide">{{ locale === 'tr' ? 'KVKK kapsamında altyapı' : 'GDPR compliant infrastructure' }}</span>
               </div>
               <div class="flex items-center gap-3">
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">
                   <CheckCircle2 :size="16" />
                 </div>
-                <span class="text-xs font-black text-slate-800 tracking-wide">Hızlı onboarding</span>
+                <span class="text-xs font-black text-slate-800 tracking-wide">{{ locale === 'tr' ? 'Hızlı onboarding' : 'Rapid onboarding' }}</span>
               </div>
               <div class="flex items-center gap-3">
                 <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 border border-blue-100 text-blue-600 shrink-0">
                   <CheckCircle2 :size="16" />
                 </div>
-                <span class="text-xs font-black text-slate-800 tracking-wide">Yerli destek ekibi</span>
+                <span class="text-xs font-black text-slate-800 tracking-wide">{{ locale === 'tr' ? 'Yerli destek ekibi' : 'Dedicated support team' }}</span>
               </div>
             </div>
           </div>
