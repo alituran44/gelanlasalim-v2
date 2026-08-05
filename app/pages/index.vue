@@ -4,6 +4,7 @@ import {
   Search,
   MapPin,
   Building2,
+  Building,
   Clock3,
   SlidersHorizontal,
   ChevronDown,
@@ -2126,87 +2127,142 @@ function toggleFilterSection(section: string) {
       </div>
     </section>
 
-    <!-- FİRMA DETAY VE YORUM MODALI (Photo 2 / 5 Feedbacks) -->
-    <div v-if="showCompanyModal && selectedCompany" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto">
-      <div class="bg-white rounded-3xl border border-slate-200 p-6 max-w-2xl w-full shadow-2xl text-left space-y-6 max-h-[90vh] overflow-y-auto">
-        <!-- Header -->
-        <div class="flex justify-between items-start border-b pb-4" style="border-color: #F1F5F9;">
-          <div>
-            <div class="flex items-center gap-2">
-              <h3 class="text-base font-black text-slate-800 uppercase tracking-wider">{{ selectedCompany.name }}</h3>
-              <span v-if="selectedCompany.verified" class="rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100 uppercase tracking-wider">
-                ✓ {{ locale === 'tr' ? 'ONAYLI' : 'VERIFIED' }}
-              </span>
-            </div>
-            <p class="text-xs text-slate-400 mt-1 font-bold">{{ selectedCompany.sector }}</p>
-          </div>
-          <button @click="showCompanyModal = false" class="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition">
-            <X :size="18" />
-          </button>
-        </div>
-
-        <!-- Details Info -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="space-y-3">
-            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">{{ locale === 'tr' ? 'İLETİŞİM BİLGİLERİ' : 'CONTACT DETAILS' }}</h4>
-            <div class="text-xs text-slate-600 space-y-2">
-              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'Telefon:' : 'Phone:' }}</strong> {{ selectedCompany.phone }}</div>
-              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'E-Posta:' : 'Email:' }}</strong> {{ selectedCompany.email }}</div>
-              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'Adres:' : 'Address:' }}</strong> {{ selectedCompany.address }}</div>
-            </div>
+    <!-- FİRMA DETAY VE YORUM MODALI (Corporate User Profile & Rating Modal) -->
+    <div v-if="showCompanyModal && selectedCompany" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-md p-4 overflow-y-auto">
+      <div class="bg-white rounded-3xl border border-amber-200/80 max-w-2xl w-full shadow-2xl text-left space-y-6 max-h-[90vh] overflow-y-auto">
+        <!-- Gold/Navy Hero Header Card -->
+        <div class="p-6 rounded-t-3xl text-white relative overflow-hidden" style="background: linear-gradient(135deg, #0A1128 0%, #1C2541 100%); border-bottom: 2px solid #C59B27;">
+          <div class="absolute right-3 top-3">
+            <button @click="showCompanyModal = false" class="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white transition">
+              <X :size="18" />
+            </button>
           </div>
 
-          <div class="space-y-3">
-            <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">{{ locale === 'tr' ? 'RESMİ BİLGİLER' : 'OFFICIAL DETAILS' }}</h4>
-            <div class="text-xs text-slate-600 space-y-2">
-              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'KEP Adresi:' : 'KEP Mail:' }}</strong> {{ selectedCompany.kep }}</div>
-              <div><strong class="text-slate-400">{{ locale === 'tr' ? 'MERSİS No:' : 'Tax / Reg No:' }}</strong> {{ selectedCompany.mersis }}</div>
-              <div class="flex items-center gap-1">
-                <strong class="text-slate-400">{{ locale === 'tr' ? 'Puanlama:' : 'Rating:' }}</strong>
-                <span class="font-bold text-amber-500 font-mono text-xs">{{ selectedCompany.rating }} / 5.0</span>
-                <div class="flex text-amber-400">
-                  <Star v-for="i in 5" :key="i" :size="12" :fill="i <= Math.round(selectedCompany.rating) ? 'currentColor' : 'none'" />
-                </div>
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 p-0.5 shadow-lg shrink-0">
+              <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-amber-400 font-black text-xl font-mono">
+                {{ selectedCompany.name.charAt(0) }}
               </div>
             </div>
-          </div>
-        </div>
 
-        <!-- Comments & Reviews -->
-        <div class="space-y-3 pt-4 border-t" style="border-color: #F1F5F9;">
-          <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">{{ locale === 'tr' ? 'FİRMA HAKKINDA YORUMLAR' : 'REVIEWS & FEEDBACK' }} ({{ selectedCompany.reviews.length }})</h4>
-          
-          <div class="space-y-3">
-            <div 
-              v-for="(review, rIdx) in selectedCompany.reviews" 
-              :key="rIdx"
-              class="rounded-2xl border p-4 bg-slate-50/50 space-y-2"
-              style="border-color: #E2E8F0;"
-            >
-              <div class="flex items-center justify-between">
-                <div>
-                  <span class="text-xs font-bold text-slate-700 block">{{ review.author }}</span>
-                  <span class="text-[9px] text-slate-400 font-medium block">{{ review.company }}</span>
-                </div>
-                <div class="text-right">
-                  <div class="flex text-amber-400 justify-end">
-                    <Star v-for="i in 5" :key="i" :size="10" :fill="i <= review.rating ? 'currentColor' : 'none'" />
-                  </div>
-                  <span class="text-[9px] text-slate-400 font-mono">{{ review.date }}</span>
-                </div>
+            <div class="space-y-1.5 flex-1 min-w-0">
+              <div class="flex flex-wrap items-center gap-2">
+                <h3 class="text-lg font-black text-white tracking-tight truncate">{{ selectedCompany.name }}</h3>
+                <span v-if="selectedCompany.verified" class="rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
+                  <ShieldCheck :size="11" class="text-amber-400" />
+                  ✓ {{ locale === 'tr' ? 'e-Devlet & MERSİS ONAYLI' : 'e-Devlet VERIFIED' }}
+                </span>
               </div>
-              <p class="text-xs leading-relaxed text-slate-600 font-medium">
-                {{ review.comment }}
+              <p class="text-xs text-slate-300 font-medium flex items-center gap-2">
+                <Building2 :size="13" class="text-amber-400 shrink-0" />
+                <span>{{ selectedCompany.sector }}</span>
+                <span>•</span>
+                <MapPin :size="13" class="text-amber-400 shrink-0" />
+                <span>{{ selectedCompany.address ? selectedCompany.address.split(',')[0] : 'Türkiye' }}</span>
               </p>
             </div>
           </div>
+
+          <!-- Rating & Score Bar inside Modal Header -->
+          <div class="mt-5 pt-4 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+            <div class="bg-white/10 p-2.5 rounded-xl border border-white/10">
+              <div class="text-[9px] font-black uppercase text-amber-300 tracking-wider">{{ locale === 'tr' ? 'Genel Puan' : 'Overall Score' }}</div>
+              <div class="text-lg font-black text-white font-mono flex items-center justify-center gap-1 mt-0.5">
+                <Star :size="14" class="text-amber-400 fill-amber-400" />
+                <span>{{ selectedCompany.rating || '4.9' }}</span>
+                <span class="text-xs text-slate-400">/ 5.0</span>
+              </div>
+            </div>
+            <div class="bg-white/10 p-2.5 rounded-xl border border-white/10">
+              <div class="text-[9px] font-black uppercase text-amber-300 tracking-wider">{{ locale === 'tr' ? 'Teslimat Hızı' : 'Delivery Speed' }}</div>
+              <div class="text-lg font-black text-emerald-400 font-mono mt-0.5">%98</div>
+            </div>
+            <div class="bg-white/10 p-2.5 rounded-xl border border-white/10">
+              <div class="text-[9px] font-black uppercase text-amber-300 tracking-wider">{{ locale === 'tr' ? 'Şartname Uyum' : 'Spec Accuracy' }}</div>
+              <div class="text-lg font-black text-blue-400 font-mono mt-0.5">%100</div>
+            </div>
+            <div class="bg-white/10 p-2.5 rounded-xl border border-white/10">
+              <div class="text-[9px] font-black uppercase text-amber-300 tracking-wider">{{ locale === 'tr' ? 'İhale Hacmi' : 'Trade Volume' }}</div>
+              <div class="text-lg font-black text-amber-400 font-mono mt-0.5">42+ İhale</div>
+            </div>
+          </div>
         </div>
 
-        <!-- Footer -->
-        <div class="flex justify-end pt-3 border-t" style="border-color: #F1F5F9;">
-          <button @click="showCompanyModal = false" class="rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-5 py-3 transition shadow-lg">
-            {{ locale === 'tr' ? 'Kapat' : 'Close' }}
-          </button>
+        <div class="p-6 space-y-6 pt-0">
+          <!-- Details Info -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+              <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <Building :size="14" class="text-amber-600" />
+                {{ locale === 'tr' ? 'İLETİŞİM BİLGİLERİ' : 'CONTACT DETAILS' }}
+              </h4>
+              <div class="text-xs text-slate-600 space-y-2 font-medium">
+                <div><strong class="text-slate-400">{{ locale === 'tr' ? 'Telefon:' : 'Phone:' }}</strong> {{ selectedCompany.phone }}</div>
+                <div><strong class="text-slate-400">{{ locale === 'tr' ? 'E-Posta:' : 'Email:' }}</strong> {{ selectedCompany.email }}</div>
+                <div><strong class="text-slate-400">{{ locale === 'tr' ? 'Adres:' : 'Address:' }}</strong> {{ selectedCompany.address }}</div>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
+              <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <ShieldCheck :size="14" class="text-amber-600" />
+                {{ locale === 'tr' ? 'RESMİ BİLGİLER & DOĞRULAMA' : 'OFFICIAL CREDENTIALS' }}
+              </h4>
+              <div class="text-xs text-slate-600 space-y-2 font-medium">
+                <div><strong class="text-slate-400">{{ locale === 'tr' ? 'KEP Adresi:' : 'KEP Mail:' }}</strong> {{ selectedCompany.kep }}</div>
+                <div><strong class="text-slate-400">{{ locale === 'tr' ? 'MERSİS / VKN No:' : 'Tax / Reg No:' }}</strong> {{ selectedCompany.mersis }}</div>
+                <div class="flex items-center gap-1 pt-1">
+                  <strong class="text-slate-400">{{ locale === 'tr' ? 'Doğrulama:' : 'Verification:' }}</strong>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black border border-emerald-300">
+                    ✓ {{ locale === 'tr' ? 'TİCARET SİCİL ONAYLI' : 'REGISTRY APPROVED' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comments & Reviews Breakdown -->
+          <div class="space-y-3 pt-2">
+            <div class="flex items-center justify-between border-b pb-2" style="border-color: #F1F5F9;">
+              <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <Star :size="14" class="text-amber-500 fill-amber-500" />
+                {{ locale === 'tr' ? 'ALDIĞI PUANLAR VE MÜŞTERİ DEĞERLENDİRMELERİ' : 'RATINGS & REVIEWS' }} ({{ selectedCompany.reviews ? selectedCompany.reviews.length : 0 }})
+              </h4>
+              <span class="text-xs font-bold text-amber-600 font-mono">{{ selectedCompany.rating }} / 5.0 (⭐⭐⭐⭐⭐)</span>
+            </div>
+            
+            <div class="space-y-3">
+              <div 
+                v-for="(review, rIdx) in selectedCompany.reviews" 
+                :key="rIdx"
+                class="rounded-2xl border p-4 bg-slate-50/70 space-y-2 hover:border-amber-300 transition-colors"
+                style="border-color: #E2E8F0;"
+              >
+                <div class="flex items-center justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-slate-800 block">{{ review.author }}</span>
+                    <span class="text-[10px] text-slate-500 font-semibold block">{{ review.company }}</span>
+                  </div>
+                  <div class="text-right">
+                    <div class="flex text-amber-400 justify-end">
+                      <Star v-for="i in 5" :key="i" :size="11" :fill="i <= review.rating ? 'currentColor' : 'none'" />
+                    </div>
+                    <span class="text-[9px] text-slate-400 font-mono block mt-0.5">{{ review.date }}</span>
+                  </div>
+                </div>
+                <p class="text-xs leading-relaxed text-slate-600 font-medium">
+                  "{{ review.comment }}"
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer -->
+          <div class="flex justify-end pt-3 border-t" style="border-color: #F1F5F9;">
+            <button @click="showCompanyModal = false" class="rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-6 py-3 transition shadow-lg border border-slate-700">
+              {{ locale === 'tr' ? 'Kapat' : 'Close' }}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import { Search, Bell, Plus, ChevronDown } from "lucide-vue-next"
+import { Search, Bell, Plus, ChevronDown, User } from "lucide-vue-next"
 
 const route = useRoute()
 const router = useRouter()
@@ -107,6 +107,15 @@ const pageTitle = computed(() => {
         </span>
       </button>
 
+      <!-- Profilim Button -->
+      <NuxtLink
+        to="/panel/ayarlar"
+        class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-black rounded-xl border transition-all text-slate-800 bg-amber-50 hover:bg-amber-100 border-amber-300 shadow-xs"
+      >
+        <User :size="14" class="text-amber-600" />
+        <span>Profilim</span>
+      </NuxtLink>
+
       <!-- User Menu -->
       <div class="relative">
         <button
@@ -115,12 +124,12 @@ const pageTitle = computed(() => {
           style="border-color: #E2E8F0;"
         >
           <div
-            class="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white"
-            style="background: #1E3A5F;"
+            class="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white shadow-xs"
+            style="background: linear-gradient(135deg, #0A1128, #1C2541); border: 1px solid #C59B27;"
           >
             {{ userInitial }}
           </div>
-          <span class="hidden md:block font-medium" style="color: #0F172A;">{{ userName }}</span>
+          <span class="hidden md:block font-bold text-xs" style="color: #0F172A;">{{ userName }}</span>
           <ChevronDown :size="14" style="color: #94A3B8;" />
         </button>
 

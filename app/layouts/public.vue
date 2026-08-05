@@ -56,10 +56,10 @@ const activeTenders = ref([
       <header class="w-full bg-white border-b transition-all" style="border-color: #E2E8F0;">
       <div class="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-6">
 
-        <!-- Sol: Logo (Prominent & Eye-Catching) -->
+        <!-- Sol: Logo (Prominent & Eye-Catching Gold/Navy Logo) -->
         <NuxtLink to="/" class="flex items-center gap-3 hover:opacity-90 transition shrink-0 group">
-          <img src="/logo.png" alt="GelAnlaşalım B2B Tersine İhale Platformu Logo" class="h-11 sm:h-12 w-auto drop-shadow-sm group-hover:scale-105 transition-transform" />
-          <span class="hidden xl:inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-black text-emerald-700 border border-emerald-200">
+          <img src="/logo.png" alt="GelAnlaşalım Mini İhale Sitesi Logo" class="h-12 sm:h-14 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform" />
+          <span class="hidden xl:inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-[9px] font-black text-amber-700 border border-amber-300">
             ✓ {{ locale === 'tr' ? 'ONAYLI B2B' : 'VERIFIED B2B' }}
           </span>
         </NuxtLink>
@@ -68,25 +68,25 @@ const activeTenders = ref([
         <div class="hidden lg:flex items-center gap-1 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-inner">
           <NuxtLink 
             to="/panel/ilanlarim" 
-            class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-blue-600 hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+            class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-amber-600 hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
           >
             📋 <span>{{ locale === 'tr' ? 'İlanlarım' : 'My Tenders' }}</span>
           </NuxtLink>
           <NuxtLink 
             to="/panel/gelen-teklifler" 
-            class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-blue-600 hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+            class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-amber-600 hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
           >
             📥 <span>{{ locale === 'tr' ? 'Aldığım Teklifler' : 'Received Bids' }}</span>
           </NuxtLink>
           <NuxtLink 
             to="/panel/yaptigim-teklifler" 
-            class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-blue-600 hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+            class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-amber-600 hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
           >
             📤 <span>{{ locale === 'tr' ? 'Verdiğim Teklifler' : 'My Bids' }}</span>
           </NuxtLink>
         </div>
 
-        <!-- Sağ: CTA & Dil Seçimi -->
+        <!-- Sağ: Profilim, CTA & Dil Seçimi -->
         <div class="hidden sm:flex items-center gap-2">
           <!-- Dil Seçimi (Dropdown) -->
           <button 
@@ -97,21 +97,29 @@ const activeTenders = ref([
             🌐 {{ locale === 'tr' ? 'EN' : 'TR' }}
           </button>
 
+          <!-- PROFILIM BUTTON (Prominent on every page) -->
+          <NuxtLink
+            to="/panel/ayarlar"
+            class="flex items-center gap-1.5 px-4 py-2 text-xs font-black rounded-xl border transition-all text-slate-800 bg-amber-50/80 hover:bg-amber-100 border-amber-300 shadow-sm"
+          >
+            <User :size="15" class="text-amber-600" />
+            <span>{{ locale === 'tr' ? 'Profilim' : 'My Profile' }}</span>
+          </NuxtLink>
+
           <NuxtLink
             to="/uyelik"
-            class="px-3.5 py-2 text-xs font-bold rounded-xl transition-all text-slate-700 hover:bg-slate-100"
+            class="px-3 py-2 text-xs font-bold rounded-xl transition-all text-slate-700 hover:bg-slate-100"
           >
             {{ t('login') }}
           </NuxtLink>
           <NuxtLink
             to="/uyelik"
-            class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-extrabold text-white transition-all shadow-md shadow-blue-950/10 hover:shadow-lg"
-            style="background: #003057;"
-            onmouseover="this.style.background='#1EAE4C'"
-            onmouseout="this.style.background='#003057'"
+            class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-extrabold text-white transition-all shadow-md shadow-amber-950/10 hover:shadow-lg"
+            style="background: linear-gradient(135deg, #0A1128 0%, #1C2541 100%); border: 1px solid #C59B27;"
           >
+            <span class="text-amber-400">✨</span>
             {{ locale === 'tr' ? 'Kurumsal Hesap Aç' : 'Open Business Account' }}
-            <ArrowRight :size="13" />
+            <ArrowRight :size="13" class="text-amber-400" />
           </NuxtLink>
         </div>
 
