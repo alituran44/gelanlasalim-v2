@@ -1532,6 +1532,28 @@ function toggleFilterSection(section: string) {
                 </div>
               </transition>
 
+              <!-- Empty State Card when filteredTenders has 0 items -->
+              <div v-if="filteredTenders.length === 0" class="p-12 rounded-3xl bg-slate-50 border-2 border-dashed border-slate-200 text-center space-y-4 my-6">
+                <div class="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-blue-100/70 text-blue-600 mb-2">
+                  <Search :size="32" />
+                </div>
+                <h3 class="text-lg font-black text-slate-800">
+                  {{ locale === 'tr' ? 'Aramanıza Uygun İhale Bulunamadı' : 'No Tenders Found Matching Your Criteria' }}
+                </h3>
+                <p class="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
+                  {{ locale === 'tr' ? 'Seçtiğiniz filtrelerde henüz aktif bir ihale bulunmuyor. Filtreleri temizleyebilir veya hemen ücretsiz bir ihale ilanı oluşturabilirsiniz.' : 'There are no active tenders matching your current filters. You can clear filters or publish your own tender announcement.' }}
+                </p>
+                <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  <button @click="clearFilters" class="px-4 py-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-800 font-bold text-xs transition shadow-xs cursor-pointer">
+                    {{ locale === 'tr' ? 'Filtreleri Temizle' : 'Clear Filters' }}
+                  </button>
+                  <NuxtLink to="/panel/ihale-olustur" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs transition shadow-md flex items-center gap-1.5">
+                    <Plus :size="14" />
+                    {{ locale === 'tr' ? 'Ücretsiz İhale Oluştur' : 'Create Free Tender' }}
+                  </NuxtLink>
+                </div>
+              </div>
+
               <div v-for="res in filteredTenders" :key="res.id" class="p-6 rounded-2xl bg-white border premium-shadow flex flex-col text-left">
                   <div class="flex flex-col lg:flex-row lg:justify-between gap-6">
                     <div class="min-w-0 flex-1">

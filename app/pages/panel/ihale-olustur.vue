@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { locale } from '~/composables/useLocale'
 import { 
   FilePlus2, 
   ArrowLeft, 
@@ -188,6 +189,46 @@ const paymentMethods = [
   'Mal Mukabili'
 ]
 
+const hasDraft = ref(false)
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('tenderDraft')
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved)
+        if (parsed && parsed.baslik) {
+          hasDraft.value = true
+        }
+      } catch (e) {}
+    }
+  }
+})
+
+function loadDraft() {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('tenderDraft')
+    if (saved) {
+      form.value = JSON.parse(saved)
+      hasDraft.value = false
+    }
+  }
+}
+
+function saveDraftManually() {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('tenderDraft', JSON.stringify(form.value))
+    alert(locale.value === 'tr' ? 'İhale taslağınız başarıyla kaydedildi!' : 'Your draft tender has been saved!')
+  }
+}
+
+function clearDraft() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('tenderDraft')
+    hasDraft.value = false
+  }
+}
+
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const showSuccess = ref(false)
 const createdId = ref('')
@@ -281,19 +322,39 @@ function handleSubmit() {
 <template>
   <div class="p-6 max-w-3xl mx-auto text-left">
     
-    <!-- Geri Dönüş Linki -->
-    <div class="mb-5">
+    <!-- Saved Draft Banner (if draft exists) -->
+    <div v-if="hasDraft" class="mb-5 rounded-2xl bg-amber-50 border border-amber-200 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-bold text-amber-900 shadow-xs">
+      <div class="flex items-center gap-2">
+        <FileSpreadsheet class="text-amber-600 shrink-0" :size="18" />
+        <span>{{ locale === 'tr' ? 'Tamamlanmamış kayıtlı bir ihale taslağınız bulunmaktadır.' : 'You have an unsaved tender draft available.' }}</span>
+      </div>
+      <div class="flex items-center gap-2 shrink-0">
+        <button type="button" @click="loadDraft" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-black text-xs transition cursor-pointer">
+          {{ locale === 'tr' ? 'Taslağı Yükle' : 'Load Draft' }}
+        </button>
+        <button type="button" @click="clearDraft" class="px-3 py-1.5 rounded-lg bg-white border border-amber-300 text-amber-800 hover:bg-amber-100 font-bold text-xs transition cursor-pointer">
+          {{ locale === 'tr' ? 'Sil' : 'Discard' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Geri Dönüş Linki & Draft Save Action -->
+    <div class="mb-5 flex items-center justify-between">
       <NuxtLink to="/panel/ilanlarim" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition">
         <ArrowLeft :size="14" />
-        İlanlarıma Dön
+        {{ locale === 'tr' ? 'İlanlarıma Dön' : 'Back to My Tenders' }}
       </NuxtLink>
+
+      <button type="button" @click="saveDraftManually" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer border border-slate-200 shadow-xs">
+        💾 {{ locale === 'tr' ? 'Taslağı Kaydet' : 'Save Draft' }}
+      </button>
     </div>
 
     <!-- Başlık -->
     <div class="mb-6">
       <h1 class="text-xl font-bold flex items-center gap-2" style="color: #0F172A;">
         <FilePlus2 class="text-blue-600" :size="22" />
-        Yeni İhale İlanı Oluştur
+        {{ locale === 'tr' ? 'Yeni İhale İlanı Oluştur' : 'Create New Tender Announcement' }}
       </h1>
       <p class="text-sm mt-0.5" style="color: #64748B;">Satın alma talebiniz için tedarikçilerden rekabetçi canlı teklifler toplayın</p>
     </div>

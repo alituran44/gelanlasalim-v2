@@ -104,6 +104,28 @@ function toggleSektor(key: string) {
   }
 }
 
+// OTP Modal State
+const showOtpModal = ref(false)
+const otpInput = ref('849201')
+const pendingUserSession = ref<any>(null)
+const pendingTargetRoute = ref('/panel')
+
+function verifyOtp() {
+  if (!otpInput.value || otpInput.value.length < 6) {
+    alert(locale.value === 'tr' ? 'Lütfen 6 haneli onay kodunu giriniz.' : 'Please enter 6-digit verification code.')
+    return
+  }
+  if (typeof window !== 'undefined' && pendingUserSession.value) {
+    localStorage.setItem('userSession', JSON.stringify(pendingUserSession.value))
+  }
+  showOtpModal.value = false
+  router.push(pendingTargetRoute.value)
+}
+
+function resendOtp() {
+  alert(locale.value === 'tr' ? 'Yeni doğrulama kodu e-posta adresinize gönderildi! (Kod: 849201)' : 'A new verification code has been sent! (Code: 849201)')
+}
+
 function goStep2() {
   if (!email.value || !password.value || !firstName.value || !lastName.value || !phone.value) {
     errorMessage.value = 'Lütfen tüm zorunlu alanları doldurun.'
@@ -118,7 +140,7 @@ function goStep2() {
     return
   }
 
-  // Bireysel üyelikte sektör adımı gerekmez — Doğrudan kaydol!
+  // Bireysel üyelikte sektör adımı gerekmez — OTP Modalı Aç!
   if (userRole.value === 'individual') {
     if (!agreeKvkk.value) {
       errorMessage.value = 'Lütfen KVKK ve Üyelik Sözleşmesini kabul edin.'
@@ -128,20 +150,19 @@ function goStep2() {
     errorMessage.value = ''
     setTimeout(() => {
       isSubmitting.value = false
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('userSession', JSON.stringify({
-          email: email.value,
-          firstName: firstName.value,
-          name: `${firstName.value} ${lastName.value}`,
-          company: 'Bireysel Üye',
-          role: 'individual',
-          sektorler: ['bireysel'],
-          mailBildirimi: mailBildirimi.value,
-          isPremium: false
-        }))
+      pendingUserSession.value = {
+        email: email.value,
+        firstName: firstName.value,
+        name: `${firstName.value} ${lastName.value}`,
+        company: 'Bireysel Üye',
+        role: 'individual',
+        sektorler: ['bireysel'],
+        mailBildirimi: mailBildirimi.value,
+        isPremium: false
       }
-      router.push('/panel')
-    }, 800)
+      pendingTargetRoute.value = '/panel'
+      showOtpModal.value = true
+    }, 600)
     return
   }
 
@@ -164,20 +185,19 @@ function handleRegister() {
 
   setTimeout(() => {
     isSubmitting.value = false
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('userSession', JSON.stringify({
-        email: email.value,
-        firstName: firstName.value,
-        name: `${firstName.value} ${lastName.value}`,
-        company: userRole.value === 'company' ? companyName.value : 'Bireysel Üye',
-        role: userRole.value,
-        sektorler: seciliSektorler.value,
-        mailBildirimi: mailBildirimi.value,
-        isPremium: false
-      }))
+    pendingUserSession.value = {
+      email: email.value,
+      firstName: firstName.value,
+      name: `${firstName.value} ${lastName.value}`,
+      company: userRole.value === 'company' ? companyName.value : 'Bireysel Üye',
+      role: userRole.value,
+      sektorler: seciliSektorler.value,
+      mailBildirimi: mailBildirimi.value,
+      isPremium: false
     }
-    router.push('/firma-dogrulama')
-  }, 1000)
+    pendingTargetRoute.value = '/firma-dogrulama'
+    showOtpModal.value = true
+  }, 800)
 }
 
 function handleOAuth(provider: 'google' | 'facebook') {
@@ -836,9 +856,60 @@ function handleGuestEntry() {
         <p class="text-[11px] leading-relaxed text-slate-500 font-medium">
           {{ locale === 'tr' ? 'Üyelik işlemleri ve güvenli oturum yönetimi için zorunlu çerezleri kullanıyoruz.' : 'We use essential cookies for user authentication and session security.' }}
         </p>
-        <div class="flex gap-2 justify-end">
-          <button @click="showCookieConsent = false" class="rounded-lg bg-blue-600 px-4 py-2 text-[10px] font-black text-white hover:bg-blue-700 transition-colors">
-            {{ locale === 'tr' ? 'Kabul Et' : 'Accept' }}
+        <div class="flex items-center justify-end gap-2">
+          <button @click="acceptCookies" class="rounded-xl bg-slate-900 hover:bg-slate-800 px-4 py-2 text-[11px] font-black text-white transition shadow-sm cursor-pointer">
+            {{ locale === 'tr' ? 'Anladım ve Kabul Ediyorum' : 'I Understand & Accept' }}
+          </button>
+        </div>
+      </div>
+    </transition>
+
+    <!-- OTP VERIFICATION MODAL -->
+    <transition name="fade">
+      <div v-if="showOtpModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4 backdrop-blur-xs">
+        <div class="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl text-left space-y-5">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h3 class="text-sm font-black uppercase text-slate-800 flex items-center gap-2">
+              <ShieldCheck class="text-emerald-600" :size="20" />
+              <span>{{ locale === 'tr' ? 'E-Posta Doğrulama Kodu' : 'Email Verification Code' }}</span>
+            </h3>
+            <button @click="showOtpModal = false" class="text-slate-400 hover:text-slate-700 cursor-pointer">
+              <X :size="18" />
+            </button>
+          </div>
+
+          <p class="text-xs text-slate-600 leading-relaxed">
+            {{ locale === 'tr' ? 'Güvenliğiniz için' : 'For your security, a 6-digit verification code has been sent to' }}
+            <strong class="text-slate-900 font-mono">{{ pendingUserSession?.email || email }}</strong> {{ locale === 'tr' ? 'adresine 6 haneli onay kodu gönderilmiştir.' : '.' }}
+          </p>
+
+          <div class="space-y-2">
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">{{ locale === 'tr' ? 'ONAY KODU (OTP)' : 'VERIFICATION CODE (OTP)' }}</label>
+            <input 
+              v-model="otpInput" 
+              type="text" 
+              maxlength="6" 
+              placeholder="849201" 
+              class="w-full text-center tracking-[0.5em] text-xl font-mono font-black py-3 bg-slate-50 border-2 border-emerald-300 rounded-2xl text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-inner" 
+            />
+            <span class="text-[10px] text-emerald-600 font-bold block text-center mt-1">
+              ✓ {{ locale === 'tr' ? 'Demo Onay Kodu Otomatik Dolduruldu: 849201' : 'Demo Verification Code Auto-Filled: 849201' }}
+            </span>
+          </div>
+
+          <div class="flex items-center justify-between text-xs pt-1">
+            <button type="button" @click="resendOtp" class="text-blue-600 font-bold hover:underline cursor-pointer">
+              {{ locale === 'tr' ? 'Kodu Tekrar Gönder' : 'Resend Code' }}
+            </button>
+            <span class="text-slate-400 font-mono text-[10px]">Kalan Süre: 02:45</span>
+          </div>
+
+          <button 
+            @click="verifyOtp" 
+            class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white transition-all shadow-md bg-emerald-600 hover:bg-emerald-700 cursor-pointer"
+          >
+            <CheckCircle2 :size="16" />
+            <span>{{ locale === 'tr' ? 'Doğrula ve Hesabımı Aç' : 'Verify & Open Account' }}</span>
           </button>
         </div>
       </div>

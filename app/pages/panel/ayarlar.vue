@@ -129,6 +129,16 @@ function onFileSelected(event: Event) {
   const file = target.files?.[0]
   if (!file) return
 
+  if (file.type.startsWith('image/')) {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        profileAvatarUrl.value = e.target.result as string
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
   const key = currentUploadKey.value
   if (key === 'kapak') {
     showToast(`Kapak görseli olarak "${file.name}" yüklendi.`, "success")
@@ -198,6 +208,8 @@ function toggle2FA() {
     companyForm.value.is2FaEnabled ? "success" : "warning"
   )
 }
+
+const profileAvatarUrl = ref<string>('')
 
 // Active sessions state
 const sessions = ref([
@@ -716,8 +728,16 @@ function saveProfile() {
 
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div class="flex items-start gap-4">
-                <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-slate-100 border text-slate-700 text-base font-black">
-                  AT
+                <!-- Hidden File Input for Live Image Upload -->
+                <input ref="fileInputRef" type="file" accept="image/*" class="hidden" @change="handleImageSelected" />
+
+                <div 
+                  @click="triggerDocUpload()"
+                  class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-slate-100 border text-slate-700 text-base font-black overflow-hidden cursor-pointer hover:opacity-90 transition shadow-xs"
+                  :title="locale === 'tr' ? 'Logo Değiştirmek İçin Tıklayın' : 'Click to Change Logo'"
+                >
+                  <img v-if="profileAvatarUrl" :src="profileAvatarUrl" alt="Avatar" class="h-full w-full object-cover" />
+                  <span v-else>AT</span>
                 </div>
                 <div>
                   <span class="text-[8px] font-black text-slate-400 uppercase tracking-wider block">{{ locale === 'tr' ? 'KURUM' : 'ORGANIZATION' }}</span>
