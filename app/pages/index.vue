@@ -1065,12 +1065,13 @@ function clearFilters() {
 }
 
 function toggleCategory(catName: string) {
-  expandedCategory.value = expandedCategory.value === catName ? null : catName
-}
-
-function selectMainCategory(catName: string) {
-  selectedCat.value = catName
-  selectedSubcategory.value = ''
+  if (expandedCategory.value === catName) {
+    expandedCategory.value = null
+  } else {
+    expandedCategory.value = catName
+    selectedCat.value = catName
+    selectedSubcategory.value = ''
+  }
 }
 
 function selectSubcategory(catName: string, subcatName: string) {
@@ -1290,7 +1291,7 @@ function toggleFilterSection(section: string) {
             </div>
 
             <!-- Vertical Accordion List -->
-            <div class="space-y-1.5 max-h-[760px] overflow-y-auto pr-1.5 custom-scrollbar text-xs font-medium">
+            <div class="space-y-1.5 max-h-[540px] overflow-y-auto pr-1.5 custom-scrollbar text-xs font-medium">
               <div 
                 v-for="cat in detailedCategories" 
                 :key="cat.name"
@@ -1298,30 +1299,30 @@ function toggleFilterSection(section: string) {
               >
                 <!-- Main Category Expandable Button -->
                 <button 
-                  @click="selectMainCategory(cat.name); toggleCategory(cat.name)"
+                  @click="toggleCategory(cat.name)"
                   class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-700 hover:bg-white hover:text-blue-600 font-bold transition-all text-left group"
-                  :class="selectedCat === cat.name ? 'bg-blue-600 text-white hover:text-white font-extrabold shadow-sm' : ''"
+                  :class="expandedCategory === cat.name || selectedCat === cat.name ? 'bg-blue-600 text-white hover:text-white font-extrabold shadow-sm' : ''"
                 >
                   <div class="flex items-center gap-2 truncate pr-2">
                     <ChevronRight 
                       :size="14" 
                       class="transition-transform shrink-0" 
-                      :class="{ 'rotate-90': expandedCategory === cat.name || selectedCat === cat.name }" 
+                      :class="{ 'rotate-90': expandedCategory === cat.name }" 
                     />
                     <span class="truncate">{{ cat.name }}</span>
                   </div>
                   <span 
                     class="text-[10px] px-2 py-0.5 rounded-md font-mono font-bold shrink-0"
-                    :class="selectedCat === cat.name ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-700'"
+                    :class="expandedCategory === cat.name || selectedCat === cat.name ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-700'"
                   >
                     {{ cat.count }}
                   </span>
                 </button>
 
-                <!-- Subcategories Accordion Panel -->
+                <!-- Subcategories Accordion Panel (Scrollable with max-height) -->
                 <div 
-                  v-if="expandedCategory === cat.name || selectedCat === cat.name" 
-                  class="ml-4 pl-3 border-l-2 border-blue-200 space-y-1 my-1.5"
+                  v-if="expandedCategory === cat.name" 
+                  class="ml-4 pl-3 border-l-2 border-blue-200 space-y-1 my-1.5 max-h-48 overflow-y-auto pr-1 custom-scrollbar"
                 >
                   <button 
                     v-for="sub in cat.children" 
