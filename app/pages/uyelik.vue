@@ -490,14 +490,14 @@ function handleGuestEntry() {
                 <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Ad *' : 'First Name *' }}</label>
                 <div class="relative">
                   <User :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="firstName" type="text" required :placeholder="locale === 'tr' ? 'Adınız' : 'First Name'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                  <input v-model="firstName" type="text" required aria-label="Adınız" :placeholder="locale === 'tr' ? 'Adınız' : 'First Name'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
                 </div>
               </div>
               <div>
                 <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Soyad *' : 'Last Name *' }}</label>
                 <div class="relative">
                   <User :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="lastName" type="text" required :placeholder="locale === 'tr' ? 'Soyadınız' : 'Last Name'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                  <input v-model="lastName" type="text" required aria-label="Soyadınız" :placeholder="locale === 'tr' ? 'Soyadınız' : 'Last Name'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
                 </div>
               </div>
             </div>
@@ -508,7 +508,7 @@ function handleGuestEntry() {
                 <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Firma / Şirket Adı *' : 'Company Name *' }}</label>
                 <div class="relative">
                   <Building2 :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="companyName" type="text" :required="userRole === 'company'" :placeholder="locale === 'tr' ? 'Örn: Yılmaz Ambalaj Sanayi A.Ş.' : 'e.g. Acme Logistics Inc.'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                  <input v-model="companyName" type="text" :required="userRole === 'company'" aria-label="Firma Şirket Adı" :placeholder="locale === 'tr' ? 'Örn: Yılmaz Ambalaj Sanayi A.Ş.' : 'e.g. Acme Logistics Inc.'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
                 </div>
               </div>
             </transition>
@@ -519,7 +519,7 @@ function handleGuestEntry() {
               </label>
               <div class="relative">
                 <Mail :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="email" type="email" required :placeholder="userRole === 'company' ? 'name@company.com' : 'name@email.com'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                <input v-model="email" type="email" required aria-label="E-Posta Adresi" :placeholder="userRole === 'company' ? 'name@company.com' : 'name@email.com'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
               </div>
             </div>
 
@@ -527,7 +527,7 @@ function handleGuestEntry() {
               <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Telefon *' : 'Phone *' }}</label>
               <div class="relative">
                 <Phone :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="phone" type="tel" required placeholder="+90 (555) 555 55 55" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                <input v-model="phone" type="tel" required aria-label="Telefon Numarası" placeholder="+90 (555) 555 55 55" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
               </div>
             </div>
 
@@ -535,7 +535,7 @@ function handleGuestEntry() {
               <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Şifre *' : 'Password *' }}</label>
               <div class="relative">
                 <LockKeyhole :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="password" type="password" required :placeholder="locale === 'tr' ? 'Minimum 6 karakter' : 'Minimum 6 characters'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                <input v-model="password" type="password" required aria-label="Şifreniz" :placeholder="locale === 'tr' ? 'Minimum 6 karakter' : 'Minimum 6 characters'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
               </div>
             </div>
 

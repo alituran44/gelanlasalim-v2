@@ -2407,8 +2407,9 @@ function toggleFilterSection(section: string) {
                 v-model="quickBidPrice" 
                 type="text" 
                 required 
+                aria-label="Teklif tutarınız"
                 placeholder="Örn: 45.000" 
-                class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black font-mono text-slate-900 outline-none focus:border-amber-500 focus:bg-white transition-all shadow-xs" 
+                class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black font-mono text-slate-900 outline-none focus:border-amber-500 focus:bg-white transition-all shadow-xs min-h-[44px]" 
               />
             </div>
           </div>
@@ -2420,8 +2421,9 @@ function toggleFilterSection(section: string) {
                 v-model="quickBidDeliveryDays" 
                 type="number" 
                 required 
+                aria-label="Teslimat süresi gün sayısı"
                 placeholder="7" 
-                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white transition-all" 
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white transition-all min-h-[44px]" 
               />
             </div>
             <div>
