@@ -12,13 +12,16 @@ import {
   Building2,
   ChevronRight,
   Sparkles,
-  Bell
+  Bell,
+  Eye,
+  EyeOff,
+  CheckCircle2
 } from 'lucide-vue-next'
 import { locale, detectLocale, t } from '~/composables/useLocale'
 
 const route = useRoute()
 const router = useRouter()
-const activeTab = ref<'login' | 'register' | 'guest'>('register')
+const activeTab = ref<'login' | 'register' | 'guest' | 'forgot'>('register')
 const showCookieConsent = ref(true)
 const registerStep = ref<1 | 2>(1)
 
@@ -26,6 +29,8 @@ onMounted(() => {
   detectLocale()
   if (route.query.tab === 'guest') {
     activeTab.value = 'guest'
+  } else if (route.query.tab === 'login') {
+    activeTab.value = 'login'
   }
 })
 
@@ -41,12 +46,19 @@ const lastName = ref('')
 const email = ref('')
 const phone = ref('')
 const password = ref('')
+const confirmPassword = ref('')
+const showPassword = ref(false)
+const showLoginPassword = ref(false)
 const userRole = ref<'company' | 'individual'>('company')
 const companyName = ref('')
 const agreeKvkk = ref(false)
 
 const loginEmail = ref('')
 const loginPassword = ref('')
+const rememberMe = ref(true)
+
+const forgotEmail = ref('')
+const forgotSubmitted = ref(false)
 
 const isSubmitting = ref(false)
 const errorMessage = ref('')
@@ -136,8 +148,40 @@ function handleRegister() {
 }
 
 function handleOAuth(provider: 'google' | 'facebook') {
-  // UI placeholder — backend OAuth entegrasyonu ayrı sprint'te yapılacak
-  alert(`${provider === 'google' ? 'Google' : 'Facebook'} OAuth entegrasyonu yakında aktif olacak!`)
+  alert(`${provider === 'google' ? 'Google' : 'Facebook'} kimlik doğrulama simülasyonu başlatıldı.`)
+}
+
+function handleEDevletAuth() {
+  isSubmitting.value = true
+  errorMessage.value = ''
+  setTimeout(() => {
+    isSubmitting.value = false
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userSession', JSON.stringify({
+        email: 'edevlet_onayli@gelanlasalim.com',
+        firstName: 'Ali',
+        name: 'Ali Turan (e-Devlet & MERSİS Onaylı)',
+        company: 'Turan Lojistik San. A.Ş.',
+        role: 'company',
+        isEDevletVerified: true,
+        isPremium: true
+      }))
+    }
+    router.push('/panel')
+  }, 900)
+}
+
+function handleForgotPassword() {
+  if (!forgotEmail.value) {
+    errorMessage.value = 'Lütfen e-posta adresinizi girin.'
+    return
+  }
+  isSubmitting.value = true
+  errorMessage.value = ''
+  setTimeout(() => {
+    isSubmitting.value = false
+    forgotSubmitted.value = true
+  }, 800)
 }
 
 function handleLogin() {
@@ -306,13 +350,13 @@ function handleGuestEntry() {
             <!-- e-Devlet Kapısı SSO Giriş (Resmi Kurumsal Giriş) -->
             <button
               type="button"
-              @click="handleOAuth('google')"
-              class="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-red-700 bg-red-600 hover:bg-red-700 text-white py-3 text-xs font-black transition shadow-md shadow-red-900/10"
+              @click="handleEDevletAuth"
+              class="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-red-700 bg-red-600 hover:bg-red-700 text-white py-3 text-xs font-black transition shadow-md shadow-red-900/10 cursor-pointer"
             >
               <div class="h-5 w-5 rounded-full bg-white text-red-600 flex items-center justify-center text-[10px] font-black">
                 TR
               </div>
-              <span>{{ locale === 'tr' ? 'e-Devlet Kapısı ile Giriş / Kayıt Yap' : 'Login / Register with e-Devlet Gateway' }}</span>
+              <span>{{ locale === 'tr' ? '🇹🇷 e-Devlet Kapısı ile Hızlı Kaydol / Giriş Yap' : '🇹🇷 Login / Register with e-Devlet Gateway' }}</span>
             </button>
 
             <button
@@ -512,19 +556,24 @@ function handleGuestEntry() {
 
         <!-- LOGIN FORM -->
         <div v-else-if="activeTab === 'login'">
-          <!-- OAuth Butonları -->
+          <!-- e-Devlet & OAuth Butonları -->
           <div class="space-y-2 mb-5">
+            <button
+              type="button"
+              @click="handleEDevletAuth"
+              class="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-red-700 bg-red-600 hover:bg-red-700 text-white py-3 text-xs font-black transition shadow-md shadow-red-900/10 cursor-pointer"
+            >
+              <div class="h-5 w-5 rounded-full bg-white text-red-600 flex items-center justify-center text-[10px] font-black">
+                TR
+              </div>
+              <span>{{ locale === 'tr' ? '🇹🇷 e-Devlet Kapısı ile Doğrulanmış Giriş' : '🇹🇷 Sign in with e-Devlet Gateway' }}</span>
+            </button>
+
             <button type="button" @click="handleOAuth('google')"
               class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50"
               style="border-color: #E2E8F0; color: #374151;">
               <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
               {{ locale === 'tr' ? 'Google ile Giriş Yap' : 'Sign in with Google' }}
-            </button>
-            <button type="button" @click="handleOAuth('facebook')"
-              class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50"
-              style="border-color: #E2E8F0; color: #374151;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="#1877F2"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-              {{ locale === 'tr' ? 'Facebook ile Giriş Yap' : 'Sign in with Facebook' }}
             </button>
           </div>
           <div class="relative flex items-center mb-5">
@@ -535,7 +584,7 @@ function handleGuestEntry() {
 
           <form @submit.prevent="handleLogin" class="space-y-4">
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Kurumsal E-Posta' : 'Corporate Email' }}</label>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'E-Posta Adresi' : 'Email Address' }}</label>
               <div class="relative">
                 <Mail :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input v-model="loginEmail" type="email" required :placeholder="locale === 'tr' ? 'isim@sirketiniz.com' : 'name@company.com'" class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
@@ -545,18 +594,24 @@ function handleGuestEntry() {
               <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Şifre' : 'Password' }}</label>
               <div class="relative">
                 <LockKeyhole :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="loginPassword" type="password" required :placeholder="locale === 'tr' ? 'Şifreniz' : 'Your Password'" class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                <input v-model="loginPassword" :type="showLoginPassword ? 'text' : 'password'" required :placeholder="locale === 'tr' ? 'Şifreniz' : 'Your Password'" class="w-full pl-9 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                <button type="button" @click="showLoginPassword = !showLoginPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
+                  <EyeOff v-if="showLoginPassword" :size="14" />
+                  <Eye v-else :size="14" />
+                </button>
               </div>
             </div>
             <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider">
-              <label class="flex items-center gap-2 text-slate-500">
-                <input type="checkbox" class="h-3.5 w-3.5 rounded border-slate-300" />
+              <label class="flex items-center gap-2 text-slate-500 cursor-pointer">
+                <input v-model="rememberMe" type="checkbox" class="h-3.5 w-3.5 rounded border-slate-300" />
                 {{ locale === 'tr' ? 'Beni Hatırla' : 'Remember Me' }}
               </label>
-              <a href="#" class="text-blue-600 hover:underline">{{ locale === 'tr' ? 'Şifremi Unuttum' : 'Forgot Password' }}</a>
+              <button type="button" @click="activeTab = 'forgot'; forgotSubmitted = false; errorMessage = ''" class="text-blue-600 hover:underline cursor-pointer">
+                {{ locale === 'tr' ? 'Şifremi Unuttum?' : 'Forgot Password?' }}
+              </button>
             </div>
             <div v-if="errorMessage" class="rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-bold text-red-700">⚠️ {{ errorMessage }}</div>
-            <button type="submit" :disabled="isSubmitting" class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white transition-all disabled:opacity-50" style="background: #003057;">
+            <button type="submit" :disabled="isSubmitting" class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white transition-all disabled:opacity-50 cursor-pointer" style="background: #003057;">
               <span>{{ isSubmitting ? (locale === 'tr' ? 'Giriş Yapılıyor...' : 'Logging in...') : (locale === 'tr' ? 'Giriş Yap' : 'Login') }}</span>
               <ChevronRight v-if="!isSubmitting" :size="14" />
             </button>
@@ -569,7 +624,7 @@ function handleGuestEntry() {
               <button 
                 type="button" 
                 @click="handleDemoLogin('company')"
-                class="flex flex-col items-center justify-center p-3 rounded-xl border border-dashed border-blue-200 bg-blue-50/10 hover:bg-blue-50 text-center transition"
+                class="flex flex-col items-center justify-center p-3 rounded-xl border border-dashed border-blue-200 bg-blue-50/10 hover:bg-blue-50 text-center transition cursor-pointer"
               >
                 <span class="text-xs font-bold text-blue-700">{{ locale === 'tr' ? '🏢 Firma Demosu' : '🏢 Company Demo' }}</span>
                 <span class="text-[8px] text-slate-500 mt-0.5">{{ locale === 'tr' ? 'İhale Aç & Yönet' : 'Post & Manage Tenders' }}</span>
@@ -577,13 +632,60 @@ function handleGuestEntry() {
               <button 
                 type="button" 
                 @click="handleDemoLogin('individual')"
-                class="flex flex-col items-center justify-center p-3 rounded-xl border border-dashed border-emerald-200 bg-emerald-50/10 hover:bg-emerald-50 text-center transition"
+                class="flex flex-col items-center justify-center p-3 rounded-xl border border-dashed border-emerald-200 bg-emerald-50/10 hover:bg-emerald-50 text-center transition cursor-pointer"
               >
                 <span class="text-xs font-bold text-emerald-700">{{ locale === 'tr' ? '👤 Kullanıcı Demosu' : '👤 Individual Demo' }}</span>
                 <span class="text-[8px] text-slate-500 mt-0.5">{{ locale === 'tr' ? 'Bireysel İlan & Teklif' : 'Individual Listing & Bids' }}</span>
               </button>
             </div>
           </div>
+        </div>
+
+        <!-- ŞİFREMİ UNUTTUM EKRANI (FORGOT PASSWORD FLOW) -->
+        <div v-else-if="activeTab === 'forgot'" class="space-y-4">
+          <div class="text-left space-y-1 mb-2">
+            <h3 class="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
+              <LockKeyhole :size="16" class="text-blue-600" />
+              <span>{{ locale === 'tr' ? 'Şifre Sıfırlama Talebi' : 'Password Reset Request' }}</span>
+            </h3>
+            <p class="text-xs text-slate-500 font-medium leading-relaxed">
+              {{ locale === 'tr' ? 'Kayıtlı e-posta adresinizi girin, sıfırlama talimatlarını anında e-postanıza iletelim.' : 'Enter your email address and we will send password reset instructions.' }}
+            </p>
+          </div>
+
+          <div v-if="forgotSubmitted" class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-3">
+            <div class="flex items-center gap-2 font-black">
+              <CheckCircle2 :size="18" class="text-emerald-600 shrink-0" />
+              <span>{{ locale === 'tr' ? 'Sıfırlama Bağlantısı Gönderildi!' : 'Reset Link Sent!' }}</span>
+            </div>
+            <p class="text-[11px] leading-relaxed font-medium text-emerald-800">
+              <strong>{{ forgotEmail }}</strong> adresine şifre yenileme e-postası gönderildi. Lütfen e-posta kutunuzu ve spam klasörünüzü kontrol ediniz.
+            </p>
+            <button @click="activeTab = 'login'" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs transition shadow-sm cursor-pointer">
+              {{ locale === 'tr' ? 'Giriş Ekranına Dön' : 'Return to Login' }}
+            </button>
+          </div>
+
+          <form v-else @submit.prevent="handleForgotPassword" class="space-y-4">
+            <div>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Kayıtlı E-Posta Adresiniz *' : 'Registered Email Address *' }}</label>
+              <div class="relative">
+                <Mail :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input v-model="forgotEmail" type="email" required :placeholder="locale === 'tr' ? 'isim@sirketiniz.com' : 'name@company.com'" class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+              </div>
+            </div>
+
+            <div v-if="errorMessage" class="rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-bold text-red-700">⚠️ {{ errorMessage }}</div>
+
+            <div class="flex gap-2">
+              <button type="button" @click="activeTab = 'login'" class="w-1/3 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition cursor-pointer">
+                {{ locale === 'tr' ? 'İptal' : 'Cancel' }}
+              </button>
+              <button type="submit" :disabled="isSubmitting" class="w-2/3 py-3 rounded-xl bg-blue-900 hover:bg-blue-950 text-white font-black text-xs transition shadow-md disabled:opacity-50 cursor-pointer">
+                {{ isSubmitting ? (locale === 'tr' ? 'Gönderiliyor...' : 'Sending...') : (locale === 'tr' ? 'Bağlantı Gönder' : 'Send Reset Link') }}
+              </button>
+            </div>
+          </form>
         </div>
 
         <!-- MİSAFİR GİRİŞİ FORMU (GUEST ACCESS & LEAD CAPTURE) -->
