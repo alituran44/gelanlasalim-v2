@@ -497,232 +497,232 @@ const cities = [
 
 const detailedCategories = [
   {
-    name: 'İnşaat ve Yapı',
+    name: 'Construction & Building',
     count: 248,
     children: [
-      'Anahtar Teslim İnşaat', 'Konut İnşaatı', 'Ticari Bina İnşaatı', 'Fabrika İnşaatı', 'Yol Yapımı',
-      'Köprü Yapımı', 'Altyapı Çalışmaları', 'Kanalizasyon', 'İçme Suyu Hatları', 'Doğalgaz Hatları',
-      'Elektrik Altyapısı', 'Çatı İşleri', 'Cephe Kaplama', 'Mantolama', 'Boya Badana',
-      'Seramik Döşeme', 'Mermer İşleri', 'Demir-Çelik İşleri', 'Kalıp ve İskele', 'Beton İşleri',
-      'Asfalt', 'Parke', 'Peyzaj', 'Yıkım İşleri', 'Restorasyon'
+      'Turnkey Construction', 'Residential Construction', 'Commercial Building', 'Factory Construction', 'Road Construction',
+      'Bridge Construction', 'Infrastructure Works', 'Sewage & Drainage', 'Water Mains', 'Gas Pipelines',
+      'Electrical Infrastructure', 'Roofing Works', 'Facade Cladding', 'Thermal Insulation', 'Painting & Decorating',
+      'Ceramic Tiling', 'Marble Works', 'Iron & Steel Structure', 'Formwork & Scaffolding', 'Concrete Works',
+      'Asphalt Paving', 'Parquet Flooring', 'Landscape Architecture', 'Demolition Services', 'Building Restoration'
     ]
   },
   {
-    name: 'Gayrimenkul',
+    name: 'Real Estate',
     count: 122,
     children: [
-      'Arsa', 'Tarla', 'Bağ', 'Bahçe', 'Konut', 'Villa', 'Daire', 'Ofis', 'Dükkan', 'Plaza',
-      'Fabrika', 'Depo', 'AVM', 'Otel', 'Turistik Tesis', 'Kiralık Gayrimenkul', 'Satılık Gayrimenkul'
+      'Land & Plots', 'Agricultural Fields', 'Vineyards & Orchards', 'Residential Property', 'Luxury Villas', 'Apartments', 'Office Spaces', 'Commercial Shops', 'Business Plazas',
+      'Industrial Facilities', 'Warehouses & Logistics', 'Shopping Malls', 'Hotels & Resorts', 'Rental Properties', 'Properties for Sale'
     ]
   },
   {
-    name: 'Araç ve İş Makineleri',
+    name: 'Vehicles & Heavy Equipment',
     count: 271,
     children: [
-      'Otomobil', 'Ticari Araç', 'Kamyon', 'Tır', 'Otobüs', 'Minibüs', 'Traktör', 'İş Makinesi',
-      'Ekskavatör', 'Loder', 'Greyder', 'Silindir', 'Forklift', 'Vinç', 'Jeneratör', 'Römork',
-      'Araç Kiralama', 'İş Makinesi Kiralama'
+      'Passenger Cars', 'Commercial Vehicles', 'Trucks & Lorries', 'Heavy Haulage', 'Buses & Coaches', 'Minibuses', 'Agricultural Tractors', 'Heavy Machinery',
+      'Excavators', 'Wheel Loaders', 'Motor Graders', 'Road Rollers', 'Forklifts & Material Handling', 'Mobile Cranes', 'Industrial Generators', 'Heavy Trailers',
+      'Vehicle Fleet Leasing', 'Equipment Rental'
     ]
   },
   {
-    name: 'Sanayi ve Makine',
+    name: 'Industry & Machinery',
     count: 323,
     children: [
-      'Üretim Makineleri', 'CNC', 'Torna', 'Freze', 'Pres', 'Kompresör', 'Konveyör', 'Paketleme Makinesi',
-      'Gıda Makinesi', 'Plastik Makinesi', 'Tekstil Makinesi', 'Ahşap İşleme', 'Kaynak Makinesi',
-      'Robotik Sistemler', 'Endüstriyel Otomasyon'
+      'Manufacturing Machinery', 'CNC Machining Centers', 'Lathe Machines', 'Milling Machines', 'Industrial Presses', 'Air Compressors', 'Conveyor Systems', 'Packaging Machinery',
+      'Food Processing Equipment', 'Plastic Processing', 'Textile Machinery', 'Woodworking Machinery', 'Industrial Welding',
+      'Robotic Systems', 'Industrial Automation'
     ]
   },
   {
-    name: 'Bilgisayar ve Teknoloji',
+    name: 'Computers & Technology',
     count: 352,
     children: [
-      'Masaüstü Bilgisayar', 'Laptop', 'Sunucu', 'Veri Depolama', 'Ağ Sistemleri', 'Firewall',
-      'Yazıcı', 'Tarayıcı', 'Yazılım Lisansları', 'ERP', 'CRM', 'Web Yazılımı', 'Mobil Uygulama',
-      'Bulut Hizmetleri', 'Siber Güvenlik', 'Yapay Zeka', 'SEO', 'GEO', 'Veri Analizi'
+      'Desktop Workstations', 'Laptops & Notebooks', 'Enterprise Servers', 'Data Storage & SAN', 'Network Infrastructure', 'Enterprise Firewalls',
+      'Industrial Printers', 'Document Scanners', 'Software Licenses', 'ERP Systems', 'CRM Software', 'Web Development', 'Mobile Apps',
+      'Cloud Services', 'Cybersecurity', 'Artificial Intelligence', 'SEO Services', 'GEO Analytics', 'Big Data Analysis'
     ]
   },
   {
-    name: 'Elektronik',
+    name: 'Electronics & Security',
     count: 122,
     children: [
-      'Telefon', 'Tablet', 'Kamera', 'Güvenlik Kamerası', 'Alarm Sistemleri', 'Televizyon',
-      'Ses Sistemleri', 'Projektör', 'UPS', 'Elektronik Kartlar', 'Akıllı Ev Sistemleri'
+      'Smartphones', 'Tablet Computers', 'Professional Cameras', 'CCTV Cameras', 'Intrusion Alarm Systems', 'Television & Displays',
+      'Audio Systems', 'HD Projectors', 'Uninterruptible Power Supply (UPS)', 'Printed Circuit Boards (PCB)', 'Smart Home Systems'
     ]
   },
   {
-    name: 'Mobilya ve Ofis',
+    name: 'Furniture & Office',
     count: 208,
     children: [
-      'Büro Mobilyası', 'Okul Mobilyası', 'Hastane Mobilyası', 'Otel Mobilyası', 'Raf Sistemleri',
-      'Dosyalama Sistemleri', 'Toplantı Masaları', 'Ofis Sandalyeleri', 'Bekleme Koltukları'
+      'Office Furniture', 'Educational Furniture', 'Hospital Furniture', 'Hotel & Hospitality Furniture', 'Storage Racking Systems',
+      'Archival Filing Systems', 'Executive Meeting Tables', 'Ergonomic Office Chairs', 'Lounge Seating'
     ]
   },
   {
-    name: 'Sağlık ve Medikal',
+    name: 'Health & Medical',
     count: 251,
     children: [
-      'Tıbbi Cihazlar', 'Laboratuvar Cihazları', 'Sarf Malzemeleri', 'Hastane Mobilyaları',
-      'Ambulans', 'Medikal Gaz Sistemleri', 'Röntgen', 'MR', 'Ultrason', 'Dental Ürünler'
+      'Medical Devices', 'Laboratory Equipment', 'Medical Consumables', 'Hospital Beds & Furniture',
+      'Ambulances', 'Medical Gas Systems', 'X-Ray Machines', 'MRI Scanners', 'Ultrasound Equipment', 'Dental Products'
     ]
   },
   {
-    name: 'Eğitim',
+    name: 'Education & Training',
     count: 76,
     children: [
-      'Akıllı Tahta', 'Bilgisayar Laboratuvarı', 'Eğitim Yazılımları', 'Online Eğitim',
-      'Eğitim Danışmanlığı', 'Kurs Hizmetleri', 'Kitap', 'Kırtasiye', 'Laboratuvar Malzemeleri'
+      'Interactive Smart Boards', 'Computer Laboratories', 'Educational Software', 'E-Learning Platforms',
+      'Academic Consulting', 'Training Services', 'Books & Manuals', 'Stationery Supplies', 'Lab Materials'
     ]
   },
   {
-    name: 'Gıda ve Catering',
+    name: 'Food & Catering',
     count: 337,
     children: [
-      'Hazır Yemek', 'Catering', 'Personel Yemeği', 'Kumanya', 'Et Ürünleri', 'Süt Ürünleri',
-      'Sebze Meyve', 'Unlu Mamuller', 'İçecek', 'Kuru Gıda'
+      'Ready-to-Eat Meals', 'Industrial Catering', 'Staff Meal Services', 'Field Rations', 'Meat Products', 'Dairy Products',
+      'Fruits & Vegetables', 'Bakery Goods', 'Beverages', 'Dry Commodities'
     ]
   },
   {
-    name: 'Tekstil ve Giyim',
+    name: 'Textiles & Apparel',
     count: 273,
     children: [
-      'İş Elbiseleri', 'Okul Kıyafetleri', 'Güvenlik Kıyafetleri', 'Promosyon Tekstil',
-      'Ayakkabı', 'Bot', 'Eldiven', 'Kişisel Koruyucu Donanım'
+      'Workwear & Uniforms', 'School Uniforms', 'Security Apparel', 'Promotional Textiles',
+      'Safety Footwear', 'Industrial Boots', 'Work Gloves', 'Personal Protective Equipment (PPE)'
     ]
   },
   {
-    name: 'Tarım ve Hayvancılık',
+    name: 'Agriculture & Livestock',
     count: 84,
     children: [
-      'Gübre', 'Tohum', 'Sulama Sistemleri', 'Tarım Makinaları', 'Traktör', 'Sera', 'Hayvan Yemi',
-      'Veteriner Ürünleri', 'Büyükbaş', 'Küçükbaş', 'Kanatlı Hayvan'
+      'Fertilizers & Chemicals', 'Seeds & Seedlings', 'Irrigation Systems', 'Farm Machinery', 'Agricultural Tractors', 'Greenhouses', 'Animal Feed',
+      'Veterinary Supplies', 'Cattle & Livestock', 'Small Ruminants', 'Poultry'
     ]
   },
   {
-    name: 'Enerji',
+    name: 'Energy & Power',
     count: 117,
     children: [
-      'Güneş Enerjisi', 'Rüzgar Enerjisi', 'Jeneratör', 'Elektrik Malzemeleri', 'Trafo',
-      'LED Aydınlatma', 'Enerji Verimliliği', 'Şarj İstasyonları'
+      'Solar PV Systems', 'Wind Energy', 'Diesel Generators', 'Electrical Equipment', 'Power Transformers',
+      'Industrial LED Lighting', 'Energy Efficiency', 'EV Charging Stations'
     ]
   },
   {
-    name: 'Çevre ve Geri Dönüşüm',
+    name: 'Environment & Recycling',
     count: 247,
     children: [
-      'Atık Yönetimi', 'Geri Dönüşüm', 'Hurda', 'Çevre Danışmanlığı', 'Arıtma Tesisi',
-      'Tehlikeli Atık', 'Sıfır Atık', 'Temizlik Araçları'
+      'Waste Management', 'Recycling Services', 'Scrap Metals', 'Environmental Consulting', 'Water Treatment Plants',
+      'Hazardous Waste Management', 'Zero Waste Systems', 'Industrial Sweepers'
     ]
   },
   {
-    name: 'Lojistik ve Taşımacılık',
+    name: 'Logistics & Transportation',
     count: 169,
     children: [
-      'Karayolu Taşımacılığı', 'Denizyolu', 'Havayolu', 'Demiryolu', 'Depolama', 'Soğuk Zincir',
-      'Kargo', 'Kurye', 'Nakliye'
+      'Road Freight', 'Ocean Freight', 'Air Freight', 'Rail Freight', 'Warehousing', 'Cold Chain Logistics',
+      'Express Cargo', 'Courier Services', 'Local Transportation'
     ]
   },
   {
-    name: 'Güvenlik Sistemleri',
+    name: 'Security Systems',
     count: 94,
     children: [
-      'Kamera Sistemleri', 'Alarm Sistemleri', 'Yangın Alarmı', 'Kartlı Geçiş', 'Turnike',
-      'X-Ray', 'Bariyer', 'Bekçi Tur Sistemi'
+      'CCTV Systems', 'Burglar Alarms', 'Fire Alarm Systems', 'Access Control Cards', 'Turnstile Gates',
+      'X-Ray Scanners', 'Automated Barriers', 'Guard Tour Patrol Systems'
     ]
   },
   {
-    name: 'Temizlik Hizmetleri',
+    name: 'Cleaning Services',
     count: 247,
     children: [
-      'Bina Temizliği', 'Hastane Temizliği', 'Okul Temizliği', 'Fabrika Temizliği', 'Cam Temizliği',
-      'Halı Yıkama', 'İlaçlama', 'Çöp Toplama'
+      'Facility Cleaning', 'Hospital Sanitation', 'School Cleaning', 'Factory Cleaning', 'Window Washing',
+      'Carpet Cleaning', 'Pest Control', 'Waste Collection'
     ]
   },
   {
-    name: 'Turizm ve Konaklama',
+    name: 'Tourism & Hospitality',
     count: 68,
     children: [
-      'Otel Hizmeti', 'Konaklama', 'Uçak Bileti', 'Araç Kiralama', 'Organizasyon', 'Rehberlik',
-      'Tur Paketleri'
+      'Hotel Reservations', 'Accommodation Services', 'Flight Tickets', 'Car Rental', 'Event Management', 'Tour Guiding',
+      'Travel Packages'
     ]
   },
   {
-    name: 'Reklam ve Medya',
+    name: 'Advertising & Media',
     count: 142,
     children: [
-      'Dijital Pazarlama', 'SEO', 'GEO', 'Google Ads', 'Sosyal Medya Yönetimi', 'Grafik Tasarım',
-      'Logo Tasarımı', 'Baskı Hizmetleri', 'Video Prodüksiyon', 'Fotoğraf Çekimi', 'Tanıtım Filmi'
+      'Digital Marketing', 'SEO Services', 'GEO Analytics', 'Google Ads Management', 'Social Media Management', 'Graphic Design',
+      'Brand Identity Design', 'Commercial Printing', 'Video Production', 'Professional Photography', 'Corporate Video'
     ]
   },
   {
-    name: 'Ambalaj ve Baskı',
+    name: 'Packaging & Printing',
     count: 337,
     children: [
-      'Karton Kutu', 'Etiket', 'Poşet', 'Koli', 'Promosyon Ürünleri', 'Matbaa', 'Dijital Baskı',
-      'Ofset Baskı'
+      'Corrugated Cardboard Boxes', 'Labels & Stickers', 'Poly Bags', 'Shipping Cartons', 'Promotional Items', 'Commercial Printing', 'Digital Printing',
+      'Offset Printing'
     ]
   },
   {
-    name: 'Telekomünikasyon',
+    name: 'Telecommunications',
     count: 122,
     children: [
-      'Fiber Altyapı', 'IP Telefon', 'Santral', 'İnternet Hizmeti', 'GSM Hizmetleri', 'Baz İstasyonu'
+      'Fiber Optic Infrastructure', 'IP Telephony', 'PBX Exchange', 'Enterprise Internet', 'Mobile Carrier Services', 'Cellular Base Stations'
     ]
   },
   {
-    name: 'Danışmanlık',
+    name: 'Consulting Services',
     count: 163,
     children: [
-      'Hukuk Danışmanlığı', 'Mali Müşavirlik', 'İnsan Kaynakları', 'Kalite Yönetimi',
-      'ISO Belgelendirme', 'Proje Danışmanlığı', 'Eğitim Danışmanlığı'
+      'Legal Consulting', 'Financial & Accounting', 'Human Resources', 'Quality Management',
+      'ISO Certification', 'Project Management', 'Educational Advisory'
     ]
   },
   {
-    name: 'Sigorta',
+    name: 'Insurance Services',
     count: 56,
     children: [
-      'Araç Sigortası', 'Sağlık Sigortası', 'İş Yeri Sigortası', 'Nakliyat Sigortası',
-      'İnşaat Sigortası', 'Hayat Sigortası'
+      'Fleet Vehicle Insurance', 'Health Insurance', 'Commercial Property Insurance', 'Cargo & Freight Insurance',
+      'Construction Risk Insurance', 'Life Insurance'
     ]
   },
   {
-    name: 'Finans',
+    name: 'Financial Services',
     count: 115,
     children: [
-      'Finansal Danışmanlık', 'Leasing', 'Faktoring', 'Kredi Hizmetleri', 'POS Hizmetleri',
-      'Ödeme Sistemleri'
+      'Financial Advisory', 'Equipment Leasing', 'Invoice Factoring', 'Credit Services', 'POS Merchant Services',
+      'Payment Gateways'
     ]
   },
   {
-    name: 'Hukuk Hizmetleri',
+    name: 'Legal Services',
     count: 76,
     children: [
-      'Avukatlık', 'Arabuluculuk', 'İcra Takibi', 'Sözleşme Hazırlama', 'Marka Tescili',
-      'Patent İşlemleri'
+      'Legal Representation', 'Commercial Mediation', 'Debt Collection', 'Contract Drafting', 'Trademark Registration',
+      'Patent Prosecution'
     ]
   },
   {
-    name: 'Bakım ve Onarım',
+    name: 'Maintenance & Repair',
     count: 118,
     children: [
-      'Elektrik Bakımı', 'Mekanik Bakım', 'Asansör Bakımı', 'Klima Bakımı', 'Makine Bakımı',
-      'Bilgisayar Bakımı', 'Sunucu Bakımı'
+      'Electrical Maintenance', 'Mechanical Repair', 'Elevator Servicing', 'HVAC Maintenance', 'Industrial Machinery Service',
+      'Computer Support', 'Server Maintenance'
     ]
   },
   {
-    name: 'Organizasyon ve Etkinlik',
+    name: 'Events & Conferences',
     count: 76,
     children: [
-      'Fuar Organizasyonu', 'Kongre', 'Seminer', 'Konser', 'Festival', 'Catering',
-      'Sahne Sistemleri', 'Ses ve Işık Sistemleri'
+      'Trade Show Management', 'Corporate Conferences', 'Seminars', 'Concert Production', 'Festivals', 'Event Catering',
+      'Stage Systems', 'Audio & Lighting'
     ]
   },
   {
-    name: 'Diğer',
+    name: 'Other Procurement',
     count: 109,
     children: [
-      'Muhtelif Alımlar', 'Karma İhaleler', 'Özel Projeler', 'Açık Artırmalar', 'Tasfiye Satışları',
-      'Hurda Satışları', 'İkinci El Ürünler'
+      'Miscellaneous Supplies', 'Mixed Tenders', 'Special Projects', 'Public Auctions', 'Liquidation Sales',
+      'Scrap Auctions', 'Pre-Owned Assets'
     ]
   }
 ]
