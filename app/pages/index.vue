@@ -1594,8 +1594,6 @@ function toggleFilterSection(section: string) {
                         {{ expandedTenderId === res.id ? (locale === 'tr' ? 'Detayı Kapat' : 'Hide Details') : (locale === 'tr' ? 'İhale Detayları' : 'Tender Details') }}
                       </button>
                     </div>
-                      {{ expandedTenderId === res.id ? (locale === 'tr' ? 'Detayları Gizle' : 'Hide Details') : (locale === 'tr' ? 'Detayları Gör' : 'View Details') }}
-                    </button>
                   </div>
                 </div>
 
@@ -2347,6 +2345,8 @@ function toggleFilterSection(section: string) {
             </button>
           </div>
         </div>
+      </div>
+    </div>
     <!-- ⚡ ULTRA-EASY 1-CLICK QUICK BID MODAL -->
     <div v-if="showQuickBidModal && quickBidTender" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
       <div class="w-full max-w-lg rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden text-left space-y-0">
