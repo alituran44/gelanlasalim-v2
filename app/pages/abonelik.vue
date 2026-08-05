@@ -587,6 +587,16 @@ function completeCheckout() {
 
           <!-- Footer Actions -->
           <div class="p-6 border-t border-slate-100 bg-slate-50">
+            <div v-if="!showSuccessScreen" class="mb-3 flex items-center justify-center gap-2 text-[10px] text-slate-500 font-bold">
+              <input type="checkbox" checked required id="distance-sales-check" class="rounded border-slate-300" />
+              <label for="distance-sales-check">
+                {{ locale === 'tr' ? 'Ödemeyi onaylayarak ' : 'By proceeding you agree to the ' }}
+                <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" target="_blank" class="text-blue-600 underline">
+                  {{ locale === 'tr' ? 'Mesafeli Satış ve Abonelik Sözleşmesini' : 'Distance Sales & Subscription Terms' }}
+                </NuxtLink>
+                {{ locale === 'tr' ? ' kabul etmiş olursunuz.' : '.' }}
+              </label>
+            </div>
             <button 
               v-if="!showSuccessScreen"
               @click="handlePayment"

@@ -544,7 +544,7 @@ function handleGuestEntry() {
               <input v-model="agreeKvkk" id="kvkk-step1" type="checkbox" required class="mt-1 h-3.5 w-3.5 rounded border-slate-300 cursor-pointer" />
               <label for="kvkk-step1" class="text-[10px] leading-relaxed text-slate-500 font-bold uppercase tracking-wider cursor-pointer">
                 {{ locale === 'tr' ? 'Üyelik şartlarını ve ' : 'I accept the membership terms and ' }}
-                <a href="#" class="text-blue-600 hover:underline">{{ locale === 'tr' ? 'KVKK Açık Rıza Metnini' : 'Privacy Consent' }}</a>
+                <NuxtLink to="/sozlesmeler?tab=kvkk" target="_blank" class="text-blue-600 hover:underline">{{ locale === 'tr' ? 'KVKK Açık Rıza Metnini' : 'Privacy & KVKK Policy' }}</NuxtLink>
                 {{ locale === 'tr' ? ' kabul ediyorum.' : '.' }}
               </label>
             </div>
@@ -631,7 +631,7 @@ function handleGuestEntry() {
               <input v-model="agreeKvkk" id="kvkk" type="checkbox" required class="mt-1 h-3.5 w-3.5 rounded border-slate-300" />
               <label for="kvkk" class="text-[10px] leading-relaxed text-slate-500 font-bold uppercase tracking-wider">
                 {{ locale === 'tr' ? 'Üyelik şartlarını ve ' : 'I accept the membership terms and ' }}
-                <a href="#" class="text-blue-600 hover:underline">{{ locale === 'tr' ? 'KVKK Açık Rıza Metnini' : 'Privacy Consent' }}</a>
+                <NuxtLink to="/sozlesmeler?tab=kvkk" target="_blank" class="text-blue-600 hover:underline">{{ locale === 'tr' ? 'KVKK Açık Rıza Metnini' : 'Privacy & KVKK Policy' }}</NuxtLink>
                 {{ locale === 'tr' ? ' kabul ediyorum.' : '.' }}
               </label>
             </div>
