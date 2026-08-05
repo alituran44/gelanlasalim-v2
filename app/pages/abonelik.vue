@@ -1,7 +1,25 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { Check, ArrowRight, ShieldCheck, CreditCard, Building, CheckCircle, X, ShoppingCart, Lock, Sparkles, Building2, HelpCircle } from 'lucide-vue-next'
+import { 
+  Check, 
+  ArrowRight, 
+  ShieldCheck, 
+  CreditCard, 
+  Building, 
+  CheckCircle, 
+  X, 
+  ShoppingCart, 
+  Lock, 
+  Sparkles, 
+  Building2, 
+  HelpCircle, 
+  Globe, 
+  DollarSign, 
+  Euro, 
+  CheckCircle2, 
+  Shield 
+} from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale, t } from '~/composables/useLocale'
 
@@ -11,100 +29,143 @@ definePageMeta({
 
 const router = useRouter()
 
-// Pricing Packages with auto-currency and localizations
-const subscriptionPackages = computed(() => {
-  if (locale.value === 'en') {
-    return [
-      { 
-        id: '1-ay', 
-        name: 'Membership application - 1 month', 
-        price: 29, 
-        monthly: '$29.00 / month',
-        desc: '1 month subscription fee',
-        isPromo: false
-      },
-      { 
-        id: '3-ay', 
-        name: 'Membership application - 3 months', 
-        price: 79, 
-        monthly: '$26.33 / month',
-        desc: '3 months subscription fee',
-        isPromo: true
-      },
-      { 
-        id: '6-ay', 
-        name: 'Membership application - 6 months', 
-        price: 149, 
-        monthly: '$24.83 / month',
-        desc: '6 months subscription fee',
-        isPromo: false
-      },
-      { 
-        id: '9-ay', 
-        name: 'Membership application - 9 months', 
-        price: 199, 
-        monthly: '$22.11 / month',
-        desc: '9 months subscription fee',
-        isPromo: false
-      }
-    ]
-  } else {
-    return [
-      { 
-        id: '1-ay', 
-        name: 'Üyelik başvurusu - 1 ay', 
-        price: 900, 
-        monthly: '₺900,00 / ay',
-        desc: '1 aylık abonelik bedeli',
-        isPromo: false
-      },
-      { 
-        id: '3-ay', 
-        name: 'Üyelik başvurusu - 3 ay', 
-        price: 1800, 
-        monthly: '₺600,00 / ay',
-        desc: '3 aylık abonelik bedeli',
-        isPromo: true
-      },
-      { 
-        id: '6-ay', 
-        name: 'Üyelik başvurusu - 6 ay', 
-        price: 2700, 
-        monthly: '₺450,00 / ay',
-        desc: '6 aylık abonelik bedeli',
-        isPromo: false
-      },
-      { 
-        id: '9-ay', 
-        name: 'Üyelik başvurusu - 9 ay', 
-        price: 3600, 
-        monthly: '₺400,00 / ay',
-        desc: '9 aylık abonelik bedeli',
-        isPromo: false
-      }
-    ]
+// Region Selector: domestic (Türkiye / TRY ₺) vs international (Global / USD $ - EUR €)
+const paymentRegion = ref<'domestic' | 'international'>('domestic')
+const internationalCurrency = ref<'USD' | 'EUR'>('USD')
+
+// Domestic Pricing Packages (TRY ₺)
+const domesticPackages = [
+  { 
+    id: '1-ay-tr', 
+    name: 'Üyelik Başvurusu - 1 Ay', 
+    price: 90, 
+    monthly: '₺90,00 / ay',
+    desc: '1 Aylık Standart B2B İhale ve Eksiltme Paket Bedeli (%20 KDV Dahil)',
+    isPromo: false
+  },
+  { 
+    id: '3-ay-tr', 
+    name: 'Üyelik Başvurusu - 3 Ay', 
+    price: 180, 
+    monthly: '₺60,00 / ay',
+    desc: '3 Aylık Popüler Pakette Net %33 Tasarruf Avantajı',
+    isPromo: true
+  },
+  { 
+    id: '6-ay-tr', 
+    name: 'Üyelik Başvurusu - 6 Ay', 
+    price: 270, 
+    monthly: '₺45,00 / ay',
+    desc: '6 Aylık Kurumsal Pakette Net %50 Tasarruf Avantajı',
+    isPromo: false
+  },
+  { 
+    id: '12-ay-tr', 
+    name: 'Üyelik Başvurusu - 12 Ay (Yıllık)', 
+    price: 360, 
+    monthly: '₺30,00 / ay',
+    desc: '12 Aylık Yıllık Avantaj Paketinde Net %66 Tasarruf',
+    isPromo: false
   }
+]
+
+// International Pricing Packages (USD $ / EUR €)
+const internationalPackagesUSD = [
+  { 
+    id: '1-month-global-usd', 
+    name: 'Global Pass - 1 Month', 
+    price: 29, 
+    monthly: '$29.00 / mo',
+    desc: '1 Month Full Access to Global B2B Auction Arena (VAT Exempt)',
+    isPromo: false
+  },
+  { 
+    id: '3-months-global-usd', 
+    name: 'Global Business - 3 Months', 
+    price: 75, 
+    monthly: '$25.00 / mo',
+    desc: '3 Months Global Access with 15% Quarterly Discount',
+    isPromo: true
+  },
+  { 
+    id: '6-months-global-usd', 
+    name: 'Global Enterprise - 6 Months', 
+    price: 120, 
+    monthly: '$20.00 / mo',
+    desc: '6 Months Global Tier with 30% Bi-Annual Discount',
+    isPromo: false
+  },
+  { 
+    id: '12-months-global-usd', 
+    name: 'Global Annual Pass - 12 Months', 
+    price: 180, 
+    monthly: '$15.00 / mo',
+    desc: '12 Months Annual Pass with Maximum 50% Savings',
+    isPromo: false
+  }
+]
+
+const internationalPackagesEUR = [
+  { 
+    id: '1-month-global-eur', 
+    name: 'Global Pass - 1 Month', 
+    price: 25, 
+    monthly: '€25.00 / mo',
+    desc: '1 Month Full Access to Global B2B Auction Arena (VAT Exempt)',
+    isPromo: false
+  },
+  { 
+    id: '3-months-global-eur', 
+    name: 'Global Business - 3 Months', 
+    price: 65, 
+    monthly: '€21.66 / mo',
+    desc: '3 Months Global Access with 15% Quarterly Discount',
+    isPromo: true
+  },
+  { 
+    id: '6-months-global-eur', 
+    name: 'Global Enterprise - 6 Months', 
+    price: 105, 
+    monthly: '€17.50 / mo',
+    desc: '6 Months Global Tier with 30% Bi-Annual Discount',
+    isPromo: false
+  },
+  { 
+    id: '12-months-global-eur', 
+    name: 'Global Annual Pass - 12 Months', 
+    price: 155, 
+    monthly: '€12.91 / mo',
+    desc: '12 Months Annual Pass with Maximum 50% Savings',
+    isPromo: false
+  }
+]
+
+// Active Packages depending on selected region and currency
+const activePackages = computed(() => {
+  if (paymentRegion.value === 'domestic') {
+    return domesticPackages
+  }
+  return internationalCurrency.value === 'EUR' ? internationalPackagesEUR : internationalPackagesUSD
 })
 
-// Currency symbol selection helper
-const currencySymbol = computed(() => locale.value === 'en' ? '$' : '₺')
+const currencySymbol = computed(() => {
+  if (paymentRegion.value === 'domestic') return '₺'
+  return internationalCurrency.value === 'EUR' ? '€' : '$'
+})
 
-// Features list from EKAP Screenshot, dynamically translated
+// Features list
 const allFeatures = computed(() => [
-  // Column 1
   { text: t('feat_ekap_tenders'), col: 1 },
   { text: t('feat_ekap_results'), col: 1 },
   { text: t('feat_direct_proc'), col: 1 },
   { text: t('feat_sales_leases'), col: 1 },
   { text: t('feat_limit_calc'), col: 1 },
-  // Column 2
   { text: t('feat_search_suggest'), col: 2 },
   { text: t('feat_upcoming_notif'), col: 2 },
   { text: t('feat_won_notif'), col: 2 },
   { text: t('feat_cancel_notif'), col: 2 },
   { text: t('feat_unlimit_notif'), col: 2 },
   { text: t('feat_unlimit_report'), col: 2 },
-  // Column 3
   { text: t('feat_contractor_anal'), col: 3 },
   { text: t('feat_admin_anal'), col: 3 },
   { text: t('feat_sector_anal'), col: 3 },
@@ -112,13 +173,24 @@ const allFeatures = computed(() => [
   { text: t('feat_mobile_compat'), col: 3 }
 ])
 
-// Interactive States
-const { cmsData, saveCmsData } = useCmsData()
+const { cmsData } = useCmsData()
 const userSession = ref<any>({})
 
 const selectedPackage = ref<any>(null)
 const isCheckoutOpen = ref(false)
-const activePaymentMethod = ref<'paytr' | 'iyzigo' | 'bank_transfer'>('paytr')
+const activePaymentChannel = ref<string>('paytr')
+
+// Checkout Form Fields
+const cardName = ref('')
+const cardNumber = ref('')
+const cardExpiry = ref('')
+const cardCvc = ref('')
+const selectedBank = ref('garanti')
+const transferName = ref('')
+
+const isProcessing = ref(false)
+const showSuccessScreen = ref(false)
+const distanceSalesApproved = ref(true)
 
 onMounted(() => {
   if (typeof window !== 'undefined') {
@@ -126,7 +198,6 @@ onMounted(() => {
       const saved = localStorage.getItem('userSession')
       if (saved) {
         userSession.value = JSON.parse(saved)
-        // Auto-fill user's name
         const fullName = (userSession.value.firstName || '') + ' ' + (userSession.value.lastName || '')
         transferName.value = fullName.trim()
         cardName.value = fullName.trim()
@@ -137,97 +208,36 @@ onMounted(() => {
   }
 })
 
-// Payment Form Fields
-const cardName = ref('')
-const cardNumber = ref('')
-const cardExpiry = ref('')
-const cardCvc = ref('')
-const selectedBank = ref('garanti')
-const transferName = ref('')
-
-const isProcessing = ref(false)
-const showSuccessScreen = ref(false)
-
-// Calculated Values (VAT inclusive calculation)
-const totalAmount = computed(() => {
-  if (!selectedPackage.value) return 0
-  return selectedPackage.value.price
-})
-
-const vatAmount = computed(() => {
-  if (!selectedPackage.value) return 0
-  return Math.round(selectedPackage.value.price - (selectedPackage.value.price / 1.2))
-})
-
-const netAmount = computed(() => {
-  if (!selectedPackage.value) return 0
-  return totalAmount.value - vatAmount.value
-})
-
-function openCheckout(pkg: typeof subscriptionPackages.value[0]) {
+function openCheckout(pkg: any) {
   selectedPackage.value = pkg
-  isCheckoutOpen.value = true
+  if (paymentRegion.value === 'domestic') {
+    activePaymentChannel.value = 'paytr'
+  } else {
+    activePaymentChannel.value = 'stripe'
+  }
   showSuccessScreen.value = false
-  isProcessing.value = false
-}
-
-function handleRenewalClick() {
-  // Trigger checkout for renewal with 3-Month package by default
-  openCheckout(subscriptionPackages.value[1])
+  isCheckoutOpen.value = true
 }
 
 function handlePayment() {
-  if (activePaymentMethod.value !== 'bank_transfer') {
-    if (!cardName.value || !cardNumber.value || !cardExpiry.value || !cardCvc.value) {
-      alert('Lütfen tüm kart bilgilerini doldurun.')
-      return
-    }
-  } else {
-    if (!transferName.value) {
-      alert('Lütfen havale yapan kişinin adını girin.')
-      return
-    }
+  if (!distanceSalesApproved.value) {
+    alert(locale.value === 'tr' ? 'Lütfen Mesafeli Satış Sözleşmesini onaylayınız.' : 'Please agree to the Distance Sales Terms.')
+    return
   }
 
   isProcessing.value = true
-
-  // Simulate payment gateway request
   setTimeout(() => {
     isProcessing.value = false
     showSuccessScreen.value = true
-    upgradeSession()
-  }, 2000)
-}
 
-function upgradeSession() {
-  if (typeof window !== 'undefined') {
-    const currentSession = localStorage.getItem('userSession')
-    if (currentSession) {
-      const parsed = JSON.parse(currentSession)
-      parsed.isPremium = true
-      parsed.plan = selectedPackage.value?.name || 'Premium Üyelik'
-      localStorage.setItem('userSession', JSON.stringify(parsed))
+    if (typeof window !== 'undefined') {
+      const current = JSON.parse(localStorage.getItem('userSession') || '{}')
+      current.isPremium = true
+      current.subscriptionPlan = selectedPackage.value?.name
+      current.subscriptionRegion = paymentRegion.value
+      localStorage.setItem('userSession', JSON.stringify(current))
     }
-  }
-
-  // Create payment record and save to CMS
-  const paymentObj = {
-    id: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
-    referenceCode: activePaymentMethod.value === 'bank_transfer' ? 'GA-EKAP' : '-',
-    userName: activePaymentMethod.value === 'bank_transfer' ? transferName.value : cardName.value,
-    companyName: userSession.value.company || 'Bireysel Kullanıcı',
-    packageName: selectedPackage.value?.name || 'Üyelik başvurusu - 1 ay',
-    amount: `${currencySymbol.value}${totalAmount.value.toLocaleString(locale.value === 'tr' ? 'tr-TR' : 'en-US')}`,
-    paymentMethod: activePaymentMethod.value === 'bank_transfer' ? 'Havale/EFT' : (activePaymentMethod.value === 'paytr' ? 'PayTR' : 'iyzigo'),
-    status: 'bekliyor',
-    date: new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })
-  }
-  
-  if (!cmsData.value.payments) {
-    cmsData.value.payments = []
-  }
-  cmsData.value.payments.unshift(paymentObj)
-  saveCmsData(cmsData.value)
+  }, 1200)
 }
 
 function completeCheckout() {
@@ -237,383 +247,358 @@ function completeCheckout() {
 </script>
 
 <template>
-  <div class="min-h-[calc(100vh-76px)] bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 text-left animate-fadeIn">
+  <div class="min-h-[calc(100vh-76px)] bg-slate-50 py-12 px-4 sm:px-6 lg:px-8 text-left animate-fadeIn font-sans">
     <div class="max-w-7xl mx-auto space-y-8">
       
       <!-- H1 / HEADER BLOCK -->
-      <div>
-        <h1 class="text-2xl font-black tracking-tight" style="color: #003057; font-family: 'Outfit', sans-serif;">{{ t('pricing_title') }}</h1>
-        <p class="text-xs text-slate-500 mt-1 max-w-3xl leading-relaxed">
-          {{ t('pricing_desc') }}
-        </p>
-      </div>
-
-      <!-- >> ÜYE KAYIT SECTION HEADER -->
-      <div class="flex items-center gap-2">
-        <span class="inline-flex items-center rounded-md bg-[#003057]/5 border border-[#003057]/10 px-3 py-1.5 text-xs font-black" style="color: #003057; font-family: 'Outfit', sans-serif;">
-          &gt;&gt; {{ locale === 'tr' ? 'Üye kayıt' : 'Member signup' }}
+      <div class="text-center max-w-3xl mx-auto space-y-3">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-black uppercase tracking-wider">
+          ⚡ {{ locale === 'tr' ? 'KURUMSAL ABONELİK VE LİSANS PLANLARI' : 'ENTERPRISE SUBSCRIPTION TIERS' }}
         </span>
-        <div class="flex-1 h-px bg-slate-200"></div>
+        <h1 class="text-3xl font-black tracking-tight text-slate-900">
+          {{ locale === 'tr' ? 'İhtiyacınıza Uygun Esnek Ödeme Planı Seçin' : 'Select Your Tailored B2B Pricing Tier' }}
+        </h1>
+        <p class="text-xs text-slate-500 font-medium leading-relaxed">
+          {{ locale === 'tr' 
+            ? 'Yurt içi (₺ TRY) veya yurt dışı ($ USD / € EUR) ödeme seçeneklerimizden firmanıza en uygun paketi tercih edin. Şeffaf fiyatlandırma, 0 komisyon.' 
+            : 'Choose from our domestic (TRY) or global (USD/EUR) subscription tracks. Zero commission fees for buyer firms.' }}
+        </p>
+
+        <!-- MARKET REGION TOGGLE SWITCH -->
+        <div class="pt-4 flex items-center justify-center">
+          <div class="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-sm inline-flex gap-2">
+            <button 
+              @click="paymentRegion = 'domestic'"
+              class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer"
+              :class="paymentRegion === 'domestic' ? 'bg-blue-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'"
+            >
+              <span class="text-base">🇹🇷</span>
+              <span>{{ locale === 'tr' ? 'Yurt İçi Ödeme (Türkiye / ₺ TRY)' : 'Domestic Plan (Turkey / ₺ TRY)' }}</span>
+            </button>
+
+            <button 
+              @click="paymentRegion = 'international'"
+              class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer"
+              :class="paymentRegion === 'international' ? 'bg-blue-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'"
+            >
+              <Globe :size="15" class="text-emerald-400" />
+              <span>{{ locale === 'tr' ? 'Yurt Dışı Ödeme (Global / $ USD - € EUR)' : 'International Plan (Global / $ - €)' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- International Currency Switcher Sub-Bar -->
+        <div v-if="paymentRegion === 'international'" class="pt-2 flex items-center justify-center gap-3">
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ locale === 'tr' ? 'Para Birimi:' : 'Currency:' }}</span>
+          <div class="inline-flex rounded-xl bg-slate-200/80 p-1 text-xs font-bold">
+            <button 
+              @click="internationalCurrency = 'USD'" 
+              class="px-3 py-1 rounded-lg transition"
+              :class="internationalCurrency === 'USD' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900'"
+            >
+              $ USD
+            </button>
+            <button 
+              @click="internationalCurrency = 'EUR'" 
+              class="px-3 py-1 rounded-lg transition"
+              :class="internationalCurrency === 'EUR' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900'"
+            >
+              € EUR
+            </button>
+          </div>
+          <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+            ✓ {{ locale === 'tr' ? '%0 KDV Muaf İhrakat Faturası' : '0% Export VAT Exempt' }}
+          </span>
+        </div>
       </div>
 
       <!-- FOUR COLUMNS PACKAGE GRID -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
         <div 
-          v-for="pkg in subscriptionPackages" 
+          v-for="pkg in activePackages" 
           :key="pkg.id" 
-          class="border rounded-2xl bg-white overflow-hidden transition-all duration-300 flex flex-col justify-between hover:shadow-lg shadow-sm"
-          :style="pkg.isPromo ? 'border-color: #F59E0B; ring: 2px; ring-color: #F59E0B;' : 'border-color: #E2E8F0;'"
+          class="border rounded-3xl bg-white overflow-hidden transition-all duration-300 flex flex-col justify-between hover:shadow-xl shadow-sm relative group"
+          :class="pkg.isPromo ? 'border-amber-400 ring-2 ring-amber-400/30' : 'border-slate-200'"
         >
-          <!-- Package Title Bar -->
-          <div class="py-3 px-4 text-center font-bold text-xs text-white uppercase tracking-wider transition-colors relative" :style="pkg.isPromo ? 'background-color: #F59E0B;' : 'background-color: #003057;'">
-            {{ pkg.name }}
-            <span v-if="pkg.isPromo" class="absolute -top-2 right-2 rounded-full px-1.5 py-0.5 text-[8px] bg-white font-black text-amber-700">{{ t('pricing_popular') }}</span>
+          <!-- Promo Tag -->
+          <div v-if="pkg.isPromo" class="bg-amber-400 text-slate-950 font-black text-[9px] uppercase tracking-widest text-center py-1.5">
+            ⚡ {{ locale === 'tr' ? 'EN ÇOK TERCİH EDİLEN POPÜLER PLAN' : 'MOST POPULAR ENTERPRISE CHOICE' }}
+          </div>
+          <div v-else class="bg-blue-900 text-white font-bold text-[9px] uppercase tracking-widest text-center py-1.5">
+            {{ locale === 'tr' ? 'KURUMSAL KULLANIM' : 'STANDARD CORPORATE TIER' }}
           </div>
           
-          <!-- Price Content Area -->
-          <div class="p-6 text-center flex-grow flex flex-col justify-center bg-white border-b border-slate-100">
-            <div class="text-3xl font-black tracking-tight font-mono text-slate-800">
-              {{ currencySymbol }}{{ pkg.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
+          <!-- Price & Title Content Area -->
+          <div class="p-6 text-center flex-grow flex flex-col justify-between bg-white">
+            <div>
+              <h3 class="text-sm font-black text-slate-900 uppercase tracking-tight">{{ pkg.name }}</h3>
+              <div class="text-3xl font-black tracking-tight font-mono text-slate-900 mt-4">
+                {{ currencySymbol }}{{ pkg.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
+              </div>
+              <div class="text-[11px] text-blue-700 font-bold mt-1 bg-blue-50 py-1 px-2 rounded-lg inline-block">
+                {{ pkg.monthly }}
+              </div>
             </div>
-            <div class="text-[10px] text-slate-400 font-bold mt-1.5 uppercase tracking-wide">
-              {{ pkg.monthly }}
-            </div>
-            <p class="text-[10px] text-slate-400 mt-2 leading-relaxed px-2">{{ pkg.desc }}</p>
+            
+            <p class="text-[11px] text-slate-500 mt-4 leading-relaxed font-medium bg-slate-50 p-3 rounded-xl border border-slate-100">
+              {{ pkg.desc }}
+            </p>
           </div>
 
           <!-- Action Button Bar -->
-          <div class="p-4 bg-slate-50/50">
+          <div class="p-5 bg-slate-50/80 border-t border-slate-100">
             <button 
               @click="openCheckout(pkg)"
-              class="w-full text-center rounded-xl font-bold text-xs py-3 transition shadow-xs flex items-center justify-center gap-1.5 text-white animate-pulse"
-              :style="pkg.isPromo ? 'background-color: #F59E0B;' : 'background-color: #003057;'"
+              class="w-full text-center rounded-xl font-black text-xs py-3.5 transition-all shadow-md flex items-center justify-center gap-2 text-white cursor-pointer hover:scale-[1.02]"
+              :class="pkg.isPromo ? 'bg-amber-500 hover:bg-amber-600 text-slate-950' : 'bg-blue-900 hover:bg-blue-950 text-white'"
             >
-              {{ t('pricing_select') }} <ArrowRight :size="12" />
+              <span>{{ locale === 'tr' ? 'HEMEN ABONE OL' : 'SELECT THIS TIER' }}</span>
+              <ArrowRight :size="14" />
             </button>
           </div>
         </div>
       </div>
 
-      <!-- TAX NOTICE BAR -->
-      <div class="rounded-xl border border-slate-200 bg-slate-100/50 py-2.5 px-4 text-center text-xs font-bold text-slate-500">
-        {{ t('pricing_vat_notice') }}
-      </div>
-
-      <!-- >> ÖZELLİKLER SECTION HEADER -->
-      <div class="flex items-center gap-2 pt-4">
-        <span class="inline-flex items-center rounded-md bg-[#003057]/5 border border-[#003057]/10 px-3 py-1.5 text-xs font-black" style="color: #003057; font-family: 'Outfit', sans-serif;">
-          &gt;&gt; {{ locale === 'tr' ? 'Özellikler' : 'Features' }}
-        </span>
-        <div class="flex-1 h-px bg-slate-200"></div>
-      </div>
-
-      <!-- FEATURES BOX -->
-      <div class="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
-        <!-- Banner Title -->
-        <div class="py-2.5 px-4 text-center text-xs font-black tracking-wide text-slate-700 bg-slate-50 border-b border-slate-200">
-          {{ t('pricing_features_title') }}
+      <!-- TAX & SECURITY NOTICE BAR -->
+      <div class="rounded-2xl border border-slate-200 bg-white p-4 text-center text-xs font-bold text-slate-600 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+        <div class="flex items-center gap-2">
+          <ShieldCheck :size="18" class="text-emerald-600" />
+          <span>
+            {{ paymentRegion === 'domestic' 
+              ? (locale === 'tr' ? 'Tüm fiyatlara %20 KDV dahildir. E-Fatura 24 saat içinde iletilir.' : 'Prices include 20% VAT. Electronic VAT invoice issued within 24h.')
+              : (locale === 'tr' ? 'Yurt dışı ödemelerde %0 KDV İhracat faturası kesilir.' : '0% Export VAT Invoice issued for international entities.')
+            }}
+          </span>
         </div>
 
-        <!-- 3 Column Grid -->
-        <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
-          <!-- Col 1 -->
-          <div class="space-y-3">
-            <div v-for="feat in allFeatures.filter(f => f.col === 1)" :key="feat.text" class="flex items-center gap-2">
-              <Check :size="14" class="text-emerald-500 shrink-0" />
-              <span class="text-xs font-semibold text-slate-700">{{ feat.text }}</span>
-            </div>
-          </div>
-          <!-- Col 2 -->
-          <div class="space-y-3">
-            <div v-for="feat in allFeatures.filter(f => f.col === 2)" :key="feat.text" class="flex items-center gap-2">
-              <Check :size="14" class="text-emerald-500 shrink-0" />
-              <span class="text-xs font-semibold text-slate-700">{{ feat.text }}</span>
-            </div>
-          </div>
-          <!-- Col 3 -->
-          <div class="space-y-3">
-            <div v-for="feat in allFeatures.filter(f => f.col === 3)" :key="feat.text" class="flex items-center gap-2">
-              <Check :size="14" class="text-emerald-500 shrink-0" />
-              <span class="text-xs font-semibold text-slate-700">{{ feat.text }}</span>
-            </div>
-          </div>
+        <div class="flex items-center gap-3 text-[10px] font-black uppercase text-slate-400 tracking-wider">
+          <span>🔒 256-BIT TLS SSL</span>
+          <span>•</span>
+          <span>⚡ INSTANT ACTIVATION</span>
         </div>
       </div>
 
-      <!-- RENEWAL BANNER -->
-      <div class="rounded-2xl border border-blue-100 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs" style="background-color: #E0F2FE;">
-        <div>
-          <h4 class="text-xs font-bold text-blue-900">{{ t('pricing_renewal') }}</h4>
+      <!-- FEATURE LIST TABLE (3 COLUMNS) -->
+      <div class="border border-slate-200 rounded-3xl bg-white p-8 shadow-xs space-y-6">
+        <div class="border-b border-slate-100 pb-4">
+          <h3 class="text-lg font-black text-slate-900 tracking-tight">
+            {{ locale === 'tr' ? 'Tüm Paketlerde Dahil Olan Standart Özellikler' : 'Features Included Across All Subscription Tiers' }}
+          </h3>
+          <p class="text-xs text-slate-500 mt-1 font-medium">
+            {{ locale === 'tr' ? 'Herhangi bir gizli ücret veya ek komisyon bulunmamaktadır.' : 'No hidden fees or unexpected commission charges.' }}
+          </p>
         </div>
-        <button 
-          type="button" 
-          @click="handleRenewalClick"
-          class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-3.5 transition shrink-0 shadow-xs flex items-center gap-1.5"
-        >
-          {{ t('pricing_renewal_btn') }} <ArrowRight :size="14" />
-        </button>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="space-y-3">
+            <div class="text-xs font-black text-blue-900 uppercase tracking-wider mb-2">1. İHALE VE TEKLİF YÖNETİMİ</div>
+            <div v-for="(feat, idx) in allFeatures.filter(f => f.col === 1)" :key="idx" class="flex items-center gap-2 text-xs font-medium text-slate-700">
+              <CheckCircle2 :size="14" class="text-emerald-600 shrink-0" />
+              <span>{{ feat.text }}</span>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div class="text-xs font-black text-blue-900 uppercase tracking-wider mb-2">2. BİLDİRİM VE TAKİP SİSTEMİ</div>
+            <div v-for="(feat, idx) in allFeatures.filter(f => f.col === 2)" :key="idx" class="flex items-center gap-2 text-xs font-medium text-slate-700">
+              <CheckCircle2 :size="14" class="text-emerald-600 shrink-0" />
+              <span>{{ feat.text }}</span>
+            </div>
+          </div>
+
+          <div class="space-y-3">
+            <div class="text-xs font-black text-blue-900 uppercase tracking-wider mb-2">3. ANALİTİK VE MOBİL UYUM</div>
+            <div v-for="(feat, idx) in allFeatures.filter(f => f.col === 3)" :key="idx" class="flex items-center gap-2 text-xs font-medium text-slate-700">
+              <CheckCircle2 :size="14" class="text-emerald-600 shrink-0" />
+              <span>{{ feat.text }}</span>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
 
-    <!-- Checkout Slide-over Drawer / Modal -->
-    <transition
-      enter-active-class="transition ease-out duration-300"
-      enter-from-class="opacity-0"
-      enter-to-class="opacity-100"
-      leave-active-class="transition ease-in duration-200"
-      leave-from-class="opacity-100"
-      leave-to-class="opacity-0"
-    >
-      <div v-if="isCheckoutOpen" class="fixed inset-0 z-50 overflow-hidden flex justify-end" role="dialog" aria-modal="true">
-        <!-- Backdrop -->
-        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity" @click="isCheckoutOpen = false"></div>
-
-        <!-- Panel container -->
-        <div class="relative w-screen max-w-md bg-white shadow-2xl flex flex-col justify-between transform transition duration-300 ease-in-out h-full border-l border-slate-200">
+    <!-- CHECKOUT MODAL -->
+    <transition name="fade">
+      <div v-if="isCheckoutOpen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs">
+        <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 animate-scaleUp">
           
-          <!-- Header -->
-          <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-            <div class="flex items-center gap-2">
-              <ShoppingCart :size="18" class="text-[#003057]" />
-              <h2 class="text-sm font-bold text-slate-800">{{ locale === 'tr' ? 'Sipariş & Ödeme Sepeti' : 'Order & Payment Cart' }}</h2>
+          <!-- Modal Header -->
+          <div class="p-6 bg-blue-900 text-white flex items-center justify-between">
+            <div>
+              <span class="text-[10px] font-black text-blue-300 uppercase tracking-widest block">
+                {{ paymentRegion === 'domestic' ? 'TÜRKİYE YURT İÇİ ÖDEME' : 'INTERNATIONAL GLOBAL PAYMENT' }}
+              </span>
+              <h3 class="text-base font-black text-white mt-0.5">{{ selectedPackage?.name }}</h3>
             </div>
-            <button @click="isCheckoutOpen = false" class="p-1 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-200 transition">
-              <X :size="18" />
+            <button @click="isCheckoutOpen = false" class="h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
+              <X :size="16" />
             </button>
           </div>
 
-          <!-- Checkout Content -->
-          <div class="flex-grow overflow-y-auto px-6 py-6 text-left">
-            <div v-if="!showSuccessScreen">
-              <!-- Order Summary Card -->
-              <div class="rounded-xl border border-slate-200 bg-slate-50/50 p-4 mb-6">
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2">{{ locale === 'tr' ? 'SEÇİLEN PAKET' : 'SELECTED PACKAGE' }}</div>
-                <div class="flex justify-between items-start">
-                  <div>
-                    <h3 class="text-sm font-bold text-slate-800">{{ selectedPackage?.name }}</h3>
-                    <p class="text-[11px] text-slate-500 mt-0.5">{{ selectedPackage?.desc }}</p>
-                  </div>
-                  <div class="text-right">
-                    <span class="text-base font-black text-slate-900 font-mono">{{ currencySymbol }}{{ selectedPackage?.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
-                  </div>
+          <!-- Modal Body -->
+          <div class="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
+            
+            <div v-if="!showSuccessScreen" class="space-y-6">
+              
+              <!-- Payment Channels Switcher -->
+              <div>
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
+                  {{ locale === 'tr' ? 'ÖDEME KANALI SEÇİN' : 'SELECT PAYMENT GATEWAY' }}
+                </label>
+                
+                <!-- Domestic Gateways -->
+                <div v-if="paymentRegion === 'domestic'" class="grid grid-cols-3 gap-2">
+                  <button 
+                    @click="activePaymentChannel = 'paytr'"
+                    class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1 cursor-pointer"
+                    :class="activePaymentChannel === 'paytr' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
+                  >
+                    <CreditCard :size="16" />
+                    <span class="text-[10px]">PayTR 3D</span>
+                  </button>
+
+                  <button 
+                    @click="activePaymentChannel = 'iyzico'"
+                    class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1 cursor-pointer"
+                    :class="activePaymentChannel === 'iyzico' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
+                  >
+                    <CreditCard :size="16" />
+                    <span class="text-[10px]">iyzico</span>
+                  </button>
+
+                  <button 
+                    @click="activePaymentChannel = 'bank_transfer'"
+                    class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1 cursor-pointer"
+                    :class="activePaymentChannel === 'bank_transfer' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
+                  >
+                    <Building :size="16" />
+                    <span class="text-[10px]">Havale / EFT</span>
+                  </button>
                 </div>
-                
-                <hr class="border-slate-200 my-3" />
-                
-                <!-- Pricing breakdown -->
-                <div class="space-y-1.5 text-xs text-slate-500 font-medium">
-                  <div class="flex justify-between">
-                    <span>{{ locale === 'tr' ? 'Net Tutar:' : 'Net Amount:' }}</span>
-                    <span class="font-mono">{{ currencySymbol }}{{ netAmount.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>{{ locale === 'tr' ? 'KDV (%20 - Dahil):' : 'VAT (20% - Incl.):' }}</span>
-                    <span class="font-mono">{{ currencySymbol }}{{ vatAmount.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
-                  </div>
-                  <div class="flex justify-between text-slate-800 font-bold border-t border-slate-200/60 pt-1.5 mt-1.5">
-                    <span>{{ locale === 'tr' ? 'Toplam Ödeme:' : 'Total Payment:' }}</span>
-                    <span class="font-mono text-blue-600">{{ currencySymbol }}{{ totalAmount.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
-                  </div>
+
+                <!-- International Gateways -->
+                <div v-else class="grid grid-cols-3 gap-2">
+                  <button 
+                    @click="activePaymentChannel = 'stripe'"
+                    class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1 cursor-pointer"
+                    :class="activePaymentChannel === 'stripe' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
+                  >
+                    <CreditCard :size="16" />
+                    <span class="text-[10px]">Stripe Global</span>
+                  </button>
+
+                  <button 
+                    @click="activePaymentChannel = 'paypal'"
+                    class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1 cursor-pointer"
+                    :class="activePaymentChannel === 'paypal' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
+                  >
+                    <CreditCard :size="16" />
+                    <span class="text-[10px]">PayPal</span>
+                  </button>
+
+                  <button 
+                    @click="activePaymentChannel = 'swift'"
+                    class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1 cursor-pointer"
+                    :class="activePaymentChannel === 'swift' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
+                  >
+                    <Globe :size="16" />
+                    <span class="text-[10px]">SWIFT Wire</span>
+                  </button>
                 </div>
               </div>
 
-              <!-- Payment Method Tabs -->
-              <div class="space-y-6">
+              <!-- Credit Card Form (Domestic & Stripe/PayPal) -->
+              <div v-if="activePaymentChannel !== 'bank_transfer' && activePaymentChannel !== 'swift'" class="space-y-4">
                 <div>
-                  <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">{{ locale === 'tr' ? 'ÖDEME KANALI SEÇİN' : 'CHOOSE PAYMENT CHANNEL' }}</label>
-                  <div class="grid grid-cols-3 gap-2">
-                    <button 
-                      @click="activePaymentMethod = 'paytr'"
-                      class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1.5"
-                      :class="activePaymentMethod === 'paytr' ? 'border-blue-600 bg-blue-50/20 text-blue-600' : 'border-slate-200 hover:bg-slate-50 text-slate-600'"
-                    >
-                      <CreditCard :size="16" />
-                      <span class="text-[10px] font-bold">PayTR</span>
-                    </button>
-
-                    <button 
-                      @click="activePaymentMethod = 'iyzigo'"
-                      class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1.5"
-                      :class="activePaymentMethod === 'iyzigo' ? 'border-blue-600 bg-blue-50/20 text-blue-600' : 'border-slate-200 hover:bg-slate-50 text-slate-600'"
-                    >
-                      <CreditCard :size="16" />
-                      <span class="text-[10px] font-bold">iyzigo</span>
-                    </button>
-
-                    <button 
-                      @click="activePaymentMethod = 'bank_transfer'"
-                      class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1.5"
-                      :class="activePaymentMethod === 'bank_transfer' ? 'border-blue-600 bg-blue-50/20 text-blue-600' : 'border-slate-200 hover:bg-slate-50 text-slate-600'"
-                    >
-                      <Building :size="16" />
-                      <span class="text-[10px] font-bold">{{ locale === 'tr' ? 'Havale/EFT' : 'Bank Transfer' }}</span>
-                    </button>
-                  </div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">{{ locale === 'tr' ? 'Kart Üzerindeki İsim' : 'Cardholder Name' }}</label>
+                  <input v-model="cardName" type="text" placeholder="John Doe" class="w-full rounded-xl border border-slate-200 p-3 text-xs focus:border-blue-600 focus:outline-none" />
                 </div>
 
-                <!-- PayTR & iyzigo Card Details Form -->
-                <div v-if="activePaymentMethod !== 'bank_transfer'" class="space-y-4">
-                  <div class="flex items-center gap-1.5 border border-slate-100 bg-slate-50 p-2.5 rounded-lg mb-2">
-                    <Lock :size="14" class="text-emerald-600" />
-                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-wide">
-                      {{ activePaymentMethod === 'paytr' ? 'PAYTR SECURE GATEWAY' : 'IYZIGO 3D SECURE ENTEGRASYONU' }}
-                    </span>
-                  </div>
-
-                  <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Kart Üzerindeki İsim</label>
-                    <input 
-                      v-model="cardName" 
-                      type="text" 
-                      placeholder="John Doe" 
-                      class="w-full rounded-lg border border-slate-200 p-2.5 text-xs focus:border-blue-500 focus:outline-none" 
-                    />
-                    <div class="text-[10px] text-slate-500 mt-1 font-bold">
-                      Kayıtlı Şirket: <span class="text-[#003057] font-black uppercase">{{ userSession?.company || 'Bireysel Kullanıcı' }}</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Kart Numarası</label>
-                    <input 
-                      v-model="cardNumber" 
-                      type="text" 
-                      placeholder="0000 0000 0000 0000" 
-                      class="w-full rounded-lg border border-slate-200 p-2.5 text-xs font-mono focus:border-blue-500 focus:outline-none" 
-                    />
-                  </div>
-
-                  <div class="grid grid-cols-2 gap-4">
-                    <div>
-                      <label class="block text-xs font-bold text-slate-700 mb-1">Son Kullanma (AA/YY)</label>
-                      <input 
-                        v-model="cardExpiry" 
-                        type="text" 
-                        placeholder="MM/YY" 
-                        class="w-full rounded-lg border border-slate-200 p-2.5 text-xs font-mono focus:border-blue-500 focus:outline-none" 
-                      />
-                    </div>
-                    <div>
-                      <label class="block text-xs font-bold text-slate-700 mb-1">CVC / Güvenlik Kodu</label>
-                      <input 
-                        v-model="cardCvc" 
-                        type="text" 
-                        placeholder="123" 
-                        class="w-full rounded-lg border border-slate-200 p-2.5 text-xs font-mono focus:border-blue-500 focus:outline-none" 
-                      />
-                    </div>
-                  </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">{{ locale === 'tr' ? 'Kart Numarası' : 'Card Number' }}</label>
+                  <input v-model="cardNumber" type="text" placeholder="4543 0000 0000 0000" class="w-full rounded-xl border border-slate-200 p-3 text-xs font-mono focus:border-blue-600 focus:outline-none" />
                 </div>
 
-                <!-- Havale/EFT Details -->
-                <div v-else class="space-y-4">
-                  <div class="rounded-xl border border-amber-100 bg-amber-50/50 p-4 text-xs text-amber-800 space-y-2">
-                    <div class="font-bold flex items-center gap-1.5">
-                      <span>💡 Önemli Bilgi:</span>
-                    </div>
-                    <p class="leading-relaxed">Havale yaparken açıklama kısmına otomatik üretilecek referans kodunu yazmayı unutmayınız. Ödemeniz onaylandığı an üyeliğiniz başlayacaktır.</p>
-                  </div>
-
+                <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Banka Hesabı</label>
-                    <select v-model="selectedBank" class="w-full rounded-lg border border-slate-200 p-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white">
-                      <option value="garanti">Garanti BBVA - GelAnlaşalım A.Ş.</option>
-                      <option value="akbank">Akbank - GelAnlaşalım A.Ş.</option>
-                      <option value="ziraat">Ziraat Bankası - GelAnlaşalım A.Ş.</option>
-                    </select>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ locale === 'tr' ? 'Son Kullanma (AA/YY)' : 'Expiry (MM/YY)' }}</label>
+                    <input v-model="cardExpiry" type="text" placeholder="12/28" class="w-full rounded-xl border border-slate-200 p-3 text-xs font-mono focus:border-blue-600 focus:outline-none" />
                   </div>
-
-                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-3.5 space-y-2">
-                    <div class="flex justify-between items-center text-xs font-semibold text-slate-500">
-                      <span>IBAN:</span>
-                      <span class="font-mono text-slate-800 select-all">TR91 0006 2000 0001 2345 6789 99</span>
-                    </div>
-                    <div class="flex justify-between items-center text-xs font-semibold text-slate-500">
-                      <span>Referans Kodu:</span>
-                      <span class="font-mono text-blue-600 bg-blue-50 px-2 py-0.5 rounded font-bold">GA-EKAP</span>
-                    </div>
-                  </div>
-
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">Gönderen Adı Soyadı</label>
-                    <input 
-                      v-model="transferName" 
-                      type="text" 
-                      placeholder="Adınız Soyadınız" 
-                      class="w-full rounded-lg border border-slate-200 p-2.5 text-xs focus:border-blue-500 focus:outline-none" 
-                    />
-                    <div class="text-[10px] text-slate-500 mt-1 font-bold">
-                      Kayıtlı Şirket: <span class="text-[#003057] font-black uppercase">{{ userSession?.company || 'Bireysel Kullanıcı' }}</span>
-                    </div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">CVC / CVV</label>
+                    <input v-model="cardCvc" type="text" placeholder="888" class="w-full rounded-xl border border-slate-200 p-3 text-xs font-mono focus:border-blue-600 focus:outline-none" />
                   </div>
                 </div>
               </div>
+
+              <!-- Bank Transfer (Domestic) -->
+              <div v-else-if="activePaymentChannel === 'bank_transfer'" class="space-y-4">
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-2">
+                  <div class="font-bold text-slate-800">Garanti BBVA TR - GelAnlaşalım Bilişim A.Ş.</div>
+                  <div class="font-mono text-blue-700 font-bold select-all text-[11px]">TR91 0006 2000 0001 2345 6789 99</div>
+                  <div class="text-[10px] text-slate-500">Açıklama kısmına firma vergi numaranızı yazınız.</div>
+                </div>
+              </div>
+
+              <!-- SWIFT Wire Transfer (International) -->
+              <div v-else-if="activePaymentChannel === 'swift'" class="space-y-4">
+                <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-2">
+                  <div class="font-bold text-slate-800">Garanti Bank International SWIFT Account</div>
+                  <div class="font-mono text-blue-700 font-bold select-all text-[11px]">IBAN: TR44 0006 2000 0001 9999 8888 77</div>
+                  <div class="font-mono text-slate-700 text-[10px]">BIC / SWIFT CODE: <strong>GBAKTRIS</strong></div>
+                  <div class="text-[10px] text-slate-500">Please reference your Company Name in the SWIFT transfer note.</div>
+                </div>
+              </div>
+
             </div>
 
             <!-- Success Screen -->
-            <div v-else class="h-full flex flex-col items-center justify-center text-center py-12">
-              <div class="h-16 w-16 bg-emerald-50 text-emerald-500 flex items-center justify-center rounded-full mb-6">
-                <CheckCircle :size="36" />
+            <div v-else class="text-center py-8 space-y-4">
+              <div class="h-16 w-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
+                <CheckCircle2 :size="36" />
               </div>
-              <h3 class="text-lg font-bold text-slate-800">İşlem Başarılı!</h3>
-              <p class="text-xs text-slate-500 mt-2 max-w-xs leading-relaxed">
-                Tebrikler, aboneliğiniz başarıyla etkinleştirildi. Artık EKAP ihalelerini ve doğrudan temin tekliflerini kesintisiz yönetebilirsiniz.
+              <h3 class="text-lg font-black text-slate-900">{{ locale === 'tr' ? 'Abonelik İşlemi Başarılı!' : 'Subscription Successfully Activated!' }}</h3>
+              <p class="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+                {{ locale === 'tr' 
+                  ? 'Faturanız oluşturuldu ve kurumsal panel erişiminiz anında aktifleştirildi.' 
+                  : 'Your enterprise portal has been unlocked. Invoice sent to your billing email.' 
+                }}
               </p>
-              
-              <div class="mt-8 rounded-xl border border-slate-100 bg-slate-50 p-4 w-full">
-                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest text-left">İŞLEM MAKBUZU</div>
-                <div class="space-y-1.5 text-xs text-slate-600 font-medium text-left mt-3">
-                  <div class="flex justify-between">
-                    <span>Ödeme Tipi:</span>
-                    <span class="font-semibold text-slate-800 uppercase">{{ activePaymentMethod }} Gateway</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Sipariş No:</span>
-                    <span class="font-mono text-slate-800 font-bold">ORD-{{ Math.floor(100000 + Math.random() * 900000) }}</span>
-                  </div>
-                  <div class="flex justify-between">
-                    <span>Paket:</span>
-                    <span class="font-semibold text-slate-800">{{ selectedPackage?.name }}</span>
-                  </div>
-                  <div class="flex justify-between border-t border-slate-200/60 pt-1.5 mt-1.5 text-slate-800 font-bold">
-                    <span>{{ locale === 'tr' ? 'Tutar (KDV Dahil):' : 'Amount (VAT Incl.):' }}</span>
-                    <span class="font-mono text-[#003057]">{{ currencySymbol }}{{ selectedPackage?.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}</span>
-                  </div>
-                </div>
-              </div>
             </div>
+
           </div>
 
-          <!-- Footer Actions -->
-          <div class="p-6 border-t border-slate-100 bg-slate-50">
+          <!-- Modal Footer -->
+          <div class="p-6 bg-slate-50 border-t border-slate-100">
             <div v-if="!showSuccessScreen" class="mb-3 flex items-center justify-center gap-2 text-[10px] text-slate-500 font-bold">
-              <input type="checkbox" checked required id="distance-sales-check" class="rounded border-slate-300" />
-              <label for="distance-sales-check">
-                {{ locale === 'tr' ? 'Ödemeyi onaylayarak ' : 'By proceeding you agree to the ' }}
+              <input v-model="distanceSalesApproved" type="checkbox" id="modal-distance-check" class="rounded border-slate-300" />
+              <label for="modal-distance-check" class="cursor-pointer">
+                {{ locale === 'tr' ? 'Ödemeyi onaylayarak ' : 'By proceeding you agree to ' }}
                 <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" target="_blank" class="text-blue-600 underline">
-                  {{ locale === 'tr' ? 'Mesafeli Satış ve Abonelik Sözleşmesini' : 'Distance Sales & Subscription Terms' }}
+                  {{ locale === 'tr' ? 'Mesafeli Satış Sözleşmesini' : 'Distance Sales Terms' }}
                 </NuxtLink>
                 {{ locale === 'tr' ? ' kabul etmiş olursunuz.' : '.' }}
               </label>
             </div>
+
             <button 
               v-if="!showSuccessScreen"
               @click="handlePayment"
               :disabled="isProcessing"
-              class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white shadow-lg transition-all disabled:opacity-50"
-              style="background-color: #003057;"
+              class="w-full py-3.5 bg-blue-900 hover:bg-blue-950 text-white font-black text-xs rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
-              <span v-if="isProcessing">{{ locale === 'tr' ? 'Güvenli Ödeme Doğrulanıyor...' : 'Verifying Secure Payment...' }}</span>
+              <span v-if="isProcessing">{{ locale === 'tr' ? 'Ödeme Doğrulanıyor...' : 'Processing Payment...' }}</span>
               <span v-else>{{ currencySymbol }}{{ selectedPackage?.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }} {{ locale === 'tr' ? 'Güvenli Ödeme Yap' : 'Pay Securely' }}</span>
               <ArrowRight v-if="!isProcessing" :size="14" />
             </button>
+
             <button 
               v-else
               @click="completeCheckout"
-              class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white shadow-lg transition-all bg-slate-900 hover:bg-slate-800 shadow-slate-900/15"
+              class="w-full py-3.5 bg-slate-900 hover:bg-slate-950 text-white font-black text-xs rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
-              {{ locale === 'tr' ? 'Paneli Başlat' : 'Launch Dashboard' }}
+              <span>{{ locale === 'tr' ? 'Kurumsal Paneli Başlat' : 'Launch Enterprise Dashboard' }}</span>
               <ArrowRight :size="14" />
             </button>
           </div>
