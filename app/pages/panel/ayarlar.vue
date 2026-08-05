@@ -46,9 +46,14 @@ import {
   ChevronDown
 } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
+import { locale, detectLocale } from '~/composables/useLocale'
 
 definePageMeta({ 
   layout: 'dashboard' 
+})
+
+onMounted(() => {
+  detectLocale()
 })
 
 const route = useRoute()
@@ -706,7 +711,7 @@ function saveProfile() {
           <!-- Genel Bilgiler Card -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
             <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
-              <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Genel Bilgiler</h3>
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">{{ locale === 'tr' ? 'Genel Bilgiler' : 'General Information' }}</h3>
             </div>
 
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -715,18 +720,18 @@ function saveProfile() {
                   AT
                 </div>
                 <div>
-                  <span class="text-[8px] font-black text-slate-400 uppercase tracking-wider block">KURUM</span>
+                  <span class="text-[8px] font-black text-slate-400 uppercase tracking-wider block">{{ locale === 'tr' ? 'KURUM' : 'ORGANIZATION' }}</span>
                   <h3 class="text-lg font-black text-slate-800 mt-0.5">{{ companyForm.name }}</h3>
                   
                   <div class="flex flex-wrap items-center gap-3 mt-1.5 text-[10px] text-slate-400 font-bold">
-                    <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[8px]">Admin, İlan, Tedarikçi</span>
+                    <span class="bg-blue-50 text-blue-700 px-2 py-0.5 rounded text-[8px]">{{ locale === 'tr' ? 'Admin, İlan, Tedarikçi' : 'Admin, Tender, Supplier' }}</span>
                   </div>
                 </div>
               </div>
 
               <!-- Quality level display -->
               <div class="rounded-xl border bg-slate-50 p-4 space-y-2 text-center md:text-right max-w-xs" style="border-color: #F1F5F9;">
-                <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">KURUMSAL PROFİL KALİTESİ</span>
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">{{ locale === 'tr' ? 'KURUMSAL PROFİL KALİTESİ' : 'CORPORATE PROFILE QUALITY' }}</span>
                 <span class="text-lg font-black text-slate-800 block">%89</span>
               </div>
             </div>
@@ -734,31 +739,31 @@ function saveProfile() {
             <!-- Nested detail info boxes -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <span class="text-[8px] font-black text-slate-400 uppercase block">VERGİ KİMLİK NO</span>
+                <span class="text-[8px] font-black text-slate-400 uppercase block">{{ locale === 'tr' ? 'VERGİ KİMLİK NO' : 'TAX ID NUMBER' }}</span>
                 <span class="font-mono text-slate-700 block mt-1">{{ companyForm.taxNo }}</span>
               </div>
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <span class="text-[8px] font-black text-slate-400 uppercase block">ADRES</span>
+                <span class="text-[8px] font-black text-slate-400 uppercase block">{{ locale === 'tr' ? 'ADRES' : 'ADDRESS' }}</span>
                 <span class="text-slate-700 block mt-1 truncate" :title="companyForm.faturaAdresi">Çanakkale</span>
               </div>
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <span class="text-[8px] font-black text-slate-400 uppercase block">TELEFON</span>
+                <span class="text-[8px] font-black text-slate-400 uppercase block">{{ locale === 'tr' ? 'TELEFON' : 'PHONE' }}</span>
                 <span class="font-mono text-slate-700 block mt-1">{{ profileForm.phone }}</span>
               </div>
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <span class="text-[8px] font-black text-slate-400 uppercase block">WEB SİTESİ</span>
-                <span class="text-slate-500 block mt-1">Web Sitesi Girilmedi</span>
+                <span class="text-[8px] font-black text-slate-400 uppercase block">{{ locale === 'tr' ? 'WEB SİTESİ' : 'WEBSITE' }}</span>
+                <span class="text-slate-500 block mt-1">{{ locale === 'tr' ? 'Web Sitesi Girilmedi' : 'No Website Provided' }}</span>
               </div>
             </div>
 
             <!-- Profile Quality score card details -->
             <div class="rounded-xl bg-blue-50/20 border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4" style="border-color: #DBEAFE;">
               <div>
-                <h4 class="text-xs font-bold text-slate-800">Kurumsal Profil Kalitesi</h4>
-                <p class="text-[10px] text-slate-500 mt-0.5">Profil resmi, Şirket faturası, Kategoriler ve Doğrulama adımlarına göre hesaplanır.</p>
+                <h4 class="text-xs font-bold text-slate-800">{{ locale === 'tr' ? 'Kurumsal Profil Kalitesi' : 'Corporate Profile Quality' }}</h4>
+                <p class="text-[10px] text-slate-500 mt-0.5">{{ locale === 'tr' ? 'Profil resmi, Şirket faturası, Kategoriler ve Doğrulama adımlarına göre hesaplanır.' : 'Calculated based on profile image, tax registration, categories, and verification steps.' }}</p>
               </div>
-              <button type="button" @click="triggerDocUpload('profil_logo')" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 transition">
-                Görsel Yükle
+              <button type="button" @click="triggerDocUpload('profil_logo')" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 transition cursor-pointer">
+                {{ locale === 'tr' ? 'Görsel Yükle' : 'Upload Image' }}
               </button>
             </div>
           </div>
@@ -766,15 +771,15 @@ function saveProfile() {
           <!-- Kayıt & Doğrulama Bilgileri Form Card -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
             <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
-              <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">Kayıt & Doğrulama Bilgileri</h3>
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">{{ locale === 'tr' ? 'Kayıt & Doğrulama Bilgileri' : 'Registration & Verification Details' }}</h3>
               <div class="flex rounded-lg bg-slate-100 p-0.5">
-                <button type="button" class="rounded px-2.5 py-1 text-[10px] font-black bg-white text-slate-800 shadow-sm">Kayıt Bilgisi</button>
-                <button type="button" @click="showToast('Fatura & Banka görünümüne geçiliyor...')" class="rounded px-2.5 py-1 text-[10px] font-black text-slate-500">Fatura & Banka</button>
+                <button type="button" class="rounded px-2.5 py-1 text-[10px] font-black bg-white text-slate-800 shadow-sm">{{ locale === 'tr' ? 'Kayıt Bilgisi' : 'Registration Info' }}</button>
+                <button type="button" @click="showToast(locale === 'tr' ? 'Fatura & Banka görünümüne geçiliyor...' : 'Switching to Billing & Banking...')" class="rounded px-2.5 py-1 text-[10px] font-black text-slate-500 cursor-pointer">{{ locale === 'tr' ? 'Fatura & Banka' : 'Billing & Banking' }}</button>
               </div>
             </div>
 
             <p class="text-[10px] text-slate-400 leading-normal">
-              <strong>Kayıt & Doğrulama Bilgileri.</strong> Kayıt ve firma doğrulama aşamasında alınan ve değiştirilemeyen yasal verileri tutar. Yerel yasalar doğrultusunda bayilik, yetkili arayan kurallar buradaki bilgilere göre denetlenmektedir.
+              <strong>{{ locale === 'tr' ? 'Kayıt & Doğrulama Bilgileri.' : 'Registration & Verification Details.' }}</strong> {{ locale === 'tr' ? 'Kayıt ve firma doğrulama aşamasında alınan ve değiştirilemeyen yasal verileri tutar. Yerel yasalar doğrultusunda bayilik, yetkili arayan kurallar buradaki bilgilere göre denetlenmektedir.' : 'Holds immutable legal records collected during registration and verification.' }}
             </p>
 
             <!-- Editable Fields Form Grid -->
@@ -782,61 +787,61 @@ function saveProfile() {
               
               <!-- Şirket Adı -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">ŞİRKET ADI</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ locale === 'tr' ? 'ŞİRKET ADI' : 'COMPANY NAME' }}</label>
                 <input v-model="companyForm.name" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
               <!-- Yasal Firma Unvanı -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">YASAL FİRMA UNVANI</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ locale === 'tr' ? 'YASAL FİRMA UNVANI' : 'LEGAL COMPANY TITLE' }}</label>
                 <input v-model="companyForm.legalName" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
               <!-- İrtibat İsim -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">İRTİBAT İSİM</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ locale === 'tr' ? 'İRTİBAT İSİM' : 'CONTACT NAME' }}</label>
                 <input v-model="companyForm.contactPerson" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
               <!-- Vergi Numarası -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">VERGİ NUMARASI</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ locale === 'tr' ? 'VERGİ NUMARASI' : 'TAX NUMBER' }}</label>
                 <input v-model="companyForm.taxNo" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
               <!-- Faaliyet Alanları -->
               <div class="md:col-span-2">
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">FAALİYET ALANLARI</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ locale === 'tr' ? 'FAALİYET ALANLARI' : 'BUSINESS FIELDS & SECTORS' }}</label>
                 <input v-model="companyForm.sectors" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
               <!-- MERSİS No -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">MERSİS NO</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ locale === 'tr' ? 'MERSİS NO' : 'MERSIS ID' }}</label>
                 <input v-model="companyForm.mersis" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="0XXX-XXXX-XXXX-XXXX" />
               </div>
 
               <!-- Ticaret Sicil No -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">TİCARET SİCİL NO</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ locale === 'tr' ? 'TİCARET SİCİL NO' : 'TRADE REGISTRY NO' }}</label>
                 <input v-model="companyForm.sicilNo" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="Ticaret sicil numarası" />
               </div>
 
               <!-- KEP Adresi -->
               <div class="md:col-span-2">
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">KEP ADRESİ</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ locale === 'tr' ? 'KEP ADRESİ' : 'REGISTERED EMAIL (KEP)' }}</label>
                 <input v-model="companyForm.kep" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="gelanlasalim@hs01.kep.tr" />
               </div>
 
               <!-- IBAN -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">IBAN</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ locale === 'tr' ? 'IBAN' : 'BANK IBAN' }}</label>
                 <input v-model="companyForm.iban" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="TR00 0000 0000 0000 0000 00" />
               </div>
 
               <!-- Hesap Sahibi -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">HESAP SAHİBİ</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ locale === 'tr' ? 'HESAP SAHİBİ' : 'ACCOUNT HOLDER NAME' }}</label>
                 <input v-model="companyForm.accountHolder" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="Hesap sahibinin tam adı" />
               </div>
 
@@ -844,8 +849,8 @@ function saveProfile() {
 
             <!-- Save Company Button -->
             <div class="flex justify-end pt-4 border-t" style="border-color: #F1F5F9;">
-              <button type="button" @click="saveCompanyInfo" class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-2.5 transition">
-                Şirket Bilgilerini Kaydet
+              <button type="button" @click="saveCompanyInfo" class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-2.5 transition cursor-pointer">
+                {{ locale === 'tr' ? 'Şirket Bilgilerini Kaydet' : 'Save Company Details' }}
               </button>
             </div>
           </div>

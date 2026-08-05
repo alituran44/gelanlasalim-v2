@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from "vue"
-import { useRoute, useRouter } from "vue-router"
 import {
   LayoutDashboard,
   FilePlus2,
@@ -26,8 +24,10 @@ import {
   History,
   Award,
   Sliders,
-  Building
+  Building,
+  Globe
 } from "lucide-vue-next"
+import { locale, detectLocale, setLocale } from '~/composables/useLocale'
 
 const route = useRoute()
 const router = useRouter()
@@ -36,6 +36,7 @@ const router = useRouter()
 const userSession = ref<any>({})
 
 onMounted(() => {
+  detectLocale()
   if (typeof window !== 'undefined') {
     try {
       userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
@@ -44,6 +45,14 @@ onMounted(() => {
     }
   }
 })
+
+function toggleLang() {
+  if (locale.value === 'tr') {
+    setLocale('en')
+  } else {
+    setLocale('tr')
+  }
+}
 
 const userRole = computed(() => userSession.value?.role || 'company')
 const userName = computed(() => userSession.value?.firstName || 'User')
@@ -57,57 +66,113 @@ function logout() {
   router.push('/')
 }
 
-const sidebarMenus = [
-  { title: "Dashboard", icon: LayoutDashboard, to: "/panel" },
-  { title: "Marketplace", icon: ShoppingBag, to: "/panel/pazar-yeri" },
-  { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
-  { title: "My Bids", icon: Send, to: "/panel/tekliflerim" },
-  { title: "Orders & Shipping", icon: Package, to: "/panel/siparis-teslimat" },
-  { title: "Live Auctions", icon: Tv, to: "/panel/canli-etkinlikler" },
-  { title: "Analytics", icon: BarChart3, to: "/panel/istatistikler" },
-  { title: "Exchange Rates", icon: Coins, to: "/panel/doviz-kurlari" },
-  { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
-  { title: "Team & Permissions", icon: Users, to: "/panel/ekip-yetki" },
-  { title: "Account Center", icon: Settings, to: "/panel/ayarlar" },
-]
+const sidebarMenus = computed(() => {
+  if (locale.value === 'tr') {
+    return [
+      { title: "Yönetim Paneli", icon: LayoutDashboard, to: "/panel" },
+      { title: "Pazar Yeri", icon: ShoppingBag, to: "/panel/pazar-yeri" },
+      { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
+      { title: "Tekliflerim", icon: Send, to: "/panel/tekliflerim" },
+      { title: "Sipariş & Teslimat", icon: Package, to: "/panel/siparis-teslimat" },
+      { title: "Canlı Etkinlikler", icon: Tv, to: "/panel/canli-etkinlikler" },
+      { title: "İstatistikler", icon: BarChart3, to: "/panel/istatistikler" },
+      { title: "Döviz Kurları", icon: Coins, to: "/panel/doviz-kurlari" },
+      { title: "Kurumsal Firmalar", icon: Building2, to: "/panel/firmalar" },
+      { title: "Ekip & Yetki", icon: Users, to: "/panel/ekip-yetki" },
+      { title: "Hesap & Ayarlar", icon: Settings, to: "/panel/ayarlar" },
+    ]
+  } else {
+    return [
+      { title: "Dashboard", icon: LayoutDashboard, to: "/panel" },
+      { title: "Marketplace", icon: ShoppingBag, to: "/panel/pazar-yeri" },
+      { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
+      { title: "My Bids", icon: Send, to: "/panel/tekliflerim" },
+      { title: "Orders & Shipping", icon: Package, to: "/panel/siparis-teslimat" },
+      { title: "Live Auctions", icon: Tv, to: "/panel/canli-etkinlikler" },
+      { title: "Analytics", icon: BarChart3, to: "/panel/istatistikler" },
+      { title: "Exchange Rates", icon: Coins, to: "/panel/doviz-kurlari" },
+      { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
+      { title: "Team & Permissions", icon: Users, to: "/panel/ekip-yetki" },
+      { title: "Account Center", icon: Settings, to: "/panel/ayarlar" },
+    ]
+  }
+})
 
 const isSettingsPage = computed(() => {
   return route.path === '/panel/ayarlar' || route.path === '/panel/yardim'
 })
 
-const settingsGroups = [
-  {
-    title: "Profile",
-    items: [
-      { title: "Personal Info", icon: User, to: "/panel/ayarlar?tab=kisisel", tab: "kisisel" },
-      { title: "Company & Verification", icon: Building2, to: "/panel/ayarlar?tab=sirket", tab: "sirket" }
+const settingsGroups = computed(() => {
+  if (locale.value === 'tr') {
+    return [
+      {
+        title: "Profil",
+        items: [
+          { title: "Kişisel Bilgiler", icon: User, to: "/panel/ayarlar?tab=kisisel", tab: "kisisel" },
+          { title: "Şirket & Doğrulama", icon: Building2, to: "/panel/ayarlar?tab=sirket", tab: "sirket" }
+        ]
+      },
+      {
+        title: "İhalelerim & Tekliflerim",
+        items: [
+          { title: "📋 İlanlarım", icon: ClipboardList, to: "/panel/ilanlarim", tab: "ilanlarim" },
+          { title: "📥 Aldığım Teklifler", icon: Inbox, to: "/panel/gelen-teklifler", tab: "gelen" },
+          { title: "📤 Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler", tab: "verdigim" }
+        ]
+      },
+      {
+        title: "İş Akışı",
+        items: [
+          { title: "Kayıtlı Adresler", icon: MapPin, to: "/panel/ayarlar?tab=adresler", tab: "adresler" },
+          { title: "Bildirimler", icon: Bell, to: "/panel/ayarlar?tab=bildirimler", tab: "bildirimler" },
+          { title: "Takip Ettiklerim", icon: Heart, to: "/panel/ayarlar?tab=takip", tab: "takip" },
+          { title: "Geçmiş Ticaretlerim", icon: History, to: "/panel/ayarlar?tab=ticaret", tab: "ticaret" }
+        ]
+      },
+      {
+        title: "Hesap",
+        items: [
+          { title: "Üyelik Planı", icon: Award, to: "/panel/ayarlar?tab=uyelik", tab: "uyelik" },
+          { title: "Ayarlar", icon: Sliders, to: "/panel/ayarlar?tab=ayarlar", tab: "ayarlar" }
+        ]
+      }
     ]
-  },
-  {
-    title: "My Tenders & Bids",
-    items: [
-      { title: "📋 My Tenders", icon: ClipboardList, to: "/panel/ilanlarim", tab: "ilanlarim" },
-      { title: "📥 Received Bids", icon: Inbox, to: "/panel/gelen-teklifler", tab: "gelen" },
-      { title: "📤 My Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler", tab: "verdigim" }
-    ]
-  },
-  {
-    title: "Workflow",
-    items: [
-      { title: "Saved Addresses", icon: MapPin, to: "/panel/ayarlar?tab=adresler", tab: "adresler" },
-      { title: "Notifications", icon: Bell, to: "/panel/ayarlar?tab=bildirimler", tab: "bildirimler" },
-      { title: "Favorites & Follows", icon: Heart, to: "/panel/ayarlar?tab=takip", tab: "takip" },
-      { title: "Trade History", icon: History, to: "/panel/ayarlar?tab=ticaret", tab: "ticaret" }
-    ]
-  },
-  {
-    title: "Account",
-    items: [
-      { title: "Membership Plan", icon: Award, to: "/panel/ayarlar?tab=uyelik", tab: "uyelik" },
-      { title: "Settings", icon: Sliders, to: "/panel/ayarlar?tab=ayarlar", tab: "ayarlar" }
+  } else {
+    return [
+      {
+        title: "Profile",
+        items: [
+          { title: "Personal Info", icon: User, to: "/panel/ayarlar?tab=kisisel", tab: "kisisel" },
+          { title: "Company & Verification", icon: Building2, to: "/panel/ayarlar?tab=sirket", tab: "sirket" }
+        ]
+      },
+      {
+        title: "My Tenders & Bids",
+        items: [
+          { title: "📋 My Tenders", icon: ClipboardList, to: "/panel/ilanlarim", tab: "ilanlarim" },
+          { title: "📥 Received Bids", icon: Inbox, to: "/panel/gelen-teklifler", tab: "gelen" },
+          { title: "📤 My Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler", tab: "verdigim" }
+        ]
+      },
+      {
+        title: "Workflow",
+        items: [
+          { title: "Saved Addresses", icon: MapPin, to: "/panel/ayarlar?tab=adresler", tab: "adresler" },
+          { title: "Notifications", icon: Bell, to: "/panel/ayarlar?tab=bildirimler", tab: "bildirimler" },
+          { title: "Favorites & Follows", icon: Heart, to: "/panel/ayarlar?tab=takip", tab: "takip" },
+          { title: "Trade History", icon: History, to: "/panel/ayarlar?tab=ticaret", tab: "ticaret" }
+        ]
+      },
+      {
+        title: "Account",
+        items: [
+          { title: "Membership Plan", icon: Award, to: "/panel/ayarlar?tab=uyelik", tab: "uyelik" },
+          { title: "Settings", icon: Sliders, to: "/panel/ayarlar?tab=ayarlar", tab: "ayarlar" }
+        ]
+      }
     ]
   }
-]
+})
 
 const menus = computed(() => sidebarMenus)
 const activePath = computed(() => route.path)

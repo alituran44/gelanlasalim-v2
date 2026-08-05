@@ -18,10 +18,13 @@ import {
   ArrowLeft
 } from "lucide-vue-next"
 
+import { locale, detectLocale } from '~/composables/useLocale'
+
 const router = useRouter()
 const route = useRoute()
 
 onMounted(() => {
+  detectLocale()
   if (typeof window !== 'undefined') {
     const session = localStorage.getItem('userSession')
     if (!session) {
@@ -30,19 +33,37 @@ onMounted(() => {
   }
 })
 
-const sidebarMenus = [
-  { title: "Dashboard", icon: LayoutDashboard, to: "/panel" },
-  { title: "Marketplace", icon: ShoppingBag, to: "/panel/pazar-yeri" },
-  { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
-  { title: "My Bids", icon: Send, to: "/panel/tekliflerim" },
-  { title: "Orders & Delivery", icon: Package, to: "/panel/siparis-teslimat" },
-  { title: "Live Auctions", icon: Tv, to: "/panel/canli-etkinlikler" },
-  { title: "Analytics", icon: BarChart3, to: "/panel/istatistikler" },
-  { title: "Exchange Rates", icon: Coins, to: "/panel/doviz-kurlari" },
-  { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
-  { title: "Team & Permissions", icon: Users, to: "/panel/ekip-yetki" },
-  { title: "Account & Settings", icon: Settings, to: "/panel/ayarlar" },
-]
+const sidebarMenus = computed(() => {
+  if (locale.value === 'tr') {
+    return [
+      { title: "Panel", icon: LayoutDashboard, to: "/panel" },
+      { title: "Pazar Yeri", icon: ShoppingBag, to: "/panel/pazar-yeri" },
+      { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
+      { title: "Tekliflerim", icon: Send, to: "/panel/tekliflerim" },
+      { title: "Sipariş & Teslimat", icon: Package, to: "/panel/siparis-teslimat" },
+      { title: "Canlı Etkinlikler", icon: Tv, to: "/panel/canli-etkinlikler" },
+      { title: "İstatistikler", icon: BarChart3, to: "/panel/istatistikler" },
+      { title: "Döviz Kurları", icon: Coins, to: "/panel/doviz-kurlari" },
+      { title: "Kurumsal Firmalar", icon: Building2, to: "/panel/firmalar" },
+      { title: "Ekip & Yetki", icon: Users, to: "/panel/ekip-yetki" },
+      { title: "Hesap", icon: Settings, to: "/panel/ayarlar" },
+    ]
+  } else {
+    return [
+      { title: "Dashboard", icon: LayoutDashboard, to: "/panel" },
+      { title: "Marketplace", icon: ShoppingBag, to: "/panel/pazar-yeri" },
+      { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
+      { title: "My Bids", icon: Send, to: "/panel/tekliflerim" },
+      { title: "Orders & Delivery", icon: Package, to: "/panel/siparis-teslimat" },
+      { title: "Live Auctions", icon: Tv, to: "/panel/canli-etkinlikler" },
+      { title: "Analytics", icon: BarChart3, to: "/panel/istatistikler" },
+      { title: "Exchange Rates", icon: Coins, to: "/panel/doviz-kurlari" },
+      { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
+      { title: "Team & Permissions", icon: Users, to: "/panel/ekip-yetki" },
+      { title: "Account & Settings", icon: Settings, to: "/panel/ayarlar" },
+    ]
+  }
+})
 </script>
 
 <template>
@@ -77,7 +98,7 @@ const sidebarMenus = [
           class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all shrink-0 uppercase tracking-wider"
         >
           <ArrowLeft :size="13" />
-          Go to Homepage
+          {{ locale === 'tr' ? 'Ana Sayfaya Git' : 'Go to Homepage' }}
         </NuxtLink>
       </div>
 
