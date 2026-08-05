@@ -15,7 +15,8 @@ import {
   Bell,
   Eye,
   EyeOff,
-  CheckCircle2
+  CheckCircle2,
+  Home
 } from 'lucide-vue-next'
 import { locale, detectLocale, t } from '~/composables/useLocale'
 
@@ -267,8 +268,17 @@ function handleGuestEntry() {
       <div class="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-blue-900/20 to-transparent"></div>
 
       <!-- Header brand -->
-      <div class="relative z-10 flex items-center gap-2.5">
-        <img src="/logo.png" alt="GelAnlaşalım Üyelik ve Kayıt Sayfası Logosu" class="h-9 w-auto brightness-0 invert" />
+      <div class="relative z-10 flex items-center justify-between">
+        <NuxtLink to="/" class="flex items-center gap-2.5 hover:opacity-90 transition">
+          <img src="/logo.png" alt="GelAnlaşalım Logosu" class="h-9 w-auto brightness-0 invert" />
+        </NuxtLink>
+        <NuxtLink
+          to="/"
+          class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-black transition border border-white/20 backdrop-blur-md shadow-md cursor-pointer"
+        >
+          <Home :size="15" class="text-amber-400" />
+          <span>{{ locale === 'tr' ? '🏠 Ana Sayfaya Dön' : '🏠 Back to Home' }}</span>
+        </NuxtLink>
       </div>
 
       <!-- Main presentation -->
@@ -322,8 +332,23 @@ function handleGuestEntry() {
     </div>
 
     <!-- Form Right Panel -->
-    <div class="w-full lg:w-1/2 flex flex-col justify-center px-6 py-12 sm:px-12 lg:px-20 bg-white">
+    <div class="w-full lg:w-1/2 flex flex-col justify-between px-6 py-8 sm:px-12 lg:px-20 bg-white">
       <div class="mx-auto w-full max-w-md text-left">
+        <!-- Top Navigation Bar (Mobile & Desktop) -->
+        <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+          <NuxtLink to="/" class="flex items-center gap-2">
+            <img src="/logo.png" alt="GelAnlaşalım Logo" class="h-8 w-auto" />
+          </NuxtLink>
+
+          <NuxtLink
+            to="/"
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black transition-all shadow-sm cursor-pointer"
+          >
+            <Home :size="15" class="text-amber-400" />
+            <span>{{ locale === 'tr' ? '🏠 Ana Sayfaya Dön' : '🏠 Back to Home' }}</span>
+          </NuxtLink>
+        </div>
+
         <!-- Switch tabs (Register / Login / Guest) -->
         <div class="mb-8 flex border-b border-slate-100 gap-1">
           <button @click="activeTab = 'register'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2" :class="activeTab === 'register' ? 'border-amber-500 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'">
