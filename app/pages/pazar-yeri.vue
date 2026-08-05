@@ -53,8 +53,9 @@ const segments = [
         <input 
           v-model="searchQuery"
           type="text"
+          aria-label="İhale veya anahtar kelime arama"
           placeholder="İhale adı, açıklama veya anahtar kelime ile ara..."
-          class="w-full rounded-xl border pl-9 pr-4 py-2.5 text-xs outline-none bg-white transition focus:border-blue-500"
+          class="w-full rounded-xl border pl-9 pr-4 py-2.5 text-xs outline-none bg-white transition focus:border-blue-500 min-h-[44px]"
           style="border-color: #E2E8F0; color: #0F172A;"
         />
       </div>

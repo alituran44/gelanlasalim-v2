@@ -6,14 +6,26 @@ export default defineNuxtConfig({
   modules: ['@nuxtjs/tailwindcss', '@pinia/nuxt'],
   app: {
     head: {
+      htmlAttrs: {
+        lang: 'tr'
+      },
       title: 'GelAnlaşalım — B2B Canlı İhale & Satın Alma Platformu',
       meta: [
-        { name: 'description', content: 'GelAnlaşalım ile tedarik maliyetlerinizi canlı eksiltme ihaleleriyle düşürün.' }
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: 'GelAnlaşalım ile kurumsal tedarik maliyetlerinizi canlı eksiltme ihaleleriyle düşürün. Doğrulanmış B2B tedarikçi ağı ve kapalı zarf güvenliği.' },
+        { name: 'robots', content: 'index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1' },
+        { name: 'author', content: 'GelAnlaşalım B2B Platform' },
+        { property: 'og:title', content: 'GelAnlaşalım — B2B Canlı İhale & Satın Alma Platformu' },
+        { property: 'og:description', content: 'Canlı tersine eksiltme ve dijital B2B satın alma platformu.' },
+        { property: 'og:type', content: 'website' },
+        { property: 'og:url', content: 'https://gelanlasalim-v2.vercel.app' }
       ],
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap' }
+        { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap' },
+        { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
       ]
     }
   },

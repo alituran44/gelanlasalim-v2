@@ -155,8 +155,13 @@ export function detectLocale() {
     const saved = localStorage.getItem('user_locale') as Locale
     if (saved === 'tr' || saved === 'en') {
       locale.value = saved
-      return
+    } else {
+      locale.value = 'en'
     }
+    if (document && document.documentElement) {
+      document.documentElement.lang = locale.value
+    }
+    return
   }
   locale.value = 'en'
 }
@@ -165,6 +170,9 @@ export function setLocale(newLocale: Locale) {
   locale.value = newLocale
   if (typeof window !== 'undefined') {
     localStorage.setItem('user_locale', newLocale)
+    if (document && document.documentElement) {
+      document.documentElement.lang = newLocale
+    }
   }
 }
 
