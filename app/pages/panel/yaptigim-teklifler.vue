@@ -1,37 +1,65 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { SendHorizonal, Clock, CheckCircle2, XCircle, AlertCircle, Eye } from 'lucide-vue-next'
+import { useCmsData } from '~/composables/useCmsData'
+import { locale } from '~/composables/useLocale'
 
 definePageMeta({ layout: 'dashboard' })
 
-import { computed } from 'vue'
 const { cmsData } = useCmsData()
 
-const teklifler = computed(() => cmsData.value.dashboard.submittedBids)
+const teklifler = computed(() => cmsData.value.dashboard.submittedBids || [])
 
-const durumConfig: Record<string, { label: string, icon: any, style: string }> = {
-  bekliyor: { label: 'Değerlendiriliyor', icon: AlertCircle, style: 'background: rgba(245,158,11,0.1); color: #D97706;' },
-  onaylandi: { label: 'Kabul Edildi ✓', icon: CheckCircle2, style: 'background: rgba(34,197,94,0.1); color: #16A34A;' },
-  reddedildi: { label: 'Reddedildi', icon: XCircle, style: 'background: rgba(239,68,68,0.1); color: #DC2626;' },
+const getDurumConfig = (durum: string) => {
+  if (locale.value === 'en') {
+    switch (durum) {
+      case 'onaylandi':
+        return { label: 'Accepted ✓', icon: CheckCircle2, style: 'background: rgba(34,197,94,0.1); color: #16A34A;' }
+      case 'reddedildi':
+        return { label: 'Rejected', icon: XCircle, style: 'background: rgba(239,68,68,0.1); color: #DC2626;' }
+      default:
+        return { label: 'Under Evaluation', icon: AlertCircle, style: 'background: rgba(245,158,11,0.1); color: #D97706;' }
+    }
+  } else {
+    switch (durum) {
+      case 'onaylandi':
+        return { label: 'Kabul Edildi ✓', icon: CheckCircle2, style: 'background: rgba(34,197,94,0.1); color: #16A34A;' }
+      case 'reddedildi':
+        return { label: 'Reddedildi', icon: XCircle, style: 'background: rgba(239,68,68,0.1); color: #DC2626;' }
+      default:
+        return { label: 'Değerlendiriliyor', icon: AlertCircle, style: 'background: rgba(245,158,11,0.1); color: #D97706;' }
+    }
+  }
 }
 </script>
 
 <template>
-  <div class="p-6 max-w-5xl mx-auto">
+  <div class="p-6 max-w-5xl mx-auto text-left space-y-6">
 
     <!-- Başlık -->
-    <div class="mb-6">
-      <h1 class="text-xl font-bold" style="color: #0F172A;">Yaptığım Teklifler</h1>
-      <p class="text-sm mt-0.5" style="color: #64748B;">Verdiğiniz tekliflerin durumunu takip edin</p>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #F1F5F9;">
+      <div>
+        <h1 class="text-xl font-black text-slate-800 tracking-tight" style="color: #0F172A;">
+          {{ locale === 'tr' ? 'Verdiğim Teklifler' : 'My Submitted Bids' }}
+        </h1>
+        <p class="text-xs text-slate-500 font-medium mt-0.5">
+          {{ locale === 'tr' ? 'İhalelere verdiğiniz tekliflerin durumunu ve sürecini takip edin' : 'Track bid evaluation status, price quotes and delivery terms' }}
+        </p>
+      </div>
     </div>
 
     <!-- Bilgi Notu -->
     <div
-      class="flex items-center gap-2 rounded-lg px-4 py-3 mb-5 text-sm"
+      class="flex items-center gap-2 rounded-xl px-4 py-3 text-xs font-bold"
       style="background: rgba(0,48,87,0.05); border: 1px solid rgba(0,48,87,0.1); color: #003057;"
     >
-      <Eye :size="15" style="color: #1EAE4C;" />
-      <span>Alıcı firma bilgileri gizlidir. Teklif kabul edildiğinde iletişim bilgileri açılır.</span>
+      <Eye :size="15" style="color: #1EAE4C;" class="shrink-0" />
+      <span>
+        {{ locale === 'tr' 
+          ? 'Alıcı firma bilgileri gizlidir. Teklif kabul edildiğinde iletişim bilgileri doğrudan açılır.' 
+          : 'Buyer credentials are protected. Full contact info is revealed upon bid acceptance.' 
+        }}
+      </span>
     </div>
 
     <!-- Teklif Kartları -->
@@ -39,72 +67,51 @@ const durumConfig: Record<string, { label: string, icon: any, style: string }> =
       <div
         v-for="teklif in teklifler"
         :key="teklif.id"
-        class="rounded-xl border bg-white p-5 transition hover:shadow-sm"
+        class="rounded-2xl border bg-white p-5 transition hover:shadow-md shadow-xs"
         style="border-color: #E2E8F0;"
       >
-        <div class="flex items-start justify-between gap-6">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
 
-          <div class="flex-1 min-w-0">
+          <div class="flex-1 min-w-0 space-y-2">
             <!-- İlan Başlığı -->
-            <div class="flex items-center gap-2 mb-2">
-              <SendHorizonal :size="15" style="color: #1EAE4C;" />
-              <span class="font-semibold text-sm" style="color: #0F172A;">{{ teklif.ilanBaslik }}</span>
+            <div class="flex items-center gap-2">
+              <SendHorizonal :size="15" style="color: #1EAE4C;" class="shrink-0" />
+              <span class="font-bold text-sm text-slate-800">{{ teklif.ilanBaslik }}</span>
             </div>
 
-            <div class="flex flex-wrap items-center gap-3 text-xs" style="color: #94A3B8;">
+            <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400 font-medium">
               <span>{{ teklif.kategori }}</span>
-              <span>·</span>
-              <span>Alıcı: <b style="color: #475569;">{{ teklif.aliciFirma }}</b></span>
-              <span>·</span>
-              <span class="font-mono">{{ teklif.id }}</span>
+              <span>•</span>
+              <span>{{ locale === 'tr' ? 'Alıcı:' : 'Buyer:' }} <b class="text-slate-700 font-bold">{{ teklif.aliciFirma }}</b></span>
+              <span>•</span>
+              <span class="font-mono text-slate-400">{{ teklif.id }}</span>
             </div>
 
-            <!-- Not -->
-            <p v-if="teklif.notum" class="mt-2 text-xs rounded-md px-3 py-2" style="background: #F8FAFC; color: #475569; border-left: 3px solid #E2E8F0;">
-              "{{ teklif.notum }}"
-            </p>
+            <div class="flex items-center gap-2 text-xs text-slate-500 font-medium pt-1">
+              <Clock :size="13" class="text-slate-400" />
+              <span>{{ locale === 'tr' ? 'Teslimat Süresi:' : 'Delivery Time:' }} <strong>{{ teklif.teslimSuresi }}</strong></span>
+              <span>•</span>
+              <span>{{ locale === 'tr' ? 'Teklif Tarihi:' : 'Submitted Date:' }} {{ teklif.tarih }}</span>
+            </div>
           </div>
 
-          <!-- Sağ taraf -->
-          <div class="flex flex-col items-end gap-3 shrink-0">
-            <!-- Durum Badge -->
-            <span
-              class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-medium"
-              :style="durumConfig[teklif.durum].style"
-            >
-              <component :is="durumConfig[teklif.durum].icon" :size="12" />
-              {{ durumConfig[teklif.durum].label }}
+          <div class="flex sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-3 shrink-0">
+            <span class="text-lg font-black font-mono text-slate-900" style="color: #003057;">
+              {{ teklif.verilenTeklif }}
             </span>
 
-            <!-- Fiyat + Süre -->
-            <div class="text-right">
-              <div class="text-lg font-bold" style="color: #003057;">{{ teklif.teklifFiyatim }}</div>
-              <div class="flex items-center gap-1 text-xs" style="color: #94A3B8;">
-                <Clock :size="11" />
-                {{ teklif.sure }} teslimat
-              </div>
-            </div>
-
-            <!-- Bitiş tarihi -->
-            <div class="text-xs" style="color: #CBD5E1;">
-              İlan bitiş: {{ teklif.bitisTarihi }}
-            </div>
+            <span
+              class="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-bold"
+              :style="getDurumConfig(teklif.durum).style"
+            >
+              <component :is="getDurumConfig(teklif.durum).icon" :size="12" />
+              {{ getDurumConfig(teklif.durum).label }}
+            </span>
           </div>
 
         </div>
       </div>
-
-      <!-- Boş durum -->
-      <div
-        v-if="teklifler.length === 0"
-        class="rounded-xl border bg-white py-16 text-center"
-        style="border-color: #E2E8F0;"
-      >
-        <SendHorizonal :size="40" class="mx-auto mb-3" style="color: #CBD5E1;" />
-        <p class="font-medium" style="color: #0F172A;">Henüz teklif vermediniz</p>
-        <p class="text-sm mt-1" style="color: #94A3B8;">Aktif ihaleleri inceleyerek teklif verebilirsiniz.</p>
-      </div>
-
     </div>
+
   </div>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { RotateCw, Coins, ArrowRight, DollarSign, Calculator } from 'lucide-vue-next'
+import { locale } from '~/composables/useLocale'
 
 definePageMeta({
   layout: "dashboard"
@@ -27,7 +28,7 @@ const convertedResult = computed(() => {
   const amountInTry = amount * fromRate
   const finalAmount = amountInTry / toRate
   
-  return new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(finalAmount)
+  return new Intl.NumberFormat(locale.value === 'tr' ? 'tr-TR' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(finalAmount)
 })
 
 function triggerRefresh() {
@@ -44,48 +45,57 @@ function triggerRefresh() {
     <!-- Top Header -->
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4" style="border-color: #F1F5F9;">
       <div>
-        <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">KAYNAK: TCMB (DÖVİZ) - GOLD API (EMTİA)</span>
-        <h1 class="text-2xl font-black text-slate-800 mt-1" style="color: #0F172A;">Kur ve Emtia Panosu</h1>
-        <p class="text-xs text-slate-500 mt-1">Toplam 5 enstrüman izleniyor. Bu veriler ihale fiyatlandırması ve satın alma analizi için referans amaçlıdır; canlı işlem fiyatı değildir.</p>
+        <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">
+          {{ locale === 'tr' ? 'KAYNAK: TCMB (DÖVİZ) - GOLD API (EMTİA)' : 'SOURCE: CENTRAL BANK (FX) - GOLD API (COMMODITIES)' }}
+        </span>
+        <h1 class="text-xl font-black text-slate-800 mt-1 tracking-tight" style="color: #0F172A;">
+          {{ locale === 'tr' ? 'Kur ve Emtia Panosu' : 'Exchange Rates & Commodities Board' }}
+        </h1>
+        <p class="text-xs text-slate-500 font-medium mt-0.5">
+          {{ locale === 'tr' 
+            ? 'Toplam 5 enstrüman izleniyor. Bu veriler ihale fiyatlandırması ve satın alma analizi için referans amaçlıdır.' 
+            : '5 market instruments tracked. Provided for procurement benchmark and FX pricing calculation.' 
+          }}
+        </p>
       </div>
 
       <!-- Quick Info Badges -->
       <div class="flex flex-wrap items-center gap-4 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
         <div>
-          <span class="block text-[8px] text-slate-300">DÖVİZ KURLARI</span>
-          <span class="text-slate-700">3 TCMB resmi</span>
+          <span class="block text-[8px] text-slate-400 font-medium">{{ locale === 'tr' ? 'DÖVİZ KURLARI' : 'FOREX RATES' }}</span>
+          <span class="text-slate-700">3 {{ locale === 'tr' ? 'TCMB resmi' : 'Central Bank' }}</span>
         </div>
         <div class="h-6 w-px bg-slate-200"></div>
         <div>
-          <span class="block text-[8px] text-slate-300">DEĞERLİ METALLER</span>
-          <span class="text-slate-700">2 Gold API - Spot</span>
+          <span class="block text-[8px] text-slate-400 font-medium">{{ locale === 'tr' ? 'DEĞERLİ METALLER' : 'PRECIOUS METALS' }}</span>
+          <span class="text-slate-700">2 Gold API</span>
         </div>
         <div class="h-6 w-px bg-slate-200"></div>
         <div>
-          <span class="block text-[8px] text-slate-300">SON GÜNCELLEME</span>
-          <span class="text-slate-700 font-mono text-[9px]">23:34 Referans kurlar</span>
+          <span class="block text-[8px] text-slate-400 font-medium">{{ locale === 'tr' ? 'SON GÜNCELLEME' : 'LAST UPDATE' }}</span>
+          <span class="text-slate-700 font-mono text-[9px]">{{ locale === 'tr' ? 'Canlı kurlar' : 'Live rates' }}</span>
         </div>
       </div>
     </div>
 
     <!-- Actions & Info -->
-    <div class="flex justify-between items-center bg-white border p-3 rounded-xl" style="border-color: #E2E8F0;">
+    <div class="flex justify-between items-center bg-white border p-3 rounded-xl shadow-xs" style="border-color: #E2E8F0;">
       <div class="flex items-center gap-2">
         <span class="relative flex h-2 w-2">
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
         </span>
-        <span class="text-xs font-bold text-slate-600">Referans Kurlar Aktif</span>
+        <span class="text-xs font-bold text-slate-700">{{ locale === 'tr' ? 'Referans Kurlar Aktif' : 'Reference Rates Active' }}</span>
       </div>
 
       <button 
         type="button" 
         @click="triggerRefresh"
-        class="flex items-center gap-1.5 rounded-lg border px-3 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition" 
+        class="flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition cursor-pointer" 
         style="border-color: #E2E8F0;"
       >
         <RotateCw :size="13" :class="isRefreshing ? 'animate-spin' : ''" />
-        Yenile
+        {{ locale === 'tr' ? 'Yenile' : 'Refresh' }}
       </button>
     </div>
 

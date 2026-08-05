@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue"
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -12,6 +13,7 @@ import {
 } from "chart.js"
 
 import { Line } from "vue-chartjs"
+import { locale } from "~/composables/useLocale"
 
 ChartJS.register(
   CategoryScale,
@@ -24,26 +26,37 @@ ChartJS.register(
   Filler
 )
 
-const chartData = {
-  labels: [
-    "Ocak",
-    "Şubat",
-    "Mart",
-    "Nisan",
-    "Mayıs",
-    "Haziran"
-  ],
-  datasets: [
-    {
-      label: "Açılan İhaleler",
-      data: [12, 19, 14, 28, 35, 41],
-      borderColor: "#2563eb",
-      backgroundColor: "rgba(37,99,235,.12)",
-      fill: true,
-      tension: 0.4
+const chartData = computed(() => {
+  if (locale.value === 'en') {
+    return {
+      labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+      datasets: [
+        {
+          label: "Published Tenders",
+          data: [12, 19, 14, 28, 35, 41],
+          borderColor: "#2563eb",
+          backgroundColor: "rgba(37,99,235,.12)",
+          fill: true,
+          tension: 0.4
+        }
+      ]
     }
-  ]
-}
+  } else {
+    return {
+      labels: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran"],
+      datasets: [
+        {
+          label: "Açılan İhaleler",
+          data: [12, 19, 14, 28, 35, 41],
+          borderColor: "#2563eb",
+          backgroundColor: "rgba(37,99,235,.12)",
+          fill: true,
+          tension: 0.4
+        }
+      ]
+    }
+  }
+})
 
 const chartOptions = {
   responsive: true,
@@ -70,38 +83,27 @@ const chartOptions = {
 </script>
 
 <template>
-  <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-
+  <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
     <div class="mb-6 flex items-center justify-between">
-
       <div>
-
-        <h2 class="text-xl font-bold text-slate-800">
-          İhale Analizi
+        <h2 class="text-base font-black text-slate-800 tracking-tight">
+          {{ locale === 'tr' ? 'İhale Trend Analizi' : 'Tender Volume Analytics' }}
         </h2>
-
-        <p class="text-sm text-slate-500">
-          Son 6 aylık ihale istatistikleri
+        <p class="text-xs font-medium text-slate-500 mt-0.5">
+          {{ locale === 'tr' ? 'Son 6 aylık ihale hacmi istatistikleri' : '6-month cumulative tender activity trends' }}
         </p>
-
       </div>
 
-      <div
-        class="rounded-lg bg-blue-100 px-3 py-1 text-sm font-semibold text-blue-700"
-      >
-        +18%
+      <div class="rounded-full bg-blue-50 border border-blue-200 px-3 py-1 text-xs font-bold text-blue-700">
+        +18% {{ locale === 'tr' ? 'Büyüme' : 'Growth' }}
       </div>
-
     </div>
 
-    <div class="h-[360px]">
-
+    <div class="h-[340px]">
       <Line
         :data="chartData"
         :options="chartOptions"
       />
-
     </div>
-
   </div>
 </template>

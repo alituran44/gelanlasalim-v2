@@ -1,93 +1,103 @@
 <script setup lang="ts">
-import { ref } from "vue"
+import { computed } from "vue"
+import { locale } from "~/composables/useLocale"
 
-const activities = ref([
-  {
-    id: 1,
-    title: "Yeni ihale oluşturuldu",
-    description: "Dizüstü Bilgisayar Alımı",
-    time: "5 dk önce",
-    color: "bg-blue-500"
-  },
-  {
-    id: 2,
-    title: "Yeni teklif geldi",
-    description: "ABC Teknoloji teklif verdi",
-    time: "18 dk önce",
-    color: "bg-green-500"
-  },
-  {
-    id: 3,
-    title: "İhale yayına alındı",
-    description: "Ofis Mobilyaları",
-    time: "1 saat önce",
-    color: "bg-orange-500"
-  },
-  {
-    id: 4,
-    title: "Firma kaydı tamamlandı",
-    description: "Mavi Yazılım Ltd.",
-    time: "Bugün",
-    color: "bg-purple-500"
+const activities = computed(() => {
+  if (locale.value === 'en') {
+    return [
+      {
+        id: 1,
+        title: "New tender created",
+        description: "Laptop Computer Procurement",
+        time: "5 mins ago",
+        color: "bg-blue-500"
+      },
+      {
+        id: 2,
+        title: "New supplier bid received",
+        description: "ABC Technology Inc. submitted quote",
+        time: "18 mins ago",
+        color: "bg-[#1EAE4C]"
+      },
+      {
+        id: 3,
+        title: "Tender published live",
+        description: "Office Furniture Supply Batch",
+        time: "1 hour ago",
+        color: "bg-amber-500"
+      },
+      {
+        id: 4,
+        title: "Company profile verified",
+        description: "Mavi Software Systems Ltd.",
+        time: "Today",
+        color: "bg-purple-500"
+      }
+    ]
+  } else {
+    return [
+      {
+        id: 1,
+        title: "Yeni ihale oluşturuldu",
+        description: "Dizüstü Bilgisayar Alımı",
+        time: "5 dk önce",
+        color: "bg-blue-500"
+      },
+      {
+        id: 2,
+        title: "Yeni teklif geldi",
+        description: "ABC Teknoloji teklif verdi",
+        time: "18 dk önce",
+        color: "bg-[#1EAE4C]"
+      },
+      {
+        id: 3,
+        title: "İhale yayına alındı",
+        description: "Ofis Mobilyaları",
+        time: "1 saat önce",
+        color: "bg-amber-500"
+      },
+      {
+        id: 4,
+        title: "Firma kaydı tamamlandı",
+        description: "Mavi Yazılım Ltd.",
+        time: "Bugün",
+        color: "bg-purple-500"
+      }
+    ]
   }
-])
+})
 </script>
 
 <template>
+  <div class="rounded-2xl bg-white border border-slate-200 shadow-xs">
+    <div class="border-b border-slate-100 p-6">
+      <h2 class="text-base font-black text-slate-800 tracking-tight">
+        {{ locale === 'tr' ? 'Aktivite Akışı' : 'Live Activity Stream' }}
+      </h2>
+      <p class="text-xs font-medium text-slate-500 mt-0.5">
+        {{ locale === 'tr' ? 'Son sistem hareketleri ve ihale takipleri' : 'Recent platform events and procurement updates' }}
+      </p>
+    </div>
 
-<div class="rounded-2xl bg-white border border-slate-200 shadow-sm">
-
-<div class="border-b border-slate-100 p-6">
-
-<h2 class="text-xl font-bold">
-Aktivite Akışı
-</h2>
-
-<p class="text-sm text-slate-500">
-Son sistem hareketleri
-</p>
-
-</div>
-
-<div class="p-6 space-y-6">
-
-<div
-v-for="item in activities"
-:key="item.id"
-class="flex gap-4"
->
-
-<div
-class="w-3 h-3 rounded-full mt-2"
-:class="item.color"
-/>
-
-<div class="flex-1">
-
-<div class="font-semibold">
-
-{{ item.title }}
-
-</div>
-
-<div class="text-sm text-slate-500 mt-1">
-
-{{ item.description }}
-
-</div>
-
-<div class="text-xs text-slate-400 mt-2">
-
-{{ item.time }}
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
+    <div class="p-6 space-y-5">
+      <div
+        v-for="item in activities"
+        :key="item.id"
+        class="flex gap-4 items-start"
+      >
+        <div
+          class="h-3 w-3 rounded-full mt-1 shrink-0"
+          :class="item.color"
+        ></div>
+        <div class="space-y-0.5">
+          <div class="flex items-center gap-2">
+            <h3 class="text-xs font-bold text-slate-800">{{ item.title }}</h3>
+            <span class="text-[10px] font-medium text-slate-400">• {{ item.time }}</span>
+          </div>
+          <p class="text-xs text-slate-500 font-medium">{{ item.description }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>

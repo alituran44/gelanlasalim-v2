@@ -482,8 +482,15 @@ function saveProfile() {
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="docsCount === 6 ? 'bg-blue-400' : 'bg-emerald-400'"></span>
           <span class="relative inline-flex rounded-full h-2 w-2" :class="docsCount === 6 ? 'bg-blue-500' : 'bg-emerald-500'"></span>
         </span>
-        <span v-if="docsCount === 6">🍀 Tüm belgeleriniz yüklendi. Doğrulama süreci tamamlanmak üzere inceleniyor.</span>
-        <span v-else>🏢 Şirket kimliği ve fatura bilgileriniz hazır. Tam hesap aktivasyonu için kalan eksik belgeleri ({{ 6 - docsCount }} adet) yükleyin.</span>
+        <span v-if="docsCount === 6">
+          {{ locale === 'tr' ? '🍀 Tüm belgeleriniz yüklendi. Doğrulama süreci tamamlanmak üzere inceleniyor.' : '🍀 All documents uploaded. Verification is currently under review.' }}
+        </span>
+        <span v-else>
+          {{ locale === 'tr' 
+            ? `🏢 Şirket kimliği ve fatura bilgileriniz hazır. Tam hesap aktivasyonu için kalan eksik belgeleri (${6 - docsCount} adet) yükleyin.` 
+            : `🏢 Corporate identity ready. Please upload remaining required documents (${6 - docsCount} left) for full activation.` 
+          }}
+        </span>
       </div>
       <button 
         type="button"
@@ -491,7 +498,7 @@ function saveProfile() {
         class="rounded-lg text-white px-3 py-1.5 transition self-start sm:self-auto font-bold"
         :class="docsCount === 6 ? 'bg-blue-800 hover:bg-blue-900' : 'bg-emerald-800 hover:bg-emerald-900'"
       >
-        {{ docsCount === 6 ? 'Belgeleri İncele' : 'Kalan Belgeleri Yükle' }}
+        {{ docsCount === 6 ? (locale === 'tr' ? 'Belgeleri İncele' : 'Review Documents') : (locale === 'tr' ? 'Kalan Belgeleri Yükle' : 'Upload Remaining') }}
       </button>
     </div>
 
