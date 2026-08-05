@@ -1453,9 +1453,18 @@ function toggleFilterSection(section: string) {
                     </div>
                     <p class="mt-3 text-xs leading-relaxed text-slate-500 font-medium">{{ res.description }}</p>
 
-                    <div class="mt-5 flex flex-wrap gap-4 text-xs font-bold text-slate-400">
+                    <div class="mt-5 flex flex-wrap items-center gap-4 text-xs font-bold text-slate-400">
                       <span class="flex items-center gap-1.5"><MapPin :size="14" /> {{ res.city }}</span>
                       <span class="flex items-center gap-1.5"><Clock3 :size="14" /> {{ res.offers }} {{ locale === 'tr' ? 'teklif toplandı' : 'bids submitted' }}</span>
+                      <a 
+                        :href="'data:text/plain;charset=utf-8,' + encodeURIComponent('TEKNİK VE İDARİ ŞARTNAME DOSYASI\n----------------------------------------\nİhale No: 2026/' + (100000 + res.id) + '\nİhale Başlığı: ' + res.title + '\nAlıcı Firma: ' + res.company + '\nTeslimat Şehri: ' + res.city + '\n\nİŞİN NİTELİĞİ VE AÇIKLAMA:\n' + res.description + '\n\nMALZEME / HİZMET LİSTESİ:\n' + res.material_list + '\n\nİDARİ ŞARTLAR:\n' + res.admin_spec + '\n\nTEKNİK ŞARTLAR:\n' + res.tech_spec)" 
+                        :download="'Ihale_Sartnamesi_2026_' + res.id + '.txt'" 
+                        class="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-sm"
+                        title="İhale şartname ve malzeme listesi dosyasını bilgisayara indir"
+                      >
+                        <Download :size="13" class="text-emerald-600" />
+                        <span>{{ locale === 'tr' ? '📄 Şartnameyi İndir (.PDF)' : '📄 Download Spec (.PDF)' }}</span>
+                      </a>
                     </div>
                   </div>
 

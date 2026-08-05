@@ -54,80 +54,63 @@ const activeTenders = ref([
 
       <!-- Header -->
       <header class="w-full bg-white border-b transition-all" style="border-color: #E2E8F0;">
-      <div class="mx-auto flex h-[68px] max-w-7xl items-center justify-between px-6">
+      <div class="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-6">
 
-        <!-- Sol: Logo -->
-        <NuxtLink to="/" class="flex items-center gap-2 hover:opacity-90 transition shrink-0">
-          <img src="/logo.png" alt="GelAnlaşalım B2B Tersine İhale Platformu Logo" class="h-9 w-auto" />
+        <!-- Sol: Logo (Prominent & Eye-Catching) -->
+        <NuxtLink to="/" class="flex items-center gap-3 hover:opacity-90 transition shrink-0 group">
+          <img src="/logo.png" alt="GelAnlaşalım B2B Tersine İhale Platformu Logo" class="h-11 sm:h-12 w-auto drop-shadow-sm group-hover:scale-105 transition-transform" />
+          <span class="hidden xl:inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-black text-emerald-700 border border-emerald-200">
+            ✓ {{ locale === 'tr' ? 'ONAYLI B2B' : 'VERIFIED B2B' }}
+          </span>
         </NuxtLink>
 
-        <!-- Orta: Nav Linkleri -->
-        <nav class="hidden lg:flex items-center rounded-full border p-1" style="border-color: #E2E8F0; background: #F8FAFC;">
-          <a
-            href="/#nasil-calisir"
-            class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
-            style="color: #0F172A;"
-            onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
-            onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
-          >{{ locale === 'tr' ? 'Nasıl Çalışır' : 'How it Works' }}</a>
-          <a
-            href="/#ozellikler"
-            class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
-            style="color: #0F172A;"
-            onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
-            onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
-          >{{ locale === 'tr' ? 'Özellikler' : 'Features' }}</a>
-          <a
-            href="/#ihale-gezgini"
-            class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
-            style="color: #0F172A;"
-            onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
-            onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
-          >{{ locale === 'tr' ? 'Market' : 'Market' }}</a>
-          <NuxtLink
-            to="/abonelik"
-            class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
-            style="color: #0F172A;"
-            onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
-            onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
-          >{{ t('pricing') }}</NuxtLink>
-          <a
-            href="/#sss"
-            class="rounded-full px-4 py-2 text-xs font-semibold transition-all"
-            style="color: #0F172A;"
-            onmouseover="this.style.background='white'; this.style.color='#003057'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)'"
-            onmouseout="this.style.background='transparent'; this.style.color='#0F172A'; this.style.boxShadow='none'"
-          >{{ locale === 'tr' ? 'SSS' : 'FAQ' }}</a>
-        </nav>
+        <!-- Orta: Hızlı İhale & Teklif Erişim Buton Şeridi -->
+        <div class="hidden lg:flex items-center gap-1 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-inner">
+          <NuxtLink 
+            to="/panel/ilanlarim" 
+            class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-blue-600 hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            📋 <span>{{ locale === 'tr' ? 'İlanlarım' : 'My Tenders' }}</span>
+          </NuxtLink>
+          <NuxtLink 
+            to="/panel/gelen-teklifler" 
+            class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-blue-600 hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            📥 <span>{{ locale === 'tr' ? 'Aldığım Teklifler' : 'Received Bids' }}</span>
+          </NuxtLink>
+          <NuxtLink 
+            to="/panel/yaptigim-teklifler" 
+            class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-blue-600 hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            📤 <span>{{ locale === 'tr' ? 'Verdiğim Teklifler' : 'My Bids' }}</span>
+          </NuxtLink>
+        </div>
 
-        <!-- Sağ: CTA Butonlar -->
-        <div class="hidden lg:flex items-center gap-2">
+        <!-- Sağ: CTA & Dil Seçimi -->
+        <div class="hidden sm:flex items-center gap-2">
           <!-- Dil Seçimi (Dropdown) -->
           <button 
             type="button" 
             @click="setLocale(locale === 'tr' ? 'en' : 'tr')"
-            class="flex items-center gap-1.5 hover:bg-slate-100 px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-600 transition"
+            class="flex items-center gap-1.5 hover:bg-slate-100 px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-600 transition border border-slate-200/60"
           >
             🌐 {{ locale === 'tr' ? 'EN' : 'TR' }}
           </button>
 
           <NuxtLink
             to="/uyelik"
-            class="px-4 py-2.5 text-xs font-semibold rounded-lg transition-all"
-            style="color: #0F172A;"
-            onmouseover="this.style.background='#F1F5F9'; this.style.color='#003057'"
-            onmouseout="this.style.background='transparent'; this.style.color='#0F172A'"
+            class="px-3.5 py-2 text-xs font-bold rounded-xl transition-all text-slate-700 hover:bg-slate-100"
           >
             {{ t('login') }}
           </NuxtLink>
           <NuxtLink
             to="/uyelik"
-            class="flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-bold text-white transition-all"
+            class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-extrabold text-white transition-all shadow-md shadow-blue-950/10 hover:shadow-lg"
             style="background: #003057;"
             onmouseover="this.style.background='#1EAE4C'"
             onmouseout="this.style.background='#003057'"
           >
-            {{ locale === 'tr' ? 'Kurumsal hesap aç' : 'Open business account' }}
+            {{ locale === 'tr' ? 'Kurumsal Hesap Aç' : 'Open Business Account' }}
             <ArrowRight :size="13" />
           </NuxtLink>
         </div>
