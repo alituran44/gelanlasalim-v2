@@ -9,7 +9,7 @@ const city = ref("")
 
 function search() {
   navigateTo({
-    path: "/ihaleler",
+    path: "/pazar-yeri",
     query: {
       q: keyword.value,
       category: category.value,

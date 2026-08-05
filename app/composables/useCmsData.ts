@@ -245,33 +245,39 @@ export const DEFAULT_CMS_DATA = {
   ]
 }
 
-export function useCmsData() {
-  const cmsData = ref({ ...DEFAULT_CMS_DATA })
+const cmsDataRef = ref({ ...DEFAULT_CMS_DATA })
+let isInitialized = false
 
-  // Initialize and load data on client side
-  if (typeof window !== 'undefined') {
-    // Force English locale default and reset CMS data to English
-    localStorage.setItem('user_locale', 'en')
-    localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
-    cmsData.value = { ...DEFAULT_CMS_DATA }
+export function useCmsData() {
+  // Initialize and load data on client side once
+  if (typeof window !== 'undefined' && !isInitialized) {
+    isInitialized = true
+    const saved = localStorage.getItem('cmsData')
+    if (saved) {
+      try {
+        cmsDataRef.value = JSON.parse(saved)
+      } catch (e) {
+        cmsDataRef.value = { ...DEFAULT_CMS_DATA }
+      }
+    }
   }
 
   function saveCmsData(newData: typeof DEFAULT_CMS_DATA) {
-    cmsData.value = { ...newData }
+    cmsDataRef.value = { ...newData }
     if (typeof window !== 'undefined') {
       localStorage.setItem('cmsData', JSON.stringify(newData))
     }
   }
 
   function resetCmsData() {
-    cmsData.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
+    cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
     if (typeof window !== 'undefined') {
       localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
     }
   }
 
   return {
-    cmsData,
+    cmsData: cmsDataRef,
     saveCmsData,
     resetCmsData
   }

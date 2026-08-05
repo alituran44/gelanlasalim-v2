@@ -247,26 +247,51 @@ function setTab(tab: TabKey) {
             </div>
           </article>
 
-          <!-- BLOG & BASIN -->
+          <!-- BLOG -->
           <article v-if="activeTab === 'blog'" class="space-y-6">
-            <h1 class="text-2xl font-black text-slate-800 tracking-tight">Blog & Basın Odası</h1>
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight">{{ locale === 'tr' ? 'Blog & Makaleler' : 'Blog & Articles' }}</h1>
             <p class="text-xs text-slate-500 leading-relaxed font-medium">
-              Satın alma operasyonlarınızı verimli hale getirecek ipuçları ve platformumuz hakkında en güncel basın bültenleri.
+              {{ locale === 'tr' ? 'Satın alma operasyonlarınızı verimli hale getirecek ipuçları ve sektörel analizler.' : 'Insights, tips, and industry analyses to streamline your B2B procurement operations.' }}
             </p>
             <div class="space-y-4">
-              <div class="flex gap-4 p-3 rounded-2xl hover:bg-slate-50 transition border border-transparent hover:border-slate-100">
-                <div class="h-16 w-16 bg-[#003057]/10 text-[#003057] flex items-center justify-center rounded-xl font-mono text-[9px] font-black uppercase shrink-0">B2B</div>
+              <div class="flex gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div class="h-14 w-14 bg-blue-100 text-blue-700 flex items-center justify-center rounded-xl font-mono text-[9px] font-black uppercase shrink-0">B2B</div>
                 <div>
-                  <h4 class="text-xs font-bold text-slate-800">Tersine İhale ile Tedarik Tasarrufunuzu Nasıl %14 Artırırsınız?</h4>
-                  <p class="text-[10px] text-slate-400 mt-1">Geleneksel pazarlık süreçlerini geride bırakarak rekabet arenaları ile tasarrufu katlamanın formülü.</p>
+                  <h4 class="text-xs font-bold text-slate-800">{{ locale === 'tr' ? 'Tersine İhale ile Tedarik Tasarrufunuzu Nasıl %14 Artırırsınız?' : 'How to Increase Procurement Savings by 14% via Reverse Auctions' }}</h4>
+                  <p class="text-[10px] text-slate-500 mt-1 leading-relaxed">{{ locale === 'tr' ? 'Geleneksel pazarlık süreçlerini geride bırakarak rekabet arenaları ile tasarrufu katlamanın formülü.' : 'Formula for multiplying cost savings using competitive live bidding arenas.' }}</p>
                 </div>
               </div>
-              <div class="flex gap-4 p-3 rounded-2xl hover:bg-slate-50 transition border border-transparent hover:border-slate-100">
-                <div class="h-16 w-16 bg-[#003057]/10 text-[#003057] flex items-center justify-center rounded-xl font-mono text-[9px] font-black uppercase shrink-0">EKAP</div>
+              <div class="flex gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100">
+                <div class="h-14 w-14 bg-blue-100 text-blue-700 flex items-center justify-center rounded-xl font-mono text-[9px] font-black uppercase shrink-0">EKAP</div>
                 <div>
-                  <h4 class="text-xs font-bold text-slate-800">Kamu İhale Standartlarının Özel Sektör Satın Almalarına Entegrasyonu</h4>
-                  <p class="text-[10px] text-slate-400 mt-1">Ekap sistemindeki şeffaflık ilkelerini şirket içi B2B satın alma akışlarında kullanma yöntemleri.</p>
+                  <h4 class="text-xs font-bold text-slate-800">{{ locale === 'tr' ? 'Kamu İhale Standartlarının Özel Sektör Satın Almalarına Entegrasyonu' : 'Integrating Public Procurement Standards into B2B Purchases' }}</h4>
+                  <p class="text-[10px] text-slate-500 mt-1 leading-relaxed">{{ locale === 'tr' ? 'Ekap sistemindeki şeffaflık ilkelerini şirket içi B2B satın alma akışlarında kullanma yöntemleri.' : 'Best practices for leveraging public transparency principles in corporate B2B purchasing.' }}</p>
                 </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- BASIN ODASI -->
+          <article v-if="activeTab === 'basin'" class="space-y-6">
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight">{{ locale === 'tr' ? 'Basın Odası & Görseller' : 'Press Room & Media Kit' }}</h1>
+            <p class="text-xs text-slate-500 leading-relaxed font-medium">
+              {{ locale === 'tr' ? 'GelAnlaşalım hakkında basın bültenleri, haberler ve resmi logo/medya kiti varlıkları.' : 'Press releases, news coverage, and official brand logo/media kit assets.' }}
+            </p>
+            <div class="space-y-4">
+              <div class="p-4 rounded-2xl border border-slate-100 bg-slate-50 space-y-2">
+                <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider block">BASIN BÜLTENİ · 2026</span>
+                <h4 class="text-xs font-bold text-slate-800">{{ locale === 'tr' ? 'GelAnlaşalım: Özel Sektörün Canlı Ters İhale Arenası Açıldı' : 'GelAnlaşalım Launch: B2B Live Reverse Auction Arena Goes Live' }}</h4>
+                <p class="text-[11px] text-slate-500 leading-relaxed">{{ locale === 'tr' ? 'Balıkesir merkezli teknoloji şirketi GelAnlaşalım, kurumsal satın alma maliyetlerini düşüren dijital eksiltme platformunu yayına aldı.' : 'Tech platform GelAnlaşalım rolls out its digital reverse auction suite aimed at cutting corporate procurement costs.' }}</p>
+              </div>
+              
+              <div class="p-4 rounded-2xl border border-blue-100 bg-blue-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div>
+                  <h4 class="font-bold text-slate-800">{{ locale === 'tr' ? 'Vektörel Logo & Medya Kiti (.ZIP)' : 'Vector Logos & Media Kit (.ZIP)' }}</h4>
+                  <p class="text-[10px] text-slate-500 mt-0.5">{{ locale === 'tr' ? 'Yüksek çözünürlüklü amblem, logo ve kurumsal kimlik kılavuzu.' : 'High-resolution emblem, logos, and brand guidelines.' }}</p>
+                </div>
+                <a href="/logo.png" download class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl text-center transition">
+                  {{ locale === 'tr' ? 'İndir (PNG / SVG)' : 'Download (PNG / SVG)' }}
+                </a>
               </div>
             </div>
           </article>

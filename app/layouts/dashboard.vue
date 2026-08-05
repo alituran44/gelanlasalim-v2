@@ -26,8 +26,8 @@ const route = useRoute()
 onMounted(() => {
   detectLocale()
   if (typeof window !== 'undefined') {
-    const session = localStorage.getItem('userSession')
-    if (!session) {
+    const raw = localStorage.getItem('userSession')
+    if (!raw || raw === 'null' || raw === 'undefined' || raw === '{}') {
       router.push('/uyelik')
     }
   }

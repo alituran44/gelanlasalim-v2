@@ -35,6 +35,8 @@ const form = ref({
   files: [] as { name: string; size: string; progress: number; type: string }[]
 })
 
+const selectedSubcategory = ref('')
+
 // Subcategory Map (Photo 4 Alt Kategoriler)
 const categoryMap = {
   'İnşaat ve Yapı': [
@@ -157,6 +159,10 @@ const categoryMap = {
 }
 
 const categories = Object.keys(categoryMap)
+
+const currentSubcategories = computed(() => {
+  return (categoryMap as any)[form.value.kategori] || []
+})
 
 const cities = [
   'Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Aksaray', 'Amasya', 'Ankara', 'Antalya',

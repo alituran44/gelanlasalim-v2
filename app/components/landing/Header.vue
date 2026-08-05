@@ -4,23 +4,23 @@ import AppButton from "~/components/ui/AppButton.vue"
 const menu = [
   {
     title: "İhaleler",
-    to: "/ihaleler"
+    to: "/pazar-yeri"
   },
   {
     title: "Firmalar",
-    to: "/firmalar"
+    to: "/panel/firmalar"
   },
   {
     title: "Nasıl Çalışır",
     to: "/#how"
   },
   {
-    title: "Paketler",
-    to: "/#pricing"
+    title: "Abonelik Paketleri",
+    to: "/abonelik"
   },
   {
-    title: "Blog",
-    to: "/blog"
+    title: "Sözleşmeler & Bilgi",
+    to: "/sozlesmeler"
   }
 ]
 </script>

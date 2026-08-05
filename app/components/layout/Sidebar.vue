@@ -174,7 +174,7 @@ const settingsGroups = computed(() => {
   }
 })
 
-const menus = computed(() => sidebarMenus)
+const menus = sidebarMenus
 const activePath = computed(() => route.path)
 const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
 </script>
