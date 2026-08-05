@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import {
   Handshake,
   Mail,
@@ -16,18 +16,24 @@ import {
 } from 'lucide-vue-next'
 import { locale, detectLocale, t } from '~/composables/useLocale'
 
-definePageMeta({
-  layout: 'public'
-})
-
+const route = useRoute()
 const router = useRouter()
-const activeTab = ref<'login' | 'register'>('register')
+const activeTab = ref<'login' | 'register' | 'guest'>('register')
 const showCookieConsent = ref(true)
 const registerStep = ref<1 | 2>(1)
 
 onMounted(() => {
   detectLocale()
+  if (route.query.tab === 'guest') {
+    activeTab.value = 'guest'
+  }
 })
+
+// Guest Access Fields
+const guestName = ref('')
+const guestContact = ref('')
+const guestCompany = ref('')
+const guestSector = ref('İnşaat & Yapı')
 
 // Form Fields
 const firstName = ref('')
@@ -169,6 +175,41 @@ function handleDemoLogin(role: 'company' | 'individual') {
   }
   router.push('/panel')
 }
+
+function handleGuestEntry() {
+  if (!guestName.value || !guestContact.value) {
+    errorMessage.value = 'Lütfen ad soyad ve iletişim bilgilerinizi girin.'
+    return
+  }
+
+  isSubmitting.value = true
+  errorMessage.value = ''
+
+  setTimeout(() => {
+    isSubmitting.value = false
+    if (typeof window !== 'undefined') {
+      const existingLeads = JSON.parse(localStorage.getItem('guestLeads') || '[]')
+      existingLeads.push({
+        name: guestName.value,
+        contact: guestContact.value,
+        company: guestCompany.value || 'Misafir Firma',
+        sector: guestSector.value,
+        date: new Date().toISOString()
+      })
+      localStorage.setItem('guestLeads', JSON.stringify(existingLeads))
+
+      localStorage.setItem('userSession', JSON.stringify({
+        email: guestContact.value.includes('@') ? guestContact.value : 'misafir@gelanlasalim.com',
+        firstName: guestName.value.split(' ')[0] || 'Misafir',
+        name: guestName.value,
+        company: guestCompany.value || 'Misafir Firma',
+        role: 'guest',
+        isGuest: true
+      }))
+    }
+    router.push('/panel')
+  }, 600)
+}
 </script>
 
 <template>
@@ -237,13 +278,17 @@ function handleDemoLogin(role: 'company' | 'individual') {
     <!-- Form Right Panel -->
     <div class="w-full lg:w-1/2 flex flex-col justify-center px-6 py-12 sm:px-12 lg:px-20 bg-white">
       <div class="mx-auto w-full max-w-md text-left">
-        <!-- Switch tabs -->
-        <div class="mb-8 flex border-b border-slate-100">
-          <button @click="activeTab = 'register'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2" :class="activeTab === 'register' ? 'border-blue-600 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'">
+        <!-- Switch tabs (Register / Login / Guest) -->
+        <div class="mb-8 flex border-b border-slate-100 gap-1">
+          <button @click="activeTab = 'register'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2" :class="activeTab === 'register' ? 'border-amber-500 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'">
             {{ locale === 'tr' ? 'Yeni Üyelik' : 'New Account' }}
           </button>
-          <button @click="activeTab = 'login'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2" :class="activeTab === 'login' ? 'border-blue-600 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'">
+          <button @click="activeTab = 'login'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2" :class="activeTab === 'login' ? 'border-amber-500 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'">
             {{ locale === 'tr' ? 'Giriş Yap' : 'Login' }}
+          </button>
+          <button @click="activeTab = 'guest'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2 flex items-center justify-center gap-1" :class="activeTab === 'guest' ? 'border-amber-500 text-amber-700 bg-amber-50/50 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-slate-600'">
+            <span>👁️</span>
+            <span>{{ locale === 'tr' ? 'Misafir Girişi' : 'Guest Access' }}</span>
           </button>
         </div>
 
@@ -451,7 +496,7 @@ function handleDemoLogin(role: 'company' | 'individual') {
         </div>
 
         <!-- LOGIN FORM -->
-        <div v-else>
+        <div v-else-if="activeTab === 'login'">
           <!-- OAuth Butonları -->
           <div class="space-y-2 mb-5">
             <button type="button" @click="handleOAuth('google')"
@@ -469,7 +514,7 @@ function handleDemoLogin(role: 'company' | 'individual') {
           </div>
           <div class="relative flex items-center mb-5">
             <div class="flex-1 border-t" style="border-color: #E2E8F0;"></div>
-            <span class="px-3 text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ locale === 'tr' ? 'veya e-posta ile' : 'or with email' }}</span>
+            <span class="px-3 text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ locale === 'tr' ? 'veya kayıtlı hesabınızla' : 'or with registered account' }}</span>
             <div class="flex-1 border-t" style="border-color: #E2E8F0;"></div>
           </div>
 
@@ -524,6 +569,66 @@ function handleDemoLogin(role: 'company' | 'individual') {
               </button>
             </div>
           </div>
+        </div>
+
+        <!-- MİSAFİR GİRİŞİ FORMU (GUEST ACCESS & LEAD CAPTURE) -->
+        <div v-else-if="activeTab === 'guest'" class="space-y-5">
+          <div class="rounded-2xl border border-amber-200 bg-amber-50/60 p-4 text-left space-y-1">
+            <h3 class="text-xs font-black uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
+              <span>👁️</span>
+              <span>{{ locale === 'tr' ? 'Misafir Girişi & Platform İnceleme' : 'Guest Access & Demo Experience' }}</span>
+            </h3>
+            <p class="text-[11px] leading-relaxed text-amber-800 font-medium">
+              {{ locale === 'tr' ? 'Platformu şifre oluşturmadan doğrudan incelemek için iletişim bilgilerinizi giriniz. Ekibimiz size en uygun ihale örneklerini sunacaktır.' : 'Enter your contact info to browse the platform without creating a password.' }}
+            </p>
+          </div>
+
+          <form @submit.prevent="handleGuestEntry" class="space-y-4">
+            <div>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Adınız Soyadınız *' : 'Full Name *' }}</label>
+              <div class="relative">
+                <User :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input v-model="guestName" type="text" required :placeholder="locale === 'tr' ? 'Örn: Ahmet Yılmaz' : 'e.g. John Doe'" class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" />
+              </div>
+            </div>
+
+            <div>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Telefon veya Kurumsal E-Posta *' : 'Phone or Email *' }}</label>
+              <div class="relative">
+                <Phone :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input v-model="guestContact" type="text" required :placeholder="locale === 'tr' ? 'Örn: 0555 555 55 55 veya isim@firma.com' : 'Phone or Email'" class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Firma Adınız / Unvan' : 'Company Name' }}</label>
+                <div class="relative">
+                  <Building2 :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                  <input v-model="guestCompany" type="text" :placeholder="locale === 'tr' ? 'Örn: Yılmaz İnşaat A.Ş.' : 'Company Name'" class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" />
+                </div>
+              </div>
+
+              <div>
+                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'İlgilendiğiniz Sektör' : 'Sector' }}</label>
+                <select v-model="guestSector" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-bold outline-none focus:border-amber-500">
+                  <option value="İnşaat & Yapı">🏗️ İnşaat & Yapı</option>
+                  <option value="Tarım & Gıda">🌾 Tarım & Gıda</option>
+                  <option value="Teknoloji & Yazılım">🖥️ Teknoloji & Yazılım</option>
+                  <option value="Lojistik & Nakliye">🚚 Lojistik & Nakliye</option>
+                  <option value="Sanayi & Üretim">🏭 Sanayi & Üretim</option>
+                  <option value="Diğer">📦 Diğer Sektörler</option>
+                </select>
+              </div>
+            </div>
+
+            <div v-if="errorMessage" class="rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-bold text-red-700">⚠️ {{ errorMessage }}</div>
+
+            <button type="submit" :disabled="isSubmitting" class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-slate-950 transition-all shadow-md disabled:opacity-50" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border: 1px solid #C59B27;">
+              <span>{{ isSubmitting ? (locale === 'tr' ? 'Misafir Girişi Yapılıyor...' : 'Entering as Guest...') : (locale === 'tr' ? '👁️ Misafir Olarak İncelemeye Başla' : 'Explore Platform as Guest') }}</span>
+              <ChevronRight v-if="!isSubmitting" :size="14" />
+            </button>
+          </form>
         </div>
       </div>
     </div>

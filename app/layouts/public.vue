@@ -106,6 +106,16 @@ const activeTenders = ref([
             <span>{{ locale === 'tr' ? 'Profilim' : 'My Profile' }}</span>
           </NuxtLink>
 
+          <!-- MISAFIR GIRISI BUTTON -->
+          <NuxtLink
+            to="/uyelik?tab=guest"
+            class="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl border transition-all text-amber-900 bg-amber-100/70 hover:bg-amber-200/80 border-amber-300 shadow-xs"
+            title="Şifresiz Misafir Girişi Yaparak Platformu İnceleyin"
+          >
+            <span>👁️</span>
+            <span>{{ locale === 'tr' ? 'Misafir Girişi' : 'Guest Access' }}</span>
+          </NuxtLink>
+
           <NuxtLink
             to="/uyelik"
             class="px-3 py-2 text-xs font-bold rounded-xl transition-all text-slate-700 hover:bg-slate-100"
