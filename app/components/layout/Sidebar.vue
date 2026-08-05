@@ -84,6 +84,14 @@ const settingsGroups = [
     ]
   },
   {
+    title: "İhalelerim & Tekliflerim",
+    items: [
+      { title: "📋 İlanlarım", icon: ClipboardList, to: "/panel/ilanlarim", tab: "ilanlarim" },
+      { title: "📥 Aldığım Teklifler", icon: Inbox, to: "/panel/gelen-teklifler", tab: "gelen" },
+      { title: "📤 Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler", tab: "verdigim" }
+    ]
+  },
+  {
     title: "İş akışı",
     items: [
       { title: "Kayıtlı Adresler", icon: MapPin, to: "/panel/ayarlar?tab=adresler", tab: "adresler" },

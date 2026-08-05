@@ -7,7 +7,8 @@ import {
   Bell, 
   Heart, 
   History, 
-  Award, 
+  Award,
+  Star, 
   Sliders, 
   Camera, 
   Video, 
@@ -541,46 +542,88 @@ function saveProfile() {
         
         <!-- KIŞISEL TAB -->
         <div v-if="activeSubTab === 'kisisel'" class="space-y-6">
-          <!-- Top Profile Banner -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-6" style="border-color: #E2E8F0;">
-            <div class="flex items-start gap-4">
-              <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-slate-100 border text-slate-700 text-base font-black">
-                AT
+          <!-- PERMANENT RATING SCORECARD & LEVEL BENCHMARK BAR (Requirement 4) -->
+          <div class="rounded-3xl border border-amber-200/80 bg-white p-6 shadow-lg text-left space-y-6" style="background: linear-gradient(135deg, #0A1128 0%, #1C2541 100%); border-bottom: 3px solid #C59B27;">
+            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+              <div class="flex items-center gap-4">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 p-0.5 shadow-lg shrink-0">
+                  <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-amber-400 font-black text-xl font-mono">
+                    {{ profileForm.name.charAt(0) }}{{ profileForm.surname.charAt(0) }}
+                  </div>
+                </div>
+
+                <div class="space-y-1 text-white">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <h2 class="text-xl font-black tracking-tight">{{ profileForm.name }} {{ profileForm.surname }}</h2>
+                    <span class="rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
+                      <ShieldCheck :size="11" class="text-amber-400" />
+                      ✓ {{ locale === 'tr' ? 'e-Devlet & MERSİS ONAYLI' : 'e-Devlet VERIFIED' }}
+                    </span>
+                  </div>
+                  <p class="text-xs text-slate-300 font-medium flex items-center gap-3">
+                    <span>📧 {{ profileForm.email }}</span>
+                    <span>•</span>
+                    <span>📞 +90 {{ profileForm.phone }}</span>
+                  </p>
+                </div>
               </div>
-              <div>
-                <h2 class="text-lg font-black text-slate-800">{{ profileForm.name }} {{ profileForm.surname }}</h2>
-                <span class="inline-flex items-center gap-1 mt-1 rounded bg-amber-50 text-amber-700 border border-amber-100 px-2 py-0.5 text-[8px] font-black uppercase">
-                  Doğrulanmamış
+
+              <!-- Overall Score Pill -->
+              <div class="bg-white/10 p-4 rounded-2xl border border-white/15 text-center min-w-[200px]">
+                <span class="text-[9px] font-black text-amber-300 uppercase tracking-widest block">GENEL VERİLEN PUAN</span>
+                <div class="text-2xl font-black text-white font-mono flex items-center justify-center gap-1.5 mt-1">
+                  <Star :size="18" class="text-amber-400 fill-amber-400" />
+                  <span>4.9</span>
+                  <span class="text-xs text-slate-400 font-normal">/ 5.0</span>
+                </div>
+                <div class="text-[9px] font-bold text-amber-400 mt-1">⭐⭐⭐⭐⭐ (28 Onaylı Yorum)</div>
+              </div>
+            </div>
+
+            <!-- Kıstas & Seviye Çizelgesi (Benchmark Gauge Bar) -->
+            <div class="p-4 rounded-2xl bg-white/10 border border-white/15 space-y-3">
+              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-white font-bold gap-2">
+                <span class="flex items-center gap-1.5 text-amber-300 uppercase text-[10px] font-black tracking-wider">
+                  <Award :size="14" class="text-amber-400" />
+                  PLATFORM KISTAS VE SEVİYE ÇİZELGESİ
                 </span>
-                <p class="text-[10px] text-slate-400 mt-2 font-mono">{{ profileForm.email }}</p>
+                <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black">
+                  🌟 SEVİYE ÜSTÜ (SÜPER TEDARİKÇİ)
+                </span>
               </div>
-            </div>
 
-            <div class="rounded-xl border bg-slate-50 p-4 space-y-2 text-center md:text-right max-w-xs" style="border-color: #F1F5F9;">
-              <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">GÜVENLİK DÜZEYİ DURUMU</span>
-              <span class="text-xs font-bold text-slate-700 block">Doğrulanmamış</span>
-              <NuxtLink 
-                to="/firma-dogrulama"
-                class="w-full inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2 shadow transition"
-              >
-                Doğrulamayı Tamamla
-              </NuxtLink>
-            </div>
-          </div>
+              <!-- Level Progress Bar -->
+              <div class="space-y-1.5">
+                <div class="w-full bg-slate-900/60 rounded-full h-3.5 p-0.5 border border-white/10 relative overflow-hidden">
+                  <div class="bg-gradient-to-r from-amber-500 via-yellow-400 to-emerald-400 h-full rounded-full w-[88%] transition-all duration-500 shadow-sm"></div>
+                </div>
+                <div class="flex justify-between text-[9px] font-bold text-slate-300">
+                  <span>Düşük Düzey (%0 - %40)</span>
+                  <span>Ortalama Seviye (%40 - %70)</span>
+                  <span class="text-amber-300 font-black">Seviye Üstü (%70 - %95) 🔥</span>
+                  <span>Mükemmel (%95 - %100)</span>
+                </div>
+              </div>
 
-          <!-- Quick badges -->
-          <div class="grid grid-cols-3 gap-4">
-            <div class="rounded-xl border bg-white p-3 text-center" style="border-color: #E2E8F0;">
-              <span class="text-[7px] font-black text-slate-300 uppercase block">PROFİL DURUMU</span>
-              <span class="text-[10px] font-bold text-slate-700 block mt-1">Geliştirmeye açık</span>
-            </div>
-            <div class="rounded-xl border bg-white p-3 text-center" style="border-color: #E2E8F0;">
-              <span class="text-[7px] font-black text-slate-300 uppercase block">DOĞRULAMA DURUMU</span>
-              <span class="text-[10px] font-bold text-slate-700 block mt-1">Doğrulanmamış</span>
-            </div>
-            <div class="rounded-xl border bg-white p-3 text-center" style="border-color: #E2E8F0;">
-              <span class="text-[7px] font-black text-slate-300 uppercase block">ŞİRKET</span>
-              <span class="text-[10px] font-bold text-slate-700 block mt-1 truncate">Ali Turan</span>
+              <!-- Score Matrix breakdown grid -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                <div class="bg-slate-900/50 p-2.5 rounded-xl border border-white/10 text-center">
+                  <span class="text-[8px] font-black uppercase text-slate-400 block">TESLİMAT HIZI</span>
+                  <span class="text-xs font-black text-emerald-400 font-mono block mt-0.5">%98 (Seviye Üstü)</span>
+                </div>
+                <div class="bg-slate-900/50 p-2.5 rounded-xl border border-white/10 text-center">
+                  <span class="text-[8px] font-black uppercase text-slate-400 block">ŞARTNAME UYUM</span>
+                  <span class="text-xs font-black text-blue-400 font-mono block mt-0.5">%100 (Mükemmel)</span>
+                </div>
+                <div class="bg-slate-900/50 p-2.5 rounded-xl border border-white/10 text-center">
+                  <span class="text-[8px] font-black uppercase text-slate-400 block">FİYAT REKABETİ</span>
+                  <span class="text-xs font-black text-amber-400 font-mono block mt-0.5">%96 (Seviye Üstü)</span>
+                </div>
+                <div class="bg-slate-900/50 p-2.5 rounded-xl border border-white/10 text-center">
+                  <span class="text-[8px] font-black uppercase text-slate-400 block">GÜVENİLİRLİK</span>
+                  <span class="text-xs font-black text-emerald-400 font-mono block mt-0.5">%99 (Mükemmel)</span>
+                </div>
+              </div>
             </div>
           </div>
 

@@ -73,11 +73,13 @@ const sektorler = computed(() => {
       { key: 'enerji', label: '⚡ Enerji & Elektrik', popular: false },
       { key: 'lojistik', label: '🚚 Lojistik & Nakliye', popular: false },
       { key: 'sanayi', label: '🏭 Sanayi & Üretim', popular: false },
-      { key: 'egitim', label: '📚 Eğitim & Danışmanlık', popular: false }
+      { key: 'egitim', label: '📚 Eğitim & Danışmanlık', popular: false },
+      { key: 'diger', label: '✏️ Diğer (Kendi Faaliyetinizi Yazın)', popular: true }
     ]
   }
 })
 const seciliSektorler = ref<string[]>(['tarim'])
+const customSector = ref('')
 const mailBildirimi = ref(true)
 
 function toggleSektor(key: string) {
@@ -443,10 +445,23 @@ function handleGuestEntry() {
                     ? 'border-color: #003057; background: rgba(0,48,87,0.06); color: #003057;'
                     : 'border-color: #E2E8F0; color: #64748B;'"
                 >
-                  <span>{{ sektor.label }}</span>
-                  <span v-if="sektor.popular" class="ml-auto rounded-full px-1.5 py-0.5 text-[8px] font-bold" style="background: rgba(245,158,11,0.15); color: #D97706;">{{ locale === 'tr' ? 'Popüler' : 'Popular' }}</span>
                 </button>
               </div>
+
+              <!-- Custom Sector Input Field -->
+              <transition name="fade">
+                <div v-if="seciliSektorler.includes('diger')" class="mt-3">
+                  <label class="text-[10px] font-black uppercase tracking-wider text-amber-700 block mb-1">
+                    ✏️ {{ locale === 'tr' ? 'Faaliyet Konunuzu / Özel Sektörünüzü Yazınız *' : 'Custom Sector / Business Field *' }}
+                  </label>
+                  <input 
+                    v-model="customSector" 
+                    type="text" 
+                    :placeholder="locale === 'tr' ? 'Örn: Özel Cam Ambalaj İmalatı, Endüstriyel Soğutma Sistemleri vb.' : 'e.g. Industrial Glass Packaging, HVAC Systems'" 
+                    class="w-full p-2.5 bg-amber-50/50 border border-amber-300 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white transition-all shadow-xs" 
+                  />
+                </div>
+              </transition>
             </div>
 
             <!-- Mail Bildirimi Toggle -->

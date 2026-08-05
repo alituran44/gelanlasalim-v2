@@ -1479,13 +1479,16 @@ function toggleFilterSection(section: string) {
                       </div>
 
                       <h3 class="mt-4 text-base font-black text-slate-800 hover:text-blue-600 transition-colors leading-snug">{{ res.title }}</h3>
-                      <div @click="openCompanyModal(res.company)" class="mt-2.5 flex items-center gap-2 text-xs font-bold text-slate-500 cursor-pointer hover:text-blue-600 transition-colors select-none" title="Firma profilini ve yorumları gör">
+                      <div @click="openCompanyModal(res.company)" class="mt-2.5 flex flex-wrap items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer hover:text-amber-600 transition-colors select-none" title="Firma profilini, puanlarını ve kıstas seviyesini gör">
                         <Building2 :size="14" class="text-slate-400" />
-                        <span class="underline decoration-slate-300 decoration-dashed hover:decoration-solid">{{ res.company }}</span>
+                        <span class="underline decoration-slate-300 font-extrabold">{{ res.company }}</span>
                         <span v-if="res.verified" class="rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100 uppercase tracking-wider flex items-center gap-0.5">
-                        <ShieldCheck :size="10" /> {{ locale === 'tr' ? 'ONAYLI ÜYE' : 'VERIFIED MEMBER' }}
-                      </span>
-                    </div>
+                          <ShieldCheck :size="10" /> {{ locale === 'tr' ? 'ONAYLI ÜYE' : 'VERIFIED MEMBER' }}
+                        </span>
+                        <span class="rounded-lg bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 px-2 py-0.5 text-[9px] font-black tracking-wide transition shadow-2xs">
+                          👁️ {{ locale === 'tr' ? 'Profili & Puanları Gör' : 'View Profile & Rating' }}
+                        </span>
+                      </div>
                     <p class="mt-3 text-xs leading-relaxed text-slate-500 font-medium">{{ res.description }}</p>
 
                     <div class="mt-5 flex flex-wrap items-center gap-4 text-xs font-bold text-slate-400">
