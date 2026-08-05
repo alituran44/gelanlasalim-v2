@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import { Search, Bell, Plus, ChevronDown, User } from "lucide-vue-next"
+import { Search, Bell, Plus, ChevronDown, User, Home } from "lucide-vue-next"
 
 const route = useRoute()
 const router = useRouter()
@@ -77,15 +77,23 @@ const pageTitle = computed(() => {
     <!-- Right: Actions -->
     <div class="flex items-center gap-2">
 
+      <!-- Home Page Button -->
+      <NuxtLink
+        to="/"
+        class="flex items-center gap-1.5 rounded-lg border border-slate-200/80 bg-slate-50 px-3.5 py-2 text-xs font-black text-slate-800 hover:bg-white hover:text-amber-600 transition shadow-xs"
+        title="Ana Sayfaya Dön"
+      >
+        <Home :size="14" class="text-amber-600" />
+        <span>Ana Sayfaya Git</span>
+      </NuxtLink>
+
       <!-- New Tender Button -->
       <NuxtLink
         to="/panel/ihale-olustur"
-        class="hidden md:flex items-center gap-1.5 rounded-lg px-4 py-2 text-sm font-semibold text-white transition"
-        style="background: #003057;"
-        onmouseover="this.style.background='#1EAE4C'"
-        onmouseout="this.style.background='#003057'"
+        class="hidden md:flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold text-white transition"
+        style="background: #0A1128; border: 1px solid #C59B27;"
       >
-        <Plus :size="16" />
+        <Plus :size="15" class="text-amber-400" />
         New Tender
       </NuxtLink>
 

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { Handshake, Menu, X, ArrowRight, Mail, Phone, MapPin, Facebook, Instagram, Linkedin } from 'lucide-vue-next'
+import { Handshake, Menu, X, ArrowRight, Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Home, User } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale, setLocale, detectLocale, t } from '~/composables/useLocale'
 
@@ -64,8 +64,15 @@ const activeTenders = ref([
           </span>
         </NuxtLink>
 
-        <!-- Orta: Hızlı İhale & Teklif Erişim Buton Şeridi -->
+        <!-- Orta: Hızlı Ana Sayfa, İhale & Teklif Erişim Buton Şeridi -->
         <div class="hidden lg:flex items-center gap-1 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-inner">
+          <NuxtLink 
+            to="/" 
+            class="px-3.5 py-1.5 text-xs font-black text-slate-800 hover:text-amber-600 bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm border border-slate-200/60"
+          >
+            <Home :size="14" class="text-amber-600" />
+            <span>{{ locale === 'tr' ? 'Ana Sayfa' : 'Home' }}</span>
+          </NuxtLink>
           <NuxtLink 
             to="/panel/ilanlarim" 
             class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-amber-600 hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
