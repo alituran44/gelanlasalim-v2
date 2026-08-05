@@ -14,7 +14,7 @@ export const DEFAULT_CMS_DATA = {
       'ENCRYPTED DATA TRANSMISSION',
       'FREE DURING LAUNCH PERIOD'
     ],
-    heroVideoUrl: 'https://vjs.zencdn.net/v/oceans.mp4'
+    heroVideoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-corporate-team-working-together-in-an-office-42790-large.mp4'
   },
   liveTender: {
     title: 'CNC Contract Manufacturing Batch',
