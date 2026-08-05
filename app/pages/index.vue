@@ -54,14 +54,15 @@ useSeoMeta({
 
 useHead({
   htmlAttrs: {
-    lang: 'en'
+    lang: computed(() => locale.value || 'tr')
   },
   link: [
     { rel: 'icon', type: 'image/png', href: '/logo.png' },
+    { rel: 'preload', as: 'image', href: '/hero_port_background.png', fetchpriority: 'high' },
     { rel: 'canonical', href: 'https://gelanlasalim-v2.vercel.app' }
   ],
   meta: [
-    { name: 'keywords', content: 'b2b auction, reverse auction, corporate procurement, supplier management, live bidding, rfq' },
+    { name: 'keywords', content: 'b2b auction, reverse auction, corporate procurement, supplier management, live bidding, rfq, eksiltme ihalesi' },
     { name: 'author', content: 'GelAnlaşalım Inc.' },
     { name: 'robots', content: 'index, follow' }
   ],
