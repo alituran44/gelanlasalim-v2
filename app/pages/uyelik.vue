@@ -109,10 +109,42 @@ function goStep2() {
     errorMessage.value = 'Lütfen tüm zorunlu alanları doldurun.'
     return
   }
+  if (password.value.length < 6) {
+    errorMessage.value = 'Şifreniz en az 6 karakter olmalıdır.'
+    return
+  }
   if (userRole.value === 'company' && !companyName.value) {
     errorMessage.value = 'Lütfen firma adını girin.'
     return
   }
+
+  // Bireysel üyelikte sektör adımı gerekmez — Doğrudan kaydol!
+  if (userRole.value === 'individual') {
+    if (!agreeKvkk.value) {
+      errorMessage.value = 'Lütfen KVKK ve Üyelik Sözleşmesini kabul edin.'
+      return
+    }
+    isSubmitting.value = true
+    errorMessage.value = ''
+    setTimeout(() => {
+      isSubmitting.value = false
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('userSession', JSON.stringify({
+          email: email.value,
+          firstName: firstName.value,
+          name: `${firstName.value} ${lastName.value}`,
+          company: 'Bireysel Üye',
+          role: 'individual',
+          sektorler: ['bireysel'],
+          mailBildirimi: mailBildirimi.value,
+          isPremium: false
+        }))
+      }
+      router.push('/panel')
+    }, 800)
+    return
+  }
+
   errorMessage.value = ''
   registerStep.value = 2
 }
@@ -405,23 +437,28 @@ function handleGuestEntry() {
           <!-- Adım 1: Kişisel Bilgiler -->
           <form v-if="registerStep === 1" @submit.prevent="goStep2" class="space-y-4">
             <!-- Adım göstergesi -->
-            <div class="flex items-center gap-2 mb-4">
+            <div v-if="userRole === 'company'" class="flex items-center gap-2 mb-4">
               <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white" style="background: #003057;">1</div>
               <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #003057;">{{ locale === 'tr' ? 'Kişisel Bilgiler' : 'Personal Info' }}</span>
               <div class="flex-1 h-px" style="background: #E2E8F0;"></div>
               <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold" style="background: #F1F5F9; color: #94A3B8;">2</div>
               <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ locale === 'tr' ? 'Sektörler' : 'Sectors' }}</span>
             </div>
+            <div v-else class="flex items-center gap-2 mb-4">
+              <div class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-200">
+                👤 {{ locale === 'tr' ? 'Hızlı Bireysel Üyelik Formu' : 'Fast Individual Registration' }}
+              </div>
+            </div>
 
             <!-- ROL SEÇİMİ (Şimdi Üstte - Dinamik Alan Tetikleyici) -->
             <div>
               <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Üyelik Türü / Rolünüz *' : 'Account Type / Your Role *' }}</label>
               <div class="grid grid-cols-2 gap-3 mt-1">
-                <button type="button" @click="userRole = 'company'" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 text-center transition-all" :class="userRole === 'company' ? 'border-blue-600 bg-blue-50/20 text-blue-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'">
+                <button type="button" @click="userRole = 'company'" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 text-center transition-all cursor-pointer" :class="userRole === 'company' ? 'border-blue-600 bg-blue-50/20 text-blue-700 font-bold' : 'border-slate-200 text-slate-500 hover:bg-slate-50'">
                   <span class="text-xs font-bold">{{ locale === 'tr' ? '🏢 Firma Kaydı' : '🏢 Company Account' }}</span>
                   <span class="text-[8px] mt-0.5 font-medium">{{ locale === 'tr' ? 'Şirketler İçin' : 'For Businesses' }}</span>
                 </button>
-                <button type="button" @click="userRole = 'individual'" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 text-center transition-all" :class="userRole === 'individual' ? 'border-blue-600 bg-blue-50/20 text-blue-700' : 'border-slate-200 text-slate-500 hover:bg-slate-50'">
+                <button type="button" @click="userRole = 'individual'" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 text-center transition-all cursor-pointer" :class="userRole === 'individual' ? 'border-blue-600 bg-blue-50/20 text-blue-700 font-bold' : 'border-slate-200 text-slate-500 hover:bg-slate-50'">
                   <span class="text-xs font-bold">{{ locale === 'tr' ? '👤 Kullanıcı Kaydı' : '👤 Individual Account' }}</span>
                   <span class="text-[8px] mt-0.5 font-medium">{{ locale === 'tr' ? 'Bireysel Kullanıcı' : 'For Private Users' }}</span>
                 </button>
@@ -482,11 +519,26 @@ function handleGuestEntry() {
               </div>
             </div>
 
+            <!-- KVKK Onay Kutusu (Bireysel Üyelik için 1. Adımda Gösterilir) -->
+            <div v-if="userRole === 'individual'" class="flex items-start gap-2.5 py-1">
+              <input v-model="agreeKvkk" id="kvkk-step1" type="checkbox" required class="mt-1 h-3.5 w-3.5 rounded border-slate-300 cursor-pointer" />
+              <label for="kvkk-step1" class="text-[10px] leading-relaxed text-slate-500 font-bold uppercase tracking-wider cursor-pointer">
+                {{ locale === 'tr' ? 'Üyelik şartlarını ve ' : 'I accept the membership terms and ' }}
+                <a href="#" class="text-blue-600 hover:underline">{{ locale === 'tr' ? 'KVKK Açık Rıza Metnini' : 'Privacy Consent' }}</a>
+                {{ locale === 'tr' ? ' kabul ediyorum.' : '.' }}
+              </label>
+            </div>
+
             <div v-if="errorMessage" class="rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-bold text-red-700">⚠️ {{ errorMessage }}</div>
 
-            <button type="submit" class="w-full flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-black text-white transition-all" style="background: #003057;">
-              {{ locale === 'tr' ? 'Devam Et — Sektör Seçimi' : 'Continue — Sector Selection' }}
-              <ChevronRight :size="14" />
+            <button type="submit" :disabled="isSubmitting" class="w-full flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-black text-white transition-all disabled:opacity-50 cursor-pointer" style="background: #003057;">
+              <span v-if="userRole === 'individual'">
+                {{ isSubmitting ? (locale === 'tr' ? 'Kayıt Yapılıyor...' : 'Registering...') : (locale === 'tr' ? 'Bireysel Üyeliği Tamamla' : 'Complete Registration') }}
+              </span>
+              <span v-else>
+                {{ locale === 'tr' ? 'Devam Et — Sektör Seçimi' : 'Continue — Sector Selection' }}
+              </span>
+              <ChevronRight v-if="userRole === 'company' && !isSubmitting" :size="14" />
             </button>
           </form>
 
