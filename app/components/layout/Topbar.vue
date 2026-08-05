@@ -81,10 +81,10 @@ const pageTitle = computed(() => {
       <NuxtLink
         to="/"
         class="flex items-center gap-1.5 rounded-lg border border-slate-200/80 bg-slate-50 px-3.5 py-2 text-xs font-black text-slate-800 hover:bg-white hover:text-amber-600 transition shadow-xs"
-        title="Ana Sayfaya Dön"
+        title="Go to Homepage"
       >
         <Home :size="14" class="text-amber-600" />
-        <span>Ana Sayfaya Git</span>
+        <span>Go to Homepage</span>
       </NuxtLink>
 
       <!-- New Tender Button -->
@@ -121,7 +121,7 @@ const pageTitle = computed(() => {
         class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-black rounded-xl border transition-all text-slate-800 bg-amber-50 hover:bg-amber-100 border-amber-300 shadow-xs"
       >
         <User :size="14" class="text-amber-600" />
-        <span>Profilim</span>
+        <span>My Profile</span>
       </NuxtLink>
 
       <!-- User Menu -->

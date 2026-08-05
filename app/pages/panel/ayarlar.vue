@@ -481,25 +481,25 @@ function saveProfile() {
     <!-- Title and Breadcrumbs -->
     <div class="flex flex-col md:flex-row md:items-center justify-between border-b pb-4 gap-4" style="border-color: #F1F5F9;">
       <div>
-        <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">HESAP MERKEZİ</span>
+        <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">ACCOUNT CENTER</span>
         <h1 class="text-2xl font-black text-slate-800 mt-1" style="color: #0F172A;">
           {{ 
-            activeSubTab === 'kisisel' ? 'Hesap Merkezi' :
-            activeSubTab === 'sirket' ? 'Kurumsal Kimlik' :
-            activeSubTab === 'adresler' ? 'Kayıtlı Adresler' :
-            activeSubTab === 'takip' ? 'Takip Ettiklerim' : 
-            activeSubTab === 'uyelik' ? 'Üyelik Planı' :
-            activeSubTab === 'ayarlar' ? 'Ayarlar' : 'Ayarlar'
+            activeSubTab === 'kisisel' ? 'Personal Account Center' :
+            activeSubTab === 'sirket' ? 'Company & Verification' :
+            activeSubTab === 'adresler' ? 'Saved Addresses' :
+            activeSubTab === 'takip' ? 'Favorites & Follows' : 
+            activeSubTab === 'uyelik' ? 'Membership Plan' :
+            activeSubTab === 'ayarlar' ? 'Settings' : 'Settings'
           }}
         </h1>
         <p class="text-xs text-slate-500 mt-1">
           {{ 
-            activeSubTab === 'kisisel' ? 'Kişisel bilgilerinizi, medya varlıklarınızı ve iletişim tercihlerinizi yönetin.' :
-            activeSubTab === 'sirket' ? 'Bağlı olduğunuz organizasyonun detaylarını ve doğrulama sürecini yönetin.' :
-            activeSubTab === 'adresler' ? 'Teslimat adreslerinizi yönetin. İhale oluştururken hızlıca seçebilirsiniz.' :
-            activeSubTab === 'takip' ? 'Takip ettiğiniz firmaları görüntüleyin ve güncellemelerini izleyin.' :
-            activeSubTab === 'uyelik' ? 'Paketlerinizi, ihale haklarınızı ve ek kapasite seçeneklerinizi buradan yönetin.' :
-            'Güvenlik, görünüm, bildirim ve yasal tercihlerinizi tek yerden yönetin.'
+            activeSubTab === 'kisisel' ? 'Manage your personal profile, media assets, and contact preferences.' :
+            activeSubTab === 'sirket' ? 'Manage your organization details and company verification status.' :
+            activeSubTab === 'adresler' ? 'Manage delivery and billing addresses for fast tender creation.' :
+            activeSubTab === 'takip' ? 'View saved companies and track their latest tender updates.' :
+            activeSubTab === 'uyelik' ? 'Manage your B2B membership packages and active tender quotas.' :
+            'Manage security, appearance, notification, and legal preferences in one place.'
           }}
         </p>
       </div>

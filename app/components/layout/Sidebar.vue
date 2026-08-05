@@ -77,34 +77,34 @@ const isSettingsPage = computed(() => {
 
 const settingsGroups = [
   {
-    title: "Profil",
+    title: "Profile",
     items: [
-      { title: "Kişisel", icon: User, to: "/panel/ayarlar?tab=kisisel", tab: "kisisel" },
-      { title: "Şirket & Doğrulama", icon: Building2, to: "/panel/ayarlar?tab=sirket", tab: "sirket" }
+      { title: "Personal Info", icon: User, to: "/panel/ayarlar?tab=kisisel", tab: "kisisel" },
+      { title: "Company & Verification", icon: Building2, to: "/panel/ayarlar?tab=sirket", tab: "sirket" }
     ]
   },
   {
-    title: "İhalelerim & Tekliflerim",
+    title: "My Tenders & Bids",
     items: [
-      { title: "📋 İlanlarım", icon: ClipboardList, to: "/panel/ilanlarim", tab: "ilanlarim" },
-      { title: "📥 Aldığım Teklifler", icon: Inbox, to: "/panel/gelen-teklifler", tab: "gelen" },
-      { title: "📤 Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler", tab: "verdigim" }
+      { title: "📋 My Tenders", icon: ClipboardList, to: "/panel/ilanlarim", tab: "ilanlarim" },
+      { title: "📥 Received Bids", icon: Inbox, to: "/panel/gelen-teklifler", tab: "gelen" },
+      { title: "📤 My Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler", tab: "verdigim" }
     ]
   },
   {
-    title: "İş akışı",
+    title: "Workflow",
     items: [
-      { title: "Kayıtlı Adresler", icon: MapPin, to: "/panel/ayarlar?tab=adresler", tab: "adresler" },
-      { title: "Bildirimler", icon: Bell, to: "/panel/ayarlar?tab=bildirimler", tab: "bildirimler" },
-      { title: "Takip Ettiklerim", icon: Heart, to: "/panel/ayarlar?tab=takip", tab: "takip" },
-      { title: "Geçmiş Ticaretlerim", icon: History, to: "/panel/ayarlar?tab=ticaret", tab: "ticaret" }
+      { title: "Saved Addresses", icon: MapPin, to: "/panel/ayarlar?tab=adresler", tab: "adresler" },
+      { title: "Notifications", icon: Bell, to: "/panel/ayarlar?tab=bildirimler", tab: "bildirimler" },
+      { title: "Favorites & Follows", icon: Heart, to: "/panel/ayarlar?tab=takip", tab: "takip" },
+      { title: "Trade History", icon: History, to: "/panel/ayarlar?tab=ticaret", tab: "ticaret" }
     ]
   },
   {
-    title: "Hesap",
+    title: "Account",
     items: [
-      { title: "Üyelik", icon: Award, to: "/panel/ayarlar?tab=uyelik", tab: "uyelik" },
-      { title: "Ayarlar", icon: Sliders, to: "/panel/ayarlar?tab=ayarlar", tab: "ayarlar" }
+      { title: "Membership Plan", icon: Award, to: "/panel/ayarlar?tab=uyelik", tab: "uyelik" },
+      { title: "Settings", icon: Sliders, to: "/panel/ayarlar?tab=ayarlar", tab: "ayarlar" }
     ]
   }
 ]
@@ -119,7 +119,7 @@ const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
 
     <!-- Logo Alanı -->
     <div class="px-6 py-5 border-b flex justify-start" style="border-color: rgba(255,255,255,0.08);">
-      <img src="/logo.png" alt="GelAnlaşalım B2B Kurumsal Logo" class="h-8 w-auto brightness-0 invert" />
+      <img src="/logo.png" alt="GelAnlaşalım B2B Logo" class="h-8 w-auto brightness-0 invert" />
     </div>
 
     <!-- Rol Etiketi -->
@@ -130,7 +130,7 @@ const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
           ? 'background: rgba(30,174,76,0.12); color: #1EAE4C;'
           : 'background: rgba(37,99,235,0.12); color: #2563EB;'"
       >
-        {{ userRole === 'company' ? '🏢 Firma Kaydı' : '👤 Bireysel Üye' }}
+        {{ userRole === 'company' ? '🏢 Company Account' : '👤 Private User' }}
       </span>
     </div>
 
@@ -146,7 +146,7 @@ const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
           onmouseout="this.style.background='#003057'"
         >
           <LayoutDashboard :size="14" />
-          Firma Merkezi
+          Company Hub
         </NuxtLink>
       </div>
 
@@ -189,7 +189,7 @@ const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
           onmouseout="this.style.background='#003057'"
         >
           <Plus :size="14" />
-          Yeni ihale oluştur
+          + New Tender
         </NuxtLink>
       </div>
 
@@ -233,7 +233,7 @@ const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
         :style="activePath === '/panel/yardim' ? 'background: rgba(30,174,76,0.15); color: #1EAE4C;' : ''"
       >
         <HelpCircle :size="17" :style="activePath === '/panel/yardim' ? 'color: #1EAE4C;' : ''" />
-        <span>Yardım</span>
+        <span>Help & Support</span>
       </NuxtLink>
     </div>
 
@@ -259,7 +259,7 @@ const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
         onmouseout="this.style.background='rgba(239,68,68,0.08)'"
       >
         <LogOut :size="14" />
-        Çıkış Yap
+        Log Out
       </button>
     </div>
 
