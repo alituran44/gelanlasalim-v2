@@ -23,6 +23,7 @@ import {
   Star,
   X,
   Folder,
+  Zap,
   Briefcase,
   Volume2,
   Settings,
@@ -1051,8 +1052,50 @@ const filteredTenders = computed(() => {
 })
 
 /* =========================================================
-   YARDIMCI FONKSİYONLAR
+   YARDIMCI FONKSİYONLAR & HIZLI TEKLİF
 ========================================================= */
+const showQuickBidModal = ref(false)
+const quickBidTender = ref<any>(null)
+const quickBidPrice = ref('')
+const quickBidDeliveryDays = ref('')
+const quickBidNotes = ref('')
+const isSubmittingQuickBid = ref(false)
+
+function scrollToFeed() {
+  if (typeof document !== 'undefined') {
+    setTimeout(() => {
+      const el = document.getElementById('ihale-gezgini-feed')
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    }, 50)
+  }
+}
+
+function openQuickBidModal(tender: any) {
+  quickBidTender.value = tender
+  quickBidPrice.value = ''
+  quickBidDeliveryDays.value = '7'
+  quickBidNotes.value = ''
+  showQuickBidModal.value = true
+}
+
+function submitQuickBid() {
+  if (!quickBidPrice.value) {
+    alert('Lütfen teklif tutarınızı giriniz.')
+    return
+  }
+  isSubmittingQuickBid.value = true
+  setTimeout(() => {
+    isSubmittingQuickBid.value = false
+    showQuickBidModal.value = false
+    if (quickBidTender.value) {
+      quickBidTender.value.offers = (quickBidTender.value.offers || 0) + 1
+    }
+    alert(`🎉 TEKLİFİNİZ İLETİLDİ!\n\n${quickBidTender.value?.company} firmasına ${quickBidPrice.value} ₺ tutarındaki teklifiniz anında başarıyla iletilmiştir.`)
+  }, 500)
+}
+
 function clearFilters() {
   explorerSearch.value = ''
   selectedCity.value = ''
@@ -1072,12 +1115,14 @@ function toggleCategory(catName: string) {
     expandedCategory.value = catName
     selectedCat.value = catName
     selectedSubcategory.value = ''
+    scrollToFeed()
   }
 }
 
 function selectSubcategory(catName: string, subcatName: string) {
   selectedCat.value = catName
   selectedSubcategory.value = subcatName
+  scrollToFeed()
 }
 
 function toggleFilterSection(section: string) {
@@ -1466,8 +1511,27 @@ function toggleFilterSection(section: string) {
               </div>
             </div>
 
-            <!-- Tenders Feed -->
-            <div class="space-y-4">
+            <!-- Tenders Feed Anchor & Active Filter Status Banner -->
+            <div id="ihale-gezgini-feed" class="space-y-4">
+              
+              <!-- Active Category Status Banner -->
+              <transition name="fade">
+                <div v-if="selectedCat || selectedSubcategory" class="p-4 rounded-2xl bg-amber-50 border border-amber-300/80 flex items-center justify-between flex-wrap gap-3 text-xs font-bold text-amber-950 shadow-xs">
+                  <div class="flex items-center gap-2">
+                    <span class="relative flex h-3 w-3">
+                      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span class="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                    </span>
+                    <span>
+                      ⚡ <strong>{{ selectedCat }}</strong> <span v-if="selectedSubcategory">→ {{ selectedSubcategory }}</span> kategorisindeki ihaleler listeleniyor ({{ filteredTenders.length }} İhale)
+                    </span>
+                  </div>
+                  <button @click="clearFilters" class="px-3 py-1.5 rounded-xl bg-amber-200/90 hover:bg-amber-300 text-amber-950 text-[10px] font-black uppercase tracking-wider transition-all shadow-xs">
+                    ✕ Tüm İlanları Göster
+                  </button>
+                </div>
+              </transition>
+
               <div v-for="res in filteredTenders" :key="res.id" class="p-6 rounded-2xl bg-white border premium-shadow flex flex-col text-left">
                   <div class="flex flex-col lg:flex-row lg:justify-between gap-6">
                     <div class="min-w-0 flex-1">
@@ -1513,7 +1577,23 @@ function toggleFilterSection(section: string) {
                       <div class="mt-1 text-sm font-black text-slate-800">{{ res.deadline }}</div>
                       <div class="mt-1 text-xs font-black text-red-500">{{ res.daysLeft }} {{ locale === 'tr' ? 'gün kaldı' : 'days left' }}</div>
                     </div>
-                    <button @click="expandedTenderId = expandedTenderId === res.id ? null : res.id; activeDetailTab = 'malzeme'" class="mt-6 w-full flex items-center justify-center rounded-xl bg-slate-900 py-3 text-xs font-black text-white hover:bg-blue-600 transition-all">
+                    
+                    <div class="space-y-2 mt-6">
+                      <button 
+                        @click="openQuickBidModal(res)" 
+                        class="w-full flex items-center justify-center gap-1.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs py-3 shadow-md hover:shadow-lg transition-all border border-amber-300 cursor-pointer"
+                      >
+                        <Zap :size="15" class="fill-slate-950 text-slate-950" />
+                        <span>{{ locale === 'tr' ? '⚡ Hızlı Teklif Ver' : '⚡ Submit Instant Bid' }}</span>
+                      </button>
+
+                      <button 
+                        @click="expandedTenderId = expandedTenderId === res.id ? null : res.id; activeDetailTab = 'malzeme'" 
+                        class="w-full flex items-center justify-center rounded-xl bg-slate-900 py-2.5 text-xs font-bold text-white hover:bg-blue-600 transition-all"
+                      >
+                        {{ expandedTenderId === res.id ? (locale === 'tr' ? 'Detayı Kapat' : 'Hide Details') : (locale === 'tr' ? 'İhale Detayları' : 'Tender Details') }}
+                      </button>
+                    </div>
                       {{ expandedTenderId === res.id ? (locale === 'tr' ? 'Detayları Gizle' : 'Hide Details') : (locale === 'tr' ? 'Detayları Gör' : 'View Details') }}
                     </button>
                   </div>
@@ -2267,6 +2347,92 @@ function toggleFilterSection(section: string) {
             </button>
           </div>
         </div>
+    <!-- ⚡ ULTRA-EASY 1-CLICK QUICK BID MODAL -->
+    <div v-if="showQuickBidModal && quickBidTender" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div class="w-full max-w-lg rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden text-left space-y-0">
+        <!-- Header -->
+        <div class="p-6 bg-gradient-to-r from-slate-900 via-slate-900 to-amber-950 text-white flex items-center justify-between border-b border-amber-500/30">
+          <div class="flex items-center gap-3">
+            <div class="h-10 w-10 rounded-xl bg-amber-400 text-slate-950 font-black flex items-center justify-center text-lg shadow-md shrink-0">
+              ⚡
+            </div>
+            <div>
+              <span class="text-[9px] font-black text-amber-400 uppercase tracking-widest block">1-TIK İLE ANINDA TEKLİF</span>
+              <h3 class="text-sm font-black tracking-tight text-white line-clamp-1">{{ quickBidTender.title }}</h3>
+            </div>
+          </div>
+          <button @click="showQuickBidModal = false" class="text-slate-400 hover:text-white transition p-1">
+            <X :size="20" />
+          </button>
+        </div>
+
+        <!-- Body Form -->
+        <form @submit.prevent="submitQuickBid" class="p-6 space-y-4">
+          <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-slate-700 font-medium space-y-1">
+            <div class="flex justify-between items-center text-slate-900 font-bold">
+              <span>🏢 Alıcı Firma: {{ quickBidTender.company }}</span>
+              <span class="text-[10px] bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded font-black">📍 {{ quickBidTender.city }}</span>
+            </div>
+            <div class="text-[11px] text-slate-500">İhale No: 2026/{{ 100000 + quickBidTender.id }} • {{ quickBidTender.type }}</div>
+          </div>
+
+          <div>
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">TEKLİF TUTARINIZ (₺) *</label>
+            <div class="relative">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-black text-amber-600 text-sm">₺</span>
+              <input 
+                v-model="quickBidPrice" 
+                type="text" 
+                required 
+                placeholder="Örn: 45.000" 
+                class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black font-mono text-slate-900 outline-none focus:border-amber-500 focus:bg-white transition-all shadow-xs" 
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">TESLİMAT SÜRESİ (GÜN) *</label>
+              <input 
+                v-model="quickBidDeliveryDays" 
+                type="number" 
+                required 
+                placeholder="7" 
+                class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white transition-all" 
+              />
+            </div>
+            <div>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">GARANTİ / UYUM</label>
+              <div class="w-full px-3 py-2 bg-emerald-50 border border-emerald-200 rounded-xl text-[11px] font-bold text-emerald-800 flex items-center justify-center">
+                ✓ Şartnameye Tam Uyum
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">TEKLİF NOTUNUZ (OPSİYONEL)</label>
+            <textarea 
+              v-model="quickBidNotes" 
+              rows="2" 
+              placeholder="Örn: Yerli üretim belgemiz mevcuttur, stoktan hemen kargolanır." 
+              class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-amber-500 focus:bg-white transition-all resize-none"
+            ></textarea>
+          </div>
+
+          <div class="pt-2 flex gap-3">
+            <button type="button" @click="showQuickBidModal = false" class="w-1/3 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition">
+              İptal
+            </button>
+            <button 
+              type="submit" 
+              :disabled="isSubmittingQuickBid" 
+              class="w-2/3 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer border border-amber-300 disabled:opacity-60"
+            >
+              <Zap :size="16" class="fill-slate-950 text-slate-950" />
+              <span>{{ isSubmittingQuickBid ? 'İletiliyor...' : '🚀 TEKLİFİ ANINDA GÖNDER' }}</span>
+            </button>
+          </div>
+        </form>
       </div>
     </div>
 
