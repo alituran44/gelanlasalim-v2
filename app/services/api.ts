@@ -1,5 +1,3 @@
-export const API_BASE_URL = "http://localhost:8000/api"
-
 interface ApiOptions extends RequestInit {
   token?: string
 }
@@ -8,6 +6,9 @@ export async function api<T>(
   endpoint: string,
   options: ApiOptions = {}
 ): Promise<T> {
+  const config = useRuntimeConfig()
+  const apiBaseUrl = config.public.apiBaseUrl as string
+
   const headers: HeadersInit = {
     "Content-Type": "application/json",
     ...(options.token && {
@@ -16,14 +17,14 @@ export async function api<T>(
     ...options.headers
   }
 
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-    ...options,
-    headers
-  })
-
-  if (!response.ok) {
-    throw new Error(`API Error: ${response.status}`)
+  try {
+    const response = await $fetch<T>(`${apiBaseUrl}${endpoint}`, {
+      ...options,
+      headers,
+      method: options.method as any
+    })
+    return response
+  } catch (error: any) {
+    throw new Error(`API Error: ${error.statusCode || error.message}`)
   }
-
-  return response.json() as Promise<T>
 }
