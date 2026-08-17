@@ -1,14 +1,50 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { Handshake, Menu, X, ArrowRight, Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Home, User } from 'lucide-vue-next'
+import { ref, computed, onMounted } from 'vue'
+import { Handshake, Menu, X, ArrowRight, Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Home, User, LogOut, LayoutDashboard } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale, setLocale, detectLocale, t } from '~/composables/useLocale'
 
 const { cmsData } = useCmsData()
 const mobileMenuOpen = ref(false)
+const userSession = ref<any>(null)
+
+const isLoggedIn = computed(() => {
+  if (!userSession.value) return false
+  return !!(userSession.value.email || userSession.value.id || userSession.value.companyName || userSession.value.firstName)
+})
+
+function checkSession() {
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('userSession')
+      if (raw && raw !== 'null' && raw !== 'undefined' && raw !== '{}') {
+        userSession.value = JSON.parse(raw)
+      } else {
+        userSession.value = null
+      }
+    } catch {
+      userSession.value = null
+    }
+  }
+}
+
+function handleLogout() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('userSession')
+    localStorage.removeItem('guestSession')
+  }
+  userSession.value = null
+  if (typeof window !== 'undefined') {
+    window.location.reload()
+  }
+}
 
 onMounted(() => {
   detectLocale()
+  checkSession()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', checkSession)
+  }
 })
 
 const activeTenders = ref([
@@ -93,12 +129,12 @@ const activeTenders = ref([
           </NuxtLink>
         </div>
 
-        <!-- Sağ: Profilim, CTA & Dil Seçimi -->
+        <!-- Sağ: Profilim & Giriş/Kayıt Butonları -->
         <div class="hidden sm:flex items-center gap-2">
 
-
-          <!-- PROFILIM BUTTON (Prominent on every page) -->
+          <!-- PROFILIM BUTTON (Sadece oturum AÇIKKEN gösterilir) -->
           <NuxtLink
+            v-if="isLoggedIn"
             to="/panel/ayarlar"
             class="flex items-center gap-1.5 px-4 py-2 text-xs font-black rounded-xl border transition-all text-slate-800 bg-amber-50/80 hover:bg-amber-100 border-amber-300 shadow-sm"
           >
@@ -106,8 +142,31 @@ const activeTenders = ref([
             <span>{{ 'Profilim' }}</span>
           </NuxtLink>
 
-          <!-- MISAFIR GIRISI BUTTON -->
+          <!-- PANELLE GEÇİŞ (Oturum açıkken) -->
           <NuxtLink
+            v-if="isLoggedIn"
+            to="/panel"
+            class="flex items-center gap-1.5 px-4 py-2 text-xs font-black rounded-xl text-white transition-all shadow-sm"
+            style="background: #003057;"
+          >
+            <LayoutDashboard :size="14" />
+            <span>{{ 'Panel' }}</span>
+          </NuxtLink>
+
+          <!-- ÇIKIŞ YAP BUTONU (Oturum açıkken) -->
+          <button
+            v-if="isLoggedIn"
+            type="button"
+            @click="handleLogout"
+            class="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl text-rose-600 hover:bg-rose-50 border border-rose-200 transition-all"
+          >
+            <LogOut :size="14" />
+            <span>{{ 'Çıkış' }}</span>
+          </button>
+
+          <!-- MISAFIR GIRISI BUTTON (Sadece oturum KAPALIYKEN gösterilir) -->
+          <NuxtLink
+            v-if="!isLoggedIn"
             to="/uyelik?tab=guest"
             class="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl border transition-all text-amber-900 bg-amber-100/70 hover:bg-amber-200/80 border-amber-300 shadow-xs"
             title="Şifresiz Misafir Girişi Yaparak Platformu İnceleyin"
@@ -116,13 +175,18 @@ const activeTenders = ref([
             <span>{{ 'Misafir Girişi' }}</span>
           </NuxtLink>
 
+          <!-- GIRIS YAP (Sadece oturum KAPALIYKEN gösterilir) -->
           <NuxtLink
+            v-if="!isLoggedIn"
             to="/uyelik"
             class="px-3 py-2 text-xs font-bold rounded-xl transition-all text-slate-700 hover:bg-slate-100"
           >
-            {{ t('login') }}
+            {{ 'Giriş Yap' }}
           </NuxtLink>
+
+          <!-- KURUMSAL HESAP AC (Sadece oturum KAPALIYKEN gösterilir) -->
           <NuxtLink
+            v-if="!isLoggedIn"
             to="/uyelik"
             class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-extrabold text-white transition-all shadow-md shadow-amber-950/10 hover:shadow-lg"
             style="background: linear-gradient(135deg, #0A1128 0%, #1C2541 100%); border: 1px solid #C59B27;"
@@ -133,17 +197,8 @@ const activeTenders = ref([
           </NuxtLink>
         </div>
 
-        <!-- Mobil Menü Butonu ve Dil Seçimi -->
+        <!-- Mobil Menü Butonu -->
         <div class="flex items-center gap-2 lg:hidden">
-          <button 
-            type="button" 
-            @click="setLocale('en')"
-            class="text-[10px] font-black p-2 rounded-lg border uppercase hover:bg-slate-50 transition"
-            style="border-color: #E2E8F0; color: #475569;"
-          >
-            🌐 {{ 'EN' }}
-          </button>
-          
           <button class="p-2 rounded-lg transition hover:bg-slate-100" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Menü">
             <X :size="20" v-if="mobileMenuOpen" style="color: #475569;" />
             <Menu :size="20" v-else style="color: #475569;" />
@@ -167,15 +222,30 @@ const activeTenders = ref([
             <a href="/#ihale-gezgini" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ 'Market' }}</a>
             <NuxtLink to="/abonelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ t('pricing') }}</NuxtLink>
             <a href="/#sss" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ 'SSS' }}</a>
+            
             <div class="border-t my-1" style="border-color: #F1F5F9;"></div>
-            <NuxtLink to="/uyelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ t('login') }}</NuxtLink>
+            
+            <!-- Mobil Profilim / Panel (Oturum açıkken) -->
+            <NuxtLink v-if="isLoggedIn" to="/panel/ayarlar" @click="mobileMenuOpen = false" class="py-1.5 text-amber-700 font-bold flex items-center gap-2">
+              <User :size="16" /> {{ 'Profilim' }}
+            </NuxtLink>
+            <NuxtLink v-if="isLoggedIn" to="/panel" @click="mobileMenuOpen = false" class="py-1.5 text-blue-700 font-bold flex items-center gap-2">
+              <LayoutDashboard :size="16" /> {{ 'Yönetim Paneli' }}
+            </NuxtLink>
+            <button v-if="isLoggedIn" @click="handleLogout(); mobileMenuOpen = false" class="py-1.5 text-rose-600 font-bold text-left flex items-center gap-2">
+              <LogOut :size="16" /> {{ 'Çıkış Yap' }}
+            </button>
+
+            <!-- Mobil Giriş / Kayıt (Oturum kapalıyken) -->
+            <NuxtLink v-if="!isLoggedIn" to="/uyelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ 'Giriş Yap' }}</NuxtLink>
             <NuxtLink
+              v-if="!isLoggedIn"
               to="/uyelik"
               @click="mobileMenuOpen = false"
               class="flex items-center justify-center gap-2 rounded-xl py-3 text-white font-bold"
               style="background: #003057;"
             >
-              {{ 'Kurumsal hesap aç' }} <ArrowRight :size="14" />
+              {{ 'Kurumsal Hesap Aç' }} <ArrowRight :size="14" />
             </NuxtLink>
           </div>
         </div>
