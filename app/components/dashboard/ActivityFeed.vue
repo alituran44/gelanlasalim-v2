@@ -3,38 +3,8 @@ import { computed } from "vue"
 import { locale } from "~/composables/useLocale"
 
 const activities = computed(() => {
-  if (locale.value === 'en') {
-    return [
-      {
-        id: 1,
-        title: "New tender created",
-        description: "Laptop Computer Procurement",
-        time: "5 mins ago",
-        color: "bg-blue-500"
-      },
-      {
-        id: 2,
-        title: "New supplier bid received",
-        description: "ABC Technology Inc. submitted quote",
-        time: "18 mins ago",
-        color: "bg-[#1EAE4C]"
-      },
-      {
-        id: 3,
-        title: "Tender published live",
-        description: "Office Furniture Supply Batch",
-        time: "1 hour ago",
-        color: "bg-amber-500"
-      },
-      {
-        id: 4,
-        title: "Company profile verified",
-        description: "Mavi Software Systems Ltd.",
-        time: "Today",
-        color: "bg-purple-500"
-      }
-    ]
-  } else {
+  // Pure Turkish mode
+  {
     return [
       {
         id: 1,

@@ -41,20 +41,20 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'GelAnlaşalım - B2B Reverse Auction & Procurement Platform',
-  ogTitle: 'GelAnlaşalım - B2B Reverse Auction & Procurement Platform',
-  description: 'Lower your procurement costs with live reverse auctions. Gather instant documented bids from verified corporate suppliers.',
-  ogDescription: 'Lower your procurement costs with live reverse auctions. Gather instant documented bids from verified corporate suppliers.',
+  title: 'GelAnlaşalım - B2B Canlı Eksiltme ve Satın Alma Platformu',
+  ogTitle: 'GelAnlaşalım - B2B Canlı Eksiltme ve Satın Alma Platformu',
+  description: 'Tedarik maliyetlerinizi canlı eksiltme ihaleleriyle düşürün. Doğrulanmış kurumsal tedarikçilerden anında belgeli teklif toplayın.',
+  ogDescription: 'Tedarik maliyetlerinizi canlı eksiltme ihaleleriyle düşürün. Doğrulanmış kurumsal tedarikçilerden anında belgeli teklif toplayın.',
   ogImage: 'https://gelanlasalim-v2.vercel.app/logo.png',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'GelAnlaşalım - B2B Live Auction & Supplier Platform',
-  twitterDescription: 'Reduce procurement costs by up to 14%. Transparent and encrypted B2B reverse auctions live in minutes.',
+  twitterTitle: 'GelAnlaşalım - B2B Canlı Eksiltme ve Satın Alma Platformu',
+  twitterDescription: 'Tedarik maliyetlerinizi %14\'e varan oranlarda düşürün. Şeffaf ve şifreli B2B e-ihale arenası dakikalar içinde yayında.',
   twitterImage: 'https://gelanlasalim-v2.vercel.app/logo.png'
 })
 
 useHead({
   htmlAttrs: {
-    lang: computed(() => locale.value || 'tr')
+    lang: 'tr'
   },
   link: [
     { rel: 'icon', type: 'image/png', href: '/logo.png' },
@@ -62,8 +62,8 @@ useHead({
     { rel: 'canonical', href: 'https://gelanlasalim-v2.vercel.app' }
   ],
   meta: [
-    { name: 'keywords', content: 'b2b auction, reverse auction, corporate procurement, supplier management, live bidding, rfq, eksiltme ihalesi' },
-    { name: 'author', content: 'GelAnlaşalım Inc.' },
+    { name: 'keywords', content: 'b2b ihale, ters ihale, eksiltme ihalesi, kurumsal satın alma, tedarikçi yönetimi, canlı teklif, rfq, e-ihale' },
+    { name: 'author', content: 'GelAnlaşalım Bilişim A.Ş.' },
     { name: 'robots', content: 'index, follow' }
   ],
   script: [
@@ -74,7 +74,7 @@ useHead({
         '@type': 'WebSite',
         'name': 'GelAnlaşalım',
         'url': 'https://gelanlasalim-v2.vercel.app',
-        'description': 'B2B Reverse Auction & Corporate Procurement Platform',
+        'description': 'B2B Canlı Eksiltme ve Kurumsal Satın Alma Platformu',
         'potentialAction': {
           '@type': 'SearchAction',
           'target': 'https://gelanlasalim-v2.vercel.app/?q={search_term_string}',
@@ -654,67 +654,30 @@ const sectors = [
   { name: 'Kültür, Rekreasyon ve Spor Hizmetleri', count: 38 }
 ]
 
-const tenderTypes = computed(() => {
-  if (locale.value === 'en') {
-    return [
-      { name: 'Goods Procurement', count: 578 },
-      { name: 'Service Procurement', count: 207 },
-      { name: 'Construction Work', count: 180 },
-      { name: 'Contract Manufacturing', count: 92 },
-      { name: 'Leasing / Rental', count: 85 },
-      { name: 'Sales Request', count: 39 }
-    ]
-  } else {
-    return [
+const tenderTypes = computed(() => [
       { name: 'Mal Alımı', count: 578 },
       { name: 'Hizmet Alımı', count: 207 },
       { name: 'Yapım İşi', count: 180 },
       { name: 'Fason Üretim', count: 92 },
       { name: 'Kiralama', count: 85 },
       { name: 'Satış Talebi', count: 39 }
-    ]
-  }
-})
+    ])
 
-const offerMethods = computed(() => {
-  if (locale.value === 'en') {
-    return [
-      { name: 'Open Bidding', count: 546 },
-      { name: 'Sealed Bidding', count: 395 },
-      { name: 'Invited Tender', count: 151 },
-      { name: 'Reverse Auction', count: 98 },
-      { name: 'Price Research', count: 68 },
-      { name: 'Direct RFQ', count: 57 }
-    ]
-  } else {
-    return [
+const offerMethods = computed(() => [
       { name: 'Açık Teklif', count: 546 },
       { name: 'Kapalı Teklif', count: 395 },
       { name: 'Davetli İhale', count: 151 },
       { name: 'Ters İhale', count: 98 },
       { name: 'Fiyat Araştırması', count: 68 },
       { name: 'Doğrudan Teklif Talebi', count: 57 }
-    ]
-  }
-})
+    ])
 
-const pricingTypes = computed(() => {
-  if (locale.value === 'en') {
-    return [
-      { name: 'Lump Sum / Total Price', count: 214 },
-      { name: 'Unit Price', count: 323 },
-      { name: 'Partial Bids Allowed', count: 115 },
-      { name: 'Partial Bids Not Allowed', count: 277 }
-    ]
-  } else {
-    return [
+const pricingTypes = computed(() => [
       { name: 'Toplam / Götürü Bedel', count: 214 },
       { name: 'Birim Fiyat', count: 323 },
       { name: 'Kısmi Teklif Verilebilir', count: 115 },
       { name: 'Kısmi Teklif Verilemez', count: 277 }
-    ]
-  }
-})
+    ])
 
 const tenders = [
   {
@@ -852,63 +815,21 @@ const faqs = [
   }
 ]
 
-const buyerSteps = computed(() => {
-  if (locale.value === 'en') {
-    return [
-      { number: '01', title: 'Publish Request', text: 'Define your product or service requirement. Upload technical and administrative specifications.' },
-      { number: '02', title: 'Watch Competition Arena', text: 'Track the live reverse auction arena where verified suppliers compete with instant price cuts.' },
-      { number: '03', title: 'Finalize Deal with Best Bid', text: 'Select the optimal proposal based on price, quality, and delivery terms, and lock the deal.' }
-    ]
-  } else {
-    return [
+const buyerSteps = computed(() => [
       { number: '01', title: 'İhtiyacını Yayınla', text: 'Ürün veya hizmet ihtiyacını oluştur. Teknik ve idari şartname belgelerini yükle.' },
       { number: '02', title: 'Rekabet Arenasını İzle', text: 'Tedarikçilerin anlık fiyat kırarak yarıştığı tersine ihale arenasını canlı takip et.' },
       { number: '03', title: 'En Uygun Teklifle Anlaş', text: 'Fiyat, kalite ve teslimat şartlarına göre en doğru kararı ver ve anlaşmayı kilitlesin.' }
-    ]
-  }
-})
+    ])
 
-const supplierSteps = computed(() => {
-  if (locale.value === 'en') {
-    return [
-      { number: '01', title: 'Explore Opportunities', text: 'Find active corporate tenders tailored to your sector and expertise in seconds.' },
-      { number: '02', title: 'Submit Proposal', text: 'Review technical specifications and securely submit your itemized unit price proposal.' },
-      { number: '03', title: 'Grow Client Portfolio', text: 'Close direct B2B deals with verified buyers and expand your corporate sales volume.' }
-    ]
-  } else {
-    return [
+const supplierSteps = computed(() => [
       { number: '01', title: 'İş Fırsatlarını Keşfet', text: 'Sektörüne ve uzmanlık alanına uygun güncel kurumsal ihaleleri saniyeler içinde bul.' },
       { number: '02', title: 'Teklifini Gönder', text: 'Teknik şartları incele, malzeme bazlı birim fiyat teklifini güvenle ilet.' },
       { number: '03', title: 'Yeni Portföy Kazan', text: 'Doğrulanmış B2B alıcılar ile doğrudan iş anlaşmaları yap ve ticaret hacmini büyüt.' }
-    ]
-  }
-})
+    ])
 
 const activeSteps = computed(() => activeAudience.value === 'buyer' ? buyerSteps.value : supplierSteps.value)
 
-const localizedTenders = computed(() => {
-  if (locale.value === 'en') {
-    return (tenders || []).map(t => ({
-      ...t,
-      title: t.title === '500 Adet Kurumsal Dizüstü Bilgisayar Alımı' ? '500 Units Corporate Laptop Procurement' :
-             t.title === 'Üretim Tesisi Çatı ve İzolasyon Yenileme İşi' ? 'Manufacturing Facility Roof & Insulation Renovation' :
-             t.title === '12 Aylık Personel Taşıma Hizmeti' ? '12-Month Staff Shuttle Transportation Service' :
-             t.title === '100.000 Adet Özel Tasarım Ürün Kutusu Üretimi' ? '100,000 Units Custom Box Manufacturing' :
-             t.title === 'Kurumsal Web Yazılım ve Mobil Uygulama Projesi' ? 'Corporate Web Software & Mobile App Project' : t.title,
-      type: t.type === 'Mal Alımı' ? 'Goods Procurement' : t.type === 'Yapım İşi' ? 'Construction Work' : t.type === 'Hizmet Alımı' ? 'Service Procurement' : t.type === 'Fason Üretim' ? 'Contract Manufacturing' : t.type,
-      method: t.method === 'Kapalı Teklif' ? 'Sealed Bidding' : t.method === 'Açık Teklif' ? 'Open Bidding' : t.method === 'Ters İhale' ? 'Reverse Auction' : t.method === 'Davetli İhale' ? 'Invited Tender' : t.method,
-      pricing: t.pricing === 'Birim Fiyat' ? 'Unit Price' : t.pricing === 'Toplam / Götürü Bedel' ? 'Lump Sum / Total Price' : t.pricing,
-      value: (t.value || '').replace('₺', '$').replace('5.500.000', '180,000').replace('1.250.000', '42,000').replace('840.000', '28,000').replace('350.000', '11,500').replace('2.800.000', '92,000'),
-      description: t.id === 1 ? 'Procurement of 500 corporate laptop computers in accordance with technical specs.' :
-                   t.id === 2 ? 'Roof cladding and thermal insulation renovation for factory production facility.' :
-                   t.id === 3 ? '12-month employee shuttle service for production plant staff.' :
-                   t.id === 4 ? 'Contract production of custom printed packaging boxes.' :
-                   'Development of corporate portal, mobile app, and admin control panel.'
-    }))
-  } else {
-    return tenders || []
-  }
-})
+const localizedTenders = computed(() => tenders || [])
 
 /* =========================================================
    İN-MEMORY FİLTRELEME MANTIĞI

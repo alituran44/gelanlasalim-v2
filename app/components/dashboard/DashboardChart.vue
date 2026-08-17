@@ -27,21 +27,8 @@ ChartJS.register(
 )
 
 const chartData = computed(() => {
-  if (locale.value === 'en') {
-    return {
-      labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-      datasets: [
-        {
-          label: "Published Tenders",
-          data: [12, 19, 14, 28, 35, 41],
-          borderColor: "#2563eb",
-          backgroundColor: "rgba(37,99,235,.12)",
-          fill: true,
-          tension: 0.4
-        }
-      ]
-    }
-  } else {
+  // Pure Turkish mode
+  {
     return {
       labels: ["Ocak", "Şubat", "Mart", "Nisan", "Mayıs", "Haziran"],
       datasets: [

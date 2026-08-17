@@ -9,38 +9,8 @@ import {
 import { locale } from "~/composables/useLocale"
 
 const stats = computed(() => {
-  if (locale.value === 'en') {
-    return [
-      {
-        title: "Total Tenders",
-        value: "148",
-        change: "+12%",
-        color: "bg-blue-500",
-        icon: FileText
-      },
-      {
-        title: "Active Tenders",
-        value: "23",
-        change: "+4",
-        color: "bg-emerald-500",
-        icon: Gavel
-      },
-      {
-        title: "Received Bids",
-        value: "324",
-        change: "+28",
-        color: "bg-orange-500",
-        icon: Users
-      },
-      {
-        title: "Completed Deals",
-        value: "96",
-        change: "+18%",
-        color: "bg-purple-500",
-        icon: TrendingUp
-      }
-    ]
-  } else {
+  // Pure Turkish mode
+  {
     return [
       {
         title: "Toplam İhale",

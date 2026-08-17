@@ -3,34 +3,8 @@ import { computed } from "vue"
 import { locale } from "~/composables/useLocale"
 
 const notifications = computed(() => {
-  if (locale.value === 'en') {
-    return [
-      {
-        id: 1,
-        title: "3 new supplier bids received",
-        type: "Info",
-        color: "bg-blue-500"
-      },
-      {
-        id: 2,
-        title: "Subscription renews in 5 days",
-        type: "Alert",
-        color: "bg-amber-500"
-      },
-      {
-        id: 3,
-        title: "New supplier followed your company",
-        type: "System",
-        color: "bg-emerald-500"
-      },
-      {
-        id: 4,
-        title: "Platform v2.4 updates live",
-        type: "Update",
-        color: "bg-purple-500"
-      }
-    ]
-  } else {
+  // Pure Turkish mode
+  {
     return [
       {
         id: 1,

@@ -4,50 +4,8 @@ import { ArrowRight } from "lucide-vue-next"
 import { locale } from "~/composables/useLocale"
 
 const tenders = computed(() => {
-  if (locale.value === 'en') {
-    return [
-      {
-        id: 1,
-        title: "Laptop Computer Procurement",
-        company: "ABC Technology Inc.",
-        budget: "$38,500",
-        status: "Active",
-        date: "15 July 2026"
-      },
-      {
-        id: 2,
-        title: "Office Furniture Supply Batch",
-        company: "XYZ Holdings",
-        budget: "$14,200",
-        status: "Bids Expected",
-        date: "14 July 2026"
-      },
-      {
-        id: 3,
-        title: "Enterprise Software Licenses",
-        company: "BiHocam EdTech",
-        budget: "$9,800",
-        status: "Active",
-        date: "13 July 2026"
-      },
-      {
-        id: 4,
-        title: "Rack Server Hardware Batch",
-        company: "Delta IT Systems",
-        budget: "$29,400",
-        status: "Closed",
-        date: "12 July 2026"
-      },
-      {
-        id: 5,
-        title: "CCTV Security Camera System",
-        company: "Mavi Construction",
-        budget: "$5,600",
-        status: "Active",
-        date: "11 July 2026"
-      }
-    ]
-  } else {
+  // Pure Turkish mode
+  {
     return [
       {
         id: 1,

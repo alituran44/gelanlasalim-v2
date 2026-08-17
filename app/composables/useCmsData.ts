@@ -255,16 +255,17 @@ export function useCmsData() {
     const saved = localStorage.getItem('cmsData')
     if (saved) {
       try {
-        const parsed = JSON.parse(saved)
-        // If saved data contains legacy English strings, migrate/reset to Turkish default
-        if (JSON.stringify(parsed).includes('How does the reverse auction') || JSON.stringify(parsed).includes('PRIVATE SECTOR')) {
+        const str = saved.toLowerCase()
+        // If saved data contains any legacy English or outdated schema, purge and overwrite with pure Turkish default
+        if (str.includes('how does') || str.includes('private sector') || str.includes('construction') || str.includes('procurement') || str.includes('technology') || str.includes('electronics')) {
           cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
           localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
         } else {
-          cmsDataRef.value = parsed
+          cmsDataRef.value = JSON.parse(saved)
         }
       } catch (e) {
-        cmsDataRef.value = { ...DEFAULT_CMS_DATA }
+        cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
+        localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
       }
     } else {
       localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))

@@ -265,31 +265,31 @@ function printDocument() {
 
             <div class="space-y-5 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">ARTICLE 1 — SCOPE & SUBJECT MATTER</h3>
-                <p>1.1. The Platform provides digital reverse auction infrastructure, buyer procurement publishing tools, supplier bidding management, and automated B2B transaction logs.</p>
-                <p>1.2. Access to and use of the Platform is strictly governed by the terms herein. Registration or submission of bids constitutes full, unconditional consent to this Agreement.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — KAPSAM VE KONU</h3>
+                <p>1.1. Platform; dijital canlı eksiltme altyapısı, alıcı ihale yayınlama araçları, tedarikçi teklif yönetimi ve otomatik B2B işlem günlükleri sunar.</p>
+                <p>1.2. Platforma erişim ve kullanım işbu Sözleşme hükümlerine tabidir. Üyelik kaydı yapılması veya teklif verilmesi bu Sözleşmenin tüm şartlarının kabul edildiği anlamına gelir.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">ARTICLE 2 — USER ELIGIBILITY & CORPORATE REPRESENTATION</h3>
-                <p>2.1. The Platform is restricted to legally registered corporate entities, sole proprietorships, or authorized individuals operating in good faith under applicable commercial law.</p>
-                <p>2.2. Users guarantee that all corporate documents (Tax ID, Trade Registry Gazette, Signature Circulars) submitted during verification are accurate, genuine, and up to date.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — KULLANICI ŞARTLARI VE KURUMSAL TEMSİL</h3>
+                <p>2.1. Platform, yalnızca yasal olarak tescilli kurumsal şirketler, şahıs firmaları veya ticari mevzuat çerçevesinde hareket eden yetkili temsilcilerin kullanımına açıktır.</p>
+                <p>2.2. Kullanıcılar; doğrulama sürecinde sundukları Vergi Levhası, Ticaret Sicil Gazetesi, İmza Sirküleri gibi tüm kurumsal evrakların doğru, gerçek ve güncel olduğunu taahhüt eder.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">ARTICLE 3 — BINDING NATURE OF BIDS & REVERSE AUCTION RULES</h3>
-                <p>3.1. Any price quotation, bidding increment, or proposal submitted by a Supplier during a live reverse auction constitutes an irrevocable, legally binding commercial offer.</p>
-                <p>3.2. Bidders are prohibited from withdrawing submitted bids or colluding with rival suppliers. Violation results in immediate account suspension and statutory damages.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — TEKLİFLERİN BAĞLAYICILIĞI VE CANLI EKSİLTME KURALLARI</h3>
+                <p>3.1. Canlı eksiltme süresince Tedarikçi tarafından sunulan her fiyat teklifi veya eksiltme adımı kesin ve bağlayıcı bir ticari teklif niteliğindedir.</p>
+                <p>3.2. Tedarikçilerin sunulan teklifleri geriye dönük iptal etmesi veya rakiplerle muvazaalı hareket etmesi yasaktır. İhlal halinde hesap derhal askıya alınır.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">ARTICLE 4 — INTELLECTUAL PROPERTY & DATA RIGHTS</h3>
-                <p>4.1. All trademarks, software source code, interface designs, algorithms, and documentation are the exclusive intellectual property of GelAnlaşalım Bilişim A.Ş.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — FİKRİ MÜLKİYET VE VERİ HAKLARI</h3>
+                <p>4.1. Platform üzerindeki tüm markalar, yazılım kaynak kodları, arayüz tasarımları, algoritmalar ve dokümantasyon GelAnlaşalım Bilişim A.Ş.'nin mülkiyetindedir.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">ARTICLE 5 — GOVERNING LAW & JURISDICTION</h3>
-                <p>5.1. This Agreement is governed by the laws of the Republic of Turkey. The Courts and Execution Offices of Balıkesir shall have exclusive jurisdiction over any disputes.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 5 — UYGULANACAK HUKUK VE YETKİLİ MAHKEME</h3>
+                <p>5.1. İşbu Sözleşme Türkiye Cumhuriyeti kanunlarına tabidir. Uyuşmazlıklarda Balıkesir Mahkemeleri ve İcra Daireleri münhasıran yetkilidir.</p>
               </section>
             </div>
           </article>
@@ -307,19 +307,19 @@ function printDocument() {
 
             <div class="space-y-5 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">SECTION 1 — DATA COLLECTION & CATEGORIES</h3>
-                <p>1.1. We collect corporate identification metrics, tax registry records, official contact details, user login credentials, IP logs, and reverse auction transactional history.</p>
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 1 — VERİ TOPLAMA VE KATEGORİLER</h3>
+                <p>1.1. Kurumsal kimlik bilgileri, vergi dairesi kayıtları, resmi iletişim adresleri, kullanıcı giriş bilgileri, IP günlükleri ve ihale işlem geçmişi toplanmaktadır.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">SECTION 2 — USE OF COMMERCIAL INFORMATION</h3>
-                <p>2.1. Confidential procurement specifications, bid figures, and supplier quotes are processed solely for the execution of authorized reverse auction events.</p>
-                <p>2.2. Commercial bid numbers are never sold, rented, or disclosed to unauthorized third parties or public advertising networks.</p>
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 2 — TİCARİ BİLGİLERİN KULLANIMI</h3>
+                <p>2.1. Gizli teknik şartnameler, teklif rakamları ve tedarikçi fiyatları yalnızca e-ihale süreçlerinin yürütülmesi amacıyla işlenir.</p>
+                <p>2.2. Ticari teklif verileri üçüncü taraflara satılmaz, kiralanmaz ve reklam ağlarıyla paylaşılmaz.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">SECTION 3 — SECURITY INFRASTRUCTURE</h3>
-                <p>3.1. Data in transit is protected using end-to-end HTTPS/TLS 1.2+ encryption. Data at rest is stored in ISO 27001-certified SOC-2 tier servers with real-time firewall audit streams.</p>
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 3 — GÜVENLİK ALTYAPISI</h3>
+                <p>3.1. Veriler uçtan uca HTTPS/TLS 1.2+ şifreleme ile korunur. Durağan veriler ISO 27001 sertifikalı güvenli sunucularda saklanır.</p>
               </section>
             </div>
           </article>
@@ -337,20 +337,20 @@ function printDocument() {
 
             <div class="space-y-5 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">CLAUSE 1 — DATA CONTROLLER IDENTIFICATION</h3>
-                <p>Data Controller: GelAnlaşalım Bilişim Anonim Şirketi</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDELER — VERİ SORUMLUSU KİMLİĞİ</h3>
+                <p>Veri Sorumlusu: GelAnlaşalım Bilişim Anonim Şirketi</p>
                 <p>Tax Office / No: Karesi V.D. / 3920941829 | KEP: gelanlasalim@hs01.kep.tr</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">CLAUSE 2 — PURPOSES OF PROCESSING & LEGAL GROUNDS</h3>
-                <p>2.1. Personal data (Name, Surname, Corporate Email, Phone Number, Authorized Signature) is processed under KVKK Art. 5/2-c (Contractual obligation) and Art. 5/2-f (Legitimate interest).</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — İŞLEME AMAÇLARI VE HUKUKİ SEBEPLER</h3>
+                <p>2.1. Kişisel veriler (Ad, Soyad, Kurumsal E-Posta, Telefon, İmza) KVKK Madde 5/2-c (Sözleşmenin kurulması) ve 5/2-f (Meşru menfaat) kapsamında işlenmektedir.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">CLAUSE 3 — DATA SUBJECT RIGHTS (KVKK ART. 11 & GDPR ART. 15-22)</h3>
-                <p>3.1. Users maintain rights to request confirmation of processing, request correction of inaccurate data, demand erasure ("right to be forgotten"), and object to automated profiling.</p>
-                <p>3.2. Official applications may be directed to <strong>kvkk@gelanlasalim.com</strong> or submitted via registered KEP email.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — İLGİLİ KİŞİNİN HAKLARI (KVKK MADDE 11)</h3>
+                <p>3.1. Kullanıcılar verilerinin işlenip işlenmediğini öğrenme, düzeltme talep etme ve silinmesini isteme hakkına sahiptir.</p>
+                <p>3.2. Başvurular <strong>kvkk@gelanlasalim.com</strong> adresine veya KEP üzerinden iletilebilir.</p>
               </section>
             </div>
           </article>
@@ -363,14 +363,14 @@ function printDocument() {
 
             <div class="space-y-5 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">RULE 1 — REVERSE AUCTION MECHANICS</h3>
-                <p>1.1. Procurement tenders operate on a sealed-bid or open dynamic reverse auction model where suppliers decrease unit quotes in real time.</p>
-                <p>1.2. The Buyer reserves full discretion to select winning bids based on total price, delivery timetable, supplier verification score, or specification compliance.</p>
+                <h3 class="font-bold text-slate-900 text-sm">KURAL 1 — CANLI EKSİLTME VE İHALE KURALLARI</h3>
+                <p>1.1. İhaleler kapalı zarf veya canlı eksiltme modeliyle yürütülür; tedarikçiler anlık fiyat düşürür.</p>
+                <p>1.2. Alıcı firma toplam fiyat, teslimat takvimi ve kalite uyumuna göre en uygun teklifi seçmekte serbesttir.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">RULE 2 — ANTI-COLLUSION & INTEGRITY GUARANTEE</h3>
-                <p>2.1. Price fixing, artificial bid inflation, horizontal cartel agreements, and proxy bidding between competing suppliers are strictly illegal and monitored by anti-fraud AI engines.</p>
+                <h3 class="font-bold text-slate-900 text-sm">KURAL 2 — REKABET HUKUKU VE DÜRÜSTLÜK İLKESİ</h3>
+                <p>2.1. Fiyat anlaşması yapılması, yapay fiyat yükseltilmesi ve danışıklı teklif verilmesi yasaktır.</p>
               </section>
             </div>
           </article>
@@ -383,14 +383,14 @@ function printDocument() {
 
             <div class="space-y-5 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">ARTICLE 1 — PARTIES & SUBSCRIPTION PACKAGES</h3>
-                <p>1.1. Seller: GelAnlaşalım Bilişim A.Ş. | Buyer: Subscribed Enterprise User.</p>
-                <p>1.2. Package options include 1-Month, 3-Month, 6-Month, and 9-Month B2B corporate access tiers billed electronically via credit card (PayTR/iyzico) or corporate wire transfer.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — TARAFLAR VE ABONELİK PAKETLERİ</h3>
+                <p>1.1. Satıcı: GelAnlaşalım Bilişim A.Ş. | Alıcı: Abone Kurumsal Kullanıcı.</p>
+                <p>1.2. Paket seçenekleri 1, 3, 6 ve 9 aylık dönemleri kapsar; ödemeler kredi kartı veya havale/EFT ile yapılır.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">ARTICLE 2 — INVOICING & VAT TAXATION</h3>
-                <p>2.1. All subscription invoices are generated electronically (e-Fatura / e-Arşiv) within 24 hours of payment approval and sent to the registered corporate email address.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — FATURALANDIRMA VE KDV</h3>
+                <p>2.1. Tüm üyelik faturaları ödeme onayını müteakip e-Fatura/e-Arşiv olarak düzenlenip kurumsal e-postaya gönderilir.</p>
               </section>
             </div>
           </article>
@@ -403,13 +403,13 @@ function printDocument() {
 
             <div class="space-y-5 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">POLICY 1 — ESSENTIAL & SESSION COOKIES</h3>
-                <p>1.1. Necessary cookies maintain user sessions, authentications, language preferences (`user_locale`), and tender draft state (`tenderDraft`). These are required for system functionality.</p>
+                <h3 class="font-bold text-slate-900 text-sm">POLİTİKA 1 — ZORUNLU ÇEREZLER</h3>
+                <p>1.1. Zorunlu çerezler oturum güvenliği ve kullanıcı tercihlerini korur.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">POLICY 2 — COOKIE MANAGEMENT</h3>
-                <p>2.1. Users can disable non-essential cookies via the bottom Cookie Consent Banner or browser settings anytime without affecting core reverse auction participation.</p>
+                <h3 class="font-bold text-slate-900 text-sm">POLİTİKA 2 — ÇEREZ YÖNETİMİ</h3>
+                <p>2.1. Zorunlu olmayan çerezler tarayıcı ayarlarından her zaman kapatılabilir.</p>
               </section>
             </div>
           </article>
@@ -422,8 +422,8 @@ function printDocument() {
 
             <div class="space-y-5 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">CHARTER 1 — VERIFICATION REQUIREMENTS</h3>
-                <p>1.1. Suppliers must submit valid Tax Certificates (Vergi Levhası), Trade Registry Gazette filings (Ticaret Sicil Gazetesi), and Authorized Signatory Lists before bidding on tier-1 procurement contracts.</p>
+                <h3 class="font-bold text-slate-900 text-sm">ŞART 1 — DOĞRULAMA GEREKSİNİMLERİ</h3>
+                <p>1.1. Tedarikçiler teklif vermeden önce Vergi Levhası, Ticaret Sicil Gazetesi ve İmza Sirkülerini yüklemekle yükümlüdür.</p>
               </section>
             </div>
           </article>
@@ -436,8 +436,8 @@ function printDocument() {
 
             <div class="space-y-5 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">SLA 1 — 99.9% UPTIME COMMITMENT</h3>
-                <p>1.1. GelAnlaşalım guarantees 99.9% operational availability for live reverse auction engines, websocket feeds, and bid submission endpoints on a monthly rolling average.</p>
+                <h3 class="font-bold text-slate-900 text-sm">SLA 1 — %99.9 KESİNTİSİZLİK TAAHHÜDÜ</h3>
+                <p>1.1. GelAnlaşalım, canlı eksiltme motorları ve sistem erişilebilirliği için aylık %99.9 kesintisizlik taahhüt eder.</p>
               </section>
             </div>
           </article>

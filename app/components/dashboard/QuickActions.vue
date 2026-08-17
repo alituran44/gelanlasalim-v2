@@ -9,38 +9,8 @@ import {
 import { locale } from "~/composables/useLocale"
 
 const actions = computed(() => {
-  if (locale.value === 'en') {
-    return [
-      {
-        title: "Create Tender",
-        description: "Publish new B2B auction",
-        icon: PlusCircle,
-        color: "bg-blue-600",
-        link: "/panel/ihale-olustur"
-      },
-      {
-        title: "My Tenders",
-        description: "Manage active & past auctions",
-        icon: FileText,
-        color: "bg-emerald-600",
-        link: "/panel/ilanlarim"
-      },
-      {
-        title: "Account Settings",
-        description: "Update company profile & logo",
-        icon: Users,
-        color: "bg-amber-600",
-        link: "/panel/ayarlar"
-      },
-      {
-        title: "ERP Integrations",
-        description: "SAP, Logo & Netsis sync",
-        icon: BarChart3,
-        color: "bg-purple-600",
-        link: "/entegrasyonlar"
-      }
-    ]
-  } else {
+  // Pure Turkish mode
+  {
     return [
       {
         title: "Yeni İhale",

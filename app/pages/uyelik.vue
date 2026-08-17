@@ -65,20 +65,7 @@ const isSubmitting = ref(false)
 const errorMessage = ref('')
 
 // Sektör seçimi (dile göre dinamik)
-const sektorler = computed(() => {
-  if (locale.value === 'en') {
-    return [
-      { key: 'tarim', label: '🌾 Agriculture & Food', popular: true },
-      { key: 'insaat', label: '🏗️ Construction & Structure', popular: false },
-      { key: 'saglik', label: '💊 Healthcare & Pharma', popular: false },
-      { key: 'teknoloji', label: '🖥️ Technology & Software', popular: false },
-      { key: 'enerji', label: '⚡ Energy & Power', popular: false },
-      { key: 'lojistik', label: '🚚 Logistics & Freight', popular: false },
-      { key: 'sanayi', label: '🏭 Industry & Manufacturing', popular: false },
-      { key: 'egitim', label: '📚 Education & Consulting', popular: false }
-    ]
-  } else {
-    return [
+const sektorler = computed(() => [
       { key: 'tarim', label: '🌾 Tarım & Gıda', popular: true },
       { key: 'insaat', label: '🏗️ İnşaat & Yapı', popular: false },
       { key: 'saglik', label: '💊 Sağlık & İlaç', popular: false },
@@ -88,9 +75,7 @@ const sektorler = computed(() => {
       { key: 'sanayi', label: '🏭 Sanayi & Üretim', popular: false },
       { key: 'egitim', label: '📚 Eğitim & Danışmanlık', popular: false },
       { key: 'diger', label: '✏️ Diğer (Kendi Faaliyetinizi Yazın)', popular: true }
-    ]
-  }
-})
+    ])
 const seciliSektorler = ref<string[]>(['tarim'])
 const customSector = ref('')
 const mailBildirimi = ref(true)
