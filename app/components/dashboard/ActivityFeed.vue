@@ -73,10 +73,10 @@ const activities = computed(() => {
   <div class="rounded-2xl bg-white border border-slate-200 shadow-xs">
     <div class="border-b border-slate-100 p-6">
       <h2 class="text-base font-black text-slate-800 tracking-tight">
-        {{ locale === 'tr' ? 'Aktivite Akışı' : 'Live Activity Stream' }}
+        {{ 'Aktivite Akışı' }}
       </h2>
       <p class="text-xs font-medium text-slate-500 mt-0.5">
-        {{ locale === 'tr' ? 'Son sistem hareketleri ve ihale takipleri' : 'Recent platform events and procurement updates' }}
+        {{ 'Son sistem hareketleri ve ihale takipleri' }}
       </p>
     </div>
 

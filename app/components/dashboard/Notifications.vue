@@ -65,10 +65,10 @@ const notifications = computed(() => {
   <div class="rounded-2xl bg-white border border-slate-200 shadow-xs">
     <div class="border-b border-slate-100 p-6">
       <h2 class="text-base font-black text-slate-800 tracking-tight">
-        {{ locale === 'tr' ? 'Bildirim Merkezi' : 'Notification Center' }}
+        {{ 'Bildirim Merkezi' }}
       </h2>
       <p class="text-xs font-medium text-slate-500 mt-0.5">
-        {{ locale === 'tr' ? 'Son gelen bildirim ve sistem duyuruları' : 'Latest system notifications and alerts' }}
+        {{ 'Son gelen bildirim ve sistem duyuruları' }}
       </p>
     </div>
 

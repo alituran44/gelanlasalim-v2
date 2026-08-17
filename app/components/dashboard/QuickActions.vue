@@ -78,10 +78,10 @@ const actions = computed(() => {
 <template>
   <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs">
     <h2 class="text-base font-black text-slate-800 tracking-tight">
-      {{ locale === 'tr' ? 'Hızlı İşlemler' : 'Quick Dashboard Actions' }}
+      {{ 'Hızlı İşlemler' }}
     </h2>
     <p class="mt-0.5 text-xs text-slate-500 font-medium">
-      {{ locale === 'tr' ? 'En sık kullanılan satın alma araçları' : 'Frequently used procurement utilities' }}
+      {{ 'En sık kullanılan satın alma araçları' }}
     </p>
 
     <div class="mt-5 grid gap-3">

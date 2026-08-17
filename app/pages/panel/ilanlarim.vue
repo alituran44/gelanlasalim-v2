@@ -68,10 +68,10 @@ const statusTabs = computed(() => {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #F1F5F9;">
       <div>
         <h1 class="text-xl font-black text-slate-800 tracking-tight" style="color: #0F172A;">
-          {{ locale === 'tr' ? 'İhalelerim' : 'My Tenders' }}
+          {{ 'İhalelerim' }}
         </h1>
         <p class="text-xs text-slate-500 font-medium mt-0.5">
-          {{ locale === 'tr' ? 'Oluşturduğunuz ihaleleri durum, tarih ve teklif sürecine göre yönetin.' : 'Manage created tenders, status, bids, and delivery deadlines.' }}
+          {{ 'Oluşturduğunuz ihaleleri durum, tarih ve teklif sürecine göre yönetin.' }}
         </p>
       </div>
 
@@ -80,7 +80,7 @@ const statusTabs = computed(() => {
         class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-3 shadow-lg shadow-blue-500/20 transition self-start sm:self-auto"
       >
         <Plus :size="14" />
-        <span>{{ locale === 'tr' ? 'Yeni İhale' : 'New Tender' }}</span>
+        <span>{{ 'Yeni İhale' }}</span>
       </NuxtLink>
     </div>
 
@@ -140,7 +140,7 @@ const statusTabs = computed(() => {
           <input 
             v-model="searchQuery"
             type="text"
-            :placeholder="locale === 'tr' ? 'İhale adı, kategori veya şehir ile ara...' : 'Search tender title, category or city...'"
+            :placeholder="'İhale adı, kategori veya şehir ile ara...'"
             class="w-full rounded-xl border pl-9 pr-4 py-2.5 text-xs outline-none bg-white transition focus:border-blue-500 font-medium"
             style="border-color: #E2E8F0; color: #0F172A;"
           />
@@ -183,21 +183,21 @@ const statusTabs = computed(() => {
           <div>
             <h3 class="font-bold text-sm text-slate-800">{{ tender.baslik }}</h3>
             <p class="text-xs text-slate-400 mt-0.5 font-medium">
-              {{ locale === 'tr' ? 'İhale Kodu:' : 'Tender ID:' }} <strong class="font-mono text-slate-700">{{ tender.id }}</strong> • 
-              {{ locale === 'tr' ? 'Kategori:' : 'Category:' }} {{ tender.kategori }}
+              {{ 'İhale Kodu:' }} <strong class="font-mono text-slate-700">{{ tender.id }}</strong> • 
+              {{ 'Kategori:' }} {{ tender.kategori }}
             </p>
             
             <div class="flex flex-wrap items-center gap-3 mt-2 text-[10px] text-slate-500 font-medium">
               <span class="rounded bg-slate-100 px-2 py-0.5 font-bold uppercase tracking-wider text-[8px] text-slate-700">{{ tender.olusturma }}</span>
-              <span>{{ locale === 'tr' ? 'Bütçe:' : 'Budget:' }} {{ tender.butce }}</span>
-              <span>{{ locale === 'tr' ? 'Süre:' : 'Duration:' }} {{ tender.sure }}</span>
+              <span>{{ 'Bütçe:' }} {{ tender.butce }}</span>
+              <span>{{ 'Süre:' }} {{ tender.sure }}</span>
             </div>
           </div>
         </div>
 
         <div class="flex items-center gap-4 sm:justify-end">
           <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
-            {{ tender.teklifSayisi }} {{ locale === 'tr' ? 'Teklif Alındı' : 'Bids Received' }}
+            {{ tender.teklifSayisi }} {{ 'Teklif Alındı' }}
           </span>
           <NuxtLink :to="`/panel/gelen-teklifler?ilan=${tender.id}`" class="p-2 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-50 transition border" style="border-color: #E2E8F0;">
             <ChevronRight :size="14" />

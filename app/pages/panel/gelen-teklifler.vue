@@ -26,10 +26,10 @@ function toggle(id: string) {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #F1F5F9;">
       <div>
         <h1 class="text-xl font-black text-slate-800 tracking-tight" style="color: #0F172A;">
-          {{ locale === 'tr' ? 'Gelen Teklifler' : 'Received Supplier Bids' }}
+          {{ 'Gelen Teklifler' }}
         </h1>
         <p class="text-xs text-slate-500 font-medium mt-0.5">
-          {{ locale === 'tr' ? 'İlanlarınıza gelen teklifler — sadece siz görebilirsiniz' : 'Private quotes submitted to your auctions — visible only to you' }}
+          {{ 'İlanlarınıza gelen teklifler — sadece siz görebilirsiniz' }}
         </p>
       </div>
 
@@ -39,7 +39,7 @@ function toggle(id: string) {
         style="background: rgba(0,48,87,0.06); color: #003057; border: 1px solid rgba(0,48,87,0.12);"
       >
         <Shield :size="14" style="color: #1EAE4C;" />
-        <span>{{ locale === 'tr' ? 'Kapalı Zarf — Teklifler Gizlidir' : 'Sealed Bid — Quotes Are Encrypted' }}</span>
+        <span>{{ 'Kapalı Zarf — Teklifler Gizlidir' }}</span>
       </div>
     </div>
 
@@ -66,7 +66,7 @@ function toggle(id: string) {
             <div>
               <h3 class="font-bold text-sm text-slate-800">{{ ilan.baslik }}</h3>
               <p class="text-xs text-slate-400 mt-0.5 font-medium">
-                {{ ilan.kategori }} • {{ locale === 'tr' ? 'Bitiş:' : 'Deadline:' }} {{ ilan.bitis }}
+                {{ ilan.kategori }} • {{ 'Bitiş:' }} {{ ilan.bitis }}
               </p>
             </div>
           </div>
@@ -76,7 +76,7 @@ function toggle(id: string) {
               class="rounded-full px-3 py-1 text-xs font-bold"
               style="background: rgba(245,158,11,0.1); color: #D97706;"
             >
-              {{ ilan.teklifler.length }} {{ locale === 'tr' ? 'Teklif' : 'Bids' }}
+              {{ ilan.teklifler.length }} {{ 'Teklif' }}
             </span>
             <ChevronDown v-if="expandedIlan !== ilan.id" :size="18" style="color: #94A3B8;" />
             <ChevronUp v-else :size="18" style="color: #94A3B8;" />
@@ -89,9 +89,7 @@ function toggle(id: string) {
             <div class="flex items-center gap-2 text-xs font-bold" style="color: #92400E;">
               <Shield :size="13" />
               <span>
-                {{ locale === 'tr' 
-                  ? 'Bu teklifler gizlidir. Tedarikçiler birbirlerinin tekliflerini göremez.' 
-                  : 'These proposals are sealed. Bidders cannot view competing supplier prices.' 
+                {{ 'Bu teklifler gizlidir. Tedarikçiler birbirlerinin tekliflerini göremez.' 
                 }}
               </span>
             </div>
@@ -119,7 +117,7 @@ function toggle(id: string) {
                     </span>
                   </div>
                   <div class="flex items-center gap-3 mt-0.5 text-xs text-slate-400 font-medium">
-                    <span class="flex items-center gap-1"><Clock :size="11" /> {{ teklif.sure }} {{ locale === 'tr' ? 'teslimat' : 'delivery' }}</span>
+                    <span class="flex items-center gap-1"><Clock :size="11" /> {{ teklif.sure }} {{ 'teslimat' }}</span>
                     <span class="font-mono text-xs text-slate-400">{{ teklif.id }}</span>
                   </div>
                 </div>
@@ -133,14 +131,14 @@ function toggle(id: string) {
                     ? 'background: rgba(34,197,94,0.1); color: #16A34A;'
                     : 'background: rgba(148,163,184,0.12); color: #64748B;'"
                 >
-                  {{ teklif.durum === 'onaylandi' ? (locale === 'tr' ? '✓ Onaylandı' : '✓ Approved') : (locale === 'tr' ? 'Değerlendiriliyor' : 'Under Review') }}
+                  {{ teklif.durum === 'onaylandi' ? ('✓ Onaylandı') : ('Değerlendiriliyor') }}
                 </span>
                 <button
                   v-if="teklif.durum !== 'onaylandi'"
                   class="rounded-xl px-4 py-2 text-xs font-bold text-white transition cursor-pointer hover:bg-emerald-600"
                   style="background: #003057;"
                 >
-                  {{ locale === 'tr' ? 'Onayla' : 'Approve' }}
+                  {{ 'Onayla' }}
                 </button>
               </div>
             </div>

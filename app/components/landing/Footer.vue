@@ -1,51 +1,23 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { locale } from '~/composables/useLocale'
 import { Facebook, Instagram, Linkedin } from 'lucide-vue-next'
 
-const platformLinks = computed(() => {
-  if (locale.value === 'tr') {
-    return [
-      { label: "Nasıl Çalışır", to: "/#nasil-calisir" },
-      { label: "Özellikler", to: "/#ihale-gezgini" },
-      { label: "Abonelik Paketleri", to: "/abonelik" },
-      { label: "Pazar Yeri", to: "/pazar-yeri" },
-      { label: "Entegrasyonlar", to: "/entegrasyonlar" },
-      { label: "Yardım Merkezi", to: "/yardim" }
-    ]
-  } else {
-    return [
-      { label: "How it Works", to: "/#nasil-calisir" },
-      { label: "Features", to: "/#ihale-gezgini" },
-      { label: "Pricing", to: "/abonelik" },
-      { label: "Marketplace", to: "/pazar-yeri" },
-      { label: "Integrations", to: "/entegrasyonlar" },
-      { label: "Help Center", to: "/yardim" }
-    ]
-  }
-})
+const platformLinks = [
+  { label: "Nasıl Çalışır", to: "/#nasil-calisir" },
+  { label: "Özellikler", to: "/#ihale-gezgini" },
+  { label: "Abonelik Paketleri", to: "/abonelik" },
+  { label: "Pazar Yeri", to: "/pazar-yeri" },
+  { label: "Entegrasyonlar", to: "/entegrasyonlar" },
+  { label: "Yardım Merkezi", to: "/yardim" }
+]
 
-const companyLinks = computed(() => {
-  if (locale.value === 'tr') {
-    return [
-      { label: "Hakkımızda", to: "/sozlesmeler?tab=hakkimizda" },
-      { label: "Kariyer", to: "/sozlesmeler?tab=kariyer" },
-      { label: "Blog", to: "/sozlesmeler?tab=blog" },
-      { label: "Basın Odası", to: "/sozlesmeler?tab=basin" },
-      { label: "İletişim", to: "/yardim" },
-      { label: "İş Ortaklığı Programı", to: "/sozlesmeler?tab=is-ortakligi" }
-    ]
-  } else {
-    return [
-      { label: "About Us", to: "/sozlesmeler?tab=hakkimizda" },
-      { label: "Careers", to: "/sozlesmeler?tab=kariyer" },
-      { label: "Blog", to: "/sozlesmeler?tab=blog" },
-      { label: "Press Room", to: "/sozlesmeler?tab=basin" },
-      { label: "Contact", to: "/yardim" },
-      { label: "Partnership Program", to: "/sozlesmeler?tab=is-ortakligi" }
-    ]
-  }
-})
+const companyLinks = [
+  { label: "Hakkımızda", to: "/sozlesmeler?tab=hakkimizda" },
+  { label: "Kariyer", to: "/sozlesmeler?tab=kariyer" },
+  { label: "Blog", to: "/sozlesmeler?tab=blog" },
+  { label: "Basın Odası", to: "/sozlesmeler?tab=basin" },
+  { label: "İletişim", to: "/yardim" },
+  { label: "İş Ortaklığı Programı", to: "/sozlesmeler?tab=is-ortakligi" }
+]
 </script>
 
 <template>
@@ -60,18 +32,18 @@ const companyLinks = computed(() => {
           </div>
           
           <p class="text-xs leading-relaxed font-medium text-slate-500 max-w-sm">
-            {{ locale === 'tr' ? 'B2B satın alma taleplerini, tedarikçi tekliflerini ve karar kayıtlarını tek ters ihale akışında yöneten kurumsal platform.' : 'Enterprise platform managing B2B procurement requests, supplier bids, and decision records in a single reverse auction workflow.' }}
+            B2B satın alma taleplerini, tedarikçi tekliflerini ve karar kayıtlarını tek ters ihale akışında yöneten kurumsal platform.
           </p>
 
           <!-- Status badges -->
           <div class="flex flex-wrap gap-2 pt-1">
             <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-100 px-3 py-1 text-[9px] font-black text-blue-700 uppercase tracking-wider">
               <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-              {{ locale === 'tr' ? 'KVKK KAPSAMINDA' : 'KVKK COMPLIANT' }}
+              KVKK KAPSAMINDA
             </span>
             <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-100 px-3 py-1 text-[9px] font-black text-blue-700 uppercase tracking-wider">
               <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-              {{ locale === 'tr' ? 'HTTPS/TLS ŞİFRELİ' : 'HTTPS/TLS ENCRYPTED' }}
+              HTTPS/TLS ŞİFRELİ
             </span>
           </div>
 
@@ -96,7 +68,7 @@ const companyLinks = computed(() => {
 
         <!-- Column 2: Platform Links -->
         <div class="md:col-span-2 flex flex-col gap-4 text-left">
-          <h4 class="text-xs font-black uppercase text-blue-900 tracking-wider">{{ locale === 'tr' ? 'PLATFORM' : 'PLATFORM' }}</h4>
+          <h4 class="text-xs font-black uppercase text-blue-900 tracking-wider">PLATFORM</h4>
           <div class="flex flex-col gap-3 text-xs font-bold text-slate-700">
             <NuxtLink v-for="item in platformLinks" :key="item.to" :to="item.to" class="hover:text-blue-600 transition-colors">
               {{ item.label }}
@@ -106,7 +78,7 @@ const companyLinks = computed(() => {
 
         <!-- Column 3: Company Links -->
         <div class="md:col-span-2 flex flex-col gap-4 text-left">
-          <h4 class="text-xs font-black uppercase text-blue-900 tracking-wider">{{ locale === 'tr' ? 'ŞİRKET' : 'COMPANY' }}</h4>
+          <h4 class="text-xs font-black uppercase text-blue-900 tracking-wider">ŞİRKET</h4>
           <div class="flex flex-col gap-3 text-xs font-bold text-slate-700">
             <NuxtLink v-for="item in companyLinks" :key="item.to" :to="item.to" class="hover:text-blue-600 transition-colors">
               {{ item.label }}
@@ -117,9 +89,10 @@ const companyLinks = computed(() => {
         <!-- Column 4: Contact & Support Hours -->
         <div class="md:col-span-4 flex flex-col gap-5 text-left">
           <div class="space-y-3">
-            <h4 class="text-xs font-black uppercase tracking-wider text-blue-900">{{ locale === 'tr' ? 'İLETİŞİM' : 'CONTACT' }}</h4>
+            <h4 class="text-xs font-black uppercase tracking-wider text-blue-900">İLETİŞİM</h4>
             <p class="text-xs leading-relaxed text-slate-500 font-medium whitespace-pre-line">
-              {{ locale === 'tr' ? 'Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül,\nBalıkesir, Türkiye' : 'Bahcelievler District 5083 Street, No:11/A Altieylul,\nBalikesir, Turkey' }}
+              Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül,
+              Balıkesir, Türkiye
             </p>
             <div class="text-xs font-bold text-slate-700 space-y-1.5 pt-1">
               <a href="mailto:info@gelanlasalim.com" class="block hover:text-blue-600 transition-colors">
@@ -132,10 +105,10 @@ const companyLinks = computed(() => {
           </div>
 
           <div class="space-y-1.5 pt-1">
-            <h4 class="text-xs font-black uppercase tracking-wider text-blue-900">{{ locale === 'tr' ? 'DESTEK SAATLERİ' : 'SUPPORT HOURS' }}</h4>
+            <h4 class="text-xs font-black uppercase tracking-wider text-blue-900">DESTEK SAATLERİ</h4>
             <p class="text-xs text-slate-500 font-medium leading-relaxed">
-              {{ locale === 'tr' ? 'Pazartesi - Cuma: 09:00 - 18:00' : 'Monday - Friday: 09:00 - 18:00' }} <br />
-              {{ locale === 'tr' ? 'Cumartesi: 10:00 - 14:00' : 'Saturday: 10:00 - 14:00' }}
+              Pazartesi - Cuma: 09:00 - 18:00 <br />
+              Cumartesi: 10:00 - 14:00
             </p>
           </div>
         </div>
@@ -145,11 +118,11 @@ const companyLinks = computed(() => {
       <hr class="border-slate-200 my-10" />
 
       <div class="flex flex-col sm:flex-row items-center justify-between gap-6 text-[11px] text-slate-400 font-bold uppercase tracking-wider">
-        <div>© 2026 {{ locale === 'tr' ? 'GelAnlaşalım. Tüm Hakları Saklıdır.' : 'GelAnlasalim. All Rights Reserved.' }}</div>
+        <div>© 2026 GelAnlaşalım. Tüm Hakları Saklıdır.</div>
         <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center sm:justify-end">
-          <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'KVKK Metni' : 'KVKK Policy' }}</NuxtLink>
-          <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Kullanım Koşulları' : 'Terms of Use' }}</NuxtLink>
-          <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy' }}</NuxtLink>
+          <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors">KVKK Metni</NuxtLink>
+          <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors">Kullanım Koşulları</NuxtLink>
+          <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors">Gizlilik Politikası</NuxtLink>
         </div>
       </div>
     </div>

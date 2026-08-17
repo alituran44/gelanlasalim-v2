@@ -332,14 +332,14 @@ function handleSubmit() {
     <div v-if="hasDraft" class="mb-5 rounded-2xl bg-amber-50 border border-amber-200 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-bold text-amber-900 shadow-xs">
       <div class="flex items-center gap-2">
         <FileSpreadsheet class="text-amber-600 shrink-0" :size="18" />
-        <span>{{ locale === 'tr' ? 'Tamamlanmamış kayıtlı bir ihale taslağınız bulunmaktadır.' : 'You have an unsaved tender draft available.' }}</span>
+        <span>{{ 'Tamamlanmamış kayıtlı bir ihale taslağınız bulunmaktadır.' }}</span>
       </div>
       <div class="flex items-center gap-2 shrink-0">
         <button type="button" @click="loadDraft" class="px-3 py-1.5 rounded-lg bg-amber-600 hover:bg-amber-700 text-white font-black text-xs transition cursor-pointer">
-          {{ locale === 'tr' ? 'Taslağı Yükle' : 'Load Draft' }}
+          {{ 'Taslağı Yükle' }}
         </button>
         <button type="button" @click="clearDraft" class="px-3 py-1.5 rounded-lg bg-white border border-amber-300 text-amber-800 hover:bg-amber-100 font-bold text-xs transition cursor-pointer">
-          {{ locale === 'tr' ? 'Sil' : 'Discard' }}
+          {{ 'Sil' }}
         </button>
       </div>
     </div>
@@ -348,11 +348,11 @@ function handleSubmit() {
     <div class="mb-5 flex items-center justify-between">
       <NuxtLink to="/panel/ilanlarim" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition">
         <ArrowLeft :size="14" />
-        {{ locale === 'tr' ? 'İlanlarıma Dön' : 'Back to My Tenders' }}
+        {{ 'İlanlarıma Dön' }}
       </NuxtLink>
 
       <button type="button" @click="saveDraftManually" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer border border-slate-200 shadow-xs">
-        💾 {{ locale === 'tr' ? 'Taslağı Kaydet' : 'Save Draft' }}
+        💾 {{ 'Taslağı Kaydet' }}
       </button>
     </div>
 
@@ -360,7 +360,7 @@ function handleSubmit() {
     <div class="mb-6">
       <h1 class="text-xl font-bold flex items-center gap-2" style="color: #0F172A;">
         <FilePlus2 class="text-blue-600" :size="22" />
-        {{ locale === 'tr' ? 'Yeni İhale İlanı Oluştur' : 'Create New Tender Announcement' }}
+        {{ 'Yeni İhale İlanı Oluştur' }}
       </h1>
       <p class="text-sm mt-0.5" style="color: #64748B;">Satın alma talebiniz için tedarikçilerden rekabetçi canlı teklifler toplayın</p>
     </div>

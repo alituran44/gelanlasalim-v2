@@ -89,7 +89,7 @@ const pageTitle = computed(() => {
         <input
           v-model="search"
           type="text"
-          :placeholder="locale === 'tr' ? 'İhalelerde ara...' : 'Search tenders...'"
+          :placeholder="'İhalelerde ara...'"
           class="w-64 rounded-lg border py-2 pl-9 pr-3 text-sm outline-none transition"
           style="border-color: #E2E8F0; background: #F8FAFC; color: #0F172A;"
           onfocus="this.style.borderColor='#1EAE4C'; this.style.boxShadow='0 0 0 3px rgba(30,174,76,0.1)'"
@@ -106,20 +106,20 @@ const pageTitle = computed(() => {
         type="button"
         @click="toggleLang"
         class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white px-3 py-2 text-xs font-black text-slate-800 transition shadow-xs cursor-pointer"
-        :title="locale === 'tr' ? 'Switch to English' : 'Türkçe\'ye Geç'"
+        :title="'Switch to English'"
       >
         <Globe :size="14" class="text-blue-600" />
-        <span>{{ locale === 'tr' ? '🇹🇷 TR' : '🇬🇧 EN' }}</span>
+        <span>{{ '🇹🇷 TR' }}</span>
       </button>
 
       <!-- Home Page Button -->
       <NuxtLink
         to="/"
         class="flex items-center gap-1.5 rounded-lg border border-slate-200/80 bg-slate-50 px-3.5 py-2 text-xs font-black text-slate-800 hover:bg-white hover:text-amber-600 transition shadow-xs"
-        :title="locale === 'tr' ? 'Ana Sayfaya Dön' : 'Go to Homepage'"
+        :title="'Ana Sayfaya Dön'"
       >
         <Home :size="14" class="text-amber-600" />
-        <span>{{ locale === 'tr' ? 'Ana Sayfaya Git' : 'Go to Homepage' }}</span>
+        <span>{{ 'Ana Sayfaya Git' }}</span>
       </NuxtLink>
 
       <!-- New Tender Button -->
@@ -129,14 +129,14 @@ const pageTitle = computed(() => {
         style="background: #0A1128; border: 1px solid #C59B27;"
       >
         <Plus :size="15" class="text-amber-400" />
-        <span>{{ locale === 'tr' ? 'Yeni İhale' : 'New Tender' }}</span>
+        <span>{{ 'Yeni İhale' }}</span>
       </NuxtLink>
 
       <!-- Notifications -->
       <button 
         class="relative flex h-9 w-9 items-center justify-center rounded-lg border transition hover:bg-slate-50"
         style="border-color: #E2E8F0;"
-        :title="locale === 'tr' ? 'Okunmamış Bildirimler' : 'Unread Notifications'"
+        :title="'Okunmamış Bildirimler'"
       >
         <Bell :size="17" style="color: #475569;" />
         <span
@@ -154,7 +154,7 @@ const pageTitle = computed(() => {
         class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-black rounded-xl border transition-all text-slate-800 bg-amber-50 hover:bg-amber-100 border-amber-300 shadow-xs"
       >
         <User :size="14" class="text-amber-600" />
-        <span>{{ locale === 'tr' ? 'Profilim' : 'My Profile' }}</span>
+        <span>{{ 'Profilim' }}</span>
       </NuxtLink>
 
       <!-- User Menu -->

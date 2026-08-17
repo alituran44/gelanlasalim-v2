@@ -329,20 +329,20 @@ function handleGuestEntry() {
           class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-black transition border border-white/20 backdrop-blur-md shadow-md cursor-pointer"
         >
           <Home :size="15" class="text-amber-400" />
-          <span>{{ locale === 'tr' ? '🏠 Ana Sayfaya Dön' : '🏠 Back to Home' }}</span>
+          <span>{{ '🏠 Ana Sayfaya Dön' }}</span>
         </NuxtLink>
       </div>
 
       <!-- Main presentation -->
       <div class="relative z-10 my-auto">
         <div class="inline-flex items-center gap-2 rounded-full bg-blue-500/10 border border-blue-500/25 px-3.5 py-1 text-[10px] font-bold text-blue-400 uppercase tracking-widest">
-          <Sparkles :size="12" /> {{ locale === 'tr' ? 'B2B Tedarik Çözümü' : 'B2B Procurement Solution' }}
+          <Sparkles :size="12" /> {{ 'B2B Tedarik Çözümü' }}
         </div>
         <h2 class="mt-6 text-3xl font-black text-white leading-tight md:text-4xl lg:text-5xl tracking-tight">
-          {{ locale === 'tr' ? 'Tedarik Maliyetinizi Canlı Eksiltme ile Düşürün' : 'Reduce Procurement Costs with Reverse Auctions' }}
+          {{ 'Tedarik Maliyetinizi Canlı Eksiltme ile Düşürün' }}
         </h2>
         <p class="mt-4 max-w-md text-xs text-slate-400 leading-relaxed font-medium">
-          {{ locale === 'tr' ? 'GelAnlaşalım arenasında rekabet kurallarını siz belirlersiniz. İlanınızı yayınlayın, onaylı satıcılar anlık fiyat kırarak yarışsın.' : 'You set the rules of competition in GelAnlaşalım. Post your tender and verified sellers compete with instant price cuts.' }}
+          {{ 'GelAnlaşalım arenasında rekabet kurallarını siz belirlersiniz. İlanınızı yayınlayın, onaylı satıcılar anlık fiyat kırarak yarışsın.' }}
         </p>
 
         <!-- Feature List -->
@@ -352,8 +352,8 @@ function handleGuestEntry() {
               <ShieldCheck :size="14" />
             </div>
             <div>
-              <h4 class="text-xs font-bold text-white">{{ locale === 'tr' ? 'Doğrulanmış B2B Üyeler' : 'Verified B2B Members' }}</h4>
-              <p class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'Tüm şirketlerin vergi levhası ve yetki belgeleri kontrol edilir.' : 'Tax registration and credentials of all companies are verified.' }}</p>
+              <h4 class="text-xs font-bold text-white">{{ 'Doğrulanmış B2B Üyeler' }}</h4>
+              <p class="text-[10px] text-slate-400">{{ 'Tüm şirketlerin vergi levhası ve yetki belgeleri kontrol edilir.' }}</p>
             </div>
           </div>
           <div class="flex items-start gap-3">
@@ -361,8 +361,8 @@ function handleGuestEntry() {
               <Zap :size="14" />
             </div>
             <div>
-              <h4 class="text-xs font-bold text-white">{{ locale === 'tr' ? 'Canlı Eksiltme Teknolojisi' : 'Live Reverse Auction Technology' }}</h4>
-              <p class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'Şeffaf zaman damgalı teklif yarışı ile maksimum tasarruf sağlayın.' : 'Achieve maximum savings with a transparent time-stamped bidding race.' }}</p>
+              <h4 class="text-xs font-bold text-white">{{ 'Canlı Eksiltme Teknolojisi' }}</h4>
+              <p class="text-[10px] text-slate-400">{{ 'Şeffaf zaman damgalı teklif yarışı ile maksimum tasarruf sağlayın.' }}</p>
             </div>
           </div>
           <div class="flex items-start gap-3">
@@ -370,8 +370,8 @@ function handleGuestEntry() {
               <Building2 :size="14" />
             </div>
             <div>
-              <h4 class="text-xs font-bold text-white">{{ locale === 'tr' ? '81 İl Tedarik Ağı' : 'Nationwide Supply Network' }}</h4>
-              <p class="text-[10px] text-slate-400">{{ locale === 'tr' ? 'Mal ve hizmet alımlarınızı yerel veya ulusal ölçekte rekabete açın.' : 'Open your goods and services procurement to local or national competition.' }}</p>
+              <h4 class="text-xs font-bold text-white">{{ '81 İl Tedarik Ağı' }}</h4>
+              <p class="text-[10px] text-slate-400">{{ 'Mal ve hizmet alımlarınızı yerel veya ulusal ölçekte rekabete açın.' }}</p>
             </div>
           </div>
         </div>
@@ -379,7 +379,7 @@ function handleGuestEntry() {
 
       <!-- Footer indicator -->
       <div class="relative z-10 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-        © 2026 GelAnlaşalım {{ locale === 'tr' ? 'B2B tersine ihale portalı' : 'B2B reverse auction portal' }}
+        © 2026 GelAnlaşalım {{ 'B2B tersine ihale portalı' }}
       </div>
     </div>
 
@@ -397,21 +397,21 @@ function handleGuestEntry() {
             class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black transition-all shadow-sm cursor-pointer"
           >
             <Home :size="15" class="text-amber-400" />
-            <span>{{ locale === 'tr' ? '🏠 Ana Sayfaya Dön' : '🏠 Back to Home' }}</span>
+            <span>{{ '🏠 Ana Sayfaya Dön' }}</span>
           </NuxtLink>
         </div>
 
         <!-- Switch tabs (Register / Login / Guest) -->
         <div class="mb-8 flex border-b border-slate-100 gap-1">
           <button @click="activeTab = 'register'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2" :class="activeTab === 'register' ? 'border-amber-500 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'">
-            {{ locale === 'tr' ? 'Yeni Üyelik' : 'New Account' }}
+            {{ 'Yeni Üyelik' }}
           </button>
           <button @click="activeTab = 'login'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2" :class="activeTab === 'login' ? 'border-amber-500 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'">
-            {{ locale === 'tr' ? 'Giriş Yap' : 'Login' }}
+            {{ 'Giriş Yap' }}
           </button>
           <button @click="activeTab = 'guest'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2 flex items-center justify-center gap-1" :class="activeTab === 'guest' ? 'border-amber-500 text-amber-700 bg-amber-50/50 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-slate-600'">
             <span>👁️</span>
-            <span>{{ locale === 'tr' ? 'Misafir Girişi' : 'Guest Access' }}</span>
+            <span>{{ 'Misafir Girişi' }}</span>
           </button>
         </div>
 
@@ -433,7 +433,7 @@ function handleGuestEntry() {
               <div class="h-5 w-5 rounded-full bg-white text-red-600 flex items-center justify-center text-[10px] font-black">
                 TR
               </div>
-              <span>{{ locale === 'tr' ? '🇹🇷 e-Devlet Kapısı ile Hızlı Kaydol / Giriş Yap' : '🇹🇷 Login / Register with e-Devlet Gateway' }}</span>
+              <span>{{ '🇹🇷 e-Devlet Kapısı ile Hızlı Kaydol / Giriş Yap' }}</span>
             </button>
 
             <button
@@ -443,14 +443,14 @@ function handleGuestEntry() {
               style="border-color: #E2E8F0; color: #374151;"
             >
               <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-              {{ locale === 'tr' ? 'Google ile Devam Et' : 'Continue with Google' }}
+              {{ 'Google ile Devam Et' }}
             </button>
           </div>
 
           <!-- Ayraç -->
           <div class="relative flex items-center mb-5">
             <div class="flex-1 border-t" style="border-color: #E2E8F0;"></div>
-            <span class="px-3 text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ locale === 'tr' ? 'veya kurumsal e-posta ile' : 'or with business email' }}</span>
+            <span class="px-3 text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ 'veya kurumsal e-posta ile' }}</span>
             <div class="flex-1 border-t" style="border-color: #E2E8F0;"></div>
           </div>
 
@@ -459,45 +459,45 @@ function handleGuestEntry() {
             <!-- Adım göstergesi -->
             <div v-if="userRole === 'company'" class="flex items-center gap-2 mb-4">
               <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white" style="background: #003057;">1</div>
-              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #003057;">{{ locale === 'tr' ? 'Kişisel Bilgiler' : 'Personal Info' }}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #003057;">{{ 'Kişisel Bilgiler' }}</span>
               <div class="flex-1 h-px" style="background: #E2E8F0;"></div>
               <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold" style="background: #F1F5F9; color: #94A3B8;">2</div>
-              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ locale === 'tr' ? 'Sektörler' : 'Sectors' }}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ 'Sektörler' }}</span>
             </div>
             <div v-else class="flex items-center gap-2 mb-4">
               <div class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-200">
-                👤 {{ locale === 'tr' ? 'Hızlı Bireysel Üyelik Formu' : 'Fast Individual Registration' }}
+                👤 {{ 'Hızlı Bireysel Üyelik Formu' }}
               </div>
             </div>
 
             <!-- ROL SEÇİMİ (Şimdi Üstte - Dinamik Alan Tetikleyici) -->
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Üyelik Türü / Rolünüz *' : 'Account Type / Your Role *' }}</label>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Üyelik Türü / Rolünüz *' }}</label>
               <div class="grid grid-cols-2 gap-3 mt-1">
                 <button type="button" @click="userRole = 'company'" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 text-center transition-all cursor-pointer" :class="userRole === 'company' ? 'border-blue-600 bg-blue-50/20 text-blue-700 font-bold' : 'border-slate-200 text-slate-500 hover:bg-slate-50'">
-                  <span class="text-xs font-bold">{{ locale === 'tr' ? '🏢 Firma Kaydı' : '🏢 Company Account' }}</span>
-                  <span class="text-[8px] mt-0.5 font-medium">{{ locale === 'tr' ? 'Şirketler İçin' : 'For Businesses' }}</span>
+                  <span class="text-xs font-bold">{{ '🏢 Firma Kaydı' }}</span>
+                  <span class="text-[8px] mt-0.5 font-medium">{{ 'Şirketler İçin' }}</span>
                 </button>
                 <button type="button" @click="userRole = 'individual'" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 text-center transition-all cursor-pointer" :class="userRole === 'individual' ? 'border-blue-600 bg-blue-50/20 text-blue-700 font-bold' : 'border-slate-200 text-slate-500 hover:bg-slate-50'">
-                  <span class="text-xs font-bold">{{ locale === 'tr' ? '👤 Kullanıcı Kaydı' : '👤 Individual Account' }}</span>
-                  <span class="text-[8px] mt-0.5 font-medium">{{ locale === 'tr' ? 'Bireysel Kullanıcı' : 'For Private Users' }}</span>
+                  <span class="text-xs font-bold">{{ '👤 Kullanıcı Kaydı' }}</span>
+                  <span class="text-[8px] mt-0.5 font-medium">{{ 'Bireysel Kullanıcı' }}</span>
                 </button>
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Ad *' : 'First Name *' }}</label>
+                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Ad *' }}</label>
                 <div class="relative">
                   <User :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="firstName" type="text" required aria-label="Adınız" :placeholder="locale === 'tr' ? 'Adınız' : 'First Name'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
+                  <input v-model="firstName" type="text" required aria-label="Adınız" :placeholder="'Adınız'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
                 </div>
               </div>
               <div>
-                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Soyad *' : 'Last Name *' }}</label>
+                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Soyad *' }}</label>
                 <div class="relative">
                   <User :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="lastName" type="text" required aria-label="Soyadınız" :placeholder="locale === 'tr' ? 'Soyadınız' : 'Last Name'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
+                  <input v-model="lastName" type="text" required aria-label="Soyadınız" :placeholder="'Soyadınız'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
                 </div>
               </div>
             </div>
@@ -505,17 +505,17 @@ function handleGuestEntry() {
             <!-- Firma Adı (Sadece Firma Kaydı durumunda gösterilir) -->
             <transition name="fade">
               <div v-if="userRole === 'company'">
-                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Firma / Şirket Adı *' : 'Company Name *' }}</label>
+                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Firma / Şirket Adı *' }}</label>
                 <div class="relative">
                   <Building2 :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="companyName" type="text" :required="userRole === 'company'" aria-label="Firma Şirket Adı" :placeholder="locale === 'tr' ? 'Örn: Yılmaz Ambalaj Sanayi A.Ş.' : 'e.g. Acme Logistics Inc.'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
+                  <input v-model="companyName" type="text" :required="userRole === 'company'" aria-label="Firma Şirket Adı" :placeholder="'Örn: Yılmaz Ambalaj Sanayi A.Ş.'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
                 </div>
               </div>
             </transition>
 
             <div>
               <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
-                {{ userRole === 'company' ? (locale === 'tr' ? 'Kurumsal E-Posta *' : 'Business Email *') : (locale === 'tr' ? 'E-Posta Adresi *' : 'Email Address *') }}
+                {{ userRole === 'company' ? ('Kurumsal E-Posta *') : ('E-Posta Adresi *') }}
               </label>
               <div class="relative">
                 <Mail :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -524,7 +524,7 @@ function handleGuestEntry() {
             </div>
 
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Telefon *' : 'Phone *' }}</label>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Telefon *' }}</label>
               <div class="relative">
                 <Phone :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input v-model="phone" type="tel" required aria-label="Telefon Numarası" placeholder="+90 (555) 555 55 55" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
@@ -532,10 +532,10 @@ function handleGuestEntry() {
             </div>
 
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Şifre *' : 'Password *' }}</label>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Şifre *' }}</label>
               <div class="relative">
                 <LockKeyhole :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="password" type="password" required aria-label="Şifreniz" :placeholder="locale === 'tr' ? 'Minimum 6 karakter' : 'Minimum 6 characters'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
+                <input v-model="password" type="password" required aria-label="Şifreniz" :placeholder="'Minimum 6 karakter'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
               </div>
             </div>
 
@@ -543,9 +543,9 @@ function handleGuestEntry() {
             <div v-if="userRole === 'individual'" class="flex items-start gap-2.5 py-1">
               <input v-model="agreeKvkk" id="kvkk-step1" type="checkbox" required class="mt-1 h-3.5 w-3.5 rounded border-slate-300 cursor-pointer" />
               <label for="kvkk-step1" class="text-[10px] leading-relaxed text-slate-500 font-bold uppercase tracking-wider cursor-pointer">
-                {{ locale === 'tr' ? 'Üyelik şartlarını ve ' : 'I accept the membership terms and ' }}
-                <NuxtLink to="/sozlesmeler?tab=kvkk" target="_blank" class="text-blue-600 hover:underline">{{ locale === 'tr' ? 'KVKK Açık Rıza Metnini' : 'Privacy & KVKK Policy' }}</NuxtLink>
-                {{ locale === 'tr' ? ' kabul ediyorum.' : '.' }}
+                {{ 'Üyelik şartlarını ve ' }}
+                <NuxtLink to="/sozlesmeler?tab=kvkk" target="_blank" class="text-blue-600 hover:underline">{{ 'KVKK Açık Rıza Metnini' }}</NuxtLink>
+                {{ ' kabul ediyorum.' }}
               </label>
             </div>
 
@@ -553,10 +553,10 @@ function handleGuestEntry() {
 
             <button type="submit" :disabled="isSubmitting" class="w-full flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-black text-white transition-all disabled:opacity-50 cursor-pointer" style="background: #003057;">
               <span v-if="userRole === 'individual'">
-                {{ isSubmitting ? (locale === 'tr' ? 'Kayıt Yapılıyor...' : 'Registering...') : (locale === 'tr' ? 'Bireysel Üyeliği Tamamla' : 'Complete Registration') }}
+                {{ isSubmitting ? ('Kayıt Yapılıyor...') : ('Bireysel Üyeliği Tamamla') }}
               </span>
               <span v-else>
-                {{ locale === 'tr' ? 'Devam Et — Sektör Seçimi' : 'Continue — Sector Selection' }}
+                {{ 'Devam Et — Sektör Seçimi' }}
               </span>
               <ChevronRight v-if="userRole === 'company' && !isSubmitting" :size="14" />
             </button>
@@ -567,14 +567,14 @@ function handleGuestEntry() {
             <!-- Adım göstergesi -->
             <div class="flex items-center gap-2 mb-4">
               <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold" style="background: #22C55E; color: white;">✓</div>
-              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ locale === 'tr' ? 'Kişisel Bilgiler' : 'Personal Info' }}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ 'Kişisel Bilgiler' }}</span>
               <div class="flex-1 h-px" style="background: #003057;"></div>
               <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white" style="background: #003057;">2</div>
-              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #003057;">{{ locale === 'tr' ? 'Sektörler' : 'Sectors' }}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #003057;">{{ 'Sektörler' }}</span>
             </div>
 
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider block mb-3" style="color: #475569;">{{ locale === 'tr' ? 'İlgilendiğiniz Sektörleri Seçin *' : 'Select Sectors You Are Interested In *' }}</label>
+              <label class="text-[10px] font-black uppercase tracking-wider block mb-3" style="color: #475569;">{{ 'İlgilendiğiniz Sektörleri Seçin *' }}</label>
               <div class="grid grid-cols-2 gap-2">
                 <button
                   v-for="sektor in sektorler"
@@ -593,12 +593,12 @@ function handleGuestEntry() {
               <transition name="fade">
                 <div v-if="seciliSektorler.includes('diger')" class="mt-3">
                   <label class="text-[10px] font-black uppercase tracking-wider text-amber-700 block mb-1">
-                    ✏️ {{ locale === 'tr' ? 'Faaliyet Konunuzu / Özel Sektörünüzü Yazınız *' : 'Custom Sector / Business Field *' }}
+                    ✏️ {{ 'Faaliyet Konunuzu / Özel Sektörünüzü Yazınız *' }}
                   </label>
                   <input 
                     v-model="customSector" 
                     type="text" 
-                    :placeholder="locale === 'tr' ? 'Örn: Özel Cam Ambalaj İmalatı, Endüstriyel Soğutma Sistemleri vb.' : 'e.g. Industrial Glass Packaging, HVAC Systems'" 
+                    :placeholder="'Örn: Özel Cam Ambalaj İmalatı, Endüstriyel Soğutma Sistemleri vb.'" 
                     class="w-full p-2.5 bg-amber-50/50 border border-amber-300 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white transition-all shadow-xs" 
                   />
                 </div>
@@ -610,8 +610,8 @@ function handleGuestEntry() {
               <div class="flex items-center gap-2">
                 <Bell :size="14" style="color: #F59E0B;" />
                 <div>
-                  <div class="text-xs font-semibold" style="color: #0F172A;">{{ locale === 'tr' ? 'Sektör Bildirimleri' : 'Sector Alerts' }}</div>
-                  <div class="text-[10px]" style="color: #94A3B8;">{{ locale === 'tr' ? 'Seçili sektörlerde yeni ilan çıkınca mail at' : 'Email me when new tenders launch in selected sectors' }}</div>
+                  <div class="text-xs font-semibold" style="color: #0F172A;">{{ 'Sektör Bildirimleri' }}</div>
+                  <div class="text-[10px]" style="color: #94A3B8;">{{ 'Seçili sektörlerde yeni ilan çıkınca mail at' }}</div>
                 </div>
               </div>
               <button
@@ -630,9 +630,9 @@ function handleGuestEntry() {
             <div class="flex items-start gap-2.5 py-1">
               <input v-model="agreeKvkk" id="kvkk" type="checkbox" required class="mt-1 h-3.5 w-3.5 rounded border-slate-300" />
               <label for="kvkk" class="text-[10px] leading-relaxed text-slate-500 font-bold uppercase tracking-wider">
-                {{ locale === 'tr' ? 'Üyelik şartlarını ve ' : 'I accept the membership terms and ' }}
-                <NuxtLink to="/sozlesmeler?tab=kvkk" target="_blank" class="text-blue-600 hover:underline">{{ locale === 'tr' ? 'KVKK Açık Rıza Metnini' : 'Privacy & KVKK Policy' }}</NuxtLink>
-                {{ locale === 'tr' ? ' kabul ediyorum.' : '.' }}
+                {{ 'Üyelik şartlarını ve ' }}
+                <NuxtLink to="/sozlesmeler?tab=kvkk" target="_blank" class="text-blue-600 hover:underline">{{ 'KVKK Açık Rıza Metnini' }}</NuxtLink>
+                {{ ' kabul ediyorum.' }}
               </label>
             </div>
 
@@ -640,10 +640,10 @@ function handleGuestEntry() {
 
             <div class="flex gap-2">
               <button type="button" @click="registerStep = 1" class="rounded-xl border px-4 py-3 text-xs font-bold transition hover:bg-slate-50" style="border-color: #E2E8F0; color: #64748B;">
-                ← {{ locale === 'tr' ? 'Geri' : 'Back' }}
+                ← {{ 'Geri' }}
               </button>
               <button type="submit" :disabled="isSubmitting" class="flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-black text-white transition-all disabled:opacity-50" style="background: #003057;">
-                <span>{{ isSubmitting ? (locale === 'tr' ? 'Kayıt Yapılıyor...' : 'Registering...') : (locale === 'tr' ? 'Kaydol ve Devam Et' : 'Register and Continue') }}</span>
+                <span>{{ isSubmitting ? ('Kayıt Yapılıyor...') : ('Kaydol ve Devam Et') }}</span>
                 <ChevronRight v-if="!isSubmitting" :size="14" />
               </button>
             </div>
@@ -663,35 +663,35 @@ function handleGuestEntry() {
               <div class="h-5 w-5 rounded-full bg-white text-red-600 flex items-center justify-center text-[10px] font-black">
                 TR
               </div>
-              <span>{{ locale === 'tr' ? '🇹🇷 e-Devlet Kapısı ile Doğrulanmış Giriş' : '🇹🇷 Sign in with e-Devlet Gateway' }}</span>
+              <span>{{ '🇹🇷 e-Devlet Kapısı ile Doğrulanmış Giriş' }}</span>
             </button>
 
             <button type="button" @click="handleOAuth('google')"
               class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50"
               style="border-color: #E2E8F0; color: #374151;">
               <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-              {{ locale === 'tr' ? 'Google ile Giriş Yap' : 'Sign in with Google' }}
+              {{ 'Google ile Giriş Yap' }}
             </button>
           </div>
           <div class="relative flex items-center mb-5">
             <div class="flex-1 border-t" style="border-color: #E2E8F0;"></div>
-            <span class="px-3 text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ locale === 'tr' ? 'veya kayıtlı hesabınızla' : 'or with registered account' }}</span>
+            <span class="px-3 text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ 'veya kayıtlı hesabınızla' }}</span>
             <div class="flex-1 border-t" style="border-color: #E2E8F0;"></div>
           </div>
 
           <form @submit.prevent="handleLogin" class="space-y-4">
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'E-Posta Adresi' : 'Email Address' }}</label>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'E-Posta Adresi' }}</label>
               <div class="relative">
                 <Mail :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="loginEmail" type="email" required :placeholder="locale === 'tr' ? 'isim@sirketiniz.com' : 'name@company.com'" class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                <input v-model="loginEmail" type="email" required :placeholder="'isim@sirketiniz.com'" class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
               </div>
             </div>
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Şifre' : 'Password' }}</label>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Şifre' }}</label>
               <div class="relative">
                 <LockKeyhole :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="loginPassword" :type="showLoginPassword ? 'text' : 'password'" required :placeholder="locale === 'tr' ? 'Şifreniz' : 'Your Password'" class="w-full pl-9 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                <input v-model="loginPassword" :type="showLoginPassword ? 'text' : 'password'" required :placeholder="'Şifreniz'" class="w-full pl-9 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
                 <button type="button" @click="showLoginPassword = !showLoginPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
                   <EyeOff v-if="showLoginPassword" :size="14" />
                   <Eye v-else :size="14" />
@@ -701,38 +701,38 @@ function handleGuestEntry() {
             <div class="flex items-center justify-between text-[10px] font-bold uppercase tracking-wider">
               <label class="flex items-center gap-2 text-slate-500 cursor-pointer">
                 <input v-model="rememberMe" type="checkbox" class="h-3.5 w-3.5 rounded border-slate-300" />
-                {{ locale === 'tr' ? 'Beni Hatırla' : 'Remember Me' }}
+                {{ 'Beni Hatırla' }}
               </label>
               <button type="button" @click="activeTab = 'forgot'; forgotSubmitted = false; errorMessage = ''" class="text-blue-600 hover:underline cursor-pointer">
-                {{ locale === 'tr' ? 'Şifremi Unuttum?' : 'Forgot Password?' }}
+                {{ 'Şifremi Unuttum?' }}
               </button>
             </div>
             <div v-if="errorMessage" class="rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-bold text-red-700">⚠️ {{ errorMessage }}</div>
             <button type="submit" :disabled="isSubmitting" class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white transition-all disabled:opacity-50 cursor-pointer" style="background: #003057;">
-              <span>{{ isSubmitting ? (locale === 'tr' ? 'Giriş Yapılıyor...' : 'Logging in...') : (locale === 'tr' ? 'Giriş Yap' : 'Login') }}</span>
+              <span>{{ isSubmitting ? ('Giriş Yapılıyor...') : ('Giriş Yap') }}</span>
               <ChevronRight v-if="!isSubmitting" :size="14" />
             </button>
           </form>
 
           <!-- Hızlı Demo Girişleri -->
           <div class="mt-6 pt-6 border-t" style="border-color: #F1F5F9;">
-            <label class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-2 text-center">{{ locale === 'tr' ? 'HIZLI DEMO GİRİŞLERİ' : 'QUICK DEMO LOGINS' }}</label>
+            <label class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-2 text-center">{{ 'HIZLI DEMO GİRİŞLERİ' }}</label>
             <div class="grid grid-cols-2 gap-3">
               <button 
                 type="button" 
                 @click="handleDemoLogin('company')"
                 class="flex flex-col items-center justify-center p-3 rounded-xl border border-dashed border-blue-200 bg-blue-50/10 hover:bg-blue-50 text-center transition cursor-pointer"
               >
-                <span class="text-xs font-bold text-blue-700">{{ locale === 'tr' ? '🏢 Firma Demosu' : '🏢 Company Demo' }}</span>
-                <span class="text-[8px] text-slate-500 mt-0.5">{{ locale === 'tr' ? 'İhale Aç & Yönet' : 'Post & Manage Tenders' }}</span>
+                <span class="text-xs font-bold text-blue-700">{{ '🏢 Firma Demosu' }}</span>
+                <span class="text-[8px] text-slate-500 mt-0.5">{{ 'İhale Aç & Yönet' }}</span>
               </button>
               <button 
                 type="button" 
                 @click="handleDemoLogin('individual')"
                 class="flex flex-col items-center justify-center p-3 rounded-xl border border-dashed border-emerald-200 bg-emerald-50/10 hover:bg-emerald-50 text-center transition cursor-pointer"
               >
-                <span class="text-xs font-bold text-emerald-700">{{ locale === 'tr' ? '👤 Kullanıcı Demosu' : '👤 Individual Demo' }}</span>
-                <span class="text-[8px] text-slate-500 mt-0.5">{{ locale === 'tr' ? 'Bireysel İlan & Teklif' : 'Individual Listing & Bids' }}</span>
+                <span class="text-xs font-bold text-emerald-700">{{ '👤 Kullanıcı Demosu' }}</span>
+                <span class="text-[8px] text-slate-500 mt-0.5">{{ 'Bireysel İlan & Teklif' }}</span>
               </button>
             </div>
           </div>
@@ -743,32 +743,32 @@ function handleGuestEntry() {
           <div class="text-left space-y-1 mb-2">
             <h3 class="text-sm font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
               <LockKeyhole :size="16" class="text-blue-600" />
-              <span>{{ locale === 'tr' ? 'Şifre Sıfırlama Talebi' : 'Password Reset Request' }}</span>
+              <span>{{ 'Şifre Sıfırlama Talebi' }}</span>
             </h3>
             <p class="text-xs text-slate-500 font-medium leading-relaxed">
-              {{ locale === 'tr' ? 'Kayıtlı e-posta adresinizi girin, sıfırlama talimatlarını anında e-postanıza iletelim.' : 'Enter your email address and we will send password reset instructions.' }}
+              {{ 'Kayıtlı e-posta adresinizi girin, sıfırlama talimatlarını anında e-postanıza iletelim.' }}
             </p>
           </div>
 
           <div v-if="forgotSubmitted" class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-900 space-y-3">
             <div class="flex items-center gap-2 font-black">
               <CheckCircle2 :size="18" class="text-emerald-600 shrink-0" />
-              <span>{{ locale === 'tr' ? 'Sıfırlama Bağlantısı Gönderildi!' : 'Reset Link Sent!' }}</span>
+              <span>{{ 'Sıfırlama Bağlantısı Gönderildi!' }}</span>
             </div>
             <p class="text-[11px] leading-relaxed font-medium text-emerald-800">
               <strong>{{ forgotEmail }}</strong> adresine şifre yenileme e-postası gönderildi. Lütfen e-posta kutunuzu ve spam klasörünüzü kontrol ediniz.
             </p>
             <button @click="activeTab = 'login'" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs transition shadow-sm cursor-pointer">
-              {{ locale === 'tr' ? 'Giriş Ekranına Dön' : 'Return to Login' }}
+              {{ 'Giriş Ekranına Dön' }}
             </button>
           </div>
 
           <form v-else @submit.prevent="handleForgotPassword" class="space-y-4">
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Kayıtlı E-Posta Adresiniz *' : 'Registered Email Address *' }}</label>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Kayıtlı E-Posta Adresiniz *' }}</label>
               <div class="relative">
                 <Mail :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="forgotEmail" type="email" required :placeholder="locale === 'tr' ? 'isim@sirketiniz.com' : 'name@company.com'" class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
+                <input v-model="forgotEmail" type="email" required :placeholder="'isim@sirketiniz.com'" class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all" />
               </div>
             </div>
 
@@ -776,10 +776,10 @@ function handleGuestEntry() {
 
             <div class="flex gap-2">
               <button type="button" @click="activeTab = 'login'" class="w-1/3 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition cursor-pointer">
-                {{ locale === 'tr' ? 'İptal' : 'Cancel' }}
+                {{ 'İptal' }}
               </button>
               <button type="submit" :disabled="isSubmitting" class="w-2/3 py-3 rounded-xl bg-blue-900 hover:bg-blue-950 text-white font-black text-xs transition shadow-md disabled:opacity-50 cursor-pointer">
-                {{ isSubmitting ? (locale === 'tr' ? 'Gönderiliyor...' : 'Sending...') : (locale === 'tr' ? 'Bağlantı Gönder' : 'Send Reset Link') }}
+                {{ isSubmitting ? ('Gönderiliyor...') : ('Bağlantı Gönder') }}
               </button>
             </div>
           </form>
@@ -790,41 +790,41 @@ function handleGuestEntry() {
           <div class="rounded-2xl border border-amber-200 bg-amber-50/60 p-4 text-left space-y-1">
             <h3 class="text-xs font-black uppercase tracking-wider text-amber-900 flex items-center gap-1.5">
               <span>👁️</span>
-              <span>{{ locale === 'tr' ? 'Misafir Girişi & Platform İnceleme' : 'Guest Access & Demo Experience' }}</span>
+              <span>{{ 'Misafir Girişi & Platform İnceleme' }}</span>
             </h3>
             <p class="text-[11px] leading-relaxed text-amber-800 font-medium">
-              {{ locale === 'tr' ? 'Platformu şifre oluşturmadan doğrudan incelemek için iletişim bilgilerinizi giriniz. Ekibimiz size en uygun ihale örneklerini sunacaktır.' : 'Enter your contact info to browse the platform without creating a password.' }}
+              {{ 'Platformu şifre oluşturmadan doğrudan incelemek için iletişim bilgilerinizi giriniz. Ekibimiz size en uygun ihale örneklerini sunacaktır.' }}
             </p>
           </div>
 
           <form @submit.prevent="handleGuestEntry" class="space-y-4">
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Adınız Soyadınız *' : 'Full Name *' }}</label>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Adınız Soyadınız *' }}</label>
               <div class="relative">
                 <User :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="guestName" type="text" required :placeholder="locale === 'tr' ? 'Örn: Ahmet Yılmaz' : 'e.g. John Doe'" class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" />
+                <input v-model="guestName" type="text" required :placeholder="'Örn: Ahmet Yılmaz'" class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" />
               </div>
             </div>
 
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Telefon veya Kurumsal E-Posta *' : 'Phone or Email *' }}</label>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Telefon veya Kurumsal E-Posta *' }}</label>
               <div class="relative">
                 <Phone :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="guestContact" type="text" required :placeholder="locale === 'tr' ? 'Örn: 0555 555 55 55 veya isim@firma.com' : 'Phone or Email'" class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" />
+                <input v-model="guestContact" type="text" required :placeholder="'Örn: 0555 555 55 55 veya isim@firma.com'" class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" />
               </div>
             </div>
 
             <div class="grid grid-cols-2 gap-3">
               <div>
-                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'Firma Adınız / Unvan' : 'Company Name' }}</label>
+                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Firma Adınız / Unvan' }}</label>
                 <div class="relative">
                   <Building2 :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="guestCompany" type="text" :placeholder="locale === 'tr' ? 'Örn: Yılmaz İnşaat A.Ş.' : 'Company Name'" class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" />
+                  <input v-model="guestCompany" type="text" :placeholder="'Örn: Yılmaz İnşaat A.Ş.'" class="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-amber-500 focus:bg-white transition-all" />
                 </div>
               </div>
 
               <div>
-                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ locale === 'tr' ? 'İlgilendiğiniz Sektör' : 'Sector' }}</label>
+                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'İlgilendiğiniz Sektör' }}</label>
                 <select v-model="guestSector" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 font-bold outline-none focus:border-amber-500">
                   <option value="İnşaat & Yapı">🏗️ İnşaat & Yapı</option>
                   <option value="Tarım & Gıda">🌾 Tarım & Gıda</option>
@@ -839,7 +839,7 @@ function handleGuestEntry() {
             <div v-if="errorMessage" class="rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-bold text-red-700">⚠️ {{ errorMessage }}</div>
 
             <button type="submit" :disabled="isSubmitting" class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-slate-950 transition-all shadow-md disabled:opacity-50" style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); border: 1px solid #C59B27;">
-              <span>{{ isSubmitting ? (locale === 'tr' ? 'Misafir Girişi Yapılıyor...' : 'Entering as Guest...') : (locale === 'tr' ? '👁️ Misafir Olarak İncelemeye Başla' : 'Explore Platform as Guest') }}</span>
+              <span>{{ isSubmitting ? ('Misafir Girişi Yapılıyor...') : ('👁️ Misafir Olarak İncelemeye Başla') }}</span>
               <ChevronRight v-if="!isSubmitting" :size="14" />
             </button>
           </form>
@@ -851,14 +851,14 @@ function handleGuestEntry() {
     <transition name="fade">
       <div v-if="showCookieConsent" class="fixed bottom-6 right-6 z-50 max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl text-left flex flex-col gap-3">
         <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
-          🍪 {{ locale === 'tr' ? 'Çerez Onayı & KVKK' : 'Cookie Consent & Privacy' }}
+          🍪 {{ 'Çerez Onayı & KVKK' }}
         </h4>
         <p class="text-[11px] leading-relaxed text-slate-500 font-medium">
-          {{ locale === 'tr' ? 'Üyelik işlemleri ve güvenli oturum yönetimi için zorunlu çerezleri kullanıyoruz.' : 'We use essential cookies for user authentication and session security.' }}
+          {{ 'Üyelik işlemleri ve güvenli oturum yönetimi için zorunlu çerezleri kullanıyoruz.' }}
         </p>
         <div class="flex items-center justify-end gap-2">
           <button @click="acceptCookies" class="rounded-xl bg-slate-900 hover:bg-slate-800 px-4 py-2 text-[11px] font-black text-white transition shadow-sm cursor-pointer">
-            {{ locale === 'tr' ? 'Anladım ve Kabul Ediyorum' : 'I Understand & Accept' }}
+            {{ 'Anladım ve Kabul Ediyorum' }}
           </button>
         </div>
       </div>
@@ -871,7 +871,7 @@ function handleGuestEntry() {
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <h3 class="text-sm font-black uppercase text-slate-800 flex items-center gap-2">
               <ShieldCheck class="text-emerald-600" :size="20" />
-              <span>{{ locale === 'tr' ? 'E-Posta Doğrulama Kodu' : 'Email Verification Code' }}</span>
+              <span>{{ 'E-Posta Doğrulama Kodu' }}</span>
             </h3>
             <button @click="showOtpModal = false" class="text-slate-400 hover:text-slate-700 cursor-pointer">
               <X :size="18" />
@@ -879,12 +879,12 @@ function handleGuestEntry() {
           </div>
 
           <p class="text-xs text-slate-600 leading-relaxed">
-            {{ locale === 'tr' ? 'Güvenliğiniz için' : 'For your security, a 6-digit verification code has been sent to' }}
-            <strong class="text-slate-900 font-mono">{{ pendingUserSession?.email || email }}</strong> {{ locale === 'tr' ? 'adresine 6 haneli onay kodu gönderilmiştir.' : '.' }}
+            {{ 'Güvenliğiniz için' }}
+            <strong class="text-slate-900 font-mono">{{ pendingUserSession?.email || email }}</strong> {{ 'adresine 6 haneli onay kodu gönderilmiştir.' }}
           </p>
 
           <div class="space-y-2">
-            <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">{{ locale === 'tr' ? 'ONAY KODU (OTP)' : 'VERIFICATION CODE (OTP)' }}</label>
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">{{ 'ONAY KODU (OTP)' }}</label>
             <input 
               v-model="otpInput" 
               type="text" 
@@ -893,13 +893,13 @@ function handleGuestEntry() {
               class="w-full text-center tracking-[0.5em] text-xl font-mono font-black py-3 bg-slate-50 border-2 border-emerald-300 rounded-2xl text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-inner" 
             />
             <span class="text-[10px] text-emerald-600 font-bold block text-center mt-1">
-              ✓ {{ locale === 'tr' ? 'Demo Onay Kodu Otomatik Dolduruldu: 849201' : 'Demo Verification Code Auto-Filled: 849201' }}
+              ✓ {{ 'Demo Onay Kodu Otomatik Dolduruldu: 849201' }}
             </span>
           </div>
 
           <div class="flex items-center justify-between text-xs pt-1">
             <button type="button" @click="resendOtp" class="text-blue-600 font-bold hover:underline cursor-pointer">
-              {{ locale === 'tr' ? 'Kodu Tekrar Gönder' : 'Resend Code' }}
+              {{ 'Kodu Tekrar Gönder' }}
             </button>
             <span class="text-slate-400 font-mono text-[10px]">Kalan Süre: 02:45</span>
           </div>
@@ -909,7 +909,7 @@ function handleGuestEntry() {
             class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white transition-all shadow-md bg-emerald-600 hover:bg-emerald-700 cursor-pointer"
           >
             <CheckCircle2 :size="16" />
-            <span>{{ locale === 'tr' ? 'Doğrula ve Hesabımı Aç' : 'Verify & Open Account' }}</span>
+            <span>{{ 'Doğrula ve Hesabımı Aç' }}</span>
           </button>
         </div>
       </div>

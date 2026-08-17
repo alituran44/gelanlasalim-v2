@@ -98,7 +98,7 @@ const sidebarMenus = computed(() => {
           class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all shrink-0 uppercase tracking-wider"
         >
           <ArrowLeft :size="13" />
-          {{ locale === 'tr' ? 'Ana Sayfaya Git' : 'Go to Homepage' }}
+          {{ 'Ana Sayfaya Git' }}
         </NuxtLink>
       </div>
 

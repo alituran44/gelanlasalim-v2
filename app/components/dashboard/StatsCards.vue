@@ -97,7 +97,7 @@ const stats = computed(() => {
               {{ item.change }}
             </span>
             <span class="text-[10px] font-medium text-slate-400">
-              {{ locale === 'tr' ? 'geçen aya göre' : 'vs last month' }}
+              {{ 'geçen aya göre' }}
             </span>
           </div>
         </div>

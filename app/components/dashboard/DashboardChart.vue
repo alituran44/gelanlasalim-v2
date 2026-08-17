@@ -87,15 +87,15 @@ const chartOptions = {
     <div class="mb-6 flex items-center justify-between">
       <div>
         <h2 class="text-base font-black text-slate-800 tracking-tight">
-          {{ locale === 'tr' ? 'İhale Trend Analizi' : 'Tender Volume Analytics' }}
+          {{ 'İhale Trend Analizi' }}
         </h2>
         <p class="text-xs font-medium text-slate-500 mt-0.5">
-          {{ locale === 'tr' ? 'Son 6 aylık ihale hacmi istatistikleri' : '6-month cumulative tender activity trends' }}
+          {{ 'Son 6 aylık ihale hacmi istatistikleri' }}
         </p>
       </div>
 
       <div class="rounded-full bg-blue-50 border border-blue-200 px-3 py-1 text-xs font-bold text-blue-700">
-        +18% {{ locale === 'tr' ? 'Büyüme' : 'Growth' }}
+        +18% {{ 'Büyüme' }}
       </div>
     </div>
 

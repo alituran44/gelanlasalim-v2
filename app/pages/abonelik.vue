@@ -253,15 +253,13 @@ function completeCheckout() {
       <!-- H1 / HEADER BLOCK -->
       <div class="text-center max-w-3xl mx-auto space-y-3">
         <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-black uppercase tracking-wider">
-          ⚡ {{ locale === 'tr' ? 'KURUMSAL ABONELİK VE LİSANS PLANLARI' : 'ENTERPRISE SUBSCRIPTION TIERS' }}
+          ⚡ {{ 'KURUMSAL ABONELİK VE LİSANS PLANLARI' }}
         </span>
         <h1 class="text-3xl font-black tracking-tight text-slate-900">
-          {{ locale === 'tr' ? 'İhtiyacınıza Uygun Esnek Ödeme Planı Seçin' : 'Select Your Tailored B2B Pricing Tier' }}
+          {{ 'İhtiyacınıza Uygun Esnek Ödeme Planı Seçin' }}
         </h1>
         <p class="text-xs text-slate-500 font-medium leading-relaxed">
-          {{ locale === 'tr' 
-            ? 'Yurt içi (₺ TRY) veya yurt dışı ($ USD / € EUR) ödeme seçeneklerimizden firmanıza en uygun paketi tercih edin. Şeffaf fiyatlandırma, 0 komisyon.' 
-            : 'Choose from our domestic (TRY) or global (USD/EUR) subscription tracks. Zero commission fees for buyer firms.' }}
+          {{ 'Yurt içi (₺ TRY) veya yurt dışı ($ USD / € EUR) ödeme seçeneklerimizden firmanıza en uygun paketi tercih edin. Şeffaf fiyatlandırma, 0 komisyon.' }}
         </p>
 
         <!-- MARKET REGION TOGGLE SWITCH -->
@@ -273,7 +271,7 @@ function completeCheckout() {
               :class="paymentRegion === 'domestic' ? 'bg-blue-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'"
             >
               <span class="text-base">🇹🇷</span>
-              <span>{{ locale === 'tr' ? 'Yurt İçi Ödeme (Türkiye / ₺ TRY)' : 'Domestic Plan (Turkey / ₺ TRY)' }}</span>
+              <span>{{ 'Yurt İçi Ödeme (Türkiye / ₺ TRY)' }}</span>
             </button>
 
             <button 
@@ -282,14 +280,14 @@ function completeCheckout() {
               :class="paymentRegion === 'international' ? 'bg-blue-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'"
             >
               <Globe :size="15" class="text-emerald-400" />
-              <span>{{ locale === 'tr' ? 'Yurt Dışı Ödeme (Global / $ USD - € EUR)' : 'International Plan (Global / $ - €)' }}</span>
+              <span>{{ 'Yurt Dışı Ödeme (Global / $ USD - € EUR)' }}</span>
             </button>
           </div>
         </div>
 
         <!-- International Currency Switcher Sub-Bar -->
         <div v-if="paymentRegion === 'international'" class="pt-2 flex items-center justify-center gap-3">
-          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ locale === 'tr' ? 'Para Birimi:' : 'Currency:' }}</span>
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{{ 'Para Birimi:' }}</span>
           <div class="inline-flex rounded-xl bg-slate-200/80 p-1 text-xs font-bold">
             <button 
               @click="internationalCurrency = 'USD'" 
@@ -307,7 +305,7 @@ function completeCheckout() {
             </button>
           </div>
           <span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-            ✓ {{ locale === 'tr' ? '%0 KDV Muaf İhrakat Faturası' : '0% Export VAT Exempt' }}
+            ✓ {{ '%0 KDV Muaf İhrakat Faturası' }}
           </span>
         </div>
       </div>
@@ -322,10 +320,10 @@ function completeCheckout() {
         >
           <!-- Promo Tag -->
           <div v-if="pkg.isPromo" class="bg-amber-400 text-slate-950 font-black text-[9px] uppercase tracking-widest text-center py-1.5">
-            ⚡ {{ locale === 'tr' ? 'EN ÇOK TERCİH EDİLEN POPÜLER PLAN' : 'MOST POPULAR ENTERPRISE CHOICE' }}
+            ⚡ {{ 'EN ÇOK TERCİH EDİLEN POPÜLER PLAN' }}
           </div>
           <div v-else class="bg-blue-900 text-white font-bold text-[9px] uppercase tracking-widest text-center py-1.5">
-            {{ locale === 'tr' ? 'KURUMSAL KULLANIM' : 'STANDARD CORPORATE TIER' }}
+            {{ 'KURUMSAL KULLANIM' }}
           </div>
           
           <!-- Price & Title Content Area -->
@@ -333,7 +331,7 @@ function completeCheckout() {
             <div>
               <h3 class="text-sm font-black text-slate-900 uppercase tracking-tight">{{ pkg.name }}</h3>
               <div class="text-3xl font-black tracking-tight font-mono text-slate-900 mt-4">
-                {{ currencySymbol }}{{ pkg.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }}
+                {{ currencySymbol }}{{ pkg.price.toLocaleString('tr-TR') }}
               </div>
               <div class="text-[11px] text-blue-700 font-bold mt-1 bg-blue-50 py-1 px-2 rounded-lg inline-block">
                 {{ pkg.monthly }}
@@ -352,7 +350,7 @@ function completeCheckout() {
               class="w-full text-center rounded-xl font-black text-xs py-3.5 transition-all shadow-md flex items-center justify-center gap-2 text-white cursor-pointer hover:scale-[1.02]"
               :class="pkg.isPromo ? 'bg-amber-500 hover:bg-amber-600 text-slate-950' : 'bg-blue-900 hover:bg-blue-950 text-white'"
             >
-              <span>{{ locale === 'tr' ? 'HEMEN ABONE OL' : 'SELECT THIS TIER' }}</span>
+              <span>{{ 'HEMEN ABONE OL' }}</span>
               <ArrowRight :size="14" />
             </button>
           </div>
@@ -365,8 +363,8 @@ function completeCheckout() {
           <ShieldCheck :size="18" class="text-emerald-600" />
           <span>
             {{ paymentRegion === 'domestic' 
-              ? (locale === 'tr' ? 'Tüm fiyatlara %20 KDV dahildir. E-Fatura 24 saat içinde iletilir.' : 'Prices include 20% VAT. Electronic VAT invoice issued within 24h.')
-              : (locale === 'tr' ? 'Yurt dışı ödemelerde %0 KDV İhracat faturası kesilir.' : '0% Export VAT Invoice issued for international entities.')
+              ? ('Tüm fiyatlara %20 KDV dahildir. E-Fatura 24 saat içinde iletilir.')
+              : ('Yurt dışı ödemelerde %0 KDV İhracat faturası kesilir.')
             }}
           </span>
         </div>
@@ -382,10 +380,10 @@ function completeCheckout() {
       <div class="border border-slate-200 rounded-3xl bg-white p-8 shadow-xs space-y-6">
         <div class="border-b border-slate-100 pb-4">
           <h3 class="text-lg font-black text-slate-900 tracking-tight">
-            {{ locale === 'tr' ? 'Tüm Paketlerde Dahil Olan Standart Özellikler' : 'Features Included Across All Subscription Tiers' }}
+            {{ 'Tüm Paketlerde Dahil Olan Standart Özellikler' }}
           </h3>
           <p class="text-xs text-slate-500 mt-1 font-medium">
-            {{ locale === 'tr' ? 'Herhangi bir gizli ücret veya ek komisyon bulunmamaktadır.' : 'No hidden fees or unexpected commission charges.' }}
+            {{ 'Herhangi bir gizli ücret veya ek komisyon bulunmamaktadır.' }}
           </p>
         </div>
 
@@ -444,7 +442,7 @@ function completeCheckout() {
               <!-- Payment Channels Switcher -->
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
-                  {{ locale === 'tr' ? 'ÖDEME KANALI SEÇİN' : 'SELECT PAYMENT GATEWAY' }}
+                  {{ 'ÖDEME KANALI SEÇİN' }}
                 </label>
                 
                 <!-- Domestic Gateways -->
@@ -511,18 +509,18 @@ function completeCheckout() {
               <!-- Credit Card Form (Domestic & Stripe/PayPal) -->
               <div v-if="activePaymentChannel !== 'bank_transfer' && activePaymentChannel !== 'swift'" class="space-y-4">
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">{{ locale === 'tr' ? 'Kart Üzerindeki İsim' : 'Cardholder Name' }}</label>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">{{ 'Kart Üzerindeki İsim' }}</label>
                   <input v-model="cardName" type="text" placeholder="John Doe" class="w-full rounded-xl border border-slate-200 p-3 text-xs focus:border-blue-600 focus:outline-none" />
                 </div>
 
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">{{ locale === 'tr' ? 'Kart Numarası' : 'Card Number' }}</label>
+                  <label class="block text-xs font-bold text-slate-700 mb-1">{{ 'Kart Numarası' }}</label>
                   <input v-model="cardNumber" type="text" placeholder="4543 0000 0000 0000" class="w-full rounded-xl border border-slate-200 p-3 text-xs font-mono focus:border-blue-600 focus:outline-none" />
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ locale === 'tr' ? 'Son Kullanma (AA/YY)' : 'Expiry (MM/YY)' }}</label>
+                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ 'Son Kullanma (AA/YY)' }}</label>
                     <input v-model="cardExpiry" type="text" placeholder="12/28" class="w-full rounded-xl border border-slate-200 p-3 text-xs font-mono focus:border-blue-600 focus:outline-none" />
                   </div>
                   <div>
@@ -558,11 +556,9 @@ function completeCheckout() {
               <div class="h-16 w-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
                 <CheckCircle2 :size="36" />
               </div>
-              <h3 class="text-lg font-black text-slate-900">{{ locale === 'tr' ? 'Abonelik İşlemi Başarılı!' : 'Subscription Successfully Activated!' }}</h3>
+              <h3 class="text-lg font-black text-slate-900">{{ 'Abonelik İşlemi Başarılı!' }}</h3>
               <p class="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
-                {{ locale === 'tr' 
-                  ? 'Faturanız oluşturuldu ve kurumsal panel erişiminiz anında aktifleştirildi.' 
-                  : 'Your enterprise portal has been unlocked. Invoice sent to your billing email.' 
+                {{ 'Faturanız oluşturuldu ve kurumsal panel erişiminiz anında aktifleştirildi.' 
                 }}
               </p>
             </div>
@@ -574,11 +570,11 @@ function completeCheckout() {
             <div v-if="!showSuccessScreen" class="mb-3 flex items-center justify-center gap-2 text-[10px] text-slate-500 font-bold">
               <input v-model="distanceSalesApproved" type="checkbox" id="modal-distance-check" class="rounded border-slate-300" />
               <label for="modal-distance-check" class="cursor-pointer">
-                {{ locale === 'tr' ? 'Ödemeyi onaylayarak ' : 'By proceeding you agree to ' }}
+                {{ 'Ödemeyi onaylayarak ' }}
                 <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" target="_blank" class="text-blue-600 underline">
-                  {{ locale === 'tr' ? 'Mesafeli Satış Sözleşmesini' : 'Distance Sales Terms' }}
+                  {{ 'Mesafeli Satış Sözleşmesini' }}
                 </NuxtLink>
-                {{ locale === 'tr' ? ' kabul etmiş olursunuz.' : '.' }}
+                {{ ' kabul etmiş olursunuz.' }}
               </label>
             </div>
 
@@ -588,8 +584,8 @@ function completeCheckout() {
               :disabled="isProcessing"
               class="w-full py-3.5 bg-blue-900 hover:bg-blue-950 text-white font-black text-xs rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
-              <span v-if="isProcessing">{{ locale === 'tr' ? 'Ödeme Doğrulanıyor...' : 'Processing Payment...' }}</span>
-              <span v-else>{{ currencySymbol }}{{ selectedPackage?.price.toLocaleString(locale === 'tr' ? 'tr-TR' : 'en-US') }} {{ locale === 'tr' ? 'Güvenli Ödeme Yap' : 'Pay Securely' }}</span>
+              <span v-if="isProcessing">{{ 'Ödeme Doğrulanıyor...' }}</span>
+              <span v-else>{{ currencySymbol }}{{ selectedPackage?.price.toLocaleString('tr-TR') }} {{ 'Güvenli Ödeme Yap' }}</span>
               <ArrowRight v-if="!isProcessing" :size="14" />
             </button>
 
@@ -598,7 +594,7 @@ function completeCheckout() {
               @click="completeCheckout"
               class="w-full py-3.5 bg-slate-900 hover:bg-slate-950 text-white font-black text-xs rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer"
             >
-              <span>{{ locale === 'tr' ? 'Kurumsal Paneli Başlat' : 'Launch Enterprise Dashboard' }}</span>
+              <span>{{ 'Kurumsal Paneli Başlat' }}</span>
               <ArrowRight :size="14" />
             </button>
           </div>

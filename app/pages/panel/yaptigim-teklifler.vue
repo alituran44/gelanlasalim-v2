@@ -40,10 +40,10 @@ const getDurumConfig = (durum: string) => {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #F1F5F9;">
       <div>
         <h1 class="text-xl font-black text-slate-800 tracking-tight" style="color: #0F172A;">
-          {{ locale === 'tr' ? 'Verdiğim Teklifler' : 'My Submitted Bids' }}
+          {{ 'Verdiğim Teklifler' }}
         </h1>
         <p class="text-xs text-slate-500 font-medium mt-0.5">
-          {{ locale === 'tr' ? 'İhalelere verdiğiniz tekliflerin durumunu ve sürecini takip edin' : 'Track bid evaluation status, price quotes and delivery terms' }}
+          {{ 'İhalelere verdiğiniz tekliflerin durumunu ve sürecini takip edin' }}
         </p>
       </div>
     </div>
@@ -55,9 +55,7 @@ const getDurumConfig = (durum: string) => {
     >
       <Eye :size="15" style="color: #1EAE4C;" class="shrink-0" />
       <span>
-        {{ locale === 'tr' 
-          ? 'Alıcı firma bilgileri gizlidir. Teklif kabul edildiğinde iletişim bilgileri doğrudan açılır.' 
-          : 'Buyer credentials are protected. Full contact info is revealed upon bid acceptance.' 
+        {{ 'Alıcı firma bilgileri gizlidir. Teklif kabul edildiğinde iletişim bilgileri doğrudan açılır.' 
         }}
       </span>
     </div>
@@ -82,16 +80,16 @@ const getDurumConfig = (durum: string) => {
             <div class="flex flex-wrap items-center gap-3 text-xs text-slate-400 font-medium">
               <span>{{ teklif.kategori }}</span>
               <span>•</span>
-              <span>{{ locale === 'tr' ? 'Alıcı:' : 'Buyer:' }} <b class="text-slate-700 font-bold">{{ teklif.aliciFirma }}</b></span>
+              <span>{{ 'Alıcı:' }} <b class="text-slate-700 font-bold">{{ teklif.aliciFirma }}</b></span>
               <span>•</span>
               <span class="font-mono text-slate-400">{{ teklif.id }}</span>
             </div>
 
             <div class="flex items-center gap-2 text-xs text-slate-500 font-medium pt-1">
               <Clock :size="13" class="text-slate-400" />
-              <span>{{ locale === 'tr' ? 'Teslimat Süresi:' : 'Delivery Time:' }} <strong>{{ teklif.teslimSuresi }}</strong></span>
+              <span>{{ 'Teslimat Süresi:' }} <strong>{{ teklif.teslimSuresi }}</strong></span>
               <span>•</span>
-              <span>{{ locale === 'tr' ? 'Teklif Tarihi:' : 'Submitted Date:' }} {{ teklif.tarih }}</span>
+              <span>{{ 'Teklif Tarihi:' }} {{ teklif.tarih }}</span>
             </div>
           </div>
 

@@ -54,17 +54,14 @@ onMounted(() => {
         <div>
           <h1 class="text-base font-black flex items-center gap-2 text-slate-800 tracking-tight">
             <ShieldCheck class="text-emerald-500" :size="20" />
-            {{ locale === 'tr' ? 'Şirket Profiliniz Doğrulandı!' : 'Corporate Profile Verified!' }}
+            {{ 'Şirket Profiliniz Doğrulandı!' }}
           </h1>
           <p class="text-xs text-slate-500 font-medium mt-1">
-            {{ locale === 'tr' 
-              ? `Tebrikler ${companyName}, tüm B2B ihale açma, teklif verme ve sözleşme süreçleriniz aktiftir.` 
-              : `Welcome ${companyName}, all your B2B auction creation, bidding, and contract operations are active.` 
-            }}
+            {{ `Tebrikler ${companyName}, tüm B2B ihale açma, teklif verme ve sözleşme süreçleriniz aktiftir.` }}
           </p>
         </div>
         <div class="rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 px-3 py-1 text-[10px] font-black uppercase tracking-wider">
-          ✓ {{ locale === 'tr' ? 'Onaylı Üye' : 'Verified Member' }}
+          ✓ {{ 'Onaylı Üye' }}
         </div>
       </div>
 
@@ -105,19 +102,17 @@ onMounted(() => {
           <div class="rounded-2xl border bg-white p-6 shadow-xs flex items-start justify-between relative overflow-hidden" style="border-color: #E2E8F0;">
             <div class="space-y-2 max-w-md">
               <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-200 px-2.5 py-0.5 text-[9px] font-black uppercase text-blue-600 tracking-wider">
-                {{ locale === 'tr' ? 'KURUMSAL DOĞRULAMA' : 'CORPORATE VERIFICATION' }}
+                {{ 'KURUMSAL DOĞRULAMA' }}
               </span>
               <h2 class="text-lg font-black text-slate-800 leading-tight">
-                {{ locale === 'tr' ? 'Kontrol paneliniz hazır; doğrulama bekleniyor.' : 'Your dashboard is ready; verification pending.' }}
+                {{ 'Kontrol paneliniz hazır; doğrulama bekleniyor.' }}
               </h2>
               <p class="text-xs text-slate-500 font-medium leading-relaxed">
-                {{ locale === 'tr' 
-                  ? 'Kurumsal ihale, teklif ve sözleşme işlemlerini başlatmak için şirket doğrulamanızı tamamlamanız gerekir.' 
-                  : 'To start B2B auction creation and supplier bidding, please complete your corporate KYC verification.' 
+                {{ 'Kurumsal ihale, teklif ve sözleşme işlemlerini başlatmak için şirket doğrulamanızı tamamlamanız gerekir.' 
                 }}
               </p>
               <div class="text-[9px] font-black text-slate-400 uppercase tracking-wider pt-2">
-                {{ locale === 'tr' ? 'HESAP SAHİBİ:' : 'ACCOUNT OWNER:' }} {{ companyName }}
+                {{ 'HESAP SAHİBİ:' }} {{ companyName }}
               </div>
             </div>
             
@@ -129,7 +124,7 @@ onMounted(() => {
           <!-- Tamamlanması Gerekenler Listesi -->
           <div class="rounded-2xl border bg-white p-6 shadow-xs space-y-4" style="border-color: #E2E8F0;">
             <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">
-              {{ locale === 'tr' ? 'TAMAMLANMASI GEREKENLER' : 'REQUIRED VERIFICATION STEPS' }}
+              {{ 'TAMAMLANMASI GEREKENLER' }}
             </h3>
             
             <div class="divide-y divide-slate-100">
@@ -139,12 +134,12 @@ onMounted(() => {
                 <div class="flex items-center gap-3">
                   <span class="text-xs font-bold text-slate-400 bg-slate-100 rounded-lg px-2 py-1 font-mono">01</span>
                   <div>
-                    <h4 class="text-xs font-bold text-slate-800">{{ locale === 'tr' ? 'Şirket kimliği' : 'Company Identity' }}</h4>
-                    <p class="text-[10px] text-slate-400 font-medium">{{ locale === 'tr' ? 'Şirket temel bilgileri hazır.' : 'Basic company credentials registered.' }}</p>
+                    <h4 class="text-xs font-bold text-slate-800">{{ 'Şirket kimliği' }}</h4>
+                    <p class="text-[10px] text-slate-400 font-medium">{{ 'Şirket temel bilgileri hazır.' }}</p>
                   </div>
                 </div>
                 <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
-                  <CheckCircle2 :size="10" /> {{ locale === 'tr' ? 'TAMAMLANDI' : 'COMPLETED' }}
+                  <CheckCircle2 :size="10" /> {{ 'TAMAMLANDI' }}
                 </span>
               </div>
 
@@ -153,12 +148,12 @@ onMounted(() => {
                 <div class="flex items-center gap-3">
                   <span class="text-xs font-bold text-slate-400 bg-slate-100 rounded-lg px-2 py-1 font-mono">02</span>
                   <div>
-                    <h4 class="text-xs font-bold text-slate-800">{{ locale === 'tr' ? 'Fatura bilgileri' : 'Billing Information' }}</h4>
-                    <p class="text-[10px] text-slate-400 font-medium">{{ locale === 'tr' ? 'Fatura bilgileri hazır.' : 'VAT tax details verified.' }}</p>
+                    <h4 class="text-xs font-bold text-slate-800">{{ 'Fatura bilgileri' }}</h4>
+                    <p class="text-[10px] text-slate-400 font-medium">{{ 'Fatura bilgileri hazır.' }}</p>
                   </div>
                 </div>
                 <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
-                  <CheckCircle2 :size="10" /> {{ locale === 'tr' ? 'TAMAMLANDI' : 'COMPLETED' }}
+                  <CheckCircle2 :size="10" /> {{ 'TAMAMLANDI' }}
                 </span>
               </div>
 
@@ -167,12 +162,12 @@ onMounted(() => {
                 <div class="flex items-center gap-3">
                   <span class="text-xs font-bold text-slate-400 bg-slate-100 rounded-lg px-2 py-1 font-mono">03</span>
                   <div>
-                    <h4 class="text-xs font-bold text-slate-800">{{ locale === 'tr' ? 'IBAN bilgileri' : 'Bank IBAN Account' }}</h4>
-                    <p class="text-[10px] text-slate-400 font-medium">{{ locale === 'tr' ? 'TR / SWIFT IBAN bilgisi eklenebilir.' : 'Bank IBAN account details.' }}</p>
+                    <h4 class="text-xs font-bold text-slate-800">{{ 'IBAN bilgileri' }}</h4>
+                    <p class="text-[10px] text-slate-400 font-medium">{{ 'TR / SWIFT IBAN bilgisi eklenebilir.' }}</p>
                   </div>
                 </div>
                 <NuxtLink to="/firma-dogrulama" class="text-[10px] font-bold text-blue-600 border border-blue-200 hover:bg-blue-50 px-4 py-1.5 rounded-xl transition">
-                  {{ locale === 'tr' ? 'EKLE' : 'ADD' }}
+                  {{ 'EKLE' }}
                 </NuxtLink>
               </div>
 
@@ -181,17 +176,15 @@ onMounted(() => {
                 <div class="flex items-center gap-3">
                   <span class="text-xs font-bold text-slate-400 bg-slate-100 rounded-lg px-2 py-1 font-mono">04</span>
                   <div class="max-w-xs sm:max-w-md">
-                    <h4 class="text-xs font-bold text-slate-800">{{ locale === 'tr' ? 'Zorunlu belgeler (KYC)' : 'Required KYC Documents' }}</h4>
+                    <h4 class="text-xs font-bold text-slate-800">{{ 'Zorunlu belgeler (KYC)' }}</h4>
                     <p class="text-[10px] text-slate-400 leading-normal truncate sm:whitespace-normal">
-                      {{ locale === 'tr' 
-                        ? 'Vergi Levhası, Ticaret Sicil Gazetesi, İmza Sirküleri.' 
-                        : 'Tax Certificate, Trade Gazette, Signature Circulars.' 
+                      {{ 'Vergi Levhası, Ticaret Sicil Gazetesi, İmza Sirküleri.' 
                       }}
                     </p>
                   </div>
                 </div>
                 <NuxtLink to="/firma-dogrulama" class="text-[10px] font-bold text-blue-600 border border-blue-200 hover:bg-blue-50 px-4 py-1.5 rounded-xl transition">
-                  {{ locale === 'tr' ? 'YÜKLE' : 'UPLOAD' }}
+                  {{ 'YÜKLE' }}
                 </NuxtLink>
               </div>
 
@@ -200,12 +193,12 @@ onMounted(() => {
                 <div class="flex items-center gap-3">
                   <span class="text-xs font-bold text-slate-400 bg-slate-100 rounded-lg px-2 py-1 font-mono">05</span>
                   <div>
-                    <h4 class="text-xs font-bold text-slate-800">{{ locale === 'tr' ? 'Yetkili kişi bilgileri' : 'Authorized Signatory Details' }}</h4>
-                    <p class="text-[10px] text-slate-400 font-medium">{{ locale === 'tr' ? 'Yetkili kişi bilgileri kayıtlı.' : 'Authorized person registered.' }}</p>
+                    <h4 class="text-xs font-bold text-slate-800">{{ 'Yetkili kişi bilgileri' }}</h4>
+                    <p class="text-[10px] text-slate-400 font-medium">{{ 'Yetkili kişi bilgileri kayıtlı.' }}</p>
                   </div>
                 </div>
                 <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-100">
-                  <CheckCircle2 :size="10" /> {{ locale === 'tr' ? 'TAMAMLANDI' : 'COMPLETED' }}
+                  <CheckCircle2 :size="10" /> {{ 'TAMAMLANDI' }}
                 </span>
               </div>
 
@@ -222,7 +215,7 @@ onMounted(() => {
               to="/firma-dogrulama"
               class="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3.5 shadow-lg shadow-blue-500/20 transition"
             >
-              {{ locale === 'tr' ? 'Doğrulamaya Git →' : 'Complete Verification →' }}
+              {{ 'Doğrulamaya Git →' }}
             </NuxtLink>
             <button 
               type="button"
@@ -230,12 +223,10 @@ onMounted(() => {
               class="w-full border rounded-xl py-3 text-xs font-bold transition hover:bg-slate-50 cursor-pointer"
               style="border-color: #E2E8F0; color: #64748B;"
             >
-              {{ locale === 'tr' ? 'Hızlı İnceleme Modu (Demo)' : 'Quick Preview Mode (Demo)' }}
+              {{ 'Hızlı İnceleme Modu (Demo)' }}
             </button>
             <p class="text-[9px] text-slate-400 leading-normal max-w-[220px] mx-auto">
-              {{ locale === 'tr' 
-                ? 'Erteleme yalnızca bu hatırlatmayı giderir; ihale işlemleri doğrulama tamamlanana kadar kilitlidir.' 
-                : 'Demo preview unlocks dashboard widgets for evaluation.' 
+              {{ 'Erteleme yalnızca bu hatırlatmayı giderir; ihale işlemleri doğrulama tamamlanana kadar kilitlidir.' 
               }}
             </p>
           </div>
@@ -243,15 +234,13 @@ onMounted(() => {
           <!-- Verification Summary Card -->
           <div class="rounded-2xl border bg-white p-5 shadow-xs space-y-3" style="border-color: #E2E8F0;">
             <h4 class="text-[10px] font-black uppercase tracking-wider text-slate-400">
-              {{ locale === 'tr' ? 'DOĞRULAMA ÖZETİ' : 'VERIFICATION SUMMARY' }}
+              {{ 'DOĞRULAMA ÖZETİ' }}
             </h4>
             <span class="text-xs font-bold text-slate-700 block">
-              {{ locale === 'tr' ? 'Tamamlanması gereken adımlar var' : 'Pending verification requirements' }}
+              {{ 'Tamamlanması gereken adımlar var' }}
             </span>
             <p class="text-[10px] text-slate-400 leading-relaxed bg-slate-50 border p-3 rounded-xl">
-              {{ locale === 'tr' 
-                ? 'Evraklarınızı yükleyerek 1 iş günü içinde onay alabilirsiniz.' 
-                : 'Upload required documents to complete KYC within 1 business day.' 
+              {{ 'Evraklarınızı yükleyerek 1 iş günü içinde onay alabilirsiniz.' 
               }}
             </p>
           </div>
@@ -259,7 +248,7 @@ onMounted(() => {
           <!-- Neler Etkilenir Card -->
           <div class="rounded-2xl border bg-white p-5 shadow-xs space-y-3" style="border-color: #E2E8F0;">
             <h4 class="text-[10px] font-black uppercase tracking-wider text-slate-400">
-              {{ locale === 'tr' ? 'NELER ETKİLENİR?' : 'LOCKED FEATURES' }}
+              {{ 'NELER ETKİLENİR?' }}
             </h4>
             
             <div class="space-y-2.5">
@@ -269,7 +258,7 @@ onMounted(() => {
                 <div class="flex h-6 w-6 items-center justify-center rounded bg-amber-50 border border-amber-200 text-amber-500">
                   <Lock :size="12" />
                 </div>
-                <span class="text-xs font-bold text-slate-600">{{ locale === 'tr' ? 'İhale oluşturma' : 'Auction creation' }}</span>
+                <span class="text-xs font-bold text-slate-600">{{ 'İhale oluşturma' }}</span>
               </div>
 
               <!-- Item 2: Teklif Verme -->
@@ -277,7 +266,7 @@ onMounted(() => {
                 <div class="flex h-6 w-6 items-center justify-center rounded bg-amber-50 border border-amber-200 text-amber-500">
                   <Lock :size="12" />
                 </div>
-                <span class="text-xs font-bold text-slate-600">{{ locale === 'tr' ? 'Teklif verme' : 'Submitting bids' }}</span>
+                <span class="text-xs font-bold text-slate-600">{{ 'Teklif verme' }}</span>
               </div>
 
               <!-- Item 3: Sözleşme ve Teslimat -->
@@ -285,7 +274,7 @@ onMounted(() => {
                 <div class="flex h-6 w-6 items-center justify-center rounded bg-amber-50 border border-amber-200 text-amber-500">
                   <Lock :size="12" />
                 </div>
-                <span class="text-xs font-bold text-slate-600">{{ locale === 'tr' ? 'Sözleşme ve teslimat takibi' : 'Contract & delivery tracking' }}</span>
+                <span class="text-xs font-bold text-slate-600">{{ 'Sözleşme ve teslimat takibi' }}</span>
               </div>
 
             </div>

@@ -46,15 +46,13 @@ function triggerRefresh() {
     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4" style="border-color: #F1F5F9;">
       <div>
         <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">
-          {{ locale === 'tr' ? 'KAYNAK: TCMB (DÖVİZ) - GOLD API (EMTİA)' : 'SOURCE: CENTRAL BANK (FX) - GOLD API (COMMODITIES)' }}
+          {{ 'KAYNAK: TCMB (DÖVİZ) - GOLD API (EMTİA)' }}
         </span>
         <h1 class="text-xl font-black text-slate-800 mt-1 tracking-tight" style="color: #0F172A;">
-          {{ locale === 'tr' ? 'Kur ve Emtia Panosu' : 'Exchange Rates & Commodities Board' }}
+          {{ 'Kur ve Emtia Panosu' }}
         </h1>
         <p class="text-xs text-slate-500 font-medium mt-0.5">
-          {{ locale === 'tr' 
-            ? 'Toplam 5 enstrüman izleniyor. Bu veriler ihale fiyatlandırması ve satın alma analizi için referans amaçlıdır.' 
-            : '5 market instruments tracked. Provided for procurement benchmark and FX pricing calculation.' 
+          {{ 'Toplam 5 enstrüman izleniyor. Bu veriler ihale fiyatlandırması ve satın alma analizi için referans amaçlıdır.' 
           }}
         </p>
       </div>
@@ -62,18 +60,18 @@ function triggerRefresh() {
       <!-- Quick Info Badges -->
       <div class="flex flex-wrap items-center gap-4 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
         <div>
-          <span class="block text-[8px] text-slate-400 font-medium">{{ locale === 'tr' ? 'DÖVİZ KURLARI' : 'FOREX RATES' }}</span>
-          <span class="text-slate-700">3 {{ locale === 'tr' ? 'TCMB resmi' : 'Central Bank' }}</span>
+          <span class="block text-[8px] text-slate-400 font-medium">{{ 'DÖVİZ KURLARI' }}</span>
+          <span class="text-slate-700">3 {{ 'TCMB resmi' }}</span>
         </div>
         <div class="h-6 w-px bg-slate-200"></div>
         <div>
-          <span class="block text-[8px] text-slate-400 font-medium">{{ locale === 'tr' ? 'DEĞERLİ METALLER' : 'PRECIOUS METALS' }}</span>
+          <span class="block text-[8px] text-slate-400 font-medium">{{ 'DEĞERLİ METALLER' }}</span>
           <span class="text-slate-700">2 Gold API</span>
         </div>
         <div class="h-6 w-px bg-slate-200"></div>
         <div>
-          <span class="block text-[8px] text-slate-400 font-medium">{{ locale === 'tr' ? 'SON GÜNCELLEME' : 'LAST UPDATE' }}</span>
-          <span class="text-slate-700 font-mono text-[9px]">{{ locale === 'tr' ? 'Canlı kurlar' : 'Live rates' }}</span>
+          <span class="block text-[8px] text-slate-400 font-medium">{{ 'SON GÜNCELLEME' }}</span>
+          <span class="text-slate-700 font-mono text-[9px]">{{ 'Canlı kurlar' }}</span>
         </div>
       </div>
     </div>
@@ -85,7 +83,7 @@ function triggerRefresh() {
           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
           <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
         </span>
-        <span class="text-xs font-bold text-slate-700">{{ locale === 'tr' ? 'Referans Kurlar Aktif' : 'Reference Rates Active' }}</span>
+        <span class="text-xs font-bold text-slate-700">{{ 'Referans Kurlar Aktif' }}</span>
       </div>
 
       <button 
@@ -95,7 +93,7 @@ function triggerRefresh() {
         style="border-color: #E2E8F0;"
       >
         <RotateCw :size="13" :class="isRefreshing ? 'animate-spin' : ''" />
-        {{ locale === 'tr' ? 'Yenile' : 'Refresh' }}
+        {{ 'Yenile' }}
       </button>
     </div>
 

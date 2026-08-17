@@ -27,7 +27,7 @@ const activeTenders = ref([
       <div class="w-full bg-[#001D36] text-white py-2.5 px-6 overflow-hidden border-b border-blue-900/40 relative z-50 text-[11px] font-bold">
         <div class="mx-auto max-w-7xl flex items-center justify-between gap-4">
           <span class="bg-[#1EAE4C] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-wider flex items-center gap-1 shrink-0 animate-pulse">
-            ⚡ {{ locale === 'tr' ? 'YAYINDAKİ İHALELER' : 'ACTIVE TENDERS' }}
+            ⚡ {{ 'YAYINDAKİ İHALELER' }}
           </span>
           <div class="relative w-full overflow-hidden h-4 flex items-center mx-4">
             <div class="absolute whitespace-nowrap flex gap-12 animate-marquee hover:pause-animation">
@@ -47,7 +47,7 @@ const activeTenders = ref([
             </div>
           </div>
           <a href="/#ihale-gezgini" class="text-[#1EAE4C] hover:underline flex items-center gap-0.5 text-[10px] shrink-0 font-black">
-            {{ locale === 'tr' ? 'İncele' : 'Review' }} <ArrowRight :size="12" />
+            {{ 'İncele' }} <ArrowRight :size="12" />
           </a>
         </div>
       </div>
@@ -60,7 +60,7 @@ const activeTenders = ref([
         <NuxtLink to="/" class="flex items-center gap-3 hover:opacity-90 transition shrink-0 group">
           <img src="/logo.png" alt="GelAnlaşalım Mini İhale Sitesi Logo" class="h-12 sm:h-14 w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-transform" />
           <span class="hidden xl:inline-flex items-center gap-1 rounded-full bg-amber-50 px-2.5 py-0.5 text-[9px] font-black text-amber-700 border border-amber-300">
-            ✓ {{ locale === 'tr' ? 'ONAYLI B2B' : 'VERIFIED B2B' }}
+            ✓ {{ 'ONAYLI B2B' }}
           </span>
         </NuxtLink>
 
@@ -71,25 +71,25 @@ const activeTenders = ref([
             class="px-3.5 py-1.5 text-xs font-black text-slate-800 hover:text-amber-600 bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm border border-slate-200/60"
           >
             <Home :size="14" class="text-amber-600" />
-            <span>{{ locale === 'tr' ? 'Ana Sayfa' : 'Home' }}</span>
+            <span>{{ 'Ana Sayfa' }}</span>
           </NuxtLink>
           <NuxtLink 
             to="/panel/ilanlarim" 
             class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-amber-600 hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
           >
-            📋 <span>{{ locale === 'tr' ? 'İlanlarım' : 'My Tenders' }}</span>
+            📋 <span>{{ 'İlanlarım' }}</span>
           </NuxtLink>
           <NuxtLink 
             to="/panel/gelen-teklifler" 
             class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-amber-600 hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
           >
-            📥 <span>{{ locale === 'tr' ? 'Aldığım Teklifler' : 'Received Bids' }}</span>
+            📥 <span>{{ 'Aldığım Teklifler' }}</span>
           </NuxtLink>
           <NuxtLink 
             to="/panel/yaptigim-teklifler" 
             class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-amber-600 hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
           >
-            📤 <span>{{ locale === 'tr' ? 'Verdiğim Teklifler' : 'My Bids' }}</span>
+            📤 <span>{{ 'Verdiğim Teklifler' }}</span>
           </NuxtLink>
         </div>
 
@@ -98,10 +98,10 @@ const activeTenders = ref([
           <!-- Dil Seçimi (Dropdown) -->
           <button 
             type="button" 
-            @click="setLocale(locale === 'tr' ? 'en' : 'tr')"
+            @click="setLocale('en')"
             class="flex items-center gap-1.5 hover:bg-slate-100 px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-600 transition border border-slate-200/60"
           >
-            🌐 {{ locale === 'tr' ? 'EN' : 'TR' }}
+            🌐 {{ 'EN' }}
           </button>
 
           <!-- PROFILIM BUTTON (Prominent on every page) -->
@@ -110,7 +110,7 @@ const activeTenders = ref([
             class="flex items-center gap-1.5 px-4 py-2 text-xs font-black rounded-xl border transition-all text-slate-800 bg-amber-50/80 hover:bg-amber-100 border-amber-300 shadow-sm"
           >
             <User :size="15" class="text-amber-600" />
-            <span>{{ locale === 'tr' ? 'Profilim' : 'My Profile' }}</span>
+            <span>{{ 'Profilim' }}</span>
           </NuxtLink>
 
           <!-- MISAFIR GIRISI BUTTON -->
@@ -120,7 +120,7 @@ const activeTenders = ref([
             title="Şifresiz Misafir Girişi Yaparak Platformu İnceleyin"
           >
             <span>👁️</span>
-            <span>{{ locale === 'tr' ? 'Misafir Girişi' : 'Guest Access' }}</span>
+            <span>{{ 'Misafir Girişi' }}</span>
           </NuxtLink>
 
           <NuxtLink
@@ -135,7 +135,7 @@ const activeTenders = ref([
             style="background: linear-gradient(135deg, #0A1128 0%, #1C2541 100%); border: 1px solid #C59B27;"
           >
             <span class="text-amber-400">✨</span>
-            {{ locale === 'tr' ? 'Kurumsal Hesap Aç' : 'Open Business Account' }}
+            {{ 'Kurumsal Hesap Aç' }}
             <ArrowRight :size="13" class="text-amber-400" />
           </NuxtLink>
         </div>
@@ -144,11 +144,11 @@ const activeTenders = ref([
         <div class="flex items-center gap-2 lg:hidden">
           <button 
             type="button" 
-            @click="setLocale(locale === 'tr' ? 'en' : 'tr')"
+            @click="setLocale('en')"
             class="text-[10px] font-black p-2 rounded-lg border uppercase hover:bg-slate-50 transition"
             style="border-color: #E2E8F0; color: #475569;"
           >
-            🌐 {{ locale === 'tr' ? 'EN' : 'TR' }}
+            🌐 {{ 'EN' }}
           </button>
           
           <button class="p-2 rounded-lg transition hover:bg-slate-100" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Menü">
@@ -169,11 +169,11 @@ const activeTenders = ref([
       >
         <div v-if="mobileMenuOpen" class="border-t bg-white px-6 py-5 lg:hidden" style="border-color: #F1F5F9;">
           <div class="flex flex-col gap-3 text-sm font-semibold" style="color: #475569;">
-            <a href="/#nasil-calisir" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Nasıl Çalışır' : 'How it Works' }}</a>
-            <a href="/#ozellikler" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Özellikler' : 'Features' }}</a>
-            <a href="/#ihale-gezgini" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'Market' : 'Market' }}</a>
+            <a href="/#nasil-calisir" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ 'Nasıl Çalışır' }}</a>
+            <a href="/#ozellikler" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ 'Özellikler' }}</a>
+            <a href="/#ihale-gezgini" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ 'Market' }}</a>
             <NuxtLink to="/abonelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ t('pricing') }}</NuxtLink>
-            <a href="/#sss" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ locale === 'tr' ? 'SSS' : 'FAQ' }}</a>
+            <a href="/#sss" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ 'SSS' }}</a>
             <div class="border-t my-1" style="border-color: #F1F5F9;"></div>
             <NuxtLink to="/uyelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ t('login') }}</NuxtLink>
             <NuxtLink
@@ -182,7 +182,7 @@ const activeTenders = ref([
               class="flex items-center justify-center gap-2 rounded-xl py-3 text-white font-bold"
               style="background: #003057;"
             >
-              {{ locale === 'tr' ? 'Kurumsal hesap aç' : 'Open business account' }} <ArrowRight :size="14" />
+              {{ 'Kurumsal hesap aç' }} <ArrowRight :size="14" />
             </NuxtLink>
           </div>
         </div>
@@ -207,18 +207,18 @@ const activeTenders = ref([
             </div>
             
             <p class="text-xs leading-relaxed font-medium text-slate-500">
-              {{ locale === 'tr' ? 'B2B satın alma taleplerini, tedarikçi tekliflerini ve karar kayıtlarını tek ters ihale akışında yöneten kurumsal platform.' : 'Enterprise platform managing B2B procurement requests, supplier bids, and decision records in a single reverse auction workflow.' }}
+              {{ 'B2B satın alma taleplerini, tedarikçi tekliflerini ve karar kayıtlarını tek ters ihale akışında yöneten kurumsal platform.' }}
             </p>
 
             <!-- Status badges -->
             <div class="flex flex-wrap gap-2 pt-1">
               <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-100 px-2.5 py-1 text-[9px] font-black text-blue-700 uppercase tracking-wide">
                 <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-                {{ locale === 'tr' ? 'KVKK Kapsamında' : 'KVKK Compliant' }}
+                {{ 'KVKK Kapsamında' }}
               </span>
               <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-100 px-2.5 py-1 text-[9px] font-black text-blue-700 uppercase tracking-wide">
                 <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-                {{ locale === 'tr' ? 'HTTPS/TLS Şifreli' : 'HTTPS/TLS Encrypted' }}
+                {{ 'HTTPS/TLS Şifreli' }}
               </span>
             </div>
 
@@ -243,36 +243,36 @@ const activeTenders = ref([
 
           <!-- Column 2: Platform Links -->
           <div class="md:col-span-2 flex flex-col gap-4 text-left">
-            <h4 class="text-xs font-black uppercase text-blue-600 tracking-wider">{{ locale === 'tr' ? 'PLATFORM' : 'PLATFORM' }}</h4>
+            <h4 class="text-xs font-black uppercase text-blue-600 tracking-wider">{{ 'PLATFORM' }}</h4>
             <div class="flex flex-col gap-4 sm:gap-3 text-[11px] font-bold text-slate-700">
-              <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Nasıl Çalışır' : 'How it Works' }}</a>
-              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Özellikler' : 'Features' }}</a>
+              <a href="#nasil-calisir" class="hover:text-blue-600 transition-colors py-1">{{ 'Nasıl Çalışır' }}</a>
+              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors py-1">{{ 'Özellikler' }}</a>
               <NuxtLink to="/abonelik" class="hover:text-blue-600 transition-colors py-1">{{ t('pricing') }}</NuxtLink>
-              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Pazar Yeri' : 'Marketplace' }}</a>
-              <NuxtLink to="/entegrasyonlar" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Entegrasyonlar' : 'Integrations' }}</NuxtLink>
-              <a href="#sss" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Yardım Merkezi' : 'Help Center' }}</a>
+              <a href="#ihale-gezgini" class="hover:text-blue-600 transition-colors py-1">{{ 'Pazar Yeri' }}</a>
+              <NuxtLink to="/entegrasyonlar" class="hover:text-blue-600 transition-colors py-1">{{ 'Entegrasyonlar' }}</NuxtLink>
+              <a href="#sss" class="hover:text-blue-600 transition-colors py-1">{{ 'Yardım Merkezi' }}</a>
             </div>
           </div>
 
           <!-- Column 3: Company Links -->
           <div class="md:col-span-2 flex flex-col gap-4 text-left">
-            <h4 class="text-xs font-black uppercase text-blue-600 tracking-wider">{{ locale === 'tr' ? 'ŞİRKET' : 'COMPANY' }}</h4>
+            <h4 class="text-xs font-black uppercase text-blue-600 tracking-wider">{{ 'ŞİRKET' }}</h4>
             <div class="flex flex-col gap-4 sm:gap-3 text-[11px] font-bold text-slate-700">
-              <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Hakkımızda' : 'About Us' }}</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=kariyer" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Kariyer' : 'Careers' }}</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Blog' : 'Blog' }}</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Basın Odası' : 'Press Room' }}</NuxtLink>
-              <a href="#sss" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'İletişim' : 'Contact' }}</a>
-              <NuxtLink to="/sozlesmeler?tab=is-ortakligi" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'İş Ortaklığı Programı' : 'Partnership Program' }}</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="hover:text-blue-600 transition-colors py-1">{{ 'Hakkımızda' }}</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=kariyer" class="hover:text-blue-600 transition-colors py-1">{{ 'Kariyer' }}</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors py-1">{{ 'Blog' }}</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-blue-600 transition-colors py-1">{{ 'Basın Odası' }}</NuxtLink>
+              <a href="#sss" class="hover:text-blue-600 transition-colors py-1">{{ 'İletişim' }}</a>
+              <NuxtLink to="/sozlesmeler?tab=is-ortakligi" class="hover:text-blue-600 transition-colors py-1">{{ 'İş Ortaklığı Programı' }}</NuxtLink>
             </div>
           </div>
 
           <!-- Column 4: Contact details -->
           <div class="md:col-span-4 flex flex-col gap-5 text-left">
             <div class="space-y-3">
-              <h4 class="text-xs font-black uppercase tracking-wider" style="color: #003057;">{{ locale === 'tr' ? 'İLETİŞİM' : 'CONTACT' }}</h4>
+              <h4 class="text-xs font-black uppercase tracking-wider" style="color: #003057;">{{ 'İLETİŞİM' }}</h4>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium whitespace-pre-line">
-                {{ locale === 'tr' ? (cmsData.contact ? cmsData.contact.address : 'Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül,\nBalıkesir, Türkiye') : 'Bahcelievler District 5083 Street, No:11/A Altieylul,\nBalikesir, Turkey' }}
+                {{ cmsData.contact ? cmsData.contact.address : 'Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül,\nBalıkesir, Türkiye' }}
               </p>
               <div class="text-[11px] font-bold text-slate-700 space-y-3">
                 <a :href="'mailto:' + (cmsData.contact ? cmsData.contact.email : 'info@gelanlasalim.com')" class="block hover:text-[#1EAE4C] py-1">
@@ -285,10 +285,10 @@ const activeTenders = ref([
             </div>
 
             <div class="space-y-2">
-              <h4 class="text-xs font-black uppercase text-[#003057] tracking-wider">{{ locale === 'tr' ? 'DESTEK SAATLERİ' : 'SUPPORT HOURS' }}</h4>
+              <h4 class="text-xs font-black uppercase text-[#003057] tracking-wider">{{ 'DESTEK SAATLERİ' }}</h4>
               <p class="text-[11px] text-slate-500 font-medium leading-relaxed">
-                {{ locale === 'tr' ? (cmsData.contact ? cmsData.contact.workHoursWeekdays : 'Pazartesi - Cuma: 09:00 - 18:00') : 'Monday - Friday: 09:00 - 18:00' }} <br />
-                {{ locale === 'tr' ? (cmsData.contact ? cmsData.contact.workHoursSaturday : 'Cumartesi: 10:00 - 14:00') : 'Saturday: 10:00 - 14:00' }}
+                {{ cmsData.contact ? cmsData.contact.workHoursWeekdays : 'Pazartesi - Cuma: 09:00 - 18:00' }} <br />
+                {{ cmsData.contact ? cmsData.contact.workHoursSaturday : 'Cumartesi: 10:00 - 14:00' }}
               </p>
             </div>
           </div>
@@ -298,11 +298,11 @@ const activeTenders = ref([
         <hr class="border-slate-200 my-10" />
 
         <div class="flex flex-col sm:flex-row items-center justify-between gap-6 text-[10px] text-slate-400 font-black uppercase tracking-wider">
-          <div>© 2026 {{ locale === 'tr' ? 'GelAnlaşalım. Tüm Hakları Saklıdır.' : 'GelAnlasalim. All Rights Reserved.' }}</div>
+          <div>© 2026 {{ 'GelAnlaşalım. Tüm Hakları Saklıdır.' }}</div>
           <div class="flex flex-wrap gap-x-6 gap-y-3 justify-center sm:justify-end">
-            <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'KVKK Metni' : 'KVKK Policy' }}</NuxtLink>
-            <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Kullanım Koşulları' : 'Terms of Use' }}</NuxtLink>
-            <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors py-1">{{ locale === 'tr' ? 'Gizlilik Politikası' : 'Privacy Policy' }}</NuxtLink>
+            <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors py-1">{{ 'KVKK Metni' }}</NuxtLink>
+            <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors py-1">{{ 'Kullanım Koşulları' }}</NuxtLink>
+            <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors py-1">{{ 'Gizlilik Politikası' }}</NuxtLink>
           </div>
         </div>
       </div>

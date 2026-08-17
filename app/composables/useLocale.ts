@@ -1,10 +1,10 @@
 import { ref } from 'vue'
 
-export type Locale = 'tr' | 'en'
+export type Locale = 'tr'
 
 export const locale = ref<Locale>('tr')
 
-// Translations dictionary
+// Translations dictionary - 100% Turkish
 export const translations: Record<Locale, Record<string, string>> = {
   tr: {
     // Navigation / Header
@@ -76,106 +76,29 @@ export const translations: Record<Locale, Record<string, string>> = {
     feat_sector_anal: 'Sektörel pazar analizleri',
     feat_competitor_anal: 'Rakip firma analizleri',
     feat_mobile_compat: 'Mobil uyumlu uygulama'
-  },
-  en: {
-    // Navigation / Header
-    home: 'Home',
-    tenders: 'Tenders',
-    pricing: 'Pricing',
-    about: 'About Us',
-    login: 'Login',
-    register: 'Register',
-    dashboard: 'Dashboard',
-    logout: 'Log Out',
-    language: 'Language',
-
-    // Hero Section
-    hero_tagline: "PRIVATE SECTOR'S LIVE REVERSE AUCTION ARENA",
-    hero_title1: 'Start Tenders.',
-    hero_title2: 'Get Bids.',
-    hero_title3: "Let's Agree.",
-    hero_desc: 'GelAnlaşalım digitalizes your e-tenders, bid collection, orders, and procurement workflows in a single platform. Reduce your costs, save time, and manage your procurement operations efficiently.',
-    hero_cta_create: 'Create Free Tender',
-    hero_cta_explore: 'Explore Tenders',
-
-    // Pricing / Subscription Page
-    pricing_title: 'Platform Membership and Access Packages',
-    pricing_desc: "Start your membership today to benefit from GelAnlaşalım's advanced tender search, public procurement analyses, and instant notification services.",
-    pricing_select: 'Select',
-    pricing_popular: 'POPULAR',
-    pricing_vat_notice: 'Prices are inclusive of 20% VAT.',
-    pricing_renewal: 'If you already have a membership, click below to renew with a 20% discount.',
-    pricing_renewal_btn: 'Renew Membership',
-    pricing_features_title: 'Applicable to all packages',
-
-    // Registration Page
-    reg_title: 'New Account',
-    reg_login_tab: 'LOGIN',
-    reg_register_tab: 'REGISTER',
-    reg_personal_info: 'Personal Info',
-    reg_sectors: 'Sectors',
-    reg_role: 'Account Type / Your Role *',
-    reg_role_company: '🏢 Company Account',
-    reg_role_company_desc: 'For Businesses',
-    reg_role_indiv: '👤 Individual Account',
-    reg_role_indiv_desc: 'For Private Users',
-    reg_fname: 'First Name *',
-    reg_lname: 'Last Name *',
-    reg_company_name: 'Company / Business Name *',
-    reg_email_company: 'Corporate Email *',
-    reg_email_indiv: 'Email Address *',
-    reg_phone: 'Phone Number *',
-    reg_password: 'Password *',
-    reg_err_all: 'Please fill in all required fields.',
-    reg_err_company: 'Please enter your company name.',
-    reg_continue_sectors: 'Continue — Select Sectors',
-
-    // EKAP Features List
-    feat_ekap_tenders: 'EKAP public tenders',
-    feat_ekap_results: 'EKAP tender results',
-    feat_direct_proc: 'Direct procurements',
-    feat_sales_leases: 'Sales and Leases',
-    feat_limit_calc: 'Limit value calculation',
-    feat_search_suggest: 'Smart search suggestions',
-    feat_upcoming_notif: 'Upcoming tender alerts',
-    feat_won_notif: 'Awarded tender notifications',
-    feat_cancel_notif: 'Cancellation & outcome alerts',
-    feat_unlimit_notif: 'Unlimited alerts (SMS + Email)',
-    feat_unlimit_report: 'Unlimited reports (Excel)',
-    feat_contractor_anal: 'Contractor analytics',
-    feat_admin_anal: 'Authority analytics',
-    feat_sector_anal: 'Sector analytics',
-    feat_competitor_anal: 'Competitor analytics',
-    feat_mobile_compat: 'Mobile responsive design'
   }
 }
 
 export function detectLocale() {
+  locale.value = 'tr'
   if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('user_locale') as Locale
-    if (saved === 'tr' || saved === 'en') {
-      locale.value = saved
-    } else {
-      locale.value = 'en'
-    }
+    localStorage.setItem('user_locale', 'tr')
     if (document && document.documentElement) {
-      document.documentElement.lang = locale.value
+      document.documentElement.lang = 'tr'
     }
-    return
   }
-  locale.value = 'en'
 }
 
-export function setLocale(newLocale: Locale) {
-  locale.value = newLocale
+export function setLocale(newLocale?: any) {
+  locale.value = 'tr'
   if (typeof window !== 'undefined') {
-    localStorage.setItem('user_locale', newLocale)
+    localStorage.setItem('user_locale', 'tr')
     if (document && document.documentElement) {
-      document.documentElement.lang = newLocale
+      document.documentElement.lang = 'tr'
     }
   }
 }
 
 export function t(key: string): string {
-  return translations[locale.value][key] || key
+  return translations.tr[key] || key
 }

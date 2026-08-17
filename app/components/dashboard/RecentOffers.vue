@@ -122,10 +122,10 @@ const badgeClass = (status: string) => {
     <div class="flex items-center justify-between border-b border-slate-100 p-6">
       <div>
         <h2 class="text-base font-black text-slate-800 tracking-tight">
-          {{ locale === 'tr' ? 'Gelen Teklifler' : 'Received Supplier Bids' }}
+          {{ 'Gelen Teklifler' }}
         </h2>
         <p class="text-xs text-slate-500 font-medium mt-0.5">
-          {{ locale === 'tr' ? 'İhalelerinize verilen son teklifler' : 'Latest quotes submitted by verified suppliers' }}
+          {{ 'İhalelerinize verilen son teklifler' }}
         </p>
       </div>
 
@@ -133,7 +133,7 @@ const badgeClass = (status: string) => {
         to="/panel/gelen-teklifler"
         class="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700"
       >
-        <span>{{ locale === 'tr' ? 'Tümünü Gör' : 'View All' }}</span>
+        <span>{{ 'Tümünü Gör' }}</span>
         <ArrowRight :size="14" />
       </NuxtLink>
     </div>
