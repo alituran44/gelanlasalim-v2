@@ -412,6 +412,29 @@ function importExcelItems() {
               </div>
             </div>
           </div>
+
+          <!-- 1,614+ Açık API Kataloğu Kartı -->
+          <div class="mt-8 bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 p-6 rounded-2xl border border-emerald-500/30 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+            <div class="space-y-2 text-left">
+              <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 text-[10px] font-black uppercase tracking-wider">
+                <span>⚡ 1,614+ AÇIK VE ÜCRETSİZ API KATALOĞU</span>
+              </div>
+              <h3 class="text-lg font-black tracking-tight text-white">Yazılım ve Entegrasyon Projeleriniz İçin Ücretsiz API Rehberi</h3>
+              <p class="text-xs text-slate-300 leading-relaxed max-w-2xl font-medium">
+                Geliştiriciler için Şifresiz (No Auth), API Anahtarlı ve OAuth destekli 1.614'ten fazla Türkçe açıklamalı ücretsiz kamu ve üçüncü taraf API servisini doğrudan keşfedin.
+              </p>
+            </div>
+            <a 
+              href="https://public-apis-5itssx65q-bi-hocam.vercel.app/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="shrink-0 rounded-xl bg-emerald-500 text-slate-950 font-black px-6 py-3.5 text-xs hover:bg-emerald-400 transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20"
+            >
+              <span>API Portalı ve Rehberini Aç</span>
+              <Network :size="16" />
+            </a>
+          </div>
+
         </div>
       </div>
     </div>
