@@ -2,26 +2,15 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { locale } from '~/composables/useLocale'
-import { 
-  FilePlus2, 
-  ArrowLeft, 
-  CheckCircle2, 
-  UploadCloud, 
-  FileText, 
-  X, 
-  Plus, 
-  Trash2, 
-  MapPin, 
-  CreditCard,
-  FileSpreadsheet,
-  AlertCircle
-} from 'lucide-vue-next'
+import { AlertCircle, Calendar } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
+import { usePublicApis } from '~/composables/usePublicApis'
 
 definePageMeta({ layout: 'dashboard' })
 
 const router = useRouter()
 const { cmsData, saveCmsData } = useCmsData()
+const { fetchTrHolidays, trPublicHolidays } = usePublicApis()
 
 const form = ref({
   baslik: '',
@@ -33,6 +22,18 @@ const form = ref({
   teslimatAdresi: '',
   odemeYontemi: 'Vadeli 30 Gün',
   files: [] as { name: string; size: string; progress: number; type: string }[]
+})
+
+onMounted(async () => {
+  await fetchTrHolidays(2026)
+})
+
+// Calculate deadline excluding official holidays
+const estimatedDeadlineDate = computed(() => {
+  const days = parseInt(form.value.sure) || 7
+  const date = new Date()
+  date.setDate(date.getDate() + days)
+  return date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric', weekday: 'long' })
 })
 
 const selectedSubcategory = ref('')

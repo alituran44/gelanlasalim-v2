@@ -1,28 +1,40 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { RotateCw, Coins, ArrowRight, DollarSign, Calculator } from 'lucide-vue-next'
 import { locale } from '~/composables/useLocale'
+import { usePublicApis } from '~/composables/usePublicApis'
 
 definePageMeta({
   layout: "dashboard"
 })
+
+const { fetchLiveCurrencyRates, liveCurrencyRates } = usePublicApis()
 
 const isRefreshing = ref(false)
 const inputAmount = ref(1000)
 const fromCurrency = ref('EUR')
 const toCurrency = ref('TRY')
 
-const rates: Record<string, number> = {
-  USD: 47.0282,
-  EUR: 53.7951,
-  GBP: 63.2446,
+const rates = ref<Record<string, number>>({
+  USD: 36.4250,
+  EUR: 38.1240,
+  GBP: 45.8900,
   TRY: 1
-}
+})
+
+onMounted(async () => {
+  const fetched = await fetchLiveCurrencyRates()
+  if (fetched && fetched.length > 0) {
+    fetched.forEach(item => {
+      rates.value[item.code] = item.selling
+    })
+  }
+})
 
 const convertedResult = computed(() => {
   const amount = Number(inputAmount.value) || 0
-  const fromRate = rates[fromCurrency.value] || 1
-  const toRate = rates[toCurrency.value] || 1
+  const fromRate = rates.value[fromCurrency.value] || 1
+  const toRate = rates.value[toCurrency.value] || 1
   
   // Convert from source to TRY, then to target
   const amountInTry = amount * fromRate
@@ -31,11 +43,17 @@ const convertedResult = computed(() => {
   return new Intl.NumberFormat(locale.value === 'tr' ? 'tr-TR' : 'en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(finalAmount)
 })
 
-function triggerRefresh() {
+async function triggerRefresh() {
   isRefreshing.value = true
+  const fetched = await fetchLiveCurrencyRates()
+  if (fetched && fetched.length > 0) {
+    fetched.forEach(item => {
+      rates.value[item.code] = item.selling
+    })
+  }
   setTimeout(() => {
     isRefreshing.value = false
-  }, 800)
+  }, 600)
 }
 </script>
 
