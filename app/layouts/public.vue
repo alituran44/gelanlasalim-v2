@@ -95,14 +95,7 @@ const activeTenders = ref([
 
         <!-- Sağ: Profilim, CTA & Dil Seçimi -->
         <div class="hidden sm:flex items-center gap-2">
-          <!-- Dil Seçimi (Dropdown) -->
-          <button 
-            type="button" 
-            @click="setLocale('en')"
-            class="flex items-center gap-1.5 hover:bg-slate-100 px-3 py-2 rounded-xl text-xs font-black uppercase text-slate-600 transition border border-slate-200/60"
-          >
-            🌐 {{ 'EN' }}
-          </button>
+
 
           <!-- PROFILIM BUTTON (Prominent on every page) -->
           <NuxtLink

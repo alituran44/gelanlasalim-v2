@@ -101,16 +101,7 @@ const pageTitle = computed(() => {
     <!-- Right: Actions -->
     <div class="flex items-center gap-2">
 
-      <!-- Language Toggle Button (TR / EN) -->
-      <button
-        type="button"
-        @click="toggleLang"
-        class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-white px-3 py-2 text-xs font-black text-slate-800 transition shadow-xs cursor-pointer"
-        :title="'Switch to English'"
-      >
-        <Globe :size="14" class="text-blue-600" />
-        <span>{{ '🇹🇷 TR' }}</span>
-      </button>
+
 
       <!-- Home Page Button -->
       <NuxtLink
