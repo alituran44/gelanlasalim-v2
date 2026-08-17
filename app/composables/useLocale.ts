@@ -2,7 +2,7 @@ import { ref } from 'vue'
 
 export type Locale = 'tr' | 'en'
 
-export const locale = ref<Locale>('en')
+export const locale = ref<Locale>('tr')
 
 // Translations dictionary
 export const translations: Record<Locale, Record<string, string>> = {
@@ -60,22 +60,22 @@ export const translations: Record<Locale, Record<string, string>> = {
     reg_continue_sectors: 'Devam Et — Sektör Seçimi',
 
     // EKAP Features List
-    feat_ekap_tenders: 'Ekap ihaleleri',
-    feat_ekap_results: 'Ekap ihale sonuçları',
-    feat_direct_proc: 'Doğrudan teminler',
-    feat_sales_leases: 'Satış ve Kiralamalar',
-    feat_limit_calc: 'Sınır değer hesaplama',
-    feat_search_suggest: 'Arama önerileri',
+    feat_ekap_tenders: 'EKAP kamu ihaleleri',
+    feat_ekap_results: 'EKAP ihale sonuçları',
+    feat_direct_proc: 'Doğrudan temin ilanları',
+    feat_sales_leases: 'Satış ve Kiralama duyuruları',
+    feat_limit_calc: 'Eşik değer hesaplama',
+    feat_search_suggest: 'Akıllı arama önerileri',
     feat_upcoming_notif: 'Yaklaşan ihale bildirimleri',
-    feat_won_notif: 'Kazanılan ihale bildirimleri',
-    feat_cancel_notif: 'İptal-Düzeltme-Sonuç bildirimleri',
-    feat_unlimit_notif: 'Sınırsız bildirim (Sms+Email)',
+    feat_won_notif: 'Sonuçlanan ihale uyarıları',
+    feat_cancel_notif: 'İptal ve düzeltme duyuruları',
+    feat_unlimit_notif: 'Sınırsız bildirim (SMS + E-Posta)',
     feat_unlimit_report: 'Sınırsız raporlama (Excel)',
-    feat_contractor_anal: 'Yüklenici analizleri',
-    feat_admin_anal: 'İdare analizleri',
-    feat_sector_anal: 'Sektör analizleri',
-    feat_competitor_anal: 'Rakip analizleri',
-    feat_mobile_compat: 'Mobil uyumluluk'
+    feat_contractor_anal: 'Yüklenici firma analizleri',
+    feat_admin_anal: 'İdare/Kurum analizleri',
+    feat_sector_anal: 'Sektörel pazar analizleri',
+    feat_competitor_anal: 'Rakip firma analizleri',
+    feat_mobile_compat: 'Mobil uyumlu uygulama'
   },
   en: {
     // Navigation / Header

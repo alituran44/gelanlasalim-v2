@@ -107,26 +107,26 @@ useHead({
         'mainEntity': [
           {
             '@type': 'Question',
-            'name': 'How does the reverse auction system work?',
+            'name': 'Tersine ihale (eksiltme) sistemi nasıl çalışır?',
             'acceptedAnswer': {
               '@type': 'Answer',
-              'text': 'The buyer opens a tender specifying quantities and technical specs. Verified suppliers compete in real time by lowering their bids before the clock expires.'
+              'text': 'Alıcı firma satın almak istediği malzeme veya hizmet için miktar ve teknik şartname belirterek ihale açar. Doğrulanmış tedarikçiler canlı sürede fiyat eksilterek yarışır.'
             }
           },
           {
             '@type': 'Question',
-            'name': 'How are companies verified on the platform?',
+            'name': 'Platformda şirket doğrulaması nasıl yapılıyor?',
             'acceptedAnswer': {
               '@type': 'Answer',
-              'text': 'Tax registration, signature circulars, and trade registry documents are verified by our team. Only approved corporate accounts can open tenders and place bids.'
+              'text': 'Vergi levhası, imza sirküleri ve ticaret sicil gazetesi ekibimizce kontrol edilir. Yalnızca onaylanmış kurumsal hesaplar ihale açabilir ve teklif verebilir.'
             }
           },
           {
             '@type': 'Question',
-            'name': 'Are payment and delivery processes secure?',
+            'name': 'Ödeme ve teslimat süreçleri güvenli mi?',
             'acceptedAnswer': {
               '@type': 'Answer',
-              'text': 'Yes. The buyer deposits funds into a secure account. Payment is released to the supplier only after inspection and approval.'
+              'text': 'Evet. Alıcı firma ihale bedelini güvenli hesaba yatırır. Teslimat onaylanıp denetlendikten sonra ödeme tedarikçiye aktarılır.'
             }
           }
         ]
