@@ -1686,65 +1686,6 @@ function toggleFilterSection(section: string) {
       </div>
     </section>
 
-    <!-- TASARRUF HESAPLAMA ARACI (ROI) -->
-    <section id="ozellikler" class="border-b border-slate-200 bg-slate-50 py-20">
-      <div class="mx-auto max-w-7xl px-6">
-        <div class="text-center mb-12">
-          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ 'VERİMLİLİK & ROI' }}</span>
-          <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ 'Tedarik Tasarrufunuzu Hesaplayın' }}</h2>
-          <p class="mt-3 max-w-xl mx-auto text-xs text-slate-500">{{ 'Yıllık satın alma hacminizi belirleyin, GelAnlaşalım B2B tersine ihale arenası ile elde edeceğiniz tahmini kazancı anında görün.' }}</p>
-        </div>
-
-        <div class="mx-auto max-w-4xl rounded-3xl border bg-white p-8 md:p-12 premium-shadow flex flex-col gap-8 md:gap-12 text-left">
-          <!-- Slider area -->
-          <div class="space-y-4">
-            <div class="flex justify-between items-baseline">
-              <label for="annualVolumeInput" class="text-xs font-black text-slate-800 uppercase tracking-wider font-sans">{{ 'Yıllık Satın Alma Hacminiz' }}</label>
-              <span class="font-mono text-xl font-black text-blue-600">{{ currencySymbol }}{{ annualVolume.toLocaleString('tr-TR') }}</span>
-            </div>
-            <input
-              type="range"
-              id="annualVolumeInput"
-              min="500000"
-              max="50000000"
-              step="500000"
-              v-model.number="annualVolume"
-              class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
-            />
-            <div class="flex justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-              <span>{{ currencySymbol }}500K</span>
-              <span>{{ currencySymbol }}25M</span>
-              <span>{{ currencySymbol }}50M</span>
-            </div>
-          </div>
-
-          <!-- Calculated values grid -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <!-- Col 1: Net Savings -->
-            <div class="p-6 rounded-2xl bg-blue-50/50 border border-blue-100 flex flex-col gap-1.5">
-              <span class="text-[9px] font-black uppercase text-blue-600 tracking-wider">{{ 'Tahmini Yıllık Tasarruf (%14.2)' }}</span>
-              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ currencySymbol }}{{ calculatedSavings.toLocaleString('tr-TR') }}</span>
-              <span class="text-[10px] text-slate-400">{{ 'Canlı eksiltme arenaları ortalama verisidir.' }}</span>
-            </div>
-
-            <!-- Col 2: Labor hours saved -->
-            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col gap-1.5">
-              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">{{ 'Kazanılan İş Gücü' }}</span>
-              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ Math.round(savedHours) }} {{ 'Adam/Ay' }}</span>
-              <span class="text-[10px] text-slate-400">{{ 'Excel kıyaslama ve e-posta takibi elenir.' }}</span>
-            </div>
-
-            <!-- Col 3: Qualified suppliers reached -->
-            <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200/60 flex flex-col gap-1.5">
-              <span class="text-[9px] font-black uppercase text-slate-500 tracking-wider">{{ 'Nitelikli Tedarikçi Erişimi' }}</span>
-              <span class="font-mono text-2xl font-black text-slate-955 tracking-tight">{{ connectedSuppliersCount }} {{ 'Firma' }}</span>
-              <span class="text-[10px] text-slate-400">{{ 'İhalelerinize katılım sağlayacak hazır ağ.' }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <!-- KRİPTOGRAFİK ZAMAN DAMGASI & GÜVENLİK (AUDIT TRAIL TIMELINE) -->
     <section class="border-b border-slate-200 bg-white py-20">
       <div class="mx-auto max-w-7xl px-6">
