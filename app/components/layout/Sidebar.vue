@@ -103,75 +103,39 @@ const isSettingsPage = computed(() => {
 })
 
 const settingsGroups = computed(() => {
-  if (locale.value === 'tr') {
-    return [
-      {
-        title: "Profil",
-        items: [
-          { title: "Kişisel Bilgiler", icon: User, to: "/panel/ayarlar?tab=kisisel", tab: "kisisel" },
-          { title: "Şirket & Doğrulama", icon: Building2, to: "/panel/ayarlar?tab=sirket", tab: "sirket" }
-        ]
-      },
-      {
-        title: "İhalelerim & Tekliflerim",
-        items: [
-          { title: "📋 İlanlarım", icon: ClipboardList, to: "/panel/ilanlarim", tab: "ilanlarim" },
-          { title: "📥 Aldığım Teklifler", icon: Inbox, to: "/panel/gelen-teklifler", tab: "gelen" },
-          { title: "📤 Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler", tab: "verdigim" }
-        ]
-      },
-      {
-        title: "İş Akışı",
-        items: [
-          { title: "Kayıtlı Adresler", icon: MapPin, to: "/panel/ayarlar?tab=adresler", tab: "adresler" },
-          { title: "Bildirimler", icon: Bell, to: "/panel/ayarlar?tab=bildirimler", tab: "bildirimler" },
-          { title: "Takip Ettiklerim", icon: Heart, to: "/panel/ayarlar?tab=takip", tab: "takip" },
-          { title: "Geçmiş Ticaretlerim", icon: History, to: "/panel/ayarlar?tab=ticaret", tab: "ticaret" }
-        ]
-      },
-      {
-        title: "Hesap",
-        items: [
-          { title: "Üyelik Planı", icon: Award, to: "/panel/ayarlar?tab=uyelik", tab: "uyelik" },
-          { title: "Ayarlar", icon: Sliders, to: "/panel/ayarlar?tab=ayarlar", tab: "ayarlar" }
-        ]
-      }
-    ]
-  } else {
-    return [
-      {
-        title: "Profile",
-        items: [
-          { title: "Personal Info", icon: User, to: "/panel/ayarlar?tab=kisisel", tab: "kisisel" },
-          { title: "Company & Verification", icon: Building2, to: "/panel/ayarlar?tab=sirket", tab: "sirket" }
-        ]
-      },
-      {
-        title: "My Tenders & Bids",
-        items: [
-          { title: "📋 My Tenders", icon: ClipboardList, to: "/panel/ilanlarim", tab: "ilanlarim" },
-          { title: "📥 Received Bids", icon: Inbox, to: "/panel/gelen-teklifler", tab: "gelen" },
-          { title: "📤 My Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler", tab: "verdigim" }
-        ]
-      },
-      {
-        title: "Workflow",
-        items: [
-          { title: "Saved Addresses", icon: MapPin, to: "/panel/ayarlar?tab=adresler", tab: "adresler" },
-          { title: "Notifications", icon: Bell, to: "/panel/ayarlar?tab=bildirimler", tab: "bildirimler" },
-          { title: "Favorites & Follows", icon: Heart, to: "/panel/ayarlar?tab=takip", tab: "takip" },
-          { title: "Trade History", icon: History, to: "/panel/ayarlar?tab=ticaret", tab: "ticaret" }
-        ]
-      },
-      {
-        title: "Account",
-        items: [
-          { title: "Membership Plan", icon: Award, to: "/panel/ayarlar?tab=uyelik", tab: "uyelik" },
-          { title: "Settings", icon: Sliders, to: "/panel/ayarlar?tab=ayarlar", tab: "ayarlar" }
-        ]
-      }
-    ]
-  }
+  return [
+    {
+      title: "Profil",
+      items: [
+        { title: "Kişisel Bilgiler", icon: User, to: "/panel/ayarlar?tab=kisisel", tab: "kisisel" },
+        { title: "Şirket & Doğrulama", icon: Building2, to: "/panel/ayarlar?tab=sirket", tab: "sirket" }
+      ]
+    },
+    {
+      title: "İhalelerim & Tekliflerim",
+      items: [
+        { title: "📋 İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim", tab: "ilanlarim" },
+        { title: "📥 Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler", tab: "gelen" },
+        { title: "📤 Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler", tab: "verdigim" }
+      ]
+    },
+    {
+      title: "İş Akışı",
+      items: [
+        { title: "Kayıtlı Adresler", icon: MapPin, to: "/panel/ayarlar?tab=adresler", tab: "adresler" },
+        { title: "Bildirimler", icon: Bell, to: "/panel/ayarlar?tab=bildirimler", tab: "bildirimler" },
+        { title: "Takip Ettiklerim", icon: Heart, to: "/panel/ayarlar?tab=takip", tab: "takip" },
+        { title: "Geçmiş Ticaretlerim", icon: History, to: "/panel/ayarlar?tab=ticaret", tab: "ticaret" }
+      ]
+    },
+    {
+      title: "Hesap",
+      items: [
+        { title: "Üyelik Planı", icon: Award, to: "/panel/ayarlar?tab=uyelik", tab: "uyelik" },
+        { title: "Ayarlar & İptal", icon: Sliders, to: "/panel/ayarlar?tab=ayarlar", tab: "ayarlar" }
+      ]
+    }
+  ]
 })
 
 const menus = sidebarMenus
@@ -180,22 +144,24 @@ const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
 </script>
 
 <template>
-  <aside class="w-64 h-screen sticky top-0 flex flex-col shrink-0" style="background: #0F172A;">
+  <aside class="w-64 h-screen sticky top-0 flex flex-col shrink-0" style="background: #0F223D;">
 
     <!-- Logo Alanı -->
-    <div class="px-6 py-5 border-b flex justify-start" style="border-color: rgba(255,255,255,0.08);">
-      <img src="/logo.png" alt="GelAnlaşalım B2B Logo" class="h-8 w-auto brightness-0 invert" />
+    <div class="px-6 py-5 border-b flex justify-start items-center" style="border-color: rgba(255,255,255,0.08);">
+      <NuxtLink to="/">
+        <img src="/logo.png" alt="İhaleciBurada Logo" class="h-8 w-auto bg-white p-1 rounded-lg" />
+      </NuxtLink>
     </div>
 
     <!-- Rol Etiketi -->
     <div class="px-6 py-3">
       <span
-        class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium"
+        class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold"
         :style="userRole === 'company'
-          ? 'background: rgba(30,174,76,0.12); color: #1EAE4C;'
+          ? 'background: rgba(0,82,255,0.18); color: #00C2FF; border: 1px solid rgba(0,194,255,0.3);'
           : 'background: rgba(37,99,235,0.12); color: #2563EB;'"
       >
-        {{ userRole === 'company' ? '🏢 Company Account' : '👤 Private User' }}
+        {{ userRole === 'company' ? '🏢 Onaylı Kurumsal Hesap' : '👤 Bireysel Üye' }}
       </span>
     </div>
 

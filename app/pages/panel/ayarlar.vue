@@ -2066,36 +2066,46 @@ function saveProfile() {
             </div>
           </div>
 
-          <!-- Veri ve Hesap Kapatma Card -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-            <div class="flex items-center gap-2.5 pb-2 border-b" style="border-color: #F1F5F9;">
-              <Sliders :size="15" class="text-blue-600" />
-              <div>
-                <span class="text-[8px] font-black text-slate-300 block">VERİ VE HESAP</span>
-                <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Veri ve Hesap</h3>
+          <!-- 🟢 ÜYELİK VE HESAP İPTALİ / KVKK CARD -->
+          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-5" style="border-color: #E2E8F0;">
+            <div class="flex items-center justify-between pb-3 border-b" style="border-color: #F1F5F9;">
+              <div class="flex items-center gap-2.5">
+                <div class="p-2 rounded-xl bg-red-50 text-red-600">
+                  <ShieldAlert :size="18" />
+                </div>
+                <div>
+                  <span class="text-[9px] font-black text-red-500 tracking-wider block uppercase">GÜVENLİK & AYRILMA</span>
+                  <h3 class="text-sm font-black text-slate-800">Üyelik ve Hesap İptali</h3>
+                </div>
               </div>
+              <span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-100 text-slate-600">
+                Hesap Durumu: Aktif
+              </span>
             </div>
-            <p class="text-[10px] text-slate-400">KVKK veri talebi ve hesabın kapatılma durumunu buradan takip edin.</p>
+            
+            <p class="text-xs text-slate-500 leading-relaxed">
+              İhaleciBurada.com üyeliğinizi veya kurumsal hesabınızı dilediğiniz an tek tıkla iptal edebilirsiniz. İptal işlemi sonrasında aktif ihaleleriniz sonlandırılır ve verileriniz 6698 sayılı KVKK kapsamında arşivlenir/silinir.
+            </p>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div class="p-5 rounded-xl bg-slate-50 border flex flex-col justify-between h-36" style="border-color: #E2E8F0;">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col justify-between">
                 <div>
-                  <span class="text-[8px] font-black text-slate-300 uppercase block">VERİ VE RAPORLAR</span>
-                  <h4 class="text-xs font-bold text-slate-800 mt-1">Veri dışa aktarma henüz hazır değil</h4>
-                  <p class="text-[10px] text-slate-400 mt-1 leading-normal">Geçmiş verilerinizi ve raporlarınızı indirmek için kurumsal temsilcinizle görüşün veya e-posta talebi oluşturun.</p>
+                  <h4 class="text-xs font-bold text-slate-800">Oturumu Kapat</h4>
+                  <p class="text-[10px] text-slate-400 mt-1">Bu cihazdaki mevcut oturumunuzu güvenli bir şekilde sonlandırır.</p>
                 </div>
+                <button type="button" @click="logout" class="mt-4 rounded-xl border px-3 py-2 text-xs font-bold bg-white text-slate-700 hover:bg-slate-100 transition flex items-center justify-center gap-1.5" style="border-color: #CBD5E1;">
+                  <LogOut :size="13" /> Oturumu Sonlandır
+                </button>
               </div>
 
-              <div class="p-5 rounded-xl bg-slate-50 border flex flex-col justify-between h-36" style="border-color: #E2E8F0;">
+              <div class="p-4 rounded-xl bg-red-50/60 border border-red-200 flex flex-col justify-between">
                 <div>
-                  <span class="text-[8px] font-black text-slate-300 uppercase block">HESAP İŞLEMLERİ</span>
-                  <h4 class="text-xs font-bold text-slate-800 mt-1">Hesap kapatma talebi manuel inceleme ile alınır</h4>
-                  <p class="text-[10px] text-slate-400 mt-1 leading-normal">Hesap kapatma talebiniz incelendikten sonra verileriniz silinir. Rolü devretmeniz veya silmeniz gerekebilir.</p>
+                  <h4 class="text-xs font-bold text-red-900">Üyeliğimi Kalıcı Olarak İptal Et</h4>
+                  <p class="text-[10px] text-red-700/80 mt-1">Hesabınızı, kurumsal firma profilinizi ve aboneliğinizi tamamen iptal eder.</p>
                 </div>
-                <div class="flex gap-2">
-                  <button type="button" @click="logout" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold bg-white text-slate-700 hover:bg-slate-100" style="border-color: #E2E8F0;">Oturumu Sonlandır</button>
-                  <button type="button" @click="isDeleteModalOpen = true" class="rounded-lg bg-red-50 hover:bg-red-100 border border-red-200 text-red-600 font-bold text-[10px] px-3 py-1.5 transition">Hesabı Kapat</button>
-                </div>
+                <button type="button" @click="isDeleteModalOpen = true" class="mt-4 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-4 py-2 transition shadow-xs flex items-center justify-center gap-1.5">
+                  <Trash2 :size="13" /> Üyelik İptali Başlat
+                </button>
               </div>
             </div>
           </div>
@@ -2123,30 +2133,56 @@ function saveProfile() {
       </div>
     </div>
 
-    <!-- 2. Hesap Silme Güvenlik Modalı (Modal System) -->
+    <!-- 2. Üyelik & Hesap İptali Güvenlik Modalı (Modal System) -->
     <div v-if="isDeleteModalOpen" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-      <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4 border text-left shadow-2xl relative">
+      <div class="bg-white rounded-2xl max-w-lg w-full p-6 space-y-4 border text-left shadow-2xl relative">
         <button type="button" @click="isDeleteModalOpen = false" class="absolute right-4 top-4 text-slate-400 hover:text-slate-600">
           <X :size="16" />
         </button>
 
-        <div class="flex items-center gap-2 text-red-600">
-          <ShieldAlert :size="20" />
-          <h3 class="text-sm font-black uppercase">Hesap Kapatma Onayı</h3>
+        <div class="flex items-center gap-2.5 text-red-600 border-b pb-3" style="border-color: #F1F5F9;">
+          <ShieldAlert :size="22" />
+          <div>
+            <h3 class="text-sm font-black uppercase text-slate-800">Üyelik ve Hesap İptali</h3>
+            <p class="text-[10px] text-slate-400 font-medium">Bu işlem geri alınamaz ve tüm aktif ihaleleriniz durdurulur.</p>
+          </div>
         </div>
 
-        <p class="text-xs text-slate-500 leading-relaxed">
-          Hesabınızı kapatmak istediğinize emin misiniz? Bu işlem geri alınamaz. Devam etmek için şifrenizi girmeniz gerekmektedir.
-        </p>
-
+        <!-- İptal Nedeni -->
         <div>
-          <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Şifreniz</label>
-          <input v-model="deletePassword" type="password" placeholder="••••••••" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+          <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Ayrılma / İptal Nedeni *</label>
+          <select class="w-full rounded-xl border px-3 py-2.5 text-xs bg-slate-50 outline-none font-medium text-slate-700" style="border-color: #E2E8F0;">
+            <option value="1">Yeterli teklif alamadım / Tasarruf oranından memnun kalmadım</option>
+            <option value="2">Farklı bir B2B platformuna geçiş yapıyorum</option>
+            <option value="3">Geçici olarak satın alma süreçlerimizi durdurduk</option>
+            <option value="4">Firma faaliyetimiz veya departmanımız kapandı</option>
+            <option value="5">Diğer / Kişisel tercih</option>
+          </select>
         </div>
 
-        <div class="flex justify-end gap-2 text-xs font-bold pt-2">
-          <button type="button" @click="isDeleteModalOpen = false" class="rounded-xl border px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-700">İptal</button>
-          <button type="button" @click="confirmAccountDelete" class="rounded-xl bg-red-600 hover:bg-red-700 text-white px-5 py-2 transition shadow">Talebi Gönder</button>
+        <!-- Geri Bildirim Notu -->
+        <div>
+          <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Görüş veya Öneriniz (Opsiyonel)</label>
+          <textarea rows="2" placeholder="Hizmetimizi geliştirmemiz için deneyiminizi paylaşabilirsiniz..." class="w-full rounded-xl border px-3 py-2 text-xs bg-slate-50 outline-none resize-none" style="border-color: #E2E8F0;"></textarea>
+        </div>
+
+        <!-- Şifre Doğrulama -->
+        <div>
+          <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Onay İçin Hesap Şifreniz *</label>
+          <input v-model="deletePassword" type="password" placeholder="••••••••" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none focus:border-red-500" style="border-color: #E2E8F0;" />
+        </div>
+
+        <!-- KVKK Onay Kutusu -->
+        <div class="flex items-start gap-2 pt-1">
+          <input type="checkbox" id="kvkkDeleteCheck" checked class="mt-0.5 h-4 w-4 rounded text-red-600 border-slate-300" />
+          <label for="kvkkDeleteCheck" class="text-[10px] text-slate-500 leading-tight">
+            Hesabımın, teklif geçmişimin ve kurumsal verilerimin 6698 sayılı KVKK kapsamında kalıcı olarak silinmesini / anonimleştirilmesini onaylıyorum.
+          </label>
+        </div>
+
+        <div class="flex justify-end gap-2 text-xs font-bold pt-3 border-t" style="border-color: #F1F5F9;">
+          <button type="button" @click="isDeleteModalOpen = false" class="rounded-xl border px-4 py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700">Vazgeç</button>
+          <button type="button" @click="confirmAccountDelete" class="rounded-xl bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 transition shadow font-black">Üyeliğimi Kalıcı Olarak İptal Et</button>
         </div>
       </div>
     </div>

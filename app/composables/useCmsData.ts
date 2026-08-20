@@ -3,16 +3,16 @@ import { ref } from 'vue'
 // Default contents in Turkish for authentic local B2B portal experience
 export const DEFAULT_CMS_DATA = {
   hero: {
-    tagline: "ÖZEL SEKTÖRÜN CANLI TERS İHALE ARENASI",
+    tagline: "ÖZEL SEKTÖRÜN CANLI TERS İHALE VE PAZARLIK ARENASI",
     titleLine1: 'İhale Aç.',
-    titleLine2: 'Teklif Al.',
-    titleItalic: "Gel Anlaşalım.",
-    description: 'GelAnlaşalım; e-ihale, teklif toplama, sipariş ve tedarik süreçlerinizi tek platformda dijitalleştirir. Maliyetlerinizi düşürün, zamandan tasarruf edin ve satın alma operasyonlarınızı daha verimli yönetin.',
+    titleLine2: 'Teklif Topla.',
+    titleItalic: "İhaleci Burada.",
+    description: 'İhaleciBurada.com; e-ihale, canlı eksiltme, teklif toplama ve doğrudan fiyat pazarlığı süreçlerinizi tek platformda dijitalleştirir. Maliyetlerinizi düşürün, rekabetçi tekliflerle tasarruf edin.',
     badgeStrip: [
       'KVKK & GDPR UYUMLU',
       'BELGE DENETİMİ & ZAMAN DAMGASI',
       'ŞİFRELİ VERİ İLETİMİ',
-      'LANSMAN SÜRESİNCE ÜCRETSİZ'
+      'DOĞRUDAN PAZARLIK MODÜLÜ'
     ],
     heroVideoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-corporate-team-working-together-in-an-office-42790-large.mp4'
   },

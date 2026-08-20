@@ -41,15 +41,15 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'GelAnlaşalım - B2B Canlı Eksiltme ve Satın Alma Platformu',
-  ogTitle: 'GelAnlaşalım - B2B Canlı Eksiltme ve Satın Alma Platformu',
-  description: 'Tedarik maliyetlerinizi canlı eksiltme ihaleleriyle düşürün. Doğrulanmış kurumsal tedarikçilerden anında belgeli teklif toplayın.',
-  ogDescription: 'Tedarik maliyetlerinizi canlı eksiltme ihaleleriyle düşürün. Doğrulanmış kurumsal tedarikçilerden anında belgeli teklif toplayın.',
-  ogImage: 'https://gelanlasalim-v2.vercel.app/logo.png',
+  title: 'İhaleciBurada — B2B Canlı Eksiltme ve Satın Alma Platformu',
+  ogTitle: 'İhaleciBurada — B2B Canlı Eksiltme ve Satın Alma Platformu',
+  description: 'Tedarik maliyetlerinizi canlı eksiltme ihaleleri ve doğrudan fiyat pazarlığı ile düşürün. Doğrulanmış kurumsal tedarikçilerden anında belgeli teklif toplayın.',
+  ogDescription: 'Tedarik maliyetlerinizi canlı eksiltme ihaleleri ve doğrudan fiyat pazarlığı ile düşürün. Doğrulanmış kurumsal tedarikçilerden anında belgeli teklif toplayın.',
+  ogImage: 'https://ihaleciburada.com/logo.png',
   twitterCard: 'summary_large_image',
-  twitterTitle: 'GelAnlaşalım - B2B Canlı Eksiltme ve Satın Alma Platformu',
+  twitterTitle: 'İhaleciBurada — B2B Canlı Eksiltme ve Satın Alma Platformu',
   twitterDescription: 'Tedarik maliyetlerinizi %14\'e varan oranlarda düşürün. Şeffaf ve şifreli B2B e-ihale arenası dakikalar içinde yayında.',
-  twitterImage: 'https://gelanlasalim-v2.vercel.app/logo.png'
+  twitterImage: 'https://ihaleciburada.com/logo.png'
 })
 
 useHead({
@@ -59,11 +59,11 @@ useHead({
   link: [
     { rel: 'icon', type: 'image/png', href: '/logo.png' },
     { rel: 'preload', as: 'image', href: '/hero_port_background.png', fetchpriority: 'high' },
-    { rel: 'canonical', href: 'https://gelanlasalim-v2.vercel.app' }
+    { rel: 'canonical', href: 'https://ihaleciburada.com' }
   ],
   meta: [
-    { name: 'keywords', content: 'b2b ihale, ters ihale, eksiltme ihalesi, kurumsal satın alma, tedarikçi yönetimi, canlı teklif, rfq, e-ihale' },
-    { name: 'author', content: 'GelAnlaşalım Bilişim A.Ş.' },
+    { name: 'keywords', content: 'ihale, b2b ihale, ters ihale, eksiltme ihalesi, kurumsal satın alma, tedarikçi yönetimi, canlı teklif, rfq, e-ihale, ihaleciburada' },
+    { name: 'author', content: 'İhaleciBurada Bilişim ve Tedarik A.Ş.' },
     { name: 'robots', content: 'index, follow' }
   ],
   script: [
@@ -72,12 +72,12 @@ useHead({
       innerHTML: JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'WebSite',
-        'name': 'GelAnlaşalım',
-        'url': 'https://gelanlasalim-v2.vercel.app',
+        'name': 'İhaleciBurada',
+        'url': 'https://ihaleciburada.com',
         'description': 'B2B Canlı Eksiltme ve Kurumsal Satın Alma Platformu',
         'potentialAction': {
           '@type': 'SearchAction',
-          'target': 'https://gelanlasalim-v2.vercel.app/?q={search_term_string}',
+          'target': 'https://ihaleciburada.com/?q={search_term_string}',
           'query-input': 'required name=search_term_string'
         }
       })
@@ -87,15 +87,15 @@ useHead({
       innerHTML: JSON.stringify({
         '@context': 'https://schema.org',
         '@type': 'Organization',
-        'name': 'GelAnlaşalım Inc.',
-        'url': 'https://gelanlasalim-v2.vercel.app',
-        'logo': 'https://gelanlasalim-v2.vercel.app/logo.png',
+        'name': 'İhaleciBurada A.Ş.',
+        'url': 'https://ihaleciburada.com',
+        'logo': 'https://ihaleciburada.com/logo.png',
         'contactPoint': {
           '@type': 'ContactPoint',
-          'telephone': '+90-555-555-55-55',
+          'telephone': '+90-850-308-00-00',
           'contactType': 'customer service',
-          'email': 'info@gelanlasalim.com',
-          'availableLanguage': 'English'
+          'email': 'info@ihaleciburada.com',
+          'availableLanguage': 'Turkish'
         }
       })
     },
@@ -141,9 +141,34 @@ import { locale, detectLocale, t } from '~/composables/useLocale'
 const { cmsData } = useCmsData()
 
 const heroVideoRef = ref<HTMLVideoElement | null>(null)
+const userSession = ref<any>(null)
+
+const isLoggedIn = computed(() => {
+  if (!userSession.value) return false
+  return !!(userSession.value.email || userSession.value.id || userSession.value.companyName || userSession.value.firstName)
+})
+
+function checkSession() {
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('userSession')
+      if (raw && raw !== 'null' && raw !== 'undefined' && raw !== '{}') {
+        userSession.value = JSON.parse(raw)
+      } else {
+        userSession.value = null
+      }
+    } catch {
+      userSession.value = null
+    }
+  }
+}
 
 onMounted(() => {
   detectLocale()
+  checkSession()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', checkSession)
+  }
   if (heroVideoRef.value) {
     heroVideoRef.value.play().catch(err => {
       console.warn('Autoplay prevented:', err)
@@ -855,14 +880,104 @@ const filteredTenders = computed(() => {
 })
 
 /* =========================================================
-   YARDIMCI FONKSİYONLAR & HIZLI TEKLİF
+   YARDIMCI FONKSİYONLAR & HIZLI TEKLİF & PAZARLIK SİSTEMİ
 ========================================================= */
 const showQuickBidModal = ref(false)
+const showAuthRequiredModal = ref(false)
 const quickBidTender = ref<any>(null)
 const quickBidPrice = ref('')
 const quickBidDeliveryDays = ref('')
 const quickBidNotes = ref('')
 const isSubmittingQuickBid = ref(false)
+
+// Firmanın İhalesine Gelen Teklifler Listesi
+const incomingBids = ref([
+  {
+    id: 101,
+    tenderTitle: '500 Adet Kurumsal Dizüstü Bilgisayar Alımı',
+    tenderId: 1,
+    bidderFirm: 'TeknoBilişim Dağıtım Ltd. Şti.',
+    verified: true,
+    bidAmount: 5120000,
+    originalValue: 5500000,
+    savings: '%6.9 Tasarruf',
+    deliveryDays: 14,
+    notes: 'TSE belgeli 3 yıl yerinde garantili teslimat.',
+    status: 'Yeni Teklif ⚡',
+    timeAgo: '12 dk önce',
+    negotiationHistory: []
+  },
+  {
+    id: 102,
+    tenderTitle: 'Üretim Tesisi Çatı ve İzolasyon Yenileme İşi',
+    tenderId: 2,
+    bidderFirm: 'Marmara Yapı & İzolasyon A.Ş.',
+    verified: true,
+    bidAmount: 1140000,
+    originalValue: 1250000,
+    savings: '%8.8 Tasarruf',
+    deliveryDays: 20,
+    notes: 'Yangın dayanımlı taşyünü ve membran kaplama dahildir.',
+    status: 'Pazarlık Sürecinde 💬',
+    timeAgo: '45 dk önce',
+    negotiationHistory: [
+      { sender: 'Siz', text: 'Birim fiyatı 1.100.000 ₺ yapabilirseniz hemen onaylayacağız.', price: 1100000, date: '1 saat önce' }
+    ]
+  },
+  {
+    id: 103,
+    tenderTitle: '100.000 Adet Özel Tasarım Ürün Kutusu Üretimi',
+    tenderId: 4,
+    bidderFirm: 'Anadolu Ambalaj & Koli Sanayi',
+    verified: true,
+    bidAmount: 318000,
+    originalValue: 350000,
+    savings: '%9.1 Tasarruf',
+    deliveryDays: 10,
+    notes: 'Numune baskı 48 saatte onayınıza sunulur.',
+    status: 'Yeni Teklif ⚡',
+    timeAgo: '2 saat önce',
+    negotiationHistory: []
+  }
+])
+
+const showNegotiationModal = ref(false)
+const selectedBidForNegotiation = ref<any>(null)
+const counterOfferPrice = ref('')
+const counterOfferNotes = ref('')
+
+function openNegotiationModal(bid: any) {
+  selectedBidForNegotiation.value = bid
+  counterOfferPrice.value = bid.bidAmount ? String(Math.round(bid.bidAmount * 0.96)) : ''
+  counterOfferNotes.value = 'Teklifinizi inceledik. Belirttiğimiz hedef fiyata çekilmesi durumunda ihale tarafınıza verilecektir.'
+  showNegotiationModal.value = true
+}
+
+function submitCounterOffer() {
+  if (!counterOfferPrice.value) {
+    alert('Lütfen karşı teklif / hedef pazarlık tutarını giriniz.')
+    return
+  }
+  if (selectedBidForNegotiation.value) {
+    selectedBidForNegotiation.value.status = 'Karşı Teklif İletildi (Pazarlık) 💬'
+    if (!selectedBidForNegotiation.value.negotiationHistory) {
+      selectedBidForNegotiation.value.negotiationHistory = []
+    }
+    selectedBidForNegotiation.value.negotiationHistory.push({
+      sender: 'Siz (İhale Sahibi)',
+      price: Number(counterOfferPrice.value),
+      text: counterOfferNotes.value,
+      date: 'Şimdi'
+    })
+  }
+  showNegotiationModal.value = false
+  alert(`💬 PAZARLIK TEKLİFİNİZ İLETİLDİ!\n\n${selectedBidForNegotiation.value?.bidderFirm} firmasına ${Number(counterOfferPrice.value).toLocaleString('tr-TR')} ₺ tutarındaki karşı teklifiniz başarıyla gönderilmiştir.`)
+}
+
+function acceptBid(bid: any) {
+  bid.status = 'Teklif Kabul Edildi ✓'
+  alert(`🎉 TEBRİKLER!\n\n${bid.bidderFirm} firmasının teklifini kabul ettiniz. Sözleşme ve onay aşamasına geçilmiştir.`)
+}
 
 function scrollToFeed() {
   if (typeof document !== 'undefined') {
@@ -875,7 +990,13 @@ function scrollToFeed() {
   }
 }
 
+// 🟢 HIZLI TEKLİF VER: GİRİŞ YAPMA ZORUNLULUĞU KONTROLÜ
 function openQuickBidModal(tender: any) {
+  if (!isLoggedIn.value) {
+    quickBidTender.value = tender
+    showAuthRequiredModal.value = true
+    return
+  }
   quickBidTender.value = tender
   quickBidPrice.value = ''
   quickBidDeliveryDays.value = '7'
@@ -895,7 +1016,7 @@ function submitQuickBid() {
     if (quickBidTender.value) {
       quickBidTender.value.offers = (quickBidTender.value.offers || 0) + 1
     }
-    alert(`🎉 TEKLİFİNİZ İLETİLDİ!\n\n${quickBidTender.value?.company} firmasına ${quickBidPrice.value} ₺ tutarındaki teklifiniz anında başarıyla iletilmiştir.`)
+    alert(`🎉 TEKLİFİNİZ İLETİLDİ!\n\n${quickBidTender.value?.company} firmasına ${Number(quickBidPrice.value).toLocaleString('tr-TR')} ₺ tutarındaki teklifiniz anında başarıyla iletilmiştir.`)
   }, 500)
 }
 
@@ -1104,15 +1225,102 @@ function toggleFilterSection(section: string) {
       </div>
     </section>
 
+    <!-- 🟢 FİRMANIZA GELEN CANLI TEKLİFLER & FİYAT PAZARLIĞI MASASI -->
+    <section class="border-b border-slate-200 bg-gradient-to-b from-slate-50 to-white py-14">
+      <div class="mx-auto max-w-7xl px-6 text-left space-y-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+          <div>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#0052FF] text-[10px] font-black uppercase tracking-wider mb-2">
+              <span>💬 CANLI PAZARLIK & TEKLİF AKIŞI</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Firmanızın İhalelerine Gelen Son Teklifler
+            </h2>
+            <p class="text-xs text-slate-500 font-medium mt-1">
+              Yayındaki ihalelerinize tedarikçilerden gelen fiyat tekliflerini anlık görün, doğrudan pazarlık yapın veya karşı teklif iletin.
+            </p>
+          </div>
+          <NuxtLink
+            to="/panel/gelen-teklifler"
+            class="inline-flex items-center gap-2 rounded-xl bg-[#0F223D] hover:bg-[#1A3358] text-white text-xs font-black px-4 py-2.5 transition self-start md:self-auto shadow-sm"
+          >
+            <span>Tüm Teklifleri Yönet ({{ incomingBids.length }})</span>
+            <ArrowRight :size="14" class="text-[#00C2FF]" />
+          </NuxtLink>
+        </div>
+
+        <!-- Incoming Bids Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div
+            v-for="bid in incomingBids"
+            :key="bid.id"
+            class="bg-white rounded-2xl border border-slate-200/90 p-5 space-y-4 hover:border-blue-400 hover:shadow-lg transition-all flex flex-col justify-between"
+          >
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="px-2.5 py-1 rounded-lg text-[10px] font-black bg-blue-50 text-[#0052FF] border border-blue-200">
+                  {{ bid.status }}
+                </span>
+                <span class="text-[10px] text-slate-400 font-bold font-mono">{{ bid.timeAgo }}</span>
+              </div>
+
+              <div>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block">İHALE BAŞLIĞI</span>
+                <h3 class="text-xs font-black text-slate-800 line-clamp-1 mt-0.5">{{ bid.tenderTitle }}</h3>
+              </div>
+
+              <!-- Teklif Veren Firma & Fiyat -->
+              <div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-slate-500 font-medium">Teklif Veren:</span>
+                  <span class="font-bold text-slate-800">{{ bid.bidderFirm }}</span>
+                </div>
+                <div class="flex items-center justify-between text-xs">
+                  <span class="text-slate-500 font-medium">Teklif Tutarı:</span>
+                  <span class="font-black text-sm font-mono text-emerald-600">{{ bid.bidAmount.toLocaleString('tr-TR') }} ₺</span>
+                </div>
+                <div class="flex items-center justify-between text-[11px] pt-1 border-t border-slate-200">
+                  <span class="text-slate-400 font-semibold">Tasarruf Oranı:</span>
+                  <span class="font-black text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">{{ bid.savings }}</span>
+                </div>
+              </div>
+
+              <p class="text-[11px] text-slate-500 leading-snug italic">
+                "{{ bid.notes }}"
+              </p>
+            </div>
+
+            <!-- Action Buttons: Fiyat Pazarlığı Yap & Kabul Et -->
+            <div class="pt-2 flex items-center gap-2 border-t border-slate-100">
+              <button
+                type="button"
+                @click="openNegotiationModal(bid)"
+                class="flex-1 py-2.5 px-3 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <span>💬 Pazarlık Yap</span>
+              </button>
+              <button
+                type="button"
+                @click="acceptBid(bid)"
+                class="flex-1 py-2.5 px-3 rounded-xl bg-[#0052FF] hover:bg-blue-700 text-white text-xs font-black transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+              >
+                <span>✓ Kabul Et</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- B2B EXPLORER SECTION -->
     <section id="ihale-gezgini" class="border-b border-slate-200 bg-white py-20">
       <div class="mx-auto max-w-7xl px-6">
         <!-- Explorer Header -->
         <div class="mb-12 flex flex-col justify-between gap-6 lg:flex-row lg:items-end text-left">
           <div>
-            <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">{{ 'İHALE PAZARI' }}</span>
-            <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">{{ 'Doğru Firmayla Doğru Şartlarda Anlaşın' }}</h2>
-            <p class="mt-3 max-w-2xl text-xs text-slate-500">{{ 'Sektörünüze özel ihaleleri sol panelden filtreleyin; teklif süreçlerini canlı takip edin.' }}</p>
+            <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">İHALE PAZARI</span>
+            <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Doğru Firmayla Doğru Şartlarda Anlaşın</h2>
+            <p class="mt-3 max-w-2xl text-xs text-slate-500">Sektörünüze özel ihaleleri sol panelden filtreleyin; teklif süreçlerini canlı takip edin.</p>
           </div>
           <div class="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-3.5 flex flex-col gap-1 items-start">
             <span class="text-xs font-black text-blue-900">{{ filteredTenders.length }} {{ 'Aktif Sonuç' }}</span>
@@ -2260,6 +2468,145 @@ function toggleFilterSection(section: string) {
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- 🟢 1. HIZLI TEKLİF VER: KAYIT OLMA / GİRİŞ YAPMA ZORUNLULUĞU MODALI -->
+    <div v-if="showAuthRequiredModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div class="w-full max-w-md rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden text-left p-6 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2.5 text-[#0052FF]">
+            <div class="h-10 w-10 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center">
+              <LockKeyhole :size="20" class="text-[#0052FF]" />
+            </div>
+            <div>
+              <span class="text-[9px] font-black text-[#FF5938] uppercase tracking-wider block">GÜVENLİ TEKLİF DOĞRULAMASI</span>
+              <h3 class="text-sm font-black text-slate-900">Kurumsal Üyelik Zorunluluğu</h3>
+            </div>
+          </div>
+          <button @click="showAuthRequiredModal = false" class="text-slate-400 hover:text-slate-700 transition">
+            <X :size="18" />
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <div v-if="quickBidTender" class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
+            <span class="text-slate-400 font-bold block text-[10px]">SEÇİLEN İHALE:</span>
+            <span class="font-black text-slate-800 line-clamp-1">{{ quickBidTender.title }}</span>
+          </div>
+
+          <p class="text-xs text-slate-600 leading-relaxed">
+            İhaleciBurada platformunda ihalelere teklif sunabilmek, fiyat kırabilmek ve doğrudan pazarlık yapabilmek için <strong>kurumsal üye girişi yapmanız veya ücretsiz kayıt olmanız gerekmektedir</strong>.
+          </p>
+
+          <div class="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-emerald-900 text-xs space-y-1">
+            <div class="font-black flex items-center gap-1.5">
+              <span>✓ %100 Ücretsiz Tedarikçi Kaydı</span>
+            </div>
+            <p class="text-[11px] text-emerald-800/80">Kayıt işleminiz 1 dakikada tamamlanır, anında teklif vermeye başlayabilirsiniz.</p>
+          </div>
+        </div>
+
+        <div class="pt-2 flex flex-col sm:flex-row gap-2.5">
+          <NuxtLink
+            to="/uyelik"
+            class="flex-1 py-3 rounded-xl bg-[#0052FF] hover:bg-blue-700 text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-md"
+          >
+            <span>Giriş Yap</span>
+            <ArrowRight :size="14" />
+          </NuxtLink>
+          <NuxtLink
+            to="/uyelik"
+            class="flex-1 py-3 rounded-xl bg-gradient-to-r from-[#0F223D] to-[#0052FF] text-white font-black text-xs transition flex items-center justify-center gap-2 shadow-md border border-blue-400"
+          >
+            <span>Ücretsiz Kayıt Ol</span>
+            <Sparkles :size="14" class="text-[#00C2FF]" />
+          </NuxtLink>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🟢 2. FİYAT PAZARLIĞI VE KARŞI TEKLİF MODALI -->
+    <div v-if="showNegotiationModal && selectedBidForNegotiation" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div class="w-full max-w-lg rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden text-left p-6 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="h-10 w-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-lg">
+              💬
+            </div>
+            <div>
+              <span class="text-[9px] font-black text-amber-600 uppercase tracking-wider block">B2B FİYAT PAZARLIĞI</span>
+              <h3 class="text-sm font-black text-slate-900">Tedarikçi ile Pazarlık & Karşı Teklif</h3>
+            </div>
+          </div>
+          <button @click="showNegotiationModal = false" class="text-slate-400 hover:text-slate-700 transition">
+            <X :size="18" />
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-500 font-medium">Tedarikçi Firma:</span>
+              <span class="font-black text-slate-800">{{ selectedBidForNegotiation.bidderFirm }}</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-500 font-medium">Mevcut Teklif Tutarı:</span>
+              <span class="font-black text-emerald-600 font-mono text-sm">{{ selectedBidForNegotiation.bidAmount.toLocaleString('tr-TR') }} ₺</span>
+            </div>
+            <div class="flex justify-between items-center text-[11px]">
+              <span class="text-slate-400">İhale:</span>
+              <span class="text-slate-700 font-bold line-clamp-1">{{ selectedBidForNegotiation.tenderTitle }}</span>
+            </div>
+          </div>
+
+          <!-- Hedef Pazarlık Fiyatı -->
+          <div>
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">
+              HEDEF PAZARLIK / KARŞI TEKLİF TUTARI (₺) *
+            </label>
+            <div class="relative">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-black text-amber-600 text-sm">₺</span>
+              <input
+                v-model="counterOfferPrice"
+                type="number"
+                placeholder="Örn: 4.900.000"
+                class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black font-mono text-slate-900 outline-none focus:border-amber-500 focus:bg-white transition-all shadow-xs"
+              />
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 block">Tedarikçiye kabul etmesi için ileteceğiniz revize fiyat teklifi.</span>
+          </div>
+
+          <!-- Pazarlık Notu / Şartları -->
+          <div>
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">
+              PAZARLIK ŞARTLARI VE NOTUNUZ *
+            </label>
+            <textarea
+              v-model="counterOfferNotes"
+              rows="3"
+              placeholder="Örn: Belirtilen fiyata inilmesi ve peşin ödeme şartıyla ihaleyi hemen onaylamaya hazırız."
+              class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-amber-500 focus:bg-white transition-all resize-none"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="pt-2 flex gap-3">
+          <button
+            type="button"
+            @click="showNegotiationModal = false"
+            class="w-1/3 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition"
+          >
+            Vazgeç
+          </button>
+          <button
+            type="button"
+            @click="submitCounterOffer"
+            class="w-2/3 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border border-amber-300"
+          >
+            <span>💬 Karşı Teklifi İlet</span>
+          </button>
+        </div>
       </div>
     </div>
 
