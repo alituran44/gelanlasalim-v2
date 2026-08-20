@@ -22,14 +22,14 @@ export const translations: Record<Locale, Record<string, string>> = {
     hero_tagline: 'ÖZEL SEKTÖRÜN CANLI TERS İHALE ARENASI',
     hero_title1: 'İhale Ver.',
     hero_title2: 'Teklif Al.',
-    hero_title3: 'Gel Anlaşalım.',
-    hero_desc: 'GelAnlaşalım; e-ihale, teklif toplama, sipariş ve tedarik süreçlerinizi tek platformda dijitalleştirir. Maliyetlerinizi düşürün, zamandan tasarruf edin ve satın alma operasyonlarınızı daha verimli yönetin.',
+    hero_title3: 'İhaleci Burada.',
+    hero_desc: 'İhaleciBurada; e-ihale, teklif toplama, sipariş ve tedarik süreçlerinizi tek platformda dijitalleştirir. Maliyetlerinizi düşürün, zamandan tasarruf edin ve satın alma operasyonlarınızı daha verimli yönetin.',
     hero_cta_create: 'Ücretsiz İhale Oluştur',
     hero_cta_explore: 'İhaleleri Keşfet',
 
     // Pricing / Subscription Page
     pricing_title: 'Platform Üyeliği ve Erişim Paketleri',
-    pricing_desc: 'GelAnlaşalım platformunun gelişmiş ihale arama, KİK analizleri ve anlık bildirim servislerinden yararlanmak için üyeliğinizi hemen başlatın.',
+    pricing_desc: 'İhaleciBurada platformunun gelişmiş ihale arama, KİK analizleri ve anlık bildirim servislerinden yararlanmak için üyeliğinizi hemen başlatın.',
     pricing_select: 'Seç',
     pricing_popular: 'EN POPÜLER',
     pricing_vat_notice: 'Fiyatlara %20 KDV dahildir.',

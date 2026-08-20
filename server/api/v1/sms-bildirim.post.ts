@@ -19,11 +19,11 @@ export default defineEventHandler(async (event) => {
   let messageText = customMessage
   if (!messageText) {
     if (type === 'otp') {
-      messageText = `[GelAnlaşalım] Kurumsal üyelik doğrulama kodunuz: ${otpCode}. Bu kodu 3 dakika içinde kimseyle paylaşmayınız.`
+      messageText = `[İhaleciBurada] Kurumsal üyelik doğrulama kodunuz: ${otpCode}. Bu kodu 3 dakika içinde kimseyle paylaşmayınız.`
     } else if (type === 'tender_update') {
-      messageText = `[GelAnlaşalım] Takip ettiğiniz ihalede canlı fiyat eksiltmesi gerçekleşti. Detaylar için panele giriniz.`
+      messageText = `[İhaleciBurada] Takip ettiğiniz ihalede canlı fiyat eksiltmesi gerçekleşti. Detaylar için panele giriniz.`
     } else if (type === 'bid_received') {
-      messageText = `[GelAnlaşalım] Yayınladığınız ihale için yeni bir doğrulanmış tedarikçi teklifi alındı.`
+      messageText = `[İhaleciBurada] Yayınladığınız ihale için yeni bir doğrulanmış tedarikçi teklifi alındı.`
     }
   }
 
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     success: true,
     code: 'SMS_SENT',
     messageId,
-    gateway: 'GelAnlaşalım SMS & E-Posta Servis Ağı (Netgsm / İletimerkezi Entegre)',
+    gateway: 'İhaleciBurada SMS & E-Posta Servis Ağı (Netgsm / İletimerkezi Entegre)',
     recipient: {
       phone: phone || null,
       email: email || null

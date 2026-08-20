@@ -30,7 +30,7 @@ export default defineEventHandler(async (event) => {
     code: 'VERIFIED_ACTIVE',
     data: {
       vkn,
-      unvan: companyTitle || (vkn.length === 10 ? 'GELANLAŞALIM BİLİŞİM LİMİTED ŞİRKETİ' : 'KURUMSAL KULLANICI MÜŞTERİ'),
+      unvan: companyTitle || (vkn.length === 10 ? 'İHALECİBURADA BİLİŞİM LİMİTED ŞİRKETİ' : 'KURUMSAL KULLANICI MÜŞTERİ'),
       vergiDairesi: taxOffice || 'Karesi Vergi Dairesi Müdürlüğü',
       faaliyetDurumu: 'FAAL / AKTİF MÜKELLEF',
       mersisNo: `0${vkn}00015`,

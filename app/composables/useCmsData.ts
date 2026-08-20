@@ -66,7 +66,7 @@ export const DEFAULT_CMS_DATA = {
     { q: "Tersine ihale (eksiltme) sistemi nasıl çalışır?", a: "Alıcı firma satın almak istediği malzeme veya hizmet için miktar ve teknik şartname belirterek ihale açar. Doğrulanmış tedarikçiler canlı sürede fiyat eksilterek yarışır." },
     { q: "Platformda şirket doğrulaması nasıl yapılıyor?", a: "Vergi levhası, imza sirküleri ve ticaret sicil gazetesi ekibimizce kontrol edilir. Yalnızca onaylanmış kurumsal hesaplar ihale açabilir ve teklif verebilir." },
     { q: "Ödeme ve teslimat süreçleri güvenli mi?", a: "Evet. Alıcı firma ihale bedelini güvenli hesaba yatırır. Teslimat onaylanıp denetlendikten sonra ödeme tedarikçiye aktarılır." },
-    { q: "Alıcı firmalar komisyon veya ücret öder mi?", a: "Hayır. GelAnlaşalım platformu alıcı firmalar için tamamen ücretsizdir." },
+    { q: "Alıcı firmalar komisyon veya ücret öder mi?", a: "Hayır. İhaleciBurada platformu alıcı firmalar için tamamen ücretsizdir." },
     { q: "Hangi sektörlerde ihale açabilirim?", a: "Tarım, inşaat, sağlık, teknoloji, lojistik, ambalaj, otomotiv ve tüm kurumsal satın alma kategorilerinde ihale açabilirsiniz." }
   ],
   problems: [
@@ -214,8 +214,8 @@ export const DEFAULT_CMS_DATA = {
   },
   contact: {
     address: 'Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül, Balıkesir, Türkiye',
-    email: 'info@gelanlasalim.com',
-    kep: 'gelanlasalim@hs01.kep.tr',
+    email: 'info@ihaleciburada.com',
+    kep: 'ihaleciburada@hs01.kep.tr',
     workHoursWeekdays: 'Pazartesi - Cuma: 09:00 - 18:00',
     workHoursSaturday: 'Cumartesi: 10:00 - 14:00'
   },

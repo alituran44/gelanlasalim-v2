@@ -8,9 +8,9 @@ interface FAQItem {
 
 const faqs: FAQItem[] = [
   {
-    question: "GelAnlaşalım nedir?",
+    question: "İhaleciBurada nedir?",
     answer:
-      "GelAnlaşalım, firmaların dijital ortamda ihale oluşturmasını, teklif toplamasını ve teklifleri karşılaştırarak en doğru tedarikçiyi seçmesini sağlayan modern bir B2B platformudur."
+      "İhaleciBurada, firmaların dijital ortamda ihale oluşturmasını, teklif toplamasını ve teklifleri karşılaştırarak en doğru tedarikçiyi seçmesini sağlayan modern bir B2B platformudur."
   },
   {
     question: "Platformu kullanmak ücretli mi?",
@@ -68,7 +68,7 @@ function toggle(index: number) {
         <p
           class="mt-6 text-lg text-slate-500"
         >
-          GelAnlaşalım hakkında en çok sorulan soruların cevaplarını burada
+          İhaleciBurada hakkında en çok sorulan soruların cevaplarını burada
           bulabilirsiniz.
         </p>
 

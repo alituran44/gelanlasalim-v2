@@ -196,7 +196,7 @@ function handleEDevletAuth() {
     isSubmitting.value = false
     if (typeof window !== 'undefined') {
       localStorage.setItem('userSession', JSON.stringify({
-        email: 'edevlet_onayli@gelanlasalim.com',
+        email: 'edevlet_onayli@ihaleciburada.com',
         firstName: 'Ali',
         name: 'Ali Turan (e-Devlet & MERSİS Onaylı)',
         company: 'Turan Lojistik San. A.Ş.',
@@ -249,7 +249,7 @@ function handleLogin() {
 function handleDemoLogin(role: 'company' | 'individual') {
   if (typeof window !== 'undefined') {
     localStorage.setItem('userSession', JSON.stringify({
-      email: role === 'company' ? 'firma_demo@gelanlasalim.com' : 'kullanici_demo@gelanlasalim.com',
+      email: role === 'company' ? 'firma_demo@ihaleciburada.com' : 'kullanici_demo@ihaleciburada.com',
       firstName: role === 'company' ? 'Kemal' : 'Ahmet',
       name: role === 'company' ? 'Kemal Yılmaz' : 'Ahmet Yıldız',
       company: role === 'company' ? 'Yılmaz Tekstil A.Ş.' : 'Bireysel Üye',
@@ -283,7 +283,7 @@ function handleGuestEntry() {
       localStorage.setItem('guestLeads', JSON.stringify(existingLeads))
 
       localStorage.setItem('userSession', JSON.stringify({
-        email: guestContact.value.includes('@') ? guestContact.value : 'misafir@gelanlasalim.com',
+        email: guestContact.value.includes('@') ? guestContact.value : 'misafir@ihaleciburada.com',
         firstName: guestName.value.split(' ')[0] || 'Misafir',
         name: guestName.value,
         company: guestCompany.value || 'Misafir Firma',
@@ -327,7 +327,7 @@ function handleGuestEntry() {
           {{ 'Tedarik Maliyetinizi Canlı Eksiltme ile Düşürün' }}
         </h2>
         <p class="mt-4 max-w-md text-xs text-slate-400 leading-relaxed font-medium">
-          {{ 'GelAnlaşalım arenasında rekabet kurallarını siz belirlersiniz. İlanınızı yayınlayın, onaylı satıcılar anlık fiyat kırarak yarışsın.' }}
+          {{ 'İhaleciBurada arenasında rekabet kurallarını siz belirlersiniz. İlanınızı yayınlayın, onaylı satıcılar anlık fiyat kırarak yarışsın.' }}
         </p>
 
         <!-- Feature List -->
@@ -364,7 +364,7 @@ function handleGuestEntry() {
 
       <!-- Footer indicator -->
       <div class="relative z-10 text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-        © 2026 GelAnlaşalım {{ 'B2B tersine ihale portalı' }}
+        © 2026 İhaleciBurada {{ 'B2B tersine ihale portalı' }}
       </div>
     </div>
 
@@ -374,7 +374,7 @@ function handleGuestEntry() {
         <!-- Top Navigation Bar (Mobile & Desktop) -->
         <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
           <NuxtLink to="/" class="flex items-center gap-2">
-            <img src="/logo.png" alt="GelAnlaşalım Logo" class="h-8 w-auto" />
+            <img src="/logo.png" alt="İhaleciBurada Logo" class="h-8 w-auto" />
           </NuxtLink>
 
           <NuxtLink

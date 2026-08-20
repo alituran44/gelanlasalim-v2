@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { HelpCircle, Search, ChevronDown, Mail, Phone } from 'lucide-vue-next'
+import { HelpCircle, Search, ChevronDown, Mail, Phone, Play, BookOpen, Sparkles, Zap, TrendingDown, ShieldCheck, Layers } from 'lucide-vue-next'
+import VideoGuideModal from '~/components/common/VideoGuideModal.vue'
 
 definePageMeta({
   layout: "public"
@@ -8,17 +9,72 @@ definePageMeta({
 
 const searchQuery = ref('')
 const openFaq = ref<number | null>(0)
+const showVideoModal = ref(false)
+const selectedVideoId = ref('intro-3min')
+
+function playVideo(id: string) {
+  selectedVideoId.value = id
+  showVideoModal.value = true
+}
 
 const faqs = [
-  { q: "GelAnlaşalım.com B2B İhale Platformu nedir?", a: "GelAnlaşalım.com, kurumsal alıcılar ile doğrulanmış tedarikçileri canlı tersine ihale (eksiltme) arenasında buluşturan dijital satın alma platformudur." },
+  { q: "İhaleciBurada.com B2B İhale Platformu nedir?", a: "İhaleciBurada.com, kurumsal alıcılar ile doğrulanmış tedarikçileri canlı tersine ihale (eksiltme) arenasında buluşturan dijital satın alma platformudur." },
   { q: "Tersine ihale (canlı eksiltme) sistemi nasıl çalışır?", a: "Alıcı firma satın almak istediği ürün veya hizmet için şartname ve bütçesini belirler. Tedarikçiler canlı sürede teklif vererek fiyat eksiltir; en uygun teklif sahibi ihaleyi kazanır." },
   { q: "Firmaların doğrulanması ve güvenliği nasıl sağlanır?", a: "Platforma üye olan her şirketin vergi kimlik numarası, MERSİS/KEP adresleri ve kurumsal belgeleri kontrol edilerek 'Onaylı Üye' rozeti tanımlanır." },
-  { q: "Alıcı olarak üyelik komisyonu ödemem gerekiyor mu?", a: "Hayır. GelAnlaşalım platformunda alıcı şirketler için üyelik ve ihale açma süreçleri tamamen ücretsizdir." }
+  { q: "Alıcı olarak üyelik komisyonu ödemem gerekiyor mu?", a: "Hayır. İhaleciBurada platformunda alıcı şirketler için üyelik ve ihale açma süreçleri tamamen ücretsizdir." }
+]
+
+const videoCards = [
+  {
+    id: 'intro-3min',
+    title: '3 Dakikada İhaleciBurada Tanıtımı',
+    desc: 'Ters ihale modeli, canlı eksiltme kuralları ve tedarik tasarrufu sağlama.',
+    duration: '03:15',
+    badge: 'GENEL TANITIM',
+    thumbnail: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80',
+    icon: Sparkles
+  },
+  {
+    id: 'ihale-acma',
+    title: 'İhale Nasıl Açılır & Şartname Yükleme',
+    desc: 'Sıfırdan ihale oluşturma, malzeme kalemi tanımlama ve fotoğraf ekleme.',
+    duration: '02:40',
+    badge: 'ALICI REHBERİ',
+    thumbnail: 'https://images.unsplash.com/photo-1450133064473-71024230f91b?auto=format&fit=crop&w=800&q=80',
+    icon: Zap
+  },
+  {
+    id: 'teklif-verme',
+    title: 'Nasıl Teklif Verilir & Canlı Eksiltme',
+    desc: 'Tedarikçi olarak ihaleye katılma, birim fiyat girme ve anlık fiyat kırma.',
+    duration: '02:50',
+    badge: 'TEDARİKÇİ REHBERİ',
+    thumbnail: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80',
+    icon: TrendingDown
+  },
+  {
+    id: 'kyc-dogrulama',
+    title: 'Firma Doğrulama (KYC) & MERSİS/KEP',
+    desc: 'Vergi levhası doğrulama, e-Devlet entegrasyonu ve Onaylı Rozet alma.',
+    duration: '02:15',
+    badge: 'GÜVENLİK & ONAY',
+    thumbnail: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=800&q=80',
+    icon: ShieldCheck
+  },
+  {
+    id: 'erp-entegrasyon',
+    title: 'SAP, Logo & Excel Entegrasyonu',
+    desc: 'ERP sistemlerinden satın alma taleplerini otomatik ihaleye dönüştürme.',
+    duration: '02:30',
+    badge: 'ERP & EXCEL',
+    thumbnail: 'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=800&q=80',
+    icon: Layers
+  }
 ]
 </script>
 
 <template>
-  <div class="p-6 max-w-5xl mx-auto text-left space-y-8 py-12">
+  <div class="p-6 max-w-5xl mx-auto text-left space-y-10 py-12">
     
     <!-- Top Header -->
     <div class="border-b pb-6" style="border-color: #F1F5F9;">
@@ -26,7 +82,7 @@ const faqs = [
         <HelpCircle class="text-blue-600" :size="28" />
         Rehber & Yardım Merkezi
       </h1>
-      <p class="text-xs text-slate-500 mt-2">Platform kullanımı, ihale kuralları ve destek hizmetleri hakkında merak edilen tüm yanıtlar.</p>
+      <p class="text-xs text-slate-500 mt-2">Platform kullanımı, ihale kuralları ve destek hizmetleri hakkında merak edilen tüm yanıtlar ve görüntülü eğitim videoları.</p>
     </div>
 
     <!-- Search -->
@@ -35,10 +91,67 @@ const faqs = [
       <input 
         v-model="searchQuery"
         type="text"
-        placeholder="Aramak istediğiniz soruyu yazın..."
+        placeholder="Aramak istediğiniz konuyu veya soruyu yazın..."
         class="w-full rounded-xl border pl-11 pr-4 py-3 text-xs outline-none bg-white transition focus:border-blue-500 shadow-sm"
         style="border-color: #E2E8F0; color: #0F172A;"
       />
+    </div>
+
+    <!-- VIDEO REHBERLER BÖLÜMÜ -->
+    <div class="space-y-4 pt-2">
+      <div class="flex items-center justify-between">
+        <div>
+          <span class="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+            GÖRSEL & VİDEO EĞİTİMLER
+          </span>
+          <h2 class="text-lg font-black text-slate-800 mt-1">Platform Kullanım Videoları</h2>
+        </div>
+        <button
+          @click="playVideo('intro-3min')"
+          class="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700 cursor-pointer"
+        >
+          <Play :size="13" class="fill-blue-600" />
+          <span>Tümünü İzle</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          v-for="video in videoCards"
+          :key="video.id"
+          @click="playVideo(video.id)"
+          class="group rounded-2xl border border-slate-200 bg-white overflow-hidden hover:border-blue-500 hover:shadow-lg transition-all duration-200 cursor-pointer flex flex-col justify-between"
+        >
+          <div class="relative aspect-video w-full overflow-hidden bg-slate-800">
+            <img :src="video.thumbnail" :alt="video.title" class="h-full w-full object-cover group-hover:scale-105 transition duration-300" />
+            <div class="absolute inset-0 bg-slate-950/30 flex items-center justify-center">
+              <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-600 text-white shadow-lg group-hover:scale-110 transition">
+                <Play :size="16" class="fill-white translate-x-0.5" />
+              </div>
+            </div>
+            <span class="absolute bottom-2 right-2 rounded bg-slate-950/80 px-1.5 py-0.5 text-[9px] font-mono font-bold text-white">
+              {{ video.duration }}
+            </span>
+          </div>
+
+          <div class="p-4 space-y-2 flex-1 flex flex-col justify-between">
+            <div>
+              <span class="text-[8px] font-black uppercase text-blue-600 block">{{ video.badge }}</span>
+              <h3 class="text-xs font-bold text-slate-900 group-hover:text-blue-600 transition leading-snug">
+                {{ video.title }}
+              </h3>
+              <p class="text-[11px] text-slate-500 mt-1 line-clamp-2">
+                {{ video.desc }}
+              </p>
+            </div>
+
+            <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] font-bold text-blue-600">
+              <span>Simülasyonu İzle</span>
+              <span>→</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- FAQ Accordions -->
@@ -62,11 +175,18 @@ const faqs = [
         <p class="text-xs text-blue-700 mt-1">Destek ekibimiz 7/24 sorularınızı yanıtlamaktan memnuniyet duyar.</p>
       </div>
       <div class="flex gap-3 shrink-0">
-        <a href="mailto:destek@gelanlasalim.com" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition flex items-center gap-2">
+        <a href="mailto:destek@ihaleciburada.com" class="px-5 py-2.5 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition flex items-center gap-2">
           <Mail :size="14" /> E-posta Gönder
         </a>
       </div>
     </div>
 
+    <!-- Video Modal -->
+    <VideoGuideModal
+      v-model="showVideoModal"
+      :initial-video-id="selectedVideoId"
+    />
+
   </div>
 </template>
+

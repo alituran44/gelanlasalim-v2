@@ -854,7 +854,7 @@ function saveProfile() {
               <!-- KEP Adresi -->
               <div class="md:col-span-2">
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'KEP ADRESİ' }}</label>
-                <input v-model="companyForm.kep" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="gelanlasalim@hs01.kep.tr" />
+                <input v-model="companyForm.kep" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="ihaleciburada@hs01.kep.tr" />
               </div>
 
               <!-- IBAN -->

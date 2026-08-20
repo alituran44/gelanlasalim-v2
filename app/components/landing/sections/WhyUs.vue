@@ -51,7 +51,7 @@ const features = [
         </span>
 
         <h2 class="mt-4 text-5xl font-black text-slate-900">
-          Neden GelAnlaşalım?
+          Neden İhaleciBurada?
         </h2>
 
         <p class="mx-auto mt-6 max-w-3xl text-lg text-slate-500">

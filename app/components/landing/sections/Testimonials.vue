@@ -3,7 +3,7 @@ const testimonials = [
   {
     name: "Ahmet Yılmaz",
     company: "Yılmaz İnşaat",
-    text: "GelAnlaşalım sayesinde teklif toplama süremiz günlerden saatlere düştü.",
+    text: "İhaleciBurada sayesinde teklif toplama süremiz günlerden saatlere düştü.",
     rating: 5
   },
   {

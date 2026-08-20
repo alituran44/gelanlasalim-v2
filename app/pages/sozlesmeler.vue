@@ -259,7 +259,7 @@ function printDocument() {
             </h1>
             
             <p class="text-xs text-slate-500 font-medium leading-relaxed">
-              {{ 'Bu Kullanım Şartları ve Hizmet Sözleşmesi ("Sözleşme"), GelAnlaşalım Bilişim A.Ş. ("Şirket") ile GelAnlaşalım B2B dijital e-ihale platformunu ("Platform") kullanan kurumsal veya bireysel kullanıcılar ("Kullanıcı") arasında akdedilmiştir.' 
+              {{ 'Bu Kullanım Şartları ve Hizmet Sözleşmesi ("Sözleşme"), İhaleciBurada Bilişim A.Ş. ("Şirket") ile İhaleciBurada B2B dijital e-ihale platformunu ("Platform") kullanan kurumsal veya bireysel kullanıcılar ("Kullanıcı") arasında akdedilmiştir.' 
               }}
             </p>
 
@@ -284,7 +284,7 @@ function printDocument() {
 
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — FİKRİ MÜLKİYET VE VERİ HAKLARI</h3>
-                <p>4.1. Platform üzerindeki tüm markalar, yazılım kaynak kodları, arayüz tasarımları, algoritmalar ve dokümantasyon GelAnlaşalım Bilişim A.Ş.'nin mülkiyetindedir.</p>
+                <p>4.1. Platform üzerindeki tüm markalar, yazılım kaynak kodları, arayüz tasarımları, algoritmalar ve dokümantasyon İhaleciBurada Bilişim A.Ş.'nin mülkiyetindedir.</p>
               </section>
 
               <section class="space-y-2">
@@ -301,7 +301,7 @@ function printDocument() {
             </h1>
             
             <p class="text-xs text-slate-500 font-medium leading-relaxed">
-              {{ 'Bu politika, GelAnlaşalım B2B e-ihale platformunu ziyaret eden veya kullanan tarafların ticari ve kişisel verilerinin korunması prensiplerini düzenlemektedir.'
+              {{ 'Bu politika, İhaleciBurada B2B e-ihale platformunu ziyaret eden veya kullanan tarafların ticari ve kişisel verilerinin korunması prensiplerini düzenlemektedir.'
               }}
             </p>
 
@@ -338,8 +338,8 @@ function printDocument() {
             <div class="space-y-5 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDELER — VERİ SORUMLUSU KİMLİĞİ</h3>
-                <p>Veri Sorumlusu: GelAnlaşalım Bilişim Anonim Şirketi</p>
-                <p>Tax Office / No: Karesi V.D. / 3920941829 | KEP: gelanlasalim@hs01.kep.tr</p>
+                <p>Veri Sorumlusu: İhaleciBurada Bilişim Anonim Şirketi</p>
+                <p>Tax Office / No: Karesi V.D. / 3920941829 | KEP: ihaleciburada@hs01.kep.tr</p>
               </section>
 
               <section class="space-y-2">
@@ -350,7 +350,7 @@ function printDocument() {
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — İLGİLİ KİŞİNİN HAKLARI (KVKK MADDE 11)</h3>
                 <p>3.1. Kullanıcılar verilerinin işlenip işlenmediğini öğrenme, düzeltme talep etme ve silinmesini isteme hakkına sahiptir.</p>
-                <p>3.2. Başvurular <strong>kvkk@gelanlasalim.com</strong> adresine veya KEP üzerinden iletilebilir.</p>
+                <p>3.2. Başvurular <strong>kvkk@ihaleciburada.com</strong> adresine veya KEP üzerinden iletilebilir.</p>
               </section>
             </div>
           </article>
@@ -384,7 +384,7 @@ function printDocument() {
             <div class="space-y-5 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — TARAFLAR VE ABONELİK PAKETLERİ</h3>
-                <p>1.1. Satıcı: GelAnlaşalım Bilişim A.Ş. | Alıcı: Abone Kurumsal Kullanıcı.</p>
+                <p>1.1. Satıcı: İhaleciBurada Bilişim A.Ş. | Alıcı: Abone Kurumsal Kullanıcı.</p>
                 <p>1.2. Paket seçenekleri 1, 3, 6 ve 9 aylık dönemleri kapsar; ödemeler kredi kartı veya havale/EFT ile yapılır.</p>
               </section>
 
@@ -437,7 +437,7 @@ function printDocument() {
             <div class="space-y-5 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">SLA 1 — %99.9 KESİNTİSİZLİK TAAHHÜDÜ</h3>
-                <p>1.1. GelAnlaşalım, canlı eksiltme motorları ve sistem erişilebilirliği için aylık %99.9 kesintisizlik taahhüt eder.</p>
+                <p>1.1. İhaleciBurada, canlı eksiltme motorları ve sistem erişilebilirliği için aylık %99.9 kesintisizlik taahhüt eder.</p>
               </section>
             </div>
           </article>
@@ -451,7 +451,7 @@ function printDocument() {
             <div class="space-y-5 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">SECURITY STANDARDS</h3>
-                <p>1.1. GelAnlaşalım adheres to ISO/IEC 27001:2022 Information Security Management Standards. All infrastructure undergoes routine vulnerability scanning and penetration testing.</p>
+                <p>1.1. İhaleciBurada adheres to ISO/IEC 27001:2022 Information Security Management Standards. All infrastructure undergoes routine vulnerability scanning and penetration testing.</p>
               </section>
             </div>
           </article>
@@ -460,7 +460,7 @@ function printDocument() {
           <article v-if="activeTab === 'hakkimizda'" class="space-y-6">
             <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ 'Hakkımızda & Vizyonumuz' }}</h1>
             <p class="text-xs text-slate-500 font-medium leading-relaxed">
-              {{ 'GelAnlaşalım, kurumsal satın alma süreçlerini şeffaf, rekabetçi ve tamamen dijital hale getirmek amacıyla kurulmuş yeni nesil bir B2B e-ihale platformudur.'
+              {{ 'İhaleciBurada, kurumsal satın alma süreçlerini şeffaf, rekabetçi ve tamamen dijital hale getirmek amacıyla kurulmuş yeni nesil bir B2B e-ihale platformudur.'
               }}
             </p>
           </article>
@@ -491,7 +491,7 @@ function printDocument() {
           <article v-if="activeTab === 'basin'" class="space-y-6">
             <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ 'Basın Odası & Medya Kiti' }}</h1>
             <p class="text-xs text-slate-500 font-medium leading-relaxed">
-              {{ 'GelAnlaşalım basın bültenleri, haberler ve vektörel logo kitleri.' }}
+              {{ 'İhaleciBurada basın bültenleri, haberler ve vektörel logo kitleri.' }}
             </p>
           </article>
 

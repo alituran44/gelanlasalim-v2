@@ -41,7 +41,7 @@ const steps = [
         </h2>
 
         <p class="mt-6 max-w-3xl mx-auto text-lg text-slate-500">
-          GelAnlaşalım ile ihale oluşturmak ve teklif toplamak
+          İhaleciBurada ile ihale oluşturmak ve teklif toplamak
           birkaç dakikanızı alır.
         </p>
       </div>

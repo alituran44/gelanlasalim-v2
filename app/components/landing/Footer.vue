@@ -95,11 +95,11 @@ const companyLinks = [
               Balıkesir, Türkiye
             </p>
             <div class="text-xs font-bold text-slate-700 space-y-1.5 pt-1">
-              <a href="mailto:info@gelanlasalim.com" class="block hover:text-blue-600 transition-colors">
-                info@gelanlasalim.com
+              <a href="mailto:info@ihaleciburada.com" class="block hover:text-blue-600 transition-colors">
+                info@ihaleciburada.com
               </a>
-              <a href="mailto:gelanlasalim@hs01.kep.tr" class="block hover:text-blue-600 font-mono text-[11px] transition-colors">
-                gelanlasalim@hs01.kep.tr
+              <a href="mailto:ihaleciburada@hs01.kep.tr" class="block hover:text-blue-600 font-mono text-[11px] transition-colors">
+                ihaleciburada@hs01.kep.tr
               </a>
             </div>
           </div>
@@ -118,7 +118,7 @@ const companyLinks = [
       <hr class="border-slate-200 my-10" />
 
       <div class="flex flex-col sm:flex-row items-center justify-between gap-6 text-[11px] text-slate-400 font-bold uppercase tracking-wider">
-        <div>© 2026 GelAnlaşalım. Tüm Hakları Saklıdır.</div>
+        <div>© 2026 İhaleciBurada. Tüm Hakları Saklıdır.</div>
         <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center sm:justify-end">
           <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors">KVKK Metni</NuxtLink>
           <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors">Kullanım Koşulları</NuxtLink>

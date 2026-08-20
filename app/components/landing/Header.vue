@@ -40,16 +40,16 @@ const menu = [
         <div
           class="flex h-12 w-12 items-center justify-center rounded-xl bg-blue-600 text-xl font-black text-white"
         >
-          G
+          İ
         </div>
 
         <div>
           <div class="text-xl font-black text-slate-800">
-            GelAnlaşalım
+            İhaleciBurada
           </div>
 
           <div class="text-xs text-slate-500">
-            Dijital İhale Platformu
+            B2B Dijital İhale Platformu
           </div>
         </div>
       </NuxtLink>

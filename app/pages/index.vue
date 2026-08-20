@@ -37,6 +37,7 @@ import {
   Eye,
   Image as ImageIcon
 } from 'lucide-vue-next'
+import VideoGuides from '~/components/landing/sections/VideoGuides.vue'
 
 // Nuxt Layout Meta
 definePageMeta({
@@ -382,7 +383,7 @@ function openCompanyModal(companyName: string) {
       mersis: '0XXX-XXXX-XXXX-XXXX',
       rating: 4.5,
       reviews: [
-        { author: 'Sistem Yöneticisi', company: 'GelAnlaşalım Platformu', rating: 5, comment: 'B2B platform üyesi kurumsal satıcı.', date: 'Temmuz 2026' }
+        { author: 'Sistem Yöneticisi', company: 'İhaleciBurada Platformu', rating: 5, comment: 'B2B platform üyesi kurumsal satıcı.', date: 'Temmuz 2026' }
       ]
     }
   }
@@ -863,16 +864,16 @@ const tenders = [
 
 const faqs = [
   {
-    question: 'GelAnlaşalım nedir?',
-    answer: 'GelAnlaşalım, özel sektördeki firmaların satın alma taleplerini yayınlayabildiği, tedarikçilerin ise bu taleplere teklif verebildiği dijital ihale ve iş fırsatları platformudur.'
+    question: 'İhaleciBurada nedir?',
+    answer: 'İhaleciBurada, özel sektördeki firmaların satın alma taleplerini yayınlayabildiği, tedarikçilerin ise bu taleplere teklif verebildiği dijital ihale ve iş fırsatları platformudur.'
   },
   {
-    question: 'Kimler GelAnlaşalım kullanabilir?',
+    question: 'Kimler İhaleciBurada kullanabilir?',
     answer: 'Satın alma yapan şirketler, KOBİ’ler, üreticiler, hizmet sağlayıcılar, tedarikçiler ve yeni müşterilere ulaşmak isteyen tüm işletmeler platformu kullanabilir.'
   },
   {
     question: 'Platformda kamu ihaleleri var mı?',
-    answer: 'Hayır. GelAnlaşalım özel sektör odaklıdır. Platformun temel amacı şirketler arasındaki satın alma, teklif toplama ve tedarik süreçlerini B2B tersine ihale modeliyle dijitalleştirmektir.'
+    answer: 'Hayır. İhaleciBurada özel sektör odaklıdır. Platformun temel amacı şirketler arasındaki satın alma, teklif toplama ve tedarik süreçlerini B2B tersine ihale modeliyle dijitalleştirmektir.'
   },
   {
     question: 'İhale oluşturmak ücretli mi?',
@@ -1681,7 +1682,7 @@ function toggleFilterSection(section: string) {
                     <!-- İhale İlanı -->
                     <div v-if="activeDetailTab === 'ilan'" class="text-left text-xs leading-relaxed text-slate-600">
                       <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-2">Resmi İlan Özeti</h4>
-                      <p>{{ res.description }} Bu ihale özel sektör satın alma kurallarına uygun olarak gelanlasalim.com altyapısında canlı eksiltme usulüyle yapılmaktadır.</p>
+                      <p>{{ res.description }} Bu ihale özel sektör satın alma kurallarına uygun olarak ihaleciburada.com altyapısında canlı eksiltme usulüyle yapılmaktadır.</p>
                     </div>
 
                     <!-- İdari Şartname -->
@@ -2265,6 +2266,9 @@ function toggleFilterSection(section: string) {
         </div>
       </div>
     </section>
+
+    <!-- VİDEO REHBERLER & AKADEMİ SECTION -->
+    <VideoGuides />
 
     <!-- FAQ SECTION -->
     <section id="sss" class="border-b border-slate-200 bg-white py-20">

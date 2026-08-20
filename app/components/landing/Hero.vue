@@ -52,7 +52,7 @@ import AppButton from "~/components/ui/AppButton.vue"
           <p
             class="mt-8 max-w-xl text-xl leading-9 text-slate-600"
           >
-            GelAnlaşalım ile dijital ihale oluştur,
+            İhaleciBurada ile dijital ihale oluştur,
             güvenilir firmalardan teklif al,
             fiyatları karşılaştır,
             en doğru kararı ver.

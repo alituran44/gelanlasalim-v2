@@ -13,8 +13,12 @@ import {
   Phone,
   CheckSquare,
   Square,
-  AlertCircle
+  AlertCircle,
+  Play,
+  BookOpen,
+  Sparkles
 } from 'lucide-vue-next'
+import VideoGuideModal from '~/components/common/VideoGuideModal.vue'
 
 definePageMeta({
   layout: "dashboard"
@@ -24,6 +28,13 @@ const searchQuery = ref('')
 const activeCategory = ref<'tumu' | 'genel' | 'ihale' | 'segment' | 'uyelik' | 'guven'>('tumu')
 
 const openFaq = ref<number | null>(0)
+const showVideoModal = ref(false)
+const selectedVideoId = ref('intro-3min')
+
+function openVideoGuide(id: string) {
+  selectedVideoId.value = id
+  showVideoModal.value = true
+}
 
 function toggleFaq(index: number) {
   openFaq.value = openFaq.value === index ? null : index
@@ -61,13 +72,93 @@ function submitSupport() {
         <p class="text-xs text-slate-500 mt-1">Sık sorulan sorular ve destek talebi oluşturma.</p>
       </div>
 
-      <button 
-        type="button"
-        @click="openFaq = null"
-        class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-3 shadow transition self-start sm:self-auto"
-      >
-        Destek Talebi Oluştur →
-      </button>
+      <div class="flex items-center gap-2">
+        <button 
+          type="button"
+          @click="openVideoGuide('intro-3min')"
+          class="inline-flex items-center gap-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs px-4 py-3 shadow transition cursor-pointer"
+        >
+          <Play :size="13" class="fill-white" />
+          <span>Video Rehberler</span>
+        </button>
+
+        <button 
+          type="button"
+          @click="openFaq = null"
+          class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-3 shadow transition self-start sm:self-auto cursor-pointer"
+        >
+          Destek Talebi Oluştur →
+        </button>
+      </div>
+    </div>
+
+    <!-- Video Tutorials Fast Strip -->
+    <div class="bg-slate-900 rounded-3xl p-6 text-white space-y-4 border border-slate-800 shadow-md">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="flex h-6 w-6 items-center justify-center rounded-lg bg-blue-600 text-white text-xs font-black">▶</span>
+          <h3 class="text-sm font-bold">Görüntülü Kullanım ve Süreç Rehberleri</h3>
+        </div>
+        <span class="text-[10px] text-slate-400 font-mono">5 Adımlı İnteraktif Akademi</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <button
+          type="button"
+          @click="openVideoGuide('intro-3min')"
+          class="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-blue-500 text-left transition flex items-start gap-3 group cursor-pointer"
+        >
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-600/20 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition">
+            <Play :size="12" class="fill-current" />
+          </div>
+          <div>
+            <div class="text-[9px] font-black uppercase text-blue-400">3 DAKİKADA TANITIM</div>
+            <div class="text-xs font-bold text-slate-200 mt-0.5 group-hover:text-white">Nasıl Çalışır & Tasarruf?</div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          @click="openVideoGuide('ihale-acma')"
+          class="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-blue-500 text-left transition flex items-start gap-3 group cursor-pointer"
+        >
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-600/20 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition">
+            <Play :size="12" class="fill-current" />
+          </div>
+          <div>
+            <div class="text-[9px] font-black uppercase text-blue-400">ALICI REHBERİ</div>
+            <div class="text-xs font-bold text-slate-200 mt-0.5 group-hover:text-white">İhale Açma & Şartname</div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          @click="openVideoGuide('teklif-verme')"
+          class="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-blue-500 text-left transition flex items-start gap-3 group cursor-pointer"
+        >
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-600/20 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition">
+            <Play :size="12" class="fill-current" />
+          </div>
+          <div>
+            <div class="text-[9px] font-black uppercase text-blue-400">TEDARİKÇİ REHBERİ</div>
+            <div class="text-xs font-bold text-slate-200 mt-0.5 group-hover:text-white">Teklif Verme & Eksiltme</div>
+          </div>
+        </button>
+
+        <button
+          type="button"
+          @click="openVideoGuide('kyc-dogrulama')"
+          class="p-3.5 rounded-2xl bg-slate-950/70 border border-slate-800 hover:border-blue-500 text-left transition flex items-start gap-3 group cursor-pointer"
+        >
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-blue-600/20 text-blue-400 group-hover:bg-blue-600 group-hover:text-white transition">
+            <Play :size="12" class="fill-current" />
+          </div>
+          <div>
+            <div class="text-[9px] font-black uppercase text-blue-400">GÜVENLİK & ONAY</div>
+            <div class="text-xs font-bold text-slate-200 mt-0.5 group-hover:text-white">e-Devlet & MERSİS KYC</div>
+          </div>
+        </button>
+      </div>
     </div>
 
     <!-- Main Grid Layout -->
@@ -117,7 +208,7 @@ function submitSupport() {
         <!-- FAQ Accordion items list -->
         <div class="space-y-3">
           
-          <!-- Faq 0: GelAnlaşalım nedir? -->
+          <!-- Faq 0: İhaleciBurada nedir? -->
           <div class="rounded-xl border bg-white overflow-hidden transition" style="border-color: #E2E8F0;">
             <button 
               type="button"
@@ -126,7 +217,7 @@ function submitSupport() {
             >
               <span class="flex items-center gap-2">
                 <span class="text-[8px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-black uppercase">GENEL</span>
-                GelAnlaşalım nedir?
+                İhaleciBurada nedir?
               </span>
               <ChevronUp v-if="openFaq === 0" :size="14" />
               <ChevronDown v-else :size="14" />
@@ -134,7 +225,7 @@ function submitSupport() {
 
             <div v-if="openFaq === 0" class="p-4 border-t border-slate-100 space-y-4 text-xs leading-relaxed text-slate-600">
               <p>
-                <strong>GelAnlaşalım,</strong> firmaların Ürün, Hizmet, Üretim ve proje bazlı sözleşmelerini platform üzerinden yönetebildiği kurumsal B2B ağdır. İhale açabilir, teklif verebilir, teklif verenlerle pazarlık yapabilir ve sevkiyat takip süreçlerini tamamlayabilirsiniz.
+                <strong>İhaleciBurada,</strong> firmaların Ürün, Hizmet, Üretim ve proje bazlı sözleşmelerini platform üzerinden yönetebildiği kurumsal B2B ağdır. İhale açabilir, teklif verebilir, teklif verenlerle pazarlık yapabilir ve sevkiyat takip süreçlerini tamamlayabilirsiniz.
               </p>
 
               <div class="flex flex-wrap gap-2 text-[8px] font-black text-slate-400 uppercase">
@@ -155,7 +246,7 @@ function submitSupport() {
             </div>
           </div>
 
-          <!-- Faq 1: GelAnlaşalım kimler için uygundur? -->
+          <!-- Faq 1: İhaleciBurada kimler için uygundur? -->
           <div class="rounded-xl border bg-white overflow-hidden transition" style="border-color: #E2E8F0;">
             <button 
               type="button"
@@ -164,7 +255,7 @@ function submitSupport() {
             >
               <span class="flex items-center gap-2">
                 <span class="text-[8px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-black uppercase">GENEL</span>
-                GelAnlaşalım kimler için uygundur?
+                İhaleciBurada kimler için uygundur?
               </span>
               <ChevronUp v-if="openFaq === 1" :size="14" />
               <ChevronDown v-else :size="14" />
@@ -193,7 +284,7 @@ function submitSupport() {
             </div>
           </div>
 
-          <!-- Faq 3: GelAnlaşalım üzerinden satış yapmak güvenli mi? -->
+          <!-- Faq 3: İhaleciBurada üzerinden satış yapmak güvenli mi? -->
           <div class="rounded-xl border bg-white overflow-hidden transition" style="border-color: #E2E8F0;">
             <button 
               type="button"
@@ -202,7 +293,7 @@ function submitSupport() {
             >
               <span class="flex items-center gap-2">
                 <span class="text-[8px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-black uppercase">GÜVEN & TİCARET</span>
-                GelAnlaşalım üzerinden satış yapmak güvenli mi?
+                İhaleciBurada üzerinden satış yapmak güvenli mi?
               </span>
               <ChevronUp v-if="openFaq === 3" :size="14" />
               <ChevronDown v-else :size="14" />
@@ -345,6 +436,12 @@ function submitSupport() {
       </div>
 
     </div>
+
+    <!-- Video Guide Modal -->
+    <VideoGuideModal
+      v-model="showVideoModal"
+      :initial-video-id="selectedVideoId"
+    />
 
   </div>
 </template>

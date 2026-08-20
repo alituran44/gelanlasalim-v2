@@ -139,7 +139,7 @@ function importExcelItems() {
     <!-- Header -->
     <div class="flex flex-col gap-1.5">
       <h1 class="text-2xl font-black text-slate-800 tracking-tight">ERP & Sistem Entegrasyonları</h1>
-      <p class="text-xs text-slate-500 font-medium">Kurumsal kaynak planlama ve harici veri kaynaklarınızı GelAnlaşalım B2B portalına bağlayın.</p>
+      <p class="text-xs text-slate-500 font-medium">Kurumsal kaynak planlama ve harici veri kaynaklarınızı İhaleciBurada B2B portalına bağlayın.</p>
     </div>
 
     <!-- Main Card Tabs Layout -->

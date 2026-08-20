@@ -80,7 +80,7 @@ const pageTitle = computed(() => {
     <div class="flex items-center gap-4">
       <div>
         <h2 class="text-base font-semibold" style="color: #0F172A;">{{ pageTitle }}</h2>
-        <p class="text-xs" style="color: #94A3B8;">GelAnlaşalım B2B Platform</p>
+        <p class="text-xs" style="color: #94A3B8;">İhaleciBurada B2B Platform</p>
       </div>
 
       <!-- Search -->

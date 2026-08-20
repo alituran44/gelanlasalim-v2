@@ -533,7 +533,7 @@ function completeCheckout() {
               <!-- Bank Transfer (Domestic) -->
               <div v-else-if="activePaymentChannel === 'bank_transfer'" class="space-y-4">
                 <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-2">
-                  <div class="font-bold text-slate-800">Garanti BBVA TR - GelAnlaşalım Bilişim A.Ş.</div>
+                  <div class="font-bold text-slate-800">Garanti BBVA TR - İhaleciBurada Bilişim A.Ş.</div>
                   <div class="font-mono text-blue-700 font-bold select-all text-[11px]">TR91 0006 2000 0001 2345 6789 99</div>
                   <div class="text-[10px] text-slate-500">Açıklama kısmına firma vergi numaranızı yazınız.</div>
                 </div>

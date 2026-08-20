@@ -88,7 +88,7 @@ function openCompanyModal(firm: any) {
       mersis: '0XXX-XXXX-XXXX-XXXX',
       rating: 4.5,
       reviews: [
-        { author: 'Sistem Yöneticisi', company: 'GelAnlaşalım Platformu', rating: 5, comment: 'Doğrulanmış B2B platform üyesi kurumsal satıcı.', date: 'Temmuz 2026' }
+        { author: 'Sistem Yöneticisi', company: 'İhaleciBurada Platformu', rating: 5, comment: 'Doğrulanmış B2B platform üyesi kurumsal satıcı.', date: 'Temmuz 2026' }
       ]
     }
   }

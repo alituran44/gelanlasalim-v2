@@ -66,7 +66,7 @@ function deleteNotification(id: string) {
           <Bell class="text-blue-600" :size="22" />
           Bildirimler
         </h1>
-        <p class="text-sm mt-0.5" style="color: #64748B;">GelAnlaşalım platformundaki ihale ve teklif bildirimlerini izleyin</p>
+        <p class="text-sm mt-0.5" style="color: #64748B;">İhaleciBurada platformundaki ihale ve teklif bildirimlerini izleyin</p>
       </div>
 
       <button 

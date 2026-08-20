@@ -1,5 +1,5 @@
-﻿# GelAnlaşalım B2B Platformu
-> GelAnlaşalım, kurumsal alıcıların satın alma taleplerini yayınlayıp onaylı tedarikçilerden kapalı zarf ve canlı eksiltme usulüyle teklif topladığı Türkiye merkezli B2B ters ihale platformudur.
+# İhaleciBurada B2B Platformu
+> İhaleciBurada, kurumsal alıcıların satın alma taleplerini yayınlayıp onaylı tedarikçilerden kapalı zarf ve canlı eksiltme usulüyle teklif topladığı Türkiye merkezli B2B ters ihale platformudur.
 
 - Web: https://gelanlasalim-v2.vercel.app
 - Model: B2B Ters İhale & Satın Alma
