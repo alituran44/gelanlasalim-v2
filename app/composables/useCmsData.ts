@@ -29,12 +29,12 @@ export const DEFAULT_CMS_DATA = {
   },
   pricing: {
     vatNotice: 'Fiyatlara %20 KDV dahildir.',
-    disclaimer: 'Bu hizmet GelAnlaşalım Bilişim A.Ş. tarafından yürütülmektedir. Şirketimizin EKAP veya herhangi bir kamu kurumu ile resmi bir illiyeti bulunmamaktadır.',
+    disclaimer: 'Bu hizmet İhaleciBurada Bilişim ve Tedarik A.Ş. tarafından yürütülmektedir.',
     packages: [
-      { id: '1_month', name: 'Üyelik Başvurusu - 1 Ay', price: 90, months: 1 },
-      { id: '3_months', name: 'Üyelik Başvurusu - 3 Ay', price: 180, months: 3 },
-      { id: '6_months', name: 'Üyelik Başvurusu - 6 Ay', price: 270, months: 6 },
-      { id: '9_months', name: 'Üyelik Başvurusu - 9 Ay', price: 360, months: 9 }
+      { id: '1_month', name: 'Üyelik Başvurusu - 1 Ay', price: 900, months: 1, monthlyPrice: 900, badge: 'KURUMSAL KULLANIM' },
+      { id: '3_months', name: 'Üyelik Başvurusu - 3 Ay', price: 1800, months: 3, monthlyPrice: 600, badge: 'EN ÇOK TERCİH EDİLEN POPÜLER PLAN', popular: true },
+      { id: '6_months', name: 'Üyelik Başvurusu - 6 Ay', price: 2700, months: 6, monthlyPrice: 450, badge: 'KURUMSAL KULLANIM' },
+      { id: '9_months', name: 'Üyelik Başvurusu - 9 Ay', price: 3600, months: 9, monthlyPrice: 400, badge: 'YILLIK AVANTAJ' }
     ],
     features: [
       [

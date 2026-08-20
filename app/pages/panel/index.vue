@@ -118,6 +118,44 @@ function acceptBid(bid: any) {
   alert(`🎉 TEBRİKLER!\n\n${bid.bidderFirm} firmasının teklifini kabul ettiniz. Sözleşme ve onay aşamasına geçilmiştir.`)
 }
 
+// 🟢 ABONELİK KALAN SÜRE CANLI SAYACI
+const subscriptionPlan = ref({
+  name: '3 Aylık Popüler Kurumsal Plan',
+  startDate: '20 Ağustos 2026',
+  endDate: '20 Kasım 2026',
+  price: '₺1.800',
+  totalDays: 90,
+  remainingDays: 82,
+  hours: 14,
+  minutes: 38,
+  seconds: 45,
+  percentRemaining: 91,
+  status: 'Aktif'
+})
+
+let timerInterval: any = null
+
+function updateCountdown() {
+  if (subscriptionPlan.value.seconds > 0) {
+    subscriptionPlan.value.seconds--
+  } else {
+    subscriptionPlan.value.seconds = 59
+    if (subscriptionPlan.value.minutes > 0) {
+      subscriptionPlan.value.minutes--
+    } else {
+      subscriptionPlan.value.minutes = 59
+      if (subscriptionPlan.value.hours > 0) {
+        subscriptionPlan.value.hours--
+      } else {
+        subscriptionPlan.value.hours = 23
+        if (subscriptionPlan.value.remainingDays > 0) {
+          subscriptionPlan.value.remainingDays--
+        }
+      }
+    }
+  }
+}
+
 onMounted(() => {
   if (typeof window !== 'undefined') {
     try {
@@ -126,9 +164,14 @@ onMounted(() => {
       if (session.company) {
         companyName.value = session.company
       }
+      if (session.subscriptionPlan) {
+        subscriptionPlan.value.name = session.subscriptionPlan
+      }
     } catch (e) {
       console.error('Error parsing session', e)
     }
+
+    timerInterval = setInterval(updateCountdown, 1000)
   }
 })
 </script>
@@ -138,6 +181,80 @@ onMounted(() => {
     <!-- VERIFIED DASHBOARD (Normal Panel) -->
     <div v-if="verified" class="space-y-6">
       
+      <!-- 🟢 1. AKTİF ABONELİK DURUMU & CANLI KALAN SÜRE SAYACI -->
+      <div class="rounded-3xl border bg-gradient-to-r from-[#0F223D] via-[#152B4D] to-[#0F223D] text-white p-6 shadow-xl relative overflow-hidden text-left space-y-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                {{ subscriptionPlan.status }} Lisans
+              </span>
+              <span class="text-xs text-blue-200 font-bold">• {{ subscriptionPlan.name }}</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white">
+              Kurumsal B2B Aboneliğiniz Aktif
+            </h2>
+            <p class="text-xs text-slate-300 max-w-xl">
+              İhale açma, kapalı zarf eksiltmeye katılma, doğrudan temin ve canlı fiyat pazarlığı yetkileriniz sınırsızdır. Bitiş: <strong class="text-white">{{ subscriptionPlan.endDate }}</strong>.
+            </p>
+          </div>
+
+          <!-- Digital Countdown Blocks -->
+          <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+            <!-- Days -->
+            <div class="bg-black/40 border border-white/10 backdrop-blur-md rounded-2xl p-3 min-w-[70px] text-center">
+              <div class="text-2xl sm:text-3xl font-black font-mono text-[#00C2FF]">{{ subscriptionPlan.remainingDays }}</div>
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mt-0.5">GÜN</span>
+            </div>
+            <span class="text-xl font-bold text-slate-500">:</span>
+
+            <!-- Hours -->
+            <div class="bg-black/40 border border-white/10 backdrop-blur-md rounded-2xl p-3 min-w-[65px] text-center">
+              <div class="text-2xl sm:text-3xl font-black font-mono text-white">{{ String(subscriptionPlan.hours).padStart(2, '0') }}</div>
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mt-0.5">SAAT</span>
+            </div>
+            <span class="text-xl font-bold text-slate-500">:</span>
+
+            <!-- Minutes -->
+            <div class="bg-black/40 border border-white/10 backdrop-blur-md rounded-2xl p-3 min-w-[65px] text-center">
+              <div class="text-2xl sm:text-3xl font-black font-mono text-white">{{ String(subscriptionPlan.minutes).padStart(2, '0') }}</div>
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mt-0.5">DAKİKA</span>
+            </div>
+            <span class="text-xl font-bold text-slate-500">:</span>
+
+            <!-- Seconds -->
+            <div class="bg-black/40 border border-amber-400/40 backdrop-blur-md rounded-2xl p-3 min-w-[65px] text-center">
+              <div class="text-2xl sm:text-3xl font-black font-mono text-amber-400">{{ String(subscriptionPlan.seconds).padStart(2, '0') }}</div>
+              <span class="text-[9px] font-black text-amber-300 uppercase tracking-widest block mt-0.5">SANİYE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Bar & Actions -->
+        <div class="pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex-1 max-w-md space-y-1.5">
+            <div class="flex justify-between text-[11px] font-bold text-slate-300">
+              <span>Abonelik Geçerlilik Oranı</span>
+              <span class="font-mono text-[#00C2FF]">%{{ subscriptionPlan.percentRemaining }} Aktif</span>
+            </div>
+            <div class="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+              <div class="bg-gradient-to-r from-[#0052FF] to-[#00C2FF] h-2 rounded-full transition-all duration-500" :style="`width: ${subscriptionPlan.percentRemaining}%`"></div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <NuxtLink
+              to="/abonelik"
+              class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg"
+            >
+              <span>⚡ Aboneliği Yenile / Uzat</span>
+              <ArrowRight :size="14" />
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+
       <!-- Hoşgeldin Bilgi Bandı -->
       <div class="rounded-2xl border bg-white p-6 shadow-xs flex items-center justify-between" style="border-color: #E2E8F0;">
         <div>
@@ -266,6 +383,80 @@ onMounted(() => {
     <!-- UNVERIFIED DASHBOARD (Verification Pending Panel) -->
     <div v-else class="max-w-6xl mx-auto space-y-6 text-left">
       
+      <!-- 🟢 AKTİF ABONELİK DURUMU & CANLI KALAN SÜRE SAYACI -->
+      <div class="rounded-3xl border bg-gradient-to-r from-[#0F223D] via-[#152B4D] to-[#0F223D] text-white p-6 shadow-xl relative overflow-hidden text-left space-y-5">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+                {{ subscriptionPlan.status }} Lisans
+              </span>
+              <span class="text-xs text-blue-200 font-bold">• {{ subscriptionPlan.name }}</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white">
+              Kurumsal B2B Aboneliğiniz Aktif
+            </h2>
+            <p class="text-xs text-slate-300 max-w-xl">
+              İhale açma, teklif verme ve doğrudan fiyat pazarlığı işlemleriniz için kalan abonelik süreniz. Bitiş: <strong class="text-white">{{ subscriptionPlan.endDate }}</strong>.
+            </p>
+          </div>
+
+          <!-- Digital Countdown Blocks -->
+          <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+            <!-- Days -->
+            <div class="bg-black/40 border border-white/10 backdrop-blur-md rounded-2xl p-3 min-w-[70px] text-center">
+              <div class="text-2xl sm:text-3xl font-black font-mono text-[#00C2FF]">{{ subscriptionPlan.remainingDays }}</div>
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mt-0.5">GÜN</span>
+            </div>
+            <span class="text-xl font-bold text-slate-500">:</span>
+
+            <!-- Hours -->
+            <div class="bg-black/40 border border-white/10 backdrop-blur-md rounded-2xl p-3 min-w-[65px] text-center">
+              <div class="text-2xl sm:text-3xl font-black font-mono text-white">{{ String(subscriptionPlan.hours).padStart(2, '0') }}</div>
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mt-0.5">SAAT</span>
+            </div>
+            <span class="text-xl font-bold text-slate-500">:</span>
+
+            <!-- Minutes -->
+            <div class="bg-black/40 border border-white/10 backdrop-blur-md rounded-2xl p-3 min-w-[65px] text-center">
+              <div class="text-2xl sm:text-3xl font-black font-mono text-white">{{ String(subscriptionPlan.minutes).padStart(2, '0') }}</div>
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mt-0.5">DAKİKA</span>
+            </div>
+            <span class="text-xl font-bold text-slate-500">:</span>
+
+            <!-- Seconds -->
+            <div class="bg-black/40 border border-amber-400/40 backdrop-blur-md rounded-2xl p-3 min-w-[65px] text-center">
+              <div class="text-2xl sm:text-3xl font-black font-mono text-amber-400">{{ String(subscriptionPlan.seconds).padStart(2, '0') }}</div>
+              <span class="text-[9px] font-black text-amber-300 uppercase tracking-widest block mt-0.5">SANİYE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Bar & Actions -->
+        <div class="pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div class="flex-1 max-w-md space-y-1.5">
+            <div class="flex justify-between text-[11px] font-bold text-slate-300">
+              <span>Abonelik Geçerlilik Oranı</span>
+              <span class="font-mono text-[#00C2FF]">%{{ subscriptionPlan.percentRemaining }} Aktif</span>
+            </div>
+            <div class="w-full bg-white/10 rounded-full h-2 overflow-hidden">
+              <div class="bg-gradient-to-r from-[#0052FF] to-[#00C2FF] h-2 rounded-full transition-all duration-500" :style="`width: ${subscriptionPlan.percentRemaining}%`"></div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <NuxtLink
+              to="/abonelik"
+              class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg"
+            >
+              <span>⚡ Aboneliği Yenile / Uzat</span>
+              <ArrowRight :size="14" />
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+
       <!-- Top banner + Steps Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         

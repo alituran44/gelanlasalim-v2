@@ -38,33 +38,33 @@ const domesticPackages = [
   { 
     id: '1-ay-tr', 
     name: 'Üyelik Başvurusu - 1 Ay', 
-    price: 90, 
-    monthly: '₺90,00 / ay',
+    price: 900, 
+    monthly: '₺900,00 / ay',
     desc: '1 Aylık Standart B2B İhale ve Eksiltme Paket Bedeli (%20 KDV Dahil)',
     isPromo: false
   },
   { 
     id: '3-ay-tr', 
     name: 'Üyelik Başvurusu - 3 Ay', 
-    price: 180, 
-    monthly: '₺60,00 / ay',
+    price: 1800, 
+    monthly: '₺600,00 / ay',
     desc: '3 Aylık Popüler Pakette Net %33 Tasarruf Avantajı',
     isPromo: true
   },
   { 
     id: '6-ay-tr', 
     name: 'Üyelik Başvurusu - 6 Ay', 
-    price: 270, 
-    monthly: '₺45,00 / ay',
+    price: 2700, 
+    monthly: '₺450,00 / ay',
     desc: '6 Aylık Kurumsal Pakette Net %50 Tasarruf Avantajı',
     isPromo: false
   },
   { 
-    id: '12-ay-tr', 
-    name: 'Üyelik Başvurusu - 12 Ay (Yıllık)', 
-    price: 360, 
-    monthly: '₺30,00 / ay',
-    desc: '12 Aylık Yıllık Avantaj Paketinde Net %66 Tasarruf',
+    id: '9-ay-tr', 
+    name: 'Üyelik Başvurusu - 9 Ay', 
+    price: 3600, 
+    monthly: '₺400,00 / ay',
+    desc: '9 Aylık Kurumsal Avantaj Paketinde Net %55 Tasarruf',
     isPromo: false
   }
 ]
