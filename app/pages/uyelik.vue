@@ -307,7 +307,7 @@ function handleGuestEntry() {
       <!-- Header brand -->
       <div class="relative z-10 flex items-center justify-between">
         <NuxtLink to="/" class="flex items-center gap-2.5 hover:opacity-90 transition">
-          <img src="/logo.png" alt="GelAnlaşalım Logosu" class="h-9 w-auto brightness-0 invert" />
+          <img src="/logo.png" alt="İhaleciBurada Logo" class="h-12 sm:h-14 w-auto bg-white/90 p-1.5 rounded-xl shadow-xs object-contain" />
         </NuxtLink>
         <NuxtLink
           to="/"

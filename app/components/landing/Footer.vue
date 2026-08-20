@@ -28,7 +28,7 @@ const companyLinks = [
         <!-- Column 1: Brand Info -->
         <div class="md:col-span-4 flex flex-col gap-5 text-left">
           <div class="flex items-center gap-2.5">
-            <img src="/logo.png" alt="GelAnlaşalım B2B Platformu Logo" class="h-10 w-auto" />
+            <img src="/logo.png" alt="İhaleciBurada.com B2B Platformu Logo" class="h-12 sm:h-14 md:h-16 w-auto object-contain drop-shadow-xs" />
           </div>
           
           <p class="text-xs leading-relaxed font-medium text-slate-500 max-w-sm">

@@ -99,12 +99,16 @@ const activeTenders = ref([
 
       <!-- Header -->
       <header class="w-full bg-white border-b transition-all" style="border-color: #E2E8F0;">
-      <div class="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-6">
+      <div class="mx-auto flex h-[84px] sm:h-[90px] max-w-7xl items-center justify-between px-6">
 
         <!-- Sol: Logo (İhaleciBurada.com) -->
-        <NuxtLink to="/" class="flex items-center gap-3 hover:opacity-95 transition shrink-0 group">
-          <img src="/logo.png" alt="İhaleciBurada.com Logo" class="h-10 sm:h-12 w-auto object-contain drop-shadow-xs group-hover:scale-102 transition-transform" />
-          <span class="hidden xl:inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-[9px] font-black text-[#0052FF] border border-blue-200">
+        <NuxtLink to="/" class="flex items-center gap-3.5 hover:opacity-95 transition shrink-0 group py-1">
+          <img 
+            src="/logo.png" 
+            alt="İhaleciBurada.com Logo" 
+            class="h-14 sm:h-16 md:h-20 lg:h-22 max-h-[76px] w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-all duration-200" 
+          />
+          <span class="hidden xl:inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-black text-[#0052FF] border border-blue-200 shadow-2xs">
             ✓ ONAYLI B2B
           </span>
         </NuxtLink>

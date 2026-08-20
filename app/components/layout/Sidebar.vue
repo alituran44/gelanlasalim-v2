@@ -147,9 +147,9 @@ const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
   <aside class="w-64 h-screen sticky top-0 flex flex-col shrink-0" style="background: #0F223D;">
 
     <!-- Logo Alanı -->
-    <div class="px-6 py-5 border-b flex justify-start items-center" style="border-color: rgba(255,255,255,0.08);">
-      <NuxtLink to="/">
-        <img src="/logo.png" alt="İhaleciBurada Logo" class="h-8 w-auto bg-white p-1 rounded-lg" />
+    <div class="px-5 py-4 border-b flex justify-start items-center" style="border-color: rgba(255,255,255,0.08);">
+      <NuxtLink to="/" class="block">
+        <img src="/logo.png" alt="İhaleciBurada Logo" class="h-10 sm:h-12 w-auto bg-white p-1.5 rounded-xl shadow-xs object-contain" />
       </NuxtLink>
     </div>
 
