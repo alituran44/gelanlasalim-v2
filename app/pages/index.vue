@@ -1088,6 +1088,49 @@ function openQuickBidModal(tender: any) {
   showQuickBidModal.value = true
 }
 
+// 🟢 İHALE DOSYALARI MODAL & İNDİRME SİSTEMİ
+const showTenderDocsModal = ref(false)
+const selectedTenderForDocs = ref<any>(null)
+
+function openTenderDocsModal(tender: any) {
+  selectedTenderForDocs.value = tender
+  showTenderDocsModal.value = true
+}
+
+function downloadDoc(docType: 'teknik' | 'idari' | 'malzeme' | 'ilan' | 'tum') {
+  if (!selectedTenderForDocs.value) return
+  const t = selectedTenderForDocs.value
+  let filename = ''
+  let content = ''
+
+  if (docType === 'teknik') {
+    filename = `Teknik_Sartname_Ihale_${100000 + t.id}.txt`
+    content = `========================================================\nTEKNİK ŞARTNAME & KALİFİKASYON STANDARTLARI\nİhale No: 2026/${100000 + t.id}\nİhale Başlığı: ${t.title}\nAlıcı Kurum: ${t.company}\nTeslim Yeri: ${t.city}\nSon Teklif Tarihi: ${t.deadline}\n========================================================\n\nTEKNİK ŞARTNAME MADDELERİ:\n${t.tech_spec || 'Teknik şartnameye uygun teslimat zorunludur.'}\n\nGARANTİ VE KALİTE STANDARTLARI:\n- TSE / CE / ISO belgeli ürün teslimi zorunludur.\n- En az 2 yıl üretici veya ithalatçı garantisi aranır.\n- Hatalı ürünler 48 saat içerisinde yenisiyle değiştirilecektir.\n`
+  } else if (docType === 'idari') {
+    filename = `Idari_Sartname_Ihale_${100000 + t.id}.txt`
+    content = `========================================================\nİDARİ ŞARTNAME & SÖZLEŞME GENEL HÜKÜMLERİ\nİhale No: 2026/${100000 + t.id}\nİhale Başlığı: ${t.title}\nAlıcı Kurum: ${t.company}\nTeslimat Şehri: ${t.city}\n========================================================\n\nİDARİ ŞARTLAR:\n${t.admin_spec || 'Tüm ödemeler teslim ve kabul tutanağını takiben 14 iş günü içinde yapılır.'}\n\nÖDEME VE TESLİMAT KOŞULLARI:\n- Ödeme: Kabul onayı sonrası banka havalesi / EFT ile gerçekleştirilir.\n- Gecikme Cezası: Her geciken gün için ihale bedelinin %0.5 oranında kesinti uygulanır.\n`
+  } else if (docType === 'malzeme') {
+    filename = `Malzeme_Ve_Birim_Fiyat_Cetveli_${100000 + t.id}.txt`
+    content = `========================================================\nMALZEME VE BİRİM FİYAT TEKLİF CETVELİ\nİhale No: 2026/${100000 + t.id}\nİhale Başlığı: ${t.title}\n========================================================\n\nMALZEME / HİZMET KALEMLERİ:\n${t.material_list}\n\nNOT: Tedarikçiler bu cetveldeki tüm kalemlere birim fiyat girmelidir.\n`
+  } else if (docType === 'ilan') {
+    filename = `Resmi_Ihale_Ilani_${100000 + t.id}.txt`
+    content = `========================================================\nRESMİ İHALE İLAN METNİ VE DUYURUSU\nİhale No: 2026/${100000 + t.id}\nİhale Adı: ${t.title}\nİhale Türü: ${t.type} - ${t.method}\nAlıcı Firma: ${t.company} (Onaylı Kurumsal Üye)\nTahmini Bütçe Hacmi: ${t.value}\nSon Teklif Verme Tarihi: ${t.deadline} (${t.daysLeft} gün kaldı)\n========================================================\n\nİLAN AÇIKLAMASI:\n${t.description}\n`
+  } else {
+    filename = `Ihale_Dosyasi_Paketi_2026_${100000 + t.id}.txt`
+    content = `========================================================\nİHALECİBURADA.COM - RESMİ İHALE DOSYASI PAKETİ\nİhale No: 2026/${100000 + t.id}\nBaşlık: ${t.title}\nFirma: ${t.company}\nBölge: ${t.city}\nBütçe: ${t.value}\n========================================================\n\n1. İLAN METNİ:\n${t.description}\n\n2. MALZEME LİSTESİ:\n${t.material_list}\n\n3. İDARİ ŞARTNAME:\n${t.admin_spec}\n\n4. TEKNİK ŞARTNAME:\n${t.tech_spec}\n\n========================================================\nBu ihale dosyası İhaleciBurada platformu üzerinden resmi olarak üretilmiştir.\n`
+  }
+
+  if (typeof document !== 'undefined') {
+    const element = document.createElement('a')
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content))
+    element.setAttribute('download', filename)
+    element.style.display = 'none'
+    document.body.appendChild(element)
+    element.click()
+    document.body.removeChild(element)
+  }
+}
+
 function submitQuickBid() {
   if (!quickBidPrice.value) {
     alert('Lütfen teklif tutarınızı giriniz.')
@@ -1588,15 +1631,15 @@ function toggleFilterSection(section: string) {
                     <div class="mt-5 flex flex-wrap items-center gap-4 text-xs font-bold text-slate-400">
                       <span class="flex items-center gap-1.5"><MapPin :size="14" /> {{ res.city }}</span>
                       <span class="flex items-center gap-1.5"><Clock3 :size="14" /> {{ res.offers }} {{ 'teklif toplandı' }}</span>
-                      <a 
-                        :href="'data:text/plain;charset=utf-8,' + encodeURIComponent('TEKNİK VE İDARİ ŞARTNAME DOSYASI\n----------------------------------------\nİhale No: 2026/' + (100000 + res.id) + '\nİhale Başlığı: ' + res.title + '\nAlıcı Firma: ' + res.company + '\nTeslimat Şehri: ' + res.city + '\n\nİŞİN NİTELİĞİ VE AÇIKLAMA:\n' + res.description + '\n\nMALZEME / HİZMET LİSTESİ:\n' + res.material_list + '\n\nİDARİ ŞARTLAR:\n' + res.admin_spec + '\n\nTEKNİK ŞARTLAR:\n' + res.tech_spec)" 
-                        :download="'Ihale_Sartnamesi_2026_' + res.id + '.txt'" 
-                        class="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-sm"
-                        title="İhale şartname ve malzeme listesi dosyasını bilgisayara indir"
+                      <button 
+                        type="button"
+                        @click="openTenderDocsModal(res)" 
+                        class="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                        title="İhale şartname ve resmi ihale dosyalarını aç ve bilgisayara indir"
                       >
                         <Download :size="13" class="text-emerald-600" />
-                        <span>{{ '📄 Şartnameyi İndir (.PDF)' }}</span>
-                      </a>
+                        <span>{{ '📄 İhale Dosyasını İndir (.PDF)' }}</span>
+                      </button>
                     </div>
                   </div>
 
@@ -1619,7 +1662,7 @@ function toggleFilterSection(section: string) {
 
                       <button 
                         @click="expandedTenderId = expandedTenderId === res.id ? null : res.id; activeDetailTab = 'malzeme'" 
-                        class="w-full flex items-center justify-center rounded-xl bg-slate-900 py-2.5 text-xs font-bold text-white hover:bg-blue-600 transition-all"
+                        class="w-full flex items-center justify-center rounded-xl bg-slate-900 py-2.5 text-xs font-bold text-white hover:bg-blue-600 transition-all cursor-pointer"
                       >
                         {{ expandedTenderId === res.id ? ('Detayı Kapat') : ('İhale Detayları') }}
                       </button>
@@ -1740,15 +1783,15 @@ function toggleFilterSection(section: string) {
                       </h4>
                       <div class="bg-slate-900 border border-slate-800 rounded-xl p-3 space-y-2 font-mono text-[11px] sm:text-xs text-slate-400">
                         <div class="flex justify-between">
-                          <span>[15:42:01] {{ 'Tedarikçi #8 (Demir A.Ş.)' }}</span>
-                          <span class="text-red-400 font-semibold">- {{ currencySymbol }}8,500 {{ 'indirim yaptı' }}</span>
+                          <span class="text-slate-300 font-mono">[15:42:01] Tedarikçi #8 (Anonim Katılımcı)</span>
+                          <span class="text-red-400 font-semibold">- {{ currencySymbol }}8.500 {{ 'indirim yaptı' }}</span>
                         </div>
                         <div class="flex justify-between">
-                          <span>[15:39:12] {{ 'Tedarikçi #3 (Öz Yapı)' }}</span>
-                          <span class="text-red-400 font-semibold">- {{ currencySymbol }}12,000 {{ 'indirim yaptı' }}</span>
+                          <span class="text-slate-300 font-mono">[15:39:12] Tedarikçi #3 (Anonim Katılımcı)</span>
+                          <span class="text-red-400 font-semibold">- {{ currencySymbol }}12.000 {{ 'indirim yaptı' }}</span>
                         </div>
                         <div class="flex justify-between">
-                          <span>[15:35:50] {{ 'Sistem' }}</span>
+                          <span class="text-slate-400 font-mono">[15:35:50] Sistem</span>
                           <span class="text-slate-500">{{ 'İhale canlı eksiltme aşamasına geçti' }}</span>
                         </div>
                       </div>
@@ -2721,6 +2764,140 @@ function toggleFilterSection(section: string) {
             class="w-2/3 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border border-amber-300"
           >
             <span>💬 Karşı Teklifi İlet</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🟢 İHALE DOSYALARI & ŞARTNAME GÖRÜNTÜLEME / İNDİRME MODALI -->
+    <div v-if="showTenderDocsModal && selectedTenderForDocs" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div class="bg-white rounded-3xl max-w-2xl w-full border border-slate-200 p-6 sm:p-8 shadow-2xl space-y-6 text-left relative overflow-hidden animate-scale-in">
+        <!-- Header -->
+        <div class="flex items-start justify-between gap-4 border-b border-slate-100 pb-4">
+          <div class="space-y-1">
+            <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-blue-50 border border-blue-200 text-[#0052FF] text-[10px] font-black uppercase tracking-wider">
+              <span>İHALE NO: 2026/{{ 100000 + selectedTenderForDocs.id }}</span>
+            </div>
+            <h3 class="text-lg font-black text-slate-900 tracking-tight">
+              {{ selectedTenderForDocs.title }}
+            </h3>
+            <p class="text-xs text-slate-500 font-medium">
+              İhale şartnameleri, birim fiyat cetveli ve resmi onay dokümanları
+            </p>
+          </div>
+          <button 
+            type="button" 
+            @click="showTenderDocsModal = false"
+            class="h-8 w-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition cursor-pointer text-sm font-bold"
+          >
+            ✕
+          </button>
+        </div>
+
+        <!-- Document List -->
+        <div class="space-y-3">
+          <!-- Doc 1: Teknik Şartname -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4 hover:bg-slate-50/80 transition">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-xl bg-blue-100/70 text-[#0052FF] flex items-center justify-center shrink-0">
+                <FileText :size="20" />
+              </div>
+              <div>
+                <div class="text-xs font-black text-slate-800">1. Teknik Şartname & Kalifikasyon Belgesi</div>
+                <div class="text-[11px] text-slate-400">Ürün spesifikasyonları, TSE standartları ve kalite şartları (.PDF)</div>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              @click="downloadDoc('teknik')" 
+              class="px-3.5 py-2 rounded-xl bg-[#0052FF] hover:bg-blue-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0"
+            >
+              <Download :size="13" />
+              <span>İndir</span>
+            </button>
+          </div>
+
+          <!-- Doc 2: İdari Şartname -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4 hover:bg-slate-50/80 transition">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-xl bg-purple-100/70 text-purple-600 flex items-center justify-center shrink-0">
+                <FileText :size="20" />
+              </div>
+              <div>
+                <div class="text-xs font-black text-slate-800">2. İdari Şartname & Sözleşme Taslağı</div>
+                <div class="text-[11px] text-slate-400">Ödeme vadeleri, teslimat şartları ve teminat hükümleri (.PDF)</div>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              @click="downloadDoc('idari')" 
+              class="px-3.5 py-2 rounded-xl bg-[#0F223D] hover:bg-[#1A3358] text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0"
+            >
+              <Download :size="13" />
+              <span>İndir</span>
+            </button>
+          </div>
+
+          <!-- Doc 3: Malzeme Cetveli -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4 hover:bg-slate-50/80 transition">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-xl bg-emerald-100/70 text-emerald-600 flex items-center justify-center shrink-0">
+                <FileText :size="20" />
+              </div>
+              <div>
+                <div class="text-xs font-black text-slate-800">3. Malzeme ve Birim Fiyat Cetveli</div>
+                <div class="text-[11px] text-slate-400">Kalem listesi, miktarlar ve birim fiyat teklif formu (.XLSX)</div>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              @click="downloadDoc('malzeme')" 
+              class="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0"
+            >
+              <Download :size="13" />
+              <span>İndir</span>
+            </button>
+          </div>
+
+          <!-- Doc 4: Resmi İhale İlanı -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-4 hover:bg-slate-50/80 transition">
+            <div class="flex items-center gap-3">
+              <div class="h-10 w-10 rounded-xl bg-amber-100/70 text-amber-600 flex items-center justify-center shrink-0">
+                <Volume2 :size="20" />
+              </div>
+              <div>
+                <div class="text-xs font-black text-slate-800">4. Resmi İhale İlan Metni & İdare Onayı</div>
+                <div class="text-[11px] text-slate-400">İhale duyurusu, son başvuru ve teklif verme takvimi (.PDF)</div>
+              </div>
+            </div>
+            <button 
+              type="button" 
+              @click="downloadDoc('ilan')" 
+              class="px-3.5 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-black transition flex items-center gap-1.5 shadow-xs cursor-pointer shrink-0"
+            >
+              <Download :size="13" />
+              <span>İndir</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Consolidated Download Button & Close -->
+        <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <button 
+            type="button" 
+            @click="downloadDoc('tum')"
+            class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-[#0052FF] to-[#00C2FF] text-white text-xs font-black flex items-center justify-center gap-2 shadow-md hover:shadow-lg transition cursor-pointer"
+          >
+            <Download :size="15" />
+            <span>📦 Tüm İhale Dosyalarını İndir (Tek Paket)</span>
+          </button>
+
+          <button 
+            type="button" 
+            @click="showTenderDocsModal = false"
+            class="px-5 py-3 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold transition cursor-pointer"
+          >
+            Kapat
           </button>
         </div>
       </div>
