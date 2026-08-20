@@ -1183,182 +1183,13 @@ function toggleFilterSection(section: string) {
 
 <template>
   <div class="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
-    <!-- HERO SECTION -->
-    <section class="relative overflow-hidden border-b border-slate-200 bg-slate-100 min-h-[640px]">
-      <!-- Background Video -->
-      <ClientOnly>
-        <video 
-          v-if="cmsData.hero.heroVideoUrl"
-          ref="heroVideoRef"
-          autoplay 
-          loop 
-          muted 
-          playsinline 
-          class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-45"
-        >
-          <source :src="cmsData.hero.heroVideoUrl" type="video/mp4" />
-        </video>
-      </ClientOnly>
-      <!-- Fallback image background if video is not available -->
-      <div 
-        v-if="!cmsData.hero.heroVideoUrl" 
-        class="absolute inset-0 w-full h-full bg-cover bg-center z-0" 
-        style="background-image: url('/hero_port_background.png'); opacity: 0.15;"
-      ></div>
-
-      <!-- Color Overlay for clean typography readability -->
-      <div class="absolute inset-0 bg-gradient-to-b from-slate-50/80 via-white/85 to-white/95 z-0"></div>
-
-      <!-- Decorative circles -->
-      <div class="absolute right-[-10%] top-[-30%] h-[600px] w-[600px] rounded-full bg-blue-500/5 blur-3xl z-10"></div>
-      <div class="absolute bottom-[-30%] left-[-10%] h-[500px] w-[500px] rounded-full bg-cyan-500/5 blur-3xl z-10"></div>
-
-      <div class="relative z-20 mx-auto grid min-h-[640px] max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr]">
-        <!-- Hero Left -->
-        <div class="text-left">
-          <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-[#0052FF]">
-            <span class="h-px w-8 bg-[#0052FF]"></span>
-            {{ localizedHero.tagline }}
-          </div>
-          <h1 class="text-4xl font-black leading-[1.15] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-            {{ localizedHero.titleLine1 }}<br />
-            {{ localizedHero.titleLine2 }}<br />
-            <span class="font-serif italic font-medium text-[#0052FF]">{{ localizedHero.titleItalic }}</span>
-          </h1>
-          <p class="mt-6 max-w-xl text-base leading-relaxed text-slate-600">
-            {{ localizedHero.description }}
-          </p>
-          
-          <!-- Buttons -->
-          <div class="mt-8 flex flex-wrap items-center gap-3">
-            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/20 hover:opacity-95 transition-all bg-[#0F223D] hover:bg-[#0052FF]">
-              {{ 'Hemen kurumsal hesap aç' }}
-              <ArrowRight :size="15" class="text-[#00C2FF]" />
-            </NuxtLink>
-            <a href="#ihale-gezgini" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-6 py-4 text-xs font-black text-slate-700 hover:bg-white hover:text-[#0052FF] transition-all">
-              {{ 'İhaleleri İncele' }}
-              <ArrowRight :size="15" />
-            </a>
-          </div>
-
-          <!-- Bottom Features Strip -->
-          <div class="mt-8 text-[9px] font-bold text-slate-500 uppercase tracking-widest flex flex-wrap gap-x-4 gap-y-2">
-            <template v-for="(badge, index) in localizedHero.badgeStrip" :key="index">
-              <span>{{ badge }}</span>
-              <span v-if="index < localizedHero.badgeStrip.length - 1" class="text-slate-300">•</span>
-            </template>
-          </div>
-
-          <!-- Video Button -->
-          <div class="mt-8">
-            <button class="flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-              </span>
-              {{ 'Video rehberlerini izle' }}
-            </button>
-          </div>
-        </div>
-
-        <!-- Hero Right (Live Card styled like the screenshot) -->
-        <div class="relative">
-          <div class="absolute -inset-8 rounded-full bg-blue-500/5 blur-3xl"></div>
-          
-          <div class="relative mx-auto max-w-[460px] rounded-3xl border border-slate-200/80 bg-white/95 p-6 premium-shadow backdrop-blur-sm text-left">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div>
-                <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-slate-400">
-                  <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> {{ 'TEMSİLİ CANLI İHALE' }}
-                </span>
-                <h3 class="mt-1.5 text-base font-black text-slate-800">{{ localizedLiveTender.title }}</h3>
-              </div>
-              <div class="text-right">
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">{{ 'KALAN SÜRE' }}</span>
-                <div class="mt-1 font-mono text-sm font-black text-slate-800">{{ localizedLiveTender.remainingTime }}</div>
-              </div>
-            </div>
-
-            <!-- Price and Savings info -->
-            <div class="py-6 flex justify-between items-start">
-              <div>
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">{{ 'GÜNCEL EN İYİ TEKLİF' }}</span>
-                <div class="mt-1 text-4xl font-black text-slate-900 tracking-tight font-mono">
-                  {{ currencySymbol }}{{ localizedLiveTender.bestBid.toLocaleString('tr-TR') }}
-                </div>
-                <div class="mt-2 text-[10px] text-slate-400 font-bold">
-                  {{ 'AÇILIŞ FİYATI' }} <span class="font-mono text-slate-600 line-through">{{ currencySymbol }}{{ localizedLiveTender.openingPrice.toLocaleString('tr-TR') }}</span>
-                </div>
-              </div>
-              
-              <div class="text-right">
-                <div class="rounded-lg px-2.5 py-1 text-[9px] font-black" style="background: rgba(30,174,76,0.08); color: #1EAE4C;">
-                  {{ localizedLiveTender.savingsText }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Competitor List -->
-            <div class="space-y-2 border-t border-slate-100 pt-5">
-              <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                {{ localizedLiveTender.competitors.length }} {{ 'TEDARİKÇİ YARIŞIYOR' }}
-              </div>
-              
-              <div 
-                v-for="comp in localizedLiveTender.competitors" 
-                :key="comp.name" 
-                class="flex items-center justify-between rounded-xl px-4 py-2.5"
-                :class="comp.leader ? 'border border-blue-200/60 bg-blue-50/40' : 'bg-white border border-slate-200/60'"
-              >
-                <div class="flex items-center gap-2.5 text-xs font-bold" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
-                  <span class="h-1.5 w-1.5 rounded-full" :class="comp.leader ? 'bg-blue-600' : 'bg-slate-300'"></span>
-                  {{ comp.name }}
-                  <span v-if="comp.leader" class="rounded bg-blue-100 px-1.5 py-0.5 text-[8px] font-black text-blue-700">{{ 'ÖNDE' }}</span>
-                </div>
-                <span class="font-mono font-bold text-xs" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
-                  {{ currencySymbol }}{{ comp.price.toLocaleString('tr-TR') }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Bottom Tabs Inside Card -->
-            <div class="grid grid-cols-4 gap-1 mt-6 border-t border-slate-100 pt-4 text-center">
-              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ 'TALEP' }}</span>
-              <span class="text-[8px] font-black text-blue-600 py-1 border-b-2 border-blue-600">+ {{ 'TEKLİF' }}</span>
-              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ 'KARAR' }}</span>
-              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ 'TESLİMAT' }}</span>
-            </div>
-
-            <div class="mt-4 text-center text-[9px] italic text-slate-400">
-              {{ 'Temsili veridir - Gerçek teklif değildir' }}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Trust Strip -->
-      <div class="relative border-t border-slate-200/80 bg-white/60 py-6 backdrop-blur-md">
-        <div class="mx-auto grid max-w-7xl gap-6 px-6 sm:grid-cols-2 lg:grid-cols-4 text-left">
-          <div v-for="(item, idx) in localizedTrustStrip" :key="idx" class="flex items-center gap-3">
-            <ShieldCheck v-if="idx === 0" class="text-blue-600 shrink-0" :size="22" />
-            <LockKeyhole v-else-if="idx === 1" class="text-blue-600 shrink-0" :size="22" />
-            <Scale v-else-if="idx === 2" class="text-blue-600 shrink-0" :size="22" />
-            <Globe2 v-else class="text-blue-600 shrink-0" :size="22" />
-            <div>
-              <div class="text-xs font-black text-slate-800">{{ item.title }}</div>
-              <div class="text-[10px] text-slate-500">{{ item.desc }}</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- B2B EXPLORER SECTION -->
-    <section id="ihale-gezgini" class="border-b border-slate-200 bg-white py-20">
+    <!-- 🟢 1. B2B EXPLORER SECTION (İHALE PAZARI & GEZGİNİ) -->
+    <section id="ihale-gezgini" class="border-b border-slate-200 bg-white py-16">
       <div class="mx-auto max-w-7xl px-6">
         <!-- Explorer Header -->
         <div class="mb-12 flex flex-col justify-between gap-6 lg:flex-row lg:items-end text-left">
           <div>
-            <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">İHALE PAZARI</span>
+            <span class="text-[10px] font-black text-[#0052FF] uppercase tracking-widest">İHALE PAZARI</span>
             <h2 class="mt-3 text-3xl font-black text-slate-900 tracking-tight md:text-4xl">Doğru Firmayla Doğru Şartlarda Anlaşın</h2>
             <p class="mt-3 max-w-2xl text-xs text-slate-500">Sektörünüze özel ihaleleri sol panelden filtreleyin; teklif süreçlerini canlı takip edin.</p>
           </div>
@@ -1809,6 +1640,175 @@ function toggleFilterSection(section: string) {
               </div>
             </div>
           </main>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🟢 2. HERO SECTION -->
+    <section class="relative overflow-hidden border-b border-slate-200 bg-slate-100 min-h-[640px]">
+      <!-- Background Video -->
+      <ClientOnly>
+        <video 
+          v-if="cmsData.hero.heroVideoUrl"
+          ref="heroVideoRef"
+          autoplay 
+          loop 
+          muted 
+          playsinline 
+          class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-45"
+        >
+          <source :src="cmsData.hero.heroVideoUrl" type="video/mp4" />
+        </video>
+      </ClientOnly>
+      <!-- Fallback image background if video is not available -->
+      <div 
+        v-if="!cmsData.hero.heroVideoUrl" 
+        class="absolute inset-0 w-full h-full bg-cover bg-center z-0" 
+        style="background-image: url('/hero_port_background.png'); opacity: 0.15;"
+      ></div>
+
+      <!-- Color Overlay for clean typography readability -->
+      <div class="absolute inset-0 bg-gradient-to-b from-slate-50/80 via-white/85 to-white/95 z-0"></div>
+
+      <!-- Decorative circles -->
+      <div class="absolute right-[-10%] top-[-30%] h-[600px] w-[600px] rounded-full bg-blue-500/5 blur-3xl z-10"></div>
+      <div class="absolute bottom-[-30%] left-[-10%] h-[500px] w-[500px] rounded-full bg-cyan-500/5 blur-3xl z-10"></div>
+
+      <div class="relative z-20 mx-auto grid min-h-[640px] max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr]">
+        <!-- Hero Left -->
+        <div class="text-left">
+          <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-[#0052FF]">
+            <span class="h-px w-8 bg-[#0052FF]"></span>
+            {{ localizedHero.tagline }}
+          </div>
+          <h1 class="text-4xl font-black leading-[1.15] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
+            {{ localizedHero.titleLine1 }}<br />
+            {{ localizedHero.titleLine2 }}<br />
+            <span class="font-serif italic font-medium text-[#0052FF]">{{ localizedHero.titleItalic }}</span>
+          </h1>
+          <p class="mt-6 max-w-xl text-base leading-relaxed text-slate-600">
+            {{ localizedHero.description }}
+          </p>
+          
+          <!-- Buttons -->
+          <div class="mt-8 flex flex-wrap items-center gap-3">
+            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/20 hover:opacity-95 transition-all bg-[#0F223D] hover:bg-[#0052FF]">
+              {{ 'Hemen kurumsal hesap aç' }}
+              <ArrowRight :size="15" class="text-[#00C2FF]" />
+            </NuxtLink>
+            <a href="#ihale-gezgini" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-6 py-4 text-xs font-black text-slate-700 hover:bg-white hover:text-[#0052FF] transition-all">
+              {{ 'İhaleleri İncele' }}
+              <ArrowRight :size="15" />
+            </a>
+          </div>
+
+          <!-- Bottom Features Strip -->
+          <div class="mt-8 text-[9px] font-bold text-slate-500 uppercase tracking-widest flex flex-wrap gap-x-4 gap-y-2">
+            <template v-for="(badge, index) in localizedHero.badgeStrip" :key="index">
+              <span>{{ badge }}</span>
+              <span v-if="index < localizedHero.badgeStrip.length - 1" class="text-slate-300">•</span>
+            </template>
+          </div>
+
+          <!-- Video Button -->
+          <div class="mt-8">
+            <button class="flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">
+              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </span>
+              {{ 'Video rehberlerini izle' }}
+            </button>
+          </div>
+        </div>
+
+        <!-- Hero Right (Live Card styled like the screenshot) -->
+        <div class="relative">
+          <div class="absolute -inset-8 rounded-full bg-blue-500/5 blur-3xl"></div>
+          
+          <div class="relative mx-auto max-w-[460px] rounded-3xl border border-slate-200/80 bg-white/95 p-6 premium-shadow backdrop-blur-sm text-left">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+              <div>
+                <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-slate-400">
+                  <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> {{ 'TEMSİLİ CANLI İHALE' }}
+                </span>
+                <h3 class="mt-1.5 text-base font-black text-slate-800">{{ localizedLiveTender.title }}</h3>
+              </div>
+              <div class="text-right">
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">{{ 'KALAN SÜRE' }}</span>
+                <div class="mt-1 font-mono text-sm font-black text-slate-800">{{ localizedLiveTender.remainingTime }}</div>
+              </div>
+            </div>
+
+            <!-- Price and Savings info -->
+            <div class="py-6 flex justify-between items-start">
+              <div>
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">{{ 'GÜNCEL EN İYİ TEKLİF' }}</span>
+                <div class="mt-1 text-4xl font-black text-slate-900 tracking-tight font-mono">
+                  {{ currencySymbol }}{{ localizedLiveTender.bestBid.toLocaleString('tr-TR') }}
+                </div>
+                <div class="mt-2 text-[10px] text-slate-400 font-bold">
+                  {{ 'AÇILIŞ FİYATI' }} <span class="font-mono text-slate-600 line-through">{{ currencySymbol }}{{ localizedLiveTender.openingPrice.toLocaleString('tr-TR') }}</span>
+                </div>
+              </div>
+              
+              <div class="text-right">
+                <div class="rounded-lg px-2.5 py-1 text-[9px] font-black" style="background: rgba(30,174,76,0.08); color: #1EAE4C;">
+                  {{ localizedLiveTender.savingsText }}
+                </div>
+              </div>
+            </div>
+
+            <!-- Competitor List -->
+            <div class="space-y-2 border-t border-slate-100 pt-5">
+              <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">
+                {{ localizedLiveTender.competitors.length }} {{ 'TEDARİKÇİ YARIŞIYOR' }}
+              </div>
+              
+              <div 
+                v-for="comp in localizedLiveTender.competitors" 
+                :key="comp.name" 
+                class="flex items-center justify-between rounded-xl px-4 py-2.5"
+                :class="comp.leader ? 'border border-blue-200/60 bg-blue-50/40' : 'bg-white border border-slate-200/60'"
+              >
+                <div class="flex items-center gap-2.5 text-xs font-bold" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
+                  <span class="h-1.5 w-1.5 rounded-full" :class="comp.leader ? 'bg-blue-600' : 'bg-slate-300'"></span>
+                  {{ comp.name }}
+                  <span v-if="comp.leader" class="rounded bg-blue-100 px-1.5 py-0.5 text-[8px] font-black text-blue-700">{{ 'ÖNDE' }}</span>
+                </div>
+                <span class="font-mono font-bold text-xs" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
+                  {{ currencySymbol }}{{ comp.price.toLocaleString('tr-TR') }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Bottom Tabs Inside Card -->
+            <div class="grid grid-cols-4 gap-1 mt-6 border-t border-slate-100 pt-4 text-center">
+              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ 'TALEP' }}</span>
+              <span class="text-[8px] font-black text-blue-600 py-1 border-b-2 border-blue-600">+ {{ 'TEKLİF' }}</span>
+              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ 'KARAR' }}</span>
+              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ 'TESLİMAT' }}</span>
+            </div>
+
+            <div class="mt-4 text-center text-[9px] italic text-slate-400">
+              {{ 'Temsili veridir - Gerçek teklif değildir' }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trust Strip -->
+      <div class="relative border-t border-slate-200/80 bg-white/60 py-6 backdrop-blur-md">
+        <div class="mx-auto grid max-w-7xl gap-6 px-6 sm:grid-cols-2 lg:grid-cols-4 text-left">
+          <div v-for="(item, idx) in localizedTrustStrip" :key="idx" class="flex items-center gap-3">
+            <ShieldCheck v-if="idx === 0" class="text-blue-600 shrink-0" :size="22" />
+            <LockKeyhole v-else-if="idx === 1" class="text-blue-600 shrink-0" :size="22" />
+            <Scale v-else-if="idx === 2" class="text-blue-600 shrink-0" :size="22" />
+            <Globe2 v-else class="text-blue-600 shrink-0" :size="22" />
+            <div>
+              <div class="text-xs font-black text-slate-800">{{ item.title }}</div>
+              <div class="text-[10px] text-slate-500">{{ item.desc }}</div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
