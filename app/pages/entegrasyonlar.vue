@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import {
   Database,
   Cpu,
@@ -20,7 +21,14 @@ definePageMeta({
   layout: 'dashboard'
 })
 
+const route = useRoute()
 const activeTab = ref<'sap' | 'logo' | 'dynamics' | 'api'>('sap')
+
+onMounted(() => {
+  if (route.query.tab && ['sap', 'logo', 'dynamics', 'api'].includes(route.query.tab as string)) {
+    activeTab.value = route.query.tab as 'sap' | 'logo' | 'dynamics' | 'api'
+  }
+})
 
 /* =========================================================
    SAP ENTEGRASYONU SIMULASYON STATE'LERİ

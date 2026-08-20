@@ -1884,48 +1884,84 @@ function toggleFilterSection(section: string) {
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
           <!-- ERP Card 1: SAP -->
-          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
+          <NuxtLink 
+            to="/entegrasyonlar?tab=sap" 
+            class="group p-6 bg-white border border-slate-200/80 hover:border-blue-500 premium-shadow hover:shadow-xl rounded-2xl flex flex-col justify-between min-h-[220px] transition-all duration-200"
+          >
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ 'SAP Entegrasyonu' }}</div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-sm font-black text-slate-800 tracking-tight group-hover:text-blue-600 transition-colors">{{ 'SAP Entegrasyonu' }}</div>
+                <ArrowRight :size="14" class="text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+              </div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
                 {{ 'Satın alma taleplerinizi (Purchase Requisitions) SAP üzerinden otomatik çekin; ihale sonuçlarını SAP sipariş fişi (Purchase Order) olarak geri aktarın.' }}
               </p>
             </div>
-            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">ERP CONNECTED</span>
-          </div>
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+              <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">ERP CONNECTED</span>
+              <span class="text-[10px] font-bold text-slate-400 group-hover:text-blue-600">İncele →</span>
+            </div>
+          </NuxtLink>
 
           <!-- ERP Card 2: Logo -->
-          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
+          <NuxtLink 
+            to="/entegrasyonlar?tab=logo" 
+            class="group p-6 bg-white border border-slate-200/80 hover:border-blue-500 premium-shadow hover:shadow-xl rounded-2xl flex flex-col justify-between min-h-[220px] transition-all duration-200"
+          >
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ 'Logo & Netsis Entegrasyonu' }}</div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-sm font-black text-slate-800 tracking-tight group-hover:text-blue-600 transition-colors">{{ 'Logo & Netsis Entegrasyonu' }}</div>
+                <ArrowRight :size="14" class="text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+              </div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
                 {{ 'Logo Tiger, Go3 veya Netsis sistemlerinizdeki malzeme kartlarını, birimlerini ve tedarikçi cari hesaplarını anlık olarak platformla senkronize edin.' }}
               </p>
             </div>
-            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">API READY</span>
-          </div>
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+              <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">API READY</span>
+              <span class="text-[10px] font-bold text-slate-400 group-hover:text-blue-600">İncele →</span>
+            </div>
+          </NuxtLink>
 
           <!-- ERP Card 3: MS Dynamics -->
-          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
+          <NuxtLink 
+            to="/entegrasyonlar?tab=dynamics" 
+            class="group p-6 bg-white border border-slate-200/80 hover:border-blue-500 premium-shadow hover:shadow-xl rounded-2xl flex flex-col justify-between min-h-[220px] transition-all duration-200"
+          >
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">Microsoft Dynamics 365</div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-sm font-black text-slate-800 tracking-tight group-hover:text-blue-600 transition-colors">Microsoft Dynamics 365</div>
+                <ArrowRight :size="14" class="text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+              </div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
                 {{ 'Dynamics 365 Supply Chain Management modülüyle iki yönlü canlı veri eşleştirmesi sağlayarak teklif toplama süreçlerinizi hızlandırın.' }}
               </p>
             </div>
-            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">AUTOMATED SYNC</span>
-          </div>
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+              <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">AUTOMATED SYNC</span>
+              <span class="text-[10px] font-bold text-slate-400 group-hover:text-blue-600">İncele →</span>
+            </div>
+          </NuxtLink>
 
           <!-- ERP Card 4: Excel & REST API -->
-          <div class="p-6 bg-white border premium-shadow rounded-2xl flex flex-col justify-between min-h-[220px]">
+          <NuxtLink 
+            to="/entegrasyonlar?tab=api" 
+            class="group p-6 bg-white border border-slate-200/80 hover:border-blue-500 premium-shadow hover:shadow-xl rounded-2xl flex flex-col justify-between min-h-[220px] transition-all duration-200"
+          >
             <div>
-              <div class="text-sm font-black text-slate-800 tracking-tight mb-2">{{ 'REST API & Excel Entegrasyonu' }}</div>
+              <div class="flex items-center justify-between mb-2">
+                <div class="text-sm font-black text-slate-800 tracking-tight group-hover:text-blue-600 transition-colors">{{ 'REST API & Excel Entegrasyonu' }}</div>
+                <ArrowRight :size="14" class="text-slate-300 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+              </div>
               <p class="text-[11px] leading-relaxed text-slate-500 font-medium font-sans">
                 {{ 'Özel şirket içi yazılımlarınız için RESTful API uç noktaları. Veya tek tıkla gelişmiş Excel tablosu yükleme ve karşılaştırma aracı.' }}
               </p>
             </div>
-            <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">RESTFUL API / XLS</span>
-          </div>
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+              <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider">RESTFUL API / XLS</span>
+              <span class="text-[10px] font-bold text-slate-400 group-hover:text-blue-600">İncele →</span>
+            </div>
+          </NuxtLink>
         </div>
       </div>
     </section>
