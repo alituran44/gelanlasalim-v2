@@ -32,7 +32,10 @@ import {
   ListTodo,
   Sparkles,
   Check,
-  Info
+  Info,
+  Camera,
+  Eye,
+  Image as ImageIcon
 } from 'lucide-vue-next'
 
 // Nuxt Layout Meta
@@ -253,9 +256,10 @@ function submitContactForm() {
   }, 1200)
 }
 
-// Firma Profilleri ve Yorumlar Veritabanı (Photo 2 / 4 / 5 Feedbacks)
+// Firma Profilleri ve Yorumlar Veritabanı
 const companyProfiles: Record<string, {
   name: string
+  logo?: string
   verified: boolean
   sector: string
   phone: string
@@ -268,6 +272,7 @@ const companyProfiles: Record<string, {
 }> = {
   'Anadolu E-Ticaret A.Ş.': {
     name: 'Anadolu E-Ticaret A.Ş.',
+    logo: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=200&auto=format&fit=crop&q=80',
     verified: true,
     sector: 'Matbaa, Kırtasiye ve Ambalaj / Bilişim',
     phone: '+90 (312) 444 0 262',
@@ -284,6 +289,7 @@ const companyProfiles: Record<string, {
   },
   'Marmara Teknoloji Yatırımları A.Ş.': {
     name: 'Marmara Teknoloji Yatırımları A.Ş.',
+    logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80',
     verified: true,
     sector: 'Teknoloji, Donanım ve Entegrasyon',
     phone: '+90 (212) 222 34 56',
@@ -299,6 +305,7 @@ const companyProfiles: Record<string, {
   },
   'Bursa Endüstri Üretim A.Ş.': {
     name: 'Bursa Endüstri Üretim A.Ş.',
+    logo: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=200&auto=format&fit=crop&q=80',
     verified: true,
     sector: 'Sanayi, Yedek Parça ve Makine',
     phone: '+90 (224) 444 16 16',
@@ -313,6 +320,7 @@ const companyProfiles: Record<string, {
   },
   'Ege Gıda Sanayi Ltd. Şti.': {
     name: 'Ege Gıda Sanayi Ltd. Şti.',
+    logo: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&auto=format&fit=crop&q=80',
     verified: true,
     sector: 'Tarım, Gıda ve Paketleme',
     phone: '+90 (232) 777 88 99',
@@ -327,6 +335,7 @@ const companyProfiles: Record<string, {
   },
   'Atlas Holding A.Ş.': {
     name: 'Atlas Holding A.Ş.',
+    logo: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=200&auto=format&fit=crop&q=80',
     verified: true,
     sector: 'Lojistik, Taşımacılık ve Depolama',
     phone: '+90 (216) 555 12 34',
@@ -344,6 +353,18 @@ const companyProfiles: Record<string, {
 const showCompanyModal = ref(false)
 const selectedCompany = ref<any>(null)
 
+const showImageLightboxModal = ref(false)
+const lightboxImageUrl = ref('')
+const lightboxTitle = ref('')
+
+function openImageLightbox(tender: any) {
+  if (tender.image) {
+    lightboxImageUrl.value = tender.image
+    lightboxTitle.value = tender.title
+    showImageLightboxModal.value = true
+  }
+}
+
 function openCompanyModal(companyName: string) {
   const profile = companyProfiles[companyName]
   if (profile) {
@@ -351,6 +372,7 @@ function openCompanyModal(companyName: string) {
   } else {
     selectedCompany.value = {
       name: companyName,
+      logo: '',
       verified: false,
       sector: 'Genel B2B Tedarik ve Hizmet',
       phone: '+90 (850) 888 00 00',
@@ -711,6 +733,11 @@ const tenders = [
     title: '500 Adet Kurumsal Dizüstü Bilgisayar Alımı',
     company: 'Marmara Teknoloji Yatırımları A.Ş.',
     verified: true,
+    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80'
+    ],
     category: 'Elektronik, Bilgisayar ve İletişim',
     sector: 'IT, Yazılım Geliştirme ve İnternet Hizmetleri',
     city: 'İstanbul',
@@ -733,6 +760,11 @@ const tenders = [
     title: 'Üretim Tesisi Çatı ve İzolasyon Yenileme İşi',
     company: 'Bursa Endüstri Üretim A.Ş.',
     verified: true,
+    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&auto=format&fit=crop&q=80'
+    ],
     category: 'İnşaat, Altyapı ve Yapı İşleri',
     sector: 'İnşaat ve Taahhüt İşleri',
     city: 'Bursa',
@@ -755,6 +787,10 @@ const tenders = [
     title: '12 Aylık Personel Taşıma Hizmeti',
     company: 'Ege Gıda Sanayi Ltd. Şti.',
     verified: true,
+    image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=80'
+    ],
     category: 'Nakliye, Lojistik ve Taşımacılık',
     sector: 'Nakliye ve Lojistik Hizmetleri',
     city: 'İzmir',
@@ -777,6 +813,10 @@ const tenders = [
     title: '100.000 Adet Özel Tasarım Ürün Kutusu Üretimi',
     company: 'Anadolu E-Ticaret A.Ş.',
     verified: true,
+    image: 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=800&auto=format&fit=crop&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=800&auto=format&fit=crop&q=80'
+    ],
     category: 'Matbaa, Kırtasiye ve Ambalaj',
     sector: 'Basılı Malzeme ve Matbaa',
     city: 'Ankara',
@@ -799,6 +839,10 @@ const tenders = [
     title: 'Kurumsal Web Yazılım ve Mobil Uygulama Projesi',
     company: 'Atlas Holding A.Ş.',
     verified: true,
+    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80',
+    images: [
+      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80'
+    ],
     category: 'Yazılım, Bilişim ve Dijital Hizmetler',
     sector: 'IT, Yazılım Geliştirme ve İnternet Hizmetleri',
     city: 'İstanbul',
@@ -1436,8 +1480,32 @@ function toggleFilterSection(section: string) {
                 </div>
               </div>
 
-              <div v-for="res in filteredTenders" :key="res.id" class="p-6 rounded-2xl bg-white border premium-shadow flex flex-col text-left">
+              <div v-for="res in filteredTenders" :key="res.id" class="p-6 rounded-2xl bg-white border border-slate-200/80 premium-shadow flex flex-col text-left hover:border-blue-300 transition-all duration-200">
                   <div class="flex flex-col lg:flex-row lg:justify-between gap-6">
+                    
+                    <!-- 🖼️ İhale Görseli (Eğer görsel varsa gösterilir) -->
+                    <div 
+                      v-if="res.image" 
+                      class="relative group/img shrink-0 rounded-2xl overflow-hidden border border-slate-200/90 bg-slate-100 w-full sm:w-44 h-40 sm:h-36 cursor-pointer shadow-xs" 
+                      @click="openImageLightbox(res)"
+                      title="Görseli büyütmek için tıklayın"
+                    >
+                      <img 
+                        :src="res.image" 
+                        :alt="res.title" 
+                        class="w-full h-full object-cover group-hover/img:scale-108 transition-transform duration-300" 
+                      />
+                      <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-black gap-1.5 backdrop-blur-2xs">
+                        <Eye :size="16" class="text-amber-400" />
+                        <span>Büyüt 🔍</span>
+                      </div>
+                      <span class="absolute bottom-2 left-2 bg-slate-900/85 backdrop-blur-xs text-white text-[9px] font-black px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-sm">
+                        <Camera :size="10" class="text-amber-400" /> 
+                        <span>{{ res.images?.length > 1 ? res.images.length + ' Fotoğraf' : 'Görsel' }}</span>
+                      </span>
+                    </div>
+
+                    <!-- İhale Bilgileri -->
                     <div class="min-w-0 flex-1">
                       <div class="flex flex-wrap items-center gap-2">
                         <span v-if="res.featured" class="rounded-full bg-orange-50 border border-orange-200 px-2.5 py-0.5 text-[9px] font-black text-orange-700 uppercase">🔥 {{ 'Öne Çıkan' }}</span>
@@ -1526,7 +1594,7 @@ function toggleFilterSection(section: string) {
                   <!-- Sekmeler -->
                   <div class="border-t border-sky-100 pt-3 flex flex-wrap gap-2">
                     <button 
-                      v-for="tab in ['malzeme', 'ilan', 'idari', 'teknik', 'benzer']" 
+                      v-for="tab in (res.image ? ['malzeme', 'ilan', 'goruntuler', 'idari', 'teknik', 'benzer'] : ['malzeme', 'ilan', 'idari', 'teknik', 'benzer'])" 
                       :key="tab" 
                       @click="activeDetailTab = tab" 
                       class="px-3 py-1.5 rounded-lg border text-xs font-semibold transition-all uppercase tracking-wider flex items-center gap-1.5" 
@@ -1539,6 +1607,10 @@ function toggleFilterSection(section: string) {
                       <template v-else-if="tab === 'ilan'">
                         <Volume2 :size="12" />
                         <span>{{ 'İhale İlanı' }}</span>
+                      </template>
+                      <template v-else-if="tab === 'goruntuler'">
+                        <Camera :size="12" />
+                        <span>{{ 'Fotoğraflar & Numune' }}</span>
                       </template>
                       <template v-else-if="tab === 'idari'">
                         <ShieldCheck :size="12" />
@@ -1557,6 +1629,26 @@ function toggleFilterSection(section: string) {
 
                   <!-- Sekme İçerikleri -->
                   <div class="bg-white border border-slate-200 rounded-xl p-4 mt-2">
+                    <!-- Görseller & Numune Galerisi -->
+                    <div v-if="activeDetailTab === 'goruntuler'" class="text-left space-y-3">
+                      <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-2 flex items-center gap-2">
+                        <Camera :size="14" class="text-blue-600" />
+                        <span>{{ 'İhale ve Numune Ürün Fotoğrafları' }}</span>
+                      </h4>
+                      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                        <div 
+                          v-for="(imgUrl, imgIdx) in (res.images || [res.image])" 
+                          :key="imgIdx"
+                          class="relative rounded-2xl overflow-hidden border border-slate-200 group cursor-pointer h-48 bg-slate-100"
+                          @click="lightboxImageUrl = imgUrl; lightboxTitle = res.title; showImageLightboxModal = true"
+                        >
+                          <img :src="imgUrl" :alt="res.title + ' Görsel ' + (imgIdx + 1)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                          <div class="absolute inset-0 bg-slate-950/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold gap-1 backdrop-blur-2xs">
+                            <Eye :size="16" class="text-amber-400" /> <span>Tam Ekran Aç</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <!-- Malzeme Listesi -->
                     <div v-if="activeDetailTab === 'malzeme'">
                       <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider border-b border-slate-100 pb-2 mb-3">Malzeme & Birim Fiyat Teklif Formu</h4>
@@ -2448,8 +2540,15 @@ function toggleFilterSection(section: string) {
           </div>
 
           <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 p-0.5 shadow-lg shrink-0">
-              <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-amber-400 font-black text-xl font-mono">
+            <!-- Firma Logosu / Monogram Avatar -->
+            <div class="w-18 h-18 sm:w-20 sm:h-20 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 p-0.5 shadow-lg shrink-0 overflow-hidden">
+              <img 
+                v-if="selectedCompany.logo" 
+                :src="selectedCompany.logo" 
+                :alt="selectedCompany.name + ' Logosu'" 
+                class="w-full h-full object-cover bg-white rounded-[14px]" 
+              />
+              <div v-else class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-amber-400 font-black text-2xl font-mono">
                 {{ selectedCompany.name.charAt(0) }}
               </div>
             </div>
@@ -2938,6 +3037,37 @@ function toggleFilterSection(section: string) {
         </div>
       </div>
     </div>
+
+    <!-- 📷 İHALE GÖRSELİ TAM EKRAN LIGHTBOX MODALI -->
+    <transition name="fade">
+      <div v-if="showImageLightboxModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-4" @click.self="showImageLightboxModal = false">
+        <div class="relative max-w-4xl w-full bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-slate-700 flex flex-col">
+          <!-- Top Bar -->
+          <div class="p-4 bg-slate-950/80 border-b border-slate-800 flex items-center justify-between text-white">
+            <div class="flex items-center gap-2">
+              <Camera :size="16" class="text-amber-400" />
+              <span class="text-xs font-black text-slate-200 truncate">{{ lightboxTitle }}</span>
+            </div>
+            <button @click="showImageLightboxModal = false" class="p-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white transition cursor-pointer">
+              <X :size="18" />
+            </button>
+          </div>
+
+          <!-- Main Image View -->
+          <div class="p-2 sm:p-4 flex items-center justify-center bg-slate-950/50 min-h-[300px] max-h-[75vh]">
+            <img :src="lightboxImageUrl" :alt="lightboxTitle" class="max-w-full max-h-[70vh] object-contain rounded-xl shadow-lg" />
+          </div>
+
+          <!-- Footer Bar -->
+          <div class="p-3 bg-slate-950/80 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+            <span class="text-[11px]">HD Orijinal İhale & Numune Fotoğrafı</span>
+            <button @click="showImageLightboxModal = false" class="px-4 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition cursor-pointer">
+              Kapat
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
 
     <!-- COOKIES CONSENT BANNER -->
     <transition name="fade">

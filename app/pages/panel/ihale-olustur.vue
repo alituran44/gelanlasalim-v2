@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { locale } from '~/composables/useLocale'
-import { AlertCircle, Calendar } from 'lucide-vue-next'
+import { AlertCircle, Calendar, UploadCloud, FileText, FileSpreadsheet, X, Camera, Eye, Trash2, Plus } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { usePublicApis } from '~/composables/usePublicApis'
 
@@ -11,6 +11,9 @@ definePageMeta({ layout: 'dashboard' })
 const router = useRouter()
 const { cmsData, saveCmsData } = useCmsData()
 const { fetchTrHolidays, trPublicHolidays } = usePublicApis()
+
+const fileInputRef = ref<HTMLInputElement | null>(null)
+const imageInputRef = ref<HTMLInputElement | null>(null)
 
 const form = ref({
   baslik: '',
@@ -21,6 +24,7 @@ const form = ref({
   sehir: 'Balıkesir',
   teslimatAdresi: '',
   odemeYontemi: 'Vadeli 30 Gün',
+  images: [] as { url: string; name: string }[],
   files: [] as { name: string; size: string; progress: number; type: string }[]
 })
 
@@ -236,12 +240,42 @@ function clearDraft() {
   }
 }
 
-const fileInputRef = ref<HTMLInputElement | null>(null)
 const showSuccess = ref(false)
 const createdId = ref('')
 
 function triggerFileSelect() {
   fileInputRef.value?.click()
+}
+
+function triggerImageSelect() {
+  imageInputRef.value?.click()
+}
+
+function handleImageChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  if (!target.files || target.files.length === 0) return
+
+  for (let i = 0; i < target.files.length; i++) {
+    const file = target.files[i]
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        form.value.images.push({
+          url: e.target.result as string,
+          name: file.name
+        })
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+}
+
+function removeImage(index: number) {
+  form.value.images.splice(index, 1)
+}
+
+function addSampleImage(url: string, name: string) {
+  form.value.images.push({ url, name })
 }
 
 function handleFileChange(event: Event) {
@@ -293,6 +327,8 @@ function handleSubmit() {
   createdId.value = newId
 
   const combinedCategory = `${form.value.kategori} / ${selectedSubcategory.value}`
+  const primaryImg = form.value.images[0]?.url || ''
+  const imgList = form.value.images.map(img => img.url)
 
   // Add to active tenders list
   cmsData.value.dashboard.tenders.unshift({
@@ -304,6 +340,8 @@ function handleSubmit() {
     durum: 'active',
     butce: budgetVal,
     city: form.value.sehir,
+    image: primaryImg,
+    images: imgList,
     olusturma: 'Bugün'
   })
 
@@ -313,6 +351,7 @@ function handleSubmit() {
     baslik: form.value.baslik,
     kategori: combinedCategory,
     bitis: form.value.sure,
+    image: primaryImg,
     teklifler: []
   })
 
@@ -534,9 +573,91 @@ function handleSubmit() {
         </div>
       </div>
 
-      <!-- KART 4: DOSYA & ŞARTNAME YÜKLEME -->
+      <!-- KART 4: İHALE & NUMUNE GÖRSELLERİ YÜKLEME -->
       <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-        <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">4. Şartname & Ek Belgeler Yükleme</h2>
+        <div class="flex items-center justify-between">
+          <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
+            <Camera :size="15" />
+            <span>4. İhale & Numune Görselleri Yükleme (Fotoğraf)</span>
+          </h2>
+          <span class="text-[10px] text-slate-400 font-bold">İsteğe Bağlı</span>
+        </div>
+        
+        <!-- Image Upload Drag & Drop Zone -->
+        <div 
+          @click="triggerImageSelect"
+          class="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition hover:bg-slate-50 flex flex-col items-center justify-center gap-2 group border-slate-300"
+        >
+          <Camera :size="28" class="text-slate-400 group-hover:text-blue-600 transition" />
+          <div>
+            <span class="text-xs font-bold text-slate-700">İhale Ürün Fotoğrafı veya Numune Görseli Yükleyin</span>
+            <p class="text-[10px] text-slate-400 mt-1">JPG, PNG veya WEBP (Maks: 5MB)</p>
+          </div>
+          <input 
+            ref="imageInputRef"
+            type="file"
+            multiple
+            accept="image/*"
+            class="hidden"
+            @change="handleImageChange"
+          />
+        </div>
+
+        <!-- Predefined sample quick-add buttons -->
+        <div class="flex flex-wrap items-center gap-2 pt-1">
+          <span class="text-[10px] font-bold text-slate-400">Hızlı Numune Ekle:</span>
+          <button 
+            type="button" 
+            @click="addSampleImage('https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80', 'Kurumsal Donanım Numunesi')"
+            class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1"
+          >
+            <Plus :size="10" /> 💻 Donanım / Laptop
+          </button>
+          <button 
+            type="button" 
+            @click="addSampleImage('https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80', 'İnşaat / Çatı Numunesi')"
+            class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1"
+          >
+            <Plus :size="10" /> 🏗️ Çatı / İnşaat
+          </button>
+          <button 
+            type="button" 
+            @click="addSampleImage('https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=800&auto=format&fit=crop&q=80', 'Kutu & Koli Ambalaj Numunesi')"
+            class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1"
+          >
+            <Plus :size="10" /> 📦 Ambalaj / Kutu
+          </button>
+        </div>
+
+        <!-- Uploaded Images Preview Grid -->
+        <div v-if="form.images.length > 0" class="space-y-2 mt-3 pt-3 border-t border-slate-100">
+          <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">YÜKLENEN GÖRSELLER ({{ form.images.length }})</label>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div 
+              v-for="(img, idx) in form.images" 
+              :key="idx"
+              class="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 group h-28"
+            >
+              <img :src="img.url" :alt="img.name" class="w-full h-full object-cover" />
+              <button 
+                type="button"
+                @click="removeImage(idx)"
+                class="absolute top-1.5 right-1.5 p-1 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition shadow-xs cursor-pointer"
+                title="Görseli Sil"
+              >
+                <Trash2 :size="12" />
+              </button>
+              <div class="absolute bottom-0 inset-x-0 bg-slate-900/80 p-1 text-[9px] text-white truncate px-1.5">
+                {{ img.name }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- KART 5: DOSYA & ŞARTNAME YÜKLEME -->
+      <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+        <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">5. Şartname & Ek Belgeler Yükleme</h2>
         
         <!-- Drag & Drop Zone -->
         <div 

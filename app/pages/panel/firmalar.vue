@@ -10,23 +10,23 @@ const searchQuery = ref('')
 const selectedCity = ref('Balıkesir')
 
 const firms = [
-  { name: 'Ali Turan', city: 'Çanakkale', district: 'Merkez', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'AT' },
-  { name: 'yavuz uyanık', city: 'İstanbul', district: 'Beylikdüzü', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'YU' },
-  { name: 'İSTFA GLOBAL TEDARİK YAPI BİLİŞİM DIŞ TİCARET LİMİTED ŞİRKETİ', city: 'İstanbul', district: 'Başakşehir', status: 'Doğrulanmış', sector: 'Hizmet', initial: 'İŞ', isBig: true },
-  { name: 'KADİR AK', city: 'İstanbul', district: 'Başakşehir', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'KA' },
-  { name: 'osman karada', city: 'İstanbul', district: 'Ataşehir', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'OK' },
-  { name: 'SMT RULMAN', city: 'İstanbul', district: 'Ümraniye', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'SR' },
-  { name: 'Musa Mert Çördük', city: 'Konya', district: 'Selçuklu', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'MÇ' },
-  { name: 'Zeynep Özdemir', city: 'İstanbul', district: 'Sancaktepe', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'ZÖ' },
-  { name: 'YUSUF HAMARAT', city: 'İstanbul', district: 'Sultanbeyli', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'YH' },
-  { name: 'Ferdi Yılmaz', city: 'İzmir', district: 'Karabağlar', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'FY' },
-  { name: 'Furkan Şahin', city: 'Kocaeli', district: 'İzmit', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'FŞ' },
-  { name: 'Makks Villas A.Ş.', city: 'İstanbul', district: 'Pendik', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'MA' }
+  { name: 'İSTFA GLOBAL TEDARİK YAPI BİLİŞİM LİMİTED ŞİRKETİ', logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80', city: 'İstanbul', district: 'Başakşehir', status: 'Doğrulanmış', sector: 'Hizmet', initial: 'İŞ', isBig: true },
+  { name: 'Marmara Teknoloji Yatırımları A.Ş.', logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80', city: 'İstanbul', district: 'Levent', status: 'Doğrulanmış', sector: 'Bilişim', initial: 'MT', isBig: true },
+  { name: 'Anadolu E-Ticaret A.Ş.', logo: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=200&auto=format&fit=crop&q=80', city: 'Ankara', district: 'Çankaya', status: 'Doğrulanmış', sector: 'Matbaa & Ambalaj', initial: 'AE', isBig: true },
+  { name: 'Bursa Endüstri Üretim A.Ş.', logo: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=200&auto=format&fit=crop&q=80', city: 'Bursa', district: 'Nilüfer', status: 'Doğrulanmış', sector: 'Sanayi & İmalat', initial: 'BE' },
+  { name: 'Ege Gıda Sanayi Ltd. Şti.', logo: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&auto=format&fit=crop&q=80', city: 'İzmir', district: 'Bornova', status: 'Doğrulanmış', sector: 'Gıda & Catering', initial: 'EG' },
+  { name: 'Atlas Holding A.Ş.', logo: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=200&auto=format&fit=crop&q=80', city: 'İstanbul', district: 'Ataşehir', status: 'Doğrulanmış', sector: 'Lojistik', initial: 'AH' },
+  { name: 'Ali Turan Mühendislik', logo: '', city: 'Çanakkale', district: 'Merkez', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'AT' },
+  { name: 'Yavuz Uyanık İnşaat', logo: '', city: 'İstanbul', district: 'Beylikdüzü', status: 'Doğrulanmamış', sector: 'İnşaat', initial: 'YU' },
+  { name: 'Kadir Ak Yapı', logo: '', city: 'İstanbul', district: 'Başakşehir', status: 'Doğrulanmamış', sector: 'Yapı', initial: 'KA' },
+  { name: 'SMT Rulman Sanayi', logo: '', city: 'İstanbul', district: 'Ümraniye', status: 'Doğrulanmamış', sector: 'Yedek Parça', initial: 'SR' },
+  { name: 'Makks Villas A.Ş.', logo: '', city: 'İstanbul', district: 'Pendik', status: 'Doğrulanmamış', sector: 'Gayrimenkul', initial: 'MA' }
 ]
 
-// Shared Mock Company Profiles Database (Photo 2 / 5 Feedbacks)
+// Shared Mock Company Profiles Database
 const companyProfiles: Record<string, {
   name: string
+  logo?: string
   verified: boolean
   sector: string
   phone: string
@@ -37,8 +37,9 @@ const companyProfiles: Record<string, {
   rating: number
   reviews: Array<{ author: string, company: string, rating: number, comment: string, date: string }>
 }> = {
-  'İSTFA GLOBAL TEDARİK YAPI BİLİŞİM DIŞ TİCARET LİMİTED ŞİRKETİ': {
-    name: 'İSTFA GLOBAL TEDARİK YAPI BİLİŞİM DIŞ TİCARET LİMİTED ŞİRKETİ',
+  'İSTFA GLOBAL TEDARİK YAPI BİLİŞİM LİMİTED ŞİRKETİ': {
+    name: 'İSTFA GLOBAL TEDARİK YAPI BİLİŞİM LİMİTED ŞİRKETİ',
+    logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80',
     verified: true,
     sector: 'Yapı, Bilişim ve Dış Ticaret Tedariği',
     phone: '+90 (212) 654 32 10',
@@ -53,6 +54,7 @@ const companyProfiles: Record<string, {
   },
   'Makks Villas A.Ş.': {
     name: 'Makks Villas A.Ş.',
+    logo: '',
     verified: false,
     sector: 'İnşaat, Gayrimenkul ve Villa Yapımı',
     phone: '+90 (216) 333 44 55',
@@ -190,13 +192,14 @@ function openCompanyModal(firm: any) {
           <span class="text-[10px] text-white/20 font-black tracking-widest">KURUMSAL TEDARİKÇİ</span>
         </div>
 
-        <!-- Corporate Avatar & Name -->
+        <!-- Corporate Avatar / Logo & Name -->
         <div class="flex items-start gap-3 mt-4 relative z-10">
           <div 
-            class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-black text-slate-700 bg-slate-100 border"
+            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xs font-black text-slate-700 bg-slate-100 border border-slate-200 overflow-hidden"
             :style="firm.isBig ? 'background: #FFFFFF; border-color: #E2E8F0; margin-top: 8px;' : ''"
           >
-            {{ firm.initial }}
+            <img v-if="firm.logo" :src="firm.logo" :alt="firm.name" class="w-full h-full object-cover" />
+            <span v-else>{{ firm.initial }}</span>
           </div>
           <div class="min-w-0" :style="firm.isBig ? 'margin-top: 8px;' : ''">
             <h4 class="text-xs font-black text-slate-800 leading-snug truncate" :title="firm.name">{{ firm.name }}</h4>
@@ -253,14 +256,20 @@ function openCompanyModal(firm: any) {
     <div class="bg-white rounded-3xl border border-slate-200 p-6 max-w-2xl w-full shadow-2xl text-left space-y-6 max-h-[90vh] overflow-y-auto">
       <!-- Header -->
       <div class="flex justify-between items-start border-b pb-4" style="border-color: #F1F5F9;">
-        <div>
-          <div class="flex items-center gap-2">
-            <h3 class="text-base font-black text-slate-800 uppercase tracking-wider">{{ selectedCompany.name }}</h3>
-            <span v-if="selectedCompany.verified" class="rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100 uppercase tracking-wider">
-              ✓ ONAYLI
-            </span>
+        <div class="flex items-center gap-3">
+          <div class="h-14 w-14 rounded-2xl border border-slate-200 overflow-hidden bg-slate-100 flex items-center justify-center shrink-0">
+            <img v-if="selectedCompany.logo" :src="selectedCompany.logo" :alt="selectedCompany.name" class="w-full h-full object-cover" />
+            <span v-else class="text-base font-black text-slate-700 font-mono">{{ selectedCompany.name.charAt(0) }}</span>
           </div>
-          <p class="text-xs text-slate-400 mt-1 font-bold">{{ selectedCompany.sector }}</p>
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-black text-slate-800 uppercase tracking-wider">{{ selectedCompany.name }}</h3>
+              <span v-if="selectedCompany.verified" class="rounded-full bg-blue-50 px-2 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100 uppercase tracking-wider">
+                ✓ ONAYLI
+              </span>
+            </div>
+            <p class="text-xs text-slate-400 mt-1 font-bold">{{ selectedCompany.sector }}</p>
+          </div>
         </div>
         <button @click="showCompanyModal = false" class="p-1 rounded-lg hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition">
           <X :size="18" />
