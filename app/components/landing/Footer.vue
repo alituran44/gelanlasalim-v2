@@ -2,6 +2,7 @@
 import { Facebook, Instagram, Linkedin } from 'lucide-vue-next'
 
 const platformLinks = [
+  { label: "Video Rehberler & Akademi", to: "/videolar" },
   { label: "Nasıl Çalışır", to: "/#nasil-calisir" },
   { label: "Özellikler", to: "/#ihale-gezgini" },
   { label: "Abonelik Paketleri", to: "/abonelik" },

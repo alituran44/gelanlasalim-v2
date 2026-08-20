@@ -140,6 +140,12 @@ const activeTenders = ref([
           >
             📤 <span>Verdiğim Teklifler</span>
           </NuxtLink>
+          <NuxtLink 
+            to="/videolar" 
+            class="px-3.5 py-1.5 text-xs font-black text-blue-700 hover:text-blue-900 bg-blue-50/80 hover:bg-blue-100/80 rounded-xl transition-all flex items-center gap-1.5 shadow-sm border border-blue-200"
+          >
+            🎬 <span>Video Rehberler</span>
+          </NuxtLink>
         </div>
 
         <!-- Sağ: Profilim & İhale Aç / Giriş Butonları -->

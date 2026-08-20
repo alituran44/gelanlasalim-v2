@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import { Search, Bell, Plus, ChevronDown, User, Home, Globe } from "lucide-vue-next"
+import { Search, Bell, Plus, ChevronDown, User, Home, Globe, Play } from "lucide-vue-next"
 import { locale, detectLocale, setLocale } from '~/composables/useLocale'
 
 const route = useRoute()
@@ -102,6 +102,16 @@ const pageTitle = computed(() => {
     <div class="flex items-center gap-2">
 
 
+
+      <!-- Video Guides Button -->
+      <NuxtLink
+        to="/videolar"
+        class="hidden sm:flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50/80 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100/80 transition shadow-xs"
+        :title="'Sitenin Kullanım Videoları'"
+      >
+        <Play :size="12" class="fill-blue-700" />
+        <span>Video Rehberler</span>
+      </NuxtLink>
 
       <!-- Home Page Button -->
       <NuxtLink
