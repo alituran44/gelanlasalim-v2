@@ -1089,14 +1089,14 @@ function toggleFilterSection(section: string) {
       <div class="relative z-20 mx-auto grid min-h-[640px] max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr]">
         <!-- Hero Left -->
         <div class="text-left">
-          <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em]" style="color: #1EAE4C;">
-            <span class="h-px w-8" style="background-color: #1EAE4C;"></span>
+          <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-[#0052FF]">
+            <span class="h-px w-8 bg-[#0052FF]"></span>
             {{ localizedHero.tagline }}
           </div>
           <h1 class="text-4xl font-black leading-[1.15] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
             {{ localizedHero.titleLine1 }}<br />
             {{ localizedHero.titleLine2 }}<br />
-            <span class="font-serif italic font-medium" style="color: #1EAE4C;">{{ localizedHero.titleItalic }}</span>
+            <span class="font-serif italic font-medium text-[#0052FF]">{{ localizedHero.titleItalic }}</span>
           </h1>
           <p class="mt-6 max-w-xl text-base leading-relaxed text-slate-600">
             {{ localizedHero.description }}
@@ -1104,12 +1104,12 @@ function toggleFilterSection(section: string) {
           
           <!-- Buttons -->
           <div class="mt-8 flex flex-wrap items-center gap-3">
-            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/10 hover:opacity-90 transition-all" style="background: #003057;">
+            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/20 hover:opacity-95 transition-all bg-[#0F223D] hover:bg-[#0052FF]">
               {{ 'Hemen kurumsal hesap aç' }}
-              <ArrowRight :size="15" />
+              <ArrowRight :size="15" class="text-[#00C2FF]" />
             </NuxtLink>
-            <a href="#nasil-calisir" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/80 px-6 py-4 text-xs font-black text-slate-700 hover:bg-white transition-all">
-              {{ 'Nasıl çalışır' }}
+            <a href="#ihale-gezgini" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-6 py-4 text-xs font-black text-slate-700 hover:bg-white hover:text-[#0052FF] transition-all">
+              {{ 'İhaleleri İncele' }}
               <ArrowRight :size="15" />
             </a>
           </div>
@@ -1241,14 +1241,14 @@ function toggleFilterSection(section: string) {
           </div>
         </div>
 
-        <!-- Explorer Main 2-Column Layout -->
+        <!-- Explorer Main 2-Column Layout (Narrowed Sidebar & Swapped Order) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
-          <!-- LEFT SIDEBAR: Sahibinden-Style Accordion Category & Sector Tree -->
-          <aside class="lg:col-span-4 bg-slate-50/90 border border-slate-200/90 rounded-3xl p-5 text-left shadow-sm sticky top-24">
-            <div class="flex items-center justify-between border-b border-slate-200 pb-3.5 mb-3.5">
-              <h3 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                <Folder :size="16" class="text-blue-600" />
+          <!-- RIGHT / NARROWED SIDEBAR: Categories & Sectors (order-2 on desktop) -->
+          <aside class="lg:col-span-3 lg:order-2 bg-slate-50/90 border border-slate-200/90 rounded-3xl p-4 text-left shadow-sm sticky top-24">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3 mb-3">
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                <Folder :size="15" class="text-blue-600" />
                 <span>{{ 'Kategoriler & Sektörler' }}</span>
               </h3>
               <button 
@@ -1261,7 +1261,7 @@ function toggleFilterSection(section: string) {
             </div>
 
             <!-- Vertical Accordion List -->
-            <div class="space-y-1.5 max-h-[540px] overflow-y-auto pr-1.5 custom-scrollbar text-xs font-medium">
+            <div class="space-y-1 max-h-[540px] overflow-y-auto pr-1 custom-scrollbar text-xs font-medium">
               <div 
                 v-for="cat in detailedCategories" 
                 :key="cat.name"
@@ -1270,19 +1270,19 @@ function toggleFilterSection(section: string) {
                 <!-- Main Category Expandable Button -->
                 <button 
                   @click="toggleCategory(cat.name)"
-                  class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-slate-700 hover:bg-white hover:text-blue-600 font-bold transition-all text-left group"
+                  class="w-full flex items-center justify-between px-3 py-2 rounded-xl text-slate-700 hover:bg-white hover:text-blue-600 font-bold transition-all text-left group text-xs"
                   :class="expandedCategory === cat.name || selectedCat === cat.name ? 'bg-blue-600 text-white hover:text-white font-extrabold shadow-sm' : ''"
                 >
-                  <div class="flex items-center gap-2 truncate pr-2">
+                  <div class="flex items-center gap-1.5 truncate pr-1">
                     <ChevronRight 
-                      :size="14" 
+                      :size="13" 
                       class="transition-transform shrink-0" 
                       :class="{ 'rotate-90': expandedCategory === cat.name }" 
                     />
-                    <span class="truncate">{{ cat.name }}</span>
+                    <span class="truncate text-[11px]">{{ cat.name }}</span>
                   </div>
                   <span 
-                    class="text-[10px] px-2 py-0.5 rounded-md font-mono font-bold shrink-0"
+                    class="text-[9px] px-1.5 py-0.5 rounded-md font-mono font-bold shrink-0"
                     :class="expandedCategory === cat.name || selectedCat === cat.name ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-700'"
                   >
                     {{ cat.count }}
@@ -1292,13 +1292,13 @@ function toggleFilterSection(section: string) {
                 <!-- Subcategories Accordion Panel (Scrollable with max-height) -->
                 <div 
                   v-if="expandedCategory === cat.name" 
-                  class="ml-4 pl-3 border-l-2 border-blue-200 space-y-1 my-1.5 max-h-48 overflow-y-auto pr-1 custom-scrollbar"
+                  class="ml-3 pl-2.5 border-l-2 border-blue-200 space-y-1 my-1.5 max-h-48 overflow-y-auto pr-1 custom-scrollbar"
                 >
                   <button 
                     v-for="sub in cat.children" 
                     :key="sub"
                     @click="selectSubcategory(cat.name, sub)"
-                    class="w-full text-left py-1.5 px-2.5 rounded-lg text-[11px] transition-colors truncate"
+                    class="w-full text-left py-1 px-2 rounded-lg text-[10px] transition-colors truncate"
                     :class="selectedSubcategory === sub ? 'font-black text-blue-600 bg-blue-50 border border-blue-200/80 shadow-xs' : 'text-slate-600 hover:bg-white hover:text-blue-600'"
                   >
                     • {{ sub }}
@@ -1308,8 +1308,8 @@ function toggleFilterSection(section: string) {
             </div>
           </aside>
 
-          <!-- RIGHT MAIN FEED: Search, Filter Bar & Tender Cards -->
-          <main class="lg:col-span-8 space-y-6 text-left">
+          <!-- LEFT / MAIN FEED: Search, Filter Bar & Tender Cards (order-1 on desktop) -->
+          <main class="lg:col-span-9 lg:order-1 space-y-6 text-left">
             <!-- Sleek Horizontal Filter Bar -->
             <div class="bg-white border border-slate-200/80 rounded-3xl p-5 premium-shadow space-y-4">
               <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
