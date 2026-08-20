@@ -17,6 +17,37 @@ const ilanlar = computed(() => cmsData.value.dashboard.receivedBids || [])
 function toggle(id: string) {
   expandedIlan.value = expandedIlan.value === id ? null : id
 }
+
+const showNegotiationModal = ref(false)
+const selectedTeklifForNegotiation = ref<any>(null)
+const currentIlanTitle = ref('')
+const counterOfferPrice = ref('')
+const counterOfferNotes = ref('')
+
+function openNegotiation(teklif: any, ilan: any) {
+  selectedTeklifForNegotiation.value = teklif
+  currentIlanTitle.value = ilan.baslik
+  counterOfferPrice.value = ''
+  counterOfferNotes.value = 'Teklifinizi inceledik. Belirttiğimiz hedef fiyata çekilmesi durumunda ihale tarafınıza verilecektir.'
+  showNegotiationModal.value = true
+}
+
+function submitCounterOffer() {
+  if (!counterOfferPrice.value) {
+    alert('Lütfen karşı teklif / hedef pazarlık tutarını giriniz.')
+    return
+  }
+  if (selectedTeklifForNegotiation.value) {
+    selectedTeklifForNegotiation.value.durum = 'pazarlik'
+  }
+  showNegotiationModal.value = false
+  alert(`💬 PAZARLIK TEKLİFİNİZ İLETİLDİ!\n\n${selectedTeklifForNegotiation.value?.firma} firmasına ${Number(counterOfferPrice.value).toLocaleString('tr-TR')} ₺ tutarındaki karşı teklifiniz başarıyla gönderilmiştir.`)
+}
+
+function acceptTeklif(teklif: any) {
+  teklif.durum = 'onaylandi'
+  alert(`🎉 TEBRİKLER!\n\n${teklif.firma} firmasının teklifini kabul ettiniz. Sözleşme ve onay aşamasına geçilmiştir.`)
+}
 </script>
 
 <template>
@@ -123,28 +154,121 @@ function toggle(id: string) {
                 </div>
               </div>
 
-              <div class="flex items-center gap-4 justify-between sm:justify-end">
+              <div class="flex items-center gap-3 justify-between sm:justify-end">
                 <span class="text-base font-black font-mono text-slate-900">{{ teklif.fiyat }}</span>
                 <span
                   class="rounded-full px-2.5 py-1 text-xs font-bold"
                   :style="teklif.durum === 'onaylandi'
                     ? 'background: rgba(34,197,94,0.1); color: #16A34A;'
-                    : 'background: rgba(148,163,184,0.12); color: #64748B;'"
+                    : (teklif.durum === 'pazarlik' ? 'background: #FEF3C7; color: #B45309;' : 'background: rgba(148,163,184,0.12); color: #64748B;')"
                 >
-                  {{ teklif.durum === 'onaylandi' ? ('✓ Onaylandı') : ('Değerlendiriliyor') }}
+                  {{ teklif.durum === 'onaylandi' ? '✓ Onaylandı' : (teklif.durum === 'pazarlik' ? '💬 Pazarlık Sürecinde' : 'Değerlendiriliyor') }}
                 </span>
-                <button
-                  v-if="teklif.durum !== 'onaylandi'"
-                  class="rounded-xl px-4 py-2 text-xs font-bold text-white transition cursor-pointer hover:bg-emerald-600"
-                  style="background: #003057;"
-                >
-                  {{ 'Onayla' }}
-                </button>
+                <div v-if="teklif.durum !== 'onaylandi'" class="flex items-center gap-2">
+                  <button
+                    type="button"
+                    @click="openNegotiation(teklif, ilan)"
+                    class="rounded-xl px-3 py-2 text-xs font-black bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition cursor-pointer"
+                  >
+                    💬 Pazarlık
+                  </button>
+                  <button
+                    type="button"
+                    @click="acceptTeklif(teklif)"
+                    class="rounded-xl px-4 py-2 text-xs font-bold text-white transition cursor-pointer hover:bg-emerald-600 bg-[#0052FF]"
+                  >
+                    Kabul Et
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
+      </div>
+    </div>
+
+    <!-- 🟢 FİYAT PAZARLIĞI VE KARŞI TEKLİF MODALI -->
+    <div v-if="showNegotiationModal && selectedTeklifForNegotiation" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div class="w-full max-w-lg rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden text-left p-6 space-y-5">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="h-10 w-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-lg">
+              💬
+            </div>
+            <div>
+              <span class="text-[9px] font-black text-amber-600 uppercase tracking-wider block">B2B FİYAT PAZARLIĞI</span>
+              <h3 class="text-sm font-black text-slate-900">Tedarikçi ile Pazarlık & Karşı Teklif</h3>
+            </div>
+          </div>
+          <button @click="showNegotiationModal = false" class="text-slate-400 hover:text-slate-700 transition">
+            ✕
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-500 font-medium">Tedarikçi Firma:</span>
+              <span class="font-black text-slate-800">{{ selectedTeklifForNegotiation.firma }}</span>
+            </div>
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-500 font-medium">Mevcut Teklif Tutarı:</span>
+              <span class="font-black text-emerald-600 font-mono text-sm">{{ selectedTeklifForNegotiation.fiyat }}</span>
+            </div>
+            <div class="flex justify-between items-center text-[11px]">
+              <span class="text-slate-400">İhale:</span>
+              <span class="text-slate-700 font-bold line-clamp-1">{{ currentIlanTitle }}</span>
+            </div>
+          </div>
+
+          <!-- Hedef Pazarlık Fiyatı -->
+          <div>
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">
+              HEDEF PAZARLIK / KARŞI TEKLİF TUTARI (₺) *
+            </label>
+            <div class="relative">
+              <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-black text-amber-600 text-sm">₺</span>
+              <input
+                v-model="counterOfferPrice"
+                type="number"
+                placeholder="Örn: 950.000"
+                class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black font-mono text-slate-900 outline-none focus:border-amber-500 focus:bg-white transition-all shadow-xs"
+              />
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 block">Tedarikçiye iletilecek revize hedef teklif tutarı.</span>
+          </div>
+
+          <!-- Pazarlık Notu / Şartları -->
+          <div>
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">
+              PAZARLIK ŞARTLARI VE NOTUNUZ *
+            </label>
+            <textarea
+              v-model="counterOfferNotes"
+              rows="3"
+              placeholder="Örn: Belirtilen fiyata inilmesi durumunda ihale tarafınıza verilecektir."
+              class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-amber-500 focus:bg-white transition-all resize-none"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="pt-2 flex gap-3">
+          <button
+            type="button"
+            @click="showNegotiationModal = false"
+            class="w-1/3 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition"
+          >
+            Vazgeç
+          </button>
+          <button
+            type="button"
+            @click="submitCounterOffer"
+            class="w-2/3 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border border-amber-300"
+          >
+            <span>💬 Karşı Teklifi İlet</span>
+          </button>
+        </div>
       </div>
     </div>
 
