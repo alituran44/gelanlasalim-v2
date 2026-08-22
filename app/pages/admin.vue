@@ -37,7 +37,30 @@ import {
   ExternalLink,
   ShieldCheck,
   Clock,
-  Edit
+  Edit,
+  Tag,
+  Video,
+  Play,
+  Pause,
+  PlusCircle,
+  TrendingUp,
+  Sliders,
+  DollarSign,
+  Package,
+  Truck,
+  Layers,
+  Award,
+  AlertTriangle,
+  FileCheck,
+  XCircle,
+  ShieldAlert,
+  Server,
+  Settings,
+  Ticket,
+  Copy,
+  BarChart3,
+  RefreshCw,
+  Zap
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 
@@ -56,32 +79,40 @@ const password = ref('')
 const authError = ref('')
 
 // Tabs
-type AdminTab = 
-  | 'hero' 
-  | 'tender' 
-  | 'plans' 
-  | 'features' 
-  | 'contact' 
+export type AdminTab = 
+  | 'overview'
+  | 'kyc_desk'
+  | 'live_rooms'
+  | 'escrow_delivery'
+  | 'categories'
+  | 'video_cms'
+  | 'promo_codes'
+  | 'audit_logs'
+  | 'site_settings'
   | 'support_ai' 
   | 'crm_leads' 
   | 'email_center' 
   | 'newsletter_subs' 
+  | 'hero' 
+  | 'tender' 
+  | 'plans' 
+  | 'contact' 
   | 'db_payments' 
   | 'db_tenders' 
   | 'db_received' 
   | 'db_submitted'
 
-const activeTab = ref<AdminTab>('support_ai')
+const activeTab = ref<AdminTab>('overview')
 
 // Local copy for editing
 const formState = reactive(JSON.parse(JSON.stringify(cmsData.value)))
 
-// Ensure safety defaults for new modules if missing
+// Ensure safety defaults for all enterprise modules
 if (!formState.supportSettings) {
   formState.supportSettings = {
     whatsappEnabled: true,
     whatsappNumber: '908503080000',
-    whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale süreçleri ve 6 ay ücretsiz deneme paketi hakkında bilgi almak istiyorum.',
+    whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale ve 6 ay ücretsiz deneme hakkında bilgi almak istiyorum.',
     aiEnabled: true,
     aiBotName: 'İhaleciBurada AI Asistanı',
     aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel 6 Ay %100 Ücretsiz Deneme süreciniz hakkında size nasıl yardımcı olabilirim?',
@@ -107,19 +138,52 @@ if (!formState.emailSettings) {
     smtpHost: 'smtp.ihaleciburada.com',
     smtpPort: 587,
     smtpUser: 'info@ihaleciburada.com',
-    subscribers: [
-      { id: 1, email: 'info@kalyon.com', companyName: 'Kalyon Tedarik Ltd.', source: 'Kayıt Formu', subscribedAt: '2026-08-20', status: 'Aktif' },
-      { id: 2, email: 'satinalma@anadolu.com', companyName: 'Anadolu Lojistik A.Ş.', source: 'Bülten Aboneliği', subscribedAt: '2026-08-21', status: 'Aktif' },
-      { id: 3, email: 'kurumsal@megaambalaj.com', companyName: 'Mega Ambalaj Sanayi', source: 'İhale Katılımı', subscribedAt: '2026-08-22', status: 'Aktif' }
-    ],
+    subscribers: [],
     templates: []
+  }
+}
+
+if (!formState.kycVerifications) {
+  formState.kycVerifications = []
+}
+
+if (!formState.liveAuctionRooms) {
+  formState.liveAuctionRooms = []
+}
+
+if (!formState.escrowOrders) {
+  formState.escrowOrders = []
+}
+
+if (!formState.categories) {
+  formState.categories = []
+}
+
+if (!formState.promoCodes) {
+  formState.promoCodes = []
+}
+
+if (!formState.auditLogs) {
+  formState.auditLogs = []
+}
+
+if (!formState.siteSettings) {
+  formState.siteSettings = {
+    maintenanceMode: false,
+    maintenanceNotice: 'Platformumuzda planlı bakım çalışması yapılmaktadır.',
+    metaTitle: 'İhaleciBurada.com | Türkiye’nin Öncü B2B Canlı Eksiltme & Satın Alma Platformu',
+    metaDescription: 'B2B satın alma ihaleleri açın, canlı tersine eksiltme ile rekabetçi teklifler toplayın.',
+    announcementTicker: '⚡ LANSMANA ÖZEL: İlk 6 ay boyunca %100 ücretsiz kurumsal deneme paketi (0 ₺)!',
+    googleAnalyticsId: 'G-IHALECIBURADA2026',
+    supportPhone: '0850 308 00 00',
+    supportEmail: 'info@ihaleciburada.com'
   }
 }
 
 // Toast State
 const showToast = ref(false)
 const toastMessage = ref('')
-const toastType = ref<'success' | 'info'>('success')
+const toastType = ref<'success' | 'info' | 'error'>('success')
 
 onMounted(() => {
   if (typeof window !== 'undefined') {
@@ -145,7 +209,7 @@ function handleLogin() {
     }
     isLoggedIn.value = true
     authError.value = ''
-    triggerToast('Yönetim paneline başarıyla giriş yapıldı!', 'success')
+    triggerToast('Yönetim ve Operasyon paneline başarıyla giriş yapıldı!', 'success')
   } else {
     authError.value = 'Hatalı e-posta adresi veya şifre girdiniz.'
   }
@@ -159,18 +223,29 @@ function handleLogout() {
   triggerToast('Oturum sonlandırıldı.', 'info')
 }
 
-function triggerToast(msg: string, type: 'success' | 'info' = 'success') {
+function triggerToast(msg: string, type: 'success' | 'info' | 'error' = 'success') {
   toastMessage.value = msg
   toastType.value = type
   showToast.value = true
   setTimeout(() => {
     showToast.value = false
-  }, 3000)
+  }, 3200)
 }
 
 function handleSave() {
   saveCmsData(JSON.parse(JSON.stringify(formState)))
-  triggerToast('Tüm değişiklikler başarıyla kaydedildi ve yayına alındı!', 'success')
+  // Add audit log
+  const now = new Date().toLocaleString('tr-TR')
+  formState.auditLogs.unshift({
+    id: 'LOG-' + Math.floor(1000 + Math.random() * 9000),
+    timestamp: now,
+    userEmail: 'admin@ihaleciburada.com',
+    action: 'CMS & Operasyon Verileri Kaydedildi',
+    ipAddress: '176.240.12.84',
+    status: 'success',
+    details: 'Tüm sekmelerdeki değişiklikler yayına alındı.'
+  })
+  triggerToast('Tüm değişiklikler başarıyla kaydedildi ve anında yayına alındı!', 'success')
 }
 
 function handleReset() {
@@ -181,8 +256,139 @@ function handleReset() {
   }
 }
 
+function exportDataBackup() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(formState, null, 2))
+  const downloadAnchor = document.createElement('a')
+  downloadAnchor.setAttribute("href", dataStr)
+  downloadAnchor.setAttribute("download", `ihaleciburada_backup_${new Date().toISOString().split('T')[0]}.json`)
+  document.body.appendChild(downloadAnchor)
+  downloadAnchor.click()
+  downloadAnchor.remove()
+  triggerToast('JSON Veritabanı Yedeği Bilgisayarınıza İndirildi.', 'success')
+}
+
 // ----------------------------------------------------
-// CRM Leads Management State & Helpers
+// KYC Approval Handlers
+// ----------------------------------------------------
+function approveKyc(kyc: any) {
+  kyc.status = 'approved'
+  kyc.badgeGranted = true
+  kyc.rejectionReason = ''
+  triggerToast(`"${kyc.companyName}" kurumsal hesabı ONAYLANDI ve Mavi Rozet verildi!`, 'success')
+}
+
+function rejectKyc(kyc: any) {
+  const reason = prompt('Lütfen ret gerekçesini giriniz:', 'Yüklenen vergi levhası güncel değildir veya imza sirküleri eksiktir.')
+  if (reason) {
+    kyc.status = 'rejected'
+    kyc.badgeGranted = false
+    kyc.rejectionReason = reason
+    triggerToast(`"${kyc.companyName}" başvurusu reddedildi.`, 'info')
+  }
+}
+
+// ----------------------------------------------------
+// Live Room Operator Handlers
+// ----------------------------------------------------
+function extendRoomTime(room: any, extraSeconds = 300) {
+  room.remainingSeconds = (room.remainingSeconds || 0) + extraSeconds
+  room.status = 'live'
+  triggerToast(`"${room.tenderTitle}" odasına +5 DAKİKA süre eklendi!`, 'success')
+}
+
+function toggleRoomStatus(room: any) {
+  if (room.status === 'live') {
+    room.status = 'paused'
+    triggerToast(`Oda geçici olarak duraklatıldı (PAUSE).`, 'info')
+  } else if (room.status === 'paused') {
+    room.status = 'live'
+    triggerToast(`Oda canlı yayına devam ediyor.`, 'success')
+  } else {
+    room.status = 'live'
+    room.remainingSeconds = 600
+    triggerToast(`Oda yeniden başlatıldı!`, 'success')
+  }
+}
+
+function endRoomWithWinner(room: any) {
+  if (confirm(`İhaleyi "${room.leaderSupplier}" lider tedarikçisine (${room.currentBestBid.toLocaleString('tr-TR')} ₺) kazandırarak kapatmak istiyor musunuz?`)) {
+    room.status = 'ended'
+    room.remainingSeconds = 0
+    triggerToast(`İhale başarıyla sonuçlandırıldı ve kazanan ilan edildi!`, 'success')
+  }
+}
+
+// ----------------------------------------------------
+// Escrow Delivery Order Handlers
+// ----------------------------------------------------
+function updateEscrowStatus(order: any, nextStatus: string) {
+  order.escrowStatus = nextStatus
+  triggerToast(`Sipariş ${order.orderCode} durumu "${nextStatus}" olarak güncellendi.`, 'success')
+}
+
+// ----------------------------------------------------
+// Category Management Handlers
+// ----------------------------------------------------
+const newCategory = reactive({
+  name: '',
+  icon: 'Building2',
+  targetSavings: '%15.0',
+  description: ''
+})
+
+function addCategory() {
+  if (!newCategory.name) return
+  formState.categories.push({
+    id: 'kat-' + (formState.categories.length + 1),
+    name: newCategory.name,
+    icon: newCategory.icon,
+    targetSavings: newCategory.targetSavings || '%15.0',
+    activeTendersCount: 0,
+    description: newCategory.description || 'Yeni B2B tedarik kategorisi.'
+  })
+  newCategory.name = ''
+  newCategory.description = ''
+  triggerToast('Yeni B2B sektörü ve kategorisi eklendi!', 'success')
+}
+
+function removeCategory(idx: number) {
+  formState.categories.splice(idx, 1)
+  triggerToast('Kategori silindi.', 'info')
+}
+
+// ----------------------------------------------------
+// Promo Code Handlers
+// ----------------------------------------------------
+const newPromo = reactive({
+  code: '',
+  discountType: 'free_trial_months',
+  value: '6 Ay Bedelsiz',
+  usageLimit: 500,
+  expiryDate: '2027-02-22'
+})
+
+function addPromoCode() {
+  if (!newPromo.code) return
+  formState.promoCodes.push({
+    code: newPromo.code.toUpperCase().replace(/\s/g, ''),
+    discountType: newPromo.discountType,
+    value: newPromo.value,
+    usageLimit: newPromo.usageLimit,
+    usedCount: 0,
+    expiryDate: newPromo.expiryDate,
+    status: 'active'
+  })
+  newPromo.code = ''
+  triggerToast('Yeni promosyon kupon kodu tanımlandı!', 'success')
+}
+
+function removePromoCode(idx: number) {
+  formState.promoCodes.splice(idx, 1)
+  triggerToast('Kupon silindi.', 'info')
+}
+
+// ----------------------------------------------------
+// CRM Leads State & Helpers
 // ----------------------------------------------------
 const crmSearchQuery = ref('')
 const crmStatusFilter = ref('ALL')
@@ -215,13 +421,12 @@ const newLeadForm = reactive({
 
 function addLead() {
   if (!newLeadForm.companyName || !newLeadForm.email) {
-    alert('Lütfen en az firma adı ve e-posta adresini giriniz.')
+    alert('Lütfen firma adı ve e-posta adresini giriniz.')
     return
   }
-  const newId = Date.now()
   const today = new Date().toISOString().split('T')[0]
   formState.crmSettings.leads.unshift({
-    id: newId,
+    id: Date.now(),
     companyName: newLeadForm.companyName,
     contactName: newLeadForm.contactName || 'Yetkili',
     email: newLeadForm.email,
@@ -230,14 +435,12 @@ function addLead() {
     notes: newLeadForm.notes || 'Yeni eklenen B2B üye adayı.',
     createdAt: today
   })
-
-  // Reset Form
   newLeadForm.companyName = ''
   newLeadForm.contactName = ''
   newLeadForm.email = ''
   newLeadForm.phone = ''
   newLeadForm.notes = ''
-  triggerToast('Yeni CRM müşteri kaydı başarıyla eklendi!', 'success')
+  triggerToast('Yeni CRM müşteri kaydı eklendi!', 'success')
 }
 
 function removeLead(index: number) {
@@ -246,7 +449,7 @@ function removeLead(index: number) {
 }
 
 // ----------------------------------------------------
-// Email & Template Management State & Helpers
+// Email & Template Helpers
 // ----------------------------------------------------
 const selectedTemplateIdx = ref(0)
 const testEmailTarget = ref('kurumsal@firma.com')
@@ -256,10 +459,7 @@ const currentTemplate = computed(() => {
 })
 
 function sendTestEmail() {
-  if (!testEmailTarget.value) {
-    alert('Lütfen bir test e-posta adresi yazınız.')
-    return
-  }
+  if (!testEmailTarget.value) return
   triggerToast(`"${formState.emailSettings.senderEmail}" üzerinden "${testEmailTarget.value}" adresine test e-postası başarıyla iletildi!`, 'success')
 }
 
@@ -285,38 +485,6 @@ function addSubscriber() {
 function removeSubscriber(index: number) {
   formState.emailSettings.subscribers.splice(index, 1)
   triggerToast('Abone listeden çıkarıldı.', 'info')
-}
-
-// ----------------------------------------------------
-// Hero Badge Helpers
-// ----------------------------------------------------
-function addBadge() {
-  formState.hero.badgeStrip.push('YENİ ÖZELLİK VURGUSU')
-}
-function removeBadge(index: number) {
-  formState.hero.badgeStrip.splice(index, 1)
-}
-
-// ----------------------------------------------------
-// Live Tender Helpers
-// ----------------------------------------------------
-function addCompetitor() {
-  formState.liveTender.competitors.push({
-    name: 'Tedarikçi #' + Math.floor(100 + Math.random() * 900),
-    price: 410000,
-    leader: false
-  })
-}
-function removeCompetitor(index: number) {
-  formState.liveTender.competitors.splice(index, 1)
-}
-function setLeader(index: number) {
-  formState.liveTender.competitors.forEach((c: any, i: number) => {
-    c.leader = i === index
-  })
-  if (formState.liveTender.competitors[index]) {
-    formState.liveTender.bestBid = formState.liveTender.competitors[index].price
-  }
 }
 
 // ----------------------------------------------------
@@ -387,21 +555,19 @@ function removeSubmittedBid(index: number) {
 <template>
   <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
     
-    <!-- Login Overlay -->
+    <!-- LOGIN OVERLAY -->
     <div v-if="!isLoggedIn" class="flex-grow flex items-center justify-center p-6 relative overflow-hidden" style="background-image: radial-gradient(circle at top right, rgba(37,99,235,0.15), transparent), radial-gradient(circle at bottom left, rgba(16,185,129,0.1), transparent);">
       <div class="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/90 p-8 shadow-2xl backdrop-blur-md">
         
-        <!-- Logo -->
         <div class="flex flex-col items-center mb-8">
-          <img src="/logo.png" alt="İhaleciBurada Yönetici Giriş Logosu" class="h-10 w-auto brightness-0 invert" />
-          <h2 class="mt-4 text-lg font-black tracking-tight text-white">İhaleciBurada Yönetim & CRM Paneli</h2>
-          <p class="text-xs text-slate-400 mt-1 text-center">Platform içeriklerini, WhatsApp & AI asistanını, CRM müşteri verilerini ve e-posta bültenlerini yönetin.</p>
+          <img src="/logo.png" alt="İhaleciBurada Logo" class="h-10 w-auto brightness-0 invert" />
+          <h2 class="mt-4 text-lg font-black tracking-tight text-white">İhaleciBurada Yönetim & Operasyon Suite</h2>
+          <p class="text-xs text-slate-400 mt-1 text-center">Kurumsal KYC, Canlı Eksiltme, Escrow Teslimat, CRM ve E-Posta Merkezi.</p>
         </div>
 
-        <!-- Login Form -->
         <form @submit.prevent="handleLogin" class="space-y-4">
           <div>
-            <label class="block text-xs font-bold text-slate-400 mb-1">E-POSTA ADRESİ</label>
+            <label class="block text-xs font-bold text-slate-400 mb-1">YÖNETİCİ E-POSTA</label>
             <div class="relative">
               <User :size="16" class="absolute left-3.5 top-3 text-slate-500" />
               <input 
@@ -428,9 +594,8 @@ function removeSubmittedBid(index: number) {
             </div>
           </div>
 
-          <!-- Quick Hint for user credentials -->
           <div class="p-3 bg-blue-950/40 border border-blue-800/40 rounded-xl text-[11px] text-blue-300 space-y-1">
-            <div class="font-bold flex items-center gap-1.5"><ShieldCheck :size="13" class="text-emerald-400" /> Yönetici Giriş Bilgileri:</div>
+            <div class="font-bold flex items-center gap-1.5"><ShieldCheck :size="13" class="text-emerald-400" /> Giriş Yetkisi:</div>
             <div>E-Posta: <strong class="text-white font-mono">admin@ihaleciburada.com</strong></div>
             <div>Şifre: <strong class="text-white font-mono">admin123</strong> (veya <span class="font-mono">demo-password</span>)</div>
           </div>
@@ -440,185 +605,264 @@ function removeSubmittedBid(index: number) {
           </div>
 
           <button type="submit" class="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-xs font-black text-white hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 cursor-pointer">
-            Yönetim Paneline Giriş Yap
+            Operasyon Merkezine Giriş Yap
           </button>
         </form>
       </div>
     </div>
 
-    <!-- Authorized CMS Workspace -->
+    <!-- AUTHORIZED WORKSPACE -->
     <div v-else class="flex-grow flex flex-col md:flex-row">
-      <!-- Sidebar Navigation -->
-      <aside class="w-full md:w-64 border-r border-slate-800 bg-slate-900 flex flex-col justify-between shrink-0">
+      
+      <!-- SIDEBAR -->
+      <aside class="w-full md:w-68 border-r border-slate-800 bg-slate-900 flex flex-col justify-between shrink-0">
         <div>
-          <!-- Title & Brand -->
+          <!-- Header -->
           <div class="px-6 py-5 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-2">
               <img src="/logo.png" alt="İhaleciBurada Logo" class="h-7 w-auto brightness-0 invert" />
-              <span class="text-[8px] bg-blue-600/30 text-blue-400 px-1.5 py-0.5 rounded font-mono font-bold">ADMIN & CRM</span>
+              <span class="text-[8px] bg-emerald-600/30 text-emerald-400 px-1.5 py-0.5 rounded font-mono font-black">ENTERPRISE</span>
             </div>
           </div>
 
-          <!-- Navigation Links -->
-          <nav class="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-140px)]">
+          <!-- Grouped Nav Links -->
+          <nav class="p-4 space-y-1 overflow-y-auto max-h-[calc(100vh-140px)] text-left">
             
-            <div class="text-[9px] font-black text-emerald-400 uppercase tracking-widest px-4 mb-2 flex items-center gap-1">
-              <Sparkles :size="10" /> İLETİŞİM & YAPAY ZEKA
+            <!-- OVERVIEW -->
+            <button 
+              @click="activeTab = 'overview'" 
+              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer mb-2"
+              :class="activeTab === 'overview' ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800 hover:text-white'"
+            >
+              <BarChart3 :size="15" class="text-amber-400" />
+              <span>Yönetici Özeti & KPI</span>
+            </button>
+
+            <!-- GROUP: ONAY & GÜVENLİK -->
+            <div class="text-[9px] font-black text-emerald-400 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
+              <ShieldCheck :size="10" /> KURUMSAL ONAY & GÜVENLİK
             </div>
 
-            <!-- WhatsApp & AI Tab -->
+            <button 
+              @click="activeTab = 'kyc_desk'" 
+              class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'kyc_desk' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+            >
+              <span class="flex items-center gap-2.5"><FileCheck :size="14" /> KYC & Mavi Rozet</span>
+              <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono">
+                {{ formState.kycVerifications.filter((k: any) => k.status === 'pending').length }} Bekleyen
+              </span>
+            </button>
+
+            <button 
+              @click="activeTab = 'audit_logs'" 
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'audit_logs' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+            >
+              <ShieldAlert :size="14" />
+              Güvenlik & Audit Log
+            </button>
+
+            <!-- GROUP: İHALE & OPERASYON -->
+            <div class="text-[9px] font-black text-rose-400 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
+              <Zap :size="10" /> İHALE & OPERASYON
+            </div>
+
+            <button 
+              @click="activeTab = 'live_rooms'" 
+              class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'live_rooms' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+            >
+              <span class="flex items-center gap-2.5"><Activity :size="14" /> Canlı Eksiltme Odası</span>
+              <span class="h-2 w-2 rounded-full bg-rose-500 animate-ping"></span>
+            </button>
+
+            <button 
+              @click="activeTab = 'escrow_delivery'" 
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'escrow_delivery' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+            >
+              <Package :size="14" />
+              Sipariş & Escrow Havuz
+            </button>
+
+            <button 
+              @click="activeTab = 'categories'" 
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'categories' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+            >
+              <Layers :size="14" />
+              Sektör & Kategoriler
+            </button>
+
+            <button 
+              @click="activeTab = 'video_cms'" 
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'video_cms' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+            >
+              <Video :size="14" />
+              Video Rehberler & Akademi
+            </button>
+
+            <!-- GROUP: İLETİŞİM & AI -->
+            <div class="text-[9px] font-black text-teal-400 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
+              <Bot :size="10" /> İLETİŞİM & AI ASİSTAN
+            </div>
+
             <button 
               @click="activeTab = 'support_ai'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'support_ai' ? 'bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'support_ai' ? 'bg-teal-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <MessageSquare :size="15" />
+              <MessageSquare :size="14" />
               WhatsApp & AI Asistan
             </button>
 
-            <div class="text-[9px] font-black text-blue-400 uppercase tracking-widest px-4 pt-4 mb-2 flex items-center gap-1">
-              <Users :size="10" /> MÜŞTERİ & E-POSTA CRM
+            <!-- GROUP: MÜŞTERİ & PAZARLAMA -->
+            <div class="text-[9px] font-black text-amber-400 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
+              <Users :size="10" /> MÜŞTERİ & PAZARLAMA
             </div>
 
-            <!-- CRM Leads Tab -->
             <button 
               @click="activeTab = 'crm_leads'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'crm_leads' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <Users :size="15" />
-              CRM Müşteri / Adaylar
+              <Users :size="14" />
+              CRM Müşteri Adayları
             </button>
 
-            <!-- Email Center & Templates Tab -->
             <button 
               @click="activeTab = 'email_center'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'email_center' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <Mail :size="15" />
+              <Mail :size="14" />
               E-Posta Şablonları & Gönderim
             </button>
 
-            <!-- Newsletter Subscribers Tab -->
             <button 
               @click="activeTab = 'newsletter_subs'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'newsletter_subs' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <Inbox :size="15" />
-              Mail Aboneleri & Bülten
+              <Inbox :size="14" />
+              Bülten Aboneleri
             </button>
 
-            <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest px-4 pt-4 mb-2">SİTE CMS İÇERİK</div>
+            <button 
+              @click="activeTab = 'promo_codes'" 
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'promo_codes' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+            >
+              <Ticket :size="14" />
+              Kupon & Kampanya Kodları
+            </button>
+
+            <!-- GROUP: SİTE AYARLARI -->
+            <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest px-4 pt-3 mb-1.5">SİTE CMS & ALTYAPI</div>
+
+            <button 
+              @click="activeTab = 'site_settings'" 
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'site_settings' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+            >
+              <Settings :size="14" />
+              Site Ayarları & Bakım Modu
+            </button>
 
             <button 
               @click="activeTab = 'hero'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'hero' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <Home :size="15" />
-              Ana Sayfa (Hero & Bant)
-            </button>
-
-            <button 
-              @click="activeTab = 'tender'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'tender' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
-            >
-              <Activity :size="15" />
-              Canlı İhale Kartı
+              <Home :size="14" />
+              Hero & Duyuru Bantları
             </button>
 
             <button 
               @click="activeTab = 'plans'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'plans' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <CreditCard :size="15" />
-              Abonelik & Fiyatlandırma
+              <CreditCard :size="14" />
+              Abonelik & 6 Ay Deneme
             </button>
 
-            <button 
-              @click="activeTab = 'contact'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'contact' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
-            >
-              <Phone :size="15" />
-              İletişim & Destek
-            </button>
-
-            <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest px-4 pt-4 mb-2">B2B VERİTABANI İZLEME</div>
+            <!-- GROUP: VERİTABANI İZLEME -->
+            <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest px-4 pt-3 mb-1.5">B2B VERİTABANI</div>
 
             <button 
               @click="activeTab = 'db_tenders'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'db_tenders' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <Folder :size="15" />
+              <Folder :size="14" />
               İlanlarım (Tenders)
             </button>
 
             <button 
               @click="activeTab = 'db_received'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'db_received' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <Download :size="15" />
+              <Download :size="14" />
               Gelen Teklifler
             </button>
 
             <button 
-              @click="activeTab = 'db_submitted'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'db_submitted' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
-            >
-              <Upload :size="15" />
-              Verilen Teklifler
-            </button>
-
-            <button 
               @click="activeTab = 'db_payments'" 
-              class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'db_payments' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <CreditCard :size="15" />
+              <DollarSign :size="14" />
               Gelen Ödemeler
             </button>
 
           </nav>
         </div>
 
-        <!-- Sidebar Footer Action -->
+        <!-- Sidebar Footer -->
         <div class="p-4 border-t border-slate-800 space-y-2">
-          <NuxtLink to="/" target="_blank" class="w-full flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white transition">
+          <button @click="exportDataBackup" class="w-full flex items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-700 transition cursor-pointer">
+            <Download :size="13" />
+            JSON Veri Yedeği İndir
+          </button>
+          <NuxtLink to="/" target="_blank" class="w-full flex items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/50 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white transition">
             <ExternalLink :size="13" />
-            Canlı Siteyi Aç
+            Canlı Siteyi Gör
           </NuxtLink>
-          <button @click="handleLogout" class="w-full flex items-center justify-center gap-2 rounded-xl bg-red-950/40 text-red-400 hover:bg-red-900/60 px-4 py-2 text-xs font-bold transition cursor-pointer">
+          <button @click="handleLogout" class="w-full flex items-center justify-center gap-1.5 rounded-xl bg-red-950/40 text-red-400 hover:bg-red-900/60 px-3 py-1.5 text-xs font-bold transition cursor-pointer">
             Çıkış Yap
           </button>
         </div>
       </aside>
 
-      <!-- Main Workspace Area -->
+      <!-- MAIN WORKSPACE -->
       <main class="flex-1 p-6 md:p-8 overflow-y-auto max-h-screen text-left">
         
         <!-- Header Toolbar -->
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-slate-800 gap-4 mb-6">
           <div>
-            <h1 class="text-xl font-black text-white flex items-center gap-2">
-              <span v-if="activeTab === 'support_ai'">💬 WhatsApp & Yapay Zeka Canlı Asistan Yönetimi</span>
-              <span v-else-if="activeTab === 'crm_leads'">👥 CRM Müşteri & Aday Yönetim Merkezi</span>
-              <span v-else-if="activeTab === 'email_center'">📧 E-Posta Şablonları & Bildirim Merkezi</span>
+            <h1 class="text-xl font-black text-white flex items-center gap-2.5">
+              <span v-if="activeTab === 'overview'">📊 İhaleciBurada Yönetici Özeti & Finansal KPI</span>
+              <span v-else-if="activeTab === 'kyc_desk'">🛡️ Kurumsal Firma Doğrulama & KYC Masası (Mavi Rozet)</span>
+              <span v-else-if="activeTab === 'live_rooms'">🔴 Canlı Tersine Eksiltme Odası Operatörü</span>
+              <span v-else-if="activeTab === 'escrow_delivery'">📦 Sipariş, Güvenli Havuz (Escrow) & Teslimat</span>
+              <span v-else-if="activeTab === 'categories'">🏷️ B2B Sektör & Kategori Yönetimi</span>
+              <span v-else-if="activeTab === 'video_cms'">🎬 Video Rehberler & B2B Akademi CMS</span>
+              <span v-else-if="activeTab === 'promo_codes'">🎟️ Kupon & Lansman Promosyon Kodları</span>
+              <span v-else-if="activeTab === 'audit_logs'">🔒 Sistem Denetim İzi & Güvenlik Günlüğü</span>
+              <span v-else-if="activeTab === 'site_settings'">⚙️ Site Genel Ayarları, SEO & Bakım Modu</span>
+              <span v-else-if="activeTab === 'support_ai'">💬 WhatsApp & Yapay Zeka Canlı Asistan</span>
+              <span v-else-if="activeTab === 'crm_leads'">👥 CRM Müşteri / Aday Yönetim Merkezi</span>
+              <span v-else-if="activeTab === 'email_center'">📧 E-Posta Şablonları & Gönderim Merkezi</span>
               <span v-else-if="activeTab === 'newsletter_subs'">📬 Bülten & E-Posta Aboneleri</span>
               <span v-else-if="activeTab === 'hero'">🏠 Ana Sayfa İçerik & Bant Yönetimi</span>
-              <span v-else-if="activeTab === 'tender'">⚡ Canlı İhale Simülasyonu</span>
-              <span v-else-if="activeTab === 'plans'">💳 Abonelik Paketleri & 6 Ay Deneme</span>
-              <span v-else-if="activeTab === 'contact'">📞 İletişim & Destek Bilgileri</span>
+              <span v-else-if="activeTab === 'plans'">💳 Abonelik & 6 Ay Deneme Fiyatlandırması</span>
               <span v-else>🗄️ B2B Veritabanı Kontrolü</span>
             </h1>
-            <p class="text-xs text-slate-400 mt-1">İhaleciBurada platform altyapısını ve iletişim kanallarını canlı yönetin.</p>
+            <p class="text-xs text-slate-400 mt-1">İhaleciBurada platform altyapısını, güvenlik denetimlerini ve ticari operasyonları yönetin.</p>
           </div>
 
           <div class="flex items-center gap-3">
@@ -633,25 +877,536 @@ function removeSubmittedBid(index: number) {
           </div>
         </div>
 
-        <!-- TAB CONTENT CONTAINERS -->
+        <!-- TAB VIEWS -->
         <div class="space-y-6">
 
           <!-- ========================================================================= -->
-          <!-- TAB 1: WHATSAPP & AI ASİSTAN YÖNETİMİ -->
+          <!-- TAB: OVERVIEW & EXECUTIVE KPI DASHBOARD -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'overview'" class="space-y-6">
+            <!-- Metric Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="p-5 rounded-2xl border border-slate-800 bg-slate-900/80">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">TOPLAM TİCARET HACMİ</span>
+                <div class="text-2xl font-black text-white mt-1.5">12.4M ₺+</div>
+                <span class="text-[11px] text-emerald-400 font-bold mt-1 block">↗ %14.2 Ortalama Tasarruf</span>
+              </div>
+              <div class="p-5 rounded-2xl border border-emerald-900/50 bg-emerald-950/20">
+                <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider">6 AY DENEME AKTİF FİRMALAR</span>
+                <div class="text-2xl font-black text-emerald-400 mt-1.5">142 Firma</div>
+                <span class="text-[11px] text-emerald-300 font-bold mt-1 block">0 ₺ Bedelsiz Lansman Üyeliği</span>
+              </div>
+              <div class="p-5 rounded-2xl border border-blue-900/50 bg-blue-950/20">
+                <span class="text-[10px] font-black text-blue-400 uppercase tracking-wider">AKTİF İHALE SAYISI</span>
+                <div class="text-2xl font-black text-blue-400 mt-1.5">{{ formState.dashboard?.tenders?.length || 48 }}+</div>
+                <span class="text-[11px] text-blue-300 font-bold mt-1 block">Canlı Eksiltme Yayında</span>
+              </div>
+              <div class="p-5 rounded-2xl border border-amber-900/50 bg-amber-950/20">
+                <span class="text-[10px] font-black text-amber-400 uppercase tracking-wider">ONAY BEKLEYEN KYC EVRAKLARI</span>
+                <div class="text-2xl font-black text-amber-400 mt-1.5">
+                  {{ formState.kycVerifications.filter((k: any) => k.status === 'pending').length }} Başvuru
+                </div>
+                <button @click="activeTab = 'kyc_desk'" class="text-[11px] text-amber-300 hover:underline font-bold mt-1 block cursor-pointer">
+                  Hemen İncele & Onayla →
+                </button>
+              </div>
+            </div>
+
+            <!-- Quick Operational Actions -->
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <Zap :size="14" class="text-amber-400" /> Hızlı Operasyon Kısayolları
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <button @click="activeTab = 'kyc_desk'" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-emerald-500/50 transition text-left cursor-pointer">
+                  <FileCheck :size="18" class="text-emerald-400 mb-2" />
+                  <div class="text-xs font-bold text-white">KYC Evraklarını İncele</div>
+                  <div class="text-[10px] text-slate-400 mt-0.5">Firmalara Mavi Rozet ver</div>
+                </button>
+                <button @click="activeTab = 'live_rooms'" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-rose-500/50 transition text-left cursor-pointer">
+                  <Activity :size="18" class="text-rose-400 mb-2" />
+                  <div class="text-xs font-bold text-white">Canlı Eksiltme Yönet</div>
+                  <div class="text-[10px] text-slate-400 mt-0.5">Odalara +5 dk ekle / sonuçlandır</div>
+                </button>
+                <button @click="activeTab = 'email_center'" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-blue-500/50 transition text-left cursor-pointer">
+                  <Mail :size="18" class="text-blue-400 mb-2" />
+                  <div class="text-xs font-bold text-white">Toplu Mail & Şablonlar</div>
+                  <div class="text-[10px] text-slate-400 mt-0.5">info@ üzerinden bildirim gönder</div>
+                </button>
+                <button @click="activeTab = 'support_ai'" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-teal-500/50 transition text-left cursor-pointer">
+                  <Bot :size="18" class="text-teal-400 mb-2" />
+                  <div class="text-xs font-bold text-white">WhatsApp & AI Ayarları</div>
+                  <div class="text-[10px] text-slate-400 mt-0.5">Canlı asistan promptunu güncelle</div>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB 1: KYC & FIRMA DOĞRULAMA MASASI -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'kyc_desk'" class="space-y-6">
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <ShieldCheck :size="16" class="text-emerald-400" />
+                    Kurumsal Firma Doğrulama & KYC Masası
+                  </h3>
+                  <p class="text-[11px] text-slate-400">Firmaların yüklediği vergi levhası, imza sirküleri ve ticaret sicil evraklarını inceleyip Mavi Rozet onayını verin.</p>
+                </div>
+              </div>
+
+              <!-- KYC Cards Grid -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div 
+                  v-for="kyc in formState.kycVerifications" 
+                  :key="kyc.id"
+                  class="p-5 rounded-2xl border bg-slate-950 space-y-3 transition relative overflow-hidden"
+                  :class="kyc.status === 'approved' ? 'border-emerald-500/40 bg-emerald-950/10' : (kyc.status === 'rejected' ? 'border-red-900/40 bg-red-950/10' : 'border-amber-500/40 bg-amber-950/10')"
+                >
+                  <div class="flex items-start justify-between gap-2">
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs font-black text-white">{{ kyc.companyName }}</span>
+                        <span v-if="kyc.badgeGranted" class="bg-blue-500 text-white text-[9px] font-black px-1.5 py-0.2 rounded-full flex items-center gap-0.5">
+                          ✓ MAVİ ROZET
+                        </span>
+                      </div>
+                      <div class="text-[11px] text-slate-400 mt-0.5">{{ kyc.companyType }} • {{ kyc.taxOffice }} (Vergi No: {{ kyc.taxNo }})</div>
+                    </div>
+                    <span 
+                      class="px-2.5 py-1 rounded text-[10px] font-black uppercase"
+                      :class="kyc.status === 'approved' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : (kyc.status === 'rejected' ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-amber-950 text-amber-400 border border-amber-800 animate-pulse')"
+                    >
+                      {{ kyc.status === 'approved' ? 'Onaylandı' : (kyc.status === 'rejected' ? 'Reddedildi' : 'Onay Bekliyor') }}
+                    </span>
+                  </div>
+
+                  <div class="text-[11px] text-slate-300 space-y-1 bg-slate-900/70 p-3 rounded-xl border border-slate-800">
+                    <div><strong>Yetkili:</strong> {{ kyc.authorizedPerson }}</div>
+                    <div><strong>İletişim:</strong> {{ kyc.phone }} | {{ kyc.email }}</div>
+                    <div><strong>Yüklenen Evraklar:</strong> 
+                      <span class="text-blue-400 font-mono"> {{ kyc.uploadedDocs.join(', ') }}</span>
+                    </div>
+                    <div v-if="kyc.rejectionReason" class="text-red-400">
+                      <strong>Ret Nedeni:</strong> {{ kyc.rejectionReason }}
+                    </div>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="flex items-center justify-between pt-2">
+                    <span class="text-[10px] text-slate-500 font-mono">{{ kyc.createdAt }}</span>
+                    <div class="flex items-center gap-2">
+                      <button 
+                        v-if="kyc.status !== 'approved'" 
+                        @click="approveKyc(kyc)"
+                        class="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-xs font-black transition flex items-center gap-1 cursor-pointer shadow-xs"
+                      >
+                        <CheckCircle2 :size="13" /> Onayla & Mavi Rozet Ver
+                      </button>
+                      <button 
+                        v-if="kyc.status !== 'rejected'" 
+                        @click="rejectKyc(kyc)"
+                        class="px-3.5 py-1.5 bg-red-950/40 hover:bg-red-900/60 text-red-400 rounded-lg text-xs font-black transition flex items-center gap-1 cursor-pointer"
+                      >
+                        <XCircle :size="13" /> Reddet
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB 2: CANLI TERSİNE EKSİLTME ODASI OPERATÖRÜ -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'live_rooms'" class="space-y-6">
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <Activity :size="16" class="text-rose-500" />
+                    Canlı Tersine Eksiltme (Canlı Pazarlık) Odaları Operatör Masası
+                  </h3>
+                  <p class="text-[11px] text-slate-400">Odalara anlık müdahale edin, süre uzatın, duraklatın veya lider teklifi kabul ederek kazananı ilan edin.</p>
+                </div>
+              </div>
+
+              <!-- Live Rooms Grid -->
+              <div class="grid grid-cols-1 gap-4">
+                <div 
+                  v-for="room in formState.liveAuctionRooms" 
+                  :key="room.id"
+                  class="p-5 rounded-2xl border bg-slate-950 space-y-4 transition"
+                  :class="room.status === 'live' ? 'border-rose-500/50 ring-1 ring-rose-500/20' : 'border-slate-800'"
+                >
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs font-mono bg-rose-950 text-rose-400 border border-rose-800 px-2 py-0.5 rounded font-bold">{{ room.id }}</span>
+                        <span class="text-sm font-black text-white">{{ room.tenderTitle }}</span>
+                      </div>
+                      <div class="text-[11px] text-slate-400 mt-1">Kategori: {{ room.category }} • Katılımcı: {{ room.participantsCount }} Tedarikçi</div>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                      <span 
+                        class="px-3 py-1 rounded-full text-xs font-black flex items-center gap-1.5"
+                        :class="room.status === 'live' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 animate-pulse' : (room.status === 'paused' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40' : 'bg-slate-800 text-slate-400')"
+                      >
+                        <span v-if="room.status === 'live'" class="h-2 w-2 rounded-full bg-rose-500"></span>
+                        <span>{{ room.status === 'live' ? 'CANLI PAZARLIKTA' : (room.status === 'paused' ? 'DURAKLATILDI' : 'TAMAMLANDI') }}</span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Price & Leader Bar -->
+                  <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 bg-slate-900/80 p-4 rounded-xl border border-slate-800 text-xs">
+                    <div>
+                      <span class="text-[10px] text-slate-500 font-bold block">TAVAN AÇILIŞ</span>
+                      <span class="text-sm font-mono font-bold text-slate-300">{{ room.ceilingPrice.toLocaleString('tr-TR') }} ₺</span>
+                    </div>
+                    <div>
+                      <span class="text-[10px] text-slate-500 font-bold block">LİDER EKSİLTME TEKLİFİ</span>
+                      <span class="text-sm font-mono font-black text-emerald-400">{{ room.currentBestBid.toLocaleString('tr-TR') }} ₺</span>
+                    </div>
+                    <div>
+                      <span class="text-[10px] text-slate-500 font-bold block">MİNİMUM EKSİLTME ADIMI</span>
+                      <span class="text-sm font-mono font-bold text-blue-400">{{ room.minStep.toLocaleString('tr-TR') }} ₺</span>
+                    </div>
+                    <div>
+                      <span class="text-[10px] text-slate-500 font-bold block">LİDER TEDARİKÇİ</span>
+                      <span class="text-xs font-bold text-amber-300 truncate block">{{ room.leaderSupplier }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Operator Action Controls -->
+                  <div class="flex flex-wrap items-center justify-between gap-3 pt-1 border-t border-slate-800/80">
+                    <div class="text-xs text-slate-400 flex items-center gap-1.5">
+                      <Clock :size="14" class="text-blue-400" />
+                      <span>Kalan Süre: <strong>{{ Math.floor(room.remainingSeconds / 60) }} dk {{ room.remainingSeconds % 60 }} sn</strong></span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                      <button 
+                        @click="extendRoomTime(room, 300)" 
+                        class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-black transition flex items-center gap-1 cursor-pointer"
+                      >
+                        <PlusCircle :size="13" /> +5 Dakika Ekle
+                      </button>
+                      <button 
+                        @click="toggleRoomStatus(room)" 
+                        class="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-black transition flex items-center gap-1 cursor-pointer"
+                      >
+                        <Pause v-if="room.status === 'live'" :size="13" />
+                        <Play v-else :size="13" />
+                        <span>{{ room.status === 'live' ? 'Duraklat' : 'Devam Ettir' }}</span>
+                      </button>
+                      <button 
+                        v-if="room.status !== 'ended'"
+                        @click="endRoomWithWinner(room)" 
+                        class="px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black transition flex items-center gap-1 cursor-pointer"
+                      >
+                        <Award :size="13" /> Kazananla Sonuçlandır
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB 3: SİPARİŞ & GÜVENLİ HAVUZ (ESCROW) -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'escrow_delivery'" class="space-y-6">
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <Package :size="16" class="text-blue-400" />
+                    Sipariş & Güvenli Havuz (Escrow) Teslimat Denetim Masası
+                  </h3>
+                  <p class="text-[11px] text-slate-400">Sonuçlanan ihalelerin bloke ödemelerini, sevkiyat takip kodlarını ve teslimat onaylarını yönetin.</p>
+                </div>
+              </div>
+
+              <!-- Escrow Table -->
+              <div class="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="bg-slate-900/90 border-b border-slate-800 text-[10px] font-black text-slate-400 uppercase">
+                      <th class="p-3.5">SİPARİŞ & İHALE</th>
+                      <th class="p-3.5">ALICI & TEDARİKÇİ</th>
+                      <th class="p-3.5">TUTAR</th>
+                      <th class="p-3.5">DURUM</th>
+                      <th class="p-3.5">SEVKİYAT / KARGO</th>
+                      <th class="p-3.5 text-right">İŞLEMLER</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-800/60">
+                    <tr v-for="order in formState.escrowOrders" :key="order.id" class="hover:bg-slate-900/40 transition">
+                      <td class="p-3.5">
+                        <div class="font-bold text-white">{{ order.tenderTitle }}</div>
+                        <div class="text-[10px] text-blue-400 font-mono">{{ order.orderCode }}</div>
+                      </td>
+                      <td class="p-3.5 text-slate-300">
+                        <div><strong>Alıcı:</strong> {{ order.buyerCompany }}</div>
+                        <div class="text-slate-400"><strong>Tedarikçi:</strong> {{ order.supplierCompany }}</div>
+                      </td>
+                      <td class="p-3.5 font-mono font-bold text-emerald-400 text-sm">
+                        {{ order.totalAmount }}
+                      </td>
+                      <td class="p-3.5">
+                        <span 
+                          class="px-2.5 py-0.5 rounded text-[10px] font-black uppercase"
+                          :class="order.escrowStatus === 'odeme_cozuldu' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : (order.escrowStatus === 'teslim_onaylandi' ? 'bg-blue-950 text-blue-400 border border-blue-800' : 'bg-amber-950 text-amber-400 border border-amber-800')"
+                        >
+                          {{ order.escrowStatus.replace('_', ' ') }}
+                        </span>
+                      </td>
+                      <td class="p-3.5 text-[11px] text-slate-400 font-mono">
+                        <div>{{ order.trackingNumber }}</div>
+                        <div class="text-[10px] text-slate-500">{{ order.deliveryDate }}</div>
+                      </td>
+                      <td class="p-3.5 text-right">
+                        <div class="flex items-center justify-end gap-1.5">
+                          <button 
+                            @click="updateEscrowStatus(order, 'odeme_cozuldu')"
+                            class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-black cursor-pointer"
+                          >
+                            Ödemeyi Çöz
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB 4: SEKTÖR & KATEGORİ YÖNETİMİ -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'categories'" class="space-y-6">
+            <!-- Add New Category Form -->
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <Plus :size="14" class="text-blue-500" /> Yeni B2B Sektör / Kategori Ekle
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input v-model="newCategory.name" type="text" placeholder="Kategori Adı (Örn: Kimya & Plastik)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                <input v-model="newCategory.targetSavings" type="text" placeholder="Hedef Tasarruf Oranı (Örn: %18.5)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                <input v-model="newCategory.description" type="text" placeholder="Kısa Açıklama & Malzeme Kapsamı" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+              </div>
+              <div class="flex justify-end">
+                <button @click="addCategory" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition cursor-pointer">
+                  + Kategoriyi Kaydet
+                </button>
+              </div>
+            </div>
+
+            <!-- Categories Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div v-for="(cat, idx) in formState.categories" :key="cat.id" class="p-5 rounded-2xl border border-slate-800 bg-slate-950 space-y-3 relative">
+                <div class="flex items-start justify-between">
+                  <div>
+                    <h4 class="text-xs font-black text-white">{{ cat.name }}</h4>
+                    <span class="text-[10px] text-emerald-400 font-black mt-0.5 block">Hedef Tasarruf: {{ cat.targetSavings }}</span>
+                  </div>
+                  <button @click="removeCategory(idx)" class="p-1.5 bg-red-950/30 text-red-400 hover:bg-red-950 rounded cursor-pointer">
+                    <Trash2 :size="13" />
+                  </button>
+                </div>
+                <p class="text-[11px] text-slate-400 leading-relaxed">{{ cat.description }}</p>
+                <div class="text-[10px] text-blue-400 font-bold bg-blue-950/40 px-2 py-1 rounded inline-block">
+                  {{ cat.activeTendersCount }} Aktif İhale
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB 5: VİDEO REHBERLER & AKADEMİ CMS -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'video_cms'" class="space-y-6">
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <Video :size="14" class="text-blue-500" /> B2B Akademi & Video Rehber İçerik Yönetimi
+              </h3>
+              <p class="text-[11px] text-slate-400">Sitede ve Hero butonunda açılan 4 ana rehber videosunun URL, başlık ve seslendirme metinlerini güncelleyin.</p>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div v-for="(v, idx) in formState.videoGuides" :key="idx" class="p-5 rounded-2xl border border-slate-800 bg-slate-950 space-y-3">
+                  <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-mono bg-blue-950 text-blue-400 px-2 py-0.5 rounded font-bold">REHBER #{{ idx + 1 }}</span>
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">VİDEO BAŞLIĞI</label>
+                    <input v-model="v.title" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-900 p-2.5 text-xs text-white" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">AÇIKLAMA</label>
+                    <input v-model="v.desc" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-900 p-2.5 text-xs text-white" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-500 mb-1">VİDEO MP4 / YOUTUBE BAĞLANTI URL'İ</label>
+                    <input v-model="v.videoUrl" type="text" placeholder="https://assets.mixkit.co/..." class="w-full rounded-lg border border-slate-800 bg-slate-900 p-2.5 text-xs text-white font-mono" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB 6: KUPON & PROMOSYON KODLARI -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'promo_codes'" class="space-y-6">
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                <Ticket :size="14" class="text-blue-500" /> Promosyon & Kampanya Kuponu Oluştur
+              </h3>
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <input v-model="newPromo.code" type="text" placeholder="Kupon Kodu (Örn: LANSMAN2026)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white uppercase font-mono" />
+                <input v-model="newPromo.value" type="text" placeholder="Kupon Değeri (Örn: 6 Ay Bedelsiz)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                <input v-model="newPromo.usageLimit" type="number" placeholder="Kullanım Limiti" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                <button @click="addPromoCode" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition cursor-pointer">
+                  + Kupon Tanımla
+                </button>
+              </div>
+            </div>
+
+            <!-- Promo Codes Table -->
+            <div class="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
+              <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                  <tr class="bg-slate-900/90 border-b border-slate-800 text-[10px] font-black text-slate-400 uppercase">
+                    <th class="p-3.5">KUPON KODU</th>
+                    <th class="p-3.5">DEĞER / KAMPANYA</th>
+                    <th class="p-3.5">KULLANIM LİMİTİ</th>
+                    <th class="p-3.5">GEÇERLİLİK</th>
+                    <th class="p-3.5">DURUM</th>
+                    <th class="p-3.5 text-right">İŞLEM</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800/60">
+                  <tr v-for="(p, idx) in formState.promoCodes" :key="p.code" class="hover:bg-slate-900/40 transition">
+                    <td class="p-3.5 font-mono font-bold text-white">{{ p.code }}</td>
+                    <td class="p-3.5 text-emerald-400 font-bold">{{ p.value }}</td>
+                    <td class="p-3.5 text-slate-300 font-mono">{{ p.usedCount }} / {{ p.usageLimit }} Kullanım</td>
+                    <td class="p-3.5 text-slate-400 font-mono text-[10px]">{{ p.expiryDate }}</td>
+                    <td class="p-3.5">
+                      <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">{{ p.status }}</span>
+                    </td>
+                    <td class="p-3.5 text-right">
+                      <button @click="removePromoCode(idx)" class="p-2 bg-red-950/30 text-red-400 rounded hover:bg-red-950 cursor-pointer">
+                        <Trash2 :size="13" />
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB 7: GÜVENLİK & AUDIT LOG -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'audit_logs'" class="space-y-6">
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <ShieldAlert :size="16" class="text-blue-400" />
+                    Sistem Denetim İzi & Güvenlik Günlüğü (Audit Log)
+                  </h3>
+                  <p class="text-[11px] text-slate-400">KVKK ve ISO 27001 gereğince tüm yönetici ve kullanıcı kritik işlem kayıtları zaman damgalı olarak tutulur.</p>
+                </div>
+              </div>
+
+              <!-- Log Stream Table -->
+              <div class="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
+                <table class="w-full text-left text-xs border-collapse font-mono">
+                  <thead>
+                    <tr class="bg-slate-900/90 border-b border-slate-800 text-[10px] font-black text-slate-400 uppercase">
+                      <th class="p-3.5">ZAMAN DAMGASI</th>
+                      <th class="p-3.5">KULLANICI</th>
+                      <th class="p-3.5">İŞLEM</th>
+                      <th class="p-3.5">IP ADRESİ</th>
+                      <th class="p-3.5">DETAY</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-800/60 text-[11px]">
+                    <tr v-for="log in formState.auditLogs" :key="log.id" class="hover:bg-slate-900/40 transition">
+                      <td class="p-3.5 text-slate-400">{{ log.timestamp }}</td>
+                      <td class="p-3.5 font-bold text-white">{{ log.userEmail }}</td>
+                      <td class="p-3.5 text-emerald-400 font-sans font-bold">{{ log.action }}</td>
+                      <td class="p-3.5 text-blue-400">{{ log.ipAddress }}</td>
+                      <td class="p-3.5 text-slate-300 font-sans">{{ log.details }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB 8: SİTE GENEL AYARLARI & BAKIM MODU -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'site_settings'" class="space-y-6">
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <Settings :size="16" class="text-blue-400" />
+                    Platform Genel Yapılandırması & Bakım Modu
+                  </h3>
+                </div>
+                <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-amber-400">
+                  <input type="checkbox" v-model="formState.siteSettings.maintenanceMode" class="rounded border-slate-700 bg-slate-950 text-amber-500" />
+                  <span>Bakım Modunu Aktif Et (Maintenance)</span>
+                </label>
+              </div>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-400 mb-1">PLATFORM META BAŞLIĞI (SEO TITLE)</label>
+                  <input v-model="formState.siteSettings.metaTitle" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white" />
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-400 mb-1">META AÇIKLAMA (SEO DESCRIPTION)</label>
+                  <textarea v-model="formState.siteSettings.metaDescription" rows="2" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white"></textarea>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-slate-400 mb-1">ÜST DUYURU BANDI METNİ (TICKER)</label>
+                  <input v-model="formState.siteSettings.announcementTicker" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white" />
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">GOOGLE ANALYTICS / GTM ID</label>
+                    <input v-model="formState.siteSettings.googleAnalyticsId" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white font-mono" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">DESTEK E-POSTA</label>
+                    <input v-model="formState.siteSettings.supportEmail" type="email" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white font-mono" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB: WHATSAPP & AI ASİSTAN YÖNETİMİ -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'support_ai'" class="space-y-6">
-            
-            <!-- WhatsApp Settings Card -->
             <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
               <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 rounded-xl bg-[#25D366]/20 text-[#25D366] flex items-center justify-center">
-                    <MessageSquare :size="16" />
-                  </div>
-                  <div>
-                    <h3 class="text-sm font-black text-white">WhatsApp Canlı Destek Butonu Ayarları</h3>
-                    <p class="text-[11px] text-slate-400">Sağ alt köşede görünen WhatsApp butonunu ve hedef numarayı yapılandırın.</p>
-                  </div>
+                  <MessageSquare :size="16" class="text-emerald-400" />
+                  <h3 class="text-sm font-black text-white">WhatsApp Canlı Destek Butonu Ayarları</h3>
                 </div>
                 <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-300">
                   <input type="checkbox" v-model="formState.supportSettings.whatsappEnabled" class="rounded border-slate-700 bg-slate-950 text-emerald-500" />
@@ -661,39 +1416,21 @@ function removeSubmittedBid(index: number) {
 
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">WHATSAPP DESTEK TELEFON NUMARASI (Ülke kodu ile)</label>
-                  <input 
-                    v-model="formState.supportSettings.whatsappNumber" 
-                    type="text" 
-                    placeholder="908503080000" 
-                    class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white focus:border-emerald-500 focus:outline-none font-mono" 
-                  />
-                  <span class="text-[10px] text-slate-500 mt-1 block">Örn: 908503080000 veya 905437340860</span>
+                  <label class="block text-xs font-bold text-slate-400 mb-1">WHATSAPP NUMARASI</label>
+                  <input v-model="formState.supportSettings.whatsappNumber" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white font-mono" />
                 </div>
-
                 <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">VARSAYILAN BAŞLANGIÇ MESAJI</label>
-                  <input 
-                    v-model="formState.supportSettings.whatsappMessage" 
-                    type="text" 
-                    placeholder="Merhaba İhaleciBurada ekibi..." 
-                    class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white focus:border-emerald-500 focus:outline-none" 
-                  />
+                  <label class="block text-xs font-bold text-slate-400 mb-1">BAŞLANGIÇ MESAJI</label>
+                  <input v-model="formState.supportSettings.whatsappMessage" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white" />
                 </div>
               </div>
             </div>
 
-            <!-- AI Assistant Settings Card -->
             <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
               <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div class="flex items-center gap-2">
-                  <div class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center">
-                    <Bot :size="18" />
-                  </div>
-                  <div>
-                    <h3 class="text-sm font-black text-white">Yapay Zeka (AI) Canlı Karşılama Asistanı</h3>
-                    <p class="text-[11px] text-slate-400">Siteyi ziyaret eden kullanıcılara 7/24 rehberlik eden akıllı asistan ayarları.</p>
-                  </div>
+                  <Bot :size="18" class="text-blue-400" />
+                  <h3 class="text-sm font-black text-white">Yapay Zeka (AI) Canlı Karşılama Asistanı</h3>
                 </div>
                 <label class="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-300">
                   <input type="checkbox" v-model="formState.supportSettings.aiEnabled" class="rounded border-slate-700 bg-slate-950 text-blue-500" />
@@ -704,132 +1441,64 @@ function removeSubmittedBid(index: number) {
               <div class="space-y-4">
                 <div>
                   <label class="block text-xs font-bold text-slate-400 mb-1">ASİSTAN BOT ADI</label>
-                  <input 
-                    v-model="formState.supportSettings.aiBotName" 
-                    type="text" 
-                    placeholder="İhaleciBurada AI Asistanı" 
-                    class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white focus:border-blue-500 focus:outline-none" 
-                  />
+                  <input v-model="formState.supportSettings.aiBotName" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white" />
                 </div>
-
                 <div>
                   <label class="block text-xs font-bold text-slate-400 mb-1">İLK KARŞILAMA VE HOŞ GELDİN MESAJI</label>
-                  <textarea 
-                    v-model="formState.supportSettings.aiGreeting" 
-                    rows="3" 
-                    class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white focus:border-blue-500 focus:outline-none leading-relaxed" 
-                  ></textarea>
+                  <textarea v-model="formState.supportSettings.aiGreeting" rows="3" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white leading-relaxed"></textarea>
                 </div>
-
                 <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">AI SİSTEM TALİMATI / BİLGİ TABANI (PROMPT CONTEXT)</label>
-                  <textarea 
-                    v-model="formState.supportSettings.aiPromptContext" 
-                    rows="3" 
-                    class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white focus:border-blue-500 focus:outline-none font-mono text-[11px]" 
-                  ></textarea>
+                  <label class="block text-xs font-bold text-slate-400 mb-1">AI SİSTEM TALİMATI / PROMPT CONTEXT</label>
+                  <textarea v-model="formState.supportSettings.aiPromptContext" rows="3" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white font-mono text-[11px]"></textarea>
                 </div>
               </div>
             </div>
-
           </div>
 
           <!-- ========================================================================= -->
-          <!-- TAB 2: CRM MÜŞTERİ & ADAY YÖNETİMİ -->
+          <!-- TAB: CRM LEADS -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'crm_leads'" class="space-y-6">
-            
-            <!-- CRM KPI Summary Cards -->
-            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-              <div class="p-4 rounded-2xl border border-slate-800 bg-slate-900/80">
-                <span class="text-[10px] font-bold text-slate-400 uppercase">TOPLAM CRM KAYDI</span>
-                <div class="text-2xl font-black text-white mt-1">{{ formState.crmSettings.leads.length }}</div>
-              </div>
-              <div class="p-4 rounded-2xl border border-emerald-900/60 bg-emerald-950/20">
-                <span class="text-[10px] font-bold text-emerald-400 uppercase">6 AY DENEME AKTİF</span>
-                <div class="text-2xl font-black text-emerald-400 mt-1">
-                  {{ formState.crmSettings.leads.filter((l: any) => l.status.includes('Deneme')).length }}
-                </div>
-              </div>
-              <div class="p-4 rounded-2xl border border-blue-900/60 bg-blue-950/20">
-                <span class="text-[10px] font-bold text-blue-400 uppercase">TEKLİF VERENLER</span>
-                <div class="text-2xl font-black text-blue-400 mt-1">
-                  {{ formState.crmSettings.leads.filter((l: any) => l.status.includes('Teklif')).length }}
-                </div>
-              </div>
-              <div class="p-4 rounded-2xl border border-amber-900/60 bg-amber-950/20">
-                <span class="text-[10px] font-bold text-amber-400 uppercase">GÖRÜŞÜLEN FİRMALAR</span>
-                <div class="text-2xl font-black text-amber-400 mt-1">
-                  {{ formState.crmSettings.leads.filter((l: any) => l.status.includes('Görüş')).length }}
-                </div>
-              </div>
-            </div>
-
-            <!-- New Lead Add Form -->
             <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
               <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
                 <Plus :size="14" class="text-blue-500" /> Yeni Müşteri / Kurumsal Aday Ekle
               </h3>
-              
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <input v-model="newLeadForm.companyName" type="text" placeholder="Şirket / Firma Unvanı *" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
-                <input v-model="newLeadForm.contactName" type="text" placeholder="Yetkili Adı Soyadı" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
-                <input v-model="newLeadForm.email" type="email" placeholder="E-Posta Adresi *" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                <input v-model="newLeadForm.companyName" type="text" placeholder="Şirket Unvanı *" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                <input v-model="newLeadForm.contactName" type="text" placeholder="Yetkili Kişi" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                <input v-model="newLeadForm.email" type="email" placeholder="E-Posta Adresi *" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
               </div>
-
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <input v-model="newLeadForm.phone" type="text" placeholder="Telefon (05XX...)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
-                <select v-model="newLeadForm.status" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none">
+                <input v-model="newLeadForm.phone" type="text" placeholder="Telefon (05XX...)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                <select v-model="newLeadForm.status" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white">
                   <option value="6 Ay Deneme Aktif">6 Ay Deneme Aktif</option>
                   <option value="Teklif Veren">Teklif Veren</option>
                   <option value="İhale Açan">İhale Açan</option>
                   <option value="Görüşülüyor">Görüşülüyor</option>
-                  <option value="Yeni Üye">Yeni Üye</option>
                 </select>
-                <input v-model="newLeadForm.notes" type="text" placeholder="Müşteri Notu / Talep Detayı" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                <input v-model="newLeadForm.notes" type="text" placeholder="Not / Talep Detayı" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
               </div>
-
               <div class="flex justify-end">
-                <button @click="addLead" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer">
-                  <Plus :size="14" /> Müşteriyi Kaydet
+                <button @click="addLead" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition cursor-pointer">
+                  + Müşteriyi Kaydet
                 </button>
               </div>
             </div>
 
-            <!-- Leads Table Filter Bar -->
-            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-              <div class="relative w-full sm:w-80">
-                <Search :size="14" class="absolute left-3.5 top-3 text-slate-500" />
-                <input v-model="crmSearchQuery" type="text" placeholder="Firma, yetkili veya mail ara..." class="w-full rounded-xl border border-slate-800 bg-slate-900 p-2.5 pl-10 text-xs text-white focus:outline-none" />
-              </div>
-
-              <div class="flex items-center gap-2">
-                <span class="text-xs text-slate-400 font-bold">Durum:</span>
-                <select v-model="crmStatusFilter" class="rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-white focus:outline-none">
-                  <option value="ALL">Tüm Durumlar</option>
-                  <option value="6 Ay Deneme Aktif">6 Ay Deneme Aktif</option>
-                  <option value="Teklif Veren">Teklif Veren</option>
-                  <option value="İhale Açan">İhale Açan</option>
-                  <option value="Görüşülüyor">Görüşülüyor</option>
-                </select>
-              </div>
-            </div>
-
             <!-- Leads Table -->
-            <div class="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+            <div class="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
               <table class="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr class="bg-slate-950/80 border-b border-slate-800 text-[10px] font-black text-slate-400 uppercase">
+                  <tr class="bg-slate-900/90 border-b border-slate-800 text-[10px] font-black text-slate-400 uppercase">
                     <th class="p-3.5">FİRMA & YETKİLİ</th>
                     <th class="p-3.5">İLETİŞİM</th>
                     <th class="p-3.5">DURUM</th>
                     <th class="p-3.5">NOTLAR</th>
-                    <th class="p-3.5">TARİH</th>
                     <th class="p-3.5 text-right">İŞLEMLER</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-800/60">
-                  <tr v-for="(lead, idx) in filteredLeads" :key="lead.id" class="hover:bg-slate-850/50 transition">
+                  <tr v-for="(lead, idx) in filteredLeads" :key="lead.id" class="hover:bg-slate-900/40 transition">
                     <td class="p-3.5 font-bold text-white">
                       <div>{{ lead.companyName }}</div>
                       <div class="text-[10px] text-slate-400 font-normal">{{ lead.contactName }}</div>
@@ -839,17 +1508,13 @@ function removeSubmittedBid(index: number) {
                       <div class="text-[10px] text-slate-400 font-mono">{{ lead.phone }}</div>
                     </td>
                     <td class="p-3.5">
-                      <span 
-                        class="px-2 py-0.5 rounded text-[10px] font-black"
-                        :class="lead.status.includes('Deneme') ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : (lead.status.includes('Teklif') ? 'bg-blue-950 text-blue-400 border border-blue-800' : 'bg-amber-950 text-amber-400 border border-amber-800')"
-                      >
+                      <span class="px-2 py-0.5 rounded text-[10px] font-black bg-emerald-950 text-emerald-400 border border-emerald-800">
                         {{ lead.status }}
                       </span>
                     </td>
-                    <td class="p-3.5 text-slate-400 text-[11px] max-w-xs truncate">{{ lead.notes }}</td>
-                    <td class="p-3.5 text-slate-500 font-mono text-[10px]">{{ lead.createdAt }}</td>
+                    <td class="p-3.5 text-slate-400 text-[11px]">{{ lead.notes }}</td>
                     <td class="p-3.5 text-right">
-                      <button @click="removeLead(idx)" class="p-2 bg-red-950/30 hover:bg-red-950 text-red-400 rounded-lg transition cursor-pointer" title="Sil">
+                      <button @click="removeLead(idx)" class="p-2 bg-red-950/30 hover:bg-red-950 text-red-400 rounded cursor-pointer">
                         <Trash2 :size="13" />
                       </button>
                     </td>
@@ -857,44 +1522,37 @@ function removeSubmittedBid(index: number) {
                 </tbody>
               </table>
             </div>
-
           </div>
 
           <!-- ========================================================================= -->
-          <!-- TAB 3: E-POSTA ŞABLONLARI & BİLDİRİM MERKEZİ -->
+          <!-- TAB: EMAIL CENTER & TEMPLATES -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'email_center'" class="space-y-6">
-            
-            <!-- Sender Configuration Bar -->
             <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
               <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
                 <Mail :size="16" class="text-blue-500" />
-                <h3 class="text-sm font-black text-white">Sitenin Sahip Olduğu E-Posta & SMTP Gönderici Ayarları</h3>
+                <h3 class="text-sm font-black text-white">info@ihaleciburada.com Gönderici Yapılandırması</h3>
               </div>
-
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">GÖNDERİCİ E-POSTA ADRESİ</label>
+                  <label class="block text-xs font-bold text-slate-400 mb-1">GÖNDERİCİ E-POSTA</label>
                   <input v-model="formState.emailSettings.senderEmail" type="email" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">GÖNDERİCİ BAŞLIĞI (NAME)</label>
+                  <label class="block text-xs font-bold text-slate-400 mb-1">GÖNDERİCİ ADI</label>
                   <input v-model="formState.emailSettings.senderName" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">YANIT E-POSTA (REPLY-TO)</label>
+                  <label class="block text-xs font-bold text-slate-400 mb-1">REPLY-TO E-POSTA</label>
                   <input v-model="formState.emailSettings.replyToEmail" type="email" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
                 </div>
               </div>
             </div>
 
-            <!-- Template Selector & Editor Grid -->
+            <!-- Templates List & Editor -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-              
-              <!-- Templates List Sidebar -->
               <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-2">
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2">HAZIR E-POSTA ŞABLONLARI</span>
-                
                 <button
                   v-for="(tpl, idx) in formState.emailSettings.templates"
                   :key="tpl.id"
@@ -907,74 +1565,60 @@ function removeSubmittedBid(index: number) {
                 </button>
               </div>
 
-              <!-- Template Editor & Live Preview -->
               <div v-if="currentTemplate" class="lg:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-4">
                 <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                   <h4 class="text-sm font-black text-white">{{ currentTemplate.name }}</h4>
                   <span class="text-[10px] font-mono bg-blue-950 text-blue-400 px-2 py-0.5 rounded">{{ currentTemplate.id }}</span>
                 </div>
-
                 <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">E-POSTA KONUSU (SUBJECT)</label>
-                  <input v-model="currentTemplate.subject" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white focus:border-blue-500 focus:outline-none" />
+                  <label class="block text-xs font-bold text-slate-400 mb-1">KONU (SUBJECT)</label>
+                  <input v-model="currentTemplate.subject" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white" />
                 </div>
-
                 <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">E-POSTA İÇERİK METNİ (BODY / HTML)</label>
-                  <textarea v-model="currentTemplate.content" rows="10" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white focus:border-blue-500 focus:outline-none font-sans leading-relaxed"></textarea>
+                  <label class="block text-xs font-bold text-slate-400 mb-1">İÇERİK METNİ</label>
+                  <textarea v-model="currentTemplate.content" rows="10" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white font-sans leading-relaxed"></textarea>
                 </div>
-
-                <!-- Test Email Send Box -->
                 <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-                  <div class="flex items-center gap-2 w-full sm:w-auto flex-1">
-                    <Mail :size="14" class="text-slate-500 shrink-0" />
-                    <input v-model="testEmailTarget" type="email" placeholder="Test alıcı e-posta..." class="w-full bg-transparent border-0 text-xs text-white focus:outline-none font-mono" />
-                  </div>
-                  <button @click="sendTestEmail" class="w-full sm:w-auto px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs">
-                    <Send :size="13" />
-                    <span>Örnek Gönderim Yap</span>
+                  <input v-model="testEmailTarget" type="email" placeholder="Test alıcı e-posta..." class="w-full sm:w-auto flex-1 bg-transparent border-0 text-xs text-white font-mono" />
+                  <button @click="sendTestEmail" class="w-full sm:w-auto px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
+                    <Send :size="13" /> Test Gönderimi Yap
                   </button>
                 </div>
               </div>
-
             </div>
-
           </div>
 
           <!-- ========================================================================= -->
-          <!-- TAB 4: BÜLTEN & E-POSTA ABONELERİ -->
+          <!-- TAB: NEWSLETTER SUBSCRIBERS -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'newsletter_subs'" class="space-y-6">
-            
-            <!-- Quick Add Subscriber Form -->
             <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
               <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
-                <Plus :size="14" class="text-blue-500" /> Yeni E-Posta / Bülten Abonesi Ekle
+                <Plus :size="14" class="text-blue-500" /> Yeni Abone Ekle
               </h3>
               <div class="flex flex-col sm:flex-row gap-3">
-                <input v-model="newSubscriberEmail" type="email" placeholder="Abone E-Posta Adresi *" class="flex-1 rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
-                <input v-model="newSubscriberCompany" type="text" placeholder="Firma Adı (Opsiyonel)" class="flex-1 rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
-                <button @click="addSubscriber" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer">
-                  <Plus :size="14" /> Abone Ekle
+                <input v-model="newSubscriberEmail" type="email" placeholder="E-Posta *" class="flex-1 rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                <input v-model="newSubscriberCompany" type="text" placeholder="Firma Adı" class="flex-1 rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                <button @click="addSubscriber" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition cursor-pointer">
+                  + Abone Ekle
                 </button>
               </div>
             </div>
 
-            <!-- Subscribers Table -->
-            <div class="rounded-2xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+            <div class="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
               <table class="w-full text-left text-xs border-collapse">
                 <thead>
-                  <tr class="bg-slate-950/80 border-b border-slate-800 text-[10px] font-black text-slate-400 uppercase">
+                  <tr class="bg-slate-900/90 border-b border-slate-800 text-[10px] font-black text-slate-400 uppercase">
                     <th class="p-3.5">E-POSTA</th>
                     <th class="p-3.5">FİRMA</th>
                     <th class="p-3.5">KAYNAK</th>
-                    <th class="p-3.5">KAYIT TARİHİ</th>
+                    <th class="p-3.5">TARİH</th>
                     <th class="p-3.5">DURUM</th>
                     <th class="p-3.5 text-right">İŞLEM</th>
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-800/60">
-                  <tr v-for="(sub, idx) in formState.emailSettings.subscribers" :key="sub.id" class="hover:bg-slate-850/50 transition">
+                  <tr v-for="(sub, idx) in formState.emailSettings.subscribers" :key="sub.id" class="hover:bg-slate-900/40 transition">
                     <td class="p-3.5 font-bold text-white font-mono">{{ sub.email }}</td>
                     <td class="p-3.5 text-slate-300">{{ sub.companyName }}</td>
                     <td class="p-3.5 text-slate-400">{{ sub.source }}</td>
@@ -983,7 +1627,7 @@ function removeSubmittedBid(index: number) {
                       <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">{{ sub.status }}</span>
                     </td>
                     <td class="p-3.5 text-right">
-                      <button @click="removeSubscriber(idx)" class="p-2 bg-red-950/30 hover:bg-red-950 text-red-400 rounded-lg transition cursor-pointer">
+                      <button @click="removeSubscriber(idx)" class="p-2 bg-red-950/30 hover:bg-red-950 text-red-400 rounded cursor-pointer">
                         <Trash2 :size="13" />
                       </button>
                     </td>
@@ -991,61 +1635,41 @@ function removeSubmittedBid(index: number) {
                 </tbody>
               </table>
             </div>
-
           </div>
 
           <!-- ========================================================================= -->
-          <!-- TAB 5: HERO / ANASAYFA -->
+          <!-- TAB: HERO / HOMEPAGE -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'hero'" class="space-y-6">
             <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">ANA SAYFA BAŞLIK VE AÇIKLAMA METİNLERİ</h3>
+              <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">ANA SAYFA BAŞLIK VE METİNLERİ</h3>
               <div>
-                <label class="block text-xs font-bold text-slate-400 mb-1">ÜST KÜÇÜK SLOGAN (TAGLINE)</label>
-                <input v-model="formState.hero.tagline" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white focus:outline-none" />
+                <label class="block text-xs font-bold text-slate-400 mb-1">SLOGAN (TAGLINE)</label>
+                <input v-model="formState.hero.tagline" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white" />
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label class="block text-xs font-bold text-slate-400 mb-1">BAŞLIK 1. SATIR</label>
-                  <input v-model="formState.hero.titleLine1" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white focus:outline-none" />
+                  <input v-model="formState.hero.titleLine1" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white" />
                 </div>
                 <div>
                   <label class="block text-xs font-bold text-slate-400 mb-1">BAŞLIK 2. SATIR</label>
-                  <input v-model="formState.hero.titleLine2" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white focus:outline-none" />
+                  <input v-model="formState.hero.titleLine2" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white" />
                 </div>
               </div>
               <div>
                 <label class="block text-xs font-bold text-slate-400 mb-1">AÇIKLAMA METNİ</label>
-                <textarea v-model="formState.hero.description" rows="3" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white focus:outline-none leading-relaxed"></textarea>
+                <textarea v-model="formState.hero.description" rows="3" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white leading-relaxed"></textarea>
               </div>
             </div>
           </div>
 
           <!-- ========================================================================= -->
-          <!-- TAB 6: CANLI İHALE KARTI -->
-          <!-- ========================================================================= -->
-          <div v-if="activeTab === 'tender'" class="space-y-6">
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">CANLI EKSİLTME DEMO KARTI AYARLARI</h3>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">İHALE BAŞLIĞI</label>
-                  <input v-model="formState.liveTender.title" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white focus:outline-none" />
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">AÇILIŞ FİYATI (₺)</label>
-                  <input v-model="formState.liveTender.openingPrice" type="number" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white focus:outline-none font-mono" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ========================================================================= -->
-          <!-- TAB 7: ABONELİK PLANLARI -->
+          <!-- TAB: PLANS -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'plans'" class="space-y-6">
             <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">B2B ABONELİK FİYATLARI</h3>
+              <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">B2B ABONELİK PLANLARI (4 KART)</h3>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div v-for="pkg in formState.pricing.packages" :key="pkg.id" class="p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-2">
                   <div class="font-bold text-xs text-white">{{ pkg.name }}</div>
@@ -1059,38 +1683,20 @@ function removeSubmittedBid(index: number) {
           </div>
 
           <!-- ========================================================================= -->
-          <!-- TAB 8: İLETİŞİM BİLGİLERİ -->
-          <!-- ========================================================================= -->
-          <div v-if="activeTab === 'contact'" class="space-y-6">
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">İLETİŞİM BİLGİLERİ</h3>
-              <div>
-                <label class="block text-xs font-bold text-slate-400 mb-1">E-POSTA</label>
-                <input v-model="formState.contact.email" type="email" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white font-mono" />
-              </div>
-              <div>
-                <label class="block text-xs font-bold text-slate-400 mb-1">ADRES</label>
-                <input v-model="formState.contact.address" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white" />
-              </div>
-            </div>
-          </div>
-
-          <!-- ========================================================================= -->
-          <!-- TAB 9: VERİTABANI İLANLARIM -->
+          <!-- TAB: DB TENDERS -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'db_tenders'" class="space-y-4">
             <div class="flex justify-between items-center mb-2">
               <label class="block text-xs font-bold text-slate-400">YAYINDAKİ İHALELER LİSTESİ</label>
-              <button @click="addDashboardTender" class="flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition">
+              <button @click="addDashboardTender" class="flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition cursor-pointer">
                 <Plus :size="14" /> Yeni İhale
               </button>
             </div>
-
             <div class="space-y-4">
               <div v-for="(tender, index) in formState.dashboard.tenders" :key="tender.id" class="p-4 rounded-xl border border-slate-800 bg-slate-900/30 space-y-3">
                 <div class="flex justify-between items-center">
                   <span class="text-xs font-mono text-blue-400 font-bold bg-blue-950/30 px-2 py-0.5 rounded">{{ tender.id }}</span>
-                  <button @click="removeDashboardTender(index)" class="p-2 bg-red-950/20 hover:bg-red-950 text-red-400 rounded-lg transition">
+                  <button @click="removeDashboardTender(index)" class="p-2 bg-red-950/20 hover:bg-red-950 text-red-400 rounded-lg transition cursor-pointer">
                     <Trash2 :size="14" />
                   </button>
                 </div>
@@ -1104,7 +1710,7 @@ function removeSubmittedBid(index: number) {
           </div>
 
           <!-- ========================================================================= -->
-          <!-- TAB 10: GELEN TEKLİFLER -->
+          <!-- TAB: DB RECEIVED BIDS -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'db_received'" class="space-y-4">
             <div class="space-y-4">
@@ -1115,11 +1721,11 @@ function removeSubmittedBid(index: number) {
                     <div class="font-bold text-white">{{ bid.firma }}</div>
                     <div class="text-[11px] text-slate-400 font-mono">{{ bid.fiyat }} • {{ bid.sure }}</div>
                   </div>
-                  <button @click="removeReceivedBid(tIdx, bIdx)" class="p-1.5 bg-red-950/20 text-red-400 rounded">
+                  <button @click="removeReceivedBid(tIdx, bIdx)" class="p-1.5 bg-red-950/20 text-red-400 rounded cursor-pointer">
                     <Trash2 :size="12" />
                   </button>
                 </div>
-                <button @click="addReceivedBid(tIdx)" class="text-xs text-blue-400 font-bold flex items-center gap-1">
+                <button @click="addReceivedBid(tIdx)" class="text-xs text-blue-400 font-bold flex items-center gap-1 cursor-pointer">
                   <Plus :size="12" /> Teklif Ekle
                 </button>
               </div>
@@ -1127,34 +1733,7 @@ function removeSubmittedBid(index: number) {
           </div>
 
           <!-- ========================================================================= -->
-          <!-- TAB 11: VERİLEN TEKLİFLER -->
-          <!-- ========================================================================= -->
-          <div v-if="activeTab === 'db_submitted'" class="space-y-4">
-            <div class="flex justify-between items-center mb-2">
-              <label class="block text-xs font-bold text-slate-400">YAPTIĞIM TEKLİFLER</label>
-              <button @click="addSubmittedBid" class="flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition">
-                <Plus :size="14" /> Teklif Ekle
-              </button>
-            </div>
-            <div class="space-y-4">
-              <div v-for="(bid, index) in formState.dashboard.submittedBids" :key="bid.id" class="p-4 rounded-xl border border-slate-800 bg-slate-900/30 space-y-3">
-                <div class="flex justify-between">
-                  <span class="text-xs font-mono text-blue-400 font-bold">{{ bid.id }} - {{ bid.ilanBaslik }}</span>
-                  <button @click="removeSubmittedBid(index)" class="text-red-400">
-                    <Trash2 :size="13" />
-                  </button>
-                </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <input v-model="bid.teklifFiyatim" type="text" class="rounded border border-slate-800 bg-slate-950 p-2 text-xs text-white" />
-                  <input v-model="bid.aliciFirma" type="text" class="rounded border border-slate-800 bg-slate-950 p-2 text-xs text-white" />
-                  <input v-model="bid.durum" type="text" class="rounded border border-slate-800 bg-slate-950 p-2 text-xs text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ========================================================================= -->
-          <!-- TAB 12: GELEN ÖDEMELER -->
+          <!-- TAB: DB PAYMENTS -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'db_payments'" class="space-y-4">
             <div class="space-y-4">
@@ -1173,7 +1752,7 @@ function removeSubmittedBid(index: number) {
         <!-- Floating Bottom Save Bar -->
         <div class="mt-8 border-t border-slate-800 pt-6 flex justify-between items-center">
           <div class="text-xs text-slate-400">
-            * Tüm değişiklikler anında yerel depolama ve sisteme kaydedilir.
+            * Tüm kurumsal ayarlar ve operasyon değişiklikleri anında sisteme yansıtılır.
           </div>
           <button @click="handleSave" class="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-xs font-black text-white hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 cursor-pointer">
             <Save :size="15" />
@@ -1184,7 +1763,7 @@ function removeSubmittedBid(index: number) {
       </main>
     </div>
 
-    <!-- Global Toast Notification -->
+    <!-- GLOBAL TOAST -->
     <transition
       enter-active-class="transform ease-out duration-300 transition"
       enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
