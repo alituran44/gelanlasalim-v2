@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue'
 import { Handshake, Menu, X, ArrowRight, Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Home, User, LogOut, LayoutDashboard, Plus, FileText } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale, setLocale, detectLocale, t } from '~/composables/useLocale'
+import FloatingSupportWidget from '~/components/common/FloatingSupportWidget.vue'
 
 const { cmsData } = useCmsData()
 const mobileMenuOpen = ref(false)
@@ -410,6 +411,9 @@ const activeTenders = ref([
         </div>
       </div>
     </footer>
+
+    <!-- WhatsApp & AI Welcoming Floating Widget -->
+    <FloatingSupportWidget />
   </div>
 </template>
 

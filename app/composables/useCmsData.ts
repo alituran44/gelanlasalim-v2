@@ -242,7 +242,68 @@ export const DEFAULT_CMS_DATA = {
       status: 'approved',
       date: '16 Temmuz 2026'
     }
-  ]
+  ],
+  supportSettings: {
+    whatsappEnabled: true,
+    whatsappNumber: '908503080000',
+    whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale süreçleri ve 6 ay ücretsiz deneme paketi hakkında bilgi almak istiyorum.',
+    aiEnabled: true,
+    aiBotName: 'İhaleciBurada AI Asistanı',
+    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel 6 Ay %100 Ücretsiz Deneme süreciniz hakkında size nasıl yardımcı olabilirim?',
+    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın. Kullanıcılara 6 ay ücretsiz deneme, ihale açma, teklif verme, canlı eksiltme konularında yardımcı ol.'
+  },
+  crmSettings: {
+    leads: [
+      { id: 1, companyName: 'Kalyon Tedarik Ltd.', contactName: 'Ahmet Kalyoncu', email: 'ahmet@kalyon.com', phone: '0532 111 22 33', status: '6 Ay Deneme Aktif', stage: 'active', notes: 'İnşaat malzemesi ihalesi açacak.', createdAt: '2026-08-20' },
+      { id: 2, companyName: 'Anadolu Lojistik A.Ş.', contactName: 'Mehmet Yılmaz', email: 'mehmet@anadolulojistik.com', phone: '0544 555 66 77', status: 'Teklif Veren', stage: 'qualified', notes: 'Akaryakıt ihalesine teklif verdi.', createdAt: '2026-08-21' },
+      { id: 3, companyName: 'Mega Ambalaj Sanayi', contactName: 'Selin Erdem', email: 'selin@megaambalaj.com', phone: '0555 888 99 00', status: 'Görüşülüyor', stage: 'contacted', notes: 'Kurumsal SAP entegrasyonu talebi var.', createdAt: '2026-08-22' }
+    ]
+  },
+  emailSettings: {
+    senderName: 'İhaleciBurada B2B Operasyon',
+    senderEmail: 'info@ihaleciburada.com',
+    replyToEmail: 'destek@ihaleciburada.com',
+    smtpHost: 'smtp.ihaleciburada.com',
+    smtpPort: 587,
+    smtpUser: 'info@ihaleciburada.com',
+    subscribers: [
+      { id: 1, email: 'info@kalyon.com', companyName: 'Kalyon Tedarik Ltd.', source: 'Kayıt Formu', subscribedAt: '2026-08-20', status: 'Aktif' },
+      { id: 2, email: 'satinalma@anadolu.com', companyName: 'Anadolu Lojistik A.Ş.', source: 'Bülten Aboneliği', subscribedAt: '2026-08-21', status: 'Aktif' },
+      { id: 3, email: 'kurumsal@megaambalaj.com', companyName: 'Mega Ambalaj Sanayi', source: 'İhale Katılımı', subscribedAt: '2026-08-22', status: 'Aktif' }
+    ],
+    templates: [
+      {
+        id: 'trial-welcome',
+        name: '🎉 6 Ay Ücretsiz Lansman Hoş Geldin & Aktivasyon',
+        subject: 'İhaleciBurada.com: 6 Aylık %100 Ücretsiz Lansman Deneme Paketiniz Aktif!',
+        content: `Sayın Yetkili,\n\nİhaleciBurada B2B Canlı Eksiltme ve Satın Alma Platformu'na hoş geldiniz!\n\nLansmanımıza özel olarak tanımlanan 6 Aylık %100 Ücretsiz Kurumsal Deneme Paketiniz başarıyla aktifleştirildi.\n\n✓ 6 Ay Boyunca 0 ₺ Ücret (Kredi Kartı Gerekmez)\n✓ Sınırsız İhale Açma & Canlı Tersine Eksiltme\n✓ Doğrulanmış Kurumsal Firmalardan Belgeli Teklif Toplama\n✓ Geçerlilik Bitiş Tarihi: 22 Şubat 2027\n\nPanele gitmek ve ilk ihalenizi oluşturmak için: https://gelanlasalim-v2.vercel.app/panel\n\nSaygılarımızla,\nİhaleciBurada Müşteri Başarı Ekibi\ninfo@ihaleciburada.com | 0850 308 00 00`
+      },
+      {
+        id: 'new-tender',
+        name: '📢 Yeni İhale Yayınlandı Bildirimi',
+        subject: 'Yeni İhale Yayında: Sektörünüze Uygun Yeni Bir Satın Alma İlanı Açıldı',
+        content: `Sayın Tedarikçimiz,\n\nFaaliyet alanınıza uygun yeni bir B2B satın alma ihalesi yayına alınmıştır.\n\nİhale Başlığı: [İhale Başlığı]\nKategori: [Sektör / Kategori]\nKalan Süre: [Kalan Süre]\n\nŞartnameyi incelemek ve teklifinizi iletmek için hemen tıklayın:\nhttps://gelanlasalim-v2.vercel.app/panel/gelen-teklifler\n\nİhaleciBurada B2B Operasyon Merkezi\ninfo@ihaleciburada.com`
+      },
+      {
+        id: 'live-auction',
+        name: '⚡ Canlı Tersine Eksiltme Başladı & Teklif Uyarısı',
+        subject: 'Canlı Eksiltme Başladı: İhalede Fiyatlar Düşüyor!',
+        content: `Sayın İhale Katılımcısı,\n\nKayıt olduğunuz ihalenin CANLI TERSİNE EKSİLTME (Canlı Pazarlık) seansı başlamıştır.\n\nAnlık Lider Teklif: [Lider Fiyat]\nKalan Süre: [Süre]\n\nCanlı odaya bağlanmak ve yeni teklifinizi vermek için:\nhttps://gelanlasalim-v2.vercel.app/panel/canli-etkinlikler\n\nBol kazançlı ihaleler dileriz,\nİhaleciBurada.com`
+      },
+      {
+        id: 'kyc-approved',
+        name: '🛡️ Kurumsal Firma Doğrulama & KYC Onayı',
+        subject: 'Firma Belgeleriniz Doğrulandı — Mavi Rozetiniz Aktif!',
+        content: `Tebrikler!\n\nYüklemiş olduğunuz vergi levhası ve ticaret sicil belgeleri uzmanlarımız tarafından incelenmiş ve onaylanmıştır.\n\nProfilinize 'DOĞRULANMIŞ KURUMSAL ÜRETİCİ / ALICI' mavi rozeti eklenmiştir.\n\nİhaleciBurada Güvenlik ve Uyumluluk Departmanı\ninfo@ihaleciburada.com`
+      },
+      {
+        id: 'weekly-digest',
+        name: '📊 Haftalık B2B İhale ve Tasarruf Bülteni',
+        subject: 'Haftalık B2B Tedarik Özeti: 12.4M ₺ Hacim ve Öne Çıkan İhaleler',
+        content: `Bu hafta İhaleciBurada'da gerçekleşen öne çıkan ihaleler ve ortalama %14.2 tasarruf fırsatları bülteninizde!\n\nAktif İhale Sayısı: 48+\nTamamlanan İşlem Hacmi: 12.4M ₺+\n\nTüm güncel fırsatları listelemek için: https://gelanlasalim-v2.vercel.app/pazar-yeri\n\nİhaleciBurada B2B Bülten\ninfo@ihaleciburada.com`
+      }
+    ]
+  }
 }
 
 const cmsDataRef = ref({ ...DEFAULT_CMS_DATA })

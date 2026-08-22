@@ -1,5 +1,33 @@
 <script setup lang="ts">
-import { Facebook, Instagram, Linkedin } from 'lucide-vue-next'
+import { ref } from 'vue'
+import { Facebook, Instagram, Linkedin, Mail, CheckCircle2, ArrowRight } from 'lucide-vue-next'
+import { useCmsData } from '~/composables/useCmsData'
+
+const { cmsData, saveCmsData } = useCmsData()
+
+const subscriberEmail = ref('')
+const isSubscribed = ref(false)
+
+function handleSubscribe() {
+  const email = subscriberEmail.value.trim().toLowerCase()
+  if (!email || !email.includes('@')) return
+
+  if (cmsData.value?.emailSettings?.subscribers) {
+    const today = new Date().toISOString().split('T')[0]
+    cmsData.value.emailSettings.subscribers.unshift({
+      id: Date.now(),
+      email,
+      companyName: 'Bülten Abonesi',
+      source: 'Alt Bilgi (Footer)',
+      subscribedAt: today,
+      status: 'Aktif'
+    })
+    saveCmsData(JSON.parse(JSON.stringify(cmsData.value)))
+  }
+
+  isSubscribed.value = true
+  subscriberEmail.value = ''
+}
 
 const platformLinks = [
   { label: "Video Rehberler & Akademi", to: "/videolar" },
@@ -22,8 +50,48 @@ const companyLinks = [
 </script>
 
 <template>
-  <footer class="w-full bg-white border-t border-slate-200/80 pt-16 pb-12">
+  <footer class="w-full bg-white border-t border-slate-200/80 pt-12 pb-12">
     <div class="mx-auto max-w-7xl px-6">
+      
+      <!-- Newsletter / E-Posta Abonelik Banner -->
+      <div class="mb-12 rounded-3xl bg-gradient-to-r from-[#0F223D] via-blue-950 to-slate-900 p-8 text-white shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 text-left">
+        <div class="space-y-1.5 max-w-xl">
+          <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-black uppercase tracking-wider border border-blue-500/30">
+            <Mail :size="12" />
+            <span>B2B İHALE VE TASARRUF BÜLTENİ</span>
+          </div>
+          <h3 class="text-lg sm:text-xl font-black text-white tracking-tight">
+            Sektörünüzdeki Yeni İhaleleri E-Posta ile Kaçırmayın
+          </h3>
+          <p class="text-xs text-slate-300 leading-relaxed font-medium">
+            Haftalık canlı tersine eksiltme duyuruları, yeni alım ilanları ve kurumsal tedarik fırsatları anında posta kutunuza gelsin.
+          </p>
+        </div>
+
+        <div class="w-full lg:w-auto shrink-0">
+          <form v-if="!isSubscribed" @submit.prevent="handleSubscribe" class="flex flex-col sm:flex-row gap-2 w-full sm:w-[380px]">
+            <input 
+              v-model="subscriberEmail" 
+              type="email" 
+              placeholder="Kurumsal e-posta adresiniz..." 
+              class="flex-1 rounded-xl bg-slate-900/90 border border-slate-700 px-4 py-3 text-xs text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none" 
+              required
+            />
+            <button 
+              type="submit" 
+              class="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md cursor-pointer shrink-0"
+            >
+              <span>Abone Ol</span>
+              <ArrowRight :size="14" />
+            </button>
+          </form>
+          <div v-else class="flex items-center gap-2 px-5 py-3 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold">
+            <CheckCircle2 :size="16" class="text-emerald-400" />
+            <span>Tebrikler! Bülten aboneliğiniz başarıyla kaydedildi.</span>
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
         
         <!-- Column 1: Brand Info -->

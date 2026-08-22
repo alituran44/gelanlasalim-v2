@@ -3,6 +3,7 @@ import { onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import Sidebar from "~/components/layout/Sidebar.vue"
 import Topbar from "~/components/layout/Topbar.vue"
+import FloatingSupportWidget from "~/components/common/FloatingSupportWidget.vue"
 import {
   LayoutDashboard,
   ShoppingBag,
@@ -107,6 +108,9 @@ const sidebarMenus = computed(() => {
         <slot />
       </main>
     </div>
+
+    <!-- Floating Support Widget (WhatsApp & AI Bot) -->
+    <FloatingSupportWidget />
   </div>
 </template>
 
