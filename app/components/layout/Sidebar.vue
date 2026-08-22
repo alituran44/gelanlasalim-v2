@@ -17,6 +17,7 @@ import {
   Plus,
   HelpCircle,
   ChevronRight,
+  ChevronDown,
   User,
   MapPin,
   Bell,
@@ -34,6 +35,13 @@ const router = useRouter()
 
 // Simulated user session — safe client-side loading
 const userSession = ref<any>({})
+const isTekliflerOpen = ref(true)
+
+watchEffect(() => {
+  if (route.path === '/panel/gelen-teklifler' || route.path === '/panel/yaptigim-teklifler' || route.path === '/panel/tekliflerim') {
+    isTekliflerOpen.value = true
+  }
+})
 
 onMounted(() => {
   detectLocale()
@@ -72,7 +80,15 @@ const sidebarMenus = computed(() => {
       { title: "Yönetim Paneli", icon: LayoutDashboard, to: "/panel" },
       { title: "Pazar Yeri", icon: ShoppingBag, to: "/panel/pazar-yeri" },
       { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
-      { title: "Tekliflerim", icon: Send, to: "/panel/tekliflerim" },
+      { 
+        title: "Tekliflerim", 
+        icon: Send, 
+        isDropdown: true,
+        children: [
+          { title: "Aldığım Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
+          { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" }
+        ]
+      },
       { title: "Sipariş & Teslimat", icon: Package, to: "/panel/siparis-teslimat" },
       { title: "Canlı Etkinlikler", icon: Tv, to: "/panel/canli-etkinlikler" },
       { title: "İstatistikler", icon: BarChart3, to: "/panel/istatistikler" },
@@ -86,7 +102,15 @@ const sidebarMenus = computed(() => {
       { title: "Dashboard", icon: LayoutDashboard, to: "/panel" },
       { title: "Marketplace", icon: ShoppingBag, to: "/panel/pazar-yeri" },
       { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
-      { title: "My Bids", icon: Send, to: "/panel/tekliflerim" },
+      { 
+        title: "My Bids", 
+        icon: Send, 
+        isDropdown: true,
+        children: [
+          { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
+          { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" }
+        ]
+      },
       { title: "Orders & Shipping", icon: Package, to: "/panel/siparis-teslimat" },
       { title: "Live Auctions", icon: Tv, to: "/panel/canli-etkinlikler" },
       { title: "Analytics", icon: BarChart3, to: "/panel/istatistikler" },
@@ -225,33 +249,99 @@ const activeTabQuery = computed(() => route.query.tab || 'ayarlar')
       </div>
 
       <!-- Navigasyon -->
-      <nav class="flex-1 px-3 pb-4 space-y-0.5">
-        <NuxtLink
-          v-for="item in menus"
-          :key="item.to"
-          :to="item.to"
-          class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-150 group"
-          :class="activePath === item.to
-            ? 'text-white'
-            : 'text-slate-400 hover:text-white'"
-          :style="activePath === item.to
-            ? 'background: rgba(30,174,76,0.15); color: #1EAE4C;'
-            : ''"
-        >
-          <component
-            :is="item.icon"
-            :size="17"
-            :style="activePath === item.to ? 'color: #1EAE4C;' : ''"
-            class="shrink-0 transition-colors"
-          />
-          <span>{{ item.title }}</span>
-          <ChevronRight
-            v-if="activePath === item.to"
-            :size="14"
-            class="ml-auto"
-            style="color: #1EAE4C;"
-          />
-        </NuxtLink>
+      <nav class="flex-1 px-3 pb-4 space-y-1">
+        <template v-for="item in menus" :key="item.title">
+          
+          <!-- Dropdown item (Tekliflerim) -->
+          <div v-if="item.isDropdown" class="space-y-1">
+            <button
+              type="button"
+              @click="isTekliflerOpen = !isTekliflerOpen"
+              class="w-full flex items-center justify-between gap-3 rounded-xl px-3.5 py-2.5 text-xs font-bold transition-all duration-150 group cursor-pointer"
+              :class="(route.path === '/panel/gelen-teklifler' || route.path === '/panel/yaptigim-teklifler' || route.path === '/panel/tekliflerim')
+                ? 'text-white shadow-sm'
+                : 'text-slate-400 hover:text-white hover:bg-white/5'"
+              :style="(route.path === '/panel/gelen-teklifler' || route.path === '/panel/yaptigim-teklifler' || route.path === '/panel/tekliflerim')
+                ? 'background: #003057; border: 1px solid rgba(255, 255, 255, 0.15);'
+                : ''"
+            >
+              <div class="flex items-center gap-3">
+                <component
+                  :is="item.icon"
+                  :size="16"
+                  :style="(route.path === '/panel/gelen-teklifler' || route.path === '/panel/yaptigim-teklifler' || route.path === '/panel/tekliflerim') ? 'color: #1EAE4C;' : ''"
+                  class="shrink-0 transition-colors"
+                />
+                <span :style="(route.path === '/panel/gelen-teklifler' || route.path === '/panel/yaptigim-teklifler' || route.path === '/panel/tekliflerim') ? 'color: #1EAE4C;' : ''">{{ item.title }}</span>
+              </div>
+              <ChevronDown
+                :size="14"
+                class="transition-transform duration-200"
+                :class="isTekliflerOpen ? 'rotate-180 text-[#1EAE4C]' : 'text-slate-400'"
+              />
+            </button>
+
+            <!-- Submenu Items -->
+            <transition name="slide">
+              <div v-if="isTekliflerOpen" class="pl-4 pr-1 py-1 space-y-1">
+                <NuxtLink
+                  v-for="child in item.children"
+                  :key="child.to"
+                  :to="child.to"
+                  class="flex items-center gap-2.5 rounded-lg px-3 py-2 text-xs font-bold transition-all"
+                  :class="activePath === child.to
+                    ? 'text-white'
+                    : 'text-slate-400 hover:text-white hover:bg-white/5'"
+                  :style="activePath === child.to
+                    ? 'background: rgba(30,174,76,0.2); color: #1EAE4C; border: 1px solid rgba(30,174,76,0.3);'
+                    : ''"
+                >
+                  <component
+                    :is="child.icon"
+                    :size="14"
+                    :style="activePath === child.to ? 'color: #1EAE4C;' : ''"
+                    class="shrink-0"
+                  />
+                  <span>{{ child.title }}</span>
+                  <ChevronRight
+                    v-if="activePath === child.to"
+                    :size="12"
+                    class="ml-auto"
+                    style="color: #1EAE4C;"
+                  />
+                </NuxtLink>
+              </div>
+            </transition>
+          </div>
+
+          <!-- Standard menu item -->
+          <NuxtLink
+            v-else
+            :to="item.to"
+            class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-xs font-bold transition-all duration-150 group"
+            :class="activePath === item.to
+              ? 'text-white'
+              : 'text-slate-400 hover:text-white hover:bg-white/5'"
+            :style="activePath === item.to
+              ? 'background: rgba(30,174,76,0.15); color: #1EAE4C;'
+              : ''"
+          >
+            <component
+              :is="item.icon"
+              :size="16"
+              :style="activePath === item.to ? 'color: #1EAE4C;' : ''"
+              class="shrink-0 transition-colors"
+            />
+            <span>{{ item.title }}</span>
+            <ChevronRight
+              v-if="activePath === item.to"
+              :size="14"
+              class="ml-auto"
+              style="color: #1EAE4C;"
+            />
+          </NuxtLink>
+
+        </template>
       </nav>
     </template>
 
