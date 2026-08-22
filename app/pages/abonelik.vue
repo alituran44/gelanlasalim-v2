@@ -208,6 +208,20 @@ onMounted(() => {
   }
 })
 
+const freeTrialPackage = {
+  id: '6-ay-ucretsiz-deneme',
+  name: '6 Ay Ücretsiz Lansman Deneme Paketi',
+  price: 0,
+  monthly: '0,00 ₺ / ay',
+  desc: 'Lansmana özel ilk 6 ay boyunca sınırsız ihale açma, teklif verme, canlı eksiltme ve tüm analiz modülleri %100 ücretsizdir.',
+  isTrial: true,
+  isPromo: true
+}
+
+function startFreeTrial() {
+  openCheckout(freeTrialPackage)
+}
+
 function openCheckout(pkg: any) {
   selectedPackage.value = pkg
   if (paymentRegion.value === 'domestic') {
@@ -235,9 +249,11 @@ function handlePayment() {
       current.isPremium = true
       current.subscriptionPlan = selectedPackage.value?.name
       current.subscriptionRegion = paymentRegion.value
+      current.isTrial = selectedPackage.value?.isTrial || false
+      current.trialExpiresAt = '22 Şubat 2027'
       localStorage.setItem('userSession', JSON.stringify(current))
     }
-  }, 1200)
+  }, selectedPackage.value?.isTrial ? 600 : 1200)
 }
 
 function completeCheckout() {
@@ -310,8 +326,44 @@ function completeCheckout() {
         </div>
       </div>
 
+      <!-- 6-MONTH FREE TRIAL LAUNCH BANNER -->
+      <div class="rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-r from-emerald-950 via-slate-900 to-blue-950 p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden text-left">
+        <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl"></div>
+        <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div class="space-y-2 max-w-2xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest border border-emerald-500/30">
+              <Sparkles :size="13" />
+              <span>LANSMANA ÖZEL: 6 AY BOYUNCA %100 ÜCRETSİZ DENEME SÜRECİ</span>
+            </div>
+            <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
+              İlk 6 Ay Boyunca Hiçbir Ücret Ödemeden Tüm Sistemi Kullanın!
+            </h2>
+            <p class="text-xs text-slate-300 leading-relaxed font-medium">
+              İhaleciBurada platform lansmanına özel olarak tüm alıcı ve tedarikçi firmalarımıza ilk 6 ay boyunca ihale açma, teklif verme, canlı tersine eksiltme ve tüm analiz modülleri <strong>0 ₺</strong> bedelle sunulmaktadır. Kredi kartı gerekmez, 0 komisyon, anında koşulsuz aktivasyon.
+            </p>
+            <div class="flex flex-wrap items-center gap-4 pt-1 text-[11px] text-emerald-300 font-bold">
+              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> 6 Ay Boyunca 0 ₺</span>
+              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> Kredi Kartı İstemez</span>
+              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> Sınırsız İhale & Eksiltme</span>
+              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> Anında Aktivasyon</span>
+            </div>
+          </div>
+
+          <div class="shrink-0 w-full lg:w-auto">
+            <button
+              type="button"
+              @click="startFreeTrial"
+              class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition-all hover:scale-105 flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>6 AYLIK ÜCRETSİZ DENEMEYİ HEMEN BAŞLAT (0 ₺)</span>
+              <ArrowRight :size="16" />
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- FOUR COLUMNS PACKAGE GRID -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
         <div 
           v-for="pkg in activePackages" 
           :key="pkg.id" 
@@ -358,58 +410,62 @@ function completeCheckout() {
       </div>
 
       <!-- TAX & SECURITY NOTICE BAR -->
-      <div class="rounded-2xl border border-slate-200 bg-white p-4 text-center text-xs font-bold text-slate-600 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xs">
+      <div class="border border-slate-200 bg-white rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-bold text-slate-600 shadow-xs">
         <div class="flex items-center gap-2">
-          <ShieldCheck :size="18" class="text-emerald-600" />
-          <span>
-            {{ paymentRegion === 'domestic' 
-              ? ('Tüm fiyatlara %20 KDV dahildir. E-Fatura 24 saat içinde iletilir.')
-              : ('Yurt dışı ödemelerde %0 KDV İhracat faturası kesilir.')
-            }}
-          </span>
+          <CheckCircle2 :size="16" class="text-emerald-500 shrink-0" />
+          <span>{{ 'Tüm fiyatlara %20 KDV dahildir. E-Faturanız 24 saat içinde şirket unvanınıza kesilir.' }}</span>
         </div>
-
-        <div class="flex items-center gap-3 text-[10px] font-black uppercase text-slate-400 tracking-wider">
-          <span>🔒 256-BIT TLS SSL</span>
-          <span>•</span>
-          <span>⚡ INSTANT ACTIVATION</span>
+        <div class="flex items-center gap-4 text-[11px] text-slate-400">
+          <span class="flex items-center gap-1"><Lock :size="13" class="text-amber-500" /> 256-Bit TLS SSL</span>
+          <span class="flex items-center gap-1 text-emerald-600"><span class="h-2 w-2 rounded-full bg-emerald-500"></span> Anında Aktivasyon</span>
         </div>
       </div>
 
-      <!-- FEATURE LIST TABLE (3 COLUMNS) -->
-      <div class="border border-slate-200 rounded-3xl bg-white p-8 shadow-xs space-y-6">
-        <div class="border-b border-slate-100 pb-4">
-          <h3 class="text-lg font-black text-slate-900 tracking-tight">
-            {{ 'Tüm Paketlerde Dahil Olan Standart Özellikler' }}
-          </h3>
-          <p class="text-xs text-slate-500 mt-1 font-medium">
-            {{ 'Herhangi bir gizli ücret veya ek komisyon bulunmamaktadır.' }}
-          </p>
+      <!-- BOTTOM FEATURES ACCORDION / GRID -->
+      <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
+        <div>
+          <h2 class="text-lg font-black text-slate-900">{{ 'Tüm Paketlerde Dahil Olan Standart Özellikler' }}</h2>
+          <p class="text-xs text-slate-500 mt-0.5">{{ 'Herhangi bir gizli ücret veya ek komisyon bulunmamaktadır.' }}</p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-slate-100">
           <div class="space-y-3">
-            <div class="text-xs font-black text-blue-900 uppercase tracking-wider mb-2">1. İHALE VE TEKLİF YÖNETİMİ</div>
-            <div v-for="(feat, idx) in allFeatures.filter(f => f.col === 1)" :key="idx" class="flex items-center gap-2 text-xs font-medium text-slate-700">
-              <CheckCircle2 :size="14" class="text-emerald-600 shrink-0" />
-              <span>{{ feat.text }}</span>
-            </div>
+            <h4 class="text-xs font-black text-blue-950 uppercase tracking-wider flex items-center gap-2">
+              <span class="flex h-5 w-5 items-center justify-center rounded-md bg-blue-100 text-blue-700 text-[10px]">1</span>
+              {{ 'İHALE VE TEKLİF YÖNETİMİ' }}
+            </h4>
+            <ul class="space-y-2 text-xs text-slate-600">
+              <li v-for="(f, i) in allFeatures.filter(x => x.col === 1)" :key="i" class="flex items-center gap-2">
+                <CheckCircle2 :size="14" class="text-emerald-500 shrink-0" />
+                <span>{{ f.text }}</span>
+              </li>
+            </ul>
           </div>
 
           <div class="space-y-3">
-            <div class="text-xs font-black text-blue-900 uppercase tracking-wider mb-2">2. BİLDİRİM VE TAKİP SİSTEMİ</div>
-            <div v-for="(feat, idx) in allFeatures.filter(f => f.col === 2)" :key="idx" class="flex items-center gap-2 text-xs font-medium text-slate-700">
-              <CheckCircle2 :size="14" class="text-emerald-600 shrink-0" />
-              <span>{{ feat.text }}</span>
-            </div>
+            <h4 class="text-xs font-black text-blue-950 uppercase tracking-wider flex items-center gap-2">
+              <span class="flex h-5 w-5 items-center justify-center rounded-md bg-blue-100 text-blue-700 text-[10px]">2</span>
+              {{ 'BİLDİRİM VE TAKİP SİSTEMİ' }}
+            </h4>
+            <ul class="space-y-2 text-xs text-slate-600">
+              <li v-for="(f, i) in allFeatures.filter(x => x.col === 2)" :key="i" class="flex items-center gap-2">
+                <CheckCircle2 :size="14" class="text-emerald-500 shrink-0" />
+                <span>{{ f.text }}</span>
+              </li>
+            </ul>
           </div>
 
           <div class="space-y-3">
-            <div class="text-xs font-black text-blue-900 uppercase tracking-wider mb-2">3. ANALİTİK VE MOBİL UYUM</div>
-            <div v-for="(feat, idx) in allFeatures.filter(f => f.col === 3)" :key="idx" class="flex items-center gap-2 text-xs font-medium text-slate-700">
-              <CheckCircle2 :size="14" class="text-emerald-600 shrink-0" />
-              <span>{{ feat.text }}</span>
-            </div>
+            <h4 class="text-xs font-black text-blue-950 uppercase tracking-wider flex items-center gap-2">
+              <span class="flex h-5 w-5 items-center justify-center rounded-md bg-blue-100 text-blue-700 text-[10px]">3</span>
+              {{ 'ANALİTİK VE MOBİL UYUM' }}
+            </h4>
+            <ul class="space-y-2 text-xs text-slate-600">
+              <li v-for="(f, i) in allFeatures.filter(x => x.col === 3)" :key="i" class="flex items-center gap-2">
+                <CheckCircle2 :size="14" class="text-emerald-500 shrink-0" />
+                <span>{{ f.text }}</span>
+              </li>
+            </ul>
           </div>
         </div>
       </div>
@@ -422,14 +478,14 @@ function completeCheckout() {
         <div class="bg-white rounded-3xl max-w-lg w-full overflow-hidden shadow-2xl border border-slate-200 animate-scaleUp">
           
           <!-- Modal Header -->
-          <div class="p-6 bg-blue-900 text-white flex items-center justify-between">
+          <div class="p-6 text-white flex items-center justify-between" :class="selectedPackage?.isTrial ? 'bg-emerald-950' : 'bg-blue-900'">
             <div>
-              <span class="text-[10px] font-black text-blue-300 uppercase tracking-widest block">
-                {{ paymentRegion === 'domestic' ? 'TÜRKİYE YURT İÇİ ÖDEME' : 'INTERNATIONAL GLOBAL PAYMENT' }}
+              <span class="text-[10px] font-black uppercase tracking-widest block" :class="selectedPackage?.isTrial ? 'text-emerald-400' : 'text-blue-300'">
+                {{ selectedPackage?.isTrial ? '🎁 LANSMAN KAMPANYASI • %100 ÜCRETSİZ' : (paymentRegion === 'domestic' ? 'TÜRKİYE YURT İÇİ ÖDEME' : 'INTERNATIONAL GLOBAL PAYMENT') }}
               </span>
               <h3 class="text-base font-black text-white mt-0.5">{{ selectedPackage?.name }}</h3>
             </div>
-            <button @click="isCheckoutOpen = false" class="h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition">
+            <button @click="isCheckoutOpen = false" class="h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition cursor-pointer">
               <X :size="16" />
             </button>
           </div>
@@ -437,7 +493,35 @@ function completeCheckout() {
           <!-- Modal Body -->
           <div class="p-6 space-y-6 max-h-[80vh] overflow-y-auto">
             
-            <div v-if="!showSuccessScreen" class="space-y-6">
+            <!-- FREE TRIAL SCREEN (NO CREDIT CARD NEEDED) -->
+            <div v-if="!showSuccessScreen && selectedPackage?.isTrial" class="space-y-5 text-left">
+              <div class="p-5 rounded-2xl bg-emerald-50 border border-emerald-200/80 space-y-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+                    <Sparkles :size="20" />
+                  </div>
+                  <div>
+                    <h4 class="text-sm font-black text-slate-900">6 Ay Koşulsuz Ücretsiz Deneme</h4>
+                    <p class="text-xs text-emerald-800 font-medium">Kredi kartı gerekmez, 0 ₺ ücret!</p>
+                  </div>
+                </div>
+                <hr class="border-emerald-200/60" />
+                <ul class="space-y-2 text-xs text-slate-700 font-medium">
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> Sınırsız B2B İhale Açma & Canlı Eksiltme</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> Doğrulanmış Firmalardan Belgeli Teklif Toplama</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> 6 Ay Boyunca %0 Komisyon, 0 ₺ Bedel</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> 22 Şubat 2027 Tarihine Kadar Tam Erişim</li>
+                </ul>
+              </div>
+
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+                <span>Ödenecek Tutar:</span>
+                <span class="text-base font-black text-emerald-600">0,00 ₺ (Ücretsiz)</span>
+              </div>
+            </div>
+
+            <!-- PAID SCREEN -->
+            <div v-else-if="!showSuccessScreen" class="space-y-6">
               
               <!-- Payment Channels Switcher -->
               <div>
@@ -556,9 +640,13 @@ function completeCheckout() {
               <div class="h-16 w-16 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto">
                 <CheckCircle2 :size="36" />
               </div>
-              <h3 class="text-lg font-black text-slate-900">{{ 'Abonelik İşlemi Başarılı!' }}</h3>
+              <h3 class="text-lg font-black text-slate-900">
+                {{ selectedPackage?.isTrial ? '🎉 6 Aylık Ücretsiz Denemeniz Aktif!' : 'Abonelik İşlemi Başarılı!' }}
+              </h3>
               <p class="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
-                {{ 'Faturanız oluşturuldu ve kurumsal panel erişiminiz anında aktifleştirildi.' 
+                {{ selectedPackage?.isTrial 
+                  ? '6 ay boyunca tüm kurumsal B2B ihale ve canlı eksiltme modüllerini 0 ₺ bedelle sınırsız kullanabilirsiniz.'
+                  : 'Faturanız oluşturuldu ve kurumsal panel erişiminiz anında aktifleştirildi.' 
                 }}
               </p>
             </div>
@@ -568,11 +656,11 @@ function completeCheckout() {
           <!-- Modal Footer -->
           <div class="p-6 bg-slate-50 border-t border-slate-100">
             <div v-if="!showSuccessScreen" class="mb-3 flex items-center justify-center gap-2 text-[10px] text-slate-500 font-bold">
-              <input v-model="distanceSalesApproved" type="checkbox" id="modal-distance-check" class="rounded border-slate-300" />
+              <input v-model="distanceSalesApproved" type="checkbox" id="modal-distance-check" class="rounded border-slate-300 cursor-pointer" />
               <label for="modal-distance-check" class="cursor-pointer">
-                {{ 'Ödemeyi onaylayarak ' }}
+                {{ 'Koşulları onaylayarak ' }}
                 <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" target="_blank" class="text-blue-600 underline">
-                  {{ 'Mesafeli Satış Sözleşmesini' }}
+                  {{ 'Kullanım ve Hizmet Şartlarını' }}
                 </NuxtLink>
                 {{ ' kabul etmiş olursunuz.' }}
               </label>
@@ -582,9 +670,11 @@ function completeCheckout() {
               v-if="!showSuccessScreen"
               @click="handlePayment"
               :disabled="isProcessing"
-              class="w-full py-3.5 bg-blue-900 hover:bg-blue-950 text-white font-black text-xs rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              class="w-full py-3.5 text-white font-black text-xs rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              :class="selectedPackage?.isTrial ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-blue-900 hover:bg-blue-950'"
             >
-              <span v-if="isProcessing">{{ 'Ödeme Doğrulanıyor...' }}</span>
+              <span v-if="isProcessing">{{ selectedPackage?.isTrial ? 'Deneme Aktifleştiriliyor...' : 'Ödeme Doğrulanıyor...' }}</span>
+              <span v-else-if="selectedPackage?.isTrial">{{ '6 AYLIK ÜCRETSİZ DENEMEYİ HEMEN BAŞLAT (0 ₺)' }}</span>
               <span v-else>{{ currencySymbol }}{{ selectedPackage?.price.toLocaleString('tr-TR') }} {{ 'Güvenli Ödeme Yap' }}</span>
               <ArrowRight v-if="!isProcessing" :size="14" />
             </button>
