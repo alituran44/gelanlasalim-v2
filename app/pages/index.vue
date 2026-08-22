@@ -35,9 +35,11 @@ import {
   Info,
   Camera,
   Eye,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Play
 } from 'lucide-vue-next'
 import VideoGuides from '~/components/landing/sections/VideoGuides.vue'
+import VideoGuideModal from '~/components/common/VideoGuideModal.vue'
 
 // Nuxt Layout Meta
 definePageMeta({
@@ -146,6 +148,15 @@ const { cmsData } = useCmsData()
 
 const heroVideoRef = ref<HTMLVideoElement | null>(null)
 const userSession = ref<any>(null)
+
+// Video Guide Modal State
+const showHeroVideoModal = ref(false)
+const heroVideoId = ref('intro-3min')
+
+function openHeroVideo(id = 'intro-3min') {
+  heroVideoId.value = id
+  showHeroVideoModal.value = true
+}
 
 const isLoggedIn = computed(() => {
   if (!userSession.value) return false
@@ -1803,13 +1814,24 @@ function toggleFilterSection(section: string) {
             </template>
           </div>
 
-          <!-- Video Button -->
+          <!-- Video Button (Interactive Guide Modal Trigger) -->
           <div class="mt-8">
-            <button class="flex items-center gap-2 text-xs font-bold text-slate-700 hover:text-blue-600 transition-colors">
-              <span class="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 text-blue-600">
-                <svg class="h-4 w-4 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <button
+              type="button"
+              @click="openHeroVideo('intro-3min')"
+              class="group flex items-center gap-3 text-xs font-bold text-slate-700 hover:text-blue-600 transition-all cursor-pointer select-none"
+            >
+              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm group-hover:scale-110">
+                <Play :size="14" class="fill-current translate-x-0.5" />
               </span>
-              {{ 'Video rehberlerini izle' }}
+              <div class="text-left">
+                <span class="block font-black text-slate-900 group-hover:text-blue-600 transition-colors">
+                  {{ 'Video rehberlerini izle' }}
+                </span>
+                <span class="text-[10px] text-slate-400 font-medium group-hover:text-blue-500">
+                  3 Dakikada Türkçe Sesli B2B İhale Simülasyonu →
+                </span>
+              </div>
             </button>
           </div>
         </div>
@@ -3090,6 +3112,12 @@ function toggleFilterSection(section: string) {
         </div>
       </div>
     </transition>
+
+    <!-- Video Guide Modal Triggered From Hero / Quick Links -->
+    <VideoGuideModal
+      v-model="showHeroVideoModal"
+      :initial-video-id="heroVideoId"
+    />
   </div>
 </template>
 
