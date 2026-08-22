@@ -9,7 +9,8 @@ import {
   Zap,
   TrendingDown,
   Layers,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Volume2
 } from 'lucide-vue-next'
 import VideoGuideModal from '~/components/common/VideoGuideModal.vue'
 
@@ -76,10 +77,16 @@ function openVideo(id: string) {
       <!-- Section Header -->
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
         <div>
-          <span class="inline-flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full">
-            <BookOpen :size="13" />
-            İHALECİBURADA AKADEMİ
-          </span>
+          <div class="flex items-center gap-2">
+            <span class="inline-flex items-center gap-2 font-mono text-[11px] font-black uppercase tracking-widest text-blue-400 bg-blue-500/10 border border-blue-500/20 px-3 py-1 rounded-full">
+              <BookOpen :size="13" />
+              İHALECİBURADA AKADEMİ
+            </span>
+            <span class="inline-flex items-center gap-1.5 font-mono text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1 rounded-full">
+              <Volume2 :size="12" />
+              TÜRKÇE SESLENDİRMELİ
+            </span>
+          </div>
           <h2 class="mt-3 text-3xl sm:text-4xl font-black text-white tracking-tight">
             Sitenin Kullanımı İçin Video Rehberler
           </h2>

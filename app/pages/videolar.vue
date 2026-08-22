@@ -12,7 +12,8 @@ import {
   CheckCircle2,
   HelpCircle,
   Upload,
-  Search
+  Search,
+  Volume2
 } from 'lucide-vue-next'
 import VideoGuideModal from '~/components/common/VideoGuideModal.vue'
 
@@ -141,9 +142,16 @@ const filteredVideos = computed(() => {
       
       <!-- HERO HEADER -->
       <div class="text-center space-y-4 max-w-3xl mx-auto pt-6">
-        <div class="inline-flex items-center gap-2 rounded-full bg-blue-500/10 border border-blue-500/20 px-3.5 py-1 text-[11px] font-black uppercase tracking-widest text-blue-400">
-          <BookOpen :size="14" />
-          <span>İHALECİBURADA VİDEO AKADEMİ</span>
+        <div class="flex flex-wrap items-center justify-center gap-2">
+          <div class="inline-flex items-center gap-2 rounded-full bg-blue-500/10 border border-blue-500/20 px-3.5 py-1 text-[11px] font-black uppercase tracking-widest text-blue-400">
+            <BookOpen :size="14" />
+            <span>İHALECİBURADA VİDEO AKADEMİ</span>
+          </div>
+
+          <div class="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 px-3.5 py-1 text-[11px] font-black uppercase tracking-wider text-emerald-400">
+            <Volume2 :size="13" />
+            <span>TÜRKÇE SESLENDİRME DESTEKLİ</span>
+          </div>
         </div>
 
         <h1 class="text-3xl sm:text-5xl font-black text-white tracking-tight leading-tight">

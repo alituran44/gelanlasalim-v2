@@ -283,6 +283,76 @@ const playbackSpeed = ref<number>(1)
 const isMuted = ref(false)
 const activeTab = ref<'simulation' | 'script' | 'checklist'>('simulation')
 
+// Voiceover State
+const voiceoverEnabled = ref(true)
+const isSpeaking = ref(false)
+const speechSynthesisVoice = ref<SpeechSynthesisVoice | null>(null)
+const lastSpokenKey = ref<string>('')
+
+function initVoices() {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
+  const voices = window.speechSynthesis.getVoices()
+  const trVoice = voices.find(v => v.lang === 'tr-TR' || v.lang.startsWith('tr'))
+  if (trVoice) {
+    speechSynthesisVoice.value = trVoice
+  }
+}
+
+function speakCurrentNarration(force = false) {
+  if (typeof window === 'undefined' || !('speechSynthesis' in window)) return
+  if (!voiceoverEnabled.value || isMuted.value || !isPlaying.value) {
+    window.speechSynthesis.cancel()
+    isSpeaking.value = false
+    return
+  }
+
+  const text = currentChapter.value.subtitleText
+  const currentKey = `${selectedVideoId.value}-${currentChapter.value.index}-${text}`
+
+  if (!force && lastSpokenKey.value === currentKey && isSpeaking.value) {
+    return
+  }
+
+  lastSpokenKey.value = currentKey
+  window.speechSynthesis.cancel()
+
+  const utterance = new SpeechSynthesisUtterance(text)
+  utterance.lang = 'tr-TR'
+  utterance.rate = playbackSpeed.value
+  utterance.pitch = 1.02
+  if (speechSynthesisVoice.value) {
+    utterance.voice = speechSynthesisVoice.value
+  }
+
+  utterance.onstart = () => {
+    isSpeaking.value = true
+  }
+  utterance.onend = () => {
+    isSpeaking.value = false
+  }
+  utterance.onerror = () => {
+    isSpeaking.value = false
+  }
+
+  window.speechSynthesis.speak(utterance)
+}
+
+function toggleVoiceover() {
+  voiceoverEnabled.value = !voiceoverEnabled.value
+  if (voiceoverEnabled.value) {
+    speakCurrentNarration(true)
+  } else {
+    stopVoiceover()
+  }
+}
+
+function stopVoiceover() {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    window.speechSynthesis.cancel()
+  }
+  isSpeaking.value = false
+}
+
 let timerInterval: any = null
 
 const currentVideo = computed<VideoGuide>(() => {
@@ -314,19 +384,36 @@ function selectVideo(id: string) {
   selectedVideoId.value = id
   currentTime.value = 0
   isPlaying.value = true
+  lastSpokenKey.value = ''
+  setTimeout(() => {
+    speakCurrentNarration(true)
+  }, 100)
 }
 
 function togglePlay() {
   isPlaying.value = !isPlaying.value
+  if (!isPlaying.value) {
+    stopVoiceover()
+  } else {
+    speakCurrentNarration(true)
+  }
 }
 
 function restartVideo() {
   currentTime.value = 0
   isPlaying.value = true
+  lastSpokenKey.value = ''
+  setTimeout(() => {
+    speakCurrentNarration(true)
+  }, 100)
 }
 
 function seekTo(seconds: number) {
   currentTime.value = Math.max(0, Math.min(seconds, currentVideo.value.totalSeconds))
+  lastSpokenKey.value = ''
+  setTimeout(() => {
+    speakCurrentNarration(true)
+  }, 100)
 }
 
 function handleProgressBarClick(event: MouseEvent) {
@@ -339,15 +426,24 @@ function handleProgressBarClick(event: MouseEvent) {
 
 function changeSpeed(speed: number) {
   playbackSpeed.value = speed
+  if (isSpeaking.value) {
+    speakCurrentNarration(true)
+  }
 }
 
 function closeModal() {
   isPlaying.value = false
+  stopVoiceover()
   emit('update:modelValue', false)
 }
 
 // Timer Simulation Loop
 onMounted(() => {
+  initVoices()
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = initVoices
+  }
+
   timerInterval = setInterval(() => {
     if (isPlaying.value && props.modelValue) {
       if (currentTime.value >= currentVideo.value.totalSeconds) {
@@ -357,10 +453,33 @@ onMounted(() => {
       }
     }
   }, 1000)
+
+  if (props.modelValue && isPlaying.value) {
+    speakCurrentNarration(true)
+  }
 })
 
 onUnmounted(() => {
   if (timerInterval) clearInterval(timerInterval)
+  stopVoiceover()
+})
+
+// Watch chapter change for auto voice narration
+watch(() => currentChapter.value.index, () => {
+  if (isPlaying.value && props.modelValue) {
+    speakCurrentNarration()
+  }
+})
+
+watch(() => props.modelValue, (isOpen) => {
+  if (isOpen) {
+    isPlaying.value = true
+    setTimeout(() => {
+      speakCurrentNarration(true)
+    }, 150)
+  } else {
+    stopVoiceover()
+  }
 })
 
 watch(() => props.initialVideoId, (newVal) => {
@@ -368,6 +487,10 @@ watch(() => props.initialVideoId, (newVal) => {
     selectedVideoId.value = newVal
     currentTime.value = 0
     isPlaying.value = true
+    lastSpokenKey.value = ''
+    setTimeout(() => {
+      speakCurrentNarration(true)
+    }, 150)
   }
 })
 </script>
@@ -603,11 +726,35 @@ watch(() => props.initialVideoId, (newVal) => {
 
               </div>
 
-              <!-- BOTTOM CAPTION / SUBTITLE -->
-              <div class="relative z-10 rounded-2xl border border-slate-800 bg-slate-900/95 p-3 text-center backdrop-blur-sm">
-                <div class="text-[10px] font-black uppercase tracking-wider text-blue-400 mb-0.5">
-                  {{ currentChapter.title }}
+              <!-- BOTTOM CAPTION / SUBTITLE WITH VOICEOVER SYNC -->
+              <div class="relative z-10 rounded-2xl border border-slate-800 bg-slate-900/95 p-3 text-center backdrop-blur-sm shadow-xl">
+                <div class="flex items-center justify-between gap-2 mb-1.5">
+                  <div class="flex items-center gap-2">
+                    <!-- Animated Equalizer Wave -->
+                    <div v-if="voiceoverEnabled && isSpeaking" class="flex items-end gap-0.5 h-3.5 px-1.5 py-0.5 bg-blue-500/20 border border-blue-500/30 rounded-md">
+                      <span class="w-1 bg-blue-400 rounded-full animate-soundwave-1"></span>
+                      <span class="w-1 bg-blue-400 rounded-full animate-soundwave-2"></span>
+                      <span class="w-1 bg-blue-400 rounded-full animate-soundwave-3"></span>
+                      <span class="w-1 bg-blue-400 rounded-full animate-soundwave-4"></span>
+                      <span class="w-1 bg-blue-400 rounded-full animate-soundwave-5"></span>
+                    </div>
+
+                    <span class="text-[10px] font-black uppercase tracking-wider text-blue-400">
+                      {{ currentChapter.title }}
+                    </span>
+                  </div>
+
+                  <!-- Replay Voice Button -->
+                  <button
+                    @click="speakCurrentNarration(true)"
+                    class="inline-flex items-center gap-1.5 text-[10px] font-bold text-blue-400 hover:text-blue-300 bg-blue-950/70 border border-blue-800/60 px-2.5 py-1 rounded-lg transition cursor-pointer"
+                    title="Bu adımı Türkçe sesli dinle"
+                  >
+                    <Volume2 :size="12" class="text-blue-400" />
+                    <span>{{ isSpeaking ? 'Seslendiriliyor...' : 'Tekrar Dinle' }}</span>
+                  </button>
                 </div>
+
                 <p class="text-xs text-slate-200 font-medium leading-relaxed">
                   "{{ currentChapter.subtitleText }}"
                 </p>
@@ -630,7 +777,7 @@ watch(() => props.initialVideoId, (newVal) => {
               </div>
 
               <!-- Buttons, Time and Speed -->
-              <div class="flex items-center justify-between text-xs text-slate-400">
+              <div class="flex flex-wrap items-center justify-between gap-3 text-xs text-slate-400">
                 <div class="flex items-center gap-3">
                   <button
                     @click="togglePlay"
@@ -653,7 +800,19 @@ watch(() => props.initialVideoId, (newVal) => {
                   </div>
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-3">
+                  <!-- Voiceover On/Off Button -->
+                  <button
+                    @click="toggleVoiceover"
+                    class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition border cursor-pointer"
+                    :class="voiceoverEnabled ? 'bg-blue-600/20 border-blue-500/40 text-blue-300 hover:bg-blue-600/30' : 'bg-slate-950 border-slate-800 text-slate-500 hover:text-slate-300'"
+                    :title="voiceoverEnabled ? 'Sesli anlatımı kapat' : 'Türkçe sesli anlatımı aç'"
+                  >
+                    <Volume2 v-if="voiceoverEnabled" :size="14" class="text-blue-400" :class="{ 'animate-pulse': isSpeaking }" />
+                    <VolumeX v-else :size="14" />
+                    <span class="text-[11px] font-bold">{{ voiceoverEnabled ? 'Türkçe Seslendirme: Açık' : 'Ses: Kapalı' }}</span>
+                  </button>
+
                   <!-- Speed Selectors -->
                   <div class="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800 text-[10px] font-bold font-mono">
                     <button
@@ -798,5 +957,30 @@ watch(() => props.initialVideoId, (newVal) => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+@keyframes soundwave {
+  0%, 100% {
+    height: 3px;
+  }
+  50% {
+    height: 12px;
+  }
+}
+
+.animate-soundwave-1 {
+  animation: soundwave 0.7s ease-in-out infinite 0.1s;
+}
+.animate-soundwave-2 {
+  animation: soundwave 0.7s ease-in-out infinite 0.3s;
+}
+.animate-soundwave-3 {
+  animation: soundwave 0.7s ease-in-out infinite 0.5s;
+}
+.animate-soundwave-4 {
+  animation: soundwave 0.7s ease-in-out infinite 0.2s;
+}
+.animate-soundwave-5 {
+  animation: soundwave 0.7s ease-in-out infinite 0.4s;
 }
 </style>
