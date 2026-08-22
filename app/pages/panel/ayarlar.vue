@@ -75,6 +75,95 @@ function showToast(message: string, type: 'success' | 'error' | 'warning' = 'suc
   }, 3500)
 }
 
+// Membership & Pricing State (Photo 2)
+const membershipPricingRegion = ref<'domestic' | 'international'>('domestic')
+
+const membershipPricingDomestic = [
+  {
+    id: '1-ay-tr',
+    name: 'ÜYELİK BAŞVURUSU - 1 AY',
+    badge: 'KURUMSAL KULLANIM',
+    price: 900,
+    monthly: '₺900,00 / ay',
+    desc: '1 Aylık Standart B2B İhale ve Eksiltme Paket Bedeli (%20 KDV Dahil)',
+    isPopular: false,
+    duration: '1 Ay'
+  },
+  {
+    id: '3-ay-tr',
+    name: 'ÜYELİK BAŞVURUSU - 3 AY',
+    badge: '⚡ EN ÇOK TERCİH EDİLEN POPÜLER PLAN',
+    price: 1800,
+    monthly: '₺600,00 / ay',
+    desc: '3 Aylık Popüler Pakette Net %33 Tasarruf Avantajı',
+    isPopular: true,
+    duration: '3 Ay'
+  },
+  {
+    id: '6-ay-tr',
+    name: 'ÜYELİK BAŞVURUSU - 6 AY',
+    badge: 'KURUMSAL KULLANIM',
+    price: 2700,
+    monthly: '₺450,00 / ay',
+    desc: '6 Aylık Kurumsal Pakette Net %50 Tasarruf Avantajı',
+    isPopular: false,
+    duration: '6 Ay'
+  },
+  {
+    id: '9-ay-tr',
+    name: 'ÜYELİK BAŞVURUSU - 9 AY',
+    badge: 'YILLIK AVANTAJ',
+    price: 3600,
+    monthly: '₺400,00 / ay',
+    desc: '9 Aylık Avantaj Paketinde Net %55 Tasarruf',
+    isPopular: false,
+    duration: '9 Ay'
+  }
+]
+
+const membershipPricingGlobalUSD = [
+  {
+    id: '1-mo-usd',
+    name: 'MEMBERSHIP - 1 MONTH',
+    badge: 'STANDARD B2B',
+    price: 49,
+    monthly: '$49.00 / mo',
+    desc: '1 Month Global B2B Reverse Auction & Tender Access',
+    isPopular: false,
+    duration: '1 Month'
+  },
+  {
+    id: '3-mo-usd',
+    name: 'MEMBERSHIP - 3 MONTHS',
+    badge: '⚡ MOST POPULAR GLOBAL PLAN',
+    price: 99,
+    monthly: '$33.00 / mo',
+    desc: '3 Months Global Access with 33% Savings',
+    isPopular: true,
+    duration: '3 Months'
+  },
+  {
+    id: '6-mo-usd',
+    name: 'MEMBERSHIP - 6 MONTHS',
+    badge: 'ENTERPRISE GLOBAL',
+    price: 149,
+    monthly: '$25.00 / mo',
+    desc: '6 Months Global Package with 50% Savings',
+    isPopular: false,
+    duration: '6 Months'
+  },
+  {
+    id: '9-mo-usd',
+    name: 'MEMBERSHIP - 9 MONTHS',
+    badge: 'ANNUAL ADVANTAGE',
+    price: 199,
+    monthly: '$22.00 / mo',
+    desc: '9 Months Full Access with 55% Savings',
+    isPopular: false,
+    duration: '9 Months'
+  }
+]
+
 // Personal Profile data
 const profileForm = ref({
   name: 'Ali',
@@ -538,11 +627,11 @@ function saveProfile() {
         <div v-if="activeSubTab === 'uyelik'" class="flex gap-3 bg-white border border-slate-200 p-2.5 rounded-xl shadow-sm text-left">
           <div class="px-2.5 border-r border-slate-100 last:border-0">
             <span class="text-[8px] font-black text-slate-300 uppercase block">MEVCUT PLAN</span>
-            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">Profesyonel</span>
+            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">3 Aylık Popüler Plan</span>
           </div>
           <div class="px-2.5 border-r border-slate-100 last:border-0">
-            <span class="text-[8px] font-black text-slate-300 uppercase block">YILLIK ÜCRET</span>
-            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">₺8.000 <span class="text-[8px] text-slate-400 font-medium">+ KDV</span></span>
+            <span class="text-[8px] font-black text-slate-300 uppercase block">DÖNEM ÜCRETİ</span>
+            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">₺1.800 <span class="text-[8px] text-slate-400 font-medium">(KDV Dahil)</span></span>
           </div>
           <div class="px-2.5 border-r border-slate-100 last:border-0">
             <span class="text-[8px] font-black text-slate-300 uppercase block">BİTİŞ TARİHİ</span>
@@ -1203,241 +1292,179 @@ function saveProfile() {
           </div>
         </div>
 
-        <!-- ÜYELİK TAB -->
+        <!-- ÜYELİK TAB (Photo 2 Design: 4 Packages + Switcher + Security Strip + Standard Features) -->
         <div v-if="activeSubTab === 'uyelik'" class="space-y-8 text-left">
           
-          <!-- Planları karşılaştırın header with pill switcher -->
-          <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
+          <!-- Region Selector Switcher (Photo 2 Header) -->
+          <div class="flex justify-center pt-2">
+            <div class="inline-flex rounded-2xl border border-slate-200/90 bg-white p-1.5 shadow-xs">
+              <button
+                type="button"
+                @click="membershipPricingRegion = 'domestic'"
+                class="flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-black transition-all cursor-pointer"
+                :class="membershipPricingRegion === 'domestic' ? 'bg-[#0F223D] text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'"
+              >
+                <span class="rounded bg-white/20 px-1 text-[10px]">TR</span>
+                <span>Yurt İçi Ödeme (Türkiye / ₺ TRY)</span>
+              </button>
+              <button
+                type="button"
+                @click="membershipPricingRegion = 'international'"
+                class="flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-black transition-all cursor-pointer"
+                :class="membershipPricingRegion === 'international' ? 'bg-[#0052FF] text-white shadow-sm' : 'text-slate-600 hover:text-slate-900'"
+              >
+                <Globe :size="14" />
+                <span>Yurt Dışı Ödeme (Global / $ USD - € EUR)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Domestic Packages (TRY ₺) - 4 Cards Grid (Photo 2) -->
+          <div v-if="membershipPricingRegion === 'domestic'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+            <div
+              v-for="pkg in membershipPricingDomestic"
+              :key="pkg.id"
+              class="rounded-3xl border bg-white p-6 shadow-sm flex flex-col justify-between transition-all hover:shadow-xl relative overflow-hidden"
+              :class="pkg.isPopular ? 'border-amber-400 ring-2 ring-amber-400/20' : 'border-slate-200/80'"
+            >
+              <!-- Badge banner -->
+              <div
+                class="text-[9px] font-black uppercase tracking-wider py-1.5 px-3 rounded-lg text-center mb-4"
+                :class="pkg.isPopular ? 'bg-amber-400 text-slate-950 font-black' : 'bg-[#0F223D] text-white'"
+              >
+                {{ pkg.badge }}
+              </div>
+
+              <div class="space-y-4">
+                <h3 class="text-xs font-black text-slate-800 tracking-wider text-center uppercase">{{ pkg.name }}</h3>
+                
+                <div class="text-center py-3 border-y border-slate-100">
+                  <div class="text-4xl font-black text-slate-900 font-mono tracking-tight">₺{{ pkg.price.toLocaleString('tr-TR') }}</div>
+                  <div class="text-xs font-bold text-slate-400 mt-1">{{ pkg.monthly }}</div>
+                </div>
+
+                <p class="text-[11px] text-slate-500 leading-relaxed text-center min-h-[36px]">
+                  {{ pkg.desc }}
+                </p>
+              </div>
+
+              <div class="pt-6">
+                <NuxtLink
+                  :to="`/abonelik?plan=${pkg.id}`"
+                  class="w-full py-3.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                  :class="pkg.isPopular ? 'bg-amber-400 hover:bg-amber-500 text-slate-950' : 'bg-[#0F223D] hover:bg-[#0052FF] text-white'"
+                >
+                  <span>HEMEN ABONE OL</span>
+                  <ArrowRight :size="14" />
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+
+          <!-- International Packages (Global USD / EUR) - 4 Cards Grid (Photo 2) -->
+          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+            <div
+              v-for="pkg in membershipPricingGlobalUSD"
+              :key="pkg.id"
+              class="rounded-3xl border bg-white p-6 shadow-sm flex flex-col justify-between transition-all hover:shadow-xl relative overflow-hidden"
+              :class="pkg.isPopular ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-slate-200/80'"
+            >
+              <div
+                class="text-[9px] font-black uppercase tracking-wider py-1.5 px-3 rounded-lg text-center mb-4"
+                :class="pkg.isPopular ? 'bg-[#0052FF] text-white' : 'bg-slate-800 text-white'"
+              >
+                {{ pkg.badge }}
+              </div>
+
+              <div class="space-y-4">
+                <h3 class="text-xs font-black text-slate-800 tracking-wider text-center uppercase">{{ pkg.name }}</h3>
+                
+                <div class="text-center py-3 border-y border-slate-100">
+                  <div class="text-4xl font-black text-slate-900 font-mono tracking-tight">${{ pkg.price }}</div>
+                  <div class="text-xs font-bold text-slate-400 mt-1">{{ pkg.monthly }}</div>
+                </div>
+
+                <p class="text-[11px] text-slate-500 leading-relaxed text-center min-h-[36px]">
+                  {{ pkg.desc }}
+                </p>
+              </div>
+
+              <div class="pt-6">
+                <NuxtLink
+                  :to="`/abonelik?plan=${pkg.id}`"
+                  class="w-full py-3.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer bg-[#0052FF] hover:bg-blue-700 text-white"
+                >
+                  <span>SUBSCRIBE NOW</span>
+                  <ArrowRight :size="14" />
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trust & Security Sub-strip (Photo 2) -->
+          <div class="rounded-2xl border border-slate-200/80 bg-white p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-slate-600 shadow-xs">
+            <div class="flex items-center gap-2 font-medium">
+              <CheckCircle2 :size="15" class="text-emerald-500 shrink-0" />
+              <span>Tüm fiyatlara %20 KDV dahildir. E-Fatura 24 saat içinde iletilir.</span>
+            </div>
+            <div class="flex items-center gap-4 text-[10px] font-bold text-slate-400">
+              <span class="flex items-center gap-1"><Lock :size="12" class="text-amber-500" /> 256-BIT TLS SSL</span>
+              <span class="flex items-center gap-1 text-emerald-600 font-black"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> ANINDA AKTİVASYON</span>
+            </div>
+          </div>
+
+          <!-- Bottom Features Box ("Tüm Paketlerde Dahil Olan Standart Özellikler") (Photo 2) -->
+          <div class="rounded-3xl border border-slate-200/80 bg-white p-8 shadow-sm space-y-6">
             <div>
-              <h3 class="text-sm font-black text-slate-800">Planları karşılaştırın</h3>
-              <p class="text-[10px] text-slate-400 font-bold">Güncel gereksinimler yıldız işareti olarak gösterilmektedir. Kapsamınızı genişletin ve tüm sınırlı yetkileri aktif edin.</p>
+              <h3 class="text-base font-black text-slate-900">Tüm Paketlerde Dahil Olan Standart Özellikler</h3>
+              <p class="text-xs text-slate-500 mt-1 font-medium">Herhangi bir gizli ücret veya ek komisyon bulunmamaktadır.</p>
             </div>
-            
-            <div class="flex items-center gap-1 bg-blue-50 border border-blue-100 rounded-xl p-1 shadow-sm">
-              <span class="text-[9px] font-black uppercase text-blue-700 px-2.5 py-1.5 rounded-lg bg-white shadow-xs">AKTİF / PROFESYONEL</span>
-              <span class="text-[9px] font-black text-blue-400 px-2">PAKET</span>
-            </div>
-          </div>
 
-          <!-- The Three Side-by-Side Plans Card Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <!-- Plan 1: Temel -->
-            <div class="rounded-2xl border bg-white p-6 shadow-sm flex flex-col justify-between border-slate-200 hover:border-slate-300 transition">
-              <div class="space-y-4">
-                <div>
-                  <h4 class="text-sm font-black text-slate-800">Temel</h4>
-                  <p class="text-[9px] text-slate-400 mt-1 leading-normal">Tüm segmentlerde pasif ilan, genel teklif girişi.</p>
-                </div>
-                
-                <div>
-                  <span class="text-2xl font-black text-slate-800">₺5.000</span>
-                  <span class="text-[10px] text-slate-400 font-bold ml-1">+ KDV / yıl</span>
-                </div>
-                
-                <span class="inline-block text-[9px] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded">Aylık karşılığı: ₺417</span>
-                
-                <hr class="border-slate-100" />
-                
-                <ul class="space-y-2.5 text-[10px] font-bold text-slate-600">
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Erişilen Ürün & Hizmet: 1 Üretim + Proje Parkuru</li>
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Sınırsız teklif verme</li>
-                  <li class="flex items-center gap-2 text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> İhale açma hakkı yok</li>
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Canlı etkinliklere katılabilir</li>
-                  <li class="flex items-center gap-2 text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Ekip yönetimi dahil değil</li>
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Kurumsal firmalar vitrininde görünür</li>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2 border-t border-slate-100">
+              <!-- Col 1 -->
+              <div class="space-y-3">
+                <h4 class="text-xs font-black uppercase text-slate-800 tracking-wider flex items-center gap-1.5">
+                  <span class="flex h-5 w-5 items-center justify-center rounded-md bg-blue-50 text-blue-600 text-[10px] font-bold">1</span>
+                  İHALE VE TEKLİF YÖNETİMİ
+                </h4>
+                <ul class="space-y-2.5 text-xs text-slate-600 font-medium">
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Sınırsız B2B İhale Açma</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Canlı Tersine Eksiltme Katılımı</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Doğrudan Temin & Teklif Toplama</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Satış ve Kiralama Duyuruları</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Fiyat Pazarlığı & Karşı Teklif Modülü</li>
                 </ul>
               </div>
-              
-              <div class="pt-6">
-                <button type="button" disabled class="w-full text-center rounded-xl border border-slate-200 text-slate-400 text-xs font-bold py-2.5 cursor-not-allowed bg-slate-50">
-                  Aktif plandan geçiş kapalı
-                </button>
-              </div>
-            </div>
 
-            <!-- Plan 2: Profesyonel (MEVCUT) -->
-            <div class="rounded-2xl border bg-white p-6 shadow-md flex flex-col justify-between border-blue-200 relative scale-102 hover:shadow-lg transition">
-              <span class="absolute -top-3 left-1/2 -translate-x-1/2 text-[8px] font-black uppercase text-blue-700 bg-blue-100 border border-blue-200 px-3 py-1 rounded-full">KULLANILAN PLAN</span>
-              
-              <div class="space-y-4 mt-1">
-                <div>
-                  <h4 class="text-sm font-black text-slate-800">Profesyonel</h4>
-                  <p class="text-[9px] text-slate-400 mt-1 leading-normal">Yılda max 36 ihale açın, tüm pazarlara kapasite arttırın.</p>
-                </div>
-                
-                <div>
-                  <span class="text-2xl font-black text-slate-800">₺8.000</span>
-                  <span class="text-[10px] text-slate-400 font-bold ml-1">+ KDV / yıl</span>
-                </div>
-                
-                <span class="inline-block text-[9px] font-bold text-blue-700 bg-blue-50 border border-blue-100 px-2.5 py-1 rounded">Aylık karşılığı: ₺667</span>
-                
-                <hr class="border-slate-100" />
-                
-                <ul class="space-y-2.5 text-[10px] font-bold text-slate-600">
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Erişilen Ürün & Hizmet: 3 Üretim + Proje Parkuru</li>
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Sınırsız teklif verme</li>
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> İhale açma: <strong>36 İhale/yıl</strong></li>
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Canlı etkinliklere katılabilir</li>
-                  <li class="flex items-center gap-2 text-slate-400"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Ekip yönetimi dahil değil</li>
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Kurumsal firmalar vitrininde görünür</li>
+              <!-- Col 2 -->
+              <div class="space-y-3">
+                <h4 class="text-xs font-black uppercase text-slate-800 tracking-wider flex items-center gap-1.5">
+                  <span class="flex h-5 w-5 items-center justify-center rounded-md bg-blue-50 text-blue-600 text-[10px] font-bold">2</span>
+                  BİLDİRİM VE TAKİP SİSTEMİ
+                </h4>
+                <ul class="space-y-2.5 text-xs text-slate-600 font-medium">
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Akıllı Sektörel Arama Önerileri</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Yaklaşan İhale Anlık Bildirimleri</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Sonuçlanan İhale & Teklif Uyarıları</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Sınırsız Bildirim (SMS + E-Posta)</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Sınırsız Excel Rapor İndirme</li>
                 </ul>
               </div>
-              
-              <div class="pt-6">
-                <button type="button" class="w-full text-center rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 transition">
-                  Mevcut Planınız
-                </button>
-              </div>
-            </div>
 
-            <!-- Plan 3: Kurumsal -->
-            <div class="rounded-2xl border bg-white p-6 shadow-sm flex flex-col justify-between border-slate-200 hover:border-slate-300 transition">
-              <div class="space-y-4">
-                <div>
-                  <h4 class="text-sm font-black text-slate-800">Kurumsal</h4>
-                  <p class="text-[9px] text-slate-400 mt-1 leading-normal">Sınırsız kapasite, ekip yönetimi ve özel destek kurumsal güç.</p>
-                </div>
-                
-                <div>
-                  <span class="text-2xl font-black text-slate-800">₺15.000</span>
-                  <span class="text-[10px] text-slate-400 font-bold ml-1">+ KDV / yıl</span>
-                </div>
-                
-                <span class="inline-block text-[9px] font-bold text-slate-500 bg-slate-50 border border-slate-100 px-2.5 py-1 rounded">Aylık karşılığı: ₺1.250</span>
-                
-                <hr class="border-slate-100" />
-                
-                <ul class="space-y-2.5 text-[10px] font-bold text-slate-600">
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Erişilen Ürün & Hizmet: Sınırsız + Proje Parkuru</li>
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Sınırsız teklif verme</li>
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> İhale açma: <strong>Sınırsız</strong></li>
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Canlı etkinlik oluşturabilir</li>
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Ekip ve yetki yönetimi aktif</li>
-                  <li class="flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> Öne çıkan temsilci vitrin görünürlüğü</li>
+              <!-- Col 3 -->
+              <div class="space-y-3">
+                <h4 class="text-xs font-black uppercase text-slate-800 tracking-wider flex items-center gap-1.5">
+                  <span class="flex h-5 w-5 items-center justify-center rounded-md bg-blue-50 text-blue-600 text-[10px] font-bold">3</span>
+                  ANALİTİK VE MOBİL UYUM
+                </h4>
+                <ul class="space-y-2.5 text-xs text-slate-600 font-medium">
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Yüklenici & Tedarikçi Firma Analizleri</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> İdare ve Kurumsal Satın Alma Analizleri</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Sektörel Fiyat ve Pazar Eğilimleri</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Rakip Firma Teklif Dağılım Grafikleri</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-500 shrink-0" /> Mobil Uyumlu Web & Panel Arayüzü</li>
                 </ul>
               </div>
-              
-              <div class="pt-6">
-                <button type="button" disabled class="w-full text-center rounded-xl border border-slate-200 text-slate-400 text-xs font-bold py-2.5 cursor-not-allowed bg-slate-50">
-                  Aktif plandan geçiş kapalı
-                </button>
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Paket Karşılaştırması Table Section -->
-          <div class="space-y-4 pt-4">
-            <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
-              <div>
-                <h3 class="text-sm font-black text-slate-800">Paket karşılaştırması</h3>
-                <p class="text-[10px] text-slate-400 font-bold">Tüm planların operasyonel yetkilerini, kapasitelerini ve görünürlüklerini yan yana inceleyin.</p>
-              </div>
-              
-              <div class="flex items-center gap-2 text-[9px] font-bold text-slate-400">
-                <span class="border rounded px-2 py-1 bg-white">PAKET</span>
-                <span>/</span>
-                <span class="border rounded px-2 py-1 bg-white">ÖZELLİK</span>
-              </div>
-            </div>
-
-            <!-- Custom Styled HTML Comparison Table -->
-            <div class="rounded-2xl border bg-white overflow-hidden shadow-sm text-xs" style="border-color: #E2E8F0;">
-              <table class="w-full border-collapse">
-                <thead>
-                  <tr class="bg-slate-50/70 border-b text-[10px] font-black text-slate-400 text-left" style="border-color: #E2E8F0;">
-                    <th class="p-4 w-1/4 uppercase tracking-wider">ÖZELLİK VE DETAY</th>
-                    <th class="p-4 w-1/4 uppercase tracking-wider">ÖZELLİK</th>
-                    <th class="p-4 text-center text-slate-600">TEMEL<br><span class="text-[9px] font-medium text-slate-400">₺5.000 + KDV / yıl</span></th>
-                    <th class="p-4 text-center text-blue-700 bg-blue-50/20">PROFESYONEL<br><span class="text-[9px] font-black text-blue-600">₺8.000 + KDV / yıl</span></th>
-                    <th class="p-4 text-center text-slate-600">KURUMSAL<br><span class="text-[9px] font-medium text-slate-400">₺15.000 + KDV / yıl</span></th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100">
-                  <!-- Row 1: Segmentler -->
-                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
-                    <td class="p-4 text-slate-300">hizmetler ve erişim</td>
-                    <td class="p-4 text-slate-700">Tüm pazar segmentlerine erişim</td>
-                    <td class="p-4 text-center text-blue-600">✓</td>
-                    <td class="p-4 text-center text-blue-600 bg-blue-50/10">✓</td>
-                    <td class="p-4 text-center text-blue-600">✓</td>
-                  </tr>
-                  
-                  <!-- Row 2: İhale açma hakkı -->
-                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
-                    <td class="p-4 text-slate-300">hizmetler ve erişim</td>
-                    <td class="p-4 text-slate-700">İhale açma hakkı</td>
-                    <td class="p-4 text-center text-slate-400">Yok</td>
-                    <td class="p-4 text-center text-slate-700 bg-blue-50/10">36 İhale / yıl</td>
-                    <td class="p-4 text-center text-slate-700">Sınırsız</td>
-                  </tr>
-
-                  <!-- Row 3: Teklif Verme -->
-                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
-                    <td class="p-4 text-slate-300">hizmetler ve erişim</td>
-                    <td class="p-4 text-slate-700">Sınırsız teklif verme</td>
-                    <td class="p-4 text-center text-blue-600">✓</td>
-                    <td class="p-4 text-center text-blue-600 bg-blue-50/10">✓</td>
-                    <td class="p-4 text-center text-blue-600">✓</td>
-                  </tr>
-
-                  <!-- Row 4: Vitrin görünürlüğü -->
-                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
-                    <td class="p-4 text-slate-300">kurumsal vitrinler</td>
-                    <td class="p-4 text-slate-700">Kurumsal firmalar vitrininde görünürlük</td>
-                    <td class="p-4 text-center text-blue-600">✓</td>
-                    <td class="p-4 text-center text-blue-600 bg-blue-50/10">✓</td>
-                    <td class="p-4 text-center text-blue-600">✓</td>
-                  </tr>
-
-                  <!-- Row 5: Firma Erişimi -->
-                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
-                    <td class="p-4 text-slate-300">kurumsal vitrinler</td>
-                    <td class="p-4 text-slate-700">Daha fazla firmaya erişim</td>
-                    <td class="p-4 text-center text-blue-600">✓</td>
-                    <td class="p-4 text-center text-blue-600 bg-blue-50/10">✓</td>
-                    <td class="p-4 text-center text-blue-600">✓</td>
-                  </tr>
-
-                  <!-- Row 6: Öncelikli Sıralama -->
-                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
-                    <td class="p-4 text-slate-300">kurumsal vitrinler</td>
-                    <td class="p-4 text-slate-700">Öncelikli olarak listelenme</td>
-                    <td class="p-4 text-center text-slate-400">-- Yok</td>
-                    <td class="p-4 text-center text-slate-400 bg-blue-50/10">-- Yok</td>
-                    <td class="p-4 text-center text-blue-600">✓</td>
-                  </tr>
-
-                  <!-- Row 7: Canlı Etkinlik katılım -->
-                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
-                    <td class="p-4 text-slate-300">operasyonel yetenekler</td>
-                    <td class="p-4 text-slate-700">Canlı etkinliğe katılım</td>
-                    <td class="p-4 text-center text-blue-600">✓</td>
-                    <td class="p-4 text-center text-blue-600 bg-blue-50/10">✓</td>
-                    <td class="p-4 text-center text-blue-600">✓</td>
-                  </tr>
-
-                  <!-- Row 8: Canlı Etkinlik oluşturma -->
-                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
-                    <td class="p-4 text-slate-300">operasyonel yetenekler</td>
-                    <td class="p-4 text-slate-700">Canlı etkinlik oluşturma</td>
-                    <td class="p-4 text-center text-slate-400">-- Yok</td>
-                    <td class="p-4 text-center text-slate-400 bg-blue-50/10">-- Yok</td>
-                    <td class="p-4 text-center text-blue-600">✓</td>
-                  </tr>
-
-                  <!-- Row 9: Ekip ve Yetki -->
-                  <tr class="hover:bg-slate-50/30 transition text-[10px] font-bold text-slate-600">
-                    <td class="p-4 text-slate-300">operasyonel yetenekler</td>
-                    <td class="p-4 text-slate-700">Ekip ve yetki yönetimi</td>
-                    <td class="p-4 text-center text-slate-400">-- Yok</td>
-                    <td class="p-4 text-center text-slate-400 bg-blue-50/10">-- Yok</td>
-                    <td class="p-4 text-center text-blue-600">✓</td>
-                  </tr>
-                </tbody>
-              </table>
             </div>
           </div>
 
