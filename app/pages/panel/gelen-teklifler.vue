@@ -57,10 +57,10 @@ function acceptTeklif(teklif: any) {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #F1F5F9;">
       <div>
         <h1 class="text-xl font-black text-slate-800 tracking-tight" style="color: #0F172A;">
-          {{ 'Gelen Teklifler' }}
+          {{ 'Aldığım Teklifler (Gelen)' }}
         </h1>
         <p class="text-xs text-slate-500 font-medium mt-0.5">
-          {{ 'İlanlarınıza gelen teklifler — sadece siz görebilirsiniz' }}
+          {{ 'Açtığınız ihalelere tedarikçilerden gelen tüm teklifleri inceleyin ve pazarlık yapın' }}
         </p>
       </div>
 
@@ -72,6 +72,24 @@ function acceptTeklif(teklif: any) {
         <Shield :size="14" style="color: #1EAE4C;" />
         <span>{{ 'Kapalı Zarf — Teklifler Gizlidir' }}</span>
       </div>
+    </div>
+
+    <!-- Hızlı Geçiş Segment Sekmeleri -->
+    <div class="flex items-center gap-2 p-1 bg-slate-200/70 rounded-2xl w-fit">
+      <NuxtLink
+        to="/panel/gelen-teklifler"
+        class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black shadow-xs transition-all bg-white text-[#003057]"
+      >
+        <Inbox :size="14" class="text-[#1EAE4C]" />
+        <span>Aldığım Teklifler (Gelen)</span>
+      </NuxtLink>
+      <NuxtLink
+        to="/panel/yaptigim-teklifler"
+        class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white/50 transition-all"
+      >
+        <Send :size="14" class="text-slate-400" />
+        <span>Verdiğim Teklifler (Yaptığım)</span>
+      </NuxtLink>
     </div>
 
     <!-- İlan Grupları -->

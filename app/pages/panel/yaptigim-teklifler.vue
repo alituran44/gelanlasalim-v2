@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { SendHorizonal, Clock, CheckCircle2, XCircle, AlertCircle, Eye } from 'lucide-vue-next'
+import { SendHorizonal, Clock, CheckCircle2, XCircle, AlertCircle, Eye, Inbox, Send } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale } from '~/composables/useLocale'
 
@@ -40,12 +40,30 @@ const getDurumConfig = (durum: string) => {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #F1F5F9;">
       <div>
         <h1 class="text-xl font-black text-slate-800 tracking-tight" style="color: #0F172A;">
-          {{ 'Verdiğim Teklifler' }}
+          {{ 'Verdiğim Teklifler (Yaptığım)' }}
         </h1>
         <p class="text-xs text-slate-500 font-medium mt-0.5">
           {{ 'İhalelere verdiğiniz tekliflerin durumunu ve sürecini takip edin' }}
         </p>
       </div>
+    </div>
+
+    <!-- Hızlı Geçiş Segment Sekmeleri -->
+    <div class="flex items-center gap-2 p-1 bg-slate-200/70 rounded-2xl w-fit">
+      <NuxtLink
+        to="/panel/gelen-teklifler"
+        class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white/50 transition-all"
+      >
+        <Inbox :size="14" class="text-slate-400" />
+        <span>Aldığım Teklifler (Gelen)</span>
+      </NuxtLink>
+      <NuxtLink
+        to="/panel/yaptigim-teklifler"
+        class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black shadow-xs transition-all bg-white text-[#003057]"
+      >
+        <Send :size="14" class="text-[#1EAE4C]" />
+        <span>Verdiğim Teklifler (Yaptığım)</span>
+      </NuxtLink>
     </div>
 
     <!-- Bilgi Notu -->
