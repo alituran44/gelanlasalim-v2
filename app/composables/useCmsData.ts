@@ -408,8 +408,8 @@ export const DEFAULT_CMS_DATA = {
     ]
   },
   contact: {
-    address: 'Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül, Balıkesir, Türkiye',
-    email: 'info@ihaleciburada.com',
+    address: 'İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye',
+    email: 'ihalecib@gmail.com',
     kep: 'ihaleciburada@hs01.kep.tr',
     workHoursWeekdays: 'Pazartesi - Cuma: 09:00 - 18:00',
     workHoursSaturday: 'Cumartesi: 10:00 - 14:00'
@@ -456,11 +456,11 @@ export const DEFAULT_CMS_DATA = {
   },
   emailSettings: {
     senderName: 'İhaleciBurada B2B Operasyon',
-    senderEmail: 'info@ihaleciburada.com',
-    replyToEmail: 'destek@ihaleciburada.com',
-    smtpHost: 'smtp.ihaleciburada.com',
+    senderEmail: 'ihalecib@gmail.com',
+    replyToEmail: 'ihalecib@gmail.com',
+    smtpHost: 'smtp.gmail.com',
     smtpPort: 587,
-    smtpUser: 'info@ihaleciburada.com',
+    smtpUser: 'ihalecib@gmail.com',
     subscribers: [
       { id: 1, email: 'info@kalyon.com', companyName: 'Kalyon Tedarik Ltd.', source: 'Kayıt Formu', subscribedAt: '2026-08-20', status: 'Aktif' },
       { id: 2, email: 'satinalma@anadolu.com', companyName: 'Anadolu Lojistik A.Ş.', source: 'Bülten Aboneliği', subscribedAt: '2026-08-21', status: 'Aktif' },
@@ -471,13 +471,13 @@ export const DEFAULT_CMS_DATA = {
         id: 'trial-welcome',
         name: '🎉 6 Ay Ücretsiz Lansman Hoş Geldin & Aktivasyon',
         subject: 'İhaleciBurada.com: 6 Aylık %100 Ücretsiz Lansman Deneme Paketiniz Aktif!',
-        content: `Sayın Yetkili,\n\nİhaleciBurada B2B Canlı Eksiltme ve Satın Alma Platformu'na hoş geldiniz!\n\nLansmanımıza özel olarak tanımlanan 6 Aylık %100 Ücretsiz Kurumsal Deneme Paketiniz başarıyla aktifleştirildi.\n\n✓ 6 Ay Boyunca 0 ₺ Ücret (Kredi Kartı Gerekmez)\n✓ Sınırsız İhale Açma & Canlı Tersine Eksiltme\n✓ Doğrulanmış Kurumsal Firmalardan Belgeli Teklif Toplama\n✓ Geçerlilik Bitiş Tarihi: 22 Şubat 2027\n\nPanele gitmek ve ilk ihalenizi oluşturmak için: https://gelanlasalim-v2.vercel.app/panel\n\nSaygılarımızla,\nİhaleciBurada Müşteri Başarı Ekibi\ninfo@ihaleciburada.com | 0850 308 00 00`
+        content: `Sayın Yetkili,\n\nİhaleciBurada B2B Canlı Eksiltme ve Satın Alma Platformu'na hoş geldiniz!\n\nLansmanımıza özel olarak tanımlanan 6 Aylık %100 Ücretsiz Kurumsal Deneme Paketiniz başarıyla aktifleştirildi.\n\n✓ 6 Ay Boyunca 0 ₺ Ücret (Kredi Kartı Gerekmez)\n✓ Sınırsız İhale Açma & Canlı Tersine Eksiltme\n✓ Doğrulanmış Kurumsal Firmalardan Belgeli Teklif Toplama\n✓ Geçerlilik Bitiş Tarihi: 22 Şubat 2027\n\nPanele gitmek ve ilk ihalenizi oluşturmak için: https://gelanlasalim-v2.vercel.app/panel\n\nSaygılarımızla,\nİhaleciBurada Müşteri Başarı Ekibi\nihalecib@gmail.com | 0850 308 00 00`
       },
       {
         id: 'new-tender',
         name: '📢 Yeni İhale Yayınlandı Bildirimi',
         subject: 'Yeni İhale Yayında: Sektörünüze Uygun Yeni Bir Satın Alma İlanı Açıldı',
-        content: `Sayın Tedarikçimiz,\n\nFaaliyet alanınıza uygun yeni bir B2B satın alma ihalesi yayına alınmıştır.\n\nİhale Başlığı: [İhale Başlığı]\nKategori: [Sektör / Kategori]\nKalan Süre: [Kalan Süre]\n\nŞartnameyi incelemek ve teklifinizi iletmek için hemen tıklayın:\nhttps://gelanlasalim-v2.vercel.app/panel/gelen-teklifler\n\nİhaleciBurada B2B Operasyon Merkezi\ninfo@ihaleciburada.com`
+        content: `Sayın Tedarikçimiz,\n\nFaaliyet alanınıza uygun yeni bir B2B satın alma ihalesi yayına alınmıştır.\n\nİhale Başlığı: [İhale Başlığı]\nKategori: [Sektör / Kategori]\nKalan Süre: [Kalan Süre]\n\nŞartnameyi incelemek ve teklifinizi iletmek için hemen tıklayın:\nhttps://gelanlasalim-v2.vercel.app/panel/gelen-teklifler\n\nİhaleciBurada B2B Operasyon Merkezi\nihalecib@gmail.com`
       },
       {
         id: 'live-auction',
@@ -489,13 +489,13 @@ export const DEFAULT_CMS_DATA = {
         id: 'kyc-approved',
         name: '🛡️ Kurumsal Firma Doğrulama & KYC Onayı',
         subject: 'Firma Belgeleriniz Doğrulandı — Mavi Rozetiniz Aktif!',
-        content: `Tebrikler!\n\nYüklemiş olduğunuz vergi levhası ve ticaret sicil belgeleri uzmanlarımız tarafından incelenmiş ve onaylanmıştır.\n\nProfilinize 'DOĞRULANMIŞ KURUMSAL ÜRETİCİ / ALICI' mavi rozeti eklenmiştir.\n\nİhaleciBurada Güvenlik ve Uyumluluk Departmanı\ninfo@ihaleciburada.com`
+        content: `Tebrikler!\n\nYüklemiş olduğunuz vergi levhası ve ticaret sicil belgeleri uzmanlarımız tarafından incelenmiş ve onaylanmıştır.\n\nProfilinize 'DOĞRULANMIŞ KURUMSAL ÜRETİCİ / ALICI' mavi rozeti eklenmiştir.\n\nİhaleciBurada Güvenlik ve Uyumluluk Departmanı\nihalecib@gmail.com`
       },
       {
         id: 'weekly-digest',
         name: '📊 Haftalık B2B İhale ve Tasarruf Bülteni',
         subject: 'Haftalık B2B Tedarik Özeti: 12.4M ₺ Hacim ve Öne Çıkan İhaleler',
-        content: `Bu hafta İhaleciBurada'da gerçekleşen öne çıkan ihaleler ve ortalama %14.2 tasarruf fırsatları bülteninizde!\n\nAktif İhale Sayısı: 48+\nTamamlanan İşlem Hacmi: 12.4M ₺+\n\nTüm güncel fırsatları listelemek için: https://gelanlasalim-v2.vercel.app/pazar-yeri\n\nİhaleciBurada B2B Bülten\ninfo@ihaleciburada.com`
+        content: `Bu hafta İhaleciBurada'da gerçekleşen öne çıkan ihaleler ve ortalama %14.2 tasarruf fırsatları bülteninizde!\n\nAktif İhale Sayısı: 48+\nTamamlanan İşlem Hacmi: 12.4M ₺+\n\nTüm güncel fırsatları listelemek için: https://gelanlasalim-v2.vercel.app/pazar-yeri\n\nİhaleciBurada B2B Bülten\nihalecib@gmail.com`
       }
     ]
   },
@@ -662,7 +662,7 @@ export const DEFAULT_CMS_DATA = {
     announcementTicker: '⚡ LANSMANA ÖZEL: Tüm alıcı ve tedarikçi firmalarımıza ilk 6 ay boyunca %100 ücretsiz kurumsal deneme paketi! Kredi kartı gerekmez, 0 ₺ bedelsiz anında aktivasyon.',
     googleAnalyticsId: 'G-IHALECIBURADA2026',
     supportPhone: '0850 308 00 00',
-    supportEmail: 'info@ihaleciburada.com',
+    supportEmail: 'ihalecib@gmail.com',
     primaryCurrency: 'TRY (₺)',
     allowGuestBrowsing: true,
     enableEmailAlerts: true

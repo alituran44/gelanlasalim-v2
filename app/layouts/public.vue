@@ -379,11 +379,11 @@ const activeTenders = ref([
             <div class="space-y-3">
               <h4 class="text-xs font-black uppercase tracking-wider text-[#00C2FF]">İLETİŞİM & DESTEK</h4>
               <p class="text-[11px] leading-relaxed text-slate-400 font-medium whitespace-pre-line">
-                Maslak Mah. Büyükdere Cad. No:122 Şişli / İstanbul, Türkiye
+                İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye
               </p>
               <div class="text-[11px] font-bold text-slate-200 space-y-2">
-                <a href="mailto:info@ihaleciburada.com" class="block hover:text-[#00C2FF] py-0.5">
-                  info@ihaleciburada.com
+                <a href="mailto:ihalecib@gmail.com" class="block hover:text-[#00C2FF] py-0.5">
+                  ihalecib@gmail.com
                 </a>
                 <a href="mailto:ihaleciburada@hs01.kep.tr" class="block hover:text-[#00C2FF] font-mono text-[10px] py-0.5 text-slate-400">
                   ihaleciburada@hs01.kep.tr

@@ -29,9 +29,9 @@ const vergiNo = ref('43624665040')
 const vergiDairesi = ref('Çanakkale Vergi Dairesi Müdürlüğü')
 const il = ref('Çanakkale')
 const ilce = ref('Merkez')
-const mahalle = ref('İsmet Paşa Mah.')
+const mahalle = ref('İsmetpaşa Mah.')
 const postaKodu = ref('17100')
-const acikAdres = ref('17100 Çanakkale')
+const acikAdres = ref('Büyük Hamam Sokak Taşöz Apt. No:52/1 Merkez / Çanakkale')
 const faturaAdresiAyni = ref(true)
 
 // Step 2: Kişisel Bilgiler

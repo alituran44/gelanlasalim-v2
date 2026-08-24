@@ -100,7 +100,7 @@ useHead({
           '@type': 'ContactPoint',
           'telephone': '+90-850-308-00-00',
           'contactType': 'customer service',
-          'email': 'info@ihaleciburada.com',
+          'email': 'ihalecib@gmail.com',
           'availableLanguage': 'Turkish'
         }
       })

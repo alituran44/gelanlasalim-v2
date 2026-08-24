@@ -350,7 +350,7 @@ function printDocument() {
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — İLGİLİ KİŞİNİN HAKLARI (KVKK MADDE 11)</h3>
                 <p>3.1. Kullanıcılar verilerinin işlenip işlenmediğini öğrenme, düzeltme talep etme ve silinmesini isteme hakkına sahiptir.</p>
-                <p>3.2. Başvurular <strong>kvkk@ihaleciburada.com</strong> adresine veya KEP üzerinden iletilebilir.</p>
+                <p>3.2. Başvurular <strong>ihalecib@gmail.com</strong> adresine veya KEP üzerinden iletilebilir.</p>
               </section>
             </div>
           </article>
