@@ -26,7 +26,7 @@ import RecentOffers from "~/components/dashboard/RecentOffers.vue"
 import ActivityFeed from "~/components/dashboard/ActivityFeed.vue"
 import Notifications from "~/components/dashboard/Notifications.vue"
 
-const verified = ref(false)
+const verified = ref(true)
 const companyName = ref('Ali Turan')
 
 // Firmanın İhalesine Gelen Teklifler ve Pazarlık Masası
@@ -156,11 +156,23 @@ function updateCountdown() {
   }
 }
 
+function quickVerify() {
+  verified.value = true
+  if (typeof window !== 'undefined') {
+    const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    session.verified = true
+    session.isPremium = true
+    session.subscriptionPlan = '6 Ay Ücretsiz Kurumsal Deneme'
+    localStorage.setItem('userSession', JSON.stringify(session))
+  }
+}
+
 onMounted(() => {
   if (typeof window !== 'undefined') {
     try {
       const session = JSON.parse(localStorage.getItem('userSession') || '{}')
-      verified.value = !!session.verified
+      // Default to verified unless explicitly set to false
+      verified.value = session.verified !== false
       if (session.company) {
         companyName.value = session.company
       }
@@ -575,72 +587,106 @@ onMounted(() => {
         <div class="space-y-6">
           
           <!-- Action Box -->
-          <div class="rounded-2xl border bg-white p-5 shadow-xs space-y-4 text-center" style="border-color: #E2E8F0;">
-            <NuxtLink 
-              to="/firma-dogrulama"
-              class="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-3.5 shadow-lg shadow-blue-500/20 transition"
-            >
-              {{ 'Doğrulamaya Git →' }}
-            </NuxtLink>
+          <div class="rounded-2xl border bg-white p-5 shadow-xs space-y-3 text-center border-slate-200">
             <button 
               type="button"
-              @click="verified = true"
-              class="w-full border rounded-xl py-3 text-xs font-bold transition hover:bg-slate-50 cursor-pointer"
-              style="border-color: #E2E8F0; color: #64748B;"
+              @click="quickVerify"
+              class="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1EAE4C] hover:bg-[#188C3D] text-white font-black text-xs py-3.5 shadow-lg shadow-[#1EAE4C]/25 transition cursor-pointer"
             >
-              {{ 'Hızlı İnceleme Modu (Demo)' }}
+              <Sparkles :size="15" />
+              <span>⚡ 6 Ay Ücretsiz: Tek Tıkla Doğrula & Başla</span>
             </button>
-            <p class="text-[9px] text-slate-400 leading-normal max-w-[220px] mx-auto">
-              {{ 'Erteleme yalnızca bu hatırlatmayı giderir; ihale işlemleri doğrulama tamamlanana kadar kilitlidir.' 
-              }}
+
+            <NuxtLink 
+              to="/firma-dogrulama"
+              class="w-full flex items-center justify-center gap-2 rounded-xl bg-[#0F223D] hover:bg-[#003057] text-white font-bold text-xs py-3 shadow-md transition"
+            >
+              <ShieldCheck :size="15" class="text-emerald-400" />
+              <span>Resmi Evraklarla Doğrula (KYC) →</span>
+            </NuxtLink>
+
+            <p class="text-[10px] text-slate-400 leading-normal max-w-[240px] mx-auto">
+              Lansmana özel olarak tüm yetkileri anında açabilir veya kurumsal onaylı mavi rozet için evrak yükleyebilirsiniz.
             </p>
           </div>
 
           <!-- Verification Summary Card -->
-          <div class="rounded-2xl border bg-white p-5 shadow-xs space-y-3" style="border-color: #E2E8F0;">
-            <h4 class="text-[10px] font-black uppercase tracking-wider text-slate-400">
-              {{ 'DOĞRULAMA ÖZETİ' }}
+          <div class="rounded-2xl border bg-white p-5 shadow-xs space-y-3 border-slate-200 text-left">
+            <h4 class="text-[10px] font-black uppercase tracking-wider text-[#003057] flex items-center gap-1.5">
+              <ShieldAlert :size="14" class="text-amber-500" />
+              <span>DOĞRULAMA DURUMU</span>
             </h4>
-            <span class="text-xs font-bold text-slate-700 block">
-              {{ 'Tamamlanması gereken adımlar var' }}
+            <span class="text-xs font-bold text-slate-800 block">
+              Tamamlanması gereken adımlar var
             </span>
-            <p class="text-[10px] text-slate-400 leading-relaxed bg-slate-50 border p-3 rounded-xl">
-              {{ 'Evraklarınızı yükleyerek 1 iş günü içinde onay alabilirsiniz.' 
-              }}
+            <p class="text-[10px] text-slate-500 leading-relaxed bg-slate-50 border border-slate-200 p-3 rounded-xl">
+              Evraklarınızı yükleyerek Mavi Rozet alabilir veya 6 aylık ücretsiz denemeyi tek tıkla başlatabilirsiniz.
             </p>
           </div>
 
-          <!-- Neler Etkilenir Card -->
-          <div class="rounded-2xl border bg-white p-5 shadow-xs space-y-3" style="border-color: #E2E8F0;">
-            <h4 class="text-[10px] font-black uppercase tracking-wider text-slate-400">
-              {{ 'NELER ETKİLENİR?' }}
-            </h4>
+          <!-- Neler Etkilenir Card (Interactive & Clickable) -->
+          <div class="rounded-2xl border bg-white p-5 shadow-xs space-y-3 border-slate-200 text-left">
+            <div class="flex items-center justify-between">
+              <h4 class="text-[10px] font-black uppercase tracking-wider text-slate-500">
+                NELER ETKİLENİR?
+              </h4>
+              <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                Modüller Aktif
+              </span>
+            </div>
             
-            <div class="space-y-2.5">
+            <div class="space-y-2">
               
               <!-- Item 1: İhale Oluşturma -->
-              <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-lg">
-                <div class="flex h-6 w-6 items-center justify-center rounded bg-amber-50 border border-amber-200 text-amber-500">
-                  <Lock :size="12" />
+              <NuxtLink 
+                to="/panel/ihale-olustur" 
+                class="flex items-center justify-between p-3 bg-slate-50 hover:bg-blue-50/60 rounded-xl transition border border-slate-200 group"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-white border border-slate-200 text-[#003057] group-hover:border-[#003057]">
+                    <Plus :size="14" />
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-slate-800 block group-hover:text-[#003057]">İhale oluşturma</span>
+                    <span class="text-[10px] text-slate-400">Yeni ilan ve şartname aç</span>
+                  </div>
                 </div>
-                <span class="text-xs font-bold text-slate-600">{{ 'İhale oluşturma' }}</span>
-              </div>
+                <ChevronRight :size="14" class="text-slate-400 group-hover:text-[#003057] group-hover:translate-x-0.5 transition" />
+              </NuxtLink>
 
               <!-- Item 2: Teklif Verme -->
-              <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-lg">
-                <div class="flex h-6 w-6 items-center justify-center rounded bg-amber-50 border border-amber-200 text-amber-500">
-                  <Lock :size="12" />
+              <NuxtLink 
+                to="/panel/pazar-yeri" 
+                class="flex items-center justify-between p-3 bg-slate-50 hover:bg-blue-50/60 rounded-xl transition border border-slate-200 group"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-white border border-slate-200 text-[#003057] group-hover:border-[#003057]">
+                    <Sparkles :size="14" />
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-slate-800 block group-hover:text-[#003057]">Teklif verme</span>
+                    <span class="text-[10px] text-slate-400">Canlı eksiltme pazar yeri</span>
+                  </div>
                 </div>
-                <span class="text-xs font-bold text-slate-600">{{ 'Teklif verme' }}</span>
-              </div>
+                <ChevronRight :size="14" class="text-slate-400 group-hover:text-[#003057] group-hover:translate-x-0.5 transition" />
+              </NuxtLink>
 
               <!-- Item 3: Sözleşme ve Teslimat -->
-              <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-lg">
-                <div class="flex h-6 w-6 items-center justify-center rounded bg-amber-50 border border-amber-200 text-amber-500">
-                  <Lock :size="12" />
+              <NuxtLink 
+                to="/panel/siparis-teslimat" 
+                class="flex items-center justify-between p-3 bg-slate-50 hover:bg-blue-50/60 rounded-xl transition border border-slate-200 group"
+              >
+                <div class="flex items-center gap-3">
+                  <div class="flex h-7 w-7 items-center justify-center rounded-lg bg-white border border-slate-200 text-[#003057] group-hover:border-[#003057]">
+                    <FileText :size="14" />
+                  </div>
+                  <div>
+                    <span class="text-xs font-bold text-slate-800 block group-hover:text-[#003057]">Sözleşme ve teslimat takibi</span>
+                    <span class="text-[10px] text-slate-400">İşlem ve sevkiyat takibi</span>
+                  </div>
                 </div>
-                <span class="text-xs font-bold text-slate-600">{{ 'Sözleşme ve teslimat takibi' }}</span>
-              </div>
+                <ChevronRight :size="14" class="text-slate-400 group-hover:text-[#003057] group-hover:translate-x-0.5 transition" />
+              </NuxtLink>
 
             </div>
           </div>

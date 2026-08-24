@@ -201,8 +201,10 @@ function handleEDevletAuth() {
         name: 'Ali Turan (e-Devlet & MERSİS Onaylı)',
         company: 'Turan Lojistik San. A.Ş.',
         role: 'company',
+        verified: true,
         isEDevletVerified: true,
-        isPremium: true
+        isPremium: true,
+        subscriptionPlan: '6 Ay Ücretsiz Kurumsal Deneme'
       }))
     }
     router.push('/panel')
@@ -239,7 +241,9 @@ function handleLogin() {
         firstName: 'Ali',
         name: 'Ali Turan',
         role: 'buyer',
-        isPremium: true
+        verified: true,
+        isPremium: true,
+        subscriptionPlan: '6 Ay Ücretsiz Kurumsal Deneme'
       }))
     }
     router.push('/panel')
@@ -254,7 +258,9 @@ function handleDemoLogin(role: 'company' | 'individual') {
       name: role === 'company' ? 'Kemal Yılmaz' : 'Ahmet Yıldız',
       company: role === 'company' ? 'Yılmaz Tekstil A.Ş.' : 'Bireysel Üye',
       role: role,
-      isPremium: true
+      verified: true,
+      isPremium: true,
+      subscriptionPlan: '6 Ay Ücretsiz Kurumsal Deneme'
     }))
   }
   router.push('/panel')
@@ -288,7 +294,10 @@ function handleGuestEntry() {
         name: guestName.value,
         company: guestCompany.value || 'Misafir Firma',
         role: 'guest',
-        isGuest: true
+        verified: true,
+        isGuest: true,
+        isPremium: true,
+        subscriptionPlan: '6 Ay Ücretsiz Kurumsal Deneme'
       }))
     }
     router.push('/panel')
@@ -831,23 +840,6 @@ function handleGuestEntry() {
         </div>
       </div>
     </div>
-
-    <!-- COOKIES CONSENT BANNER (KVKK compliant) -->
-    <transition name="fade">
-      <div v-if="showCookieConsent" class="fixed bottom-6 right-6 z-50 max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl text-left flex flex-col gap-3">
-        <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
-          🍪 {{ 'Çerez Onayı & KVKK' }}
-        </h4>
-        <p class="text-[11px] leading-relaxed text-slate-500 font-medium">
-          {{ 'Üyelik işlemleri ve güvenli oturum yönetimi için zorunlu çerezleri kullanıyoruz.' }}
-        </p>
-        <div class="flex items-center justify-end gap-2">
-          <button @click="acceptCookies" class="rounded-xl bg-slate-900 hover:bg-slate-800 px-4 py-2 text-[11px] font-black text-white transition shadow-sm cursor-pointer">
-            {{ 'Anladım ve Kabul Ediyorum' }}
-          </button>
-        </div>
-      </div>
-    </transition>
 
     <!-- OTP VERIFICATION MODAL -->
     <transition name="fade">

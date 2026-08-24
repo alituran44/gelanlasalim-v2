@@ -419,6 +419,9 @@ const activeTenders = ref([
 
     <!-- WhatsApp & AI Welcoming Floating Widget -->
     <FloatingSupportWidget />
+
+    <!-- Global Responsive Cookie & KVKK Consent Banner -->
+    <CommonCookieConsent />
   </div>
 </template>
 

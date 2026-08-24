@@ -3125,24 +3125,6 @@ function toggleFilterSection(section: string) {
       </div>
     </transition>
 
-    <!-- COOKIES CONSENT BANNER (Moved to left-6 to prevent overlap with WhatsApp/AI widget) -->
-    <transition name="fade">
-      <div v-if="showCookieConsent" class="fixed bottom-6 left-6 z-50 max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl text-left flex flex-col gap-3">
-        <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
-          <Cookie :size="16" class="text-blue-600" />
-          {{ 'Çerez Onayı & KVKK' }}
-        </h4>
-        <p class="text-[11px] leading-relaxed text-slate-500 font-medium">
-          {{ 'Platform kullanım deneyiminizi optimize etmek ve güvenli bir B2B ihale süreci sağlamak adına çerezleri kullanıyoruz.' }}
-        </p>
-        <div class="flex gap-2 justify-end">
-          <button @click="acceptCookieConsent" class="rounded-lg bg-blue-600 px-4 py-2 text-[10px] font-black text-white hover:bg-blue-700 transition-colors cursor-pointer">
-            {{ 'Kabul Et' }}
-          </button>
-        </div>
-      </div>
-    </transition>
-
     <!-- Video Guide Modal Triggered From Hero / Quick Links -->
     <VideoGuideModal
       v-model="showHeroVideoModal"
