@@ -157,7 +157,7 @@ const activeTenders = ref([
             to="/abonelik" 
             class="px-3.5 py-1.5 text-xs font-black text-emerald-800 hover:text-emerald-950 bg-emerald-100/90 hover:bg-emerald-200 rounded-xl transition-all flex items-center gap-1.5 shadow-sm border border-emerald-300 animate-pulse"
           >
-            🎁 <span>6 Ay Ücretsiz</span>
+            🎁 <span>1 Ay Ücretsiz</span>
           </NuxtLink>
         </div>
 

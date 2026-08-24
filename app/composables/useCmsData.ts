@@ -441,15 +441,15 @@ export const DEFAULT_CMS_DATA = {
   supportSettings: {
     whatsappEnabled: true,
     whatsappNumber: '908503080000',
-    whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale süreçleri ve 6 ay ücretsiz deneme paketi hakkında bilgi almak istiyorum.',
+    whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale süreçleri ve 1 ay ücretsiz deneme paketi hakkında bilgi almak istiyorum.',
     aiEnabled: true,
     aiBotName: 'İhaleciBurada AI Asistanı',
-    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel 6 Ay %100 Ücretsiz Deneme süreciniz hakkında size nasıl yardımcı olabilirim?',
-    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın. Kullanıcılara 6 ay ücretsiz deneme, ihale açma, teklif verme, canlı eksiltme konularında yardımcı ol.'
+    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel 1 Ay %100 Ücretsiz Deneme süreciniz hakkında size nasıl yardımcı olabilirim?',
+    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın. Kullanıcılara 1 ay ücretsiz deneme, ihale açma, teklif verme, canlı eksiltme konularında yardımcı ol.'
   },
   crmSettings: {
     leads: [
-      { id: 1, companyName: 'Kalyon Tedarik Ltd.', contactName: 'Ahmet Kalyoncu', email: 'ahmet@kalyon.com', phone: '0532 111 22 33', status: '6 Ay Deneme Aktif', stage: 'active', notes: 'İnşaat malzemesi ihalesi açacak.', createdAt: '2026-08-20' },
+      { id: 1, companyName: 'Kalyon Tedarik Ltd.', contactName: 'Ahmet Kalyoncu', email: 'ahmet@kalyon.com', phone: '0532 111 22 33', status: '1 Ay Deneme Aktif', stage: 'active', notes: 'İnşaat malzemesi ihalesi açacak.', createdAt: '2026-08-20' },
       { id: 2, companyName: 'Anadolu Lojistik A.Ş.', contactName: 'Mehmet Yılmaz', email: 'mehmet@anadolulojistik.com', phone: '0544 555 66 77', status: 'Teklif Veren', stage: 'qualified', notes: 'Akaryakıt ihalesine teklif verdi.', createdAt: '2026-08-21' },
       { id: 3, companyName: 'Mega Ambalaj Sanayi', contactName: 'Selin Erdem', email: 'selin@megaambalaj.com', phone: '0555 888 99 00', status: 'Görüşülüyor', stage: 'contacted', notes: 'Kurumsal SAP entegrasyonu talebi var.', createdAt: '2026-08-22' }
     ]
@@ -469,9 +469,9 @@ export const DEFAULT_CMS_DATA = {
     templates: [
       {
         id: 'trial-welcome',
-        name: '🎉 6 Ay Ücretsiz Lansman Hoş Geldin & Aktivasyon',
-        subject: 'İhaleciBurada.com: 6 Aylık %100 Ücretsiz Lansman Deneme Paketiniz Aktif!',
-        content: `Sayın Yetkili,\n\nİhaleciBurada B2B Canlı Eksiltme ve Satın Alma Platformu'na hoş geldiniz!\n\nLansmanımıza özel olarak tanımlanan 6 Aylık %100 Ücretsiz Kurumsal Deneme Paketiniz başarıyla aktifleştirildi.\n\n✓ 6 Ay Boyunca 0 ₺ Ücret (Kredi Kartı Gerekmez)\n✓ Sınırsız İhale Açma & Canlı Tersine Eksiltme\n✓ Doğrulanmış Kurumsal Firmalardan Belgeli Teklif Toplama\n✓ Geçerlilik Bitiş Tarihi: 22 Şubat 2027\n\nPanele gitmek ve ilk ihalenizi oluşturmak için: https://gelanlasalim-v2.vercel.app/panel\n\nSaygılarımızla,\nİhaleciBurada Müşteri Başarı Ekibi\nihalecib@gmail.com | 0850 308 00 00`
+        name: '🎉 1 Ay Ücretsiz Lansman Hoş Geldin & Aktivasyon',
+        subject: 'İhaleciBurada.com: 1 Aylık %100 Ücretsiz Lansman Deneme Paketiniz Aktif!',
+        content: `Sayın Yetkili,\n\nİhaleciBurada B2B Canlı Eksiltme ve Satın Alma Platformu'na hoş geldiniz!\n\nLansmanımıza özel olarak tanımlanan 1 Aylık %100 Ücretsiz Kurumsal Deneme Paketiniz başarıyla aktifleştirildi.\n\n✓ 1 Ay Boyunca 0 ₺ Ücret (Kredi Kartı Gerekmez)\n✓ Sınırsız İhale Açma & Canlı Tersine Eksiltme\n✓ Doğrulanmış Kurumsal Firmalardan Belgeli Teklif Toplama\n✓ Geçerlilik Bitiş Tarihi: 25 Eylül 2026\n\nPanele gitmek ve ilk ihalenizi oluşturmak için: https://gelanlasalim-v2.vercel.app/panel\n\nSaygılarımızla,\nİhaleciBurada Müşteri Başarı Ekibi\nihalecib@gmail.com | 0850 308 00 00`
       },
       {
         id: 'new-tender',
@@ -643,14 +643,15 @@ export const DEFAULT_CMS_DATA = {
     { id: 'kat-6', name: 'Kırtasiye, Ofis & Teknoloji', icon: 'Laptop', targetSavings: '%21.0', activeTendersCount: 8, description: 'Fotokopi kağıdı, toner, bilgisayar donanımı ve ofis mobilyası.' }
   ],
   promoCodes: [
-    { code: 'LANSMAN6AY', discountType: 'free_trial_months', value: '6 Ay Bedelsiz', usageLimit: 1000, usedCount: 142, expiryDate: '22 Şubat 2027', status: 'active' },
+    { code: 'LANSMAN1AY', discountType: 'free_trial_months', value: '1 Ay Bedelsiz', usageLimit: 1000, usedCount: 142, expiryDate: '25 Eylül 2026', status: 'active' },
+    { code: 'LANSMAN20', discountType: 'percent_discount', value: '%20 İndirim', usageLimit: 500, usedCount: 45, expiryDate: '31 Aralık 2026', status: 'active' },
     { code: 'VIP2026', discountType: 'percent_discount', value: '%100 İndirim', usageLimit: 250, usedCount: 38, expiryDate: '31 Aralık 2026', status: 'active' },
     { code: 'B2BTASARRUF', discountType: 'fixed_amount', value: '1.000 ₺ Kredi', usageLimit: 500, usedCount: 89, expiryDate: '01 Ocak 2027', status: 'active' }
   ],
   auditLogs: [
     { id: 'LOG-9912', timestamp: '2026-08-23 02:10:14', userEmail: 'admin@ihaleciburada.com', action: 'Yönetici Girişi Yapıldı', ipAddress: '176.240.12.84', status: 'success', details: 'TLS 1.3 şifreli oturum başlatıldı.' },
     { id: 'LOG-9911', timestamp: '2026-08-22 23:05:42', userEmail: 'admin@ihaleciburada.com', action: 'WhatsApp & AI Ayarları Güncellendi', ipAddress: '176.240.12.84', status: 'success', details: 'Numara: 908503080000 olarak kaydedildi.' },
-    { id: 'LOG-9910', timestamp: '2026-08-22 22:58:19', userEmail: 'admin@ihaleciburada.com', action: '6 Ay Lansman Planı Yayına Alındı', ipAddress: '176.240.12.84', status: 'success', details: '0 TL bedelsiz deneme paketi aktif edildi.' },
+    { id: 'LOG-9910', timestamp: '2026-08-22 22:58:19', userEmail: 'admin@ihaleciburada.com', action: '1 Ay Lansman Planı Yayına Alındı', ipAddress: '176.240.12.84', status: 'success', details: '0 TL bedelsiz deneme paketi aktif edildi.' },
     { id: 'LOG-9909', timestamp: '2026-08-22 21:40:05', userEmail: 'sistem@ihaleciburada.com', action: 'Otomatik Veritabanı Yedeği Alındı', ipAddress: '127.0.0.1', status: 'success', details: 'JSON veri yedeği disk alanına arşivlendi.' },
     { id: 'LOG-9908', timestamp: '2026-08-22 19:15:33', userEmail: 'ahmet@kalyon.com', action: 'KYC Belgesi Yüklendi', ipAddress: '88.241.90.11', status: 'warning', details: 'Vergi levhası inceleme kuyruğuna alındı.' }
   ],
@@ -659,7 +660,7 @@ export const DEFAULT_CMS_DATA = {
     maintenanceNotice: 'Platformumuzda planlı altyapı güçlendirme çalışması yapılmaktadır. Sistem en kısa sürede tekrar aktif olacaktır.',
     metaTitle: 'İhaleciBurada.com | Türkiye’nin Öncü B2B Canlı Eksiltme & Satın Alma Platformu',
     metaDescription: 'B2B satın alma ihaleleri açın, canlı tersine eksiltme ile rekabetçi teklifler toplayın, kurumsal tedarik maliyetlerinizi %14.2 düşürün.',
-    announcementTicker: '⚡ LANSMANA ÖZEL: Tüm alıcı ve tedarikçi firmalarımıza ilk 6 ay boyunca %100 ücretsiz kurumsal deneme paketi! Kredi kartı gerekmez, 0 ₺ bedelsiz anında aktivasyon.',
+    announcementTicker: '⚡ LANSMANA ÖZEL: Tüm alıcı ve tedarikçi firmalarımıza ilk 1 ay boyunca %100 ücretsiz kurumsal deneme paketi! Kredi kartı gerekmez, 0 ₺ bedelsiz anında aktivasyon.',
     googleAnalyticsId: 'G-IHALECIBURADA2026',
     supportPhone: '0850 308 00 00',
     supportEmail: 'ihalecib@gmail.com',

@@ -10,7 +10,11 @@ import {
   Plus, 
   ArrowRight,
   Sparkles,
-  ShieldCheck
+  ShieldCheck,
+  Clock,
+  Gift,
+  Zap,
+  X
 } from 'lucide-vue-next'
 import { locale } from '~/composables/useLocale'
 
@@ -118,24 +122,28 @@ function acceptBid(bid: any) {
   alert(`🎉 TEBRİKLER!\n\n${bid.bidderFirm} firmasının teklifini kabul ettiniz. Sözleşme ve onay aşamasına geçilmiştir.`)
 }
 
-// 🟢 ABONELİK KALAN SÜRE CANLI SAYACI
+// 🟢 1 AYLIK ABONELİK VE DENEME SÜRESİ CANLI SAYACI & SATIN ALMA KANCASI (PAYWALL HOOK)
 const subscriptionPlan = ref({
-  name: '3 Aylık Popüler Kurumsal Plan',
-  startDate: '20 Ağustos 2026',
-  endDate: '20 Kasım 2026',
-  price: '₺1.800',
-  totalDays: 90,
-  remainingDays: 82,
-  hours: 14,
-  minutes: 38,
-  seconds: 45,
-  percentRemaining: 91,
+  name: '1 Aylık Ücretsiz Kurumsal Deneme Planı',
+  startDate: '25 Ağustos 2026',
+  endDate: '25 Eylül 2026',
+  price: '0 ₺',
+  totalDays: 30,
+  remainingDays: 29,
+  hours: 23,
+  minutes: 54,
+  seconds: 12,
+  percentRemaining: 96,
   status: 'Aktif'
 })
 
+const isTrialExpired = ref(false)
+const showPaywallModal = ref(false)
+const copiedCoupon = ref(false)
 let timerInterval: any = null
 
 function updateCountdown() {
+  if (isTrialExpired.value) return
   if (subscriptionPlan.value.seconds > 0) {
     subscriptionPlan.value.seconds--
   } else {
@@ -150,10 +158,50 @@ function updateCountdown() {
         subscriptionPlan.value.hours = 23
         if (subscriptionPlan.value.remainingDays > 0) {
           subscriptionPlan.value.remainingDays--
+        } else {
+          expireTrialForDemo()
         }
       }
     }
   }
+}
+
+function expireTrialForDemo() {
+  subscriptionPlan.value.remainingDays = 0
+  subscriptionPlan.value.hours = 0
+  subscriptionPlan.value.minutes = 0
+  subscriptionPlan.value.seconds = 0
+  subscriptionPlan.value.percentRemaining = 0
+  subscriptionPlan.value.status = 'Süresi Doldu'
+  isTrialExpired.value = true
+  showPaywallModal.value = true
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('trialExpired', 'true')
+  }
+}
+
+function extendTrial(days = 7) {
+  subscriptionPlan.value.remainingDays = days
+  subscriptionPlan.value.hours = 12
+  subscriptionPlan.value.minutes = 30
+  subscriptionPlan.value.seconds = 45
+  subscriptionPlan.value.percentRemaining = Math.round((days / 30) * 100)
+  subscriptionPlan.value.status = 'Aktif'
+  isTrialExpired.value = false
+  showPaywallModal.value = false
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('trialExpired')
+  }
+}
+
+function copyCoupon(code = 'LANSMAN20') {
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    navigator.clipboard.writeText(code)
+  }
+  copiedCoupon.value = true
+  setTimeout(() => {
+    copiedCoupon.value = false
+  }, 2000)
 }
 
 function quickVerify() {
@@ -162,7 +210,7 @@ function quickVerify() {
     const session = JSON.parse(localStorage.getItem('userSession') || '{}')
     session.verified = true
     session.isPremium = true
-    session.subscriptionPlan = '6 Ay Ücretsiz Kurumsal Deneme'
+    session.subscriptionPlan = '1 Ay Ücretsiz Kurumsal Deneme'
     localStorage.setItem('userSession', JSON.stringify(session))
   }
 }
@@ -179,6 +227,9 @@ onMounted(() => {
       if (session.subscriptionPlan) {
         subscriptionPlan.value.name = session.subscriptionPlan
       }
+      if (localStorage.getItem('trialExpired') === 'true') {
+        expireTrialForDemo()
+      }
     } catch (e) {
       console.error('Error parsing session', e)
     }
@@ -194,21 +245,40 @@ onMounted(() => {
     <div v-if="verified" class="space-y-6">
       
       <!-- 🟢 1. AKTİF ABONELİK DURUMU & CANLI KALAN SÜRE SAYACI -->
-      <div class="rounded-3xl border bg-gradient-to-r from-[#0F223D] via-[#152B4D] to-[#0F223D] text-white p-6 shadow-xl relative overflow-hidden text-left space-y-5">
+      <div 
+        class="rounded-3xl border text-white p-6 shadow-xl relative overflow-hidden text-left space-y-5 transition-all duration-300"
+        :class="isTrialExpired 
+          ? 'bg-gradient-to-r from-[#2A0C14] via-[#3B121D] to-[#2A0C14] border-red-500/50' 
+          : 'bg-gradient-to-r from-[#0F223D] via-[#152B4D] to-[#0F223D] border-blue-900/60'"
+      >
         <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
           <div class="space-y-2">
             <div class="flex items-center gap-2">
-              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-wider flex items-center gap-1">
-                <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span 
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 border"
+                :class="isTrialExpired 
+                  ? 'bg-red-500/20 text-red-300 border-red-400/40' 
+                  : 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'"
+              >
+                <span 
+                  class="h-1.5 w-1.5 rounded-full"
+                  :class="isTrialExpired ? 'bg-red-400' : 'bg-emerald-400 animate-ping'"
+                ></span>
                 {{ subscriptionPlan.status }} Lisans
               </span>
-              <span class="text-xs text-blue-200 font-bold">• {{ subscriptionPlan.name }}</span>
+              <span class="text-xs font-bold" :class="isTrialExpired ? 'text-red-200' : 'text-blue-200'">• {{ subscriptionPlan.name }}</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white">
-              Kurumsal B2B Aboneliğiniz Aktif
+            <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+              <span v-if="!isTrialExpired">1 Aylık Kurumsal Denemeniz Aktif</span>
+              <span v-else class="text-red-300">⚠️ 1 Aylık Deneme Süreniz Sona Erdi!</span>
             </h2>
             <p class="text-xs text-slate-300 max-w-xl">
-              İhale açma, kapalı zarf eksiltmeye katılma, doğrudan temin ve canlı fiyat pazarlığı yetkileriniz sınırsızdır. Bitiş: <strong class="text-white">{{ subscriptionPlan.endDate }}</strong>.
+              <span v-if="!isTrialExpired">
+                İhale açma, kapalı zarf eksiltmeye katılma, doğrudan temin ve canlı fiyat pazarlığı yetkileriniz sınırsızdır. Bitiş: <strong class="text-white">{{ subscriptionPlan.endDate }}</strong>.
+              </span>
+              <span v-else class="text-red-200 font-medium">
+                1 aylık ücretsiz deneme süreniz tamamlandı. İhalelere teklif vermeye ve tasarruf sağlamaya devam etmek için üyeliğinizi hemen başlatın.
+              </span>
             </p>
           </div>
 
@@ -216,7 +286,7 @@ onMounted(() => {
           <div class="flex items-center gap-2 sm:gap-3 shrink-0">
             <!-- Days -->
             <div class="bg-black/40 border border-white/10 backdrop-blur-md rounded-2xl p-3 min-w-[70px] text-center">
-              <div class="text-2xl sm:text-3xl font-black font-mono text-[#00C2FF]">{{ subscriptionPlan.remainingDays }}</div>
+              <div class="text-2xl sm:text-3xl font-black font-mono" :class="isTrialExpired ? 'text-red-400' : 'text-[#00C2FF]'">{{ subscriptionPlan.remainingDays }}</div>
               <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mt-0.5">GÜN</span>
             </div>
             <span class="text-xl font-bold text-slate-500">:</span>
@@ -236,9 +306,9 @@ onMounted(() => {
             <span class="text-xl font-bold text-slate-500">:</span>
 
             <!-- Seconds -->
-            <div class="bg-black/40 border border-amber-400/40 backdrop-blur-md rounded-2xl p-3 min-w-[65px] text-center">
-              <div class="text-2xl sm:text-3xl font-black font-mono text-amber-400">{{ String(subscriptionPlan.seconds).padStart(2, '0') }}</div>
-              <span class="text-[9px] font-black text-amber-300 uppercase tracking-widest block mt-0.5">SANİYE</span>
+            <div class="bg-black/40 border backdrop-blur-md rounded-2xl p-3 min-w-[65px] text-center" :class="isTrialExpired ? 'border-red-400/40' : 'border-amber-400/40'">
+              <div class="text-2xl sm:text-3xl font-black font-mono" :class="isTrialExpired ? 'text-red-400' : 'text-amber-400'">{{ String(subscriptionPlan.seconds).padStart(2, '0') }}</div>
+              <span class="text-[9px] font-black uppercase tracking-widest block mt-0.5" :class="isTrialExpired ? 'text-red-300' : 'text-amber-300'">SANİYE</span>
             </div>
           </div>
         </div>
@@ -247,22 +317,58 @@ onMounted(() => {
         <div class="pt-4 border-t border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div class="flex-1 max-w-md space-y-1.5">
             <div class="flex justify-between text-[11px] font-bold text-slate-300">
-              <span>Abonelik Geçerlilik Oranı</span>
-              <span class="font-mono text-[#00C2FF]">%{{ subscriptionPlan.percentRemaining }} Aktif</span>
+              <span>Deneme & Abonelik Durumu</span>
+              <span class="font-mono" :class="isTrialExpired ? 'text-red-400' : 'text-[#00C2FF]'">%{{ subscriptionPlan.percentRemaining }} {{ isTrialExpired ? 'Süresi Doldu' : 'Aktif' }}</span>
             </div>
             <div class="w-full bg-white/10 rounded-full h-2 overflow-hidden">
-              <div class="bg-gradient-to-r from-[#0052FF] to-[#00C2FF] h-2 rounded-full transition-all duration-500" :style="`width: ${subscriptionPlan.percentRemaining}%`"></div>
+              <div 
+                class="h-2 rounded-full transition-all duration-500" 
+                :class="isTrialExpired ? 'bg-red-500' : 'bg-gradient-to-r from-[#0052FF] to-[#00C2FF]'"
+                :style="`width: ${subscriptionPlan.percentRemaining}%`"
+              ></div>
             </div>
           </div>
 
-          <div class="flex items-center gap-3">
-            <NuxtLink
-              to="/abonelik"
-              class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg"
+          <div class="flex flex-wrap items-center gap-2.5">
+            <!-- Satın Alma Kancası & Plan Seç Butonu -->
+            <button
+              v-if="isTrialExpired"
+              @click="showPaywallModal = true"
+              class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-amber-500 hover:from-red-600 hover:to-amber-600 text-white font-black text-xs transition flex items-center gap-2 shadow-lg cursor-pointer animate-pulse"
             >
-              <span>⚡ Aboneliği Yenile / Uzat</span>
+              <span>🛒 Satın Alma Kancası & Planları Aç</span>
+              <ArrowRight :size="14" />
+            </button>
+
+            <NuxtLink
+              v-else
+              to="/abonelik"
+              class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-black text-xs transition flex items-center gap-2 shadow-lg cursor-pointer"
+            >
+              <span>⚡ Aboneliği Yenile / Plan Seç</span>
               <ArrowRight :size="14" />
             </NuxtLink>
+
+            <!-- Test Modu: Deneme Süresini Bitir (Kancayı Test Et) -->
+            <button
+              v-if="!isTrialExpired"
+              @click="expireTrialForDemo"
+              class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white text-[11px] font-bold transition flex items-center gap-1.5 cursor-pointer border border-white/10"
+              title="1 Aylık Deneme Süresi bittiğinde satın alma kancasının nasıl açıldığını test edin"
+            >
+              <Zap :size="13" class="text-amber-400" />
+              <span>⚡ Deneme Süresini Bitir (Kancayı Test Et)</span>
+            </button>
+
+            <!-- Test Modu: 7 Gün Süre Ekle -->
+            <button
+              v-else
+              @click="extendTrial(7)"
+              class="px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white text-[11px] font-bold transition flex items-center gap-1.5 cursor-pointer border border-white/10"
+            >
+              <Zap :size="13" class="text-emerald-400" />
+              <span>⚡ Test: 7 Gün Süre Ekle</span>
+            </button>
           </div>
         </div>
       </div>
@@ -776,6 +882,119 @@ onMounted(() => {
             class="w-2/3 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border border-amber-300"
           >
             <span>💬 Karşı Teklifi İlet</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🛒 SATIN ALMA KANCASI (PAYWALL MODAL) -->
+    <div 
+      v-if="showPaywallModal" 
+      class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in"
+    >
+      <div class="relative w-full max-w-2xl bg-[#0F223D] border border-amber-400/40 rounded-3xl p-6 sm:p-8 text-white shadow-2xl overflow-hidden text-left space-y-6 max-h-[92vh] overflow-y-auto">
+        <!-- Glow Effects -->
+        <div class="absolute -right-20 -top-20 w-64 h-64 bg-amber-500/15 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -left-20 -bottom-20 w-64 h-64 bg-[#1EAE4C]/15 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Close Button -->
+        <button 
+          @click="showPaywallModal = false" 
+          class="absolute top-5 right-5 p-2 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white transition cursor-pointer"
+        >
+          <X :size="18" />
+        </button>
+
+        <!-- Header -->
+        <div class="space-y-2">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30 text-[10px] font-black uppercase tracking-wider">
+            <Clock :size="13" />
+            <span>1 AYLIK ÜCRETSİZ DENEME SÜRENİZ SONA ERDİ</span>
+          </div>
+          <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+            İhalelere ve Canlı Eksiltmeye Kesintisiz Devam Edin!
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+            Sayın <strong class="text-white">{{ companyName }}</strong> yetkilisi, 1 aylık ücretsiz deneme sürecinizi tamamladınız. Canlı eksiltmelerle ortalama <strong class="text-emerald-400">%14.2 satın alma tasarrufu</strong> elde etmeye, yeni ihale açmaya ve doğrulanmış B2B üreticilerden teklif toplamaya devam etmek için kurumsal üyeliğinizi hemen başlatın.
+          </p>
+        </div>
+
+        <!-- Special Discount Hook Box -->
+        <div class="p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-emerald-500/20 to-amber-500/20 border border-amber-400/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center shrink-0 font-black">
+              <Gift :size="20" />
+            </div>
+            <div>
+              <div class="text-xs font-black text-amber-300">Lansmana Özel Ekstra %20 İndirim Kuponu</div>
+              <div class="text-[11px] text-slate-300 font-medium">Tüm kurumsal üyelik paketlerinde anında geçerlidir.</div>
+            </div>
+          </div>
+          <button 
+            @click="copyCoupon('LANSMAN20')"
+            class="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-mono font-black text-xs transition flex items-center justify-center gap-2 cursor-pointer shadow-md"
+          >
+            <span>LANSMAN20</span>
+            <span class="text-[10px] bg-slate-950/20 px-1.5 py-0.5 rounded font-sans">{{ copiedCoupon ? 'Kopyalandı ✓' : 'Kodu Kopyala' }}</span>
+          </button>
+        </div>
+
+        <!-- 4 Quick Plan Cards -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <NuxtLink to="/abonelik" class="p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-400/50 transition-all text-center group cursor-pointer block">
+            <div class="text-[10px] font-bold text-slate-400">1 AYLIK</div>
+            <div class="text-base font-black text-white group-hover:text-amber-300 transition">960 ₺</div>
+            <div class="text-[9px] text-slate-400">Tek Seferlik</div>
+          </NuxtLink>
+
+          <NuxtLink to="/abonelik" class="p-3.5 rounded-2xl bg-[#1EAE4C]/15 border-2 border-[#1EAE4C] hover:border-[#1EAE4C] transition-all text-center relative group cursor-pointer block">
+            <span class="absolute -top-2.5 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-[#1EAE4C] text-[8px] font-black text-white rounded-full">POPÜLER</span>
+            <div class="text-[10px] font-bold text-emerald-300">3 AYLIK</div>
+            <div class="text-base font-black text-white group-hover:text-emerald-300 transition">1.800 ₺</div>
+            <div class="text-[9px] text-emerald-400 font-bold">600 ₺ / ay</div>
+          </NuxtLink>
+
+          <NuxtLink to="/abonelik" class="p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-400/50 transition-all text-center group cursor-pointer block">
+            <div class="text-[10px] font-bold text-slate-400">6 AYLIK</div>
+            <div class="text-base font-black text-white group-hover:text-amber-300 transition">2.700 ₺</div>
+            <div class="text-[9px] text-slate-400">450 ₺ / ay</div>
+          </NuxtLink>
+
+          <NuxtLink to="/abonelik" class="p-3.5 rounded-2xl bg-white/5 border border-white/10 hover:border-amber-400/50 transition-all text-center group cursor-pointer block">
+            <div class="text-[10px] font-bold text-slate-400">12 AYLIK</div>
+            <div class="text-base font-black text-white group-hover:text-amber-300 transition">3.800 ₺</div>
+            <div class="text-[9px] text-slate-400">316 ₺ / ay</div>
+          </NuxtLink>
+        </div>
+
+        <!-- Features list -->
+        <div class="p-4 rounded-2xl bg-black/30 border border-white/5 space-y-2">
+          <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Abonelikle Kesintisiz Açık Kalacak Özellikler:</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
+            <div class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-400 shrink-0" /> Sınırsız B2B İhale ve Canlı Eksiltme</div>
+            <div class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-400 shrink-0" /> Doğrulanmış Kurumsal Üretici Ağı</div>
+            <div class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-400 shrink-0" /> Anlık NetGSM SMS & E-posta Alarmları</div>
+            <div class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-400 shrink-0" /> Güvenli Sözleşme & Escrow Ödeme</div>
+          </div>
+        </div>
+
+        <!-- Action CTAs -->
+        <div class="flex flex-col sm:flex-row items-center gap-3 pt-2">
+          <NuxtLink 
+            to="/abonelik"
+            class="w-full sm:flex-1 py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-black text-sm transition shadow-xl shadow-emerald-600/30 flex items-center justify-center gap-2 text-center"
+          >
+            <span>Planları İncele & Abone Ol (%0 Komisyon)</span>
+            <ArrowRight :size="16" />
+          </NuxtLink>
+          
+          <!-- Demo extension button for testing -->
+          <button 
+            @click="extendTrial(7)"
+            class="w-full sm:w-auto px-5 py-4 rounded-2xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <Zap :size="14" class="text-amber-400" />
+            <span>Test: 7 Gün Süre Ekle</span>
           </button>
         </div>
       </div>

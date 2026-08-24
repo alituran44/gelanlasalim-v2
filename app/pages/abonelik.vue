@@ -209,11 +209,11 @@ onMounted(() => {
 })
 
 const freeTrialPackage = {
-  id: '6-ay-ucretsiz-deneme',
-  name: '6 Ay Ücretsiz Lansman Deneme Paketi',
+  id: '1-ay-ucretsiz-deneme',
+  name: '1 Ay Ücretsiz Lansman Deneme Paketi',
   price: 0,
   monthly: '0,00 ₺ / ay',
-  desc: 'Lansmana özel ilk 6 ay boyunca sınırsız ihale açma, teklif verme, canlı eksiltme ve tüm analiz modülleri %100 ücretsizdir.',
+  desc: 'Lansmana özel ilk 1 ay boyunca sınırsız ihale açma, teklif verme, canlı eksiltme ve tüm analiz modülleri %100 ücretsizdir.',
   isTrial: true,
   isPromo: true
 }
@@ -250,7 +250,7 @@ function handlePayment() {
       current.subscriptionPlan = selectedPackage.value?.name
       current.subscriptionRegion = paymentRegion.value
       current.isTrial = selectedPackage.value?.isTrial || false
-      current.trialExpiresAt = '22 Şubat 2027'
+      current.trialExpiresAt = '25 Eylül 2026'
       localStorage.setItem('userSession', JSON.stringify(current))
     }
   }, selectedPackage.value?.isTrial ? 600 : 1200)
@@ -326,23 +326,23 @@ function completeCheckout() {
         </div>
       </div>
 
-      <!-- 6-MONTH FREE TRIAL LAUNCH BANNER -->
+      <!-- 1-MONTH FREE TRIAL LAUNCH BANNER -->
       <div class="rounded-3xl border border-emerald-500/40 bg-[#0F223D] p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden text-left">
         <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-[#1EAE4C]/10 rounded-full blur-3xl"></div>
         <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div class="space-y-2 max-w-2xl">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1EAE4C]/20 text-[#1EAE4C] text-[10px] font-black uppercase tracking-widest border border-[#1EAE4C]/30">
               <Sparkles :size="13" />
-              <span>LANSMANA ÖZEL: 6 AY BOYUNCA %100 ÜCRETSİZ DENEME SÜRECİ</span>
+              <span>LANSMANA ÖZEL: 1 AY BOYUNCA %100 ÜCRETSİZ DENEME SÜRECİ</span>
             </div>
             <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
-              İlk 6 Ay Boyunca Hiçbir Ücret Ödemeden Tüm Sistemi Kullanın!
+              İlk 1 Ay Boyunca Hiçbir Ücret Ödemeden Tüm Sistemi Kullanın!
             </h2>
             <p class="text-xs text-slate-300 leading-relaxed font-medium">
-              İhaleciBurada platform lansmanına özel olarak tüm alıcı ve tedarikçi firmalarımıza ilk 6 ay boyunca ihale açma, teklif verme, canlı tersine eksiltme ve tüm analiz modülleri <strong>0 ₺</strong> bedelle sunulmaktadır. Kredi kartı gerekmez, 0 komisyon, anında koşulsuz aktivasyon.
+              İhaleciBurada platform lansmanına özel olarak tüm alıcı ve tedarikçi firmalarımıza ilk 1 ay boyunca ihale açma, teklif verme, canlı tersine eksiltme ve tüm analiz modülleri <strong>0 ₺</strong> bedelle sunulmaktadır. Kredi kartı gerekmez, 0 komisyon, anında koşulsuz aktivasyon.
             </p>
             <div class="flex flex-wrap items-center gap-4 pt-1 text-[11px] text-emerald-300 font-bold">
-              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> 6 Ay Boyunca 0 ₺</span>
+              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> 1 Ay Boyunca 0 ₺</span>
               <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> Kredi Kartı İstemez</span>
               <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> Sınırsız İhale & Eksiltme</span>
               <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> Anında Aktivasyon</span>
@@ -353,15 +353,15 @@ function completeCheckout() {
           <div class="shrink-0 w-full lg:w-auto">
             <button
               @click="openCheckout({
-                id: '6-ay-ucretsiz-deneme',
-                name: '6 AY ÜCRETSİZ KURUMSAL DENEME',
+                id: '1-ay-ucretsiz-deneme',
+                name: '1 AY ÜCRETSİZ KURUMSAL DENEME',
                 price: 0,
                 isTrial: true,
-                desc: 'Lansmana özel 6 ay sınırsız ihale ve canlı eksiltme erişimi.'
+                desc: 'Lansmana özel 1 ay sınırsız ihale ve canlı eksiltme erişimi.'
               })"
               class="w-full lg:w-auto px-8 py-4 rounded-2xl bg-[#1EAE4C] hover:bg-[#188C3D] text-white font-black text-sm transition-all shadow-xl shadow-[#1EAE4C]/30 flex items-center justify-center gap-2 cursor-pointer transform hover:scale-105"
             >
-              <span>6 Ay Ücretsiz Başlat</span>
+              <span>1 Ay Ücretsiz Başlat</span>
               <ArrowRight :size="16" />
             </button>
           </div>
@@ -507,7 +507,7 @@ function completeCheckout() {
                     <Sparkles :size="20" />
                   </div>
                   <div>
-                    <h4 class="text-sm font-black text-slate-900">6 Ay Koşulsuz Ücretsiz Deneme</h4>
+                    <h4 class="text-sm font-black text-slate-900">1 Ay Koşulsuz Ücretsiz Deneme</h4>
                     <p class="text-xs text-emerald-800 font-medium">Kredi kartı gerekmez, 0 ₺ ücret!</p>
                   </div>
                 </div>
@@ -515,8 +515,8 @@ function completeCheckout() {
                 <ul class="space-y-2 text-xs text-slate-700 font-medium">
                   <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> Sınırsız B2B İhale Açma & Canlı Eksiltme</li>
                   <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> Doğrulanmış Firmalardan Belgeli Teklif Toplama</li>
-                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> 6 Ay Boyunca %0 Komisyon, 0 ₺ Bedel</li>
-                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> 22 Şubat 2027 Tarihine Kadar Tam Erişim</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> 1 Ay Boyunca %0 Komisyon, 0 ₺ Bedel</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> 25 Eylül 2026 Tarihine Kadar Tam Erişim</li>
                 </ul>
               </div>
 
@@ -647,11 +647,11 @@ function completeCheckout() {
                 <CheckCircle2 :size="36" />
               </div>
               <h3 class="text-lg font-black text-slate-900">
-                {{ selectedPackage?.isTrial ? '🎉 6 Aylık Ücretsiz Denemeniz Aktif!' : 'Abonelik İşlemi Başarılı!' }}
+                {{ selectedPackage?.isTrial ? '🎉 1 Aylık Ücretsiz Denemeniz Aktif!' : 'Abonelik İşlemi Başarılı!' }}
               </h3>
               <p class="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
                 {{ selectedPackage?.isTrial 
-                  ? '6 ay boyunca tüm kurumsal B2B ihale ve canlı eksiltme modüllerini 0 ₺ bedelle sınırsız kullanabilirsiniz.'
+                  ? '1 ay boyunca tüm kurumsal B2B ihale ve canlı eksiltme modüllerini 0 ₺ bedelle sınırsız kullanabilirsiniz.'
                   : 'Faturanız oluşturuldu ve kurumsal panel erişiminiz anında aktifleştirildi.' 
                 }}
               </p>
@@ -680,7 +680,7 @@ function completeCheckout() {
               :class="selectedPackage?.isTrial ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-blue-900 hover:bg-blue-950'"
             >
               <span v-if="isProcessing">{{ selectedPackage?.isTrial ? 'Deneme Aktifleştiriliyor...' : 'Ödeme Doğrulanıyor...' }}</span>
-              <span v-else-if="selectedPackage?.isTrial">{{ '6 AYLIK ÜCRETSİZ DENEMEYİ HEMEN BAŞLAT (0 ₺)' }}</span>
+              <span v-else-if="selectedPackage?.isTrial">{{ '1 AYLIK ÜCRETSİZ DENEMEYİ HEMEN BAŞLAT (0 ₺)' }}</span>
               <span v-else>{{ currencySymbol }}{{ selectedPackage?.price.toLocaleString('tr-TR') }} {{ 'Güvenli Ödeme Yap' }}</span>
               <ArrowRight v-if="!isProcessing" :size="14" />
             </button>

@@ -204,7 +204,7 @@ function handleEDevletAuth() {
         verified: true,
         isEDevletVerified: true,
         isPremium: true,
-        subscriptionPlan: '6 Ay Ücretsiz Kurumsal Deneme'
+        subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
       }))
     }
     router.push('/panel')
@@ -243,7 +243,7 @@ function handleLogin() {
         role: 'buyer',
         verified: true,
         isPremium: true,
-        subscriptionPlan: '6 Ay Ücretsiz Kurumsal Deneme'
+        subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
       }))
     }
     router.push('/panel')
@@ -260,7 +260,7 @@ function handleDemoLogin(role: 'company' | 'individual') {
       role: role,
       verified: true,
       isPremium: true,
-      subscriptionPlan: '6 Ay Ücretsiz Kurumsal Deneme'
+      subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
     }))
   }
   router.push('/panel')
@@ -297,7 +297,7 @@ function handleGuestEntry() {
         verified: true,
         isGuest: true,
         isPremium: true,
-        subscriptionPlan: '6 Ay Ücretsiz Kurumsal Deneme'
+        subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
       }))
     }
     router.push('/panel')

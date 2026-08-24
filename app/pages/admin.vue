@@ -147,18 +147,18 @@ if (!formState.supportSettings) {
   formState.supportSettings = {
     whatsappEnabled: true,
     whatsappNumber: '908503080000',
-    whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale ve 6 ay ücretsiz deneme hakkında bilgi almak istiyorum.',
+    whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale ve 1 ay ücretsiz deneme hakkında bilgi almak istiyorum.',
     aiEnabled: true,
     aiBotName: 'İhaleciBurada AI Asistanı',
-    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel 6 Ay %100 Ücretsiz Deneme süreciniz hakkında size nasıl yardımcı olabilirim?',
-    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın. Kullanıcılara 6 ay ücretsiz deneme, ihale açma, teklif verme, canlı eksiltme konularında yardımcı ol.'
+    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel 1 Ay %100 Ücretsiz Deneme süreciniz hakkında size nasıl yardımcı olabilirim?',
+    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın. Kullanıcılara 1 ay ücretsiz deneme, ihale açma, teklif verme, canlı eksiltme konularında yardımcı ol.'
   }
 }
 
 if (!formState.crmSettings) {
   formState.crmSettings = {
     leads: [
-      { id: 1, companyName: 'Kalyon Tedarik Ltd.', contactName: 'Ahmet Kalyoncu', email: 'ahmet@kalyon.com', phone: '0532 111 22 33', status: '6 Ay Deneme Aktif', stage: 'active', notes: 'İnşaat malzemesi ihalesi açacak.', createdAt: '2026-08-20' },
+      { id: 1, companyName: 'Kalyon Tedarik Ltd.', contactName: 'Ahmet Kalyoncu', email: 'ahmet@kalyon.com', phone: '0532 111 22 33', status: '1 Ay Deneme Aktif', stage: 'active', notes: 'İnşaat malzemesi ihalesi açacak.', createdAt: '2026-08-20' },
       { id: 2, companyName: 'Anadolu Lojistik A.Ş.', contactName: 'Mehmet Yılmaz', email: 'mehmet@anadolulojistik.com', phone: '0544 555 66 77', status: 'Teklif Veren', stage: 'qualified', notes: 'Akaryakıt ihalesine teklif verdi.', createdAt: '2026-08-21' },
       { id: 3, companyName: 'Mega Ambalaj Sanayi', contactName: 'Selin Erdem', email: 'selin@megaambalaj.com', phone: '0555 888 99 00', status: 'Görüşülüyor', stage: 'contacted', notes: 'Kurumsal SAP entegrasyonu talebi var.', createdAt: '2026-08-22' }
     ]
@@ -208,7 +208,7 @@ if (!formState.siteSettings) {
     maintenanceNotice: 'Platformumuzda planlı bakım çalışması yapılmaktadır.',
     metaTitle: 'İhaleciBurada.com | Türkiye’nin Öncü B2B Canlı Eksiltme & Satın Alma Platformu',
     metaDescription: 'B2B satın alma ihaleleri açın, canlı tersine eksiltme ile rekabetçi teklifler toplayın.',
-    announcementTicker: '⚡ LANSMANA ÖZEL: İlk 6 ay boyunca %100 ücretsiz kurumsal deneme paketi (0 ₺)!',
+    announcementTicker: '⚡ LANSMANA ÖZEL: İlk 1 ay boyunca %100 ücretsiz kurumsal deneme paketi (0 ₺)!',
     googleAnalyticsId: 'G-IHALECIBURADA2026',
     supportPhone: '0850 308 00 00',
     supportEmail: 'ihalecib@gmail.com'
@@ -397,9 +397,9 @@ function removeCategory(idx: number) {
 const newPromo = reactive({
   code: '',
   discountType: 'free_trial_months',
-  value: '6 Ay Bedelsiz',
+  value: '1 Ay Bedelsiz',
   usageLimit: 500,
-  expiryDate: '2027-02-22'
+  expiryDate: '2026-09-25'
 })
 
 function addPromoCode() {
@@ -450,7 +450,7 @@ const newLeadForm = reactive({
   contactName: '',
   email: '',
   phone: '',
-  status: '6 Ay Deneme Aktif',
+  status: '1 Ay Deneme Aktif',
   notes: ''
 })
 
@@ -843,7 +843,7 @@ function removeSubmittedBid(index: number) {
               :class="activeTab === 'plans' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
               <CreditCard :size="14" />
-              Abonelik & 6 Ay Deneme
+              Abonelik & 1 Ay Deneme
             </button>
 
             <!-- GROUP: VERİTABANI İZLEME -->
@@ -916,7 +916,7 @@ function removeSubmittedBid(index: number) {
               <span v-else-if="activeTab === 'email_center'">📧 E-Posta Şablonları & Gönderim Merkezi</span>
               <span v-else-if="activeTab === 'newsletter_subs'">📬 Bülten & E-Posta Aboneleri</span>
               <span v-else-if="activeTab === 'hero'">🏠 Ana Sayfa İçerik & Bant Yönetimi</span>
-              <span v-else-if="activeTab === 'plans'">💳 Abonelik & 6 Ay Deneme Fiyatlandırması</span>
+              <span v-else-if="activeTab === 'plans'">💳 Abonelik & 1 Ay Deneme Fiyatlandırması</span>
               <span v-else>🗄️ B2B Veritabanı Kontrolü</span>
             </h1>
             <p class="text-xs text-slate-400 mt-1">İhaleciBurada platform altyapısını, güvenlik denetimlerini ve ticari operasyonları yönetin.</p>
@@ -949,7 +949,7 @@ function removeSubmittedBid(index: number) {
                 <span class="text-[11px] text-emerald-400 font-bold mt-1 block">↗ %14.2 Ortalama Tasarruf</span>
               </div>
               <div class="p-5 rounded-2xl border border-emerald-900/50 bg-emerald-950/20">
-                <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider">6 AY DENEME AKTİF FİRMALAR</span>
+                <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider">1 AY DENEME AKTİF FİRMALAR</span>
                 <div class="text-2xl font-black text-emerald-400 mt-1.5">142 Firma</div>
                 <span class="text-[11px] text-emerald-300 font-bold mt-1 block">0 ₺ Bedelsiz Lansman Üyeliği</span>
               </div>
@@ -1511,7 +1511,7 @@ function removeSubmittedBid(index: number) {
               </h3>
               <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <input v-model="newPromo.code" type="text" placeholder="Kupon Kodu (Örn: LANSMAN2026)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white uppercase font-mono" />
-                <input v-model="newPromo.value" type="text" placeholder="Kupon Değeri (Örn: 6 Ay Bedelsiz)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                <input v-model="newPromo.value" type="text" placeholder="Kupon Değeri (Örn: 1 Ay Bedelsiz)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
                 <input v-model="newPromo.usageLimit" type="number" placeholder="Kullanım Limiti" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
                 <button @click="addPromoCode" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition cursor-pointer">
                   + Kupon Tanımla
@@ -1711,7 +1711,7 @@ function removeSubmittedBid(index: number) {
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <input v-model="newLeadForm.phone" type="text" placeholder="Telefon (05XX...)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
                 <select v-model="newLeadForm.status" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white">
-                  <option value="6 Ay Deneme Aktif">6 Ay Deneme Aktif</option>
+                  <option value="1 Ay Deneme Aktif">1 Ay Deneme Aktif</option>
                   <option value="Teklif Veren">Teklif Veren</option>
                   <option value="İhale Açan">İhale Açan</option>
                   <option value="Görüşülüyor">Görüşülüyor</option>
