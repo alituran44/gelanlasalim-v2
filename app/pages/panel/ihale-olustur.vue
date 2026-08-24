@@ -508,8 +508,8 @@ function handleSubmit() {
       </div>
 
       <!-- KART 2: LOJİSTİK VE ÖDEME ŞARTLARI -->
-      <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-        <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">2. Lojistik & Ödeme Şartları</h2>
+      <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4 border-slate-200">
+        <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] mb-2">2. Lojistik & Ödeme Şartları</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- Ödeme Yöntemi Tercihi -->
@@ -519,8 +519,7 @@ function handleSubmit() {
               <CreditCard :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <select 
                 v-model="form.odemeYontemi" 
-                class="w-full pl-9 pr-4 py-3 rounded-lg border text-xs outline-none bg-white transition focus:border-blue-600"
-                style="border-color: #CBD5E1; color: #0F172A;"
+                class="w-full pl-9 pr-4 py-3 rounded-xl border text-xs outline-none bg-white transition focus:border-[#003057] border-slate-300 text-slate-900"
               >
                 <option v-for="method in paymentMethods" :key="method" :value="method">{{ method }}</option>
               </select>
@@ -534,8 +533,7 @@ function handleSubmit() {
               <MapPin :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <select 
                 v-model="form.sehir" 
-                class="w-full pl-9 pr-4 py-3 rounded-lg border text-xs outline-none bg-white transition focus:border-blue-600 font-bold"
-                style="border-color: #CBD5E1; color: #0F172A;"
+                class="w-full pl-9 pr-4 py-3 rounded-xl border text-xs outline-none bg-white transition focus:border-[#003057] font-bold border-slate-300 text-slate-900"
               >
                 <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
               </select>
@@ -552,8 +550,7 @@ function handleSubmit() {
                 rows="1"
                 required
                 placeholder="Örn: Balıkesir OSB, 3. Yol No: 12" 
-                class="w-full pl-9 pr-4 py-2.5 rounded-lg border text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                style="border-color: #CBD5E1; color: #0F172A;"
+                class="w-full pl-9 pr-4 py-2.5 rounded-xl border text-xs outline-none transition focus:border-[#003057] border-slate-300 text-slate-900"
               ></textarea>
             </div>
           </div>
@@ -565,7 +562,7 @@ function handleSubmit() {
           <button 
             type="button" 
             @click="showSuggestModal = true" 
-            class="text-blue-600 hover:text-blue-700 font-bold flex items-center gap-1 hover:underline"
+            class="text-[#003057] hover:text-[#1EAE4C] font-bold flex items-center gap-1 hover:underline"
           >
             🚀 Yeni Kategori Öner
           </button>
@@ -573,8 +570,8 @@ function handleSubmit() {
       </div>
 
       <!-- KART 3: TEKNİK AÇIKLAMALAR -->
-      <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-        <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">3. Teknik Açıklama & Kalem Detayları</h2>
+      <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4 border-slate-200">
+        <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] mb-2">3. Teknik Açıklama & Kalem Detayları</h2>
         
         <!-- Teknik Açıklama -->
         <div>
@@ -758,9 +755,9 @@ function handleSubmit() {
       <div class="pt-2">
         <button 
           type="submit" 
-          class="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm py-4 transition shadow-lg shadow-blue-500/10 cursor-pointer"
+          class="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#0F223D] hover:bg-[#003057] text-white font-black text-sm py-4 transition shadow-xl cursor-pointer"
         >
-          <FilePlus2 :size="16" />
+          <FilePlus2 :size="16" class="text-emerald-400" />
           İhaleyi Başlat ve İlan Et
         </button>
       </div>

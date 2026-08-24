@@ -168,7 +168,7 @@ const activeTenders = ref([
           <NuxtLink
             v-if="isLoggedIn"
             to="/panel/ihale-olustur"
-            class="flex items-center gap-1.5 px-4 py-2 text-xs font-black rounded-xl text-white transition-all shadow-md bg-gradient-to-r from-[#0052FF] to-[#00C2FF] hover:opacity-95 hover:shadow-lg hover:shadow-blue-500/20 active:scale-98"
+            class="flex items-center gap-1.5 px-4 py-2 text-xs font-black rounded-xl text-white transition-all shadow-md bg-[#1EAE4C] hover:bg-[#188C3D] hover:shadow-lg hover:shadow-[#1EAE4C]/20 active:scale-98"
           >
             <Plus :size="15" class="text-white stroke-[3]" />
             <span>İhale Aç</span>
@@ -178,9 +178,9 @@ const activeTenders = ref([
           <NuxtLink
             v-if="isLoggedIn"
             to="/panel/ayarlar"
-            class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-black rounded-xl border transition-all text-slate-800 bg-blue-50/70 hover:bg-blue-100/80 border-blue-200 shadow-sm"
+            class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-black rounded-xl border transition-all text-slate-800 bg-slate-100 hover:bg-slate-200 border-slate-300 shadow-xs"
           >
-            <User :size="15" class="text-[#0052FF]" />
+            <User :size="15" class="text-[#003057]" />
             <span>Profilim</span>
           </NuxtLink>
 
@@ -188,7 +188,7 @@ const activeTenders = ref([
           <NuxtLink
             v-if="isLoggedIn"
             to="/panel"
-            class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-black rounded-xl text-white transition-all shadow-sm bg-[#0F223D] hover:bg-[#1A3358]"
+            class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-black rounded-xl text-white transition-all shadow-sm bg-[#0F223D] hover:bg-[#003057]"
           >
             <LayoutDashboard :size="14" />
             <span>Panel</span>
@@ -199,7 +199,7 @@ const activeTenders = ref([
             v-if="isLoggedIn"
             type="button"
             @click="handleLogout"
-            class="flex items-center gap-1 px-3 py-2 text-xs font-bold rounded-xl text-rose-600 hover:bg-rose-50 border border-rose-200 transition-all cursor-pointer"
+            class="flex items-center gap-1 px-3 py-2 text-xs font-bold rounded-xl text-slate-500 hover:text-red-600 hover:bg-red-50 border border-slate-200 transition-all cursor-pointer"
           >
             <LogOut :size="14" />
             <span>Çıkış</span>
@@ -220,7 +220,7 @@ const activeTenders = ref([
           <NuxtLink
             v-if="!isLoggedIn"
             to="/uyelik"
-            class="px-3 py-2 text-xs font-bold rounded-xl transition-all text-slate-700 hover:bg-slate-100"
+            class="px-3.5 py-2 text-xs font-bold rounded-xl transition-all text-slate-700 hover:bg-slate-100 border border-slate-200"
           >
             Giriş Yap
           </NuxtLink>
@@ -229,11 +229,10 @@ const activeTenders = ref([
           <NuxtLink
             v-if="!isLoggedIn"
             to="/uyelik"
-            class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-extrabold text-white transition-all shadow-md shadow-blue-950/10 hover:shadow-lg bg-gradient-to-r from-[#0F223D] via-[#0052FF] to-[#0F223D] border border-blue-400"
+            class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-black text-white transition-all shadow-md bg-[#0F223D] hover:bg-[#003057] border border-slate-700"
           >
-            <span class="text-[#FF5938]">✨</span>
             <span>Kurumsal Hesap Aç</span>
-            <ArrowRight :size="13" class="text-[#00C2FF]" />
+            <ArrowRight :size="13" class="text-emerald-400" />
           </NuxtLink>
         </div>
 

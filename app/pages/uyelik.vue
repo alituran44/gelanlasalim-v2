@@ -388,13 +388,13 @@ function handleGuestEntry() {
 
         <!-- Switch tabs (Register / Login / Guest) -->
         <div class="mb-8 flex border-b border-slate-100 gap-1">
-          <button @click="activeTab = 'register'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2" :class="activeTab === 'register' ? 'border-amber-500 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'">
+          <button @click="activeTab = 'register'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2" :class="activeTab === 'register' ? 'border-[#0F223D] text-[#0F223D]' : 'border-transparent text-slate-400 hover:text-slate-600'">
             {{ 'Yeni Üyelik' }}
           </button>
-          <button @click="activeTab = 'login'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2" :class="activeTab === 'login' ? 'border-amber-500 text-slate-900' : 'border-transparent text-slate-400 hover:text-slate-600'">
+          <button @click="activeTab = 'login'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2" :class="activeTab === 'login' ? 'border-[#0F223D] text-[#0F223D]' : 'border-transparent text-slate-400 hover:text-slate-600'">
             {{ 'Giriş Yap' }}
           </button>
-          <button @click="activeTab = 'guest'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2 flex items-center justify-center gap-1" :class="activeTab === 'guest' ? 'border-amber-500 text-amber-700 bg-amber-50/50 rounded-t-lg' : 'border-transparent text-slate-400 hover:text-slate-600'">
+          <button @click="activeTab = 'guest'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2 flex items-center justify-center gap-1" :class="activeTab === 'guest' ? 'border-[#0F223D] text-[#0F223D] bg-slate-50 rounded-t-lg font-black' : 'border-transparent text-slate-400 hover:text-slate-600'">
             <span>👁️</span>
             <span>{{ 'Misafir Girişi' }}</span>
           </button>

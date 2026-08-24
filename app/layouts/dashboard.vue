@@ -105,14 +105,14 @@ const sidebarMenus = computed(() => {
               <button
                 type="button"
                 @click="isTopTekliflerOpen = !isTopTekliflerOpen"
-                class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all border border-transparent cursor-pointer"
+                class="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all border border-transparent cursor-pointer"
                 :class="(route.path === '/panel/gelen-teklifler' || route.path === '/panel/yaptigim-teklifler' || route.path === '/panel/tekliflerim') 
-                  ? 'bg-[#1EAE4C]/10 text-[#1EAE4C] border-[#1EAE4C]/25' 
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+                  ? 'bg-[#0F223D] text-white shadow-xs' 
+                  : 'text-slate-700 hover:bg-slate-100 hover:text-[#0F223D]'"
               >
                 <component :is="item.icon" :size="13" />
                 <span>{{ item.title }}</span>
-                <ChevronDown :size="12" class="transition-transform duration-200" :class="isTopTekliflerOpen ? 'rotate-180 text-[#1EAE4C]' : 'text-slate-400'" />
+                <ChevronDown :size="12" class="transition-transform duration-200" :class="isTopTekliflerOpen ? 'rotate-180 text-white' : 'text-slate-400'" />
               </button>
 
               <div 
@@ -125,9 +125,9 @@ const sidebarMenus = computed(() => {
                   :to="child.to"
                   @click="isTopTekliflerOpen = false"
                   class="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-bold transition-all"
-                  :class="route.path === child.to ? 'bg-[#1EAE4C]/10 text-[#1EAE4C]' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'"
+                  :class="route.path === child.to ? 'bg-[#0F223D] text-white' : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900'"
                 >
-                  <component :is="child.icon" :size="13" :class="route.path === child.to ? 'text-[#1EAE4C]' : 'text-slate-400'" />
+                  <component :is="child.icon" :size="13" :class="route.path === child.to ? 'text-white' : 'text-slate-400'" />
                   <span>{{ child.title }}</span>
                 </NuxtLink>
               </div>
@@ -137,10 +137,10 @@ const sidebarMenus = computed(() => {
             <NuxtLink
               v-else
               :to="item.to"
-              class="flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold transition-all border border-transparent"
+              class="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all border border-transparent"
               :class="route.path === item.to 
-                ? 'bg-[#1EAE4C]/10 text-[#1EAE4C] border-[#1EAE4C]/25' 
-                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+                ? 'bg-[#0F223D] text-white shadow-xs' 
+                : 'text-slate-700 hover:bg-slate-100 hover:text-[#0F223D]'"
             >
               <component :is="item.icon" :size="13" />
               <span>{{ item.title }}</span>

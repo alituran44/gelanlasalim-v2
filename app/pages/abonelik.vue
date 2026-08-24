@@ -284,7 +284,7 @@ function completeCheckout() {
             <button 
               @click="paymentRegion = 'domestic'"
               class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer"
-              :class="paymentRegion === 'domestic' ? 'bg-blue-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'"
+              :class="paymentRegion === 'domestic' ? 'bg-[#0F223D] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'"
             >
               <span class="text-base">🇹🇷</span>
               <span>{{ 'Yurt İçi Ödeme (Türkiye / ₺ TRY)' }}</span>
@@ -293,7 +293,7 @@ function completeCheckout() {
             <button 
               @click="paymentRegion = 'international'"
               class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black transition-all cursor-pointer"
-              :class="paymentRegion === 'international' ? 'bg-blue-900 text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'"
+              :class="paymentRegion === 'international' ? 'bg-[#0F223D] text-white shadow-md' : 'text-slate-600 hover:bg-slate-100'"
             >
               <Globe :size="15" class="text-emerald-400" />
               <span>{{ 'Yurt Dışı Ödeme (Global / $ USD - € EUR)' }}</span>
@@ -327,11 +327,11 @@ function completeCheckout() {
       </div>
 
       <!-- 6-MONTH FREE TRIAL LAUNCH BANNER -->
-      <div class="rounded-3xl border-2 border-emerald-500/50 bg-gradient-to-r from-emerald-950 via-slate-900 to-blue-950 p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden text-left">
-        <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl"></div>
+      <div class="rounded-3xl border border-emerald-500/40 bg-[#0F223D] p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden text-left">
+        <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-[#1EAE4C]/10 rounded-full blur-3xl"></div>
         <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div class="space-y-2 max-w-2xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest border border-emerald-500/30">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1EAE4C]/20 text-[#1EAE4C] text-[10px] font-black uppercase tracking-widest border border-[#1EAE4C]/30">
               <Sparkles :size="13" />
               <span>LANSMANA ÖZEL: 6 AY BOYUNCA %100 ÜCRETSİZ DENEME SÜRECİ</span>
             </div>
@@ -342,20 +342,26 @@ function completeCheckout() {
               İhaleciBurada platform lansmanına özel olarak tüm alıcı ve tedarikçi firmalarımıza ilk 6 ay boyunca ihale açma, teklif verme, canlı tersine eksiltme ve tüm analiz modülleri <strong>0 ₺</strong> bedelle sunulmaktadır. Kredi kartı gerekmez, 0 komisyon, anında koşulsuz aktivasyon.
             </p>
             <div class="flex flex-wrap items-center gap-4 pt-1 text-[11px] text-emerald-300 font-bold">
-              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> 6 Ay Boyunca 0 ₺</span>
-              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> Kredi Kartı İstemez</span>
-              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> Sınırsız İhale & Eksiltme</span>
-              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> Anında Aktivasyon</span>
+              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> 6 Ay Boyunca 0 ₺</span>
+              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> Kredi Kartı İstemez</span>
+              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> Sınırsız İhale & Eksiltme</span>
+              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> Anında Aktivasyon</span>
             </div>
           </div>
 
+          <!-- Free Trial CTA Button -->
           <div class="shrink-0 w-full lg:w-auto">
             <button
-              type="button"
-              @click="startFreeTrial"
-              class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition-all hover:scale-105 flex items-center justify-center gap-2 cursor-pointer"
+              @click="openCheckout({
+                id: '6-ay-ucretsiz-deneme',
+                name: '6 AY ÜCRETSİZ KURUMSAL DENEME',
+                price: 0,
+                isTrial: true,
+                desc: 'Lansmana özel 6 ay sınırsız ihale ve canlı eksiltme erişimi.'
+              })"
+              class="w-full lg:w-auto px-8 py-4 rounded-2xl bg-[#1EAE4C] hover:bg-[#188C3D] text-white font-black text-sm transition-all shadow-xl shadow-[#1EAE4C]/30 flex items-center justify-center gap-2 cursor-pointer transform hover:scale-105"
             >
-              <span>6 AYLIK ÜCRETSİZ DENEMEYİ HEMEN BAŞLAT (0 ₺)</span>
+              <span>6 Ay Ücretsiz Başlat</span>
               <ArrowRight :size="16" />
             </button>
           </div>
@@ -368,13 +374,13 @@ function completeCheckout() {
           v-for="pkg in activePackages" 
           :key="pkg.id" 
           class="border rounded-3xl bg-white overflow-hidden transition-all duration-300 flex flex-col justify-between hover:shadow-xl shadow-sm relative group"
-          :class="pkg.isPromo ? 'border-amber-400 ring-2 ring-amber-400/30' : 'border-slate-200'"
+          :class="pkg.isPromo ? 'border-[#1EAE4C] ring-2 ring-[#1EAE4C]/30' : 'border-slate-200'"
         >
           <!-- Promo Tag -->
-          <div v-if="pkg.isPromo" class="bg-amber-400 text-slate-950 font-black text-[9px] uppercase tracking-widest text-center py-1.5">
+          <div v-if="pkg.isPromo" class="bg-[#1EAE4C] text-white font-black text-[9px] uppercase tracking-widest text-center py-1.5">
             ⚡ {{ 'EN ÇOK TERCİH EDİLEN POPÜLER PLAN' }}
           </div>
-          <div v-else class="bg-blue-900 text-white font-bold text-[9px] uppercase tracking-widest text-center py-1.5">
+          <div v-else class="bg-[#0F223D] text-white font-bold text-[9px] uppercase tracking-widest text-center py-1.5">
             {{ 'KURUMSAL KULLANIM' }}
           </div>
           
@@ -385,7 +391,7 @@ function completeCheckout() {
               <div class="text-3xl font-black tracking-tight font-mono text-slate-900 mt-4">
                 {{ currencySymbol }}{{ pkg.price.toLocaleString('tr-TR') }}
               </div>
-              <div class="text-[11px] text-blue-700 font-bold mt-1 bg-blue-50 py-1 px-2 rounded-lg inline-block">
+              <div class="text-[11px] text-[#003057] font-bold mt-1 bg-slate-100 py-1 px-2.5 rounded-lg inline-block">
                 {{ pkg.monthly }}
               </div>
             </div>
@@ -399,8 +405,8 @@ function completeCheckout() {
           <div class="p-5 bg-slate-50/80 border-t border-slate-100">
             <button 
               @click="openCheckout(pkg)"
-              class="w-full text-center rounded-xl font-black text-xs py-3.5 transition-all shadow-md flex items-center justify-center gap-2 text-white cursor-pointer hover:scale-[1.02]"
-              :class="pkg.isPromo ? 'bg-amber-500 hover:bg-amber-600 text-slate-950' : 'bg-blue-900 hover:bg-blue-950 text-white'"
+              class="w-full text-center rounded-xl font-black text-xs py-3.5 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02]"
+              :class="pkg.isPromo ? 'bg-[#1EAE4C] hover:bg-[#188C3D] text-white shadow-[#1EAE4C]/20' : 'bg-[#0F223D] hover:bg-[#003057] text-white'"
             >
               <span>{{ 'HEMEN ABONE OL' }}</span>
               <ArrowRight :size="14" />

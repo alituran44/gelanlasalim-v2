@@ -1515,14 +1515,14 @@ function toggleFilterSection(section: string) {
                   <button @click="clearFilters" class="px-4 py-2.5 rounded-xl bg-white border border-slate-200 hover:bg-slate-100 text-slate-800 font-bold text-xs transition shadow-xs cursor-pointer">
                     {{ 'Filtreleri Temizle' }}
                   </button>
-                  <NuxtLink to="/panel/ihale-olustur" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs transition shadow-md flex items-center gap-1.5">
+                  <NuxtLink to="/panel/ihale-olustur" class="px-5 py-2.5 rounded-xl bg-[#0F223D] hover:bg-[#003057] text-white font-black text-xs transition shadow-md flex items-center gap-1.5">
                     <Plus :size="14" />
                     {{ 'Ücretsiz İhale Oluştur' }}
                   </NuxtLink>
                 </div>
               </div>
 
-              <div v-for="res in filteredTenders" :key="res.id" class="p-6 rounded-2xl bg-white border border-slate-200/80 premium-shadow flex flex-col text-left hover:border-blue-300 transition-all duration-200">
+              <div v-for="res in filteredTenders" :key="res.id" class="p-6 rounded-2xl bg-white border border-slate-200/80 premium-shadow flex flex-col text-left hover:border-[#003057]/30 transition-all duration-200">
                   <div class="flex flex-col lg:flex-row lg:justify-between gap-6">
                     
                     <!-- 🖼️ İhale Görseli (Eğer görsel varsa gösterilir) -->
@@ -1538,11 +1538,11 @@ function toggleFilterSection(section: string) {
                         class="w-full h-full object-cover group-hover/img:scale-108 transition-transform duration-300" 
                       />
                       <div class="absolute inset-0 bg-slate-950/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center text-white text-[11px] font-black gap-1.5 backdrop-blur-2xs">
-                        <Eye :size="16" class="text-amber-400" />
+                        <Eye :size="16" class="text-white" />
                         <span>Büyüt 🔍</span>
                       </div>
                       <span class="absolute bottom-2 left-2 bg-slate-900/85 backdrop-blur-xs text-white text-[9px] font-black px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-sm">
-                        <Camera :size="10" class="text-amber-400" /> 
+                        <Camera :size="10" class="text-emerald-400" /> 
                         <span>{{ res.images?.length > 1 ? res.images.length + ' Fotoğraf' : 'Görsel' }}</span>
                       </span>
                     </div>
@@ -1550,20 +1550,20 @@ function toggleFilterSection(section: string) {
                     <!-- İhale Bilgileri -->
                     <div class="min-w-0 flex-1">
                       <div class="flex flex-wrap items-center gap-2">
-                        <span v-if="res.featured" class="rounded-full bg-orange-50 border border-orange-200 px-2.5 py-0.5 text-[9px] font-black text-orange-700 uppercase">🔥 {{ 'Öne Çıkan' }}</span>
-                        <span class="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 text-[9px] font-black text-blue-700 uppercase">{{ res.type }}</span>
+                        <span v-if="res.featured" class="rounded-full bg-slate-100 border border-slate-300 px-2.5 py-0.5 text-[9px] font-black text-slate-800 uppercase">⚡ {{ 'Öne Çıkan' }}</span>
+                        <span class="rounded-full bg-blue-50 border border-blue-100 px-2.5 py-0.5 text-[9px] font-black text-[#003057] uppercase">{{ res.type }}</span>
                         <span class="rounded-full bg-slate-50 border border-slate-200 px-2.5 py-0.5 text-[9px] font-black text-slate-600 uppercase">{{ res.method }}</span>
                         <span class="rounded-full bg-slate-50 border border-slate-200 px-2.5 py-0.5 text-[9px] font-black text-slate-600 uppercase">{{ res.pricing }}</span>
                       </div>
 
-                      <h3 class="mt-4 text-base font-black text-slate-800 hover:text-blue-600 transition-colors leading-snug">{{ res.title }}</h3>
-                      <div @click="openCompanyModal(res.company)" class="mt-2.5 flex flex-wrap items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer hover:text-amber-600 transition-colors select-none" title="Firma profilini, puanlarını ve kıstas seviyesini gör">
+                      <h3 class="mt-4 text-base font-black text-slate-800 hover:text-[#003057] transition-colors leading-snug">{{ res.title }}</h3>
+                      <div @click="openCompanyModal(res.company)" class="mt-2.5 flex flex-wrap items-center gap-2 text-xs font-bold text-slate-700 cursor-pointer hover:text-[#003057] transition-colors select-none" title="Firma profilini, puanlarını ve kıstas seviyesini gör">
                         <Building2 :size="14" class="text-slate-400" />
                         <span class="underline decoration-slate-300 font-extrabold">{{ res.company }}</span>
-                        <span v-if="res.verified" class="rounded-full bg-blue-50 px-1.5 py-0.5 text-[9px] font-bold text-blue-600 border border-blue-100 uppercase tracking-wider flex items-center gap-0.5">
+                        <span v-if="res.verified" class="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-black text-emerald-700 border border-emerald-200 uppercase tracking-wider flex items-center gap-0.5">
                           <ShieldCheck :size="10" /> {{ 'ONAYLI ÜYE' }}
                         </span>
-                        <span class="rounded-lg bg-amber-100/90 hover:bg-amber-200 text-amber-900 border border-amber-300 px-2 py-0.5 text-[9px] font-black tracking-wide transition shadow-2xs">
+                        <span class="rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-200 px-2 py-0.5 text-[9px] font-bold tracking-wide transition shadow-2xs">
                           👁️ {{ 'Profili & Puanları Gör' }}
                         </span>
                       </div>
@@ -1575,10 +1575,10 @@ function toggleFilterSection(section: string) {
                       <button 
                         type="button"
                         @click="openTenderDocsModal(res)" 
-                        class="px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-extrabold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer"
+                        class="px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-bold flex items-center gap-1.5 transition-all shadow-2xs cursor-pointer"
                         title="İhale şartname ve resmi ihale dosyalarını aç ve bilgisayara indir"
                       >
-                        <Download :size="13" class="text-emerald-600" />
+                        <Download :size="13" class="text-slate-500" />
                         <span>{{ '📄 İhale Dosyasını İndir (.PDF)' }}</span>
                       </button>
                     </div>
@@ -1589,21 +1589,21 @@ function toggleFilterSection(section: string) {
                     <div>
                       <div class="text-[9px] font-black uppercase text-slate-400">{{ 'Son Teklif Tarihi' }}</div>
                       <div class="mt-1 text-sm font-black text-slate-800">{{ res.deadline }}</div>
-                      <div class="mt-1 text-xs font-black text-red-500">{{ res.daysLeft }} {{ 'gün kaldı' }}</div>
+                      <div class="mt-1 text-xs font-black text-rose-600">{{ res.daysLeft }} {{ 'gün kaldı' }}</div>
                     </div>
                     
                     <div class="space-y-2 mt-6">
                       <button 
                         @click="openQuickBidModal(res)" 
-                        class="w-full flex items-center justify-center gap-1.5 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs py-3 shadow-md hover:shadow-lg transition-all border border-amber-300 cursor-pointer"
+                        class="w-full flex items-center justify-center gap-1.5 rounded-xl bg-[#003057] hover:bg-[#1EAE4C] text-white font-black text-xs py-3 shadow-md transition-all cursor-pointer"
                       >
-                        <Zap :size="15" class="fill-slate-950 text-slate-950" />
-                        <span>{{ '⚡ Hızlı Teklif Ver' }}</span>
+                        <Zap :size="15" class="text-emerald-400" />
+                        <span>{{ 'Hızlı Teklif Ver' }}</span>
                       </button>
 
                       <button 
                         @click="expandedTenderId = expandedTenderId === res.id ? null : res.id; activeDetailTab = 'malzeme'" 
-                        class="w-full flex items-center justify-center rounded-xl bg-slate-900 py-2.5 text-xs font-bold text-white hover:bg-blue-600 transition-all cursor-pointer"
+                        class="w-full flex items-center justify-center rounded-xl border border-slate-300 bg-white py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50 transition-all cursor-pointer"
                       >
                         {{ expandedTenderId === res.id ? ('Detayı Kapat') : ('İhale Detayları') }}
                       </button>
@@ -2213,7 +2213,7 @@ function toggleFilterSection(section: string) {
               <NuxtLink
                 :to="`/abonelik?plan=${pkg.id}`"
                 class="w-full py-3.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer"
-                :class="pkg.isPopular ? 'bg-amber-400 hover:bg-amber-500 text-slate-950' : 'bg-[#0F223D] hover:bg-[#0052FF] text-white'"
+                :class="pkg.isPopular ? 'bg-[#1EAE4C] hover:bg-[#188C3D] text-white shadow-[#1EAE4C]/25' : 'bg-[#0F223D] hover:bg-[#003057] text-white'"
               >
                 <span>HEMEN ABONE OL</span>
                 <ArrowRight :size="14" />
@@ -2228,11 +2228,11 @@ function toggleFilterSection(section: string) {
             v-for="pkg in homePricingGlobalUSD"
             :key="pkg.id"
             class="rounded-3xl border bg-white p-6 shadow-sm flex flex-col justify-between transition-all hover:shadow-xl relative overflow-hidden"
-            :class="pkg.isPopular ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-slate-200/80'"
+            :class="pkg.isPopular ? 'border-[#1EAE4C] ring-2 ring-[#1EAE4C]/20' : 'border-slate-200/80'"
           >
             <div
               class="text-[9px] font-black uppercase tracking-wider py-1.5 px-3 rounded-lg text-center mb-4"
-              :class="pkg.isPopular ? 'bg-[#0052FF] text-white' : 'bg-slate-800 text-white'"
+              :class="pkg.isPopular ? 'bg-[#1EAE4C] text-white' : 'bg-[#0F223D] text-white'"
             >
               {{ pkg.badge }}
             </div>
@@ -2253,7 +2253,7 @@ function toggleFilterSection(section: string) {
             <div class="pt-6">
               <NuxtLink
                 :to="`/abonelik?region=international&plan=${pkg.id}`"
-                class="w-full py-3.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer bg-[#0052FF] hover:bg-blue-700 text-white"
+                class="w-full py-3.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer bg-[#0F223D] hover:bg-[#003057] text-white"
               >
                 <span>SUBSCRIBE NOW</span>
                 <ArrowRight :size="14" />
