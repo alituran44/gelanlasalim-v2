@@ -314,20 +314,30 @@ function removeFile(index: number) {
 }
 
 function handleSubmit() {
-  if (!form.value.baslik || !form.value.butce || !form.value.teslimatAdresi) return
-
-  // Format budget with currency sign if missing
-  let budgetVal = form.value.butce.trim()
-  if (!budgetVal.startsWith('₺')) {
-    budgetVal = '₺' + budgetVal
+  if (!form.value.baslik) {
+    alert(locale.value === 'tr' ? 'Lütfen ihale başlığını giriniz.' : 'Please enter a tender title.')
+    return
   }
+
+  // Format budget with currency sign if entered, or mark as Open Reverse Auction
+  let budgetVal = form.value.butce ? form.value.butce.trim() : ''
+  if (budgetVal) {
+    if (!budgetVal.startsWith('₺') && !budgetVal.includes('₺') && !budgetVal.includes('$') && !budgetVal.includes('€')) {
+      budgetVal = '₺' + budgetVal
+    }
+  } else {
+    budgetVal = 'Açık Eksiltme'
+  }
+
+  const deliveryAddress = form.value.teslimatAdresi || `${form.value.sehir} Merkez Teslimat`
 
   // Generate unique B2B procurement ID
   const newId = 'IHC-2026-' + Math.floor(100 + Math.random() * 900)
   createdId.value = newId
 
-  const combinedCategory = `${form.value.kategori} / ${selectedSubcategory.value}`
-  const primaryImg = form.value.images[0]?.url || ''
+  const subCat = selectedSubcategory.value || 'Genel Satın Alma'
+  const combinedCategory = `${form.value.kategori} / ${subCat}`
+  const primaryImg = form.value.images[0]?.url || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'
   const imgList = form.value.images.map(img => img.url)
 
   // Add to active tenders list
@@ -335,13 +345,14 @@ function handleSubmit() {
     id: newId,
     baslik: form.value.baslik,
     kategori: combinedCategory,
-    sure: form.value.sure,
+    sure: form.value.sure || '7 gün kaldı',
     teklifSayisi: 0,
     durum: 'active',
     butce: budgetVal,
-    city: form.value.sehir,
+    city: form.value.sehir || 'Balıkesir',
     image: primaryImg,
     images: imgList,
+    aciklama: form.value.aciklama || form.value.baslik,
     olusturma: 'Bugün'
   })
 
@@ -350,7 +361,7 @@ function handleSubmit() {
     id: newId,
     baslik: form.value.baslik,
     kategori: combinedCategory,
-    bitis: form.value.sure,
+    bitis: form.value.sure || '7 gün kaldı',
     image: primaryImg,
     teklifler: []
   })
@@ -358,10 +369,13 @@ function handleSubmit() {
   // Persist to localStorage
   saveCmsData(cmsData.value)
 
+  // Clear draft
+  clearDraft()
+
   showSuccess.value = true
   setTimeout(() => {
     router.push('/panel/ilanlarim')
-  }, 2000)
+  }, 1800)
 }
 </script>
 
@@ -457,14 +471,16 @@ function handleSubmit() {
             </select>
           </div>
 
-          <!-- Yaklaşık Bütçe -->
+          <!-- Hedef Bütçe (İsteğe Bağlı) -->
           <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">YAKLAŞIK BÜTÇE (₺) *</label>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider">HEDEF BÜTÇE (₺)</label>
+              <span class="text-[9px] font-bold text-slate-400 lowercase">(isteğe bağlı)</span>
+            </div>
             <input 
               v-model="form.butce" 
               type="text" 
-              required 
-              placeholder="Örn: 150.000" 
+              placeholder="Örn: 150.000 (Boş bırakabilirsiniz)" 
               class="w-full rounded-lg border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
               style="border-color: #CBD5E1; color: #0F172A;"
             />

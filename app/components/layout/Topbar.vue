@@ -1,29 +1,69 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue"
 import { useRoute, useRouter } from "vue-router"
-import { Search, Bell, Plus, ChevronDown, User, Home, Globe, Play } from "lucide-vue-next"
+import { 
+  Search, 
+  Bell, 
+  Plus, 
+  ChevronDown, 
+  User, 
+  Home, 
+  Globe, 
+  Play, 
+  ShoppingBag, 
+  CheckCheck, 
+  Inbox, 
+  MessageSquare, 
+  CheckCircle2 
+} from "lucide-vue-next"
 import { locale, detectLocale, setLocale } from '~/composables/useLocale'
 
 const route = useRoute()
 const router = useRouter()
 const search = ref("")
-const notifCount = ref(3)
+const showNotifDropdown = ref(false)
 const showUserMenu = ref(false)
+
+const notifications = ref([
+  {
+    id: 1,
+    title: 'Yeni Teklif Geldi ⚡',
+    desc: '10 KM Mıcır Yol Yapım İşi ihalesine 1.380.000 ₺ tutarında yeni teklif sunuldu.',
+    time: '5 dk önce',
+    unread: true,
+    to: '/panel/gelen-teklifler'
+  },
+  {
+    id: 2,
+    title: 'Karşı Teklif & Pazarlık 💬',
+    desc: 'Yazılım Geliştirme ihalesinde alıcı firma pazarlık mesajı iletti.',
+    time: '45 dk önce',
+    unread: true,
+    to: '/panel/yaptigim-teklifler'
+  },
+  {
+    id: 3,
+    title: 'NetGSM SMS İletildi 📱',
+    desc: 'Teklif onay ve sözleşme bilgilendirme SMS mesajı karşı tarafa iletildi.',
+    time: '2 saat önce',
+    unread: false,
+    to: '/panel/bildirimler'
+  }
+])
+
+const notifCount = computed(() => notifications.value.filter(n => n.unread).length)
+
+function markAllAsRead() {
+  notifications.value.forEach(n => n.unread = false)
+}
 
 function handleLogout() {
   if (typeof window !== 'undefined') {
     localStorage.removeItem('userSession')
+    localStorage.removeItem('guestSession')
   }
   showUserMenu.value = false
   router.push('/')
-}
-
-function toggleLang() {
-  if (locale.value === 'tr') {
-    setLocale('en')
-  } else {
-    setLocale('tr')
-  }
 }
 
 // Simulated user session — safe client-side loading
@@ -40,16 +80,26 @@ onMounted(() => {
   }
 })
 
-const userName = computed(() => userSession.value?.firstName || (locale.value === 'tr' ? 'Kullanıcı' : 'User'))
+const userName = computed(() => {
+  return userSession.value?.firstName || userSession.value?.company || 'Kurumsal Üye'
+})
 const userInitial = computed(() => userName.value.charAt(0).toUpperCase())
 
 const pageTitle = computed(() => {
   if (locale.value === 'tr') {
     const titles: Record<string, string> = {
       '/panel': 'Yönetim Paneli',
+      '/panel/pazar-yeri': 'İhale Pazar Yeri',
       '/panel/ilanlarim': 'İhalelerim',
-      '/panel/gelen-teklifler': 'Gelen Teklifler',
-      '/panel/yaptigim-teklifler': 'Verdiğim Teklifler',
+      '/panel/gelen-teklifler': 'Aldığım Teklifler (Gelen)',
+      '/panel/yaptigim-teklifler': 'Verdiğim Teklifler (Yaptığım)',
+      '/panel/tekliflerim': 'Teklif Yönetim Merkezi',
+      '/panel/siparis-teslimat': 'Sipariş & Teslimat (Escrow)',
+      '/panel/canli-etkinlikler': 'Canlı Eksiltme Arenası',
+      '/panel/istatistikler': 'Analitik & Raporlar',
+      '/panel/doviz-kurlari': 'Döviz & Emtia Kurları',
+      '/panel/firmalar': 'Onaylı Kurumsal Firmalar',
+      '/panel/ekip-yetki': 'Ekip & Yetkilendirme',
       '/panel/mesajlar': 'Mesajlar',
       '/panel/bildirimler': 'Bildirimler',
       '/panel/ayarlar': 'Hesap & Ayarlar',
@@ -57,145 +107,176 @@ const pageTitle = computed(() => {
     }
     return titles[route.path] || 'Yönetim Paneli'
   } else {
-    const titles: Record<string, string> = {
-      '/panel': 'Dashboard',
-      '/panel/ilanlarim': 'My Tenders',
-      '/panel/gelen-teklifler': 'Received Bids',
-      '/panel/yaptigim-teklifler': 'My Submitted Bids',
-      '/panel/mesajlar': 'Messages',
-      '/panel/bildirimler': 'Notifications',
-      '/panel/ayarlar': 'Account Settings',
-      '/panel/ihale-olustur': 'Create New Tender',
-    }
-    return titles[route.path] || 'Dashboard'
+    return 'Dashboard'
   }
 })
 </script>
 
 <template>
-  <header class="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-white px-6"
-    style="border-color: #E2E8F0;">
+  <header class="sticky top-0 z-40 flex h-16 items-center justify-between border-b bg-white px-6 border-slate-200 shadow-2xs">
 
     <!-- Left: Page Title -->
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-4 text-left">
       <div>
-        <h2 class="text-base font-semibold" style="color: #0F172A;">{{ pageTitle }}</h2>
-        <p class="text-xs" style="color: #94A3B8;">İhaleciBurada B2B Platform</p>
+        <h2 class="text-base font-black text-slate-900">{{ pageTitle }}</h2>
+        <p class="text-xs text-slate-400 font-medium">İhaleciBurada B2B Operasyon Merkezi</p>
       </div>
 
       <!-- Search -->
-      <div class="relative hidden md:block">
-        <Search class="absolute left-3 top-1/2 -translate-y-1/2" :size="15" style="color: #94A3B8;" />
+      <div class="relative hidden xl:block">
+        <Search class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" :size="14" />
         <input
           v-model="search"
           type="text"
-          :placeholder="'İhalelerde ara...'"
-          class="w-64 rounded-lg border py-2 pl-9 pr-3 text-sm outline-none transition"
-          style="border-color: #E2E8F0; background: #F8FAFC; color: #0F172A;"
-          onfocus="this.style.borderColor='#1EAE4C'; this.style.boxShadow='0 0 0 3px rgba(30,174,76,0.1)'"
-          onblur="this.style.borderColor='#E2E8F0'; this.style.boxShadow='none'"
+          placeholder="İhalelerde veya tekliflerde ara..."
+          class="w-64 rounded-xl border border-slate-200 py-1.5 pl-9 pr-3 text-xs outline-none bg-slate-50 focus:border-[#1EAE4C] focus:bg-white transition"
         />
       </div>
     </div>
 
-    <!-- Right: Actions -->
+    <!-- Right: Actions & Links -->
     <div class="flex items-center gap-2">
 
-
+      <!-- Pazar Yeri Link -->
+      <NuxtLink
+        to="/panel/pazar-yeri"
+        class="hidden sm:flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-black text-slate-700 hover:text-[#1EAE4C] hover:border-[#1EAE4C] transition shadow-xs"
+        title="İhale Pazar Yeri"
+      >
+        <ShoppingBag :size="14" class="text-[#1EAE4C]" />
+        <span>Pazar Yeri</span>
+      </NuxtLink>
 
       <!-- Video Guides Button -->
       <NuxtLink
         to="/videolar"
-        class="hidden sm:flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50/80 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100/80 transition shadow-xs"
-        :title="'Sitenin Kullanım Videoları'"
+        class="hidden md:flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100 transition"
       >
-        <Play :size="12" class="fill-blue-700" />
-        <span>Video Rehberler</span>
+        <Play :size="12" class="fill-blue-700 text-blue-700" />
+        <span>Rehberler</span>
       </NuxtLink>
 
       <!-- Home Page Button -->
       <NuxtLink
         to="/"
-        class="flex items-center gap-1.5 rounded-lg border border-slate-200/80 bg-slate-50 px-3.5 py-2 text-xs font-black text-slate-800 hover:bg-white hover:text-amber-600 transition shadow-xs"
-        :title="'Ana Sayfaya Dön'"
+        class="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2 text-xs font-black text-slate-800 hover:bg-white hover:text-blue-600 transition shadow-xs"
       >
-        <Home :size="14" class="text-amber-600" />
-        <span>{{ 'Ana Sayfaya Git' }}</span>
+        <Home :size="14" class="text-blue-600" />
+        <span>Ana Sayfa</span>
       </NuxtLink>
 
       <!-- New Tender Button -->
       <NuxtLink
         to="/panel/ihale-olustur"
-        class="hidden md:flex items-center gap-1.5 rounded-lg px-4 py-2 text-xs font-bold text-white transition"
-        style="background: #0A1128; border: 1px solid #C59B27;"
+        class="hidden sm:flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black text-white bg-[#1EAE4C] hover:bg-[#188c3d] shadow-md shadow-[#1EAE4C]/20 transition"
       >
-        <Plus :size="15" class="text-amber-400" />
-        <span>{{ 'Yeni İhale' }}</span>
+        <Plus :size="15" />
+        <span>+ İhale Aç</span>
       </NuxtLink>
 
-      <!-- Notifications -->
-      <button 
-        class="relative flex h-9 w-9 items-center justify-center rounded-lg border transition hover:bg-slate-50"
-        style="border-color: #E2E8F0;"
-        :title="'Okunmamış Bildirimler'"
-      >
-        <Bell :size="17" style="color: #475569;" />
-        <span
-          v-if="notifCount > 0"
-          class="absolute -right-0.5 -top-0.5 flex h-4 w-4 items-center justify-center rounded-full text-[10px] font-bold text-white"
-          style="background: #EF4444;"
+      <!-- Notifications Dropdown Trigger -->
+      <div class="relative">
+        <button 
+          @click="showNotifDropdown = !showNotifDropdown"
+          class="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 transition hover:bg-slate-50 cursor-pointer"
+          title="Bildirimler"
         >
-          {{ notifCount }}
-        </span>
-      </button>
+          <Bell :size="17" class="text-slate-600" />
+          <span
+            v-if="notifCount > 0"
+            class="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full text-[9px] font-black text-white bg-red-500 animate-pulse"
+          >
+            {{ notifCount }}
+          </span>
+        </button>
 
-      <!-- Profilim Button -->
-      <NuxtLink
-        to="/panel/ayarlar"
-        class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-black rounded-xl border transition-all text-slate-800 bg-amber-50 hover:bg-amber-100 border-amber-300 shadow-xs"
-      >
-        <User :size="14" class="text-amber-600" />
-        <span>{{ 'Profilim' }}</span>
-      </NuxtLink>
+        <!-- Notification Panel Dropdown -->
+        <div
+          v-if="showNotifDropdown"
+          class="absolute right-0 top-11 z-50 w-80 rounded-2xl border border-slate-200 bg-white shadow-2xl p-3 text-left space-y-2 animate-fadeIn"
+        >
+          <div class="flex items-center justify-between border-b border-slate-100 pb-2 px-1">
+            <span class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+              <Bell :size="13" class="text-[#1EAE4C]" />
+              Bildirimler ({{ notifCount }})
+            </span>
+            <button 
+              @click="markAllAsRead"
+              class="text-[10px] font-bold text-blue-600 hover:underline flex items-center gap-1"
+            >
+              <CheckCheck :size="12" />
+              Tümünü Okundu Say
+            </button>
+          </div>
 
-      <!-- User Menu -->
+          <div class="space-y-1 max-h-72 overflow-y-auto">
+            <NuxtLink
+              v-for="notif in notifications"
+              :key="notif.id"
+              :to="notif.to"
+              @click="notif.unread = false; showNotifDropdown = false"
+              class="block p-2.5 rounded-xl transition-all"
+              :class="notif.unread ? 'bg-blue-50/70 hover:bg-blue-100/70' : 'hover:bg-slate-50'"
+            >
+              <div class="flex items-start justify-between gap-2">
+                <span class="text-xs font-black text-slate-900">{{ notif.title }}</span>
+                <span class="text-[9px] text-slate-400 shrink-0 font-mono">{{ notif.time }}</span>
+              </div>
+              <p class="text-[11px] text-slate-600 mt-0.5 leading-snug">{{ notif.desc }}</p>
+            </NuxtLink>
+          </div>
+
+          <div class="pt-2 border-t border-slate-100 text-center">
+            <NuxtLink
+              to="/panel/bildirimler"
+              @click="showNotifDropdown = false"
+              class="text-xs font-bold text-slate-700 hover:text-blue-600 block py-1"
+            >
+              Tüm Bildirimleri Görüntüle →
+            </NuxtLink>
+          </div>
+        </div>
+      </div>
+
+      <!-- User Profile Menu -->
       <div class="relative">
         <button
           @click="showUserMenu = !showUserMenu"
-          class="flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition hover:bg-slate-50"
-          style="border-color: #E2E8F0;"
+          class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-1.5 text-sm transition hover:bg-slate-50 cursor-pointer"
         >
           <div
             class="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white shadow-xs"
-            style="background: linear-gradient(135deg, #0A1128, #1C2541); border: 1px solid #C59B27;"
+            style="background: #003057;"
           >
             {{ userInitial }}
           </div>
-          <span class="hidden md:block font-bold text-xs" style="color: #0F172A;">{{ userName }}</span>
-          <ChevronDown :size="14" style="color: #94A3B8;" />
+          <span class="hidden md:block font-bold text-xs text-slate-900">{{ userName }}</span>
+          <ChevronDown :size="13" class="text-slate-400" />
         </button>
 
         <!-- Dropdown -->
         <div
           v-if="showUserMenu"
-          class="absolute right-0 top-11 z-50 w-44 rounded-xl border bg-white shadow-lg py-1"
-          style="border-color: #E2E8F0;"
+          class="absolute right-0 top-11 z-50 w-48 rounded-2xl border border-slate-200 bg-white shadow-xl py-1.5 text-left animate-fadeIn"
         >
+          <div class="px-4 py-2 border-b border-slate-100">
+            <div class="text-xs font-bold text-slate-800 truncate">{{ userName }}</div>
+            <div class="text-[10px] text-slate-400">Onaylı Kurumsal Hesap</div>
+          </div>
           <NuxtLink to="/panel/ayarlar" @click="showUserMenu=false"
-            class="block px-4 py-2 text-sm hover:bg-slate-50 transition" style="color: #475569;">
-            Profile Settings
+            class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
+            Hesap Ayarları
           </NuxtLink>
           <NuxtLink to="/abonelik" @click="showUserMenu=false"
-            class="block px-4 py-2 text-sm hover:bg-slate-50 transition" style="color: #475569;">
-            Subscription
+            class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
+            Üyelik Planı (6 Ay Deneme)
           </NuxtLink>
-          <div class="my-1 border-t" style="border-color: #F1F5F9;"></div>
+          <div class="my-1 border-t border-slate-100"></div>
           <button
             @click="handleLogout"
-            class="block w-full px-4 py-2 text-left text-sm transition hover:bg-red-50"
-            style="color: #EF4444;"
+            class="block w-full px-4 py-2 text-left text-xs font-bold text-red-600 hover:bg-red-50"
           >
-            Log Out
+            Çıkış Yap
           </button>
         </div>
       </div>

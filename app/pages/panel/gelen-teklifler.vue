@@ -1,8 +1,30 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Inbox, Shield, ChevronDown, ChevronUp, Star, Clock, Building2 } from 'lucide-vue-next'
+import { 
+  Inbox, 
+  Shield, 
+  ChevronDown, 
+  ChevronUp, 
+  Star, 
+  Clock, 
+  Building2, 
+  Send, 
+  Phone, 
+  Mail, 
+  MapPin, 
+  FileText, 
+  CheckCircle2, 
+  XCircle, 
+  AlertTriangle, 
+  Scale, 
+  RotateCcw,
+  Sparkles,
+  Award,
+  X
+} from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
 import { useCmsData } from '~/composables/useCmsData'
+import { useNetGsm } from '~/composables/useNetGsm'
 import { locale } from '~/composables/useLocale'
 
 definePageMeta({ layout: 'dashboard' })
@@ -10,43 +32,208 @@ definePageMeta({ layout: 'dashboard' })
 const route = useRoute()
 const expandedIlan = ref<string | null>(route.query.ilan as string || null)
 
-const { cmsData } = useCmsData()
+const { cmsData, saveCmsData } = useCmsData()
+const { sendSms } = useNetGsm()
 
-const ilanlar = computed(() => cmsData.value.dashboard.receivedBids || [])
+const ilanlar = computed(() => cmsData.value?.dashboard?.receivedBids || [])
 
 function toggle(id: string) {
   expandedIlan.value = expandedIlan.value === id ? null : id
 }
 
+// Modal States
 const showNegotiationModal = ref(false)
 const selectedTeklifForNegotiation = ref<any>(null)
-const currentIlanTitle = ref('')
+const currentIlan = ref<any>(null)
 const counterOfferPrice = ref('')
 const counterOfferNotes = ref('')
 
+const showDisputeModal = ref(false)
+const selectedIlanForDispute = ref<any>(null)
+const disputeReason = ref('Mücbir Sebep - Tedarik zinciri aksaması ve hammadde yokluğu')
+
+const showReviewModal = ref(false)
+const reviewCompany = ref<any>(null)
+const reviewRating = ref(5)
+const reviewComment = ref('')
+const reviewTags = ref<string[]>([])
+
+// Open Negotiation Modal
 function openNegotiation(teklif: any, ilan: any) {
   selectedTeklifForNegotiation.value = teklif
-  currentIlanTitle.value = ilan.baslik
-  counterOfferPrice.value = ''
+  currentIlan.value = ilan
+  const numericPrice = parseInt((teklif.fiyat || '').replace(/[^0-9]/g, '')) || 0
+  counterOfferPrice.value = numericPrice ? String(Math.round(numericPrice * 0.95)) : ''
   counterOfferNotes.value = 'Teklifinizi inceledik. Belirttiğimiz hedef fiyata çekilmesi durumunda ihale tarafınıza verilecektir.'
   showNegotiationModal.value = true
 }
 
-function submitCounterOffer() {
+// Submit Counter Offer (Pazarlık)
+async function submitCounterOffer() {
   if (!counterOfferPrice.value) {
     alert('Lütfen karşı teklif / hedef pazarlık tutarını giriniz.')
     return
   }
-  if (selectedTeklifForNegotiation.value) {
-    selectedTeklifForNegotiation.value.durum = 'pazarlik'
+
+  const teklif = selectedTeklifForNegotiation.value
+  const formattedPrice = Number(counterOfferPrice.value).toLocaleString('tr-TR') + ' ₺'
+  const now = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+
+  teklif.durum = 'pazarlik'
+  if (!teklif.pazarlikGecmisi) teklif.pazarlikGecmisi = []
+  
+  teklif.pazarlikGecmisi.unshift({
+    kim: 'Alıcı Firma (Siz)',
+    mesaj: `Karşı Teklif: ${formattedPrice} — ${counterOfferNotes.value}`,
+    tarih: now,
+    fiyat: formattedPrice
+  })
+
+  // Update matching submittedBid for supplier view
+  const matchingSubmitted = (cmsData.value.dashboard.submittedBids || []).find((b: any) => b.id === teklif.id)
+  if (matchingSubmitted) {
+    matchingSubmitted.durum = 'pazarlik'
+    if (!matchingSubmitted.pazarlikGecmisi) matchingSubmitted.pazarlikGecmisi = []
+    matchingSubmitted.pazarlikGecmisi.unshift({
+      kim: 'Alıcı Firma',
+      mesaj: `Karşı Teklif İletildi: ${formattedPrice} — ${counterOfferNotes.value}`,
+      tarih: now,
+      fiyat: formattedPrice
+    })
   }
+
+  saveCmsData(cmsData.value)
+
+  // Send NetGSM SMS to supplier
+  await sendSms({
+    recipientPhone: teklif.telefon || '+90 532 555 01 23',
+    recipientName: teklif.firma,
+    templateName: 'Karşı Teklif Pazarlık Bildirimi',
+    messageBody: `Sayın ${teklif.yetkili || teklif.firma}, "${currentIlan.value?.baslik}" ihalesinde alıcı firma ${formattedPrice} karşı teklif iletmiştir. Panelinizi inceleyiniz.`
+  })
+
   showNegotiationModal.value = false
-  alert(`💬 PAZARLIK TEKLİFİNİZ İLETİLDİ!\n\n${selectedTeklifForNegotiation.value?.firma} firmasına ${Number(counterOfferPrice.value).toLocaleString('tr-TR')} ₺ tutarındaki karşı teklifiniz başarıyla gönderilmiştir.`)
+  alert(`💬 PAZARLIK TEKLİFİNİZ İLETİLDİ!\n\n${teklif.firma} firmasına ${formattedPrice} tutarındaki karşı teklifiniz başarıyla gönderilmiştir. NetGSM SMS bildirimi yapıldı.`)
 }
 
-function acceptTeklif(teklif: any) {
+// Accept Offer & Close Tender (Single Award Rule)
+async function acceptTeklif(teklif: any, ilan: any) {
+  const confirmAccept = confirm(`🎉 "${teklif.firma}" firmasının ${teklif.fiyat} tutarındaki teklifini onaylayıp ihaleyi tamamlamak istiyor musunuz?\n\nBu işlem sonucunda ihale sonuçlanacak ve diğer teklifler elenecektir.`)
+  if (!confirmAccept) return
+
+  // 1. Mark winning bid as 'onaylandi'
   teklif.durum = 'onaylandi'
-  alert(`🎉 TEBRİKLER!\n\n${teklif.firma} firmasının teklifini kabul ettiniz. Sözleşme ve onay aşamasına geçilmiştir.`)
+
+  // 2. Mark all other bids in this tender as 'elendi'
+  ilan.teklifler.forEach((otherBid: any) => {
+    if (otherBid.id !== teklif.id) {
+      otherBid.durum = 'elendi'
+    }
+  })
+
+  // 3. Mark the parent tender as 'closed'
+  const tenderInStore = (cmsData.value.dashboard.tenders || []).find((t: any) => t.id === ilan.id || t.baslik === ilan.baslik)
+  if (tenderInStore) {
+    tenderInStore.durum = 'closed'
+    tenderInStore.sure = 'Sonuçlandı (Anlaşıldı)'
+  }
+
+  // 4. Update matching submittedBid for supplier view
+  const matchingSubmitted = (cmsData.value.dashboard.submittedBids || []).find((b: any) => b.id === teklif.id)
+  if (matchingSubmitted) {
+    matchingSubmitted.durum = 'onaylandi'
+    matchingSubmitted.yetkili = 'Ahmet Yılmaz (Alıcı Yetkilisi)'
+    matchingSubmitted.telefon = '+90 850 308 00 00'
+    matchingSubmitted.eposta = 'satinlama@ihaleciburada.com'
+    matchingSubmitted.vergiDairesi = 'Karesi V.D. / 4810293847'
+    matchingSubmitted.adres = 'Bahçelievler Mah. Balıkesir'
+  }
+
+  saveCmsData(cmsData.value)
+
+  // 5. Send NetGSM SMS
+  await sendSms({
+    recipientPhone: teklif.telefon || '+90 532 555 01 23',
+    recipientName: teklif.firma,
+    templateName: 'İhale Onay ve Anlaşma',
+    messageBody: `TEBRİKLER! "${ilan.baslik}" ihalesinde teklifiniz onaylanmıştır. Alıcı irtibat ve sözleşme detayları panelinize açılmıştır.`
+  })
+
+  alert(`🎉 TEBRİKLER! İHALE BAŞARIYLA SONUÇLANDI!\n\n${teklif.firma} firması ile ${teklif.fiyat} bedel üzerinden anlaşma sağlandı. Karşılıklı kurumsal iletişim ve vergi bilgileri açılmıştır.`)
+}
+
+// Reject Bid
+function rejectTeklif(teklif: any) {
+  const confirmReject = confirm(`${teklif.firma} firmasının teklifini reddetmek istiyor musunuz?`)
+  if (!confirmReject) return
+
+  teklif.durum = 'reddedildi'
+  const matchingSubmitted = (cmsData.value.dashboard.submittedBids || []).find((b: any) => b.id === teklif.id)
+  if (matchingSubmitted) {
+    matchingSubmitted.durum = 'reddedildi'
+  }
+
+  saveCmsData(cmsData.value)
+  alert(`${teklif.firma} firmasının teklifi reddedildi. Tedarikçi dilerse revize yeni bir teklif iletebilir.`)
+}
+
+// Open Dispute Modal
+function openDisputeModal(ilan: any) {
+  selectedIlanForDispute.value = ilan
+  showDisputeModal.value = true
+}
+
+function submitDispute() {
+  const newDispute = {
+    id: 'DSP-2026-' + Math.floor(100 + Math.random() * 900),
+    tenderTitle: selectedIlanForDispute.value?.baslik,
+    contractId: 'SZL-' + Math.floor(1000 + Math.random() * 9000),
+    parties: `İhale Sahibi (Siz) ⟷ Anlaşılan Firma`,
+    amount: 'Güvenli Havuzda',
+    reason: disputeReason.value,
+    status: 'INCELENIYOR',
+    requestedBy: 'Alıcı Firma (Siz)',
+    date: new Date().toLocaleString('tr-TR')
+  }
+
+  if (!cmsData.value.dashboard.disputes) {
+    cmsData.value.dashboard.disputes = []
+  }
+  cmsData.value.dashboard.disputes.unshift(newDispute)
+  saveCmsData(cmsData.value)
+
+  showDisputeModal.value = false
+  alert(`⚖️ MÜCBİR SEBEP / İPTAL TALEBİNİZ ALINDI\n\nTalep No: ${newDispute.id}\nİhale: ${newDispute.tenderTitle}\n\nPlatform yöneticileri ve Escrow hakem heyeti durumu inceleyerek cezai şartsız iptal ve iade sürecini başlatacaktır.`)
+}
+
+// Open Review Modal
+function openReviewModal(teklif: any) {
+  reviewCompany.value = teklif
+  reviewRating.value = 5
+  reviewComment.value = ''
+  reviewTags.value = ['Zamanında Teslimat', 'Kaliteli Malzeme']
+  showReviewModal.value = true
+}
+
+function submitReview() {
+  const newReview = {
+    id: 'REV-' + Math.floor(100 + Math.random() * 900),
+    companyName: reviewCompany.value?.firma,
+    rating: reviewRating.value,
+    reviewer: 'İhale Sahibi Kurumsal Firma',
+    tags: reviewTags.value,
+    comment: reviewComment.value || 'İhale süreci ve malzeme kalitesi beklentilerimizi tam karşıladı.',
+    date: new Date().toLocaleDateString('tr-TR')
+  }
+
+  if (!cmsData.value.dashboard.companyReviews) {
+    cmsData.value.dashboard.companyReviews = []
+  }
+  cmsData.value.dashboard.companyReviews.unshift(newReview)
+  saveCmsData(cmsData.value)
+
+  showReviewModal.value = false
+  alert(`⭐ DEĞERLENDİRMENİZ KAYDEDİLDİ!\n\n${reviewCompany.value?.firma} firmasına verdiğiniz ${reviewRating.value} yıldızlı puan profil güven skoruna yansıtıldı.`)
 }
 </script>
 
@@ -54,161 +241,265 @@ function acceptTeklif(teklif: any) {
   <div class="p-6 max-w-5xl mx-auto text-left space-y-6">
 
     <!-- Başlık + Gizlilik Notu -->
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #F1F5F9;">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 border-slate-200">
       <div>
-        <h1 class="text-xl font-black text-slate-800 tracking-tight" style="color: #0F172A;">
-          {{ 'Aldığım Teklifler (Gelen)' }}
+        <h1 class="text-2xl font-black text-slate-800 tracking-tight" style="color: #0F172A;">
+          Aldığım Teklifler (Gelen)
         </h1>
         <p class="text-xs text-slate-500 font-medium mt-0.5">
-          {{ 'Açtığınız ihalelere tedarikçilerden gelen tüm teklifleri inceleyin ve pazarlık yapın' }}
+          Açtığınız ihalelere tedarikçilerden gelen teklifleri inceleyin, canlı pazarlık yapın ve kazananı onaylayın.
         </p>
       </div>
 
       <!-- Kapalı Zarf Bilgi Bandı -->
       <div
-        class="inline-flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-bold shrink-0 self-start sm:self-auto"
-        style="background: rgba(0,48,87,0.06); color: #003057; border: 1px solid rgba(0,48,87,0.12);"
+        class="inline-flex items-center gap-2 rounded-2xl px-4 py-2.5 text-xs font-bold shrink-0 self-start sm:self-auto shadow-xs"
+        style="background: #003057; color: white;"
       >
-        <Shield :size="14" style="color: #1EAE4C;" />
-        <span>{{ 'Kapalı Zarf — Teklifler Gizlidir' }}</span>
+        <Shield :size="14" class="text-[#1EAE4C]" />
+        <span>Kapalı Zarf — Şifreli Teklif Akışı</span>
       </div>
     </div>
 
     <!-- Hızlı Geçiş Segment Sekmeleri -->
-    <div class="flex items-center gap-2 p-1 bg-slate-200/70 rounded-2xl w-fit">
+    <div class="flex items-center gap-2 p-1.5 bg-slate-200/70 rounded-2xl w-fit">
       <NuxtLink
         to="/panel/gelen-teklifler"
-        class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-black shadow-xs transition-all bg-white text-[#003057]"
+        class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-black shadow-sm transition-all bg-white text-[#003057]"
       >
-        <Inbox :size="14" class="text-[#1EAE4C]" />
+        <Inbox :size="15" class="text-[#1EAE4C]" />
         <span>Aldığım Teklifler (Gelen)</span>
       </NuxtLink>
       <NuxtLink
         to="/panel/yaptigim-teklifler"
-        class="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white/50 transition-all"
+        class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 hover:bg-white/60 transition-all"
       >
-        <Send :size="14" class="text-slate-400" />
+        <Send :size="15" class="text-slate-400" />
         <span>Verdiğim Teklifler (Yaptığım)</span>
       </NuxtLink>
     </div>
 
-    <!-- İlan Grupları -->
-    <div class="space-y-3">
+    <!-- İlan Grupları Listesi -->
+    <div class="space-y-4">
       <div
         v-for="ilan in ilanlar"
         :key="ilan.id"
-        class="rounded-2xl border bg-white overflow-hidden shadow-xs"
-        style="border-color: #E2E8F0;"
+        class="rounded-3xl border bg-white overflow-hidden shadow-xs border-slate-200 transition hover:shadow-md"
       >
         <!-- İlan Başlık Satırı -->
         <button
           @click="toggle(ilan.id)"
-          class="flex w-full items-center justify-between p-5 text-left transition hover:bg-slate-50/80 cursor-pointer"
+          class="flex w-full items-center justify-between p-6 text-left transition hover:bg-slate-50/80 cursor-pointer"
         >
           <div class="flex items-center gap-4">
-            <div
-              class="flex h-10 w-10 items-center justify-center rounded-xl shrink-0"
-              style="background: rgba(30,58,95,0.06);"
-            >
-              <Inbox :size="18" style="color: #1E3A5F;" />
+            <div class="flex h-12 w-12 items-center justify-center rounded-2xl shrink-0 bg-blue-50 border border-blue-100 text-[#003057]">
+              <Inbox :size="20" />
             </div>
             <div>
-              <h3 class="font-bold text-sm text-slate-800">{{ ilan.baslik }}</h3>
-              <p class="text-xs text-slate-400 mt-0.5 font-medium">
-                {{ ilan.kategori }} • {{ 'Bitiş:' }} {{ ilan.bitis }}
+              <div class="flex items-center gap-2">
+                <h3 class="font-black text-base text-slate-900">{{ ilan.baslik }}</h3>
+                <span class="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md font-mono">{{ ilan.id }}</span>
+              </div>
+              <p class="text-xs text-slate-400 mt-1 font-medium">
+                {{ ilan.kategori }} • <span class="text-slate-600 font-bold">Kalan Süre:</span> {{ ilan.bitis }}
               </p>
             </div>
           </div>
 
           <div class="flex items-center gap-4">
             <span
-              class="rounded-full px-3 py-1 text-xs font-bold"
-              style="background: rgba(245,158,11,0.1); color: #D97706;"
+              class="rounded-xl px-3.5 py-1.5 text-xs font-black"
+              :class="ilan.teklifler?.some((t: any) => t.durum === 'onaylandi') ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-amber-50 text-amber-700 border border-amber-200'"
             >
-              {{ ilan.teklifler.length }} {{ 'Teklif' }}
+              {{ ilan.teklifler?.some((t: any) => t.durum === 'onaylandi') ? '✓ Sonuçlandı' : `${ilan.teklifler?.length || 0} Teklif Geldi` }}
             </span>
-            <ChevronDown v-if="expandedIlan !== ilan.id" :size="18" style="color: #94A3B8;" />
-            <ChevronUp v-else :size="18" style="color: #94A3B8;" />
+            <ChevronDown v-if="expandedIlan !== ilan.id" :size="20" class="text-slate-400" />
+            <ChevronUp v-else :size="20" class="text-slate-700" />
           </div>
         </button>
 
-        <!-- Teklif Detayları (sadece ilan sahibine açık) -->
-        <div v-if="expandedIlan === ilan.id" class="border-t" style="border-color: #F1F5F9;">
-          <div class="px-5 py-3" style="background: #FFFBEB;">
-            <div class="flex items-center gap-2 text-xs font-bold" style="color: #92400E;">
-              <Shield :size="13" />
-              <span>
-                {{ 'Bu teklifler gizlidir. Tedarikçiler birbirlerinin tekliflerini göremez.' 
-                }}
-              </span>
+        <!-- Teklif Kartları & Pazarlık Arayüzü -->
+        <div v-if="expandedIlan === ilan.id" class="border-t border-slate-100">
+          
+          <!-- Bilgilendirme ve Güven Şeridi -->
+          <div class="px-6 py-3 bg-amber-50/70 border-b border-amber-100 flex items-center justify-between text-xs text-amber-900 font-bold">
+            <div class="flex items-center gap-2">
+              <Shield :size="14" class="text-amber-600" />
+              <span>Teklifler gizli kapalı zarf korumasındadır. Bir teklifi onayladığınızda ihale kapanır ve diğer teklifler elenir.</span>
             </div>
+            <button 
+              v-if="ilan.teklifler?.some((t: any) => t.durum === 'onaylandi')"
+              type="button"
+              @click="openDisputeModal(ilan)"
+              class="text-red-700 hover:text-red-900 underline text-xs font-black flex items-center gap-1 cursor-pointer"
+            >
+              <Scale :size="13" />
+              Mücbir Sebep / İptal Bildir
+            </button>
           </div>
 
-          <div class="divide-y divide-slate-100">
+          <!-- Gelen Teklif Yoksa -->
+          <div v-if="!ilan.teklifler || ilan.teklifler.length === 0" class="p-8 text-center text-slate-400 text-xs">
+            Bu ihaleye henüz tedarikçilerden teklif gelmedi. İlanınız Pazar Yeri'nde yayınlanmaktadır.
+          </div>
+
+          <!-- Teklif Öğeleri -->
+          <div v-else class="divide-y divide-slate-100">
             <div
               v-for="teklif in ilan.teklifler"
               :key="teklif.id"
-              class="flex flex-col sm:flex-row sm:items-center justify-between px-5 py-4 gap-3"
+              class="p-6 space-y-4 transition"
+              :class="teklif.durum === 'onaylandi' ? 'bg-emerald-50/40' : (teklif.durum === 'elendi' ? 'opacity-60 bg-slate-50/50' : '')"
             >
-              <div class="flex items-center gap-3">
-                <div
-                  class="flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white shrink-0"
-                  style="background: #003057;"
-                >
-                  {{ teklif.firma.charAt(0) }}
-                </div>
-                <div>
-                  <div class="flex items-center gap-2">
-                    <span class="text-sm font-bold text-slate-800">{{ teklif.firma }}</span>
-                    <span class="flex items-center gap-0.5 text-xs font-bold text-emerald-600">
-                      <Star :size="11" fill="#16A34A" class="text-emerald-600" />
-                      {{ teklif.puan }}
-                    </span>
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                
+                <!-- Firma & Puan -->
+                <div class="flex items-start sm:items-center gap-3">
+                  <div
+                    class="flex h-11 w-11 items-center justify-center rounded-2xl text-sm font-black text-white shrink-0 shadow-sm"
+                    :style="teklif.durum === 'onaylandi' ? 'background: #1EAE4C;' : 'background: #003057;'"
+                  >
+                    {{ teklif.firma.charAt(0) }}
                   </div>
-                  <div class="flex items-center gap-3 mt-0.5 text-xs text-slate-400 font-medium">
-                    <span class="flex items-center gap-1"><Clock :size="11" /> {{ teklif.sure }} {{ 'teslimat' }}</span>
-                    <span class="font-mono text-xs text-slate-400">{{ teklif.id }}</span>
+                  <div>
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <span class="text-sm font-black text-slate-900">{{ teklif.firma }}</span>
+                      <span class="inline-flex items-center gap-0.5 text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
+                        <Star :size="11" fill="#D97706" />
+                        {{ teklif.puan }}
+                      </span>
+                      <span v-if="teklif.durum === 'onaylandi'" class="px-2 py-0.5 rounded bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider">
+                        KAZANAN TEDARİKÇİ ✓
+                      </span>
+                      <span v-else-if="teklif.durum === 'elendi'" class="px-2 py-0.5 rounded bg-slate-200 text-slate-600 text-[10px] font-bold">
+                        Elenmiş
+                      </span>
+                    </div>
+
+                    <div class="flex items-center gap-4 mt-1 text-xs text-slate-400 font-medium">
+                      <span class="flex items-center gap-1"><Clock :size="12" /> Teslimat: <strong>{{ teklif.sure }}</strong></span>
+                      <span class="font-mono text-slate-400">Teklif ID: {{ teklif.id }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Fiyat ve Eylemler -->
+                <div class="flex items-center gap-3 justify-between sm:justify-end">
+                  <div class="text-right">
+                    <span class="text-[10px] text-slate-400 uppercase font-bold block">Teklif Tutarı:</span>
+                    <span class="text-lg font-black font-mono text-slate-900">{{ teklif.fiyat }}</span>
+                  </div>
+
+                  <!-- Durum Rozeti -->
+                  <span
+                    class="rounded-xl px-3 py-1.5 text-xs font-black shrink-0"
+                    :class="{
+                      'bg-emerald-100 text-emerald-800 border border-emerald-300': teklif.durum === 'onaylandi',
+                      'bg-amber-100 text-amber-800 border border-amber-300': teklif.durum === 'pazarlik',
+                      'bg-red-100 text-red-800 border border-red-200': teklif.durum === 'reddedildi',
+                      'bg-slate-100 text-slate-600': teklif.durum === 'elendi' || teklif.durum === 'bekliyor'
+                    }"
+                  >
+                    {{ 
+                      teklif.durum === 'onaylandi' ? '✓ Onaylandı' :
+                      teklif.durum === 'pazarlik' ? '💬 Pazarlıkta' :
+                      teklif.durum === 'reddedildi' ? '✕ Reddedildi' :
+                      teklif.durum === 'elendi' ? 'Elenmiş' : 'İncelemede'
+                    }}
+                  </span>
+
+                  <!-- Eylem Butonları (Teklif henüz onaylanmamışsa) -->
+                  <div v-if="!ilan.teklifler.some((t: any) => t.durum === 'onaylandi') && teklif.durum !== 'reddedildi'" class="flex items-center gap-2">
+                    <button
+                      type="button"
+                      @click="openNegotiation(teklif, ilan)"
+                      class="rounded-xl px-3.5 py-2 text-xs font-black bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition cursor-pointer shadow-2xs"
+                    >
+                      💬 Pazarlık
+                    </button>
+                    <button
+                      type="button"
+                      @click="acceptTeklif(teklif, ilan)"
+                      class="rounded-xl px-4 py-2 text-xs font-black text-white transition cursor-pointer hover:bg-[#188c3d] bg-[#1EAE4C] shadow-md shadow-[#1EAE4C]/20"
+                    >
+                      Kabul Et & Bitir
+                    </button>
+                    <button
+                      type="button"
+                      @click="rejectTeklif(teklif)"
+                      class="rounded-xl p-2 text-xs font-bold text-red-500 hover:bg-red-50 transition border border-red-200"
+                      title="Teklifi Reddet"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <!-- Anlaşıldıysa Değerlendirme Butonu -->
+                  <div v-else-if="teklif.durum === 'onaylandi'">
+                    <button
+                      type="button"
+                      @click="openReviewModal(teklif)"
+                      class="rounded-xl px-3.5 py-2 text-xs font-black bg-white hover:bg-slate-50 text-slate-800 border border-slate-300 shadow-xs flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Star :size="13" class="text-amber-500" fill="#F59E0B" />
+                      Puanla & Yorum Yaz
+                    </button>
+                  </div>
+
+                </div>
+
+              </div>
+
+              <!-- 🟢 EĞER ANLAŞMA SAĞLANDIYSA: DOĞRUDAN AÇILAN KURUMSAL İLETİŞİM KARTI -->
+              <div v-if="teklif.durum === 'onaylandi'" class="p-5 rounded-2xl bg-white border border-emerald-200 shadow-sm space-y-3">
+                <div class="flex items-center justify-between border-b border-emerald-100 pb-2">
+                  <span class="text-xs font-black text-emerald-800 flex items-center gap-1.5">
+                    <CheckCircle2 :size="15" class="text-emerald-600" />
+                    KAZANAN TEDARİKÇİ İRTİBAT VE FATURA BİLGİLERİ (AÇILDI)
+                  </span>
+                  <span class="text-[10px] font-bold text-slate-400">İhaleciBurada Sözleşme Güvencesi</span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                  <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <span class="text-[10px] text-slate-400 font-bold block">Yetkili Kişi</span>
+                    <strong class="text-slate-800">{{ teklif.yetkili || 'Mehmet Yılmaz' }}</strong>
+                  </div>
+                  <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <span class="text-[10px] text-slate-400 font-bold block">Telefon (GSM)</span>
+                    <a :href="`tel:${teklif.telefon || '+905324441122'}`" class="text-blue-600 font-bold hover:underline">{{ teklif.telefon || '+90 532 444 11 22' }}</a>
+                  </div>
+                  <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <span class="text-[10px] text-slate-400 font-bold block">Kurumsal E-Posta</span>
+                    <a :href="`mailto:${teklif.eposta || 'satis@firma.com'}`" class="text-blue-600 font-bold hover:underline">{{ teklif.eposta || 'satis@firma.com' }}</a>
+                  </div>
+                  <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
+                    <span class="text-[10px] text-slate-400 font-bold block">Vergi Dairesi / No</span>
+                    <strong class="text-slate-800">{{ teklif.vergiDairesi || 'Karesi V.D. / 1450293847' }}</strong>
                   </div>
                 </div>
               </div>
 
-              <div class="flex items-center gap-3 justify-between sm:justify-end">
-                <span class="text-base font-black font-mono text-slate-900">{{ teklif.fiyat }}</span>
-                <span
-                  class="rounded-full px-2.5 py-1 text-xs font-bold"
-                  :style="teklif.durum === 'onaylandi'
-                    ? 'background: rgba(34,197,94,0.1); color: #16A34A;'
-                    : (teklif.durum === 'pazarlik' ? 'background: #FEF3C7; color: #B45309;' : 'background: rgba(148,163,184,0.12); color: #64748B;')"
-                >
-                  {{ teklif.durum === 'onaylandi' ? '✓ Onaylandı' : (teklif.durum === 'pazarlik' ? '💬 Pazarlık Sürecinde' : 'Değerlendiriliyor') }}
-                </span>
-                <div v-if="teklif.durum !== 'onaylandi'" class="flex items-center gap-2">
-                  <button
-                    type="button"
-                    @click="openNegotiation(teklif, ilan)"
-                    class="rounded-xl px-3 py-2 text-xs font-black bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition cursor-pointer"
-                  >
-                    💬 Pazarlık
-                  </button>
-                  <button
-                    type="button"
-                    @click="acceptTeklif(teklif)"
-                    class="rounded-xl px-4 py-2 text-xs font-bold text-white transition cursor-pointer hover:bg-emerald-600 bg-[#0052FF]"
-                  >
-                    Kabul Et
-                  </button>
+              <!-- Pazarlık Geçmişi Kutusu -->
+              <div v-if="teklif.pazarlikGecmisi && teklif.pazarlikGecmisi.length > 0" class="p-3.5 rounded-xl bg-amber-50/50 border border-amber-200/60 text-xs space-y-1.5">
+                <span class="text-[10px] font-black text-amber-700 uppercase tracking-wider block">💬 Pazarlık & Karşı Teklif Geçmişi</span>
+                <div v-for="(paz, pIdx) in teklif.pazarlikGecmisi" :key="pIdx" class="flex justify-between items-center text-slate-700 bg-white p-2 rounded-lg border border-amber-100">
+                  <span><strong>{{ paz.kim }}:</strong> {{ paz.mesaj }}</span>
+                  <span class="text-[10px] text-slate-400 font-mono shrink-0 ml-2">{{ paz.tarih }}</span>
                 </div>
               </div>
+
             </div>
           </div>
+
         </div>
 
       </div>
     </div>
 
-    <!-- 🟢 FİYAT PAZARLIĞI VE KARŞI TEKLİF MODALI -->
+    <!-- MODAL 1: PAZARLIK & KARŞI TEKLİF -->
     <div v-if="showNegotiationModal && selectedTeklifForNegotiation" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
-      <div class="w-full max-w-lg rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden text-left p-6 space-y-5">
+      <div class="w-full max-w-lg rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden text-left p-6 sm:p-8 space-y-5">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div class="flex items-center gap-2.5">
             <div class="h-10 w-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-lg">
@@ -216,57 +507,49 @@ function acceptTeklif(teklif: any) {
             </div>
             <div>
               <span class="text-[9px] font-black text-amber-600 uppercase tracking-wider block">B2B FİYAT PAZARLIĞI</span>
-              <h3 class="text-sm font-black text-slate-900">Tedarikçi ile Pazarlık & Karşı Teklif</h3>
+              <h3 class="text-base font-black text-slate-900">Karşı Teklif & Hedef Fiyat İlet</h3>
             </div>
           </div>
-          <button @click="showNegotiationModal = false" class="text-slate-400 hover:text-slate-700 transition">
+          <button @click="showNegotiationModal = false" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl">
             ✕
           </button>
         </div>
 
-        <div class="space-y-3">
-          <div class="p-3 rounded-xl bg-slate-50 border border-slate-200/80 space-y-1.5">
-            <div class="flex justify-between items-center text-xs">
-              <span class="text-slate-500 font-medium">Tedarikçi Firma:</span>
+        <div class="space-y-4">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1.5 text-xs">
+            <div class="flex justify-between items-center">
+              <span class="text-slate-500 font-medium">Tedarikçi:</span>
               <span class="font-black text-slate-800">{{ selectedTeklifForNegotiation.firma }}</span>
             </div>
-            <div class="flex justify-between items-center text-xs">
+            <div class="flex justify-between items-center">
               <span class="text-slate-500 font-medium">Mevcut Teklif Tutarı:</span>
               <span class="font-black text-emerald-600 font-mono text-sm">{{ selectedTeklifForNegotiation.fiyat }}</span>
             </div>
-            <div class="flex justify-between items-center text-[11px]">
-              <span class="text-slate-400">İhale:</span>
-              <span class="text-slate-700 font-bold line-clamp-1">{{ currentIlanTitle }}</span>
-            </div>
           </div>
 
-          <!-- Hedef Pazarlık Fiyatı -->
           <div>
             <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">
-              HEDEF PAZARLIK / KARŞI TEKLİF TUTARI (₺) *
+              HEDEF PAZARLIK TUTARINIZ (₺ / KDV DAHİL) *
             </label>
             <div class="relative">
               <span class="absolute left-3.5 top-1/2 -translate-y-1/2 font-black text-amber-600 text-sm">₺</span>
               <input
                 v-model="counterOfferPrice"
                 type="number"
-                placeholder="Örn: 950.000"
-                class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black font-mono text-slate-900 outline-none focus:border-amber-500 focus:bg-white transition-all shadow-xs"
+                placeholder="Örn: 1.300.000"
+                class="w-full pl-9 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-black font-mono text-slate-900 outline-none focus:border-amber-500 focus:bg-white transition-all"
               />
             </div>
-            <span class="text-[10px] text-slate-400 mt-1 block">Tedarikçiye iletilecek revize hedef teklif tutarı.</span>
           </div>
 
-          <!-- Pazarlık Notu / Şartları -->
           <div>
             <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">
-              PAZARLIK ŞARTLARI VE NOTUNUZ *
+              PAZARLIK ŞARTLARINIZ & NOTUNUZ *
             </label>
             <textarea
               v-model="counterOfferNotes"
               rows="3"
-              placeholder="Örn: Belirtilen fiyata inilmesi durumunda ihale tarafınıza verilecektir."
-              class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-amber-500 focus:bg-white transition-all resize-none"
+              class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-amber-500 focus:bg-white resize-none"
             ></textarea>
           </div>
         </div>
@@ -282,9 +565,103 @@ function acceptTeklif(teklif: any) {
           <button
             type="button"
             @click="submitCounterOffer"
-            class="w-2/3 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border border-amber-300"
+            class="w-2/3 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs transition shadow-md flex items-center justify-center gap-2 cursor-pointer border border-amber-300"
           >
-            <span>💬 Karşı Teklifi İlet</span>
+            <span>💬 Karşı Teklifi Gönder & SMS İlet</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 2: MÜCBİR SEBEP & İPTAL TALEBİ -->
+    <div v-if="showDisputeModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div class="w-full max-w-lg rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-5 text-left">
+        <div class="flex items-center justify-between border-b pb-3 border-slate-100">
+          <div class="flex items-center gap-2">
+            <Scale :size="20" class="text-red-600" />
+            <h3 class="text-base font-black text-slate-900">Mücbir Sebep & İptal Masası</h3>
+          </div>
+          <button @click="showDisputeModal = false" class="text-slate-400 hover:text-slate-700">✕</button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <p class="text-slate-500 leading-relaxed">
+            İflas, ölüm, ağır kaza, hammadde krizleri veya doğal afet gibi mücbir sebeplerden dolayı anlaşmanın feshedilmesi gerekiyorsa gerekçenizi bildiriniz.
+          </p>
+
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">MÜCBİR SEBEP / FESİH GEREKÇESİ *</label>
+            <textarea
+              v-model="disputeReason"
+              rows="4"
+              class="w-full p-3 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 outline-none focus:border-red-500"
+              placeholder="Ayrıntılı gerekçenizi yazınız..."
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button @click="showDisputeModal = false" class="px-4 py-2.5 rounded-xl border text-xs font-bold text-slate-600">
+            Vazgeç
+          </button>
+          <button
+            @click="submitDispute"
+            class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-md"
+          >
+            Hakem Heyetine İlet
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 3: DEĞERLENDİRME & PUANLAMA -->
+    <div v-if="showReviewModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div class="w-full max-w-md rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-5 text-left">
+        <div class="flex items-center justify-between border-b pb-3 border-slate-100">
+          <div>
+            <span class="text-xs font-black text-amber-600 uppercase">FİRMA DEĞERLENDİRME</span>
+            <h3 class="text-base font-black text-slate-900 mt-0.5">{{ reviewCompany?.firma }}</h3>
+          </div>
+          <button @click="showReviewModal = false" class="text-slate-400 hover:text-slate-700">✕</button>
+        </div>
+
+        <div class="space-y-4 text-xs">
+          <!-- 5 Yıldız Seçici -->
+          <div class="text-center py-2 bg-slate-50 rounded-2xl">
+            <span class="text-[10px] font-bold text-slate-400 block mb-1">PUANINIZ</span>
+            <div class="flex items-center justify-center gap-2">
+              <button
+                v-for="star in 5"
+                :key="star"
+                type="button"
+                @click="reviewRating = star"
+                class="p-1 hover:scale-125 transition cursor-pointer"
+              >
+                <Star :size="24" :class="star <= reviewRating ? 'text-amber-500 fill-amber-500' : 'text-slate-300'" />
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">YORUM & GÖRÜŞÜNÜZ</label>
+            <textarea
+              v-model="reviewComment"
+              rows="3"
+              placeholder="Tedarikçinin teslimat hızı, paketleme kalitesi ve iletişimini değerlendirin..."
+              class="w-full p-3 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 outline-none focus:border-[#1EAE4C]"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2 pt-2">
+          <button @click="showReviewModal = false" class="px-4 py-2.5 rounded-xl border text-xs font-bold text-slate-600">
+            Kapat
+          </button>
+          <button
+            @click="submitReview"
+            class="px-5 py-2.5 rounded-xl bg-[#003057] hover:bg-[#1EAE4C] text-white font-black text-xs shadow-md"
+          >
+            Puanı Kaydet
           </button>
         </div>
       </div>

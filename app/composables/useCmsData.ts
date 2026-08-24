@@ -101,115 +101,310 @@ export const DEFAULT_CMS_DATA = {
   dashboard: {
     tenders: [
       {
+        id: 'IHC-2026-101',
+        baslik: '10 KM Mıcır Yol Yapım İşi',
+        kategori: 'İnşaat ve Yapı / Yol Yapımı',
+        sure: '7 gün kaldı',
+        teklifSayisi: 2,
+        durum: 'active',
+        butce: '1.450.000 ₺',
+        city: 'Balıkesir',
+        image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60',
+        aciklama: '10 kilometre yol boyunca 0-38 mm temel mıcır malzeme temini, serimi, finişer ve silindir ile sıkıştırma işi.',
+        olusturma: '24 Ağu 2026'
+      },
+      {
+        id: 'IHC-2026-102',
+        baslik: 'Harita Ölçüm İşi & Plankote',
+        kategori: 'İnşaat ve Yapı / Konut İnşaatı',
+        sure: '5 gün kaldı',
+        teklifSayisi: 1,
+        durum: 'active',
+        butce: '65.000 ₺',
+        city: 'Bursa',
+        image: 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=60',
+        aciklama: '35.000 m² sanayi arazisi halihazır harita alımı, plankote ve GNSS koordinatlandırma çalışması.',
+        olusturma: '24 Ağu 2026'
+      },
+      {
         id: 'IHC-2024-001',
         baslik: 'Kurumsal Ofis Malzemeleri Alımı',
-        kategori: 'Kırtasiye & Ofis',
+        kategori: 'Mobilya ve Ofis / Büro Mobilyası',
         sure: '2 gün kaldı',
-        teklifSayisi: 7,
+        teklifSayisi: 3,
         durum: 'active',
         butce: '45.000 ₺',
+        city: 'İstanbul',
+        image: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=60',
+        aciklama: 'A4 fotokopi kağıtları, tonerler ve kurumsal kırtasiye paketleri toplu tedariki.',
         olusturma: '14 Tem 2024'
       },
       {
         id: 'IHC-2024-002',
         baslik: 'Güvenlik Kamerası Sistemi Kurulumu',
-        kategori: 'Teknoloji & Yazılım',
+        kategori: 'Elektronik / Güvenlik Kamerası',
         sure: '5 gün kaldı',
-        teklifSayisi: 12,
+        teklifSayisi: 2,
         durum: 'active',
         butce: '180.000 ₺',
+        city: 'Ankara',
+        image: 'https://images.unsplash.com/photo-1557597774-9d273605dfa9?w=600&auto=format&fit=crop&q=60',
+        aciklama: '48 adet IP 4K PoE kamera, NVR sunucu ve Cat6 kablolama altyapı kurulumu.',
         olusturma: '12 Tem 2024'
       },
       {
         id: 'IHC-2024-003',
         baslik: 'Tarımsal Sulama Ekipmanları Alımı',
-        kategori: 'Tarım & Gıda',
+        kategori: 'Tarım ve Hayvancılık / Sulama Sistemleri',
         sure: 'Tamamlandı',
         teklifSayisi: 4,
         durum: 'closed',
         butce: '320.000 ₺',
+        city: 'İzmir',
+        image: 'https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=600&auto=format&fit=crop&q=60',
+        aciklama: 'Damlama sulama boruları, ana hat vanaları ve filtreleme tankları alımı.',
         olusturma: '01 Tem 2024'
       },
       {
         id: 'IHC-2024-004',
         baslik: 'Lojistik Taşımacılık Hizmeti Alımı',
-        kategori: 'Lojistik & Taşımacılık',
+        kategori: 'Araç ve İş Makineleri / Kamyon',
         sure: '10 gün kaldı',
         teklifSayisi: 3,
         durum: 'active',
         butce: '95.000 ₺',
+        city: 'Kocaeli',
+        image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=60',
+        aciklama: 'Gebze-Balıkesir arası haftalık 8 seferlik kapalı kasa tır taşımacılık hizmeti.',
         olusturma: '10 Tem 2024'
       }
     ],
     receivedBids: [
       {
+        id: 'IHC-2026-101',
+        baslik: '10 KM Mıcır Yol Yapım İşi',
+        kategori: 'İnşaat ve Yapı / Yol Yapımı',
+        bitis: '7 gün kaldı',
+        teklifler: [
+          {
+            id: 'TKF-101',
+            firma: 'Balıkesir Agrega & Mıcır Ltd.',
+            fiyat: '1.380.000 ₺',
+            sure: '15 gün',
+            puan: 4.9,
+            durum: 'bekliyor',
+            yetkili: 'Mehmet Yılmaz',
+            telefon: '+90 532 444 11 22',
+            eposta: 'satis@balikesiragrega.com',
+            vergiDairesi: 'Karesi V.D. / 1450293847',
+            adres: 'Organize Sanayi Bölgesi 4. Cadde No:12 Balıkesir',
+            pazarlikGecmisi: []
+          },
+          {
+            id: 'TKF-102',
+            firma: 'Kaya Taş Ocağı & İnşaat A.Ş.',
+            fiyat: '1.420.000 ₺',
+            sure: '12 gün',
+            puan: 4.7,
+            durum: 'bekliyor',
+            yetkili: 'Cemil Kaya',
+            telefon: '+90 533 888 77 66',
+            eposta: 'ihale@kayatasocagi.com.tr',
+            vergiDairesi: 'Altıeylül V.D. / 8740192834',
+            adres: 'Değirmenboğazı Mevkii Taşocağı Yolu Balıkesir',
+            pazarlikGecmisi: []
+          }
+        ]
+      },
+      {
+        id: 'IHC-2026-102',
+        baslik: 'Harita Ölçüm İşi & Plankote',
+        kategori: 'İnşaat ve Yapı / Konut İnşaatı',
+        bitis: '5 gün kaldı',
+        teklifler: [
+          {
+            id: 'TKF-103',
+            firma: 'Marmara Jeodezi & Harita Müh.',
+            fiyat: '58.000 ₺',
+            sure: '4 gün',
+            puan: 4.8,
+            durum: 'bekliyor',
+            yetkili: 'Harun Demir (Harita Yük. Müh.)',
+            telefon: '+90 535 777 99 00',
+            eposta: 'harun@marmarajeodezi.com',
+            vergiDairesi: 'Osmangazi V.D. / 6210984736',
+            adres: 'FSM Bulvarı No:48 Nilüfer, Bursa',
+            pazarlikGecmisi: []
+          }
+        ]
+      },
+      {
         id: 'IHC-2024-001',
         baslik: 'Kurumsal Ofis Malzemeleri Alımı',
-        kategori: 'Kırtasiye & Ofis',
+        kategori: 'Mobilya ve Ofis / Büro Mobilyası',
         bitis: '16 Tem 2024',
         teklifler: [
-          { id: 'TKF-001', firma: 'ABC Kırtasiye A.Ş.', fiyat: '38.500 ₺', sure: '7 gün', puan: 4.8, durum: 'bekliyor' },
-          { id: 'TKF-002', firma: 'Delta Ofis Ltd.', fiyat: '41.200 ₺', sure: '5 gün', puan: 4.2, durum: 'bekliyor' },
-          { id: 'TKF-003', firma: 'OfisPro Lojistik', fiyat: '36.900 ₺', sure: '10 gün', puan: 4.6, durum: 'onaylandi' }
+          {
+            id: 'TKF-001',
+            firma: 'ABC Kırtasiye A.Ş.',
+            fiyat: '38.500 ₺',
+            sure: '7 gün',
+            puan: 4.8,
+            durum: 'bekliyor',
+            yetkili: 'Ali Çelik',
+            telefon: '+90 532 111 22 33',
+            eposta: 'ali@abckirtasiye.com',
+            vergiDairesi: 'Mecidiyeköy V.D. / 0192837465',
+            adres: 'Büyükdere Cad. No:82 Şişli, İstanbul',
+            pazarlikGecmisi: []
+          },
+          {
+            id: 'TKF-002',
+            firma: 'Delta Ofis Ltd.',
+            fiyat: '41.200 ₺',
+            sure: '5 gün',
+            puan: 4.2,
+            durum: 'bekliyor',
+            yetkili: 'Selim Kurt',
+            telefon: '+90 542 333 44 55',
+            eposta: 'selim@deltaofis.com',
+            vergiDairesi: 'Kozyatağı V.D. / 9988776655',
+            adres: 'İnönü Cad. No:14 Kadıköy, İstanbul',
+            pazarlikGecmisi: []
+          },
+          {
+            id: 'TKF-003',
+            firma: 'OfisPro Lojistik',
+            fiyat: '36.900 ₺',
+            sure: '10 gün',
+            puan: 4.6,
+            durum: 'bekliyor',
+            yetkili: 'Burak Demir',
+            telefon: '+90 533 555 66 77',
+            eposta: 'burak@ofispro.com',
+            vergiDairesi: 'Beyoğlu V.D. / 4455667788',
+            adres: 'Karaköy Rıhtım Cad. No:5 İstanbul',
+            pazarlikGecmisi: []
+          }
         ]
       },
       {
         id: 'IHC-2024-002',
         baslik: 'Güvenlik Kamerası Sistemi Kurulumu',
-        kategori: 'Teknoloji & Yazılım',
+        kategori: 'Elektronik / Güvenlik Kamerası',
         bitis: '21 Tem 2024',
         teklifler: [
-          { id: 'TKF-004', firma: 'SecureTek Sistemleri', fiyat: '162.000 ₺', sure: '14 gün', puan: 4.9, durum: 'bekliyor' },
-          { id: 'TKF-005', firma: 'Kamera Dünyası A.Ş.', fiyat: '175.000 ₺', sure: '7 gün', puan: 4.1, durum: 'bekliyor' }
-        ]
-      },
-      {
-        id: 'IHC-2024-004',
-        baslik: 'Lojistik Taşımacılık Hizmeti Alımı',
-        kategori: 'Lojistik & Taşımacılık',
-        bitis: '26 Tem 2024',
-        teklifler: [
-          { id: 'TKF-006', firma: 'Hızlı Kargo Lojistik Ltd.', fiyat: '88.000 ₺', sure: '30 gün', puan: 4.7, durum: 'bekliyor' }
+          {
+            id: 'TKF-004',
+            firma: 'SecureTek Sistemleri',
+            fiyat: '162.000 ₺',
+            sure: '14 gün',
+            puan: 4.9,
+            durum: 'bekliyor',
+            yetkili: 'Volkan Aktaş',
+            telefon: '+90 530 123 45 67',
+            eposta: 'proje@securetek.com',
+            vergiDairesi: 'Çankaya V.D. / 3322110099',
+            adres: 'Cinnah Cad. No:31 Çankaya, Ankara',
+            pazarlikGecmisi: []
+          },
+          {
+            id: 'TKF-005',
+            firma: 'Kamera Dünyası A.Ş.',
+            fiyat: '175.000 ₺',
+            sure: '7 gün',
+            puan: 4.1,
+            durum: 'bekliyor',
+            yetkili: 'Engin Koç',
+            telefon: '+90 541 987 65 43',
+            eposta: 'engin@kameradunyasi.com',
+            vergiDairesi: 'Ulus V.D. / 7788990011',
+            adres: 'Rüzgarlı Sok. No:19 Altındağ, Ankara',
+            pazarlikGecmisi: []
+          }
         ]
       }
     ],
     submittedBids: [
       {
         id: 'TKF-008',
+        tenderId: 'IHC-2026-901',
         ilanBaslik: 'Yazılım Geliştirme & API Hizmetleri',
-        aliciFirma: '****** A.Ş.',
-        kategori: 'Teknoloji & Yazılım',
+        aliciFirma: 'TechB2B Holding A.Ş.',
+        kategori: 'Bilgisayar ve Teknoloji / Web Yazılımı',
         teklifFiyatim: '95.000 ₺',
         sure: '45 gün',
         durum: 'bekliyor',
-        tarih: '14 Tem 2024',
-        bitisTarihi: '20 Tem 2024',
-        notum: 'Teslimat süresini 30 güne düşürebiliriz.'
+        tarih: '24 Ağu 2026',
+        bitisTarihi: '30 Ağu 2026',
+        notum: 'Teslimat süresini 30 güne düşürebiliriz.',
+        pazarlikGecmisi: []
       },
       {
         id: 'TKF-009',
+        tenderId: 'IHC-2026-902',
         ilanBaslik: 'Tarımsal Gübre Tedariki',
-        aliciFirma: '****** Ltd.',
-        kategori: 'Tarım & Gıda',
+        aliciFirma: 'Ege Tarım Birlik Ltd.',
+        kategori: 'Tarım ve Hayvancılık / Gübre',
         teklifFiyatim: '210.000 ₺',
         sure: '14 gün',
         durum: 'onaylandi',
-        tarih: '10 Tem 2024',
-        bitisTarihi: '18 Tem 2024',
-        notum: 'ISO sertifikalı ürünler. Numune gönderilebilir.'
+        tarih: '20 Ağu 2026',
+        bitisTarihi: '28 Ağu 2026',
+        notum: 'ISO sertifikalı ürünler. Numune gönderilebilir.',
+        yetkili: 'Kenan Ege',
+        telefon: '+90 532 999 88 77',
+        eposta: 'kenan@egetarim.com',
+        vergiDairesi: 'Konak V.D. / 1122334455',
+        adres: 'Liman Cad. No:99 Konak, İzmir',
+        pazarlikGecmisi: []
       },
       {
         id: 'TKF-010',
+        tenderId: 'IHC-2026-903',
         ilanBaslik: 'Yönetici Ofis Mobilyaları Alımı',
-        aliciFirma: '****** Grup',
-        kategori: 'Kırtasiye & Ofis',
+        aliciFirma: 'Anadolu Finans Grup',
+        kategori: 'Mobilya ve Ofis / Büro Mobilyası',
         teklifFiyatim: '78.500 ₺',
         sure: '21 gün',
         durum: 'reddedildi',
-        tarih: '08 Tem 2024',
-        bitisTarihi: '15 Tem 2024',
-        notum: ''
+        tarih: '18 Ağu 2026',
+        bitisTarihi: '25 Ağu 2026',
+        notum: 'Üst segment ceviz kaplama masa takımı.',
+        pazarlikGecmisi: [
+          { kim: 'Alıcı Firma', mesaj: 'Fiyat bütçemizin üzerindedir. 65.000 TL bandında revize edebilir misiniz?', tarih: '20 Ağu 2026' }
+        ]
       }
+    ],
+    disputes: [
+      {
+        id: 'DSP-2026-01',
+        tenderTitle: 'Endüstriyel Trafo & Jeneratör Alımı',
+        contractId: 'SZL-9482',
+        parties: 'Atlas Enerji A.Ş. ⟷ Güçlü Elektrik Ltd.',
+        amount: '420.000 ₺',
+        reason: 'Mücbir Sebep - Uluslararası hammadde tedarik zinciri aksaması ve fabrikanın su baskını geçirmesi.',
+        status: 'INCELENIYOR',
+        requestedBy: 'Güçlü Elektrik Ltd. (Tedarikçi)',
+        date: '24.08.2026 14:10'
+      }
+    ],
+    companyReviews: [
+      {
+        id: 'REV-101',
+        companyName: 'ABC Kırtasiye A.Ş.',
+        rating: 5,
+        reviewer: 'Anadolu Ticaret A.Ş.',
+        tags: ['Zamanında Teslimat', 'Eksiksiz Ürün', 'Hızlı İletişim'],
+        comment: 'Tüm sipariş 3 gün içinde eksiksiz teslim edildi. İhaleciBurada güvenli havuz ödemesi sorunsuz çalıştı.',
+        date: '23.08.2026'
+      }
+    ],
+    sectorAlerts: [
+      'İnşaat ve Yapı',
+      'Bilgisayar ve Teknoloji',
+      'Sanayi ve Makine',
+      'Tarım ve Hayvancılık'
     ]
   },
   contact: {

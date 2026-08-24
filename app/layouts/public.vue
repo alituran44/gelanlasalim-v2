@@ -114,7 +114,7 @@ const activeTenders = ref([
           </span>
         </NuxtLink>
 
-        <!-- Orta: Hızlı Ana Sayfa, İhalelerim & Teklif Erişim Buton Şeridi -->
+        <!-- Orta: Hızlı Ana Sayfa, Pazar Yeri, İhalelerim & Teklif Erişim Buton Şeridi -->
         <div class="hidden lg:flex items-center gap-1 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-inner">
           <NuxtLink 
             to="/" 
@@ -122,6 +122,12 @@ const activeTenders = ref([
           >
             <Home :size="14" class="text-[#0052FF]" />
             <span>Ana Sayfa</span>
+          </NuxtLink>
+          <NuxtLink 
+            to="/pazar-yeri" 
+            class="px-3.5 py-1.5 text-xs font-black text-slate-800 hover:text-[#1EAE4C] hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+          >
+            🛒 <span>Pazar Yeri</span>
           </NuxtLink>
           <NuxtLink 
             to="/panel/ilanlarim" 
@@ -151,7 +157,7 @@ const activeTenders = ref([
             to="/abonelik" 
             class="px-3.5 py-1.5 text-xs font-black text-emerald-800 hover:text-emerald-950 bg-emerald-100/90 hover:bg-emerald-200 rounded-xl transition-all flex items-center gap-1.5 shadow-sm border border-emerald-300 animate-pulse"
           >
-            🎁 <span>6 Ay Ücretsiz Deneme</span>
+            🎁 <span>6 Ay Ücretsiz</span>
           </NuxtLink>
         </div>
 

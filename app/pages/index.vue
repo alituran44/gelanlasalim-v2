@@ -910,22 +910,52 @@ const supplierSteps = computed(() => [
 
 const activeSteps = computed(() => activeAudience.value === 'buyer' ? buyerSteps.value : supplierSteps.value)
 
-const localizedTenders = computed(() => tenders || [])
+const localizedTenders = computed(() => {
+  const dynamicTenders = (cmsData.value?.dashboard?.tenders || []).map((dt: any, idx: number) => ({
+    id: dt.id || (1000 + idx),
+    featured: idx < 2,
+    title: dt.baslik,
+    company: `${dt.city || 'Balıkesir'} Kurumsal Satın Alma A.Ş.`,
+    verified: true,
+    image: dt.image || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80',
+    images: dt.images || [dt.image || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80'],
+    category: dt.kategori?.split('/')[0]?.trim() || 'İnşaat ve Yapı',
+    sector: dt.kategori || 'Genel Satın Alma',
+    city: dt.city || 'Balıkesir',
+    type: 'Mal Alımı',
+    method: 'Canlı Eksiltme',
+    pricing: 'Toplam Bedel',
+    deadline: dt.sure || '7 gün kaldı',
+    daysLeft: 7,
+    offers: dt.teklifSayisi || 0,
+    value: dt.butce || 'Açık Eksiltme',
+    description: dt.aciklama || dt.baslik,
+    material_list: `1. ${dt.baslik} - Şartname gereğince teslimat`,
+    admin_spec: '• İhale kapalı zarf usulü ile toplanıp canlı eksiltmeye açılacaktır.\n• İhaleciBurada güvenli havuz güvencesi geçerlidir.',
+    tech_spec: '• Belgeli ve onaylı tedarikçi şartı aranmaktadır.\n• Tüm standartlara ve TSE normlarına uygunluk zorunludur.',
+    similar_history: 'Geçmiş Benzer İşlem: 1.200.000 ₺ ortalama tasarruf'
+  }))
+
+  return [...dynamicTenders, ...(tenders || [])]
+})
 
 /* =========================================================
    İN-MEMORY FİLTRELEME MANTIĞI
 ========================================================= */
 const filteredTenders = computed(() => {
-  return localizedTenders.value.filter((t) => {
-    const q = explorerSearch.value.toLocaleLowerCase('tr')
-    const searchMatch = !explorerSearch.value || 
-      t.title.toLocaleLowerCase('tr').includes(q) ||
-      t.company.toLocaleLowerCase('tr').includes(q) ||
-      t.description.toLocaleLowerCase('tr').includes(q)
+  return localizedTenders.value.filter((t: any) => {
+    const q = explorerSearch.value.toLocaleLowerCase('tr').trim()
+    const searchMatch = !q || 
+      (t.title && t.title.toLocaleLowerCase('tr').includes(q)) ||
+      (t.company && t.company.toLocaleLowerCase('tr').includes(q)) ||
+      (t.description && t.description.toLocaleLowerCase('tr').includes(q)) ||
+      (t.category && t.category.toLocaleLowerCase('tr').includes(q)) ||
+      (t.sector && t.sector.toLocaleLowerCase('tr').includes(q)) ||
+      (t.city && t.city.toLocaleLowerCase('tr').includes(q))
 
     const cityMatch = !selectedCity.value || t.city === selectedCity.value
-    const catMatch = !selectedCat.value || t.category === selectedCat.value
-    const subcatMatch = !selectedSubcategory.value || t.description.toLocaleLowerCase('tr').includes(selectedSubcategory.value.toLocaleLowerCase('tr'))
+    const catMatch = !selectedCat.value || t.category === selectedCat.value || (t.sector && t.sector.includes(selectedCat.value))
+    const subcatMatch = !selectedSubcategory.value || (t.description && t.description.toLocaleLowerCase('tr').includes(selectedSubcategory.value.toLocaleLowerCase('tr'))) || (t.sector && t.sector.includes(selectedSubcategory.value))
     const sectorMatch = !selectedSector.value || t.sector === selectedSector.value
     const typeMatch = !selectedType.value || t.type === selectedType.value
     const methodMatch = !selectedMethod.value || t.method === selectedMethod.value
@@ -3095,9 +3125,9 @@ function toggleFilterSection(section: string) {
       </div>
     </transition>
 
-    <!-- COOKIES CONSENT BANNER -->
+    <!-- COOKIES CONSENT BANNER (Moved to left-6 to prevent overlap with WhatsApp/AI widget) -->
     <transition name="fade">
-      <div v-if="showCookieConsent" class="fixed bottom-6 right-6 z-50 max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl text-left flex flex-col gap-3">
+      <div v-if="showCookieConsent" class="fixed bottom-6 left-6 z-50 max-w-sm rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl text-left flex flex-col gap-3">
         <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
           <Cookie :size="16" class="text-blue-600" />
           {{ 'Çerez Onayı & KVKK' }}
@@ -3106,7 +3136,7 @@ function toggleFilterSection(section: string) {
           {{ 'Platform kullanım deneyiminizi optimize etmek ve güvenli bir B2B ihale süreci sağlamak adına çerezleri kullanıyoruz.' }}
         </p>
         <div class="flex gap-2 justify-end">
-          <button @click="acceptCookieConsent" class="rounded-lg bg-blue-600 px-4 py-2 text-[10px] font-black text-white hover:bg-blue-700 transition-colors">
+          <button @click="acceptCookieConsent" class="rounded-lg bg-blue-600 px-4 py-2 text-[10px] font-black text-white hover:bg-blue-700 transition-colors cursor-pointer">
             {{ 'Kabul Et' }}
           </button>
         </div>

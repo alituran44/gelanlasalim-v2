@@ -130,10 +130,10 @@ const activePath = computed(() => route.path)
 <template>
   <aside class="w-64 h-screen sticky top-0 flex flex-col shrink-0 text-left font-sans select-none" style="background: #0F223D;">
 
-    <!-- Logo Alanı -->
+    <!-- Logo Alanı (Büyük & Belirgin) -->
     <div class="px-5 py-4 border-b flex justify-start items-center" style="border-color: rgba(255,255,255,0.08);">
-      <NuxtLink to="/" class="block">
-        <img src="/logo.png" alt="İhaleciBurada Logo" class="h-10 sm:h-12 w-auto bg-white p-1.5 rounded-xl shadow-xs object-contain" />
+      <NuxtLink to="/" class="block w-full">
+        <img src="/logo.png" alt="İhaleciBurada Logo" class="h-14 sm:h-16 w-full max-h-[64px] bg-white p-2 rounded-2xl shadow-sm object-contain" />
       </NuxtLink>
     </div>
 
