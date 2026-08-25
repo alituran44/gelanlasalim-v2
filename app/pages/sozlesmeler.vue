@@ -40,6 +40,7 @@ type TabKey =
   | 'tedarikci-uyum'
   | 'sla'
   | 'bilgi-guvenligi'
+  | 'escrow'
   | 'kariyer' 
   | 'is-ortakligi' 
   | 'blog'
@@ -185,6 +186,15 @@ function printDocument() {
             >
               <Lock :size="14" />
               <span>{{ '9. Bilgi Güvenliği & ISO 27001 Standardı' }}</span>
+            </button>
+
+            <button 
+              @click="setTab('escrow')"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
+              :class="activeTab === 'escrow' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
+            >
+              <ShieldCheck :size="14" />
+              <span>{{ '10. Güvenli Havuz (Escrow) & Ödeme Sözleşmesi' }}</span>
             </button>
           </div>
 
@@ -452,6 +462,44 @@ function printDocument() {
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">SECURITY STANDARDS</h3>
                 <p>1.1. İhaleciBurada adheres to ISO/IEC 27001:2022 Information Security Management Standards. All infrastructure undergoes routine vulnerability scanning and penetration testing.</p>
+              </section>
+            </div>
+          </article>
+
+          <!-- 10. GÜVENLİ HAVUZ (ESCROW) VE PAZARYERİ ÖDEME ARACILIK SÖZLEŞMESİ -->
+          <article v-if="activeTab === 'escrow'" class="space-y-6">
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1 bg-emerald-50 text-emerald-700 font-mono text-xs font-bold rounded-lg border border-emerald-200">TCMB & BDDK UYUMLU</span>
+              <span class="text-xs text-slate-400">Son Güncelleme: 25 Ağustos 2026</span>
+            </div>
+
+            <h1 class="text-2xl font-black tracking-tight text-slate-900">
+              {{ '10. B2B Pazaryeri Güvenli Havuz (Escrow) ve Ödeme Aracılık Sözleşmesi' }}
+            </h1>
+
+            <div class="space-y-5 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">1. TARAFLAR VE SÖZLEŞMENİN AMACI</h3>
+                <p>1.1. İşbu Sözleşme, İhaleciBurada platformu üzerinden ihale açan Alıcılar, teklif veren Tedarikçiler ve platform işleticisi arasında, 6493 Sayılı Ödeme ve Menkul Kıymet Mutabakat Sistemleri, Ödeme Hizmetleri ve Elektronik Para Kuruluşları Hakkında Kanun kapsamında akdedilmiştir.</p>
+                <p>1.2. Platform, BDDK ve TCMB lisanslı yetkili ödeme kuruluşları (İyzico, PayTR vb.) ile entegre çalışarak Güvenli Havuz (Escrow) ve Otomatik Para Bölme (Split Payment) altyapısını sağlar.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">2. GÜVENLİ HAVUZ (ESCROW) İŞLEYİŞİ</h3>
+                <p>2.1. İhalede mutabakat sağlandığında, Alıcı sipariş bedelini kredi kartı veya B2B Sanal IBAN ile lisanslı ödeme havuzuna yatırır. Tutar, lisanslı kuruluş güvencesinde bloke edilir.</p>
+                <p>2.2. Tedarikçi, malı veya hizmeti şartnameye uygun olarak sevk eder ve sevk irsaliyesi/kargo takip belgesini sisteme yükler.</p>
+                <p>2.3. Alıcı mal kabulünü onayladığında havuzdaki bloke çözülür; platform komisyonu (%2-%5) kesildikten sonra kalan hakediş tutarı otomatik olarak Tedarikçinin banka IBAN hesabına aktarılır.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">3. FATURALANDIRMA VE VERGİSEL SORUMLULUK</h3>
+                <p>3.1. Satışa konu mal ve hizmetin asıl faturası, Tedarikçi tarafından Alıcı adına düzenlenir.</p>
+                <p>3.2. İhaleciBurada platformu, yalnızca tahsil edilen aracılık komisyon bedeli için Tedarikçiye e-Arşiv/e-Fatura düzenler.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">4. UYUŞMAZLIK VE HAKEM HEYETİ</h3>
+                <p>4.1. Teslim edilen malların şartnameye aykırı, hasarlı veya eksik olması durumunda Alıcı "Uyuşmazlık" bildirebilir. Bu durumda havuzdaki bloke çözülmez ve İhaleciBurada Escrow Hakem Heyeti inceleme başlatır.</p>
               </section>
             </div>
           </article>

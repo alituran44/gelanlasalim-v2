@@ -405,6 +405,88 @@ export const DEFAULT_CMS_DATA = {
       'Bilgisayar ve Teknoloji',
       'Sanayi ve Makine',
       'Tarım ve Hayvancılık'
+    ],
+    escrowOrders: [
+      {
+        id: 'SIP-2026-801',
+        tenderId: 'IHC-2026-902',
+        tenderTitle: 'Tarımsal Gübre Tedariki (25 Ton)',
+        buyerFirm: 'Ege Tarım Birlik Ltd. (Alıcı)',
+        supplierFirm: 'Kenan Tarım Kimya A.Ş. (Tedarikçi)',
+        totalAmount: '210.000 ₺',
+        numericAmount: 210000,
+        commissionRate: 3,
+        commissionAmount: '6.300 ₺',
+        payoutAmount: '203.700 ₺',
+        paymentMethod: 'İyzico Pazaryeri / Güvenli Havuz (Kredi Kartı 6 Taksit)',
+        status: 'HAVUZDA_BLOKE',
+        createdAt: '24 Ağu 2026',
+        updatedAt: 'Bugün 15:30',
+        trackingCode: 'YK-894210982',
+        shippingCompany: 'Yurtiçi Lojistik / Ambar',
+        shippingDate: '25 Ağu 2026',
+        notes: 'Ürünler İzmir liman deposundan sevk edildi. Sevk İrsaliyesi No: IRS-48201',
+        deliveryEvidence: 'irsaliye_ege_tarim_25ton.pdf',
+        history: [
+          { title: 'İhale Onaylandı & Mutabakat Sağlandı', date: '24 Ağu 2026 14:00', by: 'Alıcı Firma' },
+          { title: 'Güvenli Havuz Ödemesi Alındı (İyzico Bloke)', date: '24 Ağu 2026 15:30', by: 'İyzico Escrow API' },
+          { title: 'Tedarikçi Sevkiyatı Başlattı (İrsaliye Yüklendi)', date: '25 Ağu 2026 09:15', by: 'Tedarikçi' }
+        ]
+      },
+      {
+        id: 'SIP-2026-802',
+        tenderId: 'IHC-2026-784',
+        tenderTitle: '500 Adet Kurumsal Dizüstü Bilgisayar Alımı',
+        buyerFirm: 'Ali Turan (Siz - Alıcı)',
+        supplierFirm: 'TeknoBilişim Dağıtım Ltd. Şti.',
+        totalAmount: '5.120.000 ₺',
+        numericAmount: 5120000,
+        commissionRate: 2.5,
+        commissionAmount: '128.000 ₺',
+        payoutAmount: '4.992.000 ₺',
+        paymentMethod: 'PayTR B2B Sanal IBAN / Havale',
+        status: 'MAL_KABUL_BEKLIYOR',
+        createdAt: '22 Ağu 2026',
+        updatedAt: 'Bugün 11:20',
+        trackingCode: 'MNG-7748190',
+        shippingCompany: 'MNG Kargo B2B Ağır Yük',
+        shippingDate: '23 Ağu 2026',
+        notes: '500 koli TSE mühürlü teslim edildi. Muayene ve seri no kontrolü yapılıyor.',
+        deliveryEvidence: 'sevk_irsaliyesi_bilgisayar_500.pdf',
+        history: [
+          { title: 'Mutabakat Sağlandı & Sözleşme İmzalandı', date: '22 Ağu 2026', by: 'Sistem' },
+          { title: 'B2B Havuz Ödemesi Bloke Edildi (5.120.000 ₺)', date: '22 Ağu 2026', by: 'PayTR Escrow' },
+          { title: 'Sevkiyat ve İrsaliye Girişi Yapıldı', date: '23 Ağu 2026', by: 'TeknoBilişim Ltd.' },
+          { title: 'Kargo Teslim Edildi — Muayene & Mal Kabul Bekleniyor', date: '25 Ağu 2026', by: 'Kargo Firması' }
+        ]
+      },
+      {
+        id: 'SIP-2026-799',
+        tenderId: 'IHC-2026-610',
+        tenderTitle: '100.000 Adet Özel Tasarım Ürün Kutusu Üretimi',
+        buyerFirm: 'Ali Turan (Siz - Alıcı)',
+        supplierFirm: 'Anadolu Ambalaj Sanayi',
+        totalAmount: '318.000 ₺',
+        numericAmount: 318000,
+        commissionRate: 3,
+        commissionAmount: '9.540 ₺',
+        payoutAmount: '308.460 ₺',
+        paymentMethod: 'İyzico Pazaryeri / Kredi Kartı 12 Taksit',
+        status: 'TAMAMLANDI',
+        createdAt: '15 Ağu 2026',
+        updatedAt: '20 Ağu 2026',
+        trackingCode: 'AMB-1029384',
+        shippingCompany: 'Özel Nakliye / Tır',
+        shippingDate: '18 Ağu 2026',
+        notes: 'Malzeme eksiksiz teslim alındı. Kalite onaylandı. Ödeme tedarikçi IBAN hesabına aktarıldı.',
+        deliveryEvidence: 'teslim_tutanagi_onayli.pdf',
+        history: [
+          { title: 'Havuz Ödemesi Alındı', date: '15 Ağu 2026', by: 'İyzico' },
+          { title: 'Sevkiyat Tamamlandı', date: '18 Ağu 2026', by: 'Anadolu Ambalaj' },
+          { title: 'Mal Kabulü Onaylandı & Havuz Çözüldü', date: '20 Ağu 2026', by: 'Alıcı (Siz)' },
+          { title: 'Split Payment: 308.460 ₺ Tedarikçiye, 9.540 ₺ Komisyon Platforma Aktarıldı ✓', date: '20 Ağu 2026', by: 'İyzico Dağıtım API' }
+        ]
+      }
     ]
   },
   contact: {

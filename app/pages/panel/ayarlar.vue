@@ -939,16 +939,20 @@ function saveProfile() {
                 <input v-model="companyForm.sicilNo" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="Ticaret sicil numarası" />
               </div>
 
-              <!-- IBAN -->
+              <!-- IBAN & Hakediş Hesabı (Escrow Sub-Merchant) -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'IBAN' }}</label>
-                <input v-model="companyForm.iban" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="TR00 0000 0000 0000 0000 00" />
+                <div class="flex items-center justify-between mb-1">
+                  <label class="block text-[10px] font-black text-slate-400 uppercase">{{ 'HAKEDİŞ IBAN (ESCROW TRANSFER)' }}</label>
+                  <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Otomatik Dağıtım</span>
+                </div>
+                <input v-model="companyForm.iban" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800 font-mono font-bold" style="border-color: #E2E8F0;" placeholder="TR00 0000 0000 0000 0000 00" />
+                <span class="text-[9px] text-slate-400 mt-1 block">İhaleleri kazandığınızda alıcı mal kabulü onayıyla hakedişiniz bu IBAN'a aktarılır.</span>
               </div>
 
               <!-- Hesap Sahibi -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'HESAP SAHİBİ' }}</label>
-                <input v-model="companyForm.accountHolder" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="Hesap sahibinin tam adı" />
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'HESAP SAHİBİ (ŞİRKET RESMİ UNVANI)' }}</label>
+                <input v-model="companyForm.accountHolder" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800 font-bold" style="border-color: #E2E8F0;" placeholder="Hesap sahibinin tam adı" />
               </div>
 
             </div>

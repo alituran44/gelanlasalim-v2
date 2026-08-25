@@ -358,18 +358,25 @@ function submitReview() {
         <div v-if="expandedIlan === ilan.id" class="border-t border-slate-100">
           
           <!-- Bilgilendirme ve Güven Şeridi / Mutabakat Durumu -->
-          <div v-if="ilan.teklifler?.some((t: any) => t.durum === 'onaylandi')" class="px-6 py-3.5 bg-emerald-50 border-b border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-emerald-900 font-bold">
+          <div v-if="ilan.teklifler?.some((t: any) => t.durum === 'onaylandi')" class="px-6 py-3.5 bg-emerald-50 border-b border-emerald-200 flex flex-col lg:flex-row lg:items-center justify-between gap-3 text-xs text-emerald-900 font-bold">
             <div class="flex items-center gap-2">
               <CheckCircle2 :size="16" class="text-emerald-600 shrink-0" />
               <span>🔒 BU İHALEDE MUTABAKAT SAĞLANMIŞTIR — İhale yeni teklif alımına kapatılmıştır.</span>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex flex-wrap items-center gap-2.5">
+              <NuxtLink
+                to="/panel/siparis-teslimat"
+                class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-[#0052FF] to-[#00C2FF] text-white text-xs font-black transition flex items-center gap-1.5 shadow-xs hover:opacity-95"
+              >
+                <CreditCard :size="13" />
+                <span>💳 Güvenli Havuz Ödemesi & Sipariş Takibi</span>
+              </NuxtLink>
               <button
                 type="button"
                 @click="cancelTeklifAgreement(ilan)"
                 class="px-3.5 py-1.5 rounded-xl bg-white border border-red-300 text-red-700 hover:bg-red-50 text-xs font-black transition cursor-pointer shadow-xs"
               >
-                ⚠️ Mutabakatı İptal Et (Teklife Aç)
+                ⚠️ Mutabakatı İptal Et
               </button>
               <button 
                 type="button"

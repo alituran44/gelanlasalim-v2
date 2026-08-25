@@ -297,14 +297,25 @@ function submitReview() {
           </div>
         </div>
 
-        <!-- 🟢 KABUL EDİLDİYSE: ALICI FİRMA AÇILAN İRTİBAT KARTI -->
+        <!-- 🟢 KABUL EDİLDİYSE: ALICI FİRMA AÇILAN İRTİBAT KARTI & ESCROW HAVUZ DURUMU -->
         <div v-if="teklif.durum === 'onaylandi'" class="p-5 rounded-2xl bg-white border border-emerald-200 shadow-sm space-y-3">
-          <div class="flex items-center justify-between border-b border-emerald-100 pb-2">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-emerald-100 pb-2 gap-2">
             <span class="text-xs font-black text-emerald-800 flex items-center gap-1.5">
               <CheckCircle2 :size="15" class="text-emerald-600" />
               ALICI FİRMA DOĞRUDAN İLETİŞİM & SEVKİYAT DETAYLARI (AÇILDI)
             </span>
-            <span class="text-[10px] font-bold text-slate-400">İhaleciBurada Escrow Koruması</span>
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                🔒 Alıcı Ödemesi Havuzda Güvencede
+              </span>
+              <NuxtLink
+                to="/panel/siparis-teslimat"
+                class="text-[11px] font-black text-blue-600 hover:text-blue-800 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200 flex items-center gap-1"
+              >
+                <span>🚚 Sevkiyatı Başlat (İrsaliye Gir)</span>
+                <ChevronRight :size="12" />
+              </NuxtLink>
+            </div>
           </div>
           
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
