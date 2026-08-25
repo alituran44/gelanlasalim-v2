@@ -160,15 +160,11 @@ const companyLinks = [
           <div class="space-y-3">
             <h4 class="text-xs font-black uppercase tracking-wider text-blue-900">İLETİŞİM</h4>
             <p class="text-xs leading-relaxed text-slate-500 font-medium whitespace-pre-line">
-              Bahçelievler Mahallesi 5083 Sokak, No:11/A Altıeylül,
-              Balıkesir, Türkiye
+              İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye
             </p>
             <div class="text-xs font-bold text-slate-700 space-y-1.5 pt-1">
-              <a href="mailto:info@ihaleciburada.com" class="block hover:text-blue-600 transition-colors">
-                info@ihaleciburada.com
-              </a>
-              <a href="mailto:ihaleciburada@hs01.kep.tr" class="block hover:text-blue-600 font-mono text-[11px] transition-colors">
-                ihaleciburada@hs01.kep.tr
+              <a href="mailto:ihalecib@gmail.com" class="block hover:text-blue-600 transition-colors">
+                ihalecib@gmail.com
               </a>
             </div>
           </div>

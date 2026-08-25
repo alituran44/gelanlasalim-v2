@@ -184,7 +184,6 @@ const companyForm = ref({
   sectors: 'Yazılım & IT Hizmetleri, Reklam & Pazarlama, Elektrik & Elektronik',
   mersis: '0456-2468-5040-0001',
   sicilNo: '58402-Ç',
-  kep: 'alituran@hs01.kep.tr',
   faturaAdresi: '17100 Çanakkale İsmet Paşa Mah. Merkez Çanakkale 17100',
   iban: 'TR56 0006 2000 0001 2345 6789 01',
   accountHolder: 'Ali Turan',
@@ -938,12 +937,6 @@ function saveProfile() {
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'TİCARET SİCİL NO' }}</label>
                 <input v-model="companyForm.sicilNo" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="Ticaret sicil numarası" />
-              </div>
-
-              <!-- KEP Adresi -->
-              <div class="md:col-span-2">
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'KEP ADRESİ' }}</label>
-                <input v-model="companyForm.kep" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="ihaleciburada@hs01.kep.tr" />
               </div>
 
               <!-- IBAN -->

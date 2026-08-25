@@ -84,6 +84,18 @@ const filteredTenders = computed(() => {
 })
 
 function openBidModal(tender: any) {
+  // Check if tender is closed or has mutabakat
+  if (tender.durum === 'closed' || tender.durum === 'mutabakat' || tender.durum === 'anlasildi' || (tender.sure && (tender.sure.includes('Sonuçlandı') || tender.sure.includes('Mutabakat')))) {
+    alert(`⚠️ BU İHALEDE MUTABAKAT SAĞLANDI:\n\n"${tender.baslik}" ihalesinde alıcı ve tedarikçi arasında mutabakat sağlandığı için yeni teklif verilemez.\n\nİhale sahibi veya anlaşmalı tedarikçi mutabakatı iptal ederse ihale yeniden teklif alımına açılabilir.`)
+    return
+  }
+
+  // Check if tender has expired
+  if (tender.durum === 'expired' || (tender.sure && tender.sure.includes('Süresi Doldu'))) {
+    alert(`⚠️ SÜRESİ DOLDU:\n\n"${tender.baslik}" ihalesinin süresi dolduğu için yeni teklif kabul edilmemektedir.`)
+    return
+  }
+
   // Check if supplier already submitted a bid for this tender
   const existingBid = (cmsData.value.dashboard.submittedBids || []).find(
     (b: any) => b.tenderId === tender.id || b.ilanBaslik === tender.baslik
@@ -285,10 +297,12 @@ function downloadAllSpecs(tender: any) {
 
             <div class="absolute top-3 right-3">
               <span 
-                class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm"
-                :class="tender.durum === 'closed' ? 'bg-red-500 text-white' : 'bg-[#1EAE4C] text-white'"
+                class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 text-white"
+                :class="tender.durum === 'closed' ? 'bg-amber-600' : (tender.durum === 'expired' ? 'bg-slate-600' : 'bg-[#1EAE4C]')"
               >
-                {{ tender.durum === 'closed' ? 'Sonuçlandı' : (tender.sure || 'Aktif') }}
+                <span v-if="tender.durum === 'closed'">🔒 Mutabakat Sağlandı</span>
+                <span v-else-if="tender.durum === 'expired'">⌛ Süresi Doldu</span>
+                <span v-else>{{ tender.sure || 'Aktif' }}</span>
               </span>
             </div>
 
@@ -307,9 +321,14 @@ function downloadAllSpecs(tender: any) {
           <!-- Card Body -->
           <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
             <div class="space-y-2">
-              <span class="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">
-                {{ tender.kategori }}
-              </span>
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">
+                  {{ tender.kategori }}
+                </span>
+                <span v-if="tender.durum === 'closed'" class="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                  🔒 Anlaşıldı
+                </span>
+              </div>
               <h2 class="text-base font-black text-slate-800 line-clamp-2 group-hover:text-[#003057] transition-colors">
                 {{ tender.baslik }}
               </h2>
@@ -328,7 +347,7 @@ function downloadAllSpecs(tender: any) {
                 <button
                   type="button"
                   @click="downloadAllSpecs(tender)"
-                  class="flex items-center gap-1 text-[11px] font-bold text-slate-600 hover:text-blue-600 bg-slate-50 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg border border-slate-200 transition"
+                  class="flex items-center gap-1 text-[11px] font-bold text-slate-600 hover:text-blue-600 bg-slate-50 hover:bg-blue-50 px-2.5 py-1.5 rounded-lg border border-slate-200 transition cursor-pointer"
                   title="Şartname İndir"
                 >
                   <Download :size="13" />
@@ -340,19 +359,19 @@ function downloadAllSpecs(tender: any) {
                 <button
                   type="button"
                   @click="selectedTenderForDetail = tender"
-                  class="w-full py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition text-center"
+                  class="w-full py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition text-center cursor-pointer"
                 >
                   Detayları Gör
                 </button>
                 <button
                   type="button"
                   @click="openBidModal(tender)"
-                  :disabled="tender.durum === 'closed'"
-                  class="w-full py-2.5 rounded-xl text-xs font-black text-white transition text-center flex items-center justify-center gap-1.5 shadow-md"
-                  :class="tender.durum === 'closed' ? 'bg-slate-400 cursor-not-allowed' : 'bg-[#003057] hover:bg-[#1EAE4C]'"
+                  :disabled="tender.durum === 'closed' || tender.durum === 'expired'"
+                  class="w-full py-2.5 rounded-xl text-xs font-black text-white transition text-center flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
+                  :class="tender.durum === 'closed' ? 'bg-amber-700/80 cursor-not-allowed' : (tender.durum === 'expired' ? 'bg-slate-400 cursor-not-allowed' : 'bg-[#003057] hover:bg-[#1EAE4C]')"
                 >
                   <Send :size="12" />
-                  <span>{{ tender.durum === 'closed' ? 'İhale Kapandı' : 'Teklif Ver' }}</span>
+                  <span>{{ tender.durum === 'closed' ? '🔒 Mutabakat Sağlandı' : (tender.durum === 'expired' ? '⌛ Süresi Doldu' : 'Teklif Ver') }}</span>
                 </button>
               </div>
             </div>
@@ -397,6 +416,12 @@ function downloadAllSpecs(tender: any) {
         </div>
 
         <div class="space-y-4 text-xs text-slate-600 leading-relaxed">
+          <!-- Mutabakat Bildirim Kutusu -->
+          <div v-if="selectedTenderForDetail.durum === 'closed'" class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 font-bold flex items-center gap-2.5">
+            <AlertCircle :size="18" class="text-amber-600 shrink-0" />
+            <span>⚠️ Bu ihalede taraflar arasında mutabakat sağlanmıştır. Yeni teklif verilemez veya başka bir teklif onaylanamaz.</span>
+          </div>
+
           <div>
             <h4 class="font-black text-slate-800 text-sm mb-1">İhale Açıklaması & Şartname Özeti</h4>
             <p class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
@@ -410,8 +435,8 @@ function downloadAllSpecs(tender: any) {
               <span class="font-black text-slate-800 text-sm">{{ selectedTenderForDetail.butce }}</span>
             </div>
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-              <span class="text-[10px] text-slate-400 font-bold block">Kalan Süre</span>
-              <span class="font-black text-slate-800 text-sm">{{ selectedTenderForDetail.sure }}</span>
+              <span class="text-[10px] text-slate-400 font-bold block">Durum / Süre</span>
+              <span class="font-black text-slate-800 text-sm">{{ selectedTenderForDetail.durum === 'closed' ? 'Mutabakat Sağlandı' : selectedTenderForDetail.sure }}</span>
             </div>
             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
               <span class="text-[10px] text-slate-400 font-bold block">Gelen Teklif</span>
@@ -429,7 +454,7 @@ function downloadAllSpecs(tender: any) {
             </div>
             <button 
               @click="downloadAllSpecs(selectedTenderForDetail)"
-              class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5"
+              class="px-3 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer"
             >
               <Download :size="13" />
               İndir
@@ -440,16 +465,24 @@ function downloadAllSpecs(tender: any) {
         <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
           <button 
             @click="selectedTenderForDetail = null" 
-            class="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50"
+            class="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
           >
             Kapat
           </button>
           <button
+            v-if="selectedTenderForDetail.durum !== 'closed' && selectedTenderForDetail.durum !== 'expired'"
             @click="openBidModal(selectedTenderForDetail); selectedTenderForDetail = null"
-            class="px-6 py-2.5 rounded-xl bg-[#003057] hover:bg-[#1EAE4C] text-white font-black text-xs transition flex items-center gap-1.5"
+            class="px-6 py-2.5 rounded-xl bg-[#003057] hover:bg-[#1EAE4C] text-white font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
           >
             <Send :size="13" />
             Hemen Teklif Ver
+          </button>
+          <button
+            v-else
+            disabled
+            class="px-6 py-2.5 rounded-xl bg-slate-300 text-slate-500 font-bold text-xs cursor-not-allowed"
+          >
+            Teklife Kapalı
           </button>
         </div>
       </div>

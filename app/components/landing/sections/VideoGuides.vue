@@ -50,7 +50,7 @@ const guides = [
   },
   {
     id: 'kyc-dogrulama',
-    title: 'Firma Doğrulama (KYC) & MERSİS/KEP Onayı',
+    title: 'Firma Doğrulama (KYC) & MERSİS Onayı',
     desc: 'Vergi levhası doğrulama, e-Devlet kurumsal kimlik entegrasyonu ve Onaylı Firma Rozeti.',
     duration: '02:15',
     badge: 'GÜVENLİK & ONAY',

@@ -385,9 +385,6 @@ const activeTenders = ref([
                 <a href="mailto:ihalecib@gmail.com" class="block hover:text-[#00C2FF] py-0.5">
                   ihalecib@gmail.com
                 </a>
-                <a href="mailto:ihaleciburada@hs01.kep.tr" class="block hover:text-[#00C2FF] font-mono text-[10px] py-0.5 text-slate-400">
-                  ihaleciburada@hs01.kep.tr
-                </a>
                 <div class="pt-1 text-[#FF5938] font-bold">
                   📞 0850 308 00 00
                 </div>

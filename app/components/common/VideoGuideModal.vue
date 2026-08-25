@@ -188,7 +188,7 @@ const videoCatalogue: VideoGuide[] = [
   },
   {
     id: 'kyc-dogrulama',
-    title: 'Firma Doğrulama (KYC) & MERSİS/KEP Onayı',
+    title: 'Firma Doğrulama (KYC) & MERSİS Onayı',
     subtitle: 'Vergi levhası doğrulama, e-Devlet kurumsal kimlik entegrasyonu ve Onaylı Tedarikçi Rozeti.',
     duration: '02:15',
     totalSeconds: 135,

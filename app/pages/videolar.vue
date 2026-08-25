@@ -89,7 +89,7 @@ const videos = [
   },
   {
     id: 'kyc-dogrulama',
-    title: 'Firma Doğrulama (KYC) & MERSİS/KEP',
+    title: 'Firma Doğrulama (KYC) & MERSİS Onayı',
     subtitle: 'GİB vergi levhası sorgulama, resmi evrak yükleme, e-Devlet entegrasyonu ve Onaylı Rozet alma.',
     duration: '02:15',
     category: 'guvenlik',

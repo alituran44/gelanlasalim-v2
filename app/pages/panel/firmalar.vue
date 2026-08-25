@@ -32,7 +32,6 @@ const companyProfiles: Record<string, {
   phone: string
   email: string
   address: string
-  kep: string
   mersis: string
   rating: number
   reviews: Array<{ author: string, company: string, rating: number, comment: string, date: string }>
@@ -45,7 +44,6 @@ const companyProfiles: Record<string, {
     phone: '+90 (212) 654 32 10',
     email: 'info@istfaglobal.com',
     address: 'Başakşehir, İstanbul, Türkiye',
-    kep: 'istfaglobal@hs01.kep.tr',
     mersis: '0481-0899-7712-0021',
     rating: 4.8,
     reviews: [
@@ -60,7 +58,6 @@ const companyProfiles: Record<string, {
     phone: '+90 (216) 333 44 55',
     email: 'satis@makksvillas.com',
     address: 'Pendik, İstanbul, Türkiye',
-    kep: 'makksvillas@hs01.kep.tr',
     mersis: '0612-0941-0024-0012',
     rating: 4.5,
     reviews: [
@@ -84,7 +81,6 @@ function openCompanyModal(firm: any) {
       phone: '+90 (850) 888 00 00',
       email: 'info@' + firm.name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '') + '.com',
       address: `${firm.district}, ${firm.city}, Türkiye`,
-      kep: firm.name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '') + '@hs01.kep.tr',
       mersis: '0XXX-XXXX-XXXX-XXXX',
       rating: 4.5,
       reviews: [
@@ -290,7 +286,6 @@ function openCompanyModal(firm: any) {
         <div class="space-y-3">
           <h4 class="text-xs font-black text-slate-700 uppercase tracking-wider">RESMİ BİLGİLER</h4>
           <div class="text-xs text-slate-600 space-y-2">
-            <div><strong class="text-slate-400">KEP Adresi:</strong> {{ selectedCompany.kep }}</div>
             <div><strong class="text-slate-400">MERSİS No:</strong> {{ selectedCompany.mersis }}</div>
             <div class="flex items-center gap-1">
               <strong class="text-slate-400">Puanlama:</strong>

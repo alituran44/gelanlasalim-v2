@@ -277,7 +277,6 @@ const companyProfiles: Record<string, {
   phone: string
   email: string
   address: string
-  kep: string
   mersis: string
   rating: number
   reviews: Array<{ author: string, company: string, rating: number, comment: string, date: string }>
@@ -290,7 +289,6 @@ const companyProfiles: Record<string, {
     phone: '+90 (312) 444 0 262',
     email: 'info@anadoluecommerce.com',
     address: 'Çankaya, Ankara, Türkiye',
-    kep: 'anadoluecommerce@hs01.kep.tr',
     mersis: '0086-0442-9910-0015',
     rating: 4.9,
     reviews: [
@@ -307,7 +305,6 @@ const companyProfiles: Record<string, {
     phone: '+90 (212) 222 34 56',
     email: 'contact@marmaratech.com',
     address: 'Levent, İstanbul, Türkiye',
-    kep: 'marmaratech@hs01.kep.tr',
     mersis: '0612-0894-3310-0022',
     rating: 4.7,
     reviews: [
@@ -323,7 +320,6 @@ const companyProfiles: Record<string, {
     phone: '+90 (224) 444 16 16',
     email: 'info@bursaindustry.com.tr',
     address: 'Nilüfer OSB, Bursa, Türkiye',
-    kep: 'bursaindustry@hs01.kep.tr',
     mersis: '0188-0234-9912-0048',
     rating: 4.8,
     reviews: [
@@ -338,7 +334,6 @@ const companyProfiles: Record<string, {
     phone: '+90 (232) 777 88 99',
     email: 'satis@egefood.com',
     address: 'Bornova, İzmir, Türkiye',
-    kep: 'egegida@hs01.kep.tr',
     mersis: '0344-0125-7734-0019',
     rating: 4.6,
     reviews: [
@@ -353,7 +348,6 @@ const companyProfiles: Record<string, {
     phone: '+90 (216) 555 12 34',
     email: 'operasyon@atlasholding.com.tr',
     address: 'Ataşehir, İstanbul, Türkiye',
-    kep: 'atlasholding@hs01.kep.tr',
     mersis: '0077-0941-2245-0012',
     rating: 4.9,
     reviews: [
@@ -390,7 +384,6 @@ function openCompanyModal(companyName: string) {
       phone: '+90 (850) 888 00 00',
       email: 'info@' + companyName.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '') + '.com',
       address: 'Türkiye',
-      kep: companyName.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '') + '@hs01.kep.tr',
       mersis: '0XXX-XXXX-XXXX-XXXX',
       rating: 4.5,
       reviews: [
@@ -2673,7 +2666,6 @@ function toggleFilterSection(section: string) {
                 {{ 'RESMİ BİLGİLER & DOĞRULAMA' }}
               </h4>
               <div class="text-xs text-slate-600 space-y-2 font-medium">
-                <div><strong class="text-slate-400">{{ 'KEP Adresi:' }}</strong> {{ selectedCompany.kep }}</div>
                 <div><strong class="text-slate-400">{{ 'MERSİS / VKN No:' }}</strong> {{ selectedCompany.mersis }}</div>
                 <div class="flex items-center gap-1 pt-1">
                   <strong class="text-slate-400">{{ 'Doğrulama:' }}</strong>

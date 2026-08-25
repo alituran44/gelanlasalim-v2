@@ -84,6 +84,18 @@ const filteredTenders = computed(() => {
 })
 
 function openBidModal(tender: any) {
+  // Check if tender is closed or has mutabakat
+  if (tender.durum === 'closed' || tender.durum === 'mutabakat' || tender.durum === 'anlasildi' || (tender.sure && (tender.sure.includes('Sonuçlandı') || tender.sure.includes('Mutabakat')))) {
+    alert(`⚠️ BU İHALEDE MUTABAKAT SAĞLANDI:\n\n"${tender.baslik}" ihalesinde taraflar arasında anlaşma ve mutabakat sağlandığı için yeni teklif verilemez.\n\nİhale sahibi veya kazanan tedarikçi anlaşmayı iptal ederse ihale tekrar teklif alımına açılabilir.`)
+    return
+  }
+
+  // Check if tender has expired
+  if (tender.durum === 'expired' || (tender.sure && tender.sure.includes('Süresi Doldu'))) {
+    alert(`⚠️ SÜRESİ DOLDU:\n\n"${tender.baslik}" ihalesinin yayın süresi dolduğu için yeni teklif kabul edilmemektedir.`)
+    return
+  }
+
   // Check if supplier already submitted a bid for this tender
   const existingBid = (cmsData.value.dashboard.submittedBids || []).find(
     (b: any) => b.tenderId === tender.id || b.ilanBaslik === tender.baslik
@@ -264,10 +276,12 @@ function downloadAllSpecs(tender: any) {
 
           <div class="absolute top-2.5 right-2.5">
             <span 
-              class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider text-white"
-              :class="tender.durum === 'closed' ? 'bg-red-500' : 'bg-[#1EAE4C]'"
+              class="px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-wider text-white shadow-sm flex items-center gap-1"
+              :class="tender.durum === 'closed' ? 'bg-amber-600' : (tender.durum === 'expired' ? 'bg-slate-600' : 'bg-[#1EAE4C]')"
             >
-              {{ tender.durum === 'closed' ? 'Sonuçlandı' : (tender.sure || 'Aktif') }}
+              <span v-if="tender.durum === 'closed'">🔒 Mutabakat Sağlandı</span>
+              <span v-else-if="tender.durum === 'expired'">⌛ Süresi Doldu</span>
+              <span v-else>{{ tender.sure || 'Aktif' }}</span>
             </span>
           </div>
 
@@ -286,9 +300,14 @@ function downloadAllSpecs(tender: any) {
         <!-- Body -->
         <div class="p-5 flex-1 flex flex-col justify-between space-y-3">
           <div class="space-y-1.5">
-            <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">
-              {{ tender.kategori }}
-            </span>
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">
+                {{ tender.kategori }}
+              </span>
+              <span v-if="tender.durum === 'closed'" class="text-[10px] font-black text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                🔒 Anlaşıldı
+              </span>
+            </div>
             <h3 class="text-sm font-black text-slate-800 line-clamp-2">
               {{ tender.baslik }}
             </h3>
@@ -307,7 +326,7 @@ function downloadAllSpecs(tender: any) {
               <button
                 type="button"
                 @click="downloadAllSpecs(tender)"
-                class="flex items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-blue-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 transition"
+                class="flex items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-blue-600 bg-slate-50 px-2 py-1 rounded border border-slate-200 transition cursor-pointer"
               >
                 <Download :size="12" />
                 <span>Şartname (.ZIP)</span>
@@ -318,19 +337,19 @@ function downloadAllSpecs(tender: any) {
               <button
                 type="button"
                 @click="selectedTenderForDetail = tender"
-                class="w-full py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition text-center"
+                class="w-full py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition text-center cursor-pointer"
               >
                 Detaylar
               </button>
               <button
                 type="button"
                 @click="openBidModal(tender)"
-                :disabled="tender.durum === 'closed'"
-                class="w-full py-2 rounded-xl text-xs font-black text-white transition text-center flex items-center justify-center gap-1.5 shadow-sm"
-                :class="tender.durum === 'closed' ? 'bg-slate-400 cursor-not-allowed' : 'bg-[#003057] hover:bg-[#1EAE4C]'"
+                :disabled="tender.durum === 'closed' || tender.durum === 'expired'"
+                class="w-full py-2 rounded-xl text-xs font-black text-white transition text-center flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                :class="tender.durum === 'closed' ? 'bg-amber-700/80 cursor-not-allowed' : (tender.durum === 'expired' ? 'bg-slate-400 cursor-not-allowed' : 'bg-[#003057] hover:bg-[#1EAE4C]')"
               >
                 <Send :size="12" />
-                <span>{{ tender.durum === 'closed' ? 'Kapandı' : 'Teklif Ver' }}</span>
+                <span>{{ tender.durum === 'closed' ? '🔒 Mutabakat Sağlandı' : (tender.durum === 'expired' ? '⌛ Süresi Doldu' : 'Teklif Ver') }}</span>
               </button>
             </div>
           </div>
@@ -370,6 +389,12 @@ function downloadAllSpecs(tender: any) {
         </div>
 
         <div class="space-y-3 text-xs text-slate-600">
+          <!-- Mutabakat Bildirim Kutusu -->
+          <div v-if="selectedTenderForDetail.durum === 'closed'" class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-900 font-bold flex items-center gap-2">
+            <AlertCircle :size="16" class="text-amber-600 shrink-0" />
+            <span>⚠️ Bu ihalede taraflar arasında mutabakat sağlanmıştır. Yeni teklif verilemez veya ihale üzerinde başka bir teklif onaylanamaz.</span>
+          </div>
+
           <p class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
             {{ selectedTenderForDetail.aciklama || 'Bu ihale için belirtilen standart teknik şartname kuralları geçerlidir.' }}
           </p>
@@ -380,8 +405,8 @@ function downloadAllSpecs(tender: any) {
               <span class="font-black text-slate-800">{{ selectedTenderForDetail.butce }}</span>
             </div>
             <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-              <span class="text-[10px] text-slate-400 block font-bold">Kalan Süre</span>
-              <span class="font-black text-slate-800">{{ selectedTenderForDetail.sure }}</span>
+              <span class="text-[10px] text-slate-400 block font-bold">Durum / Süre</span>
+              <span class="font-black text-slate-800">{{ selectedTenderForDetail.durum === 'closed' ? 'Mutabakat Sağlandı' : selectedTenderForDetail.sure }}</span>
             </div>
             <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-100">
               <span class="text-[10px] text-slate-400 block font-bold">Teklifler</span>
@@ -391,14 +416,22 @@ function downloadAllSpecs(tender: any) {
         </div>
 
         <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-          <button @click="selectedTenderForDetail = null" class="px-4 py-2 rounded-lg border text-xs font-bold text-slate-600">
+          <button @click="selectedTenderForDetail = null" class="px-4 py-2 rounded-lg border text-xs font-bold text-slate-600 cursor-pointer hover:bg-slate-50">
             Kapat
           </button>
           <button 
+            v-if="selectedTenderForDetail.durum !== 'closed' && selectedTenderForDetail.durum !== 'expired'"
             @click="openBidModal(selectedTenderForDetail); selectedTenderForDetail = null"
-            class="px-5 py-2 rounded-lg bg-[#003057] hover:bg-[#1EAE4C] text-white font-black text-xs"
+            class="px-5 py-2 rounded-lg bg-[#003057] hover:bg-[#1EAE4C] text-white font-black text-xs cursor-pointer shadow-sm"
           >
             Teklif Ver
+          </button>
+          <button
+            v-else
+            disabled
+            class="px-5 py-2 rounded-lg bg-slate-300 text-slate-500 font-bold text-xs cursor-not-allowed"
+          >
+            Teklife Kapalı
           </button>
         </div>
       </div>

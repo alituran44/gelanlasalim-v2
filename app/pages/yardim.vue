@@ -20,7 +20,7 @@ function playVideo(id: string) {
 const faqs = [
   { q: "İhaleciBurada.com B2B İhale Platformu nedir?", a: "İhaleciBurada.com, kurumsal alıcılar ile doğrulanmış tedarikçileri canlı tersine ihale (eksiltme) arenasında buluşturan dijital satın alma platformudur." },
   { q: "Tersine ihale (canlı eksiltme) sistemi nasıl çalışır?", a: "Alıcı firma satın almak istediği ürün veya hizmet için şartname ve bütçesini belirler. Tedarikçiler canlı sürede teklif vererek fiyat eksiltir; en uygun teklif sahibi ihaleyi kazanır." },
-  { q: "Firmaların doğrulanması ve güvenliği nasıl sağlanır?", a: "Platforma üye olan her şirketin vergi kimlik numarası, MERSİS/KEP adresleri ve kurumsal belgeleri kontrol edilerek 'Onaylı Üye' rozeti tanımlanır." },
+  { q: "Firmaların doğrulanması ve güvenliği nasıl sağlanır?", a: "Platforma üye olan her şirketin vergi kimlik numarası, MERSİS bilgileri ve kurumsal belgeleri kontrol edilerek 'Onaylı Üye' rozeti tanımlanır." },
   { q: "Alıcı olarak üyelik komisyonu ödemem gerekiyor mu?", a: "Hayır. İhaleciBurada platformunda alıcı şirketler için üyelik ve ihale açma süreçleri tamamen ücretsizdir." }
 ]
 
@@ -54,7 +54,7 @@ const videoCards = [
   },
   {
     id: 'kyc-dogrulama',
-    title: 'Firma Doğrulama (KYC) & MERSİS/KEP',
+    title: 'Firma Doğrulama (KYC) & MERSİS Onayı',
     desc: 'Vergi levhası doğrulama, e-Devlet entegrasyonu ve Onaylı Rozet alma.',
     duration: '02:15',
     badge: 'GÜVENLİK & ONAY',

@@ -410,7 +410,6 @@ export const DEFAULT_CMS_DATA = {
   contact: {
     address: 'İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye',
     email: 'ihalecib@gmail.com',
-    kep: 'ihaleciburada@hs01.kep.tr',
     workHoursWeekdays: 'Pazartesi - Cuma: 09:00 - 18:00',
     workHoursSaturday: 'Cumartesi: 10:00 - 14:00'
   },

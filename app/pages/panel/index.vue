@@ -118,8 +118,40 @@ function submitCounterOffer() {
 }
 
 function acceptBid(bid: any) {
-  bid.status = 'Teklif Kabul Edildi ✓'
-  alert(`🎉 TEBRİKLER!\n\n${bid.bidderFirm} firmasının teklifini kabul ettiniz. Sözleşme ve onay aşamasına geçilmiştir.`)
+  // Check if this tender already has an accepted bid
+  const existingWinner = incomingBids.value.find(b => b.tenderId === bid.tenderId && (b.status.includes('Kabul Edildi') || b.status.includes('Mutabakat')))
+  if (existingWinner && existingWinner.id !== bid.id) {
+    alert(`⚠️ GEÇERSİZ İŞLEM: "${bid.tenderTitle}" ihalesinde zaten "${existingWinner.bidderFirm}" firması ile mutabakat sağlanmıştır!\n\nBir ihaleye yalnızca 1 adet kazanan teklif atanabilir. Farklı bir teklifi onaylamak istiyorsanız önce mevcut mutabakatı iptal etmeniz gerekir.`)
+    return
+  }
+
+  const confirmAccept = confirm(`🎉 "${bid.bidderFirm}" firmasının ${bid.bidAmount.toLocaleString('tr-TR')} ₺ tutarındaki teklifini onaylayıp mutabakat sağlamak istiyor musunuz?\n\nBu işlem sonucunda ihale sonuçlanacak ve diğer teklifler elenecektir.`)
+  if (!confirmAccept) return
+
+  // 1. Set winning bid
+  bid.status = 'Mutabakat Sağlandı ✓'
+
+  // 2. Eliminate other bids of the same tender
+  incomingBids.value.forEach(b => {
+    if (b.tenderId === bid.tenderId && b.id !== bid.id) {
+      b.status = 'Elendi (Başka Teklifle Anlaşıldı)'
+    }
+  })
+
+  alert(`🎉 TEBRİKLER! MUTABAKAT SAĞLANDI!\n\n"${bid.tenderTitle}" ihalesi için ${bid.bidderFirm} firması ile ${bid.bidAmount.toLocaleString('tr-TR')} ₺ bedel üzerinden mutabakat sağlanmıştır. İhale tekliflere kapatıldı.`)
+}
+
+function cancelBidAgreement(bid: any) {
+  const confirmCancel = confirm(`⚠️ "${bid.tenderTitle}" ihalesindeki mutabakatı iptal edip ihaleyi tekrar teklife açmak istiyor musunuz?`)
+  if (!confirmCancel) return
+
+  incomingBids.value.forEach(b => {
+    if (b.tenderId === bid.tenderId) {
+      b.status = 'Yeni Teklif ⚡'
+    }
+  })
+
+  alert(`🔄 MUTABAKAT İPTAL EDİLDİ\n\n"${bid.tenderTitle}" ihalesi yeniden teklif toplamaya açılmıştır. Tedarikçiler tekrar teklif iletebilir.`)
 }
 
 // 🟢 1 AYLIK ABONELİK VE DENEME SÜRESİ CANLI SAYACI & SATIN ALMA KANCASI (PAYWALL HOOK)
@@ -456,22 +488,44 @@ onMounted(() => {
               </p>
             </div>
 
-            <!-- Action Buttons: Fiyat Pazarlığı Yap & Kabul Et -->
+            <!-- Action Buttons: Fiyat Pazarlığı Yap & Kabul Et & Mutabakat İptali -->
             <div class="pt-2 flex items-center gap-2 border-t border-slate-200">
-              <button
-                type="button"
-                @click="openNegotiationModal(bid)"
-                class="flex-1 py-2 px-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-black transition flex items-center justify-center gap-1 cursor-pointer"
-              >
-                <span>💬 Pazarlık</span>
-              </button>
-              <button
-                type="button"
-                @click="acceptBid(bid)"
-                class="flex-1 py-2 px-2.5 rounded-xl bg-[#0052FF] hover:bg-blue-700 text-white text-xs font-black transition flex items-center justify-center gap-1 shadow-xs cursor-pointer"
-              >
-                <span>✓ Kabul Et</span>
-              </button>
+              <!-- Anlaşıldıysa İptal Butonu -->
+              <template v-if="bid.status.includes('Mutabakat')">
+                <button
+                  type="button"
+                  @click="cancelBidAgreement(bid)"
+                  class="w-full py-2 px-2.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 text-xs font-black transition flex items-center justify-center gap-1 cursor-pointer"
+                  title="Anlaşmayı iptal edip ihaleyi tekrar teklife aç"
+                >
+                  <span>⚠️ Mutabakatı İptal Et (Teklife Aç)</span>
+                </button>
+              </template>
+
+              <!-- Elendiyse -->
+              <template v-else-if="bid.status.includes('Elendi')">
+                <div class="w-full py-2 px-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 text-[11px] font-bold text-center">
+                  🔒 İhalede Başka Teklifle Anlaşıldı
+                </div>
+              </template>
+
+              <!-- Açık Teklifse: Pazarlık ve Kabul Butonları -->
+              <template v-else>
+                <button
+                  type="button"
+                  @click="openNegotiationModal(bid)"
+                  class="flex-1 py-2 px-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-black transition flex items-center justify-center gap-1 cursor-pointer"
+                >
+                  <span>💬 Pazarlık</span>
+                </button>
+                <button
+                  type="button"
+                  @click="acceptBid(bid)"
+                  class="flex-1 py-2 px-2.5 rounded-xl bg-[#0052FF] hover:bg-blue-700 text-white text-xs font-black transition flex items-center justify-center gap-1 shadow-xs cursor-pointer"
+                >
+                  <span>✓ Kabul Et</span>
+                </button>
+              </template>
             </div>
           </div>
         </div>

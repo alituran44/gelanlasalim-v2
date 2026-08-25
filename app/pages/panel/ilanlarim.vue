@@ -8,21 +8,88 @@ definePageMeta({
   layout: "dashboard"
 })
 
-const { cmsData } = useCmsData()
+const { cmsData, saveCmsData } = useCmsData()
 const isLoading = ref(true)
-const activeTab = ref<'aktif' | 'beklemede' | 'tamamlanan' | 'iptal'>('aktif')
+const activeTab = ref<'aktif' | 'tamamlanan' | 'suresi_dolan' | 'tum'>('tum')
 const activePeriod = ref<'7gun' | '30gun' | '90gun' | '1yil'>('30gun')
 const searchQuery = ref('')
 
 onMounted(() => {
   setTimeout(() => {
     isLoading.value = false
-  }, 600)
+  }, 400)
 })
 
 const tendersList = computed(() => {
-  return cmsData.value.dashboard.tenders || []
+  return cmsData.value?.dashboard?.tenders || []
 })
+
+const filteredTenders = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  return tendersList.value.filter(t => {
+    // Status filter
+    if (activeTab.value === 'aktif' && (t.durum === 'closed' || t.durum === 'expired' || t.sure?.includes('Süresi Doldu') || t.sure?.includes('Sonuçlandı'))) {
+      return false
+    }
+    if (activeTab.value === 'tamamlanan' && t.durum !== 'closed' && !t.sure?.includes('Sonuçlandı') && !t.sure?.includes('Mutabakat')) {
+      return false
+    }
+    if (activeTab.value === 'suresi_dolan' && t.durum !== 'expired' && !t.sure?.includes('Süresi Doldu')) {
+      return false
+    }
+
+    // Search query
+    if (q) {
+      const matchTitle = (t.baslik || '').toLowerCase().includes(q)
+      const matchCat = (t.kategori || '').toLowerCase().includes(q)
+      const matchCity = (t.city || '').toLowerCase().includes(q)
+      const matchId = (t.id || '').toLowerCase().includes(q)
+      if (!matchTitle && !matchCat && !matchCity && !matchId) return false
+    }
+
+    return true
+  })
+})
+
+function republishTender(tender: any) {
+  tender.durum = 'active'
+  tender.sure = '30 gün'
+  
+  // Also reset receivedBids if closed
+  const receivedGroup = (cmsData.value.dashboard.receivedBids || []).find((g: any) => g.id === tender.id || g.baslik === tender.baslik)
+  if (receivedGroup) {
+    receivedGroup.bitis = '30 gün'
+    receivedGroup.teklifler.forEach((t: any) => {
+      if (t.durum === 'elendi') t.durum = 'bekliyor'
+    })
+  }
+
+  saveCmsData(cmsData.value)
+  alert(`🎉 İLAN YENİDEN YAYINLANDI!\n\n"${tender.baslik}" ihalesi 30 gün süreyle Pazar Yeri'nde yeniden yayına alınmıştır.`)
+}
+
+function cancelTenderAgreement(tender: any) {
+  const confirmCancel = confirm(`⚠️ "${tender.baslik}" ihalesindeki mutabakatı iptal edip ihaleyi tekrar teklif alımına açmak istiyor musunuz?`)
+  if (!confirmCancel) return
+
+  tender.durum = 'active'
+  tender.sure = '15 gün'
+
+  // Reset bids
+  const receivedGroup = (cmsData.value.dashboard.receivedBids || []).find((g: any) => g.id === tender.id || g.baslik === tender.baslik)
+  if (receivedGroup) {
+    receivedGroup.teklifler.forEach((t: any) => {
+      t.durum = 'bekliyor'
+      const matchingSubmitted = (cmsData.value.dashboard.submittedBids || []).find((b: any) => b.id === t.id)
+      if (matchingSubmitted) {
+        matchingSubmitted.durum = 'bekliyor'
+      }
+    })
+  }
+
+  saveCmsData(cmsData.value)
+  alert(`🔄 MUTABAKAT İPTAL EDİLDİ\n\n"${tender.baslik}" ihalesi tekrar teklif toplamaya açılmıştır.`)
+}
 
 const periods = computed(() => {
   if (locale.value === 'en') {
@@ -43,21 +110,17 @@ const periods = computed(() => {
 })
 
 const statusTabs = computed(() => {
-  if (locale.value === 'en') {
-    return [
-      { id: 'aktif', label: 'Active', count: tendersList.value.length },
-      { id: 'beklemede', label: 'Pending', count: 0 },
-      { id: 'tamamlanan', label: 'Completed', count: 0 },
-      { id: 'iptal', label: 'Cancelled', count: 0 }
-    ]
-  } else {
-    return [
-      { id: 'aktif', label: 'Aktif', count: tendersList.value.length },
-      { id: 'beklemede', label: 'Beklemede', count: 0 },
-      { id: 'tamamlanan', label: 'Tamamlanan', count: 0 },
-      { id: 'iptal', label: 'İptal', count: 0 }
-    ]
-  }
+  const total = tendersList.value.length
+  const activeCount = tendersList.value.filter(t => t.durum !== 'closed' && t.durum !== 'expired' && !t.sure?.includes('Süresi Doldu') && !t.sure?.includes('Sonuçlandı')).length
+  const closedCount = tendersList.value.filter(t => t.durum === 'closed' || t.sure?.includes('Sonuçlandı') || t.sure?.includes('Mutabakat')).length
+  const expiredCount = tendersList.value.filter(t => t.durum === 'expired' || t.sure?.includes('Süresi Doldu')).length
+
+  return [
+    { id: 'tum', label: 'Tüm İlanlarım', count: total },
+    { id: 'aktif', label: 'Yayında (Aktif)', count: activeCount },
+    { id: 'tamamlanan', label: 'Mutabakat Sağlanan', count: closedCount },
+    { id: 'suresi_dolan', label: 'Süresi Dolanlar', count: expiredCount }
+  ]
 })
 </script>
 
@@ -169,20 +232,45 @@ const statusTabs = computed(() => {
     </div>
 
     <!-- DATA LIST -->
-    <div v-else class="space-y-3">
+    <div v-else-if="filteredTenders.length > 0" class="space-y-3">
       <div 
-        v-for="tender in tendersList"
+        v-for="tender in filteredTenders"
         :key="tender.id"
-        class="rounded-2xl border bg-white p-5 shadow-xs hover:shadow-md transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+        class="rounded-2xl border bg-white p-5 shadow-xs hover:shadow-md transition-all flex flex-col lg:flex-row lg:items-center justify-between gap-4"
         style="border-color: #E2E8F0;"
       >
         <div class="flex items-start gap-4">
-          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 border border-blue-100">
-            <FileText :size="18" />
+          <div 
+            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border text-sm font-black"
+            :class="tender.durum === 'closed' ? 'bg-amber-50 text-amber-700 border-amber-200' : (tender.durum === 'expired' ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-blue-50 text-blue-600 border-blue-100')"
+          >
+            <FileText :size="20" />
           </div>
           <div>
-            <h3 class="font-bold text-sm text-slate-800">{{ tender.baslik }}</h3>
-            <p class="text-xs text-slate-400 mt-0.5 font-medium">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h3 class="font-bold text-sm text-slate-800">{{ tender.baslik }}</h3>
+              <!-- Durum Rozeti -->
+              <span 
+                v-if="tender.durum === 'closed' || tender.sure?.includes('Sonuçlandı') || tender.sure?.includes('Mutabakat')"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300"
+              >
+                🔒 Mutabakat Sağlandı
+              </span>
+              <span 
+                v-else-if="tender.durum === 'expired' || tender.sure?.includes('Süresi Doldu')"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-slate-100 text-slate-700 border border-slate-300"
+              >
+                ⌛ Süresi Doldu
+              </span>
+              <span 
+                v-else
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300"
+              >
+                ✓ Yayında (Aktif)
+              </span>
+            </div>
+
+            <p class="text-xs text-slate-400 mt-1 font-medium">
               {{ 'İhale Kodu:' }} <strong class="font-mono text-slate-700">{{ tender.id }}</strong> • 
               {{ 'Kategori:' }} {{ tender.kategori }}
             </p>
@@ -190,20 +278,59 @@ const statusTabs = computed(() => {
             <div class="flex flex-wrap items-center gap-3 mt-2 text-[10px] text-slate-500 font-medium">
               <span class="rounded bg-slate-100 px-2 py-0.5 font-bold uppercase tracking-wider text-[8px] text-slate-700">{{ tender.olusturma }}</span>
               <span>{{ 'Bütçe:' }} {{ tender.butce }}</span>
-              <span>{{ 'Süre:' }} {{ tender.sure }}</span>
+              <span>{{ 'Kalan Süre / Durum:' }} <strong>{{ tender.durum === 'closed' ? 'Sonuçlandı (Mutabakat)' : tender.sure }}</strong></span>
             </div>
           </div>
         </div>
 
-        <div class="flex items-center gap-4 sm:justify-end">
-          <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+        <div class="flex flex-wrap items-center gap-2.5 lg:justify-end border-t lg:border-t-0 pt-3 lg:pt-0">
+          <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
             {{ tender.teklifSayisi }} {{ 'Teklif Alındı' }}
           </span>
-          <NuxtLink :to="`/panel/gelen-teklifler?ilan=${tender.id}`" class="p-2 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-50 transition border" style="border-color: #E2E8F0;">
-            <ChevronRight :size="14" />
+
+          <!-- Eğer Mutabakat Sağlandıysa: İptal Butonu -->
+          <button
+            v-if="tender.durum === 'closed' || tender.sure?.includes('Sonuçlandı') || tender.sure?.includes('Mutabakat')"
+            type="button"
+            @click="cancelTenderAgreement(tender)"
+            class="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold transition cursor-pointer"
+            title="Mutabakatı iptal edip ihaleyi tekrar teklife aç"
+          >
+            ⚠️ Mutabakatı İptal Et
+          </button>
+
+          <!-- Eğer Süresi Dolduysa: Tekrar İlan Ver Butonu -->
+          <button
+            v-else-if="tender.durum === 'expired' || tender.sure?.includes('Süresi Doldu')"
+            type="button"
+            @click="republishTender(tender)"
+            class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition cursor-pointer shadow-xs"
+            title="İlanı 30 gün süreyle yeniden yayına al"
+          >
+            🔄 Tekrar İlan Ver
+          </button>
+
+          <!-- Gelen Tekliflere Git Linki -->
+          <NuxtLink 
+            :to="`/panel/gelen-teklifler?ilan=${tender.id}`" 
+            class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-slate-700 bg-slate-50 hover:bg-slate-100 hover:text-blue-600 transition border border-slate-200 flex items-center gap-1 cursor-pointer"
+          >
+            <span>Teklifleri İncele</span>
+            <ChevronRight :size="13" />
           </NuxtLink>
         </div>
       </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else class="rounded-2xl border bg-white p-12 text-center space-y-3" style="border-color: #E2E8F0;">
+      <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+        <Search :size="20" />
+      </div>
+      <h3 class="text-sm font-bold text-slate-800">Seçilen Filtrede İhale Bulunamadı</h3>
+      <p class="text-xs text-slate-500">
+        Lütfen yukarıdaki sekmelerden farklı bir durum seçin veya arama teriminizi değiştirin.
+      </p>
     </div>
 
   </div>

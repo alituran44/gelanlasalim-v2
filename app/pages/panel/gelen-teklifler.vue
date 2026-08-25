@@ -118,7 +118,14 @@ async function submitCounterOffer() {
 
 // Accept Offer & Close Tender (Single Award Rule)
 async function acceptTeklif(teklif: any, ilan: any) {
-  const confirmAccept = confirm(`🎉 "${teklif.firma}" firmasının ${teklif.fiyat} tutarındaki teklifini onaylayıp ihaleyi tamamlamak istiyor musunuz?\n\nBu işlem sonucunda ihale sonuçlanacak ve diğer teklifler elenecektir.`)
+  // Hard check: If another bid is already accepted, strictly block!
+  const existingAccepted = ilan.teklifler?.find((t: any) => t.durum === 'onaylandi')
+  if (existingAccepted && existingAccepted.id !== teklif.id) {
+    alert(`⚠️ GEÇERSİZ İŞLEM: "${ilan.baslik}" ihalesinde zaten "${existingAccepted.firma}" firması ile mutabakat sağlanmıştır!\n\nBir ihaleye birden fazla onay verilemez. Farklı bir teklifi onaylamak istiyorsanız önce mevcut mutabakatı iptal etmeniz gerekir.`)
+    return
+  }
+
+  const confirmAccept = confirm(`🎉 "${teklif.firma}" firmasının ${teklif.fiyat} tutarındaki teklifini onaylayıp mutabakat sağlamak istiyor musunuz?\n\nBu işlem sonucunda ihale sonuçlanacak, yeni tekliflere kapatılacak ve diğer teklifler elenecektir.`)
   if (!confirmAccept) return
 
   // 1. Mark winning bid as 'onaylandi'
@@ -135,7 +142,7 @@ async function acceptTeklif(teklif: any, ilan: any) {
   const tenderInStore = (cmsData.value.dashboard.tenders || []).find((t: any) => t.id === ilan.id || t.baslik === ilan.baslik)
   if (tenderInStore) {
     tenderInStore.durum = 'closed'
-    tenderInStore.sure = 'Sonuçlandı (Anlaşıldı)'
+    tenderInStore.sure = 'Sonuçlandı (Mutabakat Sağlandı)'
   }
 
   // 4. Update matching submittedBid for supplier view
@@ -159,7 +166,36 @@ async function acceptTeklif(teklif: any, ilan: any) {
     messageBody: `TEBRİKLER! "${ilan.baslik}" ihalesinde teklifiniz onaylanmıştır. Alıcı irtibat ve sözleşme detayları panelinize açılmıştır.`
   })
 
-  alert(`🎉 TEBRİKLER! İHALE BAŞARIYLA SONUÇLANDI!\n\n${teklif.firma} firması ile ${teklif.fiyat} bedel üzerinden anlaşma sağlandı. Karşılıklı kurumsal iletişim ve vergi bilgileri açılmıştır.`)
+  alert(`🎉 TEBRİKLER! MUTABAKAT SAĞLANDI!\n\n${teklif.firma} firması ile ${teklif.fiyat} bedel üzerinden anlaşma sağlandı. İhale teklif alımına kapatılmıştır. Karşılıklı kurumsal iletişim ve vergi bilgileri açılmıştır.`)
+}
+
+// Cancel Agreement & Re-open Tender
+function cancelTeklifAgreement(ilan: any) {
+  const confirmCancel = confirm(`⚠️ "${ilan.baslik}" ihalesindeki mutabakatı iptal edip ihaleyi tekrar teklif alımına açmak istiyor musunuz?\n\nBu işlem sonrasında tedarikçiler yeniden teklif verebilecek ve elenen teklifler aktif hale gelecektir.`)
+  if (!confirmCancel) return
+
+  // 1. Reset bids in this ilan
+  ilan.teklifler.forEach((t: any) => {
+    t.durum = 'bekliyor'
+  })
+
+  // 2. Re-open parent tender
+  const tenderInStore = (cmsData.value.dashboard.tenders || []).find((t: any) => t.id === ilan.id || t.baslik === ilan.baslik)
+  if (tenderInStore) {
+    tenderInStore.durum = 'active'
+    tenderInStore.sure = '7 gün'
+  }
+
+  // 3. Reset submitted bids
+  ilan.teklifler.forEach((t: any) => {
+    const matching = (cmsData.value.dashboard.submittedBids || []).find((b: any) => b.id === t.id)
+    if (matching) {
+      matching.durum = 'bekliyor'
+    }
+  })
+
+  saveCmsData(cmsData.value)
+  alert(`🔄 İHALE MUTABAKATI İPTAL EDİLDİ\n\n"${ilan.baslik}" ihalesi yeniden teklif toplamaya açılmıştır. Tüm tedarikçiler tekrar teklif sunabilir.`)
 }
 
 // Reject Bid
@@ -321,21 +357,35 @@ function submitReview() {
         <!-- Teklif Kartları & Pazarlık Arayüzü -->
         <div v-if="expandedIlan === ilan.id" class="border-t border-slate-100">
           
-          <!-- Bilgilendirme ve Güven Şeridi -->
-          <div class="px-6 py-3 bg-amber-50/70 border-b border-amber-100 flex items-center justify-between text-xs text-amber-900 font-bold">
+          <!-- Bilgilendirme ve Güven Şeridi / Mutabakat Durumu -->
+          <div v-if="ilan.teklifler?.some((t: any) => t.durum === 'onaylandi')" class="px-6 py-3.5 bg-emerald-50 border-b border-emerald-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-emerald-900 font-bold">
+            <div class="flex items-center gap-2">
+              <CheckCircle2 :size="16" class="text-emerald-600 shrink-0" />
+              <span>🔒 BU İHALEDE MUTABAKAT SAĞLANMIŞTIR — İhale yeni teklif alımına kapatılmıştır.</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <button
+                type="button"
+                @click="cancelTeklifAgreement(ilan)"
+                class="px-3.5 py-1.5 rounded-xl bg-white border border-red-300 text-red-700 hover:bg-red-50 text-xs font-black transition cursor-pointer shadow-xs"
+              >
+                ⚠️ Mutabakatı İptal Et (Teklife Aç)
+              </button>
+              <button 
+                type="button"
+                @click="openDisputeModal(ilan)"
+                class="text-red-700 hover:text-red-900 underline text-xs font-black flex items-center gap-1 cursor-pointer"
+              >
+                <Scale :size="13" />
+                Mücbir Sebep / İptal
+              </button>
+            </div>
+          </div>
+          <div v-else class="px-6 py-3 bg-amber-50/70 border-b border-amber-100 flex items-center justify-between text-xs text-amber-900 font-bold">
             <div class="flex items-center gap-2">
               <Shield :size="14" class="text-amber-600" />
               <span>Teklifler gizli kapalı zarf korumasındadır. Bir teklifi onayladığınızda ihale kapanır ve diğer teklifler elenir.</span>
             </div>
-            <button 
-              v-if="ilan.teklifler?.some((t: any) => t.durum === 'onaylandi')"
-              type="button"
-              @click="openDisputeModal(ilan)"
-              class="text-red-700 hover:text-red-900 underline text-xs font-black flex items-center gap-1 cursor-pointer"
-            >
-              <Scale :size="13" />
-              Mücbir Sebep / İptal Bildir
-            </button>
           </div>
 
           <!-- Gelen Teklif Yoksa -->
@@ -434,8 +484,8 @@ function submitReview() {
                     </button>
                   </div>
 
-                  <!-- Anlaşıldıysa Değerlendirme Butonu -->
-                  <div v-else-if="teklif.durum === 'onaylandi'">
+                  <!-- Anlaşıldıysa Değerlendirme & İptal Butonları -->
+                  <div v-else-if="teklif.durum === 'onaylandi'" class="flex items-center gap-2">
                     <button
                       type="button"
                       @click="openReviewModal(teklif)"
@@ -443,6 +493,14 @@ function submitReview() {
                     >
                       <Star :size="13" class="text-amber-500" fill="#F59E0B" />
                       Puanla & Yorum Yaz
+                    </button>
+                    <button
+                      type="button"
+                      @click="cancelTeklifAgreement(ilan)"
+                      class="rounded-xl px-3 py-2 text-xs font-black bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition cursor-pointer"
+                      title="Mutabakatı iptal et ve ihaleyi tekrar aç"
+                    >
+                      ⚠️ Mutabakatı İptal Et
                     </button>
                   </div>
 
