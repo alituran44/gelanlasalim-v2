@@ -33,56 +33,8 @@ import Notifications from "~/components/dashboard/Notifications.vue"
 const verified = ref(true)
 const companyName = ref('Ali Turan')
 
-// Firmanın İhalesine Gelen Teklifler ve Pazarlık Masası
-const incomingBids = ref([
-  {
-    id: 101,
-    tenderTitle: '500 Adet Kurumsal Dizüstü Bilgisayar Alımı',
-    tenderId: 1,
-    bidderFirm: 'TeknoBilişim Dağıtım Ltd. Şti.',
-    verified: true,
-    bidAmount: 5120000,
-    originalValue: 5500000,
-    savings: '%6.9 Tasarruf',
-    deliveryDays: 14,
-    notes: 'TSE belgeli 3 yıl yerinde garantili teslimat.',
-    status: 'Yeni Teklif ⚡',
-    timeAgo: '12 dk önce',
-    negotiationHistory: []
-  },
-  {
-    id: 102,
-    tenderTitle: 'Üretim Tesisi Çatı ve İzolasyon Yenileme İşi',
-    tenderId: 2,
-    bidderFirm: 'Marmara Yapı & İzolasyon A.Ş.',
-    verified: true,
-    bidAmount: 1140000,
-    originalValue: 1250000,
-    savings: '%8.8 Tasarruf',
-    deliveryDays: 20,
-    notes: 'Yangın dayanımlı taşyünü ve membran kaplama dahildir.',
-    status: 'Pazarlık Sürecinde 💬',
-    timeAgo: '45 dk önce',
-    negotiationHistory: [
-      { sender: 'Siz', text: 'Birim fiyatı 1.100.000 ₺ yapabilirseniz hemen onaylayacağız.', price: 1100000, date: '1 saat önce' }
-    ]
-  },
-  {
-    id: 103,
-    tenderTitle: '100.000 Adet Özel Tasarım Ürün Kutusu Üretimi',
-    tenderId: 4,
-    bidderFirm: 'Anadolu Ambalaj & Koli Sanayi',
-    verified: true,
-    bidAmount: 318000,
-    originalValue: 350000,
-    savings: '%9.1 Tasarruf',
-    deliveryDays: 10,
-    notes: 'Numune baskı 48 saatte onayınıza sunulur.',
-    status: 'Yeni Teklif ⚡',
-    timeAgo: '2 saat önce',
-    negotiationHistory: []
-  }
-])
+// Firmanın İhalesine Gelen Teklifler ve Pazarlık Masası (Örnek teklifler temizlendi)
+const incomingBids = ref<any[]>([])
 
 const showNegotiationModal = ref(false)
 const selectedBidForNegotiation = ref<any>(null)
@@ -448,7 +400,7 @@ onMounted(() => {
         </div>
 
         <!-- Incoming Bids Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <div v-if="incomingBids.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-5">
           <div
             v-for="bid in incomingBids"
             :key="bid.id"
@@ -528,6 +480,13 @@ onMounted(() => {
               </template>
             </div>
           </div>
+        </div>
+
+        <div v-else class="p-8 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-3">
+          <p class="text-xs text-slate-500 font-medium">Henüz ihalelerinize verilmiş bir teklif bulunmuyor. Yeni bir satın alma ihalesi açarak onaylı tedarikçilerden teklif toplayabilirsiniz.</p>
+          <NuxtLink to="/panel/ihale-olustur" class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition shadow-sm">
+            + Yeni İhale Aç
+          </NuxtLink>
         </div>
       </div>
 

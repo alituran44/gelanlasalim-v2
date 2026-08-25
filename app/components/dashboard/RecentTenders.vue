@@ -1,70 +1,27 @@
 <script setup lang="ts">
 import { computed } from "vue"
-import { ArrowRight } from "lucide-vue-next"
-import { locale } from "~/composables/useLocale"
+import { ArrowRight, FileText } from "lucide-vue-next"
+import { useCmsData } from "~/composables/useCmsData"
+
+const { cmsData } = useCmsData()
 
 const tenders = computed(() => {
-  // Pure Turkish mode
-  {
-    return [
-      {
-        id: 1,
-        title: "Dizüstü Bilgisayar Alımı",
-        company: "ABC Teknoloji A.Ş.",
-        budget: "₺1.250.000",
-        status: "Aktif",
-        date: "15 Temmuz 2026"
-      },
-      {
-        id: 2,
-        title: "Ofis Mobilyası Alımı",
-        company: "XYZ Holding",
-        budget: "₺420.000",
-        status: "Teklif Bekleniyor",
-        date: "14 Temmuz 2026"
-      },
-      {
-        id: 3,
-        title: "Yazılım Lisansları",
-        company: "BiHocam Eğitim",
-        budget: "₺310.000",
-        status: "Aktif",
-        date: "13 Temmuz 2026"
-      },
-      {
-        id: 4,
-        title: "Sunucu Donanımı",
-        company: "Delta Bilişim",
-        budget: "₺980.000",
-        status: "Kapandı",
-        date: "12 Temmuz 2026"
-      },
-      {
-        id: 5,
-        title: "Güvenlik Kamera Sistemi",
-        company: "Mavi Yapı",
-        budget: "₺165.000",
-        status: "Aktif",
-        date: "11 Temmuz 2026"
-      }
-    ]
-  }
+  return (cmsData.value?.dashboard?.tenders || []).slice(0, 5).map((t: any, idx: number) => ({
+    id: t.id || idx,
+    title: t.baslik,
+    company: t.companyName || t.firma || `${t.city || 'Kurumsal'} Alıcı`,
+    budget: t.butce || 'Açık Eksiltme',
+    status: t.durum === 'closed' ? 'Kapandı' : 'Aktif',
+    date: t.olusturma || 'Bugün'
+  }))
 })
 
 const statusClass = (status: string) => {
   switch (status) {
     case "Aktif":
-    case "Active":
       return "bg-emerald-50 text-emerald-700 border-emerald-200"
-
-    case "Teklif Bekleniyor":
-    case "Bids Expected":
-      return "bg-amber-50 text-amber-700 border-amber-200"
-
     case "Kapandı":
-    case "Closed":
       return "bg-slate-100 text-slate-600 border-slate-200"
-
     default:
       return "bg-slate-100 text-slate-700 border-slate-200"
   }
@@ -76,10 +33,10 @@ const statusClass = (status: string) => {
     <div class="flex items-center justify-between border-b border-slate-100 p-6">
       <div>
         <h2 class="text-base font-black text-slate-800 tracking-tight">
-          {{ 'Son İhaleler' }}
+          Son İhaleler
         </h2>
         <p class="text-xs text-slate-500 font-medium mt-0.5">
-          {{ 'En son yayınlanan B2B ihaleleri' }}
+          En son yayınlanan kurumsal B2B satın alma ihaleleri
         </p>
       </div>
 
@@ -87,12 +44,12 @@ const statusClass = (status: string) => {
         to="/panel/ilanlarim"
         class="flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700"
       >
-        <span>{{ 'Tümünü Gör' }}</span>
+        <span>Tümünü Gör</span>
         <ArrowRight :size="14" />
       </NuxtLink>
     </div>
 
-    <div class="divide-y divide-slate-100">
+    <div v-if="tenders.length > 0" class="divide-y divide-slate-100">
       <div
         v-for="item in tenders"
         :key="item.id"
@@ -121,6 +78,13 @@ const statusClass = (status: string) => {
           </div>
         </div>
       </div>
+    </div>
+
+    <div v-else class="p-8 text-center space-y-2">
+      <p class="text-xs text-slate-400 font-medium">Henüz yayında ihale bulunmuyor.</p>
+      <NuxtLink to="/panel/ihale-olustur" class="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:underline">
+        + İlk İhaleyi Aç
+      </NuxtLink>
     </div>
   </div>
 </template>

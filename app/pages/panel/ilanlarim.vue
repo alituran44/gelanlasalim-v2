@@ -323,14 +323,27 @@ const statusTabs = computed(() => {
     </div>
 
     <!-- Empty State -->
-    <div v-else class="rounded-2xl border bg-white p-12 text-center space-y-3" style="border-color: #E2E8F0;">
-      <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
-        <Search :size="20" />
+    <div v-else class="rounded-3xl border bg-white p-12 sm:p-16 text-center space-y-4 shadow-xs" style="border-color: #E2E8F0;">
+      <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto border border-blue-100">
+        <FileText :size="24" />
       </div>
-      <h3 class="text-sm font-bold text-slate-800">Seçilen Filtrede İhale Bulunamadı</h3>
-      <p class="text-xs text-slate-500">
-        Lütfen yukarıdaki sekmelerden farklı bir durum seçin veya arama teriminizi değiştirin.
-      </p>
+      <div class="space-y-1 max-w-md mx-auto">
+        <h3 class="text-sm font-black text-slate-800">
+          {{ tendersList.length === 0 ? 'Henüz Açtığınız Bir İhale Bulunmuyor' : 'Seçilen Filtrede İhale Bulunamadı' }}
+        </h3>
+        <p class="text-xs text-slate-500 font-medium leading-relaxed">
+          {{ tendersList.length === 0 ? 'Şartnamenizi yükleyerek ve malzeme listenizi belirterek ilk B2B satın alma ihalenizi hemen başlatabilirsiniz.' : 'Lütfen filtre kriterlerinizi değiştiriniz.' }}
+        </p>
+      </div>
+      <div class="pt-1">
+        <NuxtLink
+          to="/panel/ihale-olustur"
+          class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2.5 transition shadow-sm"
+        >
+          <Plus :size="14" />
+          <span>Yeni İhale Aç</span>
+        </NuxtLink>
+      </div>
     </div>
 
   </div>

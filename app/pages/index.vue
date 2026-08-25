@@ -646,140 +646,7 @@ const pricingTypes = computed(() => [
       { name: 'Kısmi Teklif Verilemez', count: 277 }
     ])
 
-const tenders = [
-  {
-    id: 1,
-    featured: true,
-    title: '500 Adet Kurumsal Dizüstü Bilgisayar Alımı',
-    company: 'Marmara Teknoloji Yatırımları A.Ş.',
-    verified: true,
-    image: 'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=800&auto=format&fit=crop&q=80'
-    ],
-    category: 'Elektronik, Bilgisayar ve İletişim',
-    sector: 'IT, Yazılım Geliştirme ve İnternet Hizmetleri',
-    city: 'İstanbul',
-    type: 'Mal Alımı',
-    method: 'Kapalı Teklif',
-    pricing: 'Birim Fiyat',
-    deadline: '22 Temmuz 2026',
-    daysLeft: 7,
-    offers: 14,
-    value: '5.500.000 ₺',
-    description: 'Kurumsal kullanım için teknik şartnameye uygun 500 adet dizüstü bilgisayar alımı.',
-    material_list: '1. Intel i7 İşlemcili Dizüstü Bilgisayar - 350 Adet\n2. Intel i5 İşlemcili Dizüstü Bilgisayar - 150 Adet',
-    admin_spec: '• Teklifler birim fiyat üzerinden toplanacaktır.\n• Teslimat süresi siparişten itibaren en fazla 30 gündür.',
-    tech_spec: '• En az 16GB RAM ve 512GB NVMe SSD bulunmalıdır.\n• 3 yıl yerinde üretici garantisi zorunludur.',
-    similar_history: '2025/1049 - 200 Adet Masaüstü Bilgisayar Alımı (Sonuç: 2.100.000 ₺)'
-  },
-  {
-    id: 2,
-    featured: false,
-    title: 'Üretim Tesisi Çatı ve İzolasyon Yenileme İşi',
-    company: 'Bursa Endüstri Üretim A.Ş.',
-    verified: true,
-    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&auto=format&fit=crop&q=80'
-    ],
-    category: 'İnşaat, Altyapı ve Yapı İşleri',
-    sector: 'İnşaat ve Taahhüt İşleri',
-    city: 'Bursa',
-    type: 'Yapım İşi',
-    method: 'Açık Teklif',
-    pricing: 'Toplam / Götürü Bedel',
-    deadline: '25 Temmuz 2026',
-    daysLeft: 10,
-    offers: 8,
-    value: '1.250.000 ₺',
-    description: 'Fabrika üretim tesisi çatı kaplama ve ısı izolasyon yenileme işi.',
-    material_list: '1. Çatı Sandviç Panel Kaplama (40mm EPS) - 1.800 m²\n2. İzolasyon Membranı Uygulaması - 1.800 m²',
-    admin_spec: '• İş tesliminde hakediş usulü ödeme yapılacaktır.\n• Geçici teminat mektubu talep edilmektedir.',
-    tech_spec: '• Sandviç paneller TSE ve yangın dayanım belgeli olmalıdır.\n• Uygulama garantisi en az 5 yıl olmalıdır.',
-    similar_history: '2025/4490 - Depo Çatı Tamiratı (Sonuç: 450.000 ₺)'
-  },
-  {
-    id: 3,
-    featured: false,
-    title: '12 Aylık Personel Taşıma Hizmeti',
-    company: 'Ege Gıda Sanayi Ltd. Şti.',
-    verified: true,
-    image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=800&auto=format&fit=crop&q=80'
-    ],
-    category: 'Nakliye, Lojistik ve Taşımacılık',
-    sector: 'Nakliye ve Lojistik Hizmetleri',
-    city: 'İzmir',
-    type: 'Hizmet Alımı',
-    method: 'Kapalı Teklif',
-    pricing: 'Toplam / Götürü Bedel',
-    deadline: '19 Temmuz 2026',
-    daysLeft: 4,
-    offers: 21,
-    value: '840.000 ₺',
-    description: 'Üretim tesisi çalışanları için 12 aylık personel servis taşımacılığı hizmeti.',
-    material_list: '1. 27 Kişilik Servis Aracı (Günlük 2 Sefer) - 3 Hat\n2. 16 Kişilik Servis Aracı (Günlük 2 Sefer) - 2 Hat',
-    admin_spec: '• Ödemeler aylık olarak düzenlenecek fatura karşılığında yapılacaktır.\n• Sürücülerin SRC belgeleri eksiksiz olmalıdır.',
-    tech_spec: '• Araçların yaş sınırı en fazla 5 olmalıdır.\n• Koltuk sigortaları ve D2 belgeleri bulunmalıdır.',
-    similar_history: '2025/1102 - 12 Aylık Servis Hizmeti (Sonuç: 720.000 ₺)'
-  },
-  {
-    id: 4,
-    featured: true,
-    title: '100.000 Adet Özel Tasarım Ürün Kutusu Üretimi',
-    company: 'Anadolu E-Ticaret A.Ş.',
-    verified: true,
-    image: 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=800&auto=format&fit=crop&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=800&auto=format&fit=crop&q=80'
-    ],
-    category: 'Matbaa, Kırtasiye ve Ambalaj',
-    sector: 'Basılı Malzeme ve Matbaa',
-    city: 'Ankara',
-    type: 'Fason Üretim',
-    method: 'Ters İhale',
-    pricing: 'Birim Fiyat',
-    deadline: '18 Temmuz 2026',
-    daysLeft: 3,
-    offers: 17,
-    value: '350.000 ₺',
-    description: 'Marka standartlarına uygun baskılı ürün kutularının fason üretimi.',
-    material_list: '1. Kraft Dopel Kutu (25x20x10 cm) - 50.000 Adet\n2. Selefonlu Baskılı Kutu (15x15x8 cm) - 50.000 Adet',
-    admin_spec: '• Numune onayı alındıktan sonra seri üretime başlanacaktır.\n• Teslimat 3 parti halinde Ankara depomuza yapılacaktır.',
-    tech_spec: '• Baskı kalitesi minimum 300 DPI olmalıdır.\n• Oluklu mukavva gramajı şartnameye uygun olmalıdır.',
-    similar_history: '2025/9012 - Ambalaj Kolisi Alımı (Sonuç: 180.000 ₺)'
-  },
-  {
-    id: 5,
-    featured: false,
-    title: 'Kurumsal Web Yazılım ve Mobil Uygulama Projesi',
-    company: 'Atlas Holding A.Ş.',
-    verified: true,
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80',
-    images: [
-      'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&auto=format&fit=crop&q=80'
-    ],
-    category: 'Yazılım, Bilişim ve Dijital Hizmetler',
-    sector: 'IT, Yazılım Geliştirme ve İnternet Hizmetleri',
-    city: 'İstanbul',
-    type: 'Hizmet Alımı',
-    method: 'Davetli İhale',
-    pricing: 'Toplam / Götürü Bedel',
-    deadline: '30 Temmuz 2026',
-    daysLeft: 15,
-    offers: 6,
-    value: '2.800.000 ₺',
-    description: 'Kurumsal portal, mobil uygulama ve yönetim paneli geliştirme hizmeti.',
-    material_list: '1. UI/UX Tasarım Süreci - 1 Aşama\n2. Kurumsal Web Sitesi & CMS - 1 Sistem\n3. iOS & Android Mobil Uygulama - 2 Uygulama',
-    admin_spec: '• Ödeme takvimi proje kilometre taşlarına (milestones) göre yapılacaktır.\n• Kaynak kodları teslim edilecektir.',
-    tech_spec: '• Backend teknolojisi Node.js/Go, frontend Vue.js/React olmalıdır.\n• Test kapsamı ve dokümantasyon tam olmalıdır.',
-    similar_history: '2025/7829 - CRM Entegrasyonu Projesi (Sonuç: 950.000 ₺)'
-  }
-]
+const tenders: any[] = []
 
 const faqs = [
   {
@@ -796,7 +663,7 @@ const faqs = [
   },
   {
     question: 'İhale oluşturmak ücretli mi?',
-    answer: 'Ücretlendirme modeli seçilen plana göre belirlenir. Temel planımız ile ücretsiz deneme yapabilir, profesyonel veya kurumsal paketlerimiz için lansmana özel indirimli fiyatlardan yararlanabilirsiniz.'
+    answer: 'Ücretlendirme modeli seçilen plana göre belirlenir. 1 ay lansman denememiz ile ücretsiz ihale açabilir, profesyonel veya kurumsal paketlerimiz için lansmana özel indirimli fiyatlardan yararlanabilirsiniz.'
   },
   {
     question: 'Ters ihale (Eksiltme) nedir?',
@@ -823,16 +690,16 @@ const localizedTenders = computed(() => {
     id: dt.id || (1000 + idx),
     featured: idx < 2,
     title: dt.baslik,
-    company: `${dt.city || 'Balıkesir'} Kurumsal Satın Alma A.Ş.`,
+    company: dt.companyName || dt.firma || `${dt.city || 'Doğrulanmış'} Kurumsal Alıcı`,
     verified: true,
     image: dt.image || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80',
     images: dt.images || [dt.image || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80'],
     category: dt.kategori?.split('/')[0]?.trim() || 'İnşaat ve Yapı',
     sector: dt.kategori || 'Genel Satın Alma',
-    city: dt.city || 'Balıkesir',
-    type: 'Mal Alımı',
-    method: 'Canlı Eksiltme',
-    pricing: 'Toplam Bedel',
+    city: dt.city || 'Türkiye',
+    type: dt.type || 'Mal Alımı',
+    method: dt.method || 'Canlı Eksiltme',
+    pricing: dt.pricing || 'Toplam Bedel',
     deadline: dt.sure || '7 gün kaldı',
     daysLeft: 7,
     offers: dt.teklifSayisi || 0,
@@ -844,7 +711,7 @@ const localizedTenders = computed(() => {
     similar_history: 'Geçmiş Benzer İşlem: 1.200.000 ₺ ortalama tasarruf'
   }))
 
-  return [...dynamicTenders, ...(tenders || [])]
+  return dynamicTenders
 })
 
 /* =========================================================

@@ -1,94 +1,86 @@
 <script setup lang="ts">
+import { computed } from "vue"
 import AppBadge from "~/components/ui/AppBadge.vue"
 import AppButton from "~/components/ui/AppButton.vue"
+import { useCmsData } from "~/composables/useCmsData"
 
-const tenders = [
-  {
-    title: "Hastane Yazılım Alımı",
-    company: "ABC Sağlık",
-    city: "İstanbul",
-    budget: "2.500.000 ₺",
-    category: "Yazılım"
-  },
-  {
-    title: "Okul İnşaat Projesi",
-    company: "XYZ İnşaat",
-    city: "Ankara",
-    budget: "18.000.000 ₺",
-    category: "İnşaat"
-  },
-  {
-    title: "Güneş Enerji Santrali",
-    company: "Enerji AŞ",
-    city: "İzmir",
-    budget: "32.000.000 ₺",
-    category: "Enerji"
-  }
-]
+const { cmsData } = useCmsData()
+
+const tenders = computed(() => {
+  return (cmsData.value?.dashboard?.tenders || []).map((t: any) => ({
+    title: t.baslik,
+    company: t.companyName || t.firma || `${t.city || 'Doğrulanmış'} Kurumsal Alıcı`,
+    city: t.city || 'Türkiye Geneli',
+    budget: t.butce || 'Açık Eksiltme',
+    category: t.kategori?.split('/')[0]?.trim() || 'Satın Alma'
+  }))
+})
 </script>
 
 <template>
-  <section class="bg-slate-50 py-24">
+  <section class="bg-slate-50 py-20 border-t border-slate-100">
 
     <div class="mx-auto max-w-7xl px-6">
 
-      <div class="mb-12 flex items-center justify-between">
+      <div class="mb-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
         <div>
 
-          <h2 class="text-4xl font-black">
+          <h2 class="text-3xl font-black text-slate-900">
             Öne Çıkan İhaleler
           </h2>
 
-          <p class="mt-3 text-slate-500">
-            Güncel ve yüksek bütçeli fırsatları keşfedin.
+          <p class="mt-2 text-sm text-slate-500">
+            Güncel ve onaylı kurumsal satın alma fırsatları.
           </p>
 
         </div>
 
-        <NuxtLink to="/ihaleler">
+        <NuxtLink to="/pazar-yeri">
           <AppButton variant="secondary">
-            Tümünü Gör
+            Tümünü Gör ↗
           </AppButton>
         </NuxtLink>
 
       </div>
 
-      <div class="grid gap-8 lg:grid-cols-3">
+      <div v-if="tenders.length > 0" class="grid gap-6 lg:grid-cols-3">
 
         <div
           v-for="tender in tenders"
           :key="tender.title"
-          class="rounded-3xl bg-white p-7 shadow-sm transition hover:-translate-y-2 hover:shadow-xl"
+          class="rounded-3xl bg-white p-7 shadow-xs border border-slate-200/80 transition hover:-translate-y-1 hover:shadow-lg flex flex-col justify-between"
         >
 
-          <AppBadge>
-            {{ tender.category }}
-          </AppBadge>
+          <div>
+            <AppBadge>
+              {{ tender.category }}
+            </AppBadge>
 
-          <h3 class="mt-6 text-2xl font-bold">
-            {{ tender.title }}
-          </h3>
+            <h3 class="mt-4 text-xl font-bold text-slate-900 line-clamp-2">
+              {{ tender.title }}
+            </h3>
 
-          <div class="mt-6 space-y-3 text-slate-600">
+            <div class="mt-4 space-y-2 text-xs text-slate-600 font-medium">
 
-            <div>
-              🏢 {{ tender.company }}
+              <div class="truncate">
+                🏢 {{ tender.company }}
+              </div>
+
+              <div>
+                📍 {{ tender.city }}
+              </div>
+
+              <div class="font-bold text-blue-600 font-mono">
+                💰 {{ tender.budget }}
+              </div>
+
             </div>
-
-            <div>
-              📍 {{ tender.city }}
-            </div>
-
-            <div class="font-bold text-blue-600">
-              💰 {{ tender.budget }}
-            </div>
-
           </div>
 
           <NuxtLink
-            to="/ihaleler"
-            class="mt-8 block"
+            to="/pazar-yeri"
+            class="mt-6 block"
           >
             <AppButton block>
               Teklif Ver
@@ -97,6 +89,13 @@ const tenders = [
 
         </div>
 
+      </div>
+
+      <div v-else class="rounded-3xl bg-white p-12 border border-slate-200 text-center space-y-3">
+        <p class="text-xs text-slate-500 font-medium">Henüz yayında öne çıkan ihale bulunmuyor. Yeni bir satın alma ihalesi açıldığında burada listelenecektir.</p>
+        <NuxtLink to="/panel/ihale-olustur" class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:underline">
+          + Hemen İhale Açın
+        </NuxtLink>
       </div>
 
     </div>

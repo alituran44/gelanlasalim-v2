@@ -216,7 +216,7 @@ function submitReview() {
     </div>
 
     <!-- Teklif Kartları Listesi -->
-    <div class="space-y-4">
+    <div v-if="teklifler.length > 0" class="space-y-4">
       <div
         v-for="teklif in teklifler"
         :key="teklif.id"
@@ -347,6 +347,28 @@ function submitReview() {
           </div>
         </div>
 
+      </div>
+    </div>
+
+    <!-- CLEAN EMPTY STATE -->
+    <div v-else class="rounded-3xl border bg-white p-12 sm:p-16 text-center space-y-4 shadow-xs border-slate-200">
+      <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto border border-blue-100">
+        <Send :size="24" />
+      </div>
+      <div class="space-y-1 max-w-md mx-auto">
+        <h3 class="text-sm font-black text-slate-800">Henüz Bir İhaleye Teklif Vermediniz</h3>
+        <p class="text-xs text-slate-500 font-medium leading-relaxed">
+          Pazar yerindeki aktif B2B satın alma ihalelerini inceleyerek şartnamelerine uygun ilk teklifinizi hemen sunabilirsiniz.
+        </p>
+      </div>
+      <div class="pt-1">
+        <NuxtLink
+          to="/panel/pazar-yeri"
+          class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2.5 transition shadow-sm"
+        >
+          <Send :size="14" />
+          <span>Pazar Yerini İncele ↗</span>
+        </NuxtLink>
       </div>
     </div>
 

@@ -359,20 +359,34 @@ function downloadAllSpecs(tender: any) {
     </div>
 
     <!-- Empty State -->
-    <div v-else class="bg-white rounded-2xl border border-slate-200 p-12 text-center space-y-3">
-      <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
-        <Search :size="20" />
+    <div v-else class="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-4 shadow-xs">
+      <div class="w-14 h-14 rounded-2xl bg-blue-50 text-[#003057] flex items-center justify-center mx-auto border border-blue-100">
+        <FileText :size="24" />
       </div>
-      <h3 class="text-sm font-bold text-slate-800">Eşleşen İhale Bulunamadı</h3>
-      <p class="text-xs text-slate-500">
-        "{{ searchQuery }}" aramanıza uygun aktif ihale bulunmuyor.
-      </p>
-      <button
-        @click="searchQuery = ''; selectedCategory = 'Tümü'"
-        class="px-4 py-2 rounded-xl bg-[#003057] text-white text-xs font-bold"
-      >
-        Filtreleri Temizle
-      </button>
+      <div class="space-y-1 max-w-md mx-auto">
+        <h3 class="text-sm font-black text-slate-800">
+          {{ allTenders.length === 0 ? 'Henüz Yayında İhale Bulunmuyor' : 'Eşleşen İhale Bulunamadı' }}
+        </h3>
+        <p class="text-xs text-slate-500 font-medium">
+          {{ allTenders.length === 0 ? 'Örnek ilanlar temizlendi. Platformda açılan yeni onaylı ihaleler burada listelenecektir.' : `"${searchQuery}" aramanıza uygun ihale bulunamadı.` }}
+        </p>
+      </div>
+      <div class="pt-1 flex flex-wrap items-center justify-center gap-2">
+        <NuxtLink
+          to="/panel/ihale-olustur"
+          class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold inline-flex items-center gap-1.5 shadow-sm"
+        >
+          <Plus :size="13" />
+          <span>Yeni İhale Aç</span>
+        </NuxtLink>
+        <button
+          v-if="allTenders.length > 0 && searchQuery"
+          @click="searchQuery = ''; selectedCategory = 'Tümü'"
+          class="px-4 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200"
+        >
+          Filtreleri Temizle
+        </button>
+      </div>
     </div>
 
     <!-- MODAL 1: TENDER DETAIL -->
