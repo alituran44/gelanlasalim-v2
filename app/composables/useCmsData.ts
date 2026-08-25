@@ -389,17 +389,7 @@ export const DEFAULT_CMS_DATA = {
         date: '24.08.2026 14:10'
       }
     ],
-    companyReviews: [
-      {
-        id: 'REV-101',
-        companyName: 'ABC Kırtasiye A.Ş.',
-        rating: 5,
-        reviewer: 'Anadolu Ticaret A.Ş.',
-        tags: ['Zamanında Teslimat', 'Eksiksiz Ürün', 'Hızlı İletişim'],
-        comment: 'Tüm sipariş 3 gün içinde eksiksiz teslim edildi. İhaleciBurada güvenli havuz ödemesi sorunsuz çalıştı.',
-        date: '23.08.2026'
-      }
-    ],
+    companyReviews: [],
     sectorAlerts: [
       'İnşaat ve Yapı',
       'Bilgisayar ve Teknoloji',

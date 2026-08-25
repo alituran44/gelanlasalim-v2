@@ -1,76 +1,65 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Plus, Search, SlidersHorizontal, Download, LayoutGrid, List, MapPin, Building2, User, Star, X } from 'lucide-vue-next'
+import { ref, computed } from 'vue'
+import { Plus, Search, SlidersHorizontal, Download, LayoutGrid, List, MapPin, Building2, User, Star, X, UserPlus, CheckCircle2, Copy } from 'lucide-vue-next'
 
 definePageMeta({
   layout: "dashboard"
 })
 
 const searchQuery = ref('')
-const selectedCity = ref('Balıkesir')
+const selectedCity = ref('Tümü')
 
-const firms = [
-  { name: 'İSTFA GLOBAL TEDARİK YAPI BİLİŞİM LİMİTED ŞİRKETİ', logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80', city: 'İstanbul', district: 'Başakşehir', status: 'Doğrulanmış', sector: 'Hizmet', initial: 'İŞ', isBig: true },
-  { name: 'Marmara Teknoloji Yatırımları A.Ş.', logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80', city: 'İstanbul', district: 'Levent', status: 'Doğrulanmış', sector: 'Bilişim', initial: 'MT', isBig: true },
-  { name: 'Anadolu E-Ticaret A.Ş.', logo: 'https://images.unsplash.com/photo-1572021335469-31706a17aaef?w=200&auto=format&fit=crop&q=80', city: 'Ankara', district: 'Çankaya', status: 'Doğrulanmış', sector: 'Matbaa & Ambalaj', initial: 'AE', isBig: true },
-  { name: 'Bursa Endüstri Üretim A.Ş.', logo: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=200&auto=format&fit=crop&q=80', city: 'Bursa', district: 'Nilüfer', status: 'Doğrulanmış', sector: 'Sanayi & İmalat', initial: 'BE' },
-  { name: 'Ege Gıda Sanayi Ltd. Şti.', logo: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=200&auto=format&fit=crop&q=80', city: 'İzmir', district: 'Bornova', status: 'Doğrulanmış', sector: 'Gıda & Catering', initial: 'EG' },
-  { name: 'Atlas Holding A.Ş.', logo: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=200&auto=format&fit=crop&q=80', city: 'İstanbul', district: 'Ataşehir', status: 'Doğrulanmış', sector: 'Lojistik', initial: 'AH' },
-  { name: 'Ali Turan Mühendislik', logo: '', city: 'Çanakkale', district: 'Merkez', status: 'Doğrulanmamış', sector: 'Hizmet', initial: 'AT' },
-  { name: 'Yavuz Uyanık İnşaat', logo: '', city: 'İstanbul', district: 'Beylikdüzü', status: 'Doğrulanmamış', sector: 'İnşaat', initial: 'YU' },
-  { name: 'Kadir Ak Yapı', logo: '', city: 'İstanbul', district: 'Başakşehir', status: 'Doğrulanmamış', sector: 'Yapı', initial: 'KA' },
-  { name: 'SMT Rulman Sanayi', logo: '', city: 'İstanbul', district: 'Ümraniye', status: 'Doğrulanmamış', sector: 'Yedek Parça', initial: 'SR' },
-  { name: 'Makks Villas A.Ş.', logo: '', city: 'İstanbul', district: 'Pendik', status: 'Doğrulanmamış', sector: 'Gayrimenkul', initial: 'MA' }
-]
+// Real / dynamic registered companies list (Sample mock companies cleared)
+const firms = ref<any[]>([])
 
-// Shared Mock Company Profiles Database
-const companyProfiles: Record<string, {
-  name: string
-  logo?: string
-  verified: boolean
-  sector: string
-  phone: string
-  email: string
-  address: string
-  mersis: string
-  rating: number
-  reviews: Array<{ author: string, company: string, rating: number, comment: string, date: string }>
-}> = {
-  'İSTFA GLOBAL TEDARİK YAPI BİLİŞİM LİMİTED ŞİRKETİ': {
-    name: 'İSTFA GLOBAL TEDARİK YAPI BİLİŞİM LİMİTED ŞİRKETİ',
-    logo: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=200&auto=format&fit=crop&q=80',
-    verified: true,
-    sector: 'Yapı, Bilişim ve Dış Ticaret Tedariği',
-    phone: '+90 (212) 654 32 10',
-    email: 'info@istfaglobal.com',
-    address: 'Başakşehir, İstanbul, Türkiye',
-    mersis: '0481-0899-7712-0021',
-    rating: 4.8,
-    reviews: [
-      { author: 'Caner Aksoy', company: 'Aksoy Holding', rating: 5, comment: 'Bilişim ve altyapı malzemesi tedariğinde son derece güvenilirlikler.', date: '11 Tem 2026' }
-    ]
-  },
-  'Makks Villas A.Ş.': {
-    name: 'Makks Villas A.Ş.',
-    logo: '',
-    verified: false,
-    sector: 'İnşaat, Gayrimenkul ve Villa Yapımı',
-    phone: '+90 (216) 333 44 55',
-    email: 'satis@makksvillas.com',
-    address: 'Pendik, İstanbul, Türkiye',
-    mersis: '0612-0941-0024-0012',
-    rating: 4.5,
-    reviews: [
-      { author: 'Gökhan Tan', company: 'Tan İnşaat Geliştirme', rating: 4.5, comment: 'Şantiye tadilat süreçlerini çok titiz yönettiler.', date: '01 Haz 2026' }
-    ]
-  }
-}
+// Shared Company Profiles Database
+const companyProfiles = ref<Record<string, any>>({})
+
+const filteredFirms = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  return firms.value.filter(firm => {
+    if (selectedCity.value !== 'Tümü' && firm.city !== selectedCity.value) return false
+    if (q) {
+      const matchName = (firm.name || '').toLowerCase().includes(q)
+      const matchSector = (firm.sector || '').toLowerCase().includes(q)
+      const matchCity = (firm.city || '').toLowerCase().includes(q)
+      if (!matchName && !matchSector && !matchCity) return false
+    }
+    return true
+  })
+})
 
 const showCompanyModal = ref(false)
 const selectedCompany = ref<any>(null)
 
+const showInviteModal = ref(false)
+const inviteEmail = ref('')
+const inviteCompanyName = ref('')
+const inviteCopied = ref(false)
+
+function copyInviteLink() {
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    navigator.clipboard.writeText('https://gelanlasalim-v2.vercel.app/uyelik?ref=portal')
+    inviteCopied.value = true
+    setTimeout(() => {
+      inviteCopied.value = false
+    }, 2000)
+  }
+}
+
+function sendInvite() {
+  if (!inviteEmail.value) {
+    alert('Lütfen davet edilecek e-posta adresini giriniz.')
+    return
+  }
+  alert(`✓ DAVET GÖNDERİLDİ\n\n"${inviteEmail.value}" adresine kurumsal tedarikçi katılım davetiyesi ve 1 ay ücretsiz deneme linki iletildi.`)
+  showInviteModal.value = false
+  inviteEmail.value = ''
+  inviteCompanyName.value = ''
+}
+
 function openCompanyModal(firm: any) {
-  const profile = companyProfiles[firm.name]
+  const profile = companyProfiles.value[firm.name]
   if (profile) {
     selectedCompany.value = profile
   } else {
@@ -78,14 +67,12 @@ function openCompanyModal(firm: any) {
       name: firm.name,
       verified: firm.status === 'Doğrulanmış',
       sector: firm.sector + ' Sektörü Tedarikçisi',
-      phone: '+90 (850) 888 00 00',
-      email: 'info@' + firm.name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '') + '.com',
-      address: `${firm.district}, ${firm.city}, Türkiye`,
-      mersis: '0XXX-XXXX-XXXX-XXXX',
-      rating: 4.5,
-      reviews: [
-        { author: 'Sistem Yöneticisi', company: 'İhaleciBurada Platformu', rating: 5, comment: 'Doğrulanmış B2B platform üyesi kurumsal satıcı.', date: 'Temmuz 2026' }
-      ]
+      phone: firm.phone || '+90 (850) 888 00 00',
+      email: firm.email || ('info@' + firm.name.toLowerCase().replace(/[^a-z0-9]/g, '').replace(/\s+/g, '') + '.com'),
+      address: `${firm.district || 'Merkez'}, ${firm.city || 'Türkiye'}, Türkiye`,
+      mersis: firm.mersis || '0XXX-XXXX-XXXX-XXXX',
+      rating: firm.rating || 5.0,
+      reviews: firm.reviews || []
     }
   }
   showCompanyModal.value = true
@@ -99,12 +86,13 @@ function openCompanyModal(firm: any) {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #F1F5F9;">
       <div>
         <h1 class="text-2xl font-black text-slate-800" style="color: #0F172A;">Kurumsal Firmalar</h1>
-        <p class="text-xs text-slate-500 mt-1">Tedarikçi ve firma ağınızı konum, sektör ve doğrulama durumuna göre yönetin. <span class="text-slate-400">Toplam: 99 - Doğrulanmış: 10 - Ortalama puan: --</span></p>
+        <p class="text-xs text-slate-500 mt-1">Tedarikçi ve firma ağınızı konum, sektör ve doğrulama durumuna göre yönetin. <span class="text-slate-400">Toplam: {{ firms.length }} - Doğrulanmış: {{ firms.filter(f => f.status === 'Doğrulanmış').length }}</span></p>
       </div>
 
       <button 
         type="button"
-        class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-3 shadow-lg shadow-blue-500/20 transition self-start sm:self-auto"
+        @click="showInviteModal = true"
+        class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-3 shadow-lg shadow-blue-500/20 transition self-start sm:self-auto cursor-pointer"
       >
         <Plus :size="14" />
         Tedarikçi davet et
@@ -123,10 +111,13 @@ function openCompanyModal(firm: any) {
         class="rounded-lg border px-3 py-1.5 text-xs bg-white outline-none font-bold text-slate-700 max-w-xs"
         style="border-color: #E2E8F0;"
       >
-        <option value="Balıkesir">Balıkesir (1 firma)</option>
-        <option value="İstanbul">İstanbul (82 firma)</option>
-        <option value="Çanakkale">Çanakkale (4 firma)</option>
-        <option value="İzmir">İzmir (3 firma)</option>
+        <option value="Tümü">Tüm Şehirler ({{ firms.length }} firma)</option>
+        <option value="İstanbul">İstanbul</option>
+        <option value="Ankara">Ankara</option>
+        <option value="İzmir">İzmir</option>
+        <option value="Bursa">Bursa</option>
+        <option value="Çanakkale">Çanakkale</option>
+        <option value="Balıkesir">Balıkesir</option>
       </select>
     </div>
 
@@ -138,7 +129,7 @@ function openCompanyModal(firm: any) {
           v-model="searchQuery"
           type="text"
           placeholder="Firma adı, vergi no veya e-posta ile ara..."
-          class="w-full rounded-xl border pl-9 pr-4 py-2.5 text-xs outline-none bg-white transition focus:border-blue-500"
+          class="w-full rounded-xl border pl-9 pr-4 py-2.5 text-xs outline-none bg-white transition focus:border-blue-500 font-medium"
           style="border-color: #E2E8F0; color: #0F172A;"
         />
       </div>
@@ -153,20 +144,13 @@ function openCompanyModal(firm: any) {
           <Download :size="13" />
           Dışa aktar
         </button>
-
-        <button type="button" class="p-2.5 rounded-xl border bg-white text-slate-600 hover:bg-slate-50" style="border-color: #E2E8F0;">
-          <List :size="14" />
-        </button>
-        <button type="button" class="p-2.5 rounded-xl border bg-white text-slate-400 hover:bg-slate-50" style="border-color: #E2E8F0;">
-          <LayoutGrid :size="14" />
-        </button>
       </div>
     </div>
 
-    <!-- Corporate Directory Grid Cards -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <!-- Corporate Directory Grid Cards (If Any) -->
+    <div v-if="filteredFirms.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
       <div 
-        v-for="(firm, idx) in firms" 
+        v-for="(firm, idx) in filteredFirms" 
         :key="idx"
         class="rounded-2xl border bg-white p-5 shadow-sm hover:shadow-md transition relative flex flex-col justify-between min-h-[190px]"
         style="border-color: #E2E8F0;"
@@ -183,23 +167,17 @@ function openCompanyModal(firm: any) {
           </div>
         </div>
 
-        <!-- Corporate Branding banner overlay if BIG firm -->
-        <div v-if="firm.isBig" class="absolute top-0 left-0 right-0 h-16 bg-slate-900 rounded-t-2xl flex items-center justify-center p-3 overflow-hidden select-none z-0">
-          <span class="text-[10px] text-white/20 font-black tracking-widest">KURUMSAL TEDARİKÇİ</span>
-        </div>
-
         <!-- Corporate Avatar / Logo & Name -->
         <div class="flex items-start gap-3 mt-4 relative z-10">
           <div 
             class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xs font-black text-slate-700 bg-slate-100 border border-slate-200 overflow-hidden"
-            :style="firm.isBig ? 'background: #FFFFFF; border-color: #E2E8F0; margin-top: 8px;' : ''"
           >
             <img v-if="firm.logo" :src="firm.logo" :alt="firm.name" class="w-full h-full object-cover" />
-            <span v-else>{{ firm.initial }}</span>
+            <span v-else>{{ firm.initial || (firm.name ? firm.name.charAt(0) : 'F') }}</span>
           </div>
-          <div class="min-w-0" :style="firm.isBig ? 'margin-top: 8px;' : ''">
+          <div class="min-w-0">
             <h4 class="text-xs font-black text-slate-800 leading-snug truncate" :title="firm.name">{{ firm.name }}</h4>
-            <p class="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5"><MapPin :size="9" /> {{ firm.district }}, {{ firm.city }}</p>
+            <p class="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5"><MapPin :size="9" /> {{ firm.district || 'Merkez' }}, {{ firm.city }}</p>
           </div>
         </div>
 
@@ -207,44 +185,101 @@ function openCompanyModal(firm: any) {
         <div class="grid grid-cols-3 gap-1 pt-3 border-t border-slate-100 text-[9px] text-slate-400 font-bold mt-4">
           <div>
             <span class="block text-[7px] text-slate-300">KATILDIĞI İHALE</span>
-            <span class="text-slate-600 font-mono">0</span>
+            <span class="text-slate-600 font-mono">{{ firm.tendersCount || 0 }}</span>
           </div>
           <div>
             <span class="block text-[7px] text-slate-300">TAMAMLANAN</span>
-            <span class="text-slate-600 font-mono">0</span>
+            <span class="text-slate-600 font-mono">{{ firm.completedCount || 0 }}</span>
           </div>
           <div>
             <span class="block text-[7px] text-slate-300">BAŞARI ORANI</span>
-            <span class="text-slate-600">--</span>
+            <span class="text-slate-600">{{ firm.successRate || '--' }}</span>
           </div>
         </div>
 
         <!-- Footer link -->
         <div class="flex items-center justify-between pt-3 border-t border-slate-50 mt-3 text-[10px] font-bold text-slate-400">
-          <span>Üye: Tem 2026</span>
-          <button @click="openCompanyModal(firm)" class="text-blue-600 hover:underline">Detayları görüntüle ↗</button>
+          <span>Üye: 2026</span>
+          <button @click="openCompanyModal(firm)" class="text-blue-600 hover:underline cursor-pointer">Detayları görüntüle ↗</button>
         </div>
 
       </div>
     </div>
 
-    <!-- Pagination controls -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 border-t" style="border-color: #F1F5F9;">
-      <span class="text-xs font-bold text-slate-400">1-12 / 99 sonuç</span>
-      
-      <div class="flex items-center gap-1 text-xs font-bold text-slate-500">
-        <button type="button" class="px-2 py-1 rounded hover:bg-slate-100">Önceki</button>
-        <button type="button" class="h-6 w-6 rounded bg-slate-950 text-white flex items-center justify-center font-mono">1</button>
-        <button type="button" class="h-6 w-6 rounded hover:bg-slate-100 flex items-center justify-center font-mono">2</button>
-        <button type="button" class="h-6 w-6 rounded hover:bg-slate-100 flex items-center justify-center font-mono">3</button>
-        <button type="button" class="h-6 w-6 rounded hover:bg-slate-100 flex items-center justify-center font-mono">4</button>
-        <button type="button" class="h-6 w-6 rounded hover:bg-slate-100 flex items-center justify-center font-mono">5</button>
-        <span class="px-1 text-slate-300">...</span>
-        <button type="button" class="h-6 w-6 rounded hover:bg-slate-100 flex items-center justify-center font-mono">9</button>
-        <button type="button" class="px-2 py-1 rounded hover:bg-slate-100">Sonraki</button>
+    <!-- CLEAN EMPTY STATE VIEW -->
+    <div v-else class="rounded-3xl border bg-white p-12 sm:p-16 text-center space-y-4 shadow-xs" style="border-color: #E2E8F0;">
+      <div class="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600 border border-blue-100 mx-auto">
+        <Building2 :size="24" />
+      </div>
+      <div class="space-y-1.5 max-w-md mx-auto">
+        <h3 class="text-base font-black text-slate-800">Kayıtlı Firma Bulunmuyor</h3>
+        <p class="text-xs text-slate-500 font-medium leading-relaxed">
+          Tüm örnek firmalar temizlendi. Platformunuza yeni kayıt olan ve MERSİS/vergi levhası doğrulanan kurumsal firmalar burada görüntülenecektir.
+        </p>
+      </div>
+      <div class="pt-2">
+        <button
+          type="button"
+          @click="showInviteModal = true"
+          class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2.5 transition shadow-sm cursor-pointer"
+        >
+          <UserPlus :size="14" />
+          <span>İlk Tedarikçiyi Davet Et</span>
+        </button>
       </div>
     </div>
 
+  </div>
+
+  <!-- TEDARİKÇİ DAVET MODALI -->
+  <div v-if="showInviteModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 max-w-md w-full shadow-2xl text-left space-y-5">
+      <div class="flex justify-between items-center border-b pb-3" style="border-color: #F1F5F9;">
+        <div class="flex items-center gap-2">
+          <div class="h-9 w-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+            <UserPlus :size="18" />
+          </div>
+          <div>
+            <h3 class="text-sm font-black text-slate-900">Kurumsal Tedarikçi Davet Et</h3>
+            <span class="text-[10px] text-slate-400">1 Ay %100 Ücretsiz Katılım Linki</span>
+          </div>
+        </div>
+        <button @click="showInviteModal = false" class="text-slate-400 hover:text-slate-600 p-1">✕</button>
+      </div>
+
+      <div class="space-y-3 text-xs">
+        <div>
+          <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">FİRMA ADI (OPSİYONEL)</label>
+          <input v-model="inviteCompanyName" type="text" class="w-full rounded-xl border px-3.5 py-2.5 outline-none focus:border-blue-500 bg-white text-slate-800 font-medium" placeholder="Örn: Atlas Endüstri A.Ş." />
+        </div>
+
+        <div>
+          <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">YETKİLİ E-POSTA ADRESİ *</label>
+          <input v-model="inviteEmail" type="email" class="w-full rounded-xl border px-3.5 py-2.5 outline-none focus:border-blue-500 bg-white text-slate-800 font-medium" placeholder="satinalma@firma.com" />
+        </div>
+
+        <div class="pt-2">
+          <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">HIZLI PAYLAŞIM LİNKİ</label>
+          <div class="flex items-center gap-2">
+            <input readonly value="https://gelanlasalim-v2.vercel.app/uyelik?ref=portal" class="flex-1 rounded-xl border px-3 py-2 bg-slate-50 text-slate-600 font-mono text-[11px] outline-none" />
+            <button @click="copyInviteLink" type="button" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-1 cursor-pointer">
+              <CheckCircle2 v-if="inviteCopied" :size="12" class="text-emerald-600" />
+              <Copy v-else :size="12" />
+              <span>{{ inviteCopied ? 'Kopyalandı!' : 'Kopyala' }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex justify-end gap-2 pt-3 border-t" style="border-color: #F1F5F9;">
+        <button @click="showInviteModal = false" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">
+          Vazgeç
+        </button>
+        <button @click="sendInvite" class="px-5 py-2 rounded-xl text-xs font-black text-white bg-blue-600 hover:bg-blue-700 shadow-md">
+          Davet Gönder
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- FİRMA DETAY VE YORUM MODALI (Photo 2 / 5 Feedbacks) -->
