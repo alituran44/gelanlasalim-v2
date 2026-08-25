@@ -347,7 +347,6 @@ const cities = [
 const detailedCategories = [
   {
     name: 'İnşaat & Yapı İşleri',
-    count: 248,
     children: [
       'Anahtar Teslim İnşaat', 'Konut İnşaatı', 'Ticari Bina İnşaatı', 'Fabrika İnşaatı', 'Yol İnşaatı',
       'Köprü İnşaatı', 'Altyapı Çalışmaları', 'Kanalizasyon & Drenaj', 'Su Şebekesi Hattı', 'Doğalgaz Boru Hattı',
@@ -358,7 +357,6 @@ const detailedCategories = [
   },
   {
     name: 'Gayrimenkul & Emlak',
-    count: 122,
     children: [
       'Arsa & Arazi', 'Tarım Arazisi & Tarla', 'Bağ & Bahçe', 'Konut & Daire', 'Lüks Villa', 'Rezidans', 'Ofis & Büro', 'Ticari Dükkan & Mağaza', 'İş Merkezi & Plaza',
       'Sanayi Tesisleri', 'Depo & Antrepo', 'Alışveriş Merkezi (AVM)', 'Otel & Turistik Tesis', 'Kiralık Gayrimenkul', 'Satılık Gayrimenkul'
@@ -366,7 +364,6 @@ const detailedCategories = [
   },
   {
     name: 'Taşıtlar & İş Makineleri',
-    count: 271,
     children: [
       'Binek Otomobiller', 'Ticari Araçlar', 'Kamyon & Tır', 'Ağır Nakliye Araçları', 'Otobüs', 'Minibüs', 'Tarım Traktörleri', 'İş Makineleri',
       'Ekskavatör', 'Yükleyici (Loder)', 'Greyder', 'Silindir', 'Forklift & İstifleme', 'Mobil Vinç', 'Endüstriyel Jeneratör', 'Ağır Dorse & Treyler',
@@ -375,7 +372,6 @@ const detailedCategories = [
   },
   {
     name: 'Sanayi & İmalat Makineleri',
-    count: 323,
     children: [
       'Üretim Makineleri', 'CNC İşleme Merkezleri', 'Torna Makineleri', 'Freze Makineleri', 'Endüstriyel Presler', 'Hava Kompresörleri', 'Konveyör Sistemleri', 'Ambalaj Makineleri',
       'Gıda İşleme Makineleri', 'Plastik İşleme Makineleri', 'Tekstil Makineleri', 'Ağaç İşleme Makineleri', 'Endüstriyel Kaynak Makineleri',
@@ -384,7 +380,6 @@ const detailedCategories = [
   },
   {
     name: 'Bilgisayar & Teknoloji',
-    count: 352,
     children: [
       'Masaüstü İş İstasyonları', 'Dizüstü Bilgisayar (Laptop)', 'Kurumsal Sunucular (Server)', 'Veri Depolama (NAS/SAN)', 'Ağ Altyapısı (Network)', 'Kurumsal Güvenlik Duvarı (Firewall)',
       'Endüstriyel Yazıcılar', 'Doküman Tarayıcılar', 'Yazılım Lisansları', 'ERP Sistemleri', 'CRM Yazılımları', 'Web Geliştirme', 'Mobil Uygulama',
@@ -393,7 +388,6 @@ const detailedCategories = [
   },
   {
     name: 'Elektronik & Güvenlik',
-    count: 122,
     children: [
       'Akıllı Telefonlar', 'Tablet Bilgisayarlar', 'Profesyonel Kameralar', 'CCTV Kameralar', 'Hırsız Alarm Sistemleri', 'Televizyon & Ekranlar',
       'Ses Sistemleri', 'HD Projeksiyon Cihazları', 'Kesintisiz Güç Kaynağı (UPS)', 'Baskılı Devre Kartları (PCB)', 'Akıllı Ev Sistemleri'
@@ -401,7 +395,6 @@ const detailedCategories = [
   },
   {
     name: 'Mobilya & Ofis Gereçleri',
-    count: 208,
     children: [
       'Ofis Mobilyaları', 'Eğitim Mobilyaları', 'Hastane Mobilyaları', 'Otel & Restoran Mobilyaları', 'Depo Raf Sistemleri',
       'Arşivleme Sistemleri', 'Yönetici Toplantı Masaları', 'Ergonomik Ofis Koltukları', 'Bekleme & Lobi Koltukları'
@@ -409,7 +402,6 @@ const detailedCategories = [
   },
   {
     name: 'Sağlık & Medikal Ürünler',
-    count: 251,
     children: [
       'Tıbbi Cihazlar', 'Laboratuvar Ekipmanları', 'Tıbbi Sarf Malzemeleri', 'Hasta Karyolası & Hastane Mobilyası',
       'Ambulanslar', 'Tıbbi Gaz Sistemleri', 'Röntgen Cihazları', 'Emar (MR) Cihazları', 'Ultrason Cihazları', 'Ağız & Diş Sağlığı Ürünleri'
@@ -417,7 +409,6 @@ const detailedCategories = [
   },
   {
     name: 'Eğitim & Öğretim Hizmetleri',
-    count: 76,
     children: [
       'İnteraktif Akıllı Tahtalar', 'Bilgisayar Laboratuvarları', 'Eğitim Yazılımları', 'E-Öğrenme Platformları',
       'Akademik Danışmanlık', 'Kurumsal Eğitim Hizmetleri', 'Kitap & Eğitim Materyalleri', 'Kırtasiye Malzemeleri', 'Laboratuvar Malzemeleri'
@@ -425,7 +416,6 @@ const detailedCategories = [
   },
   {
     name: 'Gıda & Yemek Hizmetleri',
-    count: 337,
     children: [
       'Hazır Yemek (Tabldot)', 'Endüstriyel Catering', 'Personel Yemek Hizmetleri', 'Saha Kumanyası', 'Et & Et Ürünleri', 'Süt & Süt Ürünleri',
       'Meyve & Sebze', 'Unlu Mamüller', 'İçecek Grubu', 'Kuru Gıda & Bakliyat'
@@ -433,7 +423,6 @@ const detailedCategories = [
   },
   {
     name: 'Tekstil & Konfeksiyon',
-    count: 273,
     children: [
       'İş Elbiseleri & Üniforma', 'Okul Kıyafetleri', 'Güvenlik Kıyafetleri', 'Promosyon Tekstil',
       'İş Güvenlik Ayakkabıları', 'Endüstriyel Çizmeler', 'İş Eldivenleri', 'Kişisel Koruyucu Donanım (KKD)'
@@ -441,7 +430,6 @@ const detailedCategories = [
   },
   {
     name: 'Tarım & Hayvancılık',
-    count: 84,
     children: [
       'Gübre & Tarım Kimyasalları', 'Tohum & Fide', 'Sulama Sistemleri', 'Tarım Makineleri', 'Tarım Traktörleri', 'Sera Sistemleri', 'Hayvan Yemi',
       'Veterinerlik Ürünleri', 'Büyükbaş Hayvancılık', 'Küçükbaş Hayvancılık', 'Kanatlı Hayvancılık'
@@ -449,7 +437,6 @@ const detailedCategories = [
   },
   {
     name: 'Enerji & Elektrik Sistemleri',
-    count: 117,
     children: [
       'Güneş Enerjisi (GES)', 'Rüzgar Enerjisi (RES)', 'Dizel Jeneratörler', 'Elektrik Ekipmanları', 'Güç Transformatörleri',
       'Endüstriyel LED Aydınlatma', 'Enerji Verimliliği', 'Elektrikli Araç Şarj İstasyonları'
@@ -457,7 +444,6 @@ const detailedCategories = [
   },
   {
     name: 'Çevre & Geri Dönüşüm',
-    count: 247,
     children: [
       'Atık Yönetimi', 'Geri Dönüşüm Hizmetleri', 'Hurda Metal & Kağıt', 'Çevre Danışmanlığı', 'Su Arıtma Tesisleri',
       'Tehlikeli Atık Yönetimi', 'Sıfır Atık Sistemleri', 'Endüstriyel Süpürme Araçları'
@@ -465,7 +451,6 @@ const detailedCategories = [
   },
   {
     name: 'Lojistik & Taşımacılık',
-    count: 169,
     children: [
       'Karayolu Taşımacılığı', 'Denizyolu Taşımacılığı', 'Havayolu Taşımacılığı', 'Demiryolu Taşımacılığı', 'Depolama & Antrepo', 'Soğuk Hava Lojistiği',
       'Hızlı Kargo', 'Kurye Hizmetleri', 'Şehir İçi Nakliye'
@@ -473,7 +458,6 @@ const detailedCategories = [
   },
   {
     name: 'Güvenlik Sistemleri',
-    count: 94,
     children: [
       'Kamera Güvenlik Sistemleri', 'Hırsız Alarmları', 'Yangın İhbar Sistemleri', 'Geçiş Kontrol Kartları', 'Turnike Sistemleri',
       'X-Ray Tarama Cihazları', 'Otomatik Bariyerler', 'Bekçi Tur Kontrol Sistemleri'
@@ -481,7 +465,6 @@ const detailedCategories = [
   },
   {
     name: 'Temizlik & Hijyen Hizmetleri',
-    count: 247,
     children: [
       'Tesis Temizliği', 'Hastane Hijyeni', 'Okul Temizliği', 'Fabrika Temizliği', 'Dış Cephe Cam Temizliği',
       'Halı & Koltuk Yıkama', 'İlaçlama & Haşere Kontrolü', 'Evsel & Endüstriyel Atık Toplama'
@@ -489,7 +472,6 @@ const detailedCategories = [
   },
   {
     name: 'Turizm & Konaklama',
-    count: 68,
     children: [
       'Otel Rezervasyonları', 'Konaklama Hizmetleri', 'Uçak Bileti', 'Araç Kiralama (Fleet)', 'Etkinlik Yönetimi', 'Rehberlik Hizmetleri',
       'Seyahat Paketleri'
@@ -497,7 +479,6 @@ const detailedCategories = [
   },
   {
     name: 'Reklam & Medya Hizmetleri',
-    count: 142,
     children: [
       'Dijital Pazarlama', 'SEO Danışmanlığı', 'GEO Analitik', 'Google Ads Yönetimi', 'Sosyal Medya Yönetimi', 'Grafik Tasarım',
       'Kurumsal Kimlik Tasarımı', 'Matbaa & Baskı İşleri', 'Video Prodüksiyon', 'Profesyonel Fotoğrafçılık', 'Tanıtım Filmi'
@@ -505,7 +486,6 @@ const detailedCategories = [
   },
   {
     name: 'Ambalaj & Matbaa',
-    count: 337,
     children: [
       'Oluklu Mukavva Kutu', 'Etiket & Stiker', 'Poşet & Ambalaj', 'Taşıma Kolisi', 'Promosyon Ürünleri', 'Ofset Baskı', 'Dijital Baskı',
       'Serigrafi Baskı'
@@ -513,14 +493,12 @@ const detailedCategories = [
   },
   {
     name: 'Telekomünikasyon & İletişim',
-    count: 122,
     children: [
       'Fiber Optik Altyapı', 'IP Santral & Telefon', 'PBX Santral', 'Kurumsal İnternet', 'Mobil Operatör Hizmetleri', 'Baz İstasyonu Altyapısı'
     ]
   },
   {
     name: 'Danışmanlık & Müşavirlik',
-    count: 163,
     children: [
       'Hukuki Danışmanlık', 'Mali Müşavirlik & Muhasebe', 'İnsan Kaynakları Danışmanlığı', 'Kalite Yönetim Danışmanlığı',
       'ISO Sertifikasyon', 'Proje Yönetimi', 'Eğitim Danışmanlığı'
@@ -528,7 +506,6 @@ const detailedCategories = [
   },
   {
     name: 'Sigorta & Reasürans Hizmetleri',
-    count: 56,
     children: [
       'Filo Araç Kaskosu', 'Özel Sağlık Sigortası', 'Ticari Mülk & İşyeri Sigortası', 'Emtia & Nakliyat Sigortası',
       'İnşaat All-Risk Sigortası', 'Hayat Sigortası'
@@ -536,7 +513,6 @@ const detailedCategories = [
   },
   {
     name: 'Finans & Bankacılık',
-    count: 115,
     children: [
       'Finansal Danışmanlık', 'Ekipman Leasing', 'Fatura Faktoring', 'Kredi Hizmetleri', 'Üye İşyeri POS Hizmetleri',
       'Ödeme Kuruluşu Altyapısı'
@@ -544,7 +520,6 @@ const detailedCategories = [
   },
   {
     name: 'Hukuk & İcra Hizmetleri',
-    count: 76,
     children: [
       'Dava & Avukatlık Hizmetleri', 'Ticari Arabuluculuk', 'İcra & Alacak Takibi', 'Sözleşme Hazırlama', 'Marka Tescili',
       'Patent Tescili'
@@ -552,7 +527,6 @@ const detailedCategories = [
   },
   {
     name: 'Bakım, Onarım & Servis',
-    count: 118,
     children: [
       'Elektrik Bakımı', 'Mekanik Onarım', 'Asansör Bakım & Servis', 'İklimlendirme (HVAC) Bakımı', 'Endüstriyel Makine Servisi',
       'Bilgisayar & Donanım Desteği', 'Sunucu Bakım Hizmetleri'
@@ -560,7 +534,6 @@ const detailedCategories = [
   },
   {
     name: 'Etkinlik & Organizasyon',
-    count: 76,
     children: [
       'Fuar Organizasyonu', 'Kurumsal Konferans', 'Seminer & Çalıştay', 'Konser Prodüksiyonu', 'Festival Organizasyonu', 'Catering & İkram',
       'Sahne & Kurulum Sistemleri', 'Ses & Işık Sistemleri'
@@ -568,7 +541,6 @@ const detailedCategories = [
   },
   {
     name: 'Diğer Satın Almalar',
-    count: 109,
     children: [
       'Çeşitli Sarf Malzemeleri', 'Karma İhaleler', 'Özel Projeler', 'Kamu Açık Artırmaları', 'Tasfiye Satışları',
       'Hurda İhaleleri', 'İkinci El Varlıklar'
@@ -577,73 +549,73 @@ const detailedCategories = [
 ]
 
 const sectors = [
-  { name: 'Tarım, Çiftçilik, Balıkçılık ve Ormancılık', count: 84 },
-  { name: 'Petrol, Yakıt, Elektrik ve Enerji', count: 97 },
-  { name: 'Madencilik, Metal ve Hammaddeler', count: 64 },
-  { name: 'Gıda ve İçecek', count: 189 },
-  { name: 'Tarım Makineleri', count: 42 },
-  { name: 'Giyim, Ayakkabı ve Aksesuar', count: 73 },
-  { name: 'Tekstil, Plastik ve Kauçuk', count: 126 },
-  { name: 'Basılı Malzeme ve Matbaa', count: 58 },
-  { name: 'Kimyasal Ürünler', count: 91 },
-  { name: 'Mobilya, Ofis ve Bilgi İşlem Ekipmanları', count: 168 },
-  { name: 'Elektrikli Makine, Cihaz ve Aydınlatma', count: 144 },
-  { name: 'Radyo, TV, İletişim ve Telekomünikasyon', count: 76 },
-  { name: 'Tıbbi Cihaz, İlaç ve Kişisel Bakım', count: 112 },
-  { name: 'Nakliye Araçları ve Yardımcı Ürünler', count: 89 },
-  { name: 'Güvenlik ve Yangınla Mücadele', count: 61 },
-  { name: 'Spor, Oyun, Oyuncak ve Sanat', count: 34 },
-  { name: 'Laboratuvar, Optik ve Hassas Ekipman', count: 52 },
-  { name: 'Mobilya, Mefruşat ve Temizlik Ürünleri', count: 103 },
-  { name: 'Su ve Arıtma Sistemleri', count: 48 },
-  { name: 'Sanayi Tipi Makineler', count: 156 },
-  { name: 'İnşaat Makinesi ve Ekipmanları', count: 137 },
-  { name: 'İnşaat, Yapı ve Yapı Malzemeleri', count: 248 },
-  { name: 'İnşaat ve Taahhüt İşleri', count: 176 },
-  { name: 'Yazılım ve Bilgi Sistemleri', count: 149 },
-  { name: 'Onarım ve Bakım Hizmetleri', count: 118 },
-  { name: 'Kurulum ve Teknik Servis Hizmetleri', count: 96 },
-  { name: 'Otel, Restoran ve Perakende Hizmetleri', count: 67 },
-  { name: 'Nakliye ve Lojistik Hizmetleri', count: 169 },
-  { name: 'Seyahat ve Organizasyon Hizmetleri', count: 44 },
-  { name: 'Posta, Kurye ve Telekomünikasyon Hizmetleri', count: 39 },
-  { name: 'Finans ve Sigorta Hizmetleri', count: 56 },
-  { name: 'Gayrimenkul Hizmetleri', count: 42 },
-  { name: 'Mimarlık, Mühendislik ve Denetim', count: 95 },
-  { name: 'IT, Yazılım Geliştirme ve İnternet Hizmetleri', count: 183 },
-  { name: 'Araştırma, Geliştirme ve Danışmanlık', count: 71 },
-  { name: 'Yönetim ve Kurumsal Hizmetler', count: 63 },
-  { name: 'Enerji ve Petrol Endüstrisi Hizmetleri', count: 54 },
-  { name: 'Pazarlama, Hukuk ve İnsan Kaynakları', count: 81 },
-  { name: 'Eğitim ve Öğretim Hizmetleri', count: 76 },
-  { name: 'Sağlık ve Sosyal Hizmetler', count: 92 },
-  { name: 'Temizlik, Atık ve Çevre Hizmetleri', count: 114 },
-  { name: 'Kültür, Rekreasyon ve Spor Hizmetleri', count: 38 }
+  { name: 'Tarım, Çiftçilik, Balıkçılık ve Ormancılık' },
+  { name: 'Petrol, Yakıt, Elektrik ve Enerji' },
+  { name: 'Madencilik, Metal ve Hammaddeler' },
+  { name: 'Gıda ve İçecek' },
+  { name: 'Tarım Makineleri' },
+  { name: 'Giyim, Ayakkabı ve Aksesuar' },
+  { name: 'Tekstil, Plastik ve Kauçuk' },
+  { name: 'Basılı Malzeme ve Matbaa' },
+  { name: 'Kimyasal Ürünler' },
+  { name: 'Mobilya, Ofis ve Bilgi İşlem Ekipmanları' },
+  { name: 'Elektrikli Makine, Cihaz ve Aydınlatma' },
+  { name: 'Radyo, TV, İletişim ve Telekomünikasyon' },
+  { name: 'Tıbbi Cihaz, İlaç ve Kişisel Bakım' },
+  { name: 'Nakliye Araçları ve Yardımcı Ürünler' },
+  { name: 'Güvenlik ve Yangınla Mücadele' },
+  { name: 'Spor, Oyun, Oyuncak ve Sanat' },
+  { name: 'Laboratuvar, Optik ve Hassas Ekipman' },
+  { name: 'Mobilya, Mefruşat ve Temizlik Ürünleri' },
+  { name: 'Su ve Arıtma Sistemleri' },
+  { name: 'Sanayi Tipi Makineler' },
+  { name: 'İnşaat Makinesi ve Ekipmanları' },
+  { name: 'İnşaat, Yapı ve Yapı Malzemeleri' },
+  { name: 'İnşaat ve Taahhüt İşleri' },
+  { name: 'Yazılım ve Bilgi Sistemleri' },
+  { name: 'Onarım ve Bakım Hizmetleri' },
+  { name: 'Kurulum ve Teknik Servis Hizmetleri' },
+  { name: 'Otel, Restoran ve Perakende Hizmetleri' },
+  { name: 'Nakliye ve Lojistik Hizmetleri' },
+  { name: 'Seyahat ve Organizasyon Hizmetleri' },
+  { name: 'Posta, Kurye ve Telekomünikasyon Hizmetleri' },
+  { name: 'Finans ve Sigorta Hizmetleri' },
+  { name: 'Gayrimenkul Hizmetleri' },
+  { name: 'Mimarlık, Mühendislik ve Denetim' },
+  { name: 'IT, Yazılım Geliştirme ve İnternet Hizmetleri' },
+  { name: 'Araştırma, Geliştirme ve Danışmanlık' },
+  { name: 'Yönetim ve Kurumsal Hizmetler' },
+  { name: 'Enerji ve Petrol Endüstrisi Hizmetleri' },
+  { name: 'Pazarlama, Hukuk ve İnsan Kaynakları' },
+  { name: 'Eğitim ve Öğretim Hizmetleri' },
+  { name: 'Sağlık ve Sosyal Hizmetler' },
+  { name: 'Temizlik, Atık ve Çevre Hizmetleri' },
+  { name: 'Kültür, Rekreasyon ve Spor Hizmetleri' }
 ]
 
 const tenderTypes = computed(() => [
-      { name: 'Mal Alımı', count: 578 },
-      { name: 'Hizmet Alımı', count: 207 },
-      { name: 'Yapım İşi', count: 180 },
-      { name: 'Fason Üretim', count: 92 },
-      { name: 'Kiralama', count: 85 },
-      { name: 'Satış Talebi', count: 39 }
+      { name: 'Mal Alımı' },
+      { name: 'Hizmet Alımı' },
+      { name: 'Yapım İşi' },
+      { name: 'Fason Üretim' },
+      { name: 'Kiralama' },
+      { name: 'Satış Talebi' }
     ])
 
 const offerMethods = computed(() => [
-      { name: 'Açık Teklif', count: 546 },
-      { name: 'Kapalı Teklif', count: 395 },
-      { name: 'Davetli İhale', count: 151 },
-      { name: 'Ters İhale', count: 98 },
-      { name: 'Fiyat Araştırması', count: 68 },
-      { name: 'Doğrudan Teklif Talebi', count: 57 }
+      { name: 'Açık Teklif' },
+      { name: 'Kapalı Teklif' },
+      { name: 'Davetli İhale' },
+      { name: 'Ters İhale' },
+      { name: 'Fiyat Araştırması' },
+      { name: 'Doğrudan Teklif Talebi' }
     ])
 
 const pricingTypes = computed(() => [
-      { name: 'Toplam / Götürü Bedel', count: 214 },
-      { name: 'Birim Fiyat', count: 323 },
-      { name: 'Kısmi Teklif Verilebilir', count: 115 },
-      { name: 'Kısmi Teklif Verilemez', count: 277 }
+      { name: 'Toplam / Götürü Bedel' },
+      { name: 'Birim Fiyat' },
+      { name: 'Kısmi Teklif Verilebilir' },
+      { name: 'Kısmi Teklif Verilemez' }
     ])
 
 const tenders: any[] = []
@@ -1100,12 +1072,6 @@ function toggleFilterSection(section: string) {
                     />
                     <span class="truncate text-[11px]">{{ cat.name }}</span>
                   </div>
-                  <span 
-                    class="text-[9px] px-1.5 py-0.5 rounded-md font-mono font-bold shrink-0"
-                    :class="expandedCategory === cat.name || selectedCat === cat.name ? 'bg-white/20 text-white' : 'bg-slate-200/70 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-700'"
-                  >
-                    {{ cat.count }}
-                  </span>
                 </button>
 
                 <!-- Subcategories Accordion Panel (Scrollable with max-height) -->
