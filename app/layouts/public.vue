@@ -71,12 +71,14 @@ onMounted(() => {
   }
 })
 
-const activeTenders = ref([
-  { title: "Metro Lojistik A.Ş. - 10.000 Litre Motorin Yakıt Tedariki İhalesi", time: "2 Saat Kaldı", savings: "Hedef Tasarruf: %15" },
-  { title: "Özgür İnşaat A.Ş. - 120 Ton Hazır Beton Alım İhalesi", time: "1 Gün Kaldı", savings: "Hedef Tasarruf: %12" },
-  { title: "Tekstil Sanayi Ltd. - 5.000 Metre Dokuma Kumaş Tedariki", time: "5 Saat Kaldı", savings: "Hedef Tasarruf: %18" },
-  { title: "Mega Gıda A.Ş. - 50.000 Adet Oluklu Ambalaj Koli Alımı", time: "7 Saat Kaldı", savings: "Hedef Tasarruf: %20" }
-])
+const activeTenders = computed(() => {
+  const list = cmsData.value?.dashboard?.tenders || []
+  return list.filter((t: any) => t.durum === 'aktif' || !t.durum || t.durum === 'open').map((t: any) => ({
+    title: `${t.sehir ? t.sehir + ' - ' : ''}${t.baslik}`,
+    time: t.sure || 'Aktif',
+    savings: t.butce ? `Bütçe: ${t.butce}` : 'Yeni İhale'
+  }))
+})
 </script>
 
 <template>
@@ -88,8 +90,9 @@ const activeTenders = ref([
       <div class="w-full bg-[#0F223D] text-white py-2 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-blue-900/40 relative z-50 text-[11px] font-bold">
         <div class="mx-auto max-w-[1720px] flex items-center justify-between gap-4">
           <div class="flex items-center gap-3 shrink-0">
-            <span class="bg-[#0052FF] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-wider flex items-center gap-1 animate-pulse shadow-sm whitespace-nowrap">
-              ⚡ YAYINDAKİ İHALELER
+            <span class="bg-[#0052FF] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-wider flex items-center gap-1 shadow-sm whitespace-nowrap">
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+              <span>B2B İHALE BORSASI</span>
             </span>
             <span class="hidden md:inline-flex items-center gap-1.5 text-slate-300 text-[10px] font-medium border-l border-slate-700 pl-3 whitespace-nowrap">
               <span>📞 Destek:</span>
@@ -97,7 +100,8 @@ const activeTenders = ref([
             </span>
           </div>
 
-          <div class="relative w-full overflow-hidden h-4 flex items-center mx-4">
+          <!-- Eğer aktif ihale varsa akan bant -->
+          <div v-if="activeTenders.length > 0" class="relative w-full overflow-hidden h-4 flex items-center mx-4">
             <div class="absolute whitespace-nowrap flex gap-12 animate-marquee hover:pause-animation">
               <span v-for="(tender, idx) in activeTenders" :key="idx" class="flex items-center gap-2">
                 <span class="text-slate-400">#{{ idx + 1 }}</span>
@@ -115,9 +119,14 @@ const activeTenders = ref([
             </div>
           </div>
 
-          <a href="/#ihale-gezgini" class="text-[#00C2FF] hover:underline flex items-center gap-0.5 text-[10px] shrink-0 font-black whitespace-nowrap">
-            İncele <ArrowRight :size="12" />
-          </a>
+          <!-- Eğer henüz ihale yoksa temiz kurumsal duyuru -->
+          <div v-else class="w-full flex items-center justify-center text-slate-300 text-[11px] font-medium truncate px-4">
+            <span>TCMB & BDDK Lisanslı B2B İhale Borsası — Onaylı üreticilerden anında teklif toplamak için ilk ihalenizi oluşturun.</span>
+          </div>
+
+          <NuxtLink to="/panel/ihale-olustur" class="text-[#00C2FF] hover:underline flex items-center gap-0.5 text-[10px] shrink-0 font-black whitespace-nowrap">
+            <span>İhale Aç</span> <ArrowRight :size="12" />
+          </NuxtLink>
         </div>
       </div>
 

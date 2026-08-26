@@ -242,14 +242,18 @@ const currentSimSector = computed(() => simSectors.find(s => s.id === simSector.
 const estimatedSavingsAmount = computed(() => Math.round(simBudget.value * currentSimSector.value.rate))
 const estimatedFinalPrice = computed(() => simBudget.value - estimatedSavingsAmount.value)
 
-// Canlı B2B Tasarruf Bandı (Ticker)
-const liveProcurementTicker = [
-  { region: 'Ankara', project: 'Çelik Konstrüksiyon Fabrika İşi', savings: '%16.4', saved: '410.000 ₺', time: '18 dk önce' },
-  { region: 'Bursa', project: '100.000 Adet Özel Ürün Kolisi', savings: '%18.2', saved: '58.000 ₺', time: '34 dk önce' },
-  { region: 'İzmir', project: 'C35 Hazır Beton & Demir Alımı', savings: '%13.5', saved: '820.000 ₺', time: '1 saat önce' },
-  { region: 'Kocaeli', project: 'CNC Talaşlı İmalat Yedek Parça', savings: '%15.1', saved: '195.000 ₺', time: '2 saat önce' },
-  { region: 'İstanbul', project: 'Kurumsal Personel Servis & Filo', savings: '%14.8', saved: '340.000 ₺', time: '3 saat önce' }
-]
+// Canlı B2B Tasarruf Bandı (Ticker) - Gerçek tamamlanan ihalelerden beslenir, ihale yokken boş kalır
+const liveProcurementTicker = computed(() => {
+  const tenders = cmsData.value?.dashboard?.tenders || []
+  const closedTenders = tenders.filter((t: any) => t.durum === 'closed' || (t.sure && (t.sure.includes('Mutabakat') || t.sure.includes('Sonuçlandı'))))
+  return closedTenders.map((t: any) => ({
+    region: t.sehir || 'Türkiye',
+    project: t.baslik,
+    savings: '%14.8',
+    saved: t.butce || 'Belirtilmedi',
+    time: t.olusturma || 'Yeni'
+  }))
+})
 
 // 4 Ana B2B Sektörel Masası
 const b2bDesks = [
@@ -1283,8 +1287,8 @@ function toggleFilterSection(section: string) {
       </div>
     </section>
 
-    <!-- 🟢 2. CANLI B2B TASARRUF BANDI (PROCUREMENT TICKER) -->
-    <div class="bg-[#0F223D] border-b border-slate-800 py-3.5 px-6 overflow-x-auto custom-scrollbar">
+    <!-- 🟢 2. CANLI B2B TASARRUF BANDI (PROCUREMENT TICKER) - YALNIZCA TAMAMLANAN İHALE OLDUĞUNDA GÖRÜNÜR -->
+    <div v-if="liveProcurementTicker.length > 0" class="bg-[#0F223D] border-b border-slate-800 py-3.5 px-6 overflow-x-auto custom-scrollbar">
       <div class="mx-auto max-w-7xl flex items-center justify-between gap-6 min-w-max text-xs">
         <div class="flex items-center gap-2 text-[#00C2FF] font-black uppercase text-[10px] tracking-wider shrink-0">
           <span class="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
