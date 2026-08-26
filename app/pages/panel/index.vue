@@ -232,14 +232,14 @@ onMounted(() => {
       
       <!-- 🟢 1. AKTİF ABONELİK DURUMU & CANLI KALAN SÜRE SAYACI -->
       <div 
-        class="rounded-3xl border text-white p-6 shadow-xl relative overflow-hidden text-left space-y-5 transition-all duration-300"
+        class="rounded-3xl border text-white p-4 sm:p-6 shadow-xl relative overflow-hidden text-left space-y-4 sm:space-y-5 transition-all duration-300"
         :class="isTrialExpired 
           ? 'bg-gradient-to-r from-[#2A0C14] via-[#3B121D] to-[#2A0C14] border-red-500/50' 
           : 'bg-gradient-to-r from-[#0F223D] via-[#152B4D] to-[#0F223D] border-blue-900/60'"
       >
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5 sm:gap-6">
           <div class="space-y-2">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <span 
                 class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 border"
                 :class="isTrialExpired 
@@ -254,47 +254,42 @@ onMounted(() => {
               </span>
               <span class="text-xs font-bold" :class="isTrialExpired ? 'text-red-200' : 'text-blue-200'">• {{ subscriptionPlan.name }}</span>
             </div>
-            <h2 class="text-xl sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
+            <h2 class="text-lg sm:text-2xl font-black tracking-tight text-white flex items-center gap-2">
               <span v-if="!isTrialExpired">1 Aylık Kurumsal Denemeniz Aktif</span>
               <span v-else class="text-red-300">⚠️ 1 Aylık Deneme Süreniz Sona Erdi!</span>
             </h2>
-            <p class="text-xs text-slate-300 max-w-xl">
-              <span v-if="!isTrialExpired">
-                İhale açma, kapalı zarf eksiltmeye katılma, doğrudan temin ve canlı fiyat pazarlığı yetkileriniz sınırsızdır. Bitiş: <strong class="text-white">{{ subscriptionPlan.endDate }}</strong>.
-              </span>
-              <span v-else class="text-red-200 font-medium">
-                1 aylık ücretsiz deneme süreniz tamamlandı. İhalelere teklif vermeye ve tasarruf sağlamaya devam etmek için üyeliğinizi hemen başlatın.
-              </span>
+            <p class="text-xs text-slate-300 max-w-xl leading-relaxed">
+              İhaleciBurada B2B Borsasında sınırsız ihale açabilir, şartname yükleyebilir ve doğrudan teklif toplayabilirsiniz.
             </p>
           </div>
 
           <!-- Digital Countdown Blocks -->
-          <div class="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div class="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <!-- Days -->
-            <div class="bg-black/40 border border-white/10 backdrop-blur-md rounded-2xl p-3 min-w-[70px] text-center">
-              <div class="text-2xl sm:text-3xl font-black font-mono" :class="isTrialExpired ? 'text-red-400' : 'text-[#00C2FF]'">{{ subscriptionPlan.remainingDays }}</div>
-              <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mt-0.5">GÜN</span>
+            <div class="bg-black/40 border border-white/10 backdrop-blur-md rounded-2xl p-2 sm:p-3 min-w-[55px] sm:min-w-[70px] text-center">
+              <div class="text-xl sm:text-3xl font-black font-mono" :class="isTrialExpired ? 'text-red-400' : 'text-[#00C2FF]'">{{ subscriptionPlan.remainingDays }}</div>
+              <span class="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest block mt-0.5">GÜN</span>
             </div>
-            <span class="text-xl font-bold text-slate-500">:</span>
+            <span class="text-lg sm:text-xl font-bold text-slate-500">:</span>
 
             <!-- Hours -->
-            <div class="bg-black/40 border border-white/10 backdrop-blur-md rounded-2xl p-3 min-w-[65px] text-center">
-              <div class="text-2xl sm:text-3xl font-black font-mono text-white">{{ String(subscriptionPlan.hours).padStart(2, '0') }}</div>
-              <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mt-0.5">SAAT</span>
+            <div class="bg-black/40 border border-white/10 backdrop-blur-md rounded-2xl p-2 sm:p-3 min-w-[50px] sm:min-w-[65px] text-center">
+              <div class="text-xl sm:text-3xl font-black font-mono text-white">{{ String(subscriptionPlan.hours).padStart(2, '0') }}</div>
+              <span class="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest block mt-0.5">SAAT</span>
             </div>
-            <span class="text-xl font-bold text-slate-500">:</span>
+            <span class="text-lg sm:text-xl font-bold text-slate-500">:</span>
 
             <!-- Minutes -->
-            <div class="bg-black/40 border border-white/10 backdrop-blur-md rounded-2xl p-3 min-w-[65px] text-center">
-              <div class="text-2xl sm:text-3xl font-black font-mono text-white">{{ String(subscriptionPlan.minutes).padStart(2, '0') }}</div>
-              <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest block mt-0.5">DAKİKA</span>
+            <div class="bg-black/40 border border-white/10 backdrop-blur-md rounded-2xl p-2 sm:p-3 min-w-[50px] sm:min-w-[65px] text-center">
+              <div class="text-xl sm:text-3xl font-black font-mono text-white">{{ String(subscriptionPlan.minutes).padStart(2, '0') }}</div>
+              <span class="text-[8px] sm:text-[9px] font-black text-slate-400 uppercase tracking-widest block mt-0.5">DAKİKA</span>
             </div>
-            <span class="text-xl font-bold text-slate-500">:</span>
+            <span class="text-lg sm:text-xl font-bold text-slate-500">:</span>
 
             <!-- Seconds -->
-            <div class="bg-black/40 border backdrop-blur-md rounded-2xl p-3 min-w-[65px] text-center" :class="isTrialExpired ? 'border-red-400/40' : 'border-amber-400/40'">
-              <div class="text-2xl sm:text-3xl font-black font-mono" :class="isTrialExpired ? 'text-red-400' : 'text-amber-400'">{{ String(subscriptionPlan.seconds).padStart(2, '0') }}</div>
-              <span class="text-[9px] font-black uppercase tracking-widest block mt-0.5" :class="isTrialExpired ? 'text-red-300' : 'text-amber-300'">SANİYE</span>
+            <div class="bg-black/40 border backdrop-blur-md rounded-2xl p-2 sm:p-3 min-w-[50px] sm:min-w-[65px] text-center" :class="isTrialExpired ? 'border-red-400/40' : 'border-amber-400/40'">
+              <div class="text-xl sm:text-3xl font-black font-mono" :class="isTrialExpired ? 'text-red-400' : 'text-amber-400'">{{ String(subscriptionPlan.seconds).padStart(2, '0') }}</div>
+              <span class="text-[8px] sm:text-[9px] font-black uppercase tracking-widest block mt-0.5" :class="isTrialExpired ? 'text-red-300' : 'text-amber-300'">SANİYE</span>
             </div>
           </div>
         </div>

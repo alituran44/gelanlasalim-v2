@@ -168,7 +168,7 @@ function submitReview() {
 </script>
 
 <template>
-  <div class="p-6 max-w-5xl mx-auto text-left space-y-6">
+  <div class="p-3 sm:p-6 max-w-5xl mx-auto text-left space-y-6">
 
     <!-- Başlık -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 border-slate-200">
@@ -224,7 +224,7 @@ function submitReview() {
       <div
         v-for="teklif in teklifler"
         :key="teklif.id"
-        class="rounded-3xl border bg-white p-6 space-y-4 shadow-xs hover:shadow-md transition-all"
+        class="rounded-3xl border bg-white p-4 sm:p-6 space-y-4 shadow-xs hover:shadow-md transition-all"
         :class="teklif.durum === 'onaylandi' ? 'border-emerald-200 bg-emerald-50/20' : 'border-slate-200'"
       >
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">

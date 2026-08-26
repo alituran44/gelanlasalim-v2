@@ -380,7 +380,7 @@ function handleSubmit() {
 </script>
 
 <template>
-  <div class="p-6 max-w-3xl mx-auto text-left">
+  <div class="p-3 sm:p-6 max-w-3xl mx-auto text-left">
     
     <!-- Saved Draft Banner (if draft exists) -->
     <div v-if="hasDraft" class="mb-5 rounded-2xl bg-amber-50 border border-amber-200 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-bold text-amber-900 shadow-xs">
@@ -430,7 +430,7 @@ function handleSubmit() {
     <form v-else @submit.prevent="handleSubmit" class="space-y-6">
       
       <!-- KART 1: GENEL BİLGİLER -->
-      <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+      <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
         <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">1. İhale Genel Bilgileri</h2>
         
         <!-- İhale Başlığı -->
@@ -508,7 +508,7 @@ function handleSubmit() {
       </div>
 
       <!-- KART 2: LOJİSTİK VE ÖDEME ŞARTLARI -->
-      <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4 border-slate-200">
+      <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
         <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] mb-2">2. Lojistik & Ödeme Şartları</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -570,7 +570,7 @@ function handleSubmit() {
       </div>
 
       <!-- KART 3: TEKNİK AÇIKLAMALAR -->
-      <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4 border-slate-200">
+      <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
         <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] mb-2">3. Teknik Açıklama & Kalem Detayları</h2>
         
         <!-- Teknik Açıklama -->

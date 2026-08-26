@@ -246,11 +246,11 @@ function downloadAllSpecs(tender: any) {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8 text-left">
-    <div class="max-w-7xl mx-auto space-y-8">
+  <div class="min-h-screen bg-slate-50 py-6 sm:py-10 px-3.5 sm:px-6 lg:px-8 text-left">
+    <div class="max-w-7xl mx-auto space-y-6 sm:space-y-8">
       
       <!-- Top Header & Terminal Banner -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#070F1E] p-8 rounded-3xl text-white shadow-xl border border-slate-800 relative overflow-hidden">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#070F1E] p-5 sm:p-8 rounded-3xl text-white shadow-xl border border-slate-800 relative overflow-hidden">
         <div class="absolute right-0 top-0 h-64 w-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
         <div class="space-y-2 relative z-10">
@@ -282,7 +282,7 @@ function downloadAllSpecs(tender: any) {
       </div>
 
       <!-- Trading Terminal Command Filter Bar -->
-      <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+      <div class="bg-white p-4 sm:p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
         <!-- Main Search & Sort Row -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
           <div class="md:col-span-8 relative">
@@ -414,7 +414,7 @@ function downloadAllSpecs(tender: any) {
           </div>
 
           <!-- Card Body -->
-          <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
+          <div class="p-4 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
             <div class="space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">

@@ -96,7 +96,7 @@ const sidebarMenus = computed(() => {
       <Topbar />
 
       <!-- Horizontal Navigation Bar (Menus at the top, scrollable on small screens) -->
-      <div class="bg-white border-b border-slate-200 px-6 py-2.5 flex items-center justify-between overflow-x-auto gap-4 scrollbar-none shrink-0 shadow-sm">
+      <div class="bg-white border-b border-slate-200 px-3 sm:px-6 py-2 flex items-center justify-between overflow-x-auto gap-3 scrollbar-none shrink-0 shadow-xs">
         <div class="flex items-center gap-1 shrink-0">
           <template v-for="item in sidebarMenus" :key="item.title">
             
@@ -105,7 +105,7 @@ const sidebarMenus = computed(() => {
               <button
                 type="button"
                 @click="isTopTekliflerOpen = !isTopTekliflerOpen"
-                class="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all border border-transparent cursor-pointer"
+                class="flex items-center gap-1.5 rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs font-bold transition-all border border-transparent cursor-pointer whitespace-nowrap"
                 :class="(route.path === '/panel/gelen-teklifler' || route.path === '/panel/yaptigim-teklifler' || route.path === '/panel/tekliflerim') 
                   ? 'bg-[#0F223D] text-white shadow-xs' 
                   : 'text-slate-700 hover:bg-slate-100 hover:text-[#0F223D]'"
@@ -137,7 +137,7 @@ const sidebarMenus = computed(() => {
             <NuxtLink
               v-else
               :to="item.to"
-              class="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-bold transition-all border border-transparent"
+              class="flex items-center gap-1.5 rounded-xl px-2.5 sm:px-3 py-1.5 sm:py-2 text-xs font-bold transition-all border border-transparent whitespace-nowrap"
               :class="route.path === item.to 
                 ? 'bg-[#0F223D] text-white shadow-xs' 
                 : 'text-slate-700 hover:bg-slate-100 hover:text-[#0F223D]'"
@@ -152,18 +152,69 @@ const sidebarMenus = computed(() => {
         <!-- Go to Homepage Link -->
         <NuxtLink
           to="/"
-          class="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-black text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all shrink-0 uppercase tracking-wider"
+          class="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-black text-slate-700 hover:bg-slate-50 hover:text-slate-900 transition-all shrink-0 uppercase tracking-wider whitespace-nowrap shadow-xs"
         >
           <ArrowLeft :size="13" />
-          {{ 'Ana Sayfaya Git' }}
+          <span class="hidden sm:inline">{{ 'Siteye Dön' }}</span>
+          <span class="sm:hidden">{{ 'Site' }}</span>
         </NuxtLink>
       </div>
 
       <!-- Main Layout Body -->
-      <main class="flex-1 p-8 overflow-y-auto">
+      <main class="flex-1 p-3.5 sm:p-6 lg:p-8 overflow-y-auto pb-20 sm:pb-8 max-w-full">
         <slot />
       </main>
     </div>
+
+    <!-- 📱 MOBİL SABİT ALT GEZİNME ÇUBUĞU (PANEL İÇİN) -->
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2 flex items-center justify-around shadow-2xl safe-bottom">
+      <NuxtLink 
+        to="/panel" 
+        class="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-[#0052FF]"
+        active-class="text-[#0052FF]"
+      >
+        <LayoutDashboard :size="18" />
+        <span>Panel</span>
+      </NuxtLink>
+
+      <NuxtLink 
+        to="/panel/pazar-yeri" 
+        class="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-[#1EAE4C]"
+        active-class="text-[#1EAE4C]"
+      >
+        <ShoppingBag :size="18" />
+        <span>Pazar Yeri</span>
+      </NuxtLink>
+
+      <!-- Ortadaki Vurgulu İhale Aç FAB Butonu -->
+      <NuxtLink 
+        to="/panel/ihale-olustur" 
+        class="flex flex-col items-center -mt-6 group"
+      >
+        <div class="h-12 w-12 rounded-full bg-[#1EAE4C] text-white flex items-center justify-center shadow-lg shadow-[#1EAE4C]/40 group-active:scale-95 transition-all border-2 border-white">
+          <Plus :size="22" class="stroke-[3]" />
+        </div>
+        <span class="text-[9px] font-black text-[#1EAE4C] mt-0.5">İhale Aç</span>
+      </NuxtLink>
+
+      <NuxtLink 
+        to="/panel/gelen-teklifler" 
+        class="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-[#0052FF]"
+        active-class="text-[#0052FF]"
+      >
+        <Inbox :size="18" />
+        <span>Gelen</span>
+      </NuxtLink>
+
+      <NuxtLink 
+        to="/panel/ayarlar" 
+        class="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-[#0F223D]"
+        active-class="text-[#0F223D]"
+      >
+        <Settings :size="18" />
+        <span>Ayarlar</span>
+      </NuxtLink>
+    </nav>
 
     <!-- Floating Support Widget (WhatsApp & AI Bot) -->
     <FloatingSupportWidget />

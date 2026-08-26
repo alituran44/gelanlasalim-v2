@@ -1114,35 +1114,35 @@ function toggleFilterSection(section: string) {
       <div class="absolute right-[-10%] top-[-20%] h-[500px] w-[500px] rounded-full bg-blue-500/10 blur-3xl z-10 pointer-events-none"></div>
       <div class="absolute bottom-[-10%] left-[-5%] h-[400px] w-[400px] rounded-full bg-emerald-500/10 blur-3xl z-10 pointer-events-none"></div>
 
-      <div class="relative z-20 mx-auto grid max-w-7xl items-center gap-12 px-6 py-16 lg:py-24 lg:grid-cols-[1.15fr_0.85fr]">
+      <div class="relative z-20 mx-auto grid max-w-7xl items-center gap-8 lg:gap-12 px-4 sm:px-6 py-10 sm:py-16 lg:py-24 lg:grid-cols-[1.15fr_0.85fr]">
         <!-- Hero Left Content -->
-        <div class="text-left space-y-6">
+        <div class="text-left space-y-5 sm:space-y-6">
           <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-400/30 text-xs font-black uppercase tracking-wider text-[#00C2FF]">
             <span class="h-2 w-2 rounded-full bg-[#00C2FF] animate-pulse"></span>
             <span>TCMB & BDDK UYUMLU KURUMSAL TEDARİK BORSASI</span>
           </div>
 
-          <h1 class="text-3xl sm:text-5xl lg:text-5xl font-black leading-[1.12] tracking-tight text-white">
+          <h1 class="text-3xl sm:text-5xl lg:text-5xl font-black leading-[1.15] sm:leading-[1.12] tracking-tight text-white">
             Tedarik Maliyetlerinizi <br class="hidden sm:inline" />
             <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00C2FF] via-white to-emerald-400">Canlı Eksiltme & Escrow</span> ile Düşürün.
           </h1>
 
-          <p class="max-w-xl text-sm sm:text-base leading-relaxed text-slate-300 font-medium">
+          <p class="max-w-xl text-xs sm:text-base leading-relaxed text-slate-300 font-medium">
             İnşaat, sanayi, lojistik ve kurumsal sarf alımlarınız için şartnamenizi yükleyin; onaylı B2B üreticilerden anında belgeli fiyat toplayıp tersine açık eksiltmeyle %18'e varan net tasarruf sağlayın.
           </p>
 
           <!-- Primary CTAs -->
-          <div class="flex flex-wrap items-center gap-3 pt-2">
+          <div class="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-2">
             <NuxtLink 
               to="/panel/ihale-olustur" 
-              class="flex items-center gap-2 rounded-2xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/30 bg-[#0052FF] hover:bg-blue-600 transition-all hover:scale-102 cursor-pointer"
+              class="flex items-center gap-2 rounded-2xl px-5 sm:px-6 py-3.5 sm:py-4 text-xs font-black text-white shadow-xl shadow-blue-600/30 bg-[#0052FF] hover:bg-blue-600 transition-all hover:scale-102 cursor-pointer"
             >
               <Plus :size="16" class="text-[#00C2FF]" />
               <span>Ücretsiz İhale Başlat</span>
             </NuxtLink>
             <a 
               href="#ihale-gezgini" 
-              class="flex items-center gap-2 rounded-2xl border border-slate-700 bg-slate-900/80 hover:bg-slate-800 px-6 py-4 text-xs font-black text-slate-200 hover:text-white transition-all cursor-pointer"
+              class="flex items-center gap-2 rounded-2xl border border-slate-700 bg-slate-900/80 hover:bg-slate-800 px-5 sm:px-6 py-3.5 sm:py-4 text-xs font-black text-slate-200 hover:text-white transition-all cursor-pointer"
             >
               <span>Pazar Yerini İncele</span>
               <ArrowRight :size="14" class="text-slate-400" />
@@ -1150,7 +1150,7 @@ function toggleFilterSection(section: string) {
             <button
               type="button"
               @click="openHeroVideo('intro-3min')"
-              class="flex items-center gap-2.5 px-4 py-4 rounded-2xl text-xs font-bold text-slate-300 hover:text-white transition-all cursor-pointer"
+              class="flex items-center gap-2 px-3 sm:px-4 py-3 sm:py-4 rounded-2xl text-xs font-bold text-slate-300 hover:text-white transition-all cursor-pointer"
             >
               <span class="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-[#00C2FF]">
                 <Play :size="12" class="fill-current translate-x-0.5" />
@@ -1160,7 +1160,7 @@ function toggleFilterSection(section: string) {
           </div>
 
           <!-- Trust Badges Strip -->
-          <div class="pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-y-2 gap-x-6 text-[11px] font-bold text-slate-400">
+          <div class="pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-y-2 gap-x-5 text-[10px] sm:text-[11px] font-bold text-slate-400">
             <div class="flex items-center gap-1.5 text-emerald-400">
               <ShieldCheck :size="14" />
               <span>%100 Güvenli Havuz (Escrow)</span>
@@ -1178,7 +1178,7 @@ function toggleFilterSection(section: string) {
 
         <!-- Hero Right: İnteraktif B2B Tasarruf Hesaplayıcı & Canlı Simülatör -->
         <div class="relative">
-          <div class="rounded-3xl border border-slate-700/80 bg-[#0B1528]/95 p-6 sm:p-7 shadow-2xl backdrop-blur-md text-left space-y-5">
+          <div class="rounded-3xl border border-slate-700/80 bg-[#0B1528]/95 p-4 sm:p-7 shadow-2xl backdrop-blur-md text-left space-y-4 sm:space-y-5">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
               <div>
                 <span class="text-[9px] font-black uppercase tracking-wider text-[#00C2FF] flex items-center gap-1">

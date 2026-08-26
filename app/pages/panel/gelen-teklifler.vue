@@ -276,7 +276,7 @@ function submitReview() {
 </script>
 
 <template>
-  <div class="p-6 max-w-5xl mx-auto text-left space-y-6">
+  <div class="p-3 sm:p-6 max-w-5xl mx-auto text-left space-y-6">
 
     <!-- Başlık + Gizlilik Notu -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4 border-slate-200">
@@ -327,7 +327,7 @@ function submitReview() {
         <!-- İlan Başlık Satırı -->
         <button
           @click="toggle(ilan.id)"
-          class="flex w-full items-center justify-between p-6 text-left transition hover:bg-slate-50/80 cursor-pointer"
+          class="flex w-full items-center justify-between p-4 sm:p-6 text-left transition hover:bg-slate-50/80 cursor-pointer"
         >
           <div class="flex items-center gap-4">
             <div class="flex h-12 w-12 items-center justify-center rounded-2xl shrink-0 bg-blue-50 border border-blue-100 text-[#003057]">

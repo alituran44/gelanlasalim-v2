@@ -292,60 +292,193 @@ const activeTenders = computed(() => {
 
       <!-- Mobil Menü -->
       <transition
-        enter-active-class="transition duration-150 ease-out"
-        enter-from-class="opacity-0 -translate-y-2"
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0 -translate-y-4"
         enter-to-class="opacity-100 translate-y-0"
-        leave-active-class="transition duration-100 ease-in"
+        leave-active-class="transition duration-150 ease-in"
         leave-from-class="opacity-100 translate-y-0"
-        leave-to-class="opacity-0 -translate-y-2"
+        leave-to-class="opacity-0 -translate-y-4"
       >
-        <div v-if="mobileMenuOpen" class="border-t bg-white px-6 py-5 lg:hidden" style="border-color: #F1F5F9;">
-          <div class="flex flex-col gap-3 text-sm font-semibold" style="color: #475569;">
-            <a href="/#nasil-calisir" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Nasıl Çalışır</a>
-            <a href="/#ozellikler" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Özellikler</a>
-            <a href="/#ihale-gezgini" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">İhale Marketi</a>
-            <NuxtLink to="/abonelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">{{ t('pricing') }}</NuxtLink>
-            <a href="/#sss" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">SSS</a>
-            
-            <div class="border-t my-1" style="border-color: #F1F5F9;"></div>
-            
-            <!-- Mobil İhale Aç / Profilim / Panel (Oturum açıkken) -->
-            <NuxtLink v-if="isLoggedIn" to="/panel/ihale-olustur" @click="mobileMenuOpen = false" class="py-2 px-3 bg-[#0052FF] text-white rounded-xl font-bold flex items-center justify-center gap-2">
-              <Plus :size="16" /> İhale Aç
-            </NuxtLink>
-            <NuxtLink v-if="isLoggedIn" to="/panel/ilanlarim" @click="mobileMenuOpen = false" class="py-1.5 text-slate-800 font-bold flex items-center gap-2">
-              <FileText :size="16" /> İhalelerim
-            </NuxtLink>
-            <NuxtLink v-if="isLoggedIn" to="/panel/ayarlar" @click="mobileMenuOpen = false" class="py-1.5 text-blue-700 font-bold flex items-center gap-2">
-              <User :size="16" /> Profilim
-            </NuxtLink>
-            <NuxtLink v-if="isLoggedIn" to="/panel" @click="mobileMenuOpen = false" class="py-1.5 text-slate-800 font-bold flex items-center gap-2">
-              <LayoutDashboard :size="16" /> Yönetim Paneli
-            </NuxtLink>
-            <button v-if="isLoggedIn" @click="handleLogout(); mobileMenuOpen = false" class="py-1.5 text-rose-600 font-bold text-left flex items-center gap-2">
-              <LogOut :size="16" /> Çıkış Yap
-            </button>
-
-            <!-- Mobil Giriş / Kayıt (Oturum kapalıyken) -->
-            <NuxtLink v-if="!isLoggedIn" to="/uyelik" @click="mobileMenuOpen = false" class="py-1.5 hover:text-blue-600 transition-colors">Giriş Yap</NuxtLink>
-            <NuxtLink
-              v-if="!isLoggedIn"
-              to="/uyelik"
+        <div v-if="mobileMenuOpen" class="border-t bg-white px-5 py-6 lg:hidden max-h-[85vh] overflow-y-auto space-y-5 shadow-2xl border-slate-200">
+          
+          <!-- Hızlı B2B Erişim Izgarası -->
+          <div class="grid grid-cols-2 gap-2">
+            <NuxtLink 
+              to="/" 
               @click="mobileMenuOpen = false"
-              class="flex items-center justify-center gap-2 rounded-xl py-3 text-white font-bold bg-[#0052FF]"
+              class="flex items-center gap-2 p-3 rounded-2xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs font-black text-slate-800"
             >
-              Kurumsal Hesap Aç <ArrowRight :size="14" />
+              <Home :size="16" class="text-[#0052FF]" />
+              <span>Ana Sayfa</span>
+            </NuxtLink>
+            <NuxtLink 
+              to="/pazar-yeri" 
+              @click="mobileMenuOpen = false"
+              class="flex items-center gap-2 p-3 rounded-2xl bg-emerald-50/60 hover:bg-emerald-100/60 border border-emerald-200 text-xs font-black text-emerald-900"
+            >
+              <ShoppingBag :size="16" class="text-emerald-600" />
+              <span>Pazar Yeri</span>
+            </NuxtLink>
+            <NuxtLink 
+              to="/panel/ilanlarim" 
+              @click="mobileMenuOpen = false"
+              class="flex items-center gap-2 p-3 rounded-2xl bg-blue-50/60 hover:bg-blue-100/60 border border-blue-200 text-xs font-bold text-blue-900"
+            >
+              <FileText :size="16" class="text-blue-600" />
+              <span>İhalelerim</span>
+            </NuxtLink>
+            <NuxtLink 
+              to="/panel/gelen-teklifler" 
+              @click="mobileMenuOpen = false"
+              class="flex items-center gap-2 p-3 rounded-2xl bg-indigo-50/60 hover:bg-indigo-100/60 border border-indigo-200 text-xs font-bold text-indigo-900"
+            >
+              <Inbox :size="16" class="text-indigo-600" />
+              <span>Gelen Teklifler</span>
+            </NuxtLink>
+            <NuxtLink 
+              to="/panel/yaptigim-teklifler" 
+              @click="mobileMenuOpen = false"
+              class="flex items-center gap-2 p-3 rounded-2xl bg-violet-50/60 hover:bg-violet-100/60 border border-violet-200 text-xs font-bold text-violet-900"
+            >
+              <Send :size="16" class="text-violet-600" />
+              <span>Verdiğim Teklif</span>
+            </NuxtLink>
+            <NuxtLink 
+              to="/videolar" 
+              @click="mobileMenuOpen = false"
+              class="flex items-center gap-2 p-3 rounded-2xl bg-sky-50/60 hover:bg-sky-100/60 border border-sky-200 text-xs font-black text-sky-900"
+            >
+              <PlayCircle :size="16" class="text-sky-600" />
+              <span>Rehberler</span>
             </NuxtLink>
           </div>
+
+          <!-- 1 Ay Ücretsiz Özel Banner -->
+          <NuxtLink 
+            to="/abonelik" 
+            @click="mobileMenuOpen = false"
+            class="flex items-center justify-between p-3.5 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white font-black text-xs shadow-md"
+          >
+            <span class="flex items-center gap-2">
+              <Sparkles :size="16" class="text-amber-300" />
+              <span>Lansmana Özel: 1 Ay %100 Ücretsiz</span>
+            </span>
+            <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-md">İncele →</span>
+          </NuxtLink>
+
+          <!-- Alt Linkler -->
+          <div class="border-t pt-3 border-slate-100 flex flex-col gap-2.5 text-xs font-bold text-slate-700">
+            <a href="/#nasil-calisir" @click="mobileMenuOpen = false" class="py-1 hover:text-blue-600">Nasıl Çalışır</a>
+            <a href="/#ozellikler" @click="mobileMenuOpen = false" class="py-1 hover:text-blue-600">Sektörel Masalar</a>
+            <a href="/#sss" @click="mobileMenuOpen = false" class="py-1 hover:text-blue-600">Sıkça Sorulan Sorular (SSS)</a>
+            <NuxtLink to="/yardim" @click="mobileMenuOpen = false" class="py-1 hover:text-blue-600">Yardım & Destek Merkezi</NuxtLink>
+          </div>
+
+          <div class="border-t pt-3 border-slate-100 space-y-2">
+            <!-- Oturum AÇIKKEN -->
+            <template v-if="isLoggedIn">
+              <NuxtLink 
+                to="/panel/ihale-olustur" 
+                @click="mobileMenuOpen = false" 
+                class="w-full py-3 bg-[#1EAE4C] text-white rounded-2xl font-black text-xs flex items-center justify-center gap-2 shadow-md"
+              >
+                <Plus :size="16" /> + Yeni İhale Oluştur
+              </NuxtLink>
+              <div class="grid grid-cols-2 gap-2">
+                <NuxtLink to="/panel/ayarlar" @click="mobileMenuOpen = false" class="py-2.5 px-3 bg-slate-100 text-slate-800 rounded-xl font-bold text-xs flex items-center justify-center gap-2">
+                  <User :size="14" /> Profilim
+                </NuxtLink>
+                <NuxtLink to="/panel" @click="mobileMenuOpen = false" class="py-2.5 px-3 bg-[#0F223D] text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2">
+                  <LayoutDashboard :size="14" /> Panel
+                </NuxtLink>
+              </div>
+              <button 
+                @click="handleLogout(); mobileMenuOpen = false" 
+                class="w-full py-2 text-rose-600 font-bold text-xs flex items-center justify-center gap-2 hover:bg-rose-50 rounded-xl"
+              >
+                <LogOut :size="14" /> Çıkış Yap
+              </button>
+            </template>
+
+            <!-- Oturum KAPALIYKEN -->
+            <template v-else>
+              <NuxtLink 
+                to="/uyelik?tab=guest" 
+                @click="mobileMenuOpen = false" 
+                class="w-full py-2.5 bg-slate-100 text-slate-800 rounded-xl font-bold text-xs flex items-center justify-center gap-2 border border-slate-300"
+              >
+                <Eye :size="14" class="text-slate-600" /> Misafir Girişi Yap
+              </NuxtLink>
+              <div class="grid grid-cols-2 gap-2">
+                <NuxtLink to="/uyelik" @click="mobileMenuOpen = false" class="py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl font-bold text-xs flex items-center justify-center border border-slate-200">
+                  Giriş Yap
+                </NuxtLink>
+                <NuxtLink to="/uyelik" @click="mobileMenuOpen = false" class="py-2.5 bg-[#0F223D] text-white rounded-xl font-black text-xs flex items-center justify-center gap-1">
+                  <span>Hesap Aç</span> <ArrowRight :size="12" class="text-emerald-400" />
+                </NuxtLink>
+              </div>
+            </template>
+          </div>
+
         </div>
       </transition>
     </header>
   </div>
 
     <!-- Main Content -->
-    <main class="flex-grow">
+    <main class="flex-grow pb-16 sm:pb-0">
       <slot />
     </main>
+
+    <!-- 📱 MOBİL SABİT ALT GEZİNME ÇUBUĞU (MOBILE BOTTOM APP BAR) -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2 flex items-center justify-around shadow-2xl safe-bottom">
+      <NuxtLink 
+        to="/" 
+        class="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-[#0052FF]"
+        active-class="text-[#0052FF]"
+      >
+        <Home :size="18" />
+        <span>Ana Sayfa</span>
+      </NuxtLink>
+
+      <NuxtLink 
+        to="/pazar-yeri" 
+        class="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-[#1EAE4C]"
+        active-class="text-[#1EAE4C]"
+      >
+        <ShoppingBag :size="18" />
+        <span>Pazar Yeri</span>
+      </NuxtLink>
+
+      <!-- Ortadaki Vurgulu İhale Aç FAB Butonu -->
+      <NuxtLink 
+        to="/panel/ihale-olustur" 
+        class="flex flex-col items-center -mt-6 group"
+      >
+        <div class="h-12 w-12 rounded-full bg-[#1EAE4C] text-white flex items-center justify-center shadow-lg shadow-[#1EAE4C]/40 group-active:scale-95 transition-all border-2 border-white">
+          <Plus :size="22" class="stroke-[3]" />
+        </div>
+        <span class="text-[9px] font-black text-[#1EAE4C] mt-0.5">İhale Aç</span>
+      </NuxtLink>
+
+      <NuxtLink 
+        to="/panel/gelen-teklifler" 
+        class="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-[#0052FF]"
+        active-class="text-[#0052FF]"
+      >
+        <Inbox :size="18" />
+        <span>Teklifler</span>
+      </NuxtLink>
+
+      <NuxtLink 
+        :to="isLoggedIn ? '/panel' : '/uyelik'" 
+        class="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-[#0F223D]"
+        active-class="text-[#0F223D]"
+      >
+        <User :size="18" />
+        <span>{{ isLoggedIn ? 'Panelim' : 'Giriş' }}</span>
+      </NuxtLink>
+    </nav>
 
     <!-- Footer -->
     <footer class="bg-[#0F223D] text-slate-300 border-t border-slate-800">
