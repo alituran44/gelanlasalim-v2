@@ -1,6 +1,29 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import { Handshake, Menu, X, ArrowRight, Mail, Phone, MapPin, Facebook, Instagram, Linkedin, Home, User, LogOut, LayoutDashboard, Plus, FileText } from 'lucide-vue-next'
+import { 
+  Handshake, 
+  Menu, 
+  X, 
+  ArrowRight, 
+  Mail, 
+  Phone, 
+  MapPin, 
+  Facebook, 
+  Instagram, 
+  Linkedin, 
+  Home, 
+  User, 
+  LogOut, 
+  LayoutDashboard, 
+  Plus, 
+  FileText,
+  ShoppingBag,
+  Inbox,
+  Send,
+  PlayCircle,
+  Sparkles,
+  Eye
+} from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale, setLocale, detectLocale, t } from '~/composables/useLocale'
 import FloatingSupportWidget from '~/components/common/FloatingSupportWidget.vue'
@@ -62,13 +85,13 @@ const activeTenders = ref([
     <div class="sticky top-0 z-50 w-full flex flex-col bg-white shadow-xs">
       
       <!-- Announcement Banner -->
-      <div class="w-full bg-[#0F223D] text-white py-2 px-6 overflow-hidden border-b border-blue-900/40 relative z-50 text-[11px] font-bold">
-        <div class="mx-auto max-w-7xl flex items-center justify-between gap-4">
+      <div class="w-full bg-[#0F223D] text-white py-2 px-4 sm:px-6 lg:px-8 overflow-hidden border-b border-blue-900/40 relative z-50 text-[11px] font-bold">
+        <div class="mx-auto max-w-[1720px] flex items-center justify-between gap-4">
           <div class="flex items-center gap-3 shrink-0">
-            <span class="bg-[#0052FF] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-wider flex items-center gap-1 animate-pulse shadow-sm">
+            <span class="bg-[#0052FF] text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-wider flex items-center gap-1 animate-pulse shadow-sm whitespace-nowrap">
               ⚡ YAYINDAKİ İHALELER
             </span>
-            <span class="hidden md:inline-flex items-center gap-1.5 text-slate-300 text-[10px] font-medium border-l border-slate-700 pl-3">
+            <span class="hidden md:inline-flex items-center gap-1.5 text-slate-300 text-[10px] font-medium border-l border-slate-700 pl-3 whitespace-nowrap">
               <span>📞 Destek:</span>
               <a href="tel:08503080000" class="text-[#FF5938] font-bold hover:underline">0850 308 00 00</a>
             </span>
@@ -92,7 +115,7 @@ const activeTenders = ref([
             </div>
           </div>
 
-          <a href="/#ihale-gezgini" class="text-[#00C2FF] hover:underline flex items-center gap-0.5 text-[10px] shrink-0 font-black">
+          <a href="/#ihale-gezgini" class="text-[#00C2FF] hover:underline flex items-center gap-0.5 text-[10px] shrink-0 font-black whitespace-nowrap">
             İncele <ArrowRight :size="12" />
           </a>
         </div>
@@ -100,75 +123,81 @@ const activeTenders = ref([
 
       <!-- Header -->
       <header class="w-full bg-white border-b transition-all" style="border-color: #E2E8F0;">
-      <div class="mx-auto flex h-[84px] sm:h-[90px] max-w-7xl items-center justify-between px-6">
+      <div class="mx-auto flex h-[84px] sm:h-[90px] max-w-[1720px] items-center justify-between px-4 sm:px-6 lg:px-8 xl:px-10 gap-4">
 
         <!-- Sol: Logo (İhaleciBurada.com) -->
         <NuxtLink to="/" class="flex items-center gap-3.5 hover:opacity-95 transition shrink-0 group py-1">
           <img 
             src="/logo.png" 
             alt="İhaleciBurada.com Logo" 
-            class="h-14 sm:h-16 md:h-20 lg:h-22 max-h-[76px] w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-all duration-200" 
+            class="h-14 sm:h-16 md:h-18 lg:h-20 max-h-[72px] w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-all duration-200" 
           />
-          <span class="hidden xl:inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-black text-[#0052FF] border border-blue-200 shadow-2xs">
+          <span class="hidden 2xl:inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-black text-[#0052FF] border border-blue-200 shadow-2xs whitespace-nowrap">
             ✓ ONAYLI B2B
           </span>
         </NuxtLink>
 
-        <!-- Orta: Hızlı Ana Sayfa, Pazar Yeri, İhalelerim & Teklif Erişim Buton Şeridi -->
-        <div class="hidden lg:flex items-center gap-1 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-inner">
+        <!-- Orta: Hızlı Ana Sayfa, Pazar Yeri, İhalelerim & Teklif Erişim Buton Şeridi (Genişletilmiş ve Ferah) -->
+        <div class="hidden lg:flex items-center gap-1.5 bg-slate-100/90 p-1.5 rounded-2xl border border-slate-200/80 shadow-inner">
           <NuxtLink 
             to="/" 
-            class="px-3.5 py-1.5 text-xs font-black text-slate-800 hover:text-[#0052FF] bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm border border-slate-200/60"
+            class="px-3.5 py-2 text-xs font-black text-slate-800 hover:text-[#0052FF] bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm border border-slate-200/60 whitespace-nowrap shrink-0"
           >
             <Home :size="14" class="text-[#0052FF]" />
             <span>Ana Sayfa</span>
           </NuxtLink>
           <NuxtLink 
             to="/pazar-yeri" 
-            class="px-3.5 py-1.5 text-xs font-black text-slate-800 hover:text-[#1EAE4C] hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+            class="px-3.5 py-2 text-xs font-black text-slate-800 hover:text-[#1EAE4C] hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm whitespace-nowrap shrink-0"
           >
-            🛒 <span>Pazar Yeri</span>
+            <ShoppingBag :size="14" class="text-emerald-600" />
+            <span>Pazar Yeri</span>
           </NuxtLink>
           <NuxtLink 
             to="/panel/ilanlarim" 
-            class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[#0052FF] hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+            class="px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-[#0052FF] hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm whitespace-nowrap shrink-0"
           >
-            📋 <span>İhalelerim</span>
+            <FileText :size="14" class="text-blue-600" />
+            <span>İhalelerim</span>
           </NuxtLink>
           <NuxtLink 
             to="/panel/gelen-teklifler" 
-            class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[#0052FF] hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+            class="px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-[#0052FF] hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm whitespace-nowrap shrink-0"
           >
-            📥 <span>Gelen Teklifler</span>
+            <Inbox :size="14" class="text-[#0052FF]" />
+            <span>Gelen Teklifler</span>
           </NuxtLink>
           <NuxtLink 
             to="/panel/yaptigim-teklifler" 
-            class="px-3.5 py-1.5 text-xs font-bold text-slate-700 hover:text-[#0052FF] hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm"
+            class="px-3.5 py-2 text-xs font-bold text-slate-700 hover:text-[#0052FF] hover:bg-white rounded-xl transition-all flex items-center gap-1.5 shadow-sm whitespace-nowrap shrink-0"
           >
-            📤 <span>Verdiğim Teklifler</span>
+            <Send :size="14" class="text-indigo-600" />
+            <span>Verdiğim Teklifler</span>
           </NuxtLink>
           <NuxtLink 
             to="/videolar" 
-            class="px-3.5 py-1.5 text-xs font-black text-blue-700 hover:text-blue-900 bg-blue-50/80 hover:bg-blue-100/80 rounded-xl transition-all flex items-center gap-1.5 shadow-sm border border-blue-200"
+            class="px-3.5 py-2 text-xs font-black text-blue-700 hover:text-blue-900 bg-blue-50/80 hover:bg-blue-100/80 rounded-xl transition-all flex items-center gap-1.5 shadow-sm border border-blue-200 whitespace-nowrap shrink-0"
           >
-            🎬 <span>Video Rehberler</span>
+            <PlayCircle :size="14" class="text-blue-600" />
+            <span>Video Rehberler</span>
           </NuxtLink>
           <NuxtLink 
             to="/abonelik" 
-            class="px-3.5 py-1.5 text-xs font-black text-emerald-800 hover:text-emerald-950 bg-emerald-100/90 hover:bg-emerald-200 rounded-xl transition-all flex items-center gap-1.5 shadow-sm border border-emerald-300 animate-pulse"
+            class="px-3.5 py-2 text-xs font-black text-emerald-800 hover:text-emerald-950 bg-emerald-100/90 hover:bg-emerald-200 rounded-xl transition-all flex items-center gap-1.5 shadow-sm border border-emerald-300 animate-pulse whitespace-nowrap shrink-0"
           >
-            🎁 <span>1 Ay Ücretsiz</span>
+            <Sparkles :size="14" class="text-emerald-600" />
+            <span>1 Ay Ücretsiz</span>
           </NuxtLink>
         </div>
 
         <!-- Sağ: Profilim & İhale Aç / Giriş Butonları -->
-        <div class="hidden sm:flex items-center gap-2">
+        <div class="hidden sm:flex items-center gap-3 shrink-0">
 
           <!-- 🟢 KULLANICI GİRİŞ YAPTIĞINDA: İHALE AÇ BUTONU -->
           <NuxtLink
             v-if="isLoggedIn"
             to="/panel/ihale-olustur"
-            class="flex items-center gap-1.5 px-4 py-2 text-xs font-black rounded-xl text-white transition-all shadow-md bg-[#1EAE4C] hover:bg-[#188C3D] hover:shadow-lg hover:shadow-[#1EAE4C]/20 active:scale-98"
+            class="flex items-center gap-1.5 px-4 py-2 text-xs font-black rounded-xl text-white transition-all shadow-md bg-[#1EAE4C] hover:bg-[#188C3D] hover:shadow-lg hover:shadow-[#1EAE4C]/20 active:scale-98 whitespace-nowrap shrink-0"
           >
             <Plus :size="15" class="text-white stroke-[3]" />
             <span>İhale Aç</span>
@@ -178,7 +207,7 @@ const activeTenders = ref([
           <NuxtLink
             v-if="isLoggedIn"
             to="/panel/ayarlar"
-            class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-black rounded-xl border transition-all text-slate-800 bg-slate-100 hover:bg-slate-200 border-slate-300 shadow-xs"
+            class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-black rounded-xl border transition-all text-slate-800 bg-slate-100 hover:bg-slate-200 border-slate-300 shadow-xs whitespace-nowrap shrink-0"
           >
             <User :size="15" class="text-[#003057]" />
             <span>Profilim</span>
@@ -188,7 +217,7 @@ const activeTenders = ref([
           <NuxtLink
             v-if="isLoggedIn"
             to="/panel"
-            class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-black rounded-xl text-white transition-all shadow-sm bg-[#0F223D] hover:bg-[#003057]"
+            class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-black rounded-xl text-white transition-all shadow-sm bg-[#0F223D] hover:bg-[#003057] whitespace-nowrap shrink-0"
           >
             <LayoutDashboard :size="14" />
             <span>Panel</span>
@@ -199,7 +228,7 @@ const activeTenders = ref([
             v-if="isLoggedIn"
             type="button"
             @click="handleLogout"
-            class="flex items-center gap-1 px-3 py-2 text-xs font-bold rounded-xl text-slate-500 hover:text-red-600 hover:bg-red-50 border border-slate-200 transition-all cursor-pointer"
+            class="flex items-center gap-1 px-3 py-2 text-xs font-bold rounded-xl text-slate-500 hover:text-red-600 hover:bg-red-50 border border-slate-200 transition-all cursor-pointer whitespace-nowrap shrink-0"
           >
             <LogOut :size="14" />
             <span>Çıkış</span>
@@ -209,10 +238,10 @@ const activeTenders = ref([
           <NuxtLink
             v-if="!isLoggedIn"
             to="/uyelik?tab=guest"
-            class="flex items-center gap-1.5 px-3 py-2 text-xs font-bold rounded-xl border transition-all text-slate-700 bg-slate-100/80 hover:bg-slate-200/80 border-slate-300 shadow-xs"
+            class="flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold rounded-xl border transition-all text-slate-700 bg-slate-100/80 hover:bg-slate-200/80 border-slate-300 shadow-xs whitespace-nowrap shrink-0"
             title="Şifresiz Misafir Girişi Yaparak Platformu İnceleyin"
           >
-            <span>👁️</span>
+            <Eye :size="14" class="text-slate-600" />
             <span>Misafir Girişi</span>
           </NuxtLink>
 
@@ -220,7 +249,7 @@ const activeTenders = ref([
           <NuxtLink
             v-if="!isLoggedIn"
             to="/uyelik"
-            class="px-3.5 py-2 text-xs font-bold rounded-xl transition-all text-slate-700 hover:bg-slate-100 border border-slate-200"
+            class="px-4 py-2 text-xs font-bold rounded-xl transition-all text-slate-700 hover:bg-slate-100 border border-slate-200 whitespace-nowrap shrink-0"
           >
             Giriş Yap
           </NuxtLink>
@@ -229,7 +258,7 @@ const activeTenders = ref([
           <NuxtLink
             v-if="!isLoggedIn"
             to="/uyelik"
-            class="flex items-center gap-2 rounded-xl px-4 py-2.5 text-xs font-black text-white transition-all shadow-md bg-[#0F223D] hover:bg-[#003057] border border-slate-700"
+            class="flex items-center gap-2 rounded-xl px-5 py-2.5 text-xs font-black text-white transition-all shadow-md bg-[#0F223D] hover:bg-[#003057] border border-slate-700 whitespace-nowrap shrink-0"
           >
             <span>Kurumsal Hesap Aç</span>
             <ArrowRight :size="13" class="text-emerald-400" />
