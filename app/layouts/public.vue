@@ -135,12 +135,30 @@ const activeTenders = computed(() => {
       <div class="mx-auto flex h-[88px] sm:h-[94px] max-w-[1720px] items-center justify-between px-4 sm:px-6 lg:px-8 xl:px-10 gap-4">
 
         <!-- Sol: Logo (İhaleciBurada.com) -->
-        <NuxtLink to="/" class="flex items-center gap-3.5 hover:opacity-95 transition shrink-0 group py-1">
-          <img 
-            src="/logo.png" 
-            alt="İhaleciBurada.com Logo" 
-            class="h-10 sm:h-12 md:h-13 lg:h-14 max-h-[58px] w-auto object-contain drop-shadow-xs group-hover:scale-103 transition-all duration-200" 
-          />
+        <NuxtLink to="/" class="flex items-center gap-3.5 hover:opacity-95 transition shrink-0 group py-1.5" title="İhaleciBurada.com Ana Sayfa">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 540 120" 
+            class="h-11 sm:h-13 md:h-14 lg:h-15 w-auto max-w-[240px] sm:max-w-[270px] object-contain drop-shadow-xs group-hover:scale-102 transition-transform duration-200" 
+            fill="none" 
+            role="img" 
+            aria-label="İhaleciBurada.com"
+          >
+            <g transform="translate(10, 10)">
+              <!-- Turuncu Nokta -->
+              <circle cx="106" cy="18" r="14" fill="#FF5938" />
+              <!-- 3 Adet Hız Çizgisi -->
+              <path d="M 38 68 L 86 63 L 83 58 L 32 64 Z" fill="#0052FF" />
+              <path d="M 18 84 L 78 78 L 75 73 L 12 80 Z" fill="#0084FF" />
+              <path d="M 0 98 L 70 91 L 67 86 L -4 94 Z" fill="#00C2FF" />
+              <!-- Koyu Lacivert Gövde -->
+              <path d="M 94 33 C 90 33 82 37 81 40 L 89 40 C 97 40 94 48 91 58 L 79 97 C 76 107 84 105 91 101 C 101 95 108 78 114 55 C 117 42 110 33 94 33 Z" fill="#0B1E3B" />
+            </g>
+            <!-- ihaleciburada Metni -->
+            <text x="152" y="84" fill="#0B1E3B" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-1.2px">ihaleciburada</text>
+            <!-- .com Uzantısı -->
+            <text x="430" y="84" fill="#0052FF" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-0.8px">.com</text>
+          </svg>
           <span class="hidden 2xl:inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-black text-[#0052FF] border border-blue-200 shadow-2xs whitespace-nowrap">
             ✓ ONAYLI B2B
           </span>
@@ -488,8 +506,30 @@ const activeTenders = computed(() => {
           <!-- Column 1: Brand Info -->
           <div class="md:col-span-4 flex flex-col gap-5 text-left">
             <div class="flex items-center gap-2.5">
-              <NuxtLink to="/" class="inline-block hover:opacity-95 transition">
-                <img src="/logo-white.png" alt="İhaleciBurada.com Logo" class="h-11 sm:h-12 w-auto object-contain drop-shadow-md" />
+              <NuxtLink to="/" class="inline-block hover:opacity-95 transition group" title="İhaleciBurada.com">
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  viewBox="0 0 540 120" 
+                  class="h-12 sm:h-14 w-auto max-w-[270px] object-contain drop-shadow-md group-hover:scale-102 transition-transform duration-200" 
+                  fill="none" 
+                  role="img" 
+                  aria-label="İhaleciBurada.com"
+                >
+                  <g transform="translate(10, 10)">
+                    <!-- Turuncu Nokta -->
+                    <circle cx="106" cy="18" r="14" fill="#FF5938" />
+                    <!-- 3 Adet Hız Çizgisi -->
+                    <path d="M 38 68 L 86 63 L 83 58 L 32 64 Z" fill="#00C2FF" />
+                    <path d="M 18 84 L 78 78 L 75 73 L 12 80 Z" fill="#0084FF" />
+                    <path d="M 0 98 L 70 91 L 67 86 L -4 94 Z" fill="#00C2FF" />
+                    <!-- Beyaz Gövde -->
+                    <path d="M 94 33 C 90 33 82 37 81 40 L 89 40 C 97 40 94 48 91 58 L 79 97 C 76 107 84 105 91 101 C 101 95 108 78 114 55 C 117 42 110 33 94 33 Z" fill="#FFFFFF" />
+                  </g>
+                  <!-- Beyaz ihaleciburada Metni -->
+                  <text x="152" y="84" fill="#FFFFFF" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-1.2px">ihaleciburada</text>
+                  <!-- Parlak Turkuaz .com Uzantısı -->
+                  <text x="430" y="84" fill="#00C2FF" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-0.8px">.com</text>
+                </svg>
               </NuxtLink>
             </div>
             
