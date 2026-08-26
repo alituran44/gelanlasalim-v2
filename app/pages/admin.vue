@@ -655,7 +655,7 @@ function removeSubmittedBid(index: number) {
           <!-- Header -->
           <div class="px-6 py-5 border-b border-slate-800 flex items-center justify-between">
             <div class="flex items-center gap-2">
-              <img src="/logo.png" alt="İhaleciBurada Logo" class="h-7 w-auto brightness-0 invert" />
+              <img src="/logo-white.png" alt="İhaleciBurada Logo" class="h-8 w-auto object-contain drop-shadow-sm" />
               <span class="text-[8px] bg-emerald-600/30 text-emerald-400 px-1.5 py-0.5 rounded font-mono font-black">ENTERPRISE</span>
             </div>
           </div>

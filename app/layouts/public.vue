@@ -132,14 +132,14 @@ const activeTenders = computed(() => {
 
       <!-- Header -->
       <header class="w-full bg-white border-b transition-all" style="border-color: #E2E8F0;">
-      <div class="mx-auto flex h-[84px] sm:h-[90px] max-w-[1720px] items-center justify-between px-4 sm:px-6 lg:px-8 xl:px-10 gap-4">
+      <div class="mx-auto flex h-[88px] sm:h-[94px] max-w-[1720px] items-center justify-between px-4 sm:px-6 lg:px-8 xl:px-10 gap-4">
 
         <!-- Sol: Logo (İhaleciBurada.com) -->
         <NuxtLink to="/" class="flex items-center gap-3.5 hover:opacity-95 transition shrink-0 group py-1">
           <img 
             src="/logo.png" 
             alt="İhaleciBurada.com Logo" 
-            class="h-14 sm:h-16 md:h-18 lg:h-20 max-h-[72px] w-auto object-contain drop-shadow-sm group-hover:scale-105 transition-all duration-200" 
+            class="h-10 sm:h-12 md:h-13 lg:h-14 max-h-[58px] w-auto object-contain drop-shadow-xs group-hover:scale-103 transition-all duration-200" 
           />
           <span class="hidden 2xl:inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-[10px] font-black text-[#0052FF] border border-blue-200 shadow-2xs whitespace-nowrap">
             ✓ ONAYLI B2B
@@ -488,7 +488,9 @@ const activeTenders = computed(() => {
           <!-- Column 1: Brand Info -->
           <div class="md:col-span-4 flex flex-col gap-5 text-left">
             <div class="flex items-center gap-2.5">
-              <img src="/logo.png" alt="İhaleciBurada Logo" class="h-9 w-auto bg-white p-1 rounded-lg" />
+              <NuxtLink to="/" class="inline-block hover:opacity-95 transition">
+                <img src="/logo-white.png" alt="İhaleciBurada.com Logo" class="h-11 sm:h-12 w-auto object-contain drop-shadow-md" />
+              </NuxtLink>
             </div>
             
             <p class="text-xs leading-relaxed font-medium text-slate-400">

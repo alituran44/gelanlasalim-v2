@@ -132,8 +132,8 @@ const activePath = computed(() => route.path)
 
     <!-- Logo Alanı (Büyük & Belirgin) -->
     <div class="px-5 py-4 border-b flex justify-start items-center" style="border-color: rgba(255,255,255,0.08);">
-      <NuxtLink to="/" class="block w-full">
-        <img src="/logo.png" alt="İhaleciBurada Logo" class="h-14 sm:h-16 w-full max-h-[64px] bg-white p-2 rounded-2xl shadow-sm object-contain" />
+      <NuxtLink to="/" class="block w-full hover:opacity-95 transition">
+        <img src="/logo-white.png" alt="İhaleciBurada.com" class="h-10 sm:h-11 w-auto max-h-[48px] object-contain drop-shadow-md" />
       </NuxtLink>
     </div>
 
