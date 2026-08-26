@@ -626,7 +626,7 @@ function saveProfile() {
         <div v-if="activeSubTab === 'uyelik'" class="flex gap-3 bg-white border border-slate-200 p-2.5 rounded-xl shadow-sm text-left">
           <div class="px-2.5 border-r border-slate-100 last:border-0">
             <span class="text-[8px] font-black text-slate-300 uppercase block">MEVCUT PLAN</span>
-            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">6 Ay Lansman Denemesi</span>
+            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">1 Ay Lansman Denemesi</span>
           </div>
           <div class="px-2.5 border-r border-slate-100 last:border-0">
             <span class="text-[8px] font-black text-slate-300 uppercase block">DÖNEM ÜCRETİ</span>
@@ -634,7 +634,7 @@ function saveProfile() {
           </div>
           <div class="px-2.5 border-r border-slate-100 last:border-0">
             <span class="text-[8px] font-black text-slate-300 uppercase block">BİTİŞ TARİHİ</span>
-            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">22 Şubat 2027 (6 Ay)</span>
+            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">27 Eylül 2026 (1 Ay)</span>
           </div>
           <div class="px-2.5 flex flex-col justify-center">
             <span class="text-[8px] font-black text-slate-300 uppercase block">DURUM</span>
@@ -1323,16 +1323,16 @@ function saveProfile() {
               <div class="space-y-2 max-w-2xl">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest border border-emerald-500/30">
                   <Sparkles :size="13" />
-                  <span>LANSMANA ÖZEL: 6 AY BOYUNCA %100 ÜCRETSİZ DENEME SÜRECİ</span>
+                  <span>LANSMANA ÖZEL: 1 AY BOYUNCA %100 ÜCRETSİZ DENEME SÜRECİ</span>
                 </div>
                 <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  İlk 6 Ay Boyunca Hiçbir Ücret Ödemeden Tüm Sistemi Kullanın!
+                  İlk 1 Ay Boyunca Hiçbir Ücret Ödemeden Tüm Sistemi Kullanın!
                 </h2>
                 <p class="text-xs text-slate-300 leading-relaxed font-medium">
-                  İhaleciBurada platform lansmanına özel olarak tüm alıcı ve tedarikçi firmalarımıza ilk 6 ay boyunca ihale açma, teklif verme, canlı tersine eksiltme ve tüm analiz modülleri <strong>0 ₺</strong> bedelle sunulmaktadır. Kredi kartı gerekmez, 0 komisyon, anında koşulsuz aktivasyon.
+                  İhaleciBurada platform lansmanına özel olarak tüm alıcı ve tedarikçi firmalarımıza ilk 1 ay boyunca ihale açma, teklif verme, canlı tersine eksiltme ve tüm analiz modülleri <strong>0 ₺</strong> bedelle sunulmaktadır. Kredi kartı gerekmez, 0 komisyon, anında koşulsuz aktivasyon.
                 </p>
                 <div class="flex flex-wrap items-center gap-4 pt-1 text-[11px] text-emerald-300 font-bold">
-                  <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> 6 Ay Boyunca 0 ₺</span>
+                  <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> 1 Ay Boyunca 0 ₺</span>
                   <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> Kredi Kartı İstemez</span>
                   <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> Sınırsız İhale & Eksiltme</span>
                   <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> Anında Aktivasyon</span>
@@ -1344,7 +1344,7 @@ function saveProfile() {
                   to="/abonelik"
                   class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition-all hover:scale-105 flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <span>6 AYLIK ÜCRETSİZ DENEMENİZ AKTİF (0 ₺)</span>
+                  <span>1 AYLIK ÜCRETSİZ DENEMENİZ AKTİF (0 ₺)</span>
                   <CheckCircle2 :size="16" />
                 </NuxtLink>
               </div>

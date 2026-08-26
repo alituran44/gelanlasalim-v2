@@ -720,7 +720,7 @@ onMounted(() => {
               class="w-full flex items-center justify-center gap-2 rounded-xl bg-[#1EAE4C] hover:bg-[#188C3D] text-white font-black text-xs py-3.5 shadow-lg shadow-[#1EAE4C]/25 transition cursor-pointer"
             >
               <Sparkles :size="15" />
-              <span>⚡ 6 Ay Ücretsiz: Tek Tıkla Doğrula & Başla</span>
+              <span>⚡ 1 Ay Ücretsiz: Tek Tıkla Doğrula & Başla</span>
             </button>
 
             <NuxtLink 
@@ -746,7 +746,7 @@ onMounted(() => {
               Tamamlanması gereken adımlar var
             </span>
             <p class="text-[10px] text-slate-500 leading-relaxed bg-slate-50 border border-slate-200 p-3 rounded-xl">
-              Evraklarınızı yükleyerek Mavi Rozet alabilir veya 6 aylık ücretsiz denemeyi tek tıkla başlatabilirsiniz.
+              Evraklarınızı yükleyerek Mavi Rozet alabilir veya 1 aylık ücretsiz denemeyi tek tıkla başlatabilirsiniz.
             </p>
           </div>
 

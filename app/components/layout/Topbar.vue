@@ -269,7 +269,7 @@ const pageTitle = computed(() => {
           </NuxtLink>
           <NuxtLink to="/abonelik" @click="showUserMenu=false"
             class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
-            Üyelik Planı (6 Ay Deneme)
+            Üyelik Planı (1 Ay Deneme)
           </NuxtLink>
           <div class="my-1 border-t border-slate-100"></div>
           <button

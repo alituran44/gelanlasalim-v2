@@ -27,10 +27,10 @@ const supportConfig = computed(() => {
   return cmsData.value?.supportSettings || {
     whatsappEnabled: true,
     whatsappNumber: '908503080000',
-    whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale ve 6 ay ücretsiz deneme hakkında bilgi almak istiyorum.',
+    whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale ve 1 ay ücretsiz deneme hakkında bilgi almak istiyorum.',
     aiEnabled: true,
     aiBotName: 'İhaleciBurada AI Asistanı',
-    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel 6 Ay %100 Ücretsiz Deneme süreciniz hakkında size nasıl yardımcı olabilirim?'
+    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel 1 Ay %100 Ücretsiz Deneme süreciniz hakkında size nasıl yardımcı olabilirim?'
   }
 })
 
@@ -113,9 +113,9 @@ function generateBotResponse(userQuery: string) {
   let replyText = ''
   let actionLink: { text: string; url: string } | undefined
 
-  if (q.includes('6 ay') || q.includes('deneme') || q.includes('ücretsiz') || q.includes('fiyat') || q.includes('ücret') || q.includes('bedava')) {
-    replyText = '🎁 Lansmanımıza özel olarak ilk 6 AY boyunca tüm alıcı ve tedarikçi firmalarımıza sistem %100 ÜCRETSİZDİR! Kredi kartı bilgisi gerekmez, 0 komisyon ile sınırsız ihale açabilir ve teklif verebilirsiniz.'
-    actionLink = { text: '6 Ay Ücretsiz Denemeyi Başlat →', url: '/abonelik' }
+  if (q.includes('1 ay') || q.includes('deneme') || q.includes('ücretsiz') || q.includes('fiyat') || q.includes('ücret') || q.includes('bedava')) {
+    replyText = '🎁 Lansmanımıza özel olarak ilk 1 AY boyunca tüm alıcı ve tedarikçi firmalarımıza sistem %100 ÜCRETSİZDİR! Kredi kartı bilgisi gerekmez, 0 komisyon ile sınırsız ihale açabilir ve teklif verebilirsiniz.'
+    actionLink = { text: '1 Ay Ücretsiz Denemeyi Başlat →', url: '/abonelik' }
   } else if (q.includes('ihale aç') || q.includes('ihale nasıl') || q.includes('satın alma') || q.includes('talep')) {
     replyText = '📢 İhale açmak çok kolay! Şartnamenizi ve malzeme miktarınızı belirleyerek dakikalar içinde canlı eksiltmeli B2B ihale başlatabilirsiniz. Doğrulanmış üreticiler size anında belgeli teklif sunar.'
     actionLink = { text: 'Hemen İhale Oluştur →', url: '/panel/ihale-olustur' }
@@ -129,7 +129,7 @@ function generateBotResponse(userQuery: string) {
     replyText = '💬 Müşteri temsilcimizle doğrudan WhatsApp üzerinden görüşmek için aşağıdaki bağlantıyı kullanabilirsiniz. 7/24 hizmetinizdeyiz!'
     actionLink = { text: 'WhatsApp Canlı Desteğe Bağlan →', url: whatsappUrl.value }
   } else {
-    replyText = `Sorunuz için teşekkürler! İhaleciBurada platformunda 6 ay ücretsiz lansman denemesi ile ihale açabilir, kurumsal teklif toplayabilir veya canlı eksiltme yapabilirsiniz. Daha detaylı canlı bilgi için WhatsApp hattımıza da yazabilirsiniz.`
+    replyText = `Sorunuz için teşekkürler! İhaleciBurada platformunda 1 ay ücretsiz lansman denemesi ile ihale açabilir, kurumsal teklif toplayabilir veya canlı eksiltme yapabilirsiniz. Daha detaylı canlı bilgi için WhatsApp hattımıza da yazabilirsiniz.`
     actionLink = { text: 'Tüm Video Rehberleri İncele →', url: '/videolar' }
   }
 
@@ -193,11 +193,11 @@ function generateBotResponse(userQuery: string) {
           </div>
         </div>
 
-        <!-- 6-Month Free Trial Promo Strip inside Chat -->
+        <!-- 1-Month Free Trial Promo Strip inside Chat -->
         <div class="bg-gradient-to-r from-emerald-600 to-teal-700 text-white px-3.5 py-1.5 text-[10px] font-bold flex items-center justify-between shadow-inner">
           <span class="flex items-center gap-1.5">
             <Sparkles :size="12" class="text-amber-300" />
-            <span>Lansmana Özel: 6 Ay %100 Ücretsiz</span>
+            <span>Lansmana Özel: 1 Ay %100 Ücretsiz</span>
           </span>
           <NuxtLink to="/abonelik" @click="isChatOpen = false" class="underline hover:text-amber-200 font-black">
             Aktif Et (0 ₺)
@@ -260,10 +260,10 @@ function generateBotResponse(userQuery: string) {
         <!-- Quick Question Chips -->
         <div class="px-3 py-2 bg-white border-t border-slate-100 flex gap-1.5 overflow-x-auto text-[10px] font-bold text-slate-600 scrollbar-none">
           <button 
-            @click="sendPreset('6 Ay Ücretsiz Deneme nasıl başlatılır?')"
+            @click="sendPreset('1 Ay Ücretsiz Deneme nasıl başlatılır?')"
             class="whitespace-nowrap px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition cursor-pointer"
           >
-            🎁 6 Ay Ücretsiz Deneme
+            🎁 1 Ay Ücretsiz Deneme
           </button>
           <button 
             @click="sendPreset('İhale nasıl açabilirim?')"

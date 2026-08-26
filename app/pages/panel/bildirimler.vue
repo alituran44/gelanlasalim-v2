@@ -25,7 +25,7 @@ const notifications = ref([
     id: 'notif-3',
     type: 'success',
     title: 'Premium Üyelik Aktif Edildi',
-    desc: 'Tebrikler! 6 Aylık B2B Premium Kurumsal üyelik paketiniz başarıyla aktif edildi. Sınırsız ihale açabilir ve teklif verebilirsiniz.',
+    desc: 'Tebrikler! 1 Aylık B2B Premium Kurumsal üyelik paketiniz başarıyla aktif edildi. Sınırsız ihale açabilir ve teklif verebilirsiniz.',
     time: 'Dün 10:15',
     read: true
   },
