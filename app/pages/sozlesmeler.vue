@@ -280,58 +280,67 @@ function printDocument() {
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — TANIMLAR VE HUKUKİ NİTELİK</h3>
-                <p>1.1. <strong>Platform:</strong> Mülkiyeti ve işletmesi Şirket\'e ait olan web sitesi, mobil uygulamalar, API servisleri ve canlı eksiltme sunucularını ifade eder.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — TANIMLAR VE HUKUKİ STATÜ</h3>
+                <p>1.1. <strong>Platform:</strong> Mülkiyeti, fikri hakları ve işletme yetkisi münhasıran Şirket\'e ait olan internet sitesi, mobil arayüzler, API servisleri, bulut tabanlı e-ihale motorları ve bağlı tüm yazılım ekosistemini ifade eder.</p>
                 <p>1.2. <strong>Aracı Hizmet Sağlayıcı:</strong> 6563 Sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun Madde 2/1-d uyarınca, başkalarına ait iktisadi ve ticari faaliyetlerin yapılmasına elektronik ticaret ortamını sağlayan Şirket\'tir.</p>
-                <p>1.3. <strong>Alıcı (İhale Sahibi):</strong> Kendi ticari gereksinimleri doğrultusunda mal, hizmet veya yapım işi satın almak üzere Platform üzerinde şartname yayınlayan onaylı tüzel kişi kullanıcıdır.</p>
-                <p>1.4. <strong>Tedarikçi (Teklif Veren):</strong> Alıcı tarafından açılan ihalelere ticari teklif sunan, fiyat indirim adımlarını takip eden ve eksiltmeye katılan onaylı işletmedir.</p>
-                <p>1.5. <strong>Canlı Eksiltme (Reverse Auction):</strong> Belirlenen süre zarfında tedarikçilerin anlık olarak fiyat düşürdüğü dijital ihale yarışıdır.</p>
+                <p>1.3. <strong>Alıcı (İhale Sahibi):</strong> Kendi ticari gereksinimleri doğrultusunda mal, hizmet veya yapım işi satın almak üzere Platform üzerinde teknik şartname yükleyerek ihale veya tersine canlı eksiltme başlatan onaylı tüzel kişi kullanıcıdır.</p>
+                <p>1.4. <strong>Tedarikçi (Teklif Veren):</strong> Alıcı tarafından açılan ihalelere şartnameye uygun teknik ve mali teklif sunan, fiyat indirim adımlarını takip eden ve eksiltmeye katılan onaylı işletmedir.</p>
+                <p>1.5. <strong>Canlı Eksiltme (Reverse Auction):</strong> Belirlenen ihale süresi zarfında tedarikçilerin anlık olarak fiyat düşürdüğü, en düşük teklifin sistem tarafından otomatik olarak sıralandığı dinamik e-ihale yarışıdır.</p>
+                <p>1.6. <strong>Şartname:</strong> Alıcı tarafından talep edilen mal/hizmetin teknik özelliklerini, teslimat yerini, ödeme vadesini ve kabul kriterlerini belirleyen bağlayıcı teknik dokümandır.</p>
               </section>
 
-              <section class="space-y-2 bg-blue-50/50 p-4 rounded-xl border border-blue-200">
+              <section class="space-y-2 bg-blue-50/60 p-4 rounded-xl border border-blue-200">
                 <h3 class="font-bold text-blue-950 text-sm">MADDE 2 — ARACI HİZMET SAĞLAYICI KONUMU VE TAM SORUMSUZLUK KAYDI</h3>
-                <p>2.1. <strong>Sözleşmenin Tarafı Olmama:</strong> Şirket, Alıcı ile Tedarikçi arasında kurulan hiçbir alım-satım, eser, hizmet veya tedarik sözleşmesinin tarafı, garantörü, kefili, temsilcisi veya acentesi DEĞİLDİR.</p>
-                <p>2.2. <strong>İçerik ve Mal Sorumsuzluğu:</strong> 6563 Sayılı Kanun Madde 9 uyarınca Şirket, Kullanıcılar tarafından sunulan teknik şartnamelerin, tekliflerin, ürün tanımlarının ve görsellerin doğruluğunu, yasallığını veya ayıptan ari olduğunu araştırmakla yükümlü değildir.</p>
-                <p>2.3. <strong>Ayıp, Hasar ve İfa İmkansızlığı:</strong> Tedarik edilen malların kusurlu, hasarlı, eksik çıkması, geç teslim edilmesi, şartnameye uymaması veya teslim edilmemesi durumunda tek muhatap Tedarikçi\'dir. Alıcı, bu nedenlerle Şirket\'ten hiçbir nam altında maddi/manevi tazminat talep edemez.</p>
-                <p>2.4. <strong>Ödeme Temerrüdü:</strong> Alıcı\'nın mal/hizmet bedelini ödememesi veya geciktirmesi halinde tek muhatap Alıcı\'dır. Şirket hiçbir şekilde borçlu veya müteselsil kefil sıfatı taşımaz.</p>
+                <p>2.1. <strong>Sözleşmenin Tarafı Olmama:</strong> Şirket, Alıcı ile Tedarikçi arasında kurulan hiçbir alım-satım, eser, hizmet, taşeronluk veya tedarik sözleşmesinin tarafı, garantörü, kefili, temsilcisi, komisyoncusu veya acentesi DEĞİLDİR. Platform münhasıran dijital bir pazar yeri ve e-ihale zemini sunmaktadır.</p>
+                <p>2.2. <strong>İçerik ve Şartname Sorumsuzluğu:</strong> 6563 Sayılı Kanun Madde 9 ve Elektronik Ticarette Hizmet Sağlayıcılar Hakkında Yönetmelik uyarınca Şirket, Kullanıcılar tarafından sisteme yüklenen teknik şartnamelerin, tekliflerin, ürün tanımlarının, lisansların, patentlerin ve görsellerin doğruluğunu, yasallığını veya ayıptan ari olduğunu araştırmakla yükümlü değildir.</p>
+                <p>2.3. <strong>Ayıp, Hasar, Eksik İfa ve Teslimat Temerrüdü:</strong> Tedarik edilen malların kusurlu, hasarlı, eksik çıkması, gecikmeli teslim edilmesi, şartname kriterlerini karşılamaması veya mücbir sebep olmaksızın hiç teslim edilmemesi durumunda tek hukuki muhatap Tedarikçi\'dir. Alıcı, bu nedenlerle Şirket\'ten hiçbir nam altında maddi, manevi veya cezai tazminat talep edemez.</p>
+                <p>2.4. <strong>Ödeme Temerrüdü ve Tahsilat Riski:</strong> Alıcı\'nın mal/hizmet bedelini ödememesi, vadesinde ifa etmemesi veya çek/senet temerrüdüne düşmesi halinde tek muhatap Alıcı\'dır. Şirket hiçbir şekilde borçlu veya müteselsil kefil sıfatı taşımaz; tahsilat garantisi vermez.</p>
               </section>
 
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — KURUMSAL ÜYELİK, TEMSİL YETKİSİ VE HESAP GÜVENLİĞİ</h3>
                 <p>3.1. Platform yalnızca Türk Ticaret Kanunu uyarınca tescil edilmiş tacirlerin ve tüzel kişilerin kullanımına açıktır. Bireysel tüketici (B2C) işlemlerine kapalıdır.</p>
-                <p>3.2. Üyelik açan kişi, temsil ettiği şirketi ilzam ve taahhüt altına sokmaya hukuken tam yetkili olduğunu beyan eder. Yetkisiz temsil durumunda hesabı açan gerçek kişi Türk Borçlar Kanunu Madde 46 uyarınca şahsen ve müteselsilen sorumludur.</p>
-                <p>3.3. Hesap kullanıcı adı, şifre ve 2FA kodlarının güvenliği münhasıran Kullanıcı\'ya aittir. Kullanıcı hesabından yapılan tüm ihale açma ve teklif verme işlemleri Kullanıcı\'yı kesin olarak bağlar.</p>
+                <p>3.2. Üyelik hesabı açan kişi, temsil ettiği şirketi ilzam ve taahhüt altına sokmaya hukuken tam yetkili olduğunu (İmza Sirküleri veya şirket içi vekaletname ile yetkilendirildiğini) beyan ve taahhüt eder. Yetkisiz temsil durumunda hesabı açan ve işlem yapan gerçek kişi Türk Borçlar Kanunu Madde 46 uyarınca şahsen ve müteselsilen sorumludur.</p>
+                <p>3.3. Hesap kullanıcı adı, şifre, API anahtarı ve 2FA kodlarının güvenliği münhasıran Kullanıcı\'ya aittir. Kullanıcı hesabından yapılan tüm ihale açma, şartname yükleme, teklif verme ve onaylama işlemleri Kullanıcı\'yı kesin olarak bağlar.</p>
+                <p>3.4. Şirket, şüpheli gördüğü hesapları tek taraflı olarak askıya alma, ek resmi evrak talep etme ve kural ihlali durumunda üyeliği derhal sonlandırma yetkisine sahiptir.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — TEKLİFLERİN BAĞLAYICILIĞI VE İHALE SERBESTİSİ</h3>
-                <p>4.1. Alıcı\'nın açtığı ihale hukuken "icaba davet" mahiyetindedir. Alıcı, ihaleyi dilediği aşamada iptal etmekte, ertelemekte veya en düşük teklifi veren yerine teslimat/kalite şartlarına göre başka bir tedarikçiyi tercih etmekte tamamen serbesttir. Bu durum Tedarikçi\'ye herhangi bir tazminat hakkı vermez.</p>
-                <p>4.2. Tedarikçi\'nin canlı eksiltme süresince verdiği her teklif kesin ve geri alınamaz bir ticari taahhüttür (icap). Tedarikçi, ihaleyi kazandıktan sonra teklifinden dönemez, fiyat artıramaz.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — İHALE AÇMA, TEKLİFLERİN BAĞLAYICILIĞI VE SEÇİM SERBESTİSİ</h3>
+                <p>4.1. <strong>İcaba Davet Niteliği:</strong> Alıcı\'nın açtığı ihale hukuken "icaba davet" mahiyetindedir. Alıcı, şartnamede aksi açıkça belirtilmedikçe ihaleyi dilediği aşamada gerekçe göstermeksizin iptal etmekte, ertelemekte veya en düşük teklifi veren yerine teslimat vadesi, kalite veya referans kriterlerine göre başka bir tedarikçiyi tercih etmekte tamamen serbesttir. Bu durum Tedarikçi\'ye herhangi bir tazminat hakkı vermez.</p>
+                <p>4.2. <strong>Teklifin Bağlayıcılığı (Kesin İcap):</strong> Tedarikçi\'nin canlı eksiltme süresince verdiği her fiyat teklifi kesin, geri alınamaz ve bağlayıcı bir ticari taahhüttür (icap). Tedarikçi, ihaleyi kazandıktan sonra haklı bir mücbir sebep olmaksızın teklifinden dönemez, fiyat artıramaz, şartname harici ek maliyet talep edemez.</p>
+                <p>4.3. İhale mutabakatı sağlandığında sistem tarafından otomatik olarak zaman damgalı Dijital İhale Tutanağı düzenlenir ve taraflara e-posta/panel yoluyla iletilir.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 5 — REKABET HUKUKU VE MANİPÜLASYON YASAĞI</h3>
-                <p>5.1. Tedarikçilerin aralarında anlaşarak taban fiyat belirlemesi (kartel), muvazaalı veya yapay teklifler vermesi, aynı sermaye grubuna ait firmalar üzerinden fiyat manipülasyonu yapması kesinlikle yasaktır.</p>
-                <p>5.2. 4054 Sayılı Rekabetin Korunması Hakkında Kanun\'a aykırı hareket eden kullanıcıların hesapları derhal kapatılır, ihaleleri iptal edilir ve yetkili kamu mercilerine (Rekabet Kurumu, Savcılık) bildirimde bulunulur.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 5 — REKABET HUKUKU, KARTEL VE PİYASA MANİPÜLASYONU YASAĞI</h3>
+                <p>5.1. Tedarikçilerin aralarında gizlice anlaşarak taban/tavan fiyat belirlemesi (kartel), muvazaalı veya danışıklı teklifler vermesi, aynı sermaye grubuna veya IP bloğuna ait firmalar üzerinden fiyat manipülasyonu yapması kesinlikle yasaktır.</p>
+                <p>5.2. 4054 Sayılı Rekabetin Korunması Hakkında Kanun ve Türk Ticaret Kanunu haksız rekabet hükümlerine aykırı hareket eden kullanıcıların hesapları derhal kapatılır, teklifleri geçersiz sayılır ve durum Rekabet Kurumu ile Cumhuriyet Başsavcılığı\'na resmi olarak bildirilir.</p>
               </section>
 
-              <section class="space-y-2 bg-amber-50/50 p-4 rounded-xl border border-amber-200">
+              <section class="space-y-2 bg-amber-50/60 p-4 rounded-xl border border-amber-200">
                 <h3 class="font-bold text-amber-950 text-sm">MADDE 6 — SORUMLULUĞUN SINIRLANDIRILMASI (CAP ON LIABILITY)</h3>
-                <p>6.1. <strong>Dolaylı Zararların Reddi:</strong> Şirket; kar kaybı, ciro kaybı, iş durması, veri kaybı, itibar kaybı veya dolaylı/özel hiçbir zarardan kusurlu olsa dahi sorumlu tutulamaz.</p>
-                <p>6.2. <strong>Azami Mali Sorumluluk Tavanı:</strong> Şirket\'in işbu Sözleşme\'den veya Platform\'un kullanımından kaynaklanan kanıtlanmış doğrudan zararlardaki toplam mali sorumluluğu, Kullanıcı\'nın zarara yol açan olaydan önceki son üç (3) ay içinde Şirket\'e fiilen ödediği toplam net abonelik bedeli ile kesin olarak sınırlandırılmıştır.</p>
-                <p>6.3. <strong>Teknik Kesintiler ve Siber Saldırılar:</strong> Telekomünikasyon sağlayıcıları, internet omurga arızaları, elektrik kesintileri, DDOS saldırıları veya donanım çökmeleri nedeniyle ihalenin aksamasından veya teklif iletilememesinden Şirket sorumlu değildir.</p>
+                <p>6.1. <strong>Dolaylı ve Netice Zararlarının Kesin Reddi:</strong> Şirket; Platform\'un kullanımından, kullanılamamasından veya e-ihale süreçlerinin aksamasından kaynaklanan kar kaybı, ciro kaybı, iş durması, ticari itibar kaybı, veri kaybı veya üçüncü şahıslara ödenen cezai şartlar dahil hiçbir dolaylı, arızi veya özel zarardan kusurlu olsa dahi sorumlu tutulamaz.</p>
+                <p>6.2. <strong>Azami Mali Sorumluluk Tavanı:</strong> Şirket\'in işbu Sözleşme\'den veya Platform\'un işleyişinden kaynaklanan kanıtlanmış doğrudan zararlardaki toplam mali sorumluluğu, Kullanıcı\'nın zarara yol açan olaydan önceki son üç (3) ay içinde Şirket\'e fiilen ödediği toplam net abonelik bedeli ile kesin olarak sınırlandırılmıştır.</p>
+                <p>6.3. <strong>Teknik Kesintiler ve İnternet Altyapısı:</strong> Telekomünikasyon sağlayıcıları, internet servis sağlayıcı arızaları, elektrik kesintileri, DDOS saldırıları veya donanım çökmeleri nedeniyle teklif iletilememesinden veya ihalenin kaçırılmasından Şirket sorumlu tutulamaz.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 7 — MÜCBİR SEBEPLER VE TEK TARAFLI DEĞİŞİKLİK</h3>
-                <p>7.1. Doğal afetler, savaş, seferberlik, yangın, salgın hastalık, grev, siber terör, yasal mevzuat değişiklikleri gibi Şirket\'in makul kontrolü dışındaki hallerde Şirket yükümlülüklerini ifa edememekten sorumlu tutulamaz.</p>
-                <p>7.2. Şirket, işbu Sözleşme şartlarını ve platform kurallarını web sitesinde yayınlamak suretiyle dilediği zaman tek taraflı olarak güncelleme hakkını saklı tutar.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 7 — FİKRİ VE SINAİ MÜLKİYET HAKLARI</h3>
+                <p>7.1. Platform üzerindeki tüm kaynak kodları, veri tabanı yapıları, algoritmalar, kullanıcı arayüzleri, ticari markalar ve tasarımlar Şirket\'in münhasır mülkiyetindedir; kopyalanamaz, kaynak koda dönüştürülemez (reverse engineering) ve izinsiz çoğaltılamaz.</p>
+                <p>7.2. İhalelerde paylaşılan teknik şartnameler ve CAD çizimleri yalnızca ilgili ihaleye teklif hazırlama amacıyla kullanılabilir; üçüncü kişilerle paylaşılamaz veya ticari amaçla kopyalanamaz.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 8 — DELİL SÖZLEŞMESİ, UYGULANACAK HUKUK VE YETKİLİ MAHKEME</h3>
-                <p>8.1. <strong>HMK 193 Delil Sözleşmesi:</strong> Taraflar arasında doğabilecek her türlü uyuşmazlıkta Şirket\'in sunucu logları, veri tabanı kayıtları, zaman damgalı sistem günlükleri ve e-posta kayıtları HMK 193 uyarınca münhasır, bağlayıcı ve kesin delil teşkil eder.</p>
-                <p>8.2. <strong>Yetki:</strong> İşbu Sözleşme Türkiye Cumhuriyeti Kanunlarına tabidir. Uyuşmazlıkların çözümünde İstanbul ve Balıkesir Mahkemeleri ile İcra Daireleri münhasıran yetkilidir.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 8 — MÜCBİR SEBEPLER VE TEK TARAFLI DEĞİŞİKLİK YETKİSİ</h3>
+                <p>8.1. Doğal afetler, deprem, yangın, sel, savaş, seferberlik, siber terör, genel internet omurgası çökmesi ve yasal mevzuat değişiklikleri gibi Şirket\'in makul kontrolü dışındaki mücbir sebep hallerinde Şirket yükümlülüklerini ifa edememekten sorumlu tutulamaz.</p>
+                <p>8.2. Şirket, işbu Sözleşme şartlarını ve platform kurallarını web sitesinde yayınlamak suretiyle dilediği zaman tek taraflı olarak güncelleme hakkını saklı tutar. Güncellenen şartlar sitede yayınlandığı tarihte yürürlüğe girer.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 9 — DELİL SÖZLEŞMESİ (HMK 193), UYGULANACAK HUKUK VE YETKİLİ MAHKEME</h3>
+                <p>9.1. <strong>HMK 193 Delil Sözleşmesi:</strong> Taraflar arasında doğabilecek her türlü ticari ve hukuki uyuşmazlıkta Şirket\'in sunucu logları, veri tabanı kayıtları, zaman damgalı sistem günlükleri, e-posta yazışmaları ve sistem kayıtları Hukuk Muhakemeleri Kanunu Madde 193 uyarınca münhasır, bağlayıcı ve kesin delil teşkil eder.</p>
+                <p>9.2. <strong>Uygulanacak Hukuk ve Yetki:</strong> İşbu Sözleşme Türkiye Cumhuriyeti Kanunlarına tabidir. Uyuşmazlıkların çözümünde İstanbul ve Balıkesir Mahkemeleri ile İcra Daireleri münhasıran yetkilidir.</p>
               </section>
             </div>
           </article>
@@ -339,7 +348,7 @@ function printDocument() {
           <!-- 2. GİZLİLİK POLİTİKASI (PRIVACY POLICY) -->
           <article v-if="activeTab === 'gizlilik'" class="space-y-6">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">TİCARİ SIR KORUMASI</span>
+              <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">TİCARİ SIR & ENDÜSTRİYEL VERİ</span>
               <span class="px-3 py-1 bg-emerald-50 text-emerald-800 font-mono text-xs font-bold rounded-lg border border-emerald-200">TLS 1.3 & AES-256</span>
               <span class="text-xs text-slate-400">Revizyon: 2026.08</span>
             </div>
@@ -349,27 +358,36 @@ function printDocument() {
             </h1>
             
             <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-              {{ 'Bu Gizlilik Politikası, İhaleciBurada platformu üzerinden işlenen kurumsal verilerin, şartnamelerin, tekliflerin ve ticari sırların korunma esaslarını, güvenlik sınırlarını ve platform işleticisinin sorumluluk muafiyetlerini düzenler.' }}
+              {{ 'Bu Gizlilik ve Ticari Sırların Korunması Politikası ("Politika"), İhaleciBurada B2B Elektronik İhale Platformu ("Platform") üzerinde işlem yapan Alıcı ve Tedarikçilerin ticari sır niteliğindeki maliyet verileri, şartnameleri, CAD çizimleri, teklif birim fiyatları ve sistem işlem loglarının korunması, işlenmesi, şifrelenmesi ve saklanmasına ilişkin kuralları ve platform işleticisinin sorumluluk muafiyetlerini düzenler.' }}
             </p>
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 1 — İŞLENEN BİLGİ KAPSAMI VE ANONİMLİK</h3>
-                <p>1.1. Şirket unvanı, VKN, MERSİS, yetkili kimlik bilgileri, ihale şartnameleri, teknik çizimler, birim fiyatlar ve ödeme kayıtları platform operasyonu için zorunlu olarak işlenir.</p>
-                <p>1.2. <strong>Anonim Teklif Güvencesi:</strong> Canlı eksiltme sırasında tedarikçi unvanları sistem tarafından maskelenir (Firma A, Firma B vb.); böylece tarafsız rekabet ve fiyat gizliliği korunur.</p>
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 1 — TOPLANAN TİCARİ VE TEKNİK VERİLERİN KAPSAMI</h3>
+                <p>1.1. <strong>Kurumsal Kimlik ve Doğrulama Verileri:</strong> Şirket ticaret unvanı, Vergi Kimlik Numarası (VKN), Vergi Dairesi, MERSİS numarası, Ticaret Sicil Gazetesi kuruluş ve pay dökümleri, Noter Onaylı İmza Sirküleri, Faaliyet Belgesi ve şirket yetkilisinin kurumsal iletişim bilgileri.</p>
+                <p>1.2. <strong>İhale ve Satın Alma Şartname Verileri:</strong> Alıcı tarafından yüklenen malzeme listeleri, metraj cetvelleri, teknik şartnameler, CAD/DWG teknik çizim dosyaları, iş programları, kalite toleransları ve tahmini satın alma bütçeleri.</p>
+                <p>1.3. <strong>Teklif, İndirim ve Maliyet Verileri:</strong> Tedarikçiler tarafından sunulan malzeme birim fiyatları, iskonto oranları, teslim süreleri, nakliye/lojistik şartları, ödeme vadeleri, banka IBAN bilgileri ve Escrow bloke hesap mutabakat kayıtları.</p>
+                <p>1.4. <strong>Sistem Güvenlik ve Denetim Logları:</strong> 5651 Sayılı Kanun uyarınca zaman damgalı IP adresleri, oturum açma/kapama zamanları, verilen tekliflerin nanosaniye bazlı zaman damgaları, parola değişiklikleri ve 2FA doğrulama işlem kayıtları.</p>
+              </section>
+
+              <section class="space-y-2 bg-blue-50/60 p-4 rounded-xl border border-blue-200">
+                <h3 class="font-bold text-blue-950 text-sm">BÖLÜM 2 — KAPALI ZARF VE ANONİM TEKLİF GİZLİLİK ZIRHI</h3>
+                <p>2.1. <strong>Tedarikçi Anonimliği Kuralı:</strong> Canlı eksiltme süresince yarışan tedarikçilerin ticari unvanları sistem tarafından otomatik olarak maskelenir (Firma-1, Firma-2, vb.). Hiçbir katılımcı, diğer rakip firmaların kim olduğunu, kurumsal unvanını veya detaylı maliyet analizini canlı ekranda göremez.</p>
+                <p>2.2. <strong>Alıcıya Sunum:</strong> Alıcı, yalnızca ihale tamamlandıktan sonra veya şartnamede açıkça belirtilen teklif açma gün ve saatinde teklif veren tüm tedarikçilerin kimlik ve detaylı fiyat analiz tablolarına erişebilir.</p>
+                <p>2.3. <strong>Veri Satışı Yasağı:</strong> Şirket personeli ve yöneticileri, platformda oluşan hiçbir ihale fiyatını, tedarikçi teklifini veya satın alma şartnamesini üçüncü şahıslara, rakip platformlara veya reklam ağlarına satmayacağını, kiralamayacağını ve paylaşmayacağını açıkça taahhüt eder.</p>
               </section>
 
               <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 2 — ŞARTNAME VE FİKRİ MÜLKİYET SORUMSUZLUK KAYDI</h3>
-                <p>2.1. Alıcı tarafından sisteme yüklenen şartname, teknik çizim veya formüllerin üçüncü tarafların patent, telif veya ticari sır haklarını ihlal etmesinden kaynaklanan her türlü hukuki ve cezai sorumluluk münhasıran Alıcı\'ya aittir.</p>
-                <p>2.2. Şirket, yüklenen şartnameleri önceden incelemekle veya doğrulamakla yükümlü değildir. İhlal iddiası durumunda "Uyar-Kaldır" (Notice-and-Takedown) mekanizması işletilir.</p>
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 3 — ŞARTNAME, PATENT VE TELİF SORUMSUZLUK KAYDI</h3>
+                <p>3.1. Alıcı tarafından sisteme yüklenen teknik şartname, formül, patentli tasarım veya CAD çizimlerinin üçüncü tarafların sınai mülkiyet haklarını, patentlerini veya ticari sırlarını ihlal etmesinden kaynaklanan her türlü hukuki, cezai ve idari sorumluluk münhasıran Alıcı\'ya aittir.</p>
+                <p>3.2. Şirket, yüklenen şartnamelerin içeriğini önceden incelemek, patent veri tabanlarında araştırmak veya doğrulamakla yükümlü değildir. Hak ihlali iddiasında bulunan hak sahipleri "Uyar-Kaldır" mekanizması kapsamında <strong>ihalecib@gmail.com</strong> adresine noter onaylı delilleriyle başvurduğunda ilgili içerik derhal incelemeye alınır.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 3 — VERİ GÜVENLİĞİ VE SİBER RİSKLER</h3>
-                <p>3.1. Platform uçtan uca TLS 1.3 şifreleme ve ISO 27001 sertifikalı Tier-3 veri merkezi sunucuları ile korunur.</p>
-                <p>3.2. Kullanıcı\'nın kendi donanımındaki virüsler, şifre sızdırması veya oltalama (phishing) saldırıları sonucu uğrayacağı veri kayıplarından Şirket sorumlu tutulamaz.</p>
-                <p>3.3. Mahkeme, savcılık, MASAK veya yetkili idari mercilerin yasal talepleri doğrultusunda bilgi paylaşılması gizlilik ihlali sayılmaz.</p>
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 4 — KRİPTOGRAFİK GÜVENLİK STANDARTLARI VE SİBER RİSKLER</h3>
+                <p>4.1. Tüm web trafiği ve API veri iletimi modern TLS 1.3 şifreleme protokolleri ile güvence altına alınmıştır. Durağan veritabanı kayıtları AES-256 algoritmasıyla şifrelenerek Türkiye sınırları içerisindeki ISO 27001 sertifikalı Tier-3 veri merkezlerinde saklanmaktadır.</p>
+                <p>4.2. <strong>Kullanıcı İhmal Muafiyeti:</strong> Kullanıcı\'nın kendi personeline ait şifrelerin çalınması, 2FA kodlarının paylaşılması, kullanıcı cihazındaki virüs/trojan/keylogger yazılımları veya oltalama (phishing) saldırıları neticesinde yaşanabilecek bilgi sızıntılarından Şirket sorumlu tutulamaz.</p>
+                <p>4.3. <strong>Yasal Mercilere Açıklama:</strong> Mahkeme kararları, Cumhuriyet Başsavcılığı müzekkereleri, MASAK, Rekabet Kurumu veya BTK gibi yetkili resmi kurumların kanuna uygun yazılı talepleri doğrultusunda bilgi verilmesi gizlilik ihlali teşkil etmez.</p>
               </section>
             </div>
           </article>
@@ -378,7 +396,7 @@ function printDocument() {
           <article v-if="activeTab === 'kvkk'" class="space-y-6">
             <div class="flex flex-wrap items-center gap-2">
               <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">6698 SAYILI KVKK</span>
-              <span class="px-3 py-1 bg-purple-50 text-purple-800 font-mono text-xs font-bold rounded-lg border border-purple-200">VERİ SORUMLUSU AYDINLATMA</span>
+              <span class="px-3 py-1 bg-purple-50 text-purple-800 font-mono text-xs font-bold rounded-lg border border-purple-200">VERİ SORUMLUSU AYDINLATMA METNİ</span>
               <span class="text-xs text-slate-400">Versiyon: 2026.08</span>
             </div>
 
@@ -387,32 +405,42 @@ function printDocument() {
             </h1>
             
             <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-              {{ '6698 Sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") Madde 10 uyarınca, veri sorumlusu sıfatıyla İhaleciBurada platform işleticisi tarafından işlenen kişisel verilere ilişkin kurumsal aydınlatma metnidir.' }}
+              {{ '6698 Sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") Madde 10 uyarınca, veri sorumlusu sıfatıyla İhaleciBurada B2B platform işleticisi tarafından işlenen kişisel verilere ilişkin aydınlatma metnidir.' }}
             </p>
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — VERİ SORUMLUSUNUN KİMLİĞİ VE TEMSİLCİSİ</h3>
-                <p>Veri Sorumlusu: İhaleciBurada B2B Elektronik İhale ve Ticaret Platformu İşleticisi</p>
-                <p>İrtibat E-Posta: <strong>ihalecib@gmail.com</strong> | DPO Hattı: <strong>0850 308 00 00</strong></p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — VERİ SORUMLUSUNUN KİMLİĞİ VE İRTİBAT KANALLARI</h3>
+                <p>1.1. Veri Sorumlusu: İhaleciBurada B2B Elektronik İhale ve Ticaret Platformu İşleticisi.</p>
+                <p>1.2. Adres: İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</p>
+                <p>1.3. E-Posta: <strong>ihalecib@gmail.com</strong> | DPO İletişim: <strong>0850 308 00 00</strong></p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — İŞLENEN KİŞİSEL VERİLER VE HUKUKİ SEBEPLER</h3>
-                <p>2.1. Şirket yetkililerine ve personeline ait Ad-Soyad, TCKN, kurumsal e-posta, telefon, imza örneği ve IP kayıtları işlenmektedir.</p>
-                <p>2.2. Hukuki Sebepler: KVKK Madde 5/2-c (Sözleşmenin kurulması ve ifası), 5/2-ç (Kanuni yükümlülüklerin yerine getirilmesi) ve 5/2-f (Meşru menfaat ve işlem güvenliği).</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — İŞLENEN KİŞİSEL VERİ KATEGORİLERİ</h3>
+                <p>2.1. <strong>Kimlik Verisi:</strong> Şirket temsilcisi veya yetkili çalışanının Adı, Soyadı, T.C. Kimlik Numarası, İmza Sirkülerindeki imza örneği.</p>
+                <p>2.2. <strong>İletişim Verisi:</strong> Kurumsal e-posta adresi, cep telefonu numarası, şirket resmi tebligat adresi, KEP adresi.</p>
+                <p>2.3. <strong>İşlem Güvenliği Verisi:</strong> IP adresleri, port bilgileri, şifrelenmiş parola hashleri, oturum çerezleri, sisteme giriş-çıkış zaman damgaları.</p>
+                <p>2.4. <strong>Finansal ve Hukuki İşlem Verisi:</strong> Banka hesap IBAN bilgisi, e-Fatura kayıtları, ödeme dekontları, ihale tutanakları ve adli müzekkere kayıtları.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — VERİ AKTARIMI VE SAKLAMA SÜRELERİ</h3>
-                <p>3.1. Kişisel veriler yalnızca kanunen yetkili kamu kurumlarına, BDDK/TCMB lisanslı ödeme kuruluşlarına ve e-Fatura entegratörlerine mevzuatın çizdiği sınırlar dahilinde aktarılır.</p>
-                <p>3.2. Ticari işlem kayıtları Türk Ticaret Kanunu ve Vergi Usul Kanunu gereğince on (10) yıl süreyle güvenli arşivde saklanır.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — KİŞİSEL VERİ İŞLEMENİN HUKUKİ SEBEPLERİ VE AMAÇLARI</h3>
+                <p>3.1. <strong>Sözleşmenin Kurulması ve İfası (KVKK Madde 5/2-c):</strong> Üyelik kaydının oluşturulması, ihalelerin açılması, tekliflerin kabul edilmesi, abonelik paketlerinin faturalandırılması ve Escrow ödeme mutabakatının sağlanması.</p>
+                <p>3.2. <strong>Kanuni Yükümlülüklerin Yerine Getirilmesi (KVKK Madde 5/2-ç):</strong> 6563 sayılı Kanun, 6102 sayılı TTK, 213 sayılı VUK ve 5651 sayılı İnternet Ortamında Yapılan Yayınların Düzenlenmesi Kanunu gereği yasal log ve muhasebe kayıtlarının tutulması.</p>
+                <p>3.3. <strong>Meşru Menfaat ve Güvenlik (KVKK Madde 5/2-f):</strong> Canlı eksiltmelerde hile, kartel ve manipülasyonun engellenmesi, sistem performansının optimize edilmesi ve siber güvenlik altyapısının korunması.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — İLGİLİ KİŞİNİN HAKLARI VE BAŞVURU YÖNTEMİ</h3>
-                <p>4.1. Veri sahipleri KVKK Madde 11 uyarınca bilgi talep etme, düzeltme, silme ve zararın giderilmesini talep etme hakkına sahiptir.</p>
-                <p>4.2. Başvurular kayıtlı kurumsal e-posta veya KEP adresi üzerinden yazılı olarak iletildiğinde en geç 30 gün içinde ücretsiz sonuçlandırılır.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — KİŞİSEL VERİLERİN AKTARILDIĞI TARAFLAR VE SAKLAMA SÜRELERİ</h3>
+                <p>4.1. Kişisel verileriniz yalnızca; kanunen yetkili kamu kurum ve kuruluşlarına (BTK, Gelir İdaresi, Mahkemeler, Savcılıklar), TCMB/BDDK lisanslı ödeme kuruluşlarına (İyzico, PayTR vb.) ve bağımsız mali müşavirlik/denetim firmalarına yasal çerçevede aktarılır.</p>
+                <p>4.2. Kişisel veriler ve ticari işlem günlükleri, Türk Ticaret Kanunu ve Vergi Usul Kanunu gereğince işlem tarihinden itibaren on (10) yıl boyunca saklanır; sürenin bitiminde re\'sen silinir veya anonim hale getirilir.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 5 — İLGİLİ KİŞİNİN HAKLARI VE BAŞVURU USULÜ (KVKK MADDE 11)</h3>
+                <p>5.1. Veri sahipleri; verilerinin işlenip işlenmediğini öğrenme, işlenme amacına uygun kullanılıp kullanılmadığını bilme, yurt içinde/dışında aktarıldığı 3. kişileri bilme, eksik/yanlış işlenmişse düzeltilmesini isteme, silinmesini/yok edilmesini talep etme ve kanuna aykırı işleme sebebiyle zarara uğraması halinde zararın giderilmesini talep etme hakkına sahiptir.</p>
+                <p>5.2. Başvurular; Veri Sorumlusuna Başvuru Usul ve Esasları Hakkında Tebliğ uyarınca kimlik teyidi yapılabilen kayıtlı kurumsal e-posta veya noter kanalıyla iletildiğinde en geç 30 gün içinde gerekçeli olarak ücretsiz yanıtlanır.</p>
               </section>
             </div>
           </article>
@@ -420,7 +448,7 @@ function printDocument() {
           <!-- 4. İHALE VE EKSİLTME KURALLARI (REVERSE AUCTION RULES) -->
           <article v-if="activeTab === 'ihale-kurallari'" class="space-y-6">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="px-3 py-1 bg-red-50 text-red-800 font-mono text-xs font-bold rounded-lg border border-red-200">MANİPÜLASYON YASAĞI</span>
+              <span class="px-3 py-1 bg-red-50 text-red-800 font-mono text-xs font-bold rounded-lg border border-red-200">MANİPÜLASYON & KARTEL YASAĞI</span>
               <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">DİNAMİK SÜRE UZATMA (+2 DK)</span>
               <span class="text-xs text-slate-400">Standart: 2026.08</span>
             </div>
@@ -431,21 +459,34 @@ function printDocument() {
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">KURAL 1 — ŞARTNAME YAYINLAMA VE DEĞİŞİKLİK YASAĞI</h3>
-                <p>1.1. Alıcı, satın alma kalemlerini, teknik kriterleri, teslimat şartlarını ve ödeme vadesini sisteme eksiksiz girmek zorundadır.</p>
-                <p>1.2. İhale canlı yayına girdikten sonra şartnamede esaslı değişiklik yapılamaz; değişiklik gerekiyorsa ihale iptal edilir ve yeni ihale açılır.</p>
+                <h3 class="font-bold text-slate-900 text-sm">KURAL 1 — İHALE BAŞLATMA, ŞARTNAME YÜKLEME VE TAVAN FİYAT</h3>
+                <p>1.1. Alıcı firma; talep ettiği ürün/hizmetin teknik özelliklerini, malzeme adet/metraj bilgilerini, teslimat adresini, nakliye sorumluluğunu, kabul şartlarını ve başlangıç tavan bütçesini eksiksiz olarak sisteme girmelidir.</p>
+                <p>1.2. İhale canlı yayına alındıktan ve tedarikçilerden ilk teklifler toplanmaya başlandıktan sonra şartnamede esaslı değişiklik yapılamaz. Esaslı değişiklik gereken durumlarda ihale iptal edilerek revize şartnameyle yeniden açılır.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">KURAL 2 — DİNAMİK SÜRE UZATMA (ANTI-SNIPING) ALGORİTMASI</h3>
-                <p>2.1. İhalenin son 2 dakikası içinde yeni bir en iyi teklif sunulursa, tüm tedarikçilerin eşit şartlarda rekabet edebilmesi için kalan süre otomatik olarak +2 dakika uzatılır.</p>
-                <p>2.2. Bu uzatma mekanizması teknik algoritma tarafından yönetilir; Kullanıcılar bu uzatmalara veya sunucu saatine itiraz edemez.</p>
+                <h3 class="font-bold text-slate-900 text-sm">KURAL 2 — CANLI EKSİLTME MEKANİZMASI VE MİNİMUM İNDİRİM ADIMI</h3>
+                <p>2.1. Canlı eksiltmede tedarikçiler başlangıç tavan fiyatından aşağı doğru en az sistem tarafından belirlenen veya Alıcı tarafından tanımlanan "Minimum İndirim Adımı" tutarı kadar indirim yaparak teklif sunabilir.</p>
+                <p>2.2. Sistemde teklif veren firma, anlık olarak kendisinden daha iyi teklif verilip verilmediğini ve sıralamasını görür; ancak diğer teklif sahiplerinin unvanlarını göremez.</p>
               </section>
 
-              <section class="space-y-2 bg-red-50/50 p-4 rounded-xl border border-red-200">
-                <h3 class="font-bold text-red-950 text-sm">KURAL 3 — CAYMA, İPTAL VE ZARAR TAZMİNİ SORUMSUZLUĞU</h3>
-                <p>3.1. <strong>Tedarikçinin Cayması:</strong> Canlı eksiltmeyi kazandıktan sonra taahhüdünü yerine getirmeyen Tedarikçi, Alıcı\'nın uğrayacağı doğrudan zararlardan şahsen sorumludur. Platform bu uyuşmazlıkta taraf veya tazminat ödeyicisi değildir.</p>
-                <p>3.2. <strong>Alıcının İptali:</strong> Alıcı, ihale sürecini veya sonucunu dilediği zaman iptal edebilir; Tedarikçiler teklif hazırlama gideri veya beklenen kar gerekçesiyle Platform\'dan tazminat talep edemez.</p>
+              <section class="space-y-2 bg-blue-50/60 p-4 rounded-xl border border-blue-200">
+                <h3 class="font-bold text-blue-950 text-sm">KURAL 3 — DİNAMİK SÜRE UZATMA (ANTI-SNIPING) KURALI</h3>
+                <p>3.1. İhalenin bitimine son iki (2) dakika kala yeni bir en iyi teklif sunulursa, sistem otomatik olarak ihale süresini +2 dakika daha uzatır.</p>
+                <p>3.2. Amaç, son saniyelerde bot veya anlık spekülatif hamlelerle diğer dürüst tedarikçilerin teklif verme hakkının engellenmesini (sniping) önlemek ve Alıcı için en rekabetçi piyasa fiyatını elde etmektir. Katılımcılar sunucu saatine ve bu uzatmalara itiraz edemez.</p>
+              </section>
+
+              <section class="space-y-2 bg-red-50/60 p-4 rounded-xl border border-red-200">
+                <h3 class="font-bold text-red-950 text-sm">KURAL 4 — TEKLİFİN BAĞLAYICILIĞI, CAYMA YASAĞI VE ZARAR TAZMİNİ</h3>
+                <p>4.1. <strong>Geri Dönülemez Ticari Taahhüt:</strong> Tedarikçinin canlı eksiltmede sisteme girdiği her fiyat teklifi bağlayıcı bir ticari taahhüttür (icap). İhaleyi kazanan tedarikçi teklifinden cayamaz, fiyat artıramaz, şartnameye aykırı şart öne süremez.</p>
+                <p>4.2. <strong>Tedarikçinin Cayması Halinde Sorumluluk:</strong> İhaleyi kazandıktan sonra taahhüdünü yerine getirmeyen Tedarikçi, Alıcı\'nın bu nedenle ikinci en iyi teklif sahibiyle çalışmak zorunda kalmasından doğacak fiyat farkı zararını (müspet zarar) doğrudan Alıcı\'ya tazmin etmekle yükümlüdür.</p>
+                <p>4.3. <strong>Platformun Sorumsuzluğu:</strong> Alıcı ile Tedarikçi arasındaki bu cayma uyuşmazlığında Platform tazminat ödeyicisi veya kefil değildir.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">KURAL 5 — İHALE SONUÇLANDIRMA VE ALICININ SEÇİM SERBESTİSİ</h3>
+                <p>5.1. Alıcı, canlı eksiltme sonunda en düşük teklifi veren tedarikçiyi seçmek zorunda değildir; teslimat vadesi, finansal güç, referanslar veya teknik uygunluk kriterlerine göre teklifler arasından serbestçe seçim yapabilir veya ihaleyi sonuçsuz bırakabilir.</p>
+                <p>5.2. İhalenin iptal edilmesi veya başka bir firmanın tercih edilmesi nedeniyle tedarikçiler Alıcı\'dan veya Platform\'dan teklif hazırlık masrafı veya kar mahrumiyeti talep edemez.</p>
               </section>
             </div>
           </article>
@@ -465,20 +506,28 @@ function printDocument() {
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — TARAFLAR VE TİCARİ NİTELİK</h3>
-                <p>1.1. İşbu Sözleşme Türk Ticaret Kanunu hükümleri uyarınca iki tacir arasında akdedilmiştir. 6502 Sayılı Tüketici Kanunu hükümleri ve genel tüketici cayma hakları uygulanmaz.</p>
-                <p>1.2. Hizmet Konusu: B2B ihale açma, teklif yönetimi, canlı eksiltme modülü ve analitik raporlara dijital abonelik erişimidir.</p>
+                <p>1.1. <strong>Hizmet Sağlayıcı:</strong> İhaleciBurada B2B Elektronik İhale ve Ticaret Platformu İşleticisi.</p>
+                <p>1.2. <strong>Abone (Müşteri):</strong> Platform üzerinde kurumsal üyelik hesabı açan, ihale açma veya teklif verme hakkı sağlayan abonelik paketini satın alan tüzel kişi veya tacir.</p>
+                <p>1.3. <strong>B2B Niteliği ve Tüketici Kanunu İstisnası:</strong> İşbu Sözleşme iki tacir arasında akdedilmiş ticari bir sözleşmedir. 6502 Sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümleri (14 günlük genel tüketici cayma hakkı) işbu sözleşmeye UYGULANMAZ.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — FİYATLANDIRMA, 1 AY DENEME VE FATURALANDIRMA</h3>
-                <p>2.1. Platformda 1 Ay Lansman Denemesi 0 ₺ olarak sunulur. Devamında 3, 6 ve 9 aylık kurumsal paketler seçilebilir.</p>
-                <p>2.2. Abonelik ücretleri kredi kartı veya havale ile tahsil edilir. Faturalar ödeme onayını takiben e-Fatura/e-Arşiv olarak düzenlenir. TTK Madde 18/3 uyarınca 8 gün içinde itiraz edilmeyen faturalar kesinleşir.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — ABONELİK PAKETLERİ, 1 AY LANSMAN DENEMESİ VE FATURALANDIRMA</h3>
+                <p>2.1. Platformda 1 Ay Lansman Denemesi 0 ₺ olarak sunulur. Süre bitiminde kurumsal kullanıcılar 3 Aylık Çeyrek Paket, 6 Aylık Yarı Yıl Paketi veya 9 Aylık Kurumsal Paket seçeneklerinden birini tercih edebilir.</p>
+                <p>2.2. Abonelik ücretleri kredi kartı (3D Secure), havale/EFT veya kurumsal Sanal POS kanallarıyla peşin tahsil edilir. Faturalar ödeme onayını takiben yedi (7) iş günü içinde e-Fatura/e-Arşiv olarak düzenlenerek kurumsal e-posta adresine iletilir.</p>
+                <p>2.3. TTK Madde 18/3 uyarınca faturanın tebliğinden itibaren sekiz (8) gün içinde itiraz edilmeyen faturalar kesinleşir.</p>
               </section>
 
               <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — DİJİTAL HİZMET İFASI VE İADE İSTİSNASI</h3>
-                <p>3.1. Yazılım ve erişim hizmeti satın alma anında derhal ifa edildiğinden, aktif döneme ait abonelik bedellerinde kısmi veya tam iade yapılmaz.</p>
-                <p>3.2. Kullanıcı dilediği zaman panel üzerinden otomatik yenilemeyi iptal edebilir; iptal bir sonraki dönemden itibaren geçerli olur.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — DİJİTAL HİZMETİN ANINDA İFASI VE İADE İSTİSNASI</h3>
+                <p>3.1. Kurumsal üyelik paketine ait yazılım erişim yetkileri, ihale modülleri ve analitik araçlar ödeme onaylandığı anda derhal ifa edilerek kullanıma açıldığından, aktif fatura dönemine ait abonelik bedellerinde kısmi veya tam iade yapılmaz.</p>
+                <p>3.2. Kullanıcı dilediği zaman yönetim paneli üzerinden otomatik yenilemeyi durdurabilir; bu durumda paket süresi sonuna kadar kullanım devam eder ve sonraki dönem karttan çekim yapılmaz.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — FESİH, HESAP DONDURMA VE YETKİLİ MAHKEME</h3>
+                <p>4.1. Kullanıcı\'nın platform kurallarını, etik ilkeleri veya rekabet mevzuatını ihlal etmesi halinde Şirket aboneliği tek taraflı olarak derhal feshetme ve hesabı dondurma hakkına sahiptir.</p>
+                <p>4.2. Uyuşmazlıklarda İstanbul ve Balıkesir Mahkemeleri ile İcra Daireleri münhasıran yetkilidir.</p>
               </section>
             </div>
           </article>
@@ -491,15 +540,21 @@ function printDocument() {
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 1 — KULLANILAN ÇEREZ TÜRLERİ</h3>
-                <p>1.1. <strong>Zorunlu Çerezler:</strong> Kullanıcı girişi, oturum kimliği, CSRF koruması ve websocket canlı teklif akışı için şarttır; kapatılamaz.</p>
-                <p>1.2. <strong>İşlevsel Çerezler:</strong> Dil seçimi (TR/EN), filtreleme ve UI tercihlerini depolar.</p>
-                <p>1.3. <strong>Performans Çerezleri:</strong> Sayfa hızları ve sistem hatalarını tespit ederek kesintisiz ihale deneyimi sağlar.</p>
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 1 — ÇEREZLERİN KULLANIM AMACI VE MEKANİZMASI</h3>
+                <p>1.1. Çerezler (Cookies), platformumuzu ziyaret ettiğinizde tarayıcınız aracılığıyla cihazınıza kaydedilen küçük metin dosyalarıdır. Çerezler; oturum güvenliğinin sağlanması, canlı websocket bağlantısının kopmaması, dil ve tema tercihlerinizin hatırlanması ve sistem hızının optimize edilmesi amacıyla kullanılır.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 2 — SORUMLULUK SINIRI</h3>
-                <p>2.1. Zorunlu çerezlerin tarayıcı tarafından engellenmesi halinde canlı ihale teklif motorunun çalışmamasından Platform sorumlu değildir.</p>
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 2 — KULLANILAN ÇEREZ KATEGORİLERİ</h3>
+                <p>2.1. <strong>Zorunlu ve Güvenlik Çerezleri:</strong> Kullanıcı girişi, 2FA kimlik doğrulama tokenları ve CSRF (Cross-Site Request Forgery) saldırı önleme mekanizmaları için teknik olarak şarttır; kapatılamaz.</p>
+                <p>2.2. <strong>İşlevsellik Çerezleri:</strong> Dil seçimi (TR/EN), pazar yeri filtreleme tercihleri ve ihale listeleme görünüm ayarlarını depolar.</p>
+                <p>2.3. <strong>Performans ve Hata Analiz Çerezleri:</strong> Sayfa yükleme hızlarını, websocket gecikme sürelerini ve sunucu yanıt sürelerini anonim olarak ölçümleyerek kesintisiz ihale altyapısı sağlar.</p>
+              </section>
+
+              <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 3 — ÇEREZ YÖNETİMİ VE TEKNİK SORUMSUZLUK</h3>
+                <p>3.1. Tarayıcı ayarlarınızdan (Chrome, Edge, Safari, Firefox) çerez izinlerini dilediğiniz an değiştirebilir, silebilir veya engelleyebilirsiniz.</p>
+                <p>3.2. Zorunlu oturum çerezlerinin kullanıcı tarafından engellenmesi durumunda ihale paneline giriş yapılamamasından, canlı eksiltme fiyatlarının anlık güncellenememesinden veya teklif iletim gecikmelerinden Platform sorumlu tutulamaz.</p>
               </section>
             </div>
           </article>
@@ -518,16 +573,28 @@ function printDocument() {
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">STANDART 1 — ZORUNLU RESMİ EVRAKLAR</h3>
-                <p>1.1. Tedarikçiler; Vergi Levhası, Ticaret Sicil Gazetesi, Noter Onaylı İmza Sirküleri ve Faaliyet Belgesini sisteme yüklemekle yükümlüdür.</p>
-                <p>1.2. Sahte veya tahrif edilmiş evrak sunan firmaların hesapları derhal kapatılır ve Cumhuriyet Savcılığı\'na suç duyurusunda bulunulur.</p>
+                <h3 class="font-bold text-slate-900 text-sm">STANDART 1 — ZORUNLU KURUMSAL BELGELER VE ŞEKLİ DOĞRULAMA</h3>
+                <p>1.1. İhaleciBurada'da "Mavi Onaylı Tedarikçi" rozeti almak için firmaların şu resmi evrakları sisteme yüklemesi şarttır:</p>
+                <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                  <li>Son takvim yılına ait onaylı Vergi Levhası</li>
+                  <li>Ticaret Sicil Gazetesi kuruluş ve son pay/temsil dağılım nüshası</li>
+                  <li>Şirket yetkililerine ait Noter Onaylı İmza Sirküleri</li>
+                  <li>Bağlı bulunulan Ticaret veya Sanayi Odası Faaliyet Belgesi (Son 6 ay)</li>
+                </ul>
+                <p>1.2. Sahte, süresi dolmuş veya tahrif edilmiş evrak sunan firmaların üyelikleri derhal iptal edilir ve TCK Madde 204 uyarınca Cumhuriyet Başsavcılığı'na suç duyurusunda bulunulur.</p>
               </section>
 
-              <section class="space-y-2 bg-amber-50/50 p-4 rounded-xl border border-amber-200">
-                <h3 class="font-bold text-amber-950 text-sm">STANDART 2 — MAVİ ONAY ROZETİNİN HUKUKİ ANLAMI (ÖNEMLİ BEYAN)</h3>
-                <p>2.1. Platform üzerindeki <strong>"Mavi Onay Rozeti"</strong>, yalnızca firmanın ibraz ettiği resmi evrakların şeklen incelendiğini gösterir.</p>
-                <p>2.2. Mavi Rozet; firmanın mali gücüne, iflas etmeyeceğine, malı ayıpsız teslim edeceğine veya ticari güvenilirliğine Şirket\'in <strong>kefil veya garantör olduğu anlamına KESİNLİKLE GELMEZ</strong>.</p>
-                <p>2.3. Alıcı, sipariş vermeden önce tedarikçi ile ilgili kendi ticari ve hukuki basiretini (TTK Madde 18/2) göstermekle yükümlüdür.</p>
+              <section class="space-y-2 bg-amber-50/60 p-4 rounded-xl border border-amber-200">
+                <h3 class="font-bold text-amber-950 text-sm">STANDART 2 — MAVİ ONAY ROZETİNİN HUKUKİ NİTELİĞİ (KRİTİK SORUMSUZLUK BEYANI)</h3>
+                <p>2.1. Platform üzerindeki <strong>"Mavi Onay Rozeti"</strong>, yalnızca firmanın ibraz ettiği resmi evrakların şeklen sisteme yüklendiğini ve vergi dairesi kaydının faal olduğunu gösterir.</p>
+                <p>2.2. Mavi Rozet; tedarikçi firmanın mali gücüne, iflas etmeyeceğine, malı ayıpsız teslim edeceğine, borçlarını ödeyeceğine veya ticari güvenilirliğine Şirket\'in <strong>kefil, garantör veya sigortacı olduğu anlamına KESİNLİKLE GELMEZ</strong>.</p>
+                <p>2.3. Alıcı firma, sipariş vermeden ve sözleşme akdetmeden önce Türk Ticaret Kanunu Madde 18/2 uyarınca basiretli bir tacir gibi hareket ederek tedarikçi hakkında kendi istihbaratını ve değerlendirmesini yapmakla yükümlüdür.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">STANDART 3 — İŞ AHLAKI, ÇEVRE VE YASAL UYUM TAAHHÜDÜ</h3>
+                <p>3.1. Tedarikçiler; çocuk işçi çalıştırmama, çevre koruma mevzuatına tam uyum, iş sağlığı ve güvenliği kuralları ile rüşvet/yolsuzlukla mücadele ilkelerine bağlı kalacaklarını peşinen taahhüt eder.</p>
+                <p>3.2. Sahte ürün, standart dışı malzeme veya şartnameye aykırı sevkiyat yapan tedarikçilerin Mavi Rozeti derhal iptal edilir ve sistem geneline ihlal kaydı işlenir.</p>
               </section>
             </div>
           </article>
@@ -535,8 +602,8 @@ function printDocument() {
           <!-- 8. SLA (SERVICE LEVEL AGREEMENT) -->
           <article v-if="activeTab === 'sla'" class="space-y-6">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="px-3 py-1 bg-emerald-50 text-emerald-800 font-mono text-xs font-bold rounded-lg border border-emerald-200">%99.9 UPTIME</span>
-              <span class="px-3 py-1 bg-slate-100 text-slate-800 font-mono text-xs font-bold rounded-lg border border-slate-200">HİZMET KREDİSİ TAZMİNİ</span>
+              <span class="px-3 py-1 bg-emerald-50 text-emerald-800 font-mono text-xs font-bold rounded-lg border border-emerald-200">%99.9 UPTIME TAAHHÜDÜ</span>
+              <span class="px-3 py-1 bg-slate-100 text-slate-800 font-mono text-xs font-bold rounded-lg border border-slate-200">YALNIZCA HİZMET KREDİSİ TAZMİNİ</span>
               <span class="text-xs text-slate-400">SLA Sürüm: 2026.08</span>
             </div>
 
@@ -546,15 +613,22 @@ function printDocument() {
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 1 — ERİŞİLEBİLİRLİK VE İSTİSNALAR</h3>
-                <p>1.1. Platform, aylık bazda en az <strong>%99.9</strong> kesintisizlik oranı taahhüt eder.</p>
-                <p>1.2. Önceden duyurulan planlı bakımlar (01:00-05:00 gece penceresi), telekomünikasyon altyapı arızaları, siber saldırılar (DDoS) ve mücbir sebepler kesinti süresi hesabına dahil edilmez.</p>
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 1 — KAPSAM VE %99.9 ERİŞİLEBİLİRLİK TAAHHÜDÜ</h3>
+                <p>1.1. İhaleciBurada, e-ihale motorları, canlı eksiltme teklif kabul sunucuları ve Escrow API ağ geçitlerinin aylık takvim bazında en az <strong>%99.9</strong> kesintisiz çalışacağını taahhüt eder.</p>
+                <p>1.2. <strong>Kesinti Hesabına Dahil Edilmeyen Haller:</strong> Önceden duyurulan planlı gece bakımları (01:00 - 05:00), telekomünikasyon omurga arızaları, genel internet erişim problemleri, siber saldırılar (DDoS) ve mücbir sebep halleri SLA kesinti süresine dahil edilmez.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 2 — HATA SINIFLANDIRMASI VE MÜDAHALE SÜRELERİ</h3>
+                <p>2.1. <strong>Kritik Seviye 1 (Canlı eksiltme motorunun durması veya ödeme geçidi hatası):</strong> Müdahale süresi &lt; 15 dakika, hedef çözüm süresi &lt; 2 saat.</p>
+                <p>2.2. <strong>Yüksek Seviye 2 (Tekil sayfa, filtre veya raporlama arızası):</strong> Müdahale süresi &lt; 1 saat, hedef çözüm süresi &lt; 6 saat.</p>
+                <p>2.3. <strong>Normal Seviye 3 (Genel soru, kılavuz ve kullanım desteği):</strong> Mesai saatleri içinde &lt; 2 saat içinde geri dönüş.</p>
               </section>
 
               <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 2 — TAZMİNAT SINIRI (YALNIZCA HİZMET KREDİSİ)</h3>
-                <p>2.1. SLA oranının %99.0\'ın altına düşmesi halinde Şirket nakit tazminat ödemez; yalnızca abonenin bir sonraki fatura dönemine mahsuben %10 Hizmet Kredisi tanımlar.</p>
-                <p>2.2. Kesintiden doğduğu iddia edilen kar kaybı veya ticari kayıplar için hiçbir tazminat talebinde bulunulamaz.</p>
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 3 — SLA İHLALİNDE TEK TAZMİNAT: HİZMET KREDİSİ (NAKİT İADE YAPILMAZ)</h3>
+                <p>3.1. Mücbir sebepler hariç aylık erişilebilirlik oranının %99.0\'ın altına düşmesi durumunda Şirket nakit tazminat ödemez; yalnızca abonenin bir sonraki fatura dönemine mahsuben %10 Hizmet Kredisi tanımlar.</p>
+                <p>3.2. Kesintiden doğduğu iddia edilen kar kaybı, kaçırılan ihale fırsatı veya ticari zararlar için hiçbir tazminat talebinde bulunulamaz.</p>
               </section>
             </div>
           </article>
@@ -567,14 +641,21 @@ function printDocument() {
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">İLKE 1 — BGYS VE ŞİFRELEME STANDARTLARI</h3>
-                <p>1.1. Platform altyapısı ISO/IEC 27001 standardında işletilmektedir. Veritabanı ve yedekleme sistemleri AES-256 algoritmasıyla şifrelenir.</p>
-                <p>1.2. Sistem bağımsız güvenlik şirketleri tarafından periyodik olarak sızma testlerine (pentest) tabi tutulur.</p>
+                <h3 class="font-bold text-slate-900 text-sm">İLKE 1 — BGYS STANDARTLARI VE VERİ ŞİFRELEME</h3>
+                <p>1.1. İhaleciBurada platform altyapısı, ISO/IEC 27001:2022 uluslararası bilgi güvenliği yönetim sistemi standartlarına tam uyumlu olarak işletilmektedir.</p>
+                <p>1.2. Veritabanı ve yedekleme sistemleri AES-256 algoritmasıyla şifrelenir. API ve web trafiği uçtan uca TLS 1.3 protokolleri ile korunur.</p>
+                <p>1.3. Sistem bağımsız yetkili siber güvenlik firmaları tarafından periyodik olarak sızma testlerine (pentest) tabi tutulur.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">İLKE 2 — KULLANICI GÜVENLİK YÜKÜMLÜLÜKLERİ</h3>
-                <p>2.1. Kullanıcı, 2FA kodlarını ve API anahtarlarını gizli tutmakla yükümlüdür. Yetkisiz erişim tespit edildiğinde derhal Platform\'a bildirilmelidir.</p>
+                <h3 class="font-bold text-slate-900 text-sm">İLKE 2 — ERİŞİM KONTROLÜ, 2FA VE KULLANICI YÜKÜMLÜLÜĞÜ</h3>
+                <p>2.1. Tüm kurumsal panel girişlerinde SMS OTP ve e-Devlet kimlik doğrulama katmanları desteklenmektedir.</p>
+                <p>2.2. Kullanıcı, 2FA kodlarını, şifrelerini ve API anahtarlarını gizli tutmakla yükümlüdür. Yetkisiz giriş şüphesi durumunda derhal Platform\'a yazılı bildirim yapılmalıdır.</p>
+              </section>
+
+              <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <h3 class="font-bold text-slate-900 text-sm">İLKE 3 — SİBER OLAY BİLDİRİMİ VE USOM/KVKK ENTEGRASYONU</h3>
+                <p>3.1. Olası bir siber güvenlik olayı tespit edildiğinde, mevzuatın öngördüğü yasal süreler içinde Ulusal Siber Olaylara Müdahale Merkezi (USOM) ve Kişisel Verileri Koruma Kurumu\'na (KVKK) resmi bildirimler yapılır.</p>
               </section>
             </div>
           </article>
@@ -592,27 +673,28 @@ function printDocument() {
             </h1>
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
-              <section class="space-y-2 bg-emerald-50/50 p-4 rounded-xl border border-emerald-200">
+              <section class="space-y-2 bg-emerald-50/60 p-4 rounded-xl border border-emerald-200">
                 <h3 class="font-bold text-emerald-950 text-sm">MADDE 1 — PLATFORMUN BANKA OLMADIĞI VURGUSU (TCMB & BDDK KORUMASI)</h3>
-                <p>1.1. Şirket bir banka, finansal kuruluş veya ödeme kuruluşu DEĞİLDİR. Platform mevduat toplamaz, faiz işletmez ve kredi vermez.</p>
-                <p>1.2. Güvenli Havuz (Escrow) ve Otomatik Para Bölme (Split Payment) işlemleri, TCMB ve BDDK tarafından lisanslanmış yetkili ödeme kuruluşları (PayTR, İyzico vb.) aracılığıyla yürütülür.</p>
+                <p>1.1. Şirket bir banka, finansal kuruluş veya ödeme kuruluşu DEĞİLDİR. Platform mevduat toplamaz, faiz işletmez, kredi vermez ve emanet para tutmaz.</p>
+                <p>1.2. Güvenli Havuz (Escrow) ve Otomatik Para Bölme (Split Payment) işlemleri; 6493 Sayılı Kanun kapsamında TCMB ve BDDK tarafından lisanslanmış yetkili ödeme kuruluşları (PayTR, İyzico vb.) aracılığıyla yürütülür.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — BLOKE VE SERBEST BIRAKMA MEKANİZMASI</h3>
-                <p>2.1. İhalede mutabakat sağlandığında Alıcı ihale bedelini lisanslı havuz hesabına yatırır; tutar lisanslı kuruluş nezdinde bloke edilir.</p>
-                <p>2.2. Tedarikçi malı sevk edip sevk irsaliyesini sisteme yükler. Alıcı mal kabul onayını verdiğinde havuzdaki bloke çözülür; platform aracılık komisyonu kesilerek kalan hakediş Tedarikçi IBAN\'ına aktarılır.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — BLOKE, SEVKİYAT VE SERBEST BIRAKMA AŞAMALARI</h3>
+                <p>2.1. <strong>Havuz Bloke Aşaması:</strong> İhalede mutabakat sağlandığında Alıcı ihale bedelini lisanslı havuz hesabına yatırır; tutar lisanslı kuruluş güvencesinde bloke edilir.</p>
+                <p>2.2. <strong>Sevkiyat Aşaması:</strong> Tedarikçi malı şartnameye uygun sevk ederek sevk irsaliyesi/kargo takip belgesini sisteme yükler.</p>
+                <p>2.3. <strong>Mal Kabul ve Hakediş Aktarımı:</strong> Alıcı malı muayene edip sistem üzerinden mal kabul onayını verdiğinde havuzdaki bloke çözülür; platform hizmet aracılık komisyonu kesildikten sonra kalan net hakediş tutarı otomatik olarak Tedarikçinin banka IBAN hesabına aktarılır.</p>
               </section>
 
               <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — ONAY SONRASI SORUMSUZLUK VE UYUŞMAZLIK HAKEM HEYETİ</h3>
-                <p>3.1. <strong>Onay Sonrası Sorumsuzluk:</strong> Alıcı mal kabul onayını verdikten sonra blokaj çözülmüş olacağından, sonradan ortaya çıkacak gizli ayıp veya eksiklikler nedeniyle Platform\'dan geri ödeme talep edilemez. Alıcı doğrudan Tedarikçi\'ye yasal başvuru yapmalıdır.</p>
-                <p>3.2. <strong>Uyuşmazlık Bildirimi:</strong> Mal kabul onayından önce Alıcı uyuşmazlık bildirirse havuzdaki bloke çözülmez; Platform Escrow Hakem Heyeti teknik inceleme başlatır. Hakem Heyeti kararı yalnızca havuzdaki tutarın idari olarak yönlendirilmesine ilişkin olup mahkeme hükmü yerine geçmez.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — ONAY SONRASI TAM SORUMSUZLUK VE UYUŞMAZLIK HAKEM HEYETİ</h3>
+                <p>3.1. <strong>Onay Sonrası Sorumsuzluk:</strong> Alıcı mal kabul onayını verdikten sonra blokaj çözülmüş olacağından, sonradan ortaya çıkacak gizli ayıp, eksiklik veya gecikme cezaları nedeniyle Platform\'dan geri ödeme talep edilemez. Alıcı doğrudan Tedarikçi\'ye yasal başvuru yapmalıdır.</p>
+                <p>3.2. <strong>Uyuşmazlık Bildirimi:</strong> Mal kabul onayından önce Alıcı uyuşmazlık bildirirse havuzdaki bloke çözülmez; Platform Escrow Hakem Heyeti teknik inceleme başlatır. Hakem Heyeti kararı yalnızca havuzdaki tutarın idari olarak serbest bırakılması veya iadesine ilişkin olup mahkeme hükmü yerine geçmez.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — VERGİSEL SORUMLULUKLAR</h3>
-                <p>4.1. Satışa konu mal/hizmetin asıl faturası, KDV, tevkifat ve stopaj beyanları münhasıran Tedarikçi ile Alıcı arasındadır. Şirket yalnızca tahsil ettiği aracılık hizmet komisyonu için e-Fatura düzenler.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — VERGİSEL VE FATURA SORUMLULUKLARI</h3>
+                <p>4.1. Satışa konu mal/hizmetin asıl faturası, KDV, tevkifat ve stopaj beyanları münhasıran Tedarikçi ile Alıcı arasındadır. Şirket yalnızca tahsil ettiği aracılık hizmet komisyonu için Tedarikçiye e-Fatura düzenler.</p>
               </section>
             </div>
           </article>
@@ -622,7 +704,7 @@ function printDocument() {
             <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ 'Hakkımızda, Misyon ve Vizyonumuz' }}</h1>
             
             <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-              {{ 'İhaleciBurada, kurumsal satın alma ve tedarik süreçlerini şeffaf, rekabetçi ve tamamen dijital bir borsaya dönüştüren bağımsız B2B e-ihale platformudur.' }}
+              {{ 'İhaleciBurada, Türkiye genelindeki kurumsal satın alma ve tedarik operasyonlarını şeffaf, rekabetçi ve tamamen dijital bir borsaya dönüştüren bağımsız B2B e-ihale platformudur.' }}
             </p>
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">

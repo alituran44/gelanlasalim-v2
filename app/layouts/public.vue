@@ -501,16 +501,16 @@ const activeTenders = computed(() => {
     <!-- Footer -->
     <footer class="bg-[#0F223D] text-slate-300 border-t border-slate-800">
       <div class="mx-auto max-w-7xl px-6 py-16">
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-10">
           
-          <!-- Column 1: Brand Info -->
-          <div class="md:col-span-4 flex flex-col gap-5 text-left">
+          <!-- Column 1: Brand Info (md:col-span-3) -->
+          <div class="md:col-span-3 flex flex-col gap-4 text-left">
             <div class="flex items-center gap-2.5">
               <NuxtLink to="/" class="inline-block hover:opacity-95 transition group" title="İhaleciBurada.com">
                 <svg 
                   xmlns="http://www.w3.org/2000/svg" 
                   viewBox="0 0 540 120" 
-                  class="h-12 sm:h-14 w-auto max-w-[270px] object-contain drop-shadow-md group-hover:scale-102 transition-transform duration-200" 
+                  class="h-11 sm:h-12 w-auto max-w-[240px] object-contain drop-shadow-md group-hover:scale-102 transition-transform duration-200" 
                   fill="none" 
                   role="img" 
                   aria-label="İhaleciBurada.com"
@@ -538,76 +538,122 @@ const activeTenders = computed(() => {
             </p>
 
             <!-- Status badges -->
-            <div class="flex flex-wrap gap-2 pt-1">
-              <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-950/80 border border-blue-500/30 px-2.5 py-1 text-[9px] font-black text-[#00C2FF] uppercase tracking-wide">
-                <span class="h-1.5 w-1.5 rounded-full bg-[#00C2FF]"></span>
-                KVKK Kapsamında
+            <div class="flex flex-wrap gap-1.5 pt-1">
+              <span class="inline-flex items-center gap-1 rounded-md bg-blue-950/80 border border-blue-500/30 px-2 py-0.5 text-[8.5px] font-black text-[#00C2FF] uppercase tracking-wide">
+                <span class="h-1 w-1 rounded-full bg-[#00C2FF]"></span>
+                KVKK Uyumlu
               </span>
-              <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-950/80 border border-blue-500/30 px-2.5 py-1 text-[9px] font-black text-[#00C2FF] uppercase tracking-wide">
-                <span class="h-1.5 w-1.5 rounded-full bg-[#00C2FF]"></span>
-                HTTPS/TLS 1.3 Şifreli
+              <span class="inline-flex items-center gap-1 rounded-md bg-blue-950/80 border border-blue-500/30 px-2 py-0.5 text-[8.5px] font-black text-[#00C2FF] uppercase tracking-wide">
+                <span class="h-1 w-1 rounded-full bg-[#00C2FF]"></span>
+                TLS 1.3 Şifreli
+              </span>
+              <span class="inline-flex items-center gap-1 rounded-md bg-emerald-950/80 border border-emerald-500/30 px-2 py-0.5 text-[8.5px] font-black text-emerald-400 uppercase tracking-wide">
+                <span class="h-1 w-1 rounded-full bg-emerald-400"></span>
+                TCMB Escrow
               </span>
             </div>
 
             <!-- Social Links -->
-            <div class="flex gap-2.5 mt-2">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-700 flex items-center justify-center text-slate-400 hover:text-[#00C2FF] hover:border-[#00C2FF] transition-all">
-                <Facebook :size="14" />
+            <div class="flex gap-2 mt-1">
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="h-7 w-7 rounded-lg border border-slate-700 flex items-center justify-center text-slate-400 hover:text-[#00C2FF] hover:border-[#00C2FF] transition-all">
+                <Facebook :size="13" />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-700 flex items-center justify-center text-slate-400 hover:text-[#00C2FF] hover:border-[#00C2FF] transition-all">
-                <Instagram :size="14" />
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="h-7 w-7 rounded-lg border border-slate-700 flex items-center justify-center text-slate-400 hover:text-[#00C2FF] hover:border-[#00C2FF] transition-all">
+                <Instagram :size="13" />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-700 flex items-center justify-center text-slate-400 hover:text-[#00C2FF] hover:border-[#00C2FF] transition-all">
-                <Linkedin :size="14" />
+              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="h-7 w-7 rounded-lg border border-slate-700 flex items-center justify-center text-slate-400 hover:text-[#00C2FF] hover:border-[#00C2FF] transition-all">
+                <Linkedin :size="13" />
               </a>
             </div>
           </div>
 
-          <!-- Column 2: Platform Links -->
-          <div class="md:col-span-2 flex flex-col gap-4 text-left">
+          <!-- Column 2: Platform Links (md:col-span-2) -->
+          <div class="md:col-span-2 flex flex-col gap-3 text-left">
             <h4 class="text-xs font-black uppercase text-[#00C2FF] tracking-wider">PLATFORM</h4>
-            <div class="flex flex-col gap-4 sm:gap-3 text-[11px] font-bold text-slate-300">
-              <a href="#nasil-calisir" class="hover:text-[#00C2FF] transition-colors py-1">Nasıl Çalışır</a>
-              <a href="#ihale-gezgini" class="hover:text-[#00C2FF] transition-colors py-1">İhale Marketi</a>
-              <NuxtLink to="/panel/ilanlarim" class="hover:text-[#00C2FF] transition-colors py-1">İhalelerim</NuxtLink>
-              <NuxtLink to="/abonelik" class="hover:text-[#00C2FF] transition-colors py-1">{{ t('pricing') }}</NuxtLink>
-              <NuxtLink to="/entegrasyonlar" class="hover:text-[#00C2FF] transition-colors py-1">Entegrasyonlar</NuxtLink>
+            <div class="flex flex-col gap-2.5 text-[11px] font-bold text-slate-300">
+              <a href="/#nasil-calisir" class="hover:text-[#00C2FF] transition-colors py-0.5">Nasıl Çalışır</a>
+              <a href="/#ihale-gezgini" class="hover:text-[#00C2FF] transition-colors py-0.5">İhale Marketi</a>
+              <NuxtLink to="/panel/ilanlarim" class="hover:text-[#00C2FF] transition-colors py-0.5">İhalelerim</NuxtLink>
+              <NuxtLink to="/abonelik" class="hover:text-[#00C2FF] transition-colors py-0.5">{{ t('pricing') }}</NuxtLink>
+              <NuxtLink to="/entegrasyonlar" class="hover:text-[#00C2FF] transition-colors py-0.5">Entegrasyonlar</NuxtLink>
+              <NuxtLink to="/yardim" class="hover:text-[#00C2FF] transition-colors py-0.5">Yardım Merkezi</NuxtLink>
             </div>
           </div>
 
-          <!-- Column 3: Company Links -->
+          <!-- Column 3: Company Links (md:col-span-2) -->
+          <div class="md:col-span-2 flex flex-col gap-3 text-left">
+            <h4 class="text-xs font-black uppercase text-[#00C2FF] tracking-wider">KURUMSAL</h4>
+            <div class="flex flex-col gap-2.5 text-[11px] font-bold text-slate-300">
+              <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="hover:text-[#00C2FF] transition-colors py-0.5">Hakkımızda & Vizyon</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=kariyer" class="hover:text-[#00C2FF] transition-colors py-0.5">Kariyer Fırsatları</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-[#00C2FF] transition-colors py-0.5">Blog & Analizler</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=is-ortakligi" class="hover:text-[#00C2FF] transition-colors py-0.5">İş Ortaklığı Programı</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=basin" class="hover:text-[#00C2FF] transition-colors py-0.5">Basın Odası & Medya</NuxtLink>
+            </div>
+          </div>
+
+          <!-- Column 4: Legal & Contracts Hub (md:col-span-3) -->
+          <div class="md:col-span-3 flex flex-col gap-3 text-left">
+            <h4 class="text-xs font-black uppercase text-[#00C2FF] tracking-wider flex items-center gap-1.5">
+              <span>HUKUKİ & SÖZLEŞMELER</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-900/60 text-blue-300 font-mono">10 Sözleşme</span>
+            </h4>
+            <div class="grid grid-cols-1 gap-1.5 text-[11px] font-medium text-slate-300">
+              <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
+                <span class="text-[#00C2FF] text-[9px]">▪</span> Kullanım Şartları (MSA)
+              </NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
+                <span class="text-[#00C2FF] text-[9px]">▪</span> Gizlilik & Ticari Sır Politikası
+              </NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
+                <span class="text-[#00C2FF] text-[9px]">▪</span> KVKK Aydınlatma & DPA
+              </NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=ihale-kurallari" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
+                <span class="text-[#00C2FF] text-[9px]">▪</span> Canlı Eksiltme Kuralları
+              </NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
+                <span class="text-[#00C2FF] text-[9px]">▪</span> Mesafeli Satış & Abonelik
+              </NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=cerezler" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
+                <span class="text-[#00C2FF] text-[9px]">▪</span> Çerez (Cookie) Politikası
+              </NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=tedarikci-uyum" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
+                <span class="text-[#00C2FF] text-[9px]">▪</span> Tedarikçi KYC & Uyum Beyanı
+              </NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=sla" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
+                <span class="text-[#00C2FF] text-[9px]">▪</span> Servis Seviyesi Taahhüdü (SLA)
+              </NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=bilgi-guvenligi" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
+                <span class="text-[#00C2FF] text-[9px]">▪</span> Bilgi Güvenliği (ISO 27001)
+              </NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=escrow" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
+                <span class="text-[#00C2FF] text-[9px]">▪</span> Escrow Güvenli Havuz Sözleşmesi
+              </NuxtLink>
+            </div>
+          </div>
+
+          <!-- Column 5: Contact details (md:col-span-2) -->
           <div class="md:col-span-2 flex flex-col gap-4 text-left">
-            <h4 class="text-xs font-black uppercase text-[#00C2FF] tracking-wider">ŞİRKET</h4>
-            <div class="flex flex-col gap-4 sm:gap-3 text-[11px] font-bold text-slate-300">
-              <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="hover:text-[#00C2FF] transition-colors py-1">Hakkımızda</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=kariyer" class="hover:text-[#00C2FF] transition-colors py-1">Kariyer</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-[#00C2FF] transition-colors py-1">Blog & Haberler</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=is-ortakligi" class="hover:text-[#00C2FF] transition-colors py-1">İş Ortaklığı</NuxtLink>
-              <NuxtLink to="/yardim" class="hover:text-[#00C2FF] transition-colors py-1">Yardım Merkezi</NuxtLink>
-            </div>
-          </div>
-
-          <!-- Column 4: Contact details -->
-          <div class="md:col-span-4 flex flex-col gap-5 text-left">
-            <div class="space-y-3">
-              <h4 class="text-xs font-black uppercase tracking-wider text-[#00C2FF]">İLETİŞİM & DESTEK</h4>
+            <div class="space-y-2">
+              <h4 class="text-xs font-black uppercase tracking-wider text-[#00C2FF]">İLETİŞİM</h4>
               <p class="text-[11px] leading-relaxed text-slate-400 font-medium whitespace-pre-line">
                 İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye
               </p>
-              <div class="text-[11px] font-bold text-slate-200 space-y-2">
+              <div class="text-[11px] font-bold text-slate-200 space-y-1.5 pt-1">
                 <a href="mailto:ihalecib@gmail.com" class="block hover:text-[#00C2FF] py-0.5">
                   ihalecib@gmail.com
                 </a>
-                <div class="pt-1 text-[#FF5938] font-bold">
+                <div class="pt-0.5 text-[#FF5938] font-bold">
                   📞 0850 308 00 00
                 </div>
               </div>
             </div>
 
-            <div class="space-y-1">
+            <div class="space-y-1 pt-1">
               <h4 class="text-xs font-black uppercase text-[#00C2FF] tracking-wider">DESTEK SAATLERİ</h4>
-              <p class="text-[11px] text-slate-400 font-medium leading-relaxed">
-                Hafta İçi: 09:00 - 18:00 | Cumartesi: 10:00 - 14:00
+              <p class="text-[10.5px] text-slate-400 font-medium leading-relaxed">
+                Hafta İçi: 09:00 - 18:00 <br />
+                Cumartesi: 10:00 - 14:00
               </p>
             </div>
           </div>
@@ -616,12 +662,29 @@ const activeTenders = computed(() => {
 
         <hr class="border-slate-800 my-10" />
 
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-6 text-[10px] text-slate-400 font-black uppercase tracking-wider">
-          <div>© 2026 İhaleciBurada.com — Tüm Hakları Saklıdır.</div>
-          <div class="flex flex-wrap gap-x-6 gap-y-3 justify-center sm:justify-end">
-            <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-[#00C2FF] transition-colors py-1">KVKK Metni</NuxtLink>
-            <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-[#00C2FF] transition-colors py-1">Kullanım Koşulları</NuxtLink>
-            <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-[#00C2FF] transition-colors py-1">Gizlilik Politikası</NuxtLink>
+        <!-- Bottom Legal Bar -->
+        <div class="flex flex-col lg:flex-row items-center justify-between gap-6 text-[10px] text-slate-400 font-medium">
+          <div class="font-bold tracking-wide text-center lg:text-left">
+            © 2026 İhaleciBurada.com — B2B Canlı Eksiltme & Satın Alma Platformu. Tüm Hakları Saklıdır.
+          </div>
+          
+          <!-- Quick Legal Links Bar -->
+          <div class="flex flex-wrap gap-x-4 gap-y-2 justify-center lg:justify-end text-[10.5px] text-slate-400 font-medium">
+            <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-[#00C2FF] transition-colors">Kullanım Koşulları</NuxtLink>
+            <span class="text-slate-700">•</span>
+            <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-[#00C2FF] transition-colors">Gizlilik</NuxtLink>
+            <span class="text-slate-700">•</span>
+            <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-[#00C2FF] transition-colors">KVKK</NuxtLink>
+            <span class="text-slate-700">•</span>
+            <NuxtLink to="/sozlesmeler?tab=ihale-kurallari" class="hover:text-[#00C2FF] transition-colors">İhale Kuralları</NuxtLink>
+            <span class="text-slate-700">•</span>
+            <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-[#00C2FF] transition-colors">Mesafeli Satış</NuxtLink>
+            <span class="text-slate-700">•</span>
+            <NuxtLink to="/sozlesmeler?tab=cerezler" class="hover:text-[#00C2FF] transition-colors">Çerezler</NuxtLink>
+            <span class="text-slate-700">•</span>
+            <NuxtLink to="/sozlesmeler?tab=tedarikci-uyum" class="hover:text-[#00C2FF] transition-colors">Tedarikçi KYC</NuxtLink>
+            <span class="text-slate-700">•</span>
+            <NuxtLink to="/sozlesmeler?tab=escrow" class="hover:text-[#00C2FF] transition-colors">Escrow Güvenli Havuz</NuxtLink>
           </div>
         </div>
       </div>

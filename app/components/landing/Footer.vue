@@ -47,6 +47,18 @@ const companyLinks = [
   { label: "İletişim", to: "/yardim" },
   { label: "İş Ortaklığı Programı", to: "/sozlesmeler?tab=is-ortakligi" }
 ]
+const legalLinks = [
+  { label: "Kullanım Şartları (MSA)", to: "/sozlesmeler?tab=kullanim" },
+  { label: "Gizlilik & Ticari Sır", to: "/sozlesmeler?tab=gizlilik" },
+  { label: "KVKK Aydınlatma & DPA", to: "/sozlesmeler?tab=kvkk" },
+  { label: "Canlı Eksiltme Kuralları", to: "/sozlesmeler?tab=ihale-kurallari" },
+  { label: "Mesafeli Satış & Abonelik", to: "/sozlesmeler?tab=mesafeli-satis" },
+  { label: "Çerez Politikası", to: "/sozlesmeler?tab=cerezler" },
+  { label: "Tedarikçi KYC & Uyum", to: "/sozlesmeler?tab=tedarikci-uyum" },
+  { label: "SLA Taahhüdü (%99.9)", to: "/sozlesmeler?tab=sla" },
+  { label: "Bilgi Güvenliği (ISO 27001)", to: "/sozlesmeler?tab=bilgi-guvenligi" },
+  { label: "Escrow Güvenli Havuz", to: "/sozlesmeler?tab=escrow" }
+]
 </script>
 
 <template>
@@ -92,10 +104,10 @@ const companyLinks = [
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
         
-        <!-- Column 1: Brand Info -->
-        <div class="md:col-span-4 flex flex-col gap-5 text-left">
+        <!-- Column 1: Brand Info (md:col-span-3) -->
+        <div class="md:col-span-3 flex flex-col gap-4 text-left">
           <div class="flex items-center gap-2.5">
             <NuxtLink to="/" class="inline-block hover:opacity-95 transition">
               <img src="/logo.png" alt="İhaleciBurada.com B2B Platformu Logo" class="h-10 sm:h-12 w-auto object-contain drop-shadow-xs" />
@@ -107,74 +119,90 @@ const companyLinks = [
           </p>
 
           <!-- Status badges -->
-          <div class="flex flex-wrap gap-2 pt-1">
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-100 px-3 py-1 text-[9px] font-black text-blue-700 uppercase tracking-wider">
-              <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
+          <div class="flex flex-wrap gap-1.5 pt-1">
+            <span class="inline-flex items-center gap-1 rounded-md bg-blue-50 border border-blue-100 px-2 py-0.5 text-[8.5px] font-black text-blue-700 uppercase tracking-wider">
+              <span class="h-1 w-1 rounded-full bg-blue-600"></span>
               KVKK KAPSAMINDA
             </span>
-            <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-100 px-3 py-1 text-[9px] font-black text-blue-700 uppercase tracking-wider">
-              <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span>
-              HTTPS/TLS ŞİFRELİ
+            <span class="inline-flex items-center gap-1 rounded-md bg-blue-50 border border-blue-100 px-2 py-0.5 text-[8.5px] font-black text-blue-700 uppercase tracking-wider">
+              <span class="h-1 w-1 rounded-full bg-blue-600"></span>
+              TLS 1.3 ŞİFRELİ
+            </span>
+            <span class="inline-flex items-center gap-1 rounded-md bg-emerald-50 border border-emerald-100 px-2 py-0.5 text-[8.5px] font-black text-emerald-700 uppercase tracking-wider">
+              <span class="h-1 w-1 rounded-full bg-emerald-600"></span>
+              TCMB ESCROW
             </span>
           </div>
 
           <!-- Social Links -->
-          <div class="flex gap-2.5 mt-2">
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 transition-all">
-              <Facebook :size="14" />
+          <div class="flex gap-2 mt-1">
+            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="h-7 w-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 transition-all">
+              <Facebook :size="13" />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 transition-all">
-              <Instagram :size="14" />
+            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="h-7 w-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 transition-all">
+              <Instagram :size="13" />
             </a>
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 transition-all">
-              <Linkedin :size="14" />
-            </a>
-            <a href="https://x.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 transition-all">
-              <svg viewBox="0 0 24 24" class="h-3.5 w-3.5 fill-current" xmlns="http://www.w3.org/2000/svg">
-                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-              </svg>
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="h-7 w-7 rounded-lg border border-slate-200 flex items-center justify-center text-slate-400 hover:text-blue-600 hover:border-blue-600 transition-all">
+              <Linkedin :size="13" />
             </a>
           </div>
         </div>
 
-        <!-- Column 2: Platform Links -->
-        <div class="md:col-span-2 flex flex-col gap-4 text-left">
+        <!-- Column 2: Platform Links (md:col-span-2) -->
+        <div class="md:col-span-2 flex flex-col gap-3 text-left">
           <h4 class="text-xs font-black uppercase text-blue-900 tracking-wider">PLATFORM</h4>
-          <div class="flex flex-col gap-3 text-xs font-bold text-slate-700">
+          <div class="flex flex-col gap-2 text-xs font-bold text-slate-700">
             <NuxtLink v-for="item in platformLinks" :key="item.to" :to="item.to" class="hover:text-blue-600 transition-colors">
               {{ item.label }}
             </NuxtLink>
           </div>
         </div>
 
-        <!-- Column 3: Company Links -->
-        <div class="md:col-span-2 flex flex-col gap-4 text-left">
+        <!-- Column 3: Company Links (md:col-span-2) -->
+        <div class="md:col-span-2 flex flex-col gap-3 text-left">
           <h4 class="text-xs font-black uppercase text-blue-900 tracking-wider">ŞİRKET</h4>
-          <div class="flex flex-col gap-3 text-xs font-bold text-slate-700">
+          <div class="flex flex-col gap-2 text-xs font-bold text-slate-700">
             <NuxtLink v-for="item in companyLinks" :key="item.to" :to="item.to" class="hover:text-blue-600 transition-colors">
               {{ item.label }}
             </NuxtLink>
           </div>
         </div>
 
-        <!-- Column 4: Contact & Support Hours -->
-        <div class="md:col-span-4 flex flex-col gap-5 text-left">
-          <div class="space-y-3">
+        <!-- Column 4: Legal Contracts Links (md:col-span-3) -->
+        <div class="md:col-span-3 flex flex-col gap-3 text-left">
+          <h4 class="text-xs font-black uppercase text-blue-900 tracking-wider flex items-center gap-1">
+            <span>HUKUKİ & SÖZLEŞMELER</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-mono">10 Tab</span>
+          </h4>
+          <div class="grid grid-cols-1 gap-1.5 text-xs font-medium text-slate-700">
+            <NuxtLink v-for="item in legalLinks" :key="item.to" :to="item.to" class="hover:text-blue-600 transition-colors flex items-center gap-1.5">
+              <span class="text-blue-600 text-[10px]">▪</span>
+              <span>{{ item.label }}</span>
+            </NuxtLink>
+          </div>
+        </div>
+
+        <!-- Column 5: Contact & Support Hours (md:col-span-2) -->
+        <div class="md:col-span-2 flex flex-col gap-4 text-left">
+          <div class="space-y-2">
             <h4 class="text-xs font-black uppercase tracking-wider text-blue-900">İLETİŞİM</h4>
             <p class="text-xs leading-relaxed text-slate-500 font-medium whitespace-pre-line">
-              İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye
+              İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale
             </p>
-            <div class="text-xs font-bold text-slate-700 space-y-1.5 pt-1">
+            <div class="text-xs font-bold text-slate-700 space-y-1 pt-1">
               <a href="mailto:ihalecib@gmail.com" class="block hover:text-blue-600 transition-colors">
                 ihalecib@gmail.com
               </a>
+              <div class="text-[#FF5938] font-bold">
+                📞 0850 308 00 00
+              </div>
             </div>
           </div>
 
-          <div class="space-y-1.5 pt-1">
+          <div class="space-y-1 pt-1">
             <h4 class="text-xs font-black uppercase tracking-wider text-blue-900">DESTEK SAATLERİ</h4>
-            <p class="text-xs text-slate-500 font-medium leading-relaxed">
-              Pazartesi - Cuma: 09:00 - 18:00 <br />
+            <p class="text-[11px] text-slate-500 font-medium leading-relaxed">
+              Hafta İçi: 09:00 - 18:00 <br />
               Cumartesi: 10:00 - 14:00
             </p>
           </div>
@@ -184,12 +212,23 @@ const companyLinks = [
 
       <hr class="border-slate-200 my-10" />
 
-      <div class="flex flex-col sm:flex-row items-center justify-between gap-6 text-[11px] text-slate-400 font-bold uppercase tracking-wider">
+      <!-- Bottom Legal Ribbon -->
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-6 text-[10px] text-slate-400 font-medium uppercase tracking-wider">
         <div>© 2026 İhaleciBurada. Tüm Hakları Saklıdır.</div>
-        <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center sm:justify-end">
-          <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors">KVKK Metni</NuxtLink>
+        <div class="flex flex-wrap gap-x-4 gap-y-2 justify-center lg:justify-end">
           <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors">Kullanım Koşulları</NuxtLink>
-          <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors">Gizlilik Politikası</NuxtLink>
+          <span class="text-slate-300">•</span>
+          <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors">Gizlilik</NuxtLink>
+          <span class="text-slate-300">•</span>
+          <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors">KVKK</NuxtLink>
+          <span class="text-slate-300">•</span>
+          <NuxtLink to="/sozlesmeler?tab=ihale-kurallari" class="hover:text-blue-600 transition-colors">İhale Kuralları</NuxtLink>
+          <span class="text-slate-300">•</span>
+          <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-blue-600 transition-colors">Mesafeli Satış</NuxtLink>
+          <span class="text-slate-300">•</span>
+          <NuxtLink to="/sozlesmeler?tab=tedarikci-uyum" class="hover:text-blue-600 transition-colors">Tedarikçi KYC</NuxtLink>
+          <span class="text-slate-300">•</span>
+          <NuxtLink to="/sozlesmeler?tab=escrow" class="hover:text-blue-600 transition-colors">Escrow</NuxtLink>
         </div>
       </div>
     </div>
