@@ -1,205 +1,64 @@
 <script setup lang="ts">
-import SearchBox from "./search/SearchBox.vue"
-import Stats from "./sections/Stats.vue"
-import AppButton from "~/components/ui/AppButton.vue"
+import { ArrowRight, ShieldCheck, Sparkles, Building2, TrendingUp } from 'lucide-vue-next'
 </script>
 
 <template>
-  <section
-    class="relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-blue-50"
-  >
-    <!-- Background -->
-    <div
-      class="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-blue-200/30 blur-3xl"
-    />
+  <section class="relative overflow-hidden bg-[#070F1E] text-white py-20">
+    <div class="relative mx-auto max-w-7xl px-6">
+      <div class="grid items-center gap-12 lg:grid-cols-2 text-left">
+        <!-- Sol -->
+        <div class="space-y-6">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/30 text-xs font-black uppercase tracking-wider text-[#00C2FF]">
+            <Sparkles :size="14" />
+            <span>TCMB & BDDK UYUMLU KURUMSAL TEDARİK BORSASI</span>
+          </div>
 
-    <div
-      class="absolute right-0 top-0 h-96 w-96 rounded-full bg-cyan-200/30 blur-3xl"
-    />
-
-    <div
-      class="relative mx-auto max-w-7xl px-6 py-24"
-    >
-
-      <div
-        class="grid items-center gap-20 lg:grid-cols-2"
-      >
-
-        <!-- SOL -->
-
-        <div>
-
-          <span
-            class="inline-flex rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700"
-          >
-            🚀 Türkiye'nin Yeni Nesil Dijital İhale Platformu
-          </span>
-
-          <h1
-            class="mt-8 text-5xl font-black leading-tight text-slate-900 lg:text-7xl"
-          >
-            Binlerce Firmadan
-
-            <span class="text-blue-600">
-
-              Teklif Al,
-
-            </span>
-
-            Dakikalar İçinde Karşılaştır.
+          <h1 class="text-4xl sm:text-6xl font-black leading-tight tracking-tight text-white">
+            Binlerce Doğrulanmış Firmadan <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00C2FF] to-emerald-400">Teklif Al</span>, Canlı Eksiltme ile Yarıştır.
           </h1>
 
-          <p
-            class="mt-8 max-w-xl text-xl leading-9 text-slate-600"
-          >
-            İhaleciBurada ile dijital ihale oluştur,
-            güvenilir firmalardan teklif al,
-            fiyatları karşılaştır,
-            en doğru kararı ver.
+          <p class="max-w-xl text-base text-slate-300 font-medium leading-relaxed">
+            İhaleciBurada ile dijital ihale oluşturun, doğrulanmış B2B üreticilerden belgeli teklif toplayın ve güvenli havuz (Escrow) güvencesiyle satın alma maliyetlerinizi düşürün.
           </p>
 
-          <div
-            class="mt-10 flex flex-wrap gap-4"
-          >
-
-            <NuxtLink to="/register">
-
-              <AppButton size="lg">
-
-                Hemen Başla
-
-              </AppButton>
-
+          <div class="flex flex-wrap gap-4 pt-2">
+            <NuxtLink to="/uyelik" class="flex items-center gap-2 px-6 py-4 rounded-xl bg-[#0052FF] hover:bg-blue-600 font-black text-xs text-white shadow-xl shadow-blue-600/30 transition">
+              <span>Hemen Başla</span>
+              <ArrowRight :size="15" />
             </NuxtLink>
-
-            <NuxtLink to="/panel">
-
-              <AppButton
-                variant="secondary"
-                size="lg"
-              >
-
-                Demo İncele
-
-              </AppButton>
-
+            <NuxtLink to="/panel" class="flex items-center gap-2 px-6 py-4 rounded-xl border border-slate-700 bg-slate-900/80 hover:bg-slate-800 font-black text-xs text-slate-200 hover:text-white transition">
+              <span>Kurumsal Panel</span>
             </NuxtLink>
-
           </div>
-
-          <div class="mt-14">
-
-            <SearchBox />
-
-          </div>
-
-          <div class="mt-14">
-
-            <Stats />
-
-          </div>
-
         </div>
 
-        <!-- SAĞ -->
-
+        <!-- Sağ -->
         <div>
-
-          <div
-            class="rounded-3xl border border-slate-200 bg-white p-8 shadow-2xl"
-          >
-
-            <div
-              class="mb-8 flex items-center justify-between"
-            >
-
+          <div class="rounded-3xl border border-slate-700 bg-[#0B1528] p-8 shadow-2xl space-y-6">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
               <div>
-
-                <h2
-                  class="text-2xl font-bold"
-                >
-                  Dashboard
-                </h2>
-
-                <p
-                  class="text-slate-500"
-                >
-                  Canlı Önizleme
-                </p>
-
+                <h2 class="text-lg font-black text-white">Canlı İşlem Kokpiti</h2>
+                <p class="text-xs text-slate-400">Gerçek Zamanlı İhale & Eksiltme Akışı</p>
               </div>
-
-              <div
-                class="rounded-full bg-green-100 px-4 py-2 text-sm font-semibold text-green-700"
-              >
-                ● Online
+              <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-xs font-mono font-bold text-emerald-400">
+                <span class="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>Canlı Bağlantı</span>
               </div>
-
             </div>
 
-            <div
-              class="grid grid-cols-2 gap-5"
-            >
-
-              <div
-                class="rounded-2xl bg-blue-600 p-5 text-white"
-              >
-
-                <div class="text-sm opacity-80">
-
-                  Aktif İhale
-
-                </div>
-
-                <div class="mt-3 text-4xl font-black">
-
-                  148
-
-                </div>
-
+            <div class="grid grid-cols-2 gap-4">
+              <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5">
+                <div class="text-xs text-slate-400 font-bold uppercase">Ortalama Tasarruf</div>
+                <div class="mt-2 text-3xl font-black font-mono text-emerald-400">%14.2</div>
               </div>
-
-              <div
-                class="rounded-2xl bg-emerald-500 p-5 text-white"
-              >
-
-                <div class="text-sm opacity-80">
-
-                  Gelen Teklif
-
-                </div>
-
-                <div class="mt-3 text-4xl font-black">
-
-                  324
-
-                </div>
-
+              <div class="rounded-2xl bg-slate-900 border border-slate-800 p-5">
+                <div class="text-xs text-slate-400 font-bold uppercase">Güvenli Havuz</div>
+                <div class="mt-2 text-3xl font-black font-mono text-[#00C2FF]">100%</div>
               </div>
-
             </div>
-
-            <div
-              class="mt-8 h-56 rounded-2xl bg-slate-100"
-            >
-
-              <div
-                class="flex h-full items-center justify-center text-slate-400"
-              >
-
-                📈 Grafik Alanı
-
-              </div>
-
-            </div>
-
           </div>
-
         </div>
-
       </div>
-
     </div>
-
   </section>
 </template>

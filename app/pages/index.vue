@@ -228,6 +228,73 @@ const activeAudience = ref<'buyer' | 'supplier'>('buyer')
 const openFaq = ref<number | null>(0)
 const showCookieConsent = ref(true)
 
+// İnteraktif Tasarruf & Borsa Simülatörü
+const simBudget = ref(1500000)
+const simSector = ref('insaat')
+const simSectors = [
+  { id: 'insaat', name: 'İnşaat & Şantiye', rate: 0.165, icon: 'Building2', tag: '%16.5 Tasarruf' },
+  { id: 'sanayi', name: 'Sanayi & Makine', rate: 0.142, icon: 'Briefcase', tag: '%14.2 Tasarruf' },
+  { id: 'lojistik', name: 'Lojistik & Enerji', rate: 0.128, icon: 'Globe2', tag: '%12.8 Tasarruf' },
+  { id: 'ambalaj', name: 'Ambalaj & Hizmet', rate: 0.180, icon: 'Folder', tag: '%18.0 Tasarruf' }
+]
+
+const currentSimSector = computed(() => simSectors.find(s => s.id === simSector.value) || simSectors[0])
+const estimatedSavingsAmount = computed(() => Math.round(simBudget.value * currentSimSector.value.rate))
+const estimatedFinalPrice = computed(() => simBudget.value - estimatedSavingsAmount.value)
+
+// Canlı B2B Tasarruf Bandı (Ticker)
+const liveProcurementTicker = [
+  { region: 'Ankara', project: 'Çelik Konstrüksiyon Fabrika İşi', savings: '%16.4', saved: '410.000 ₺', time: '18 dk önce' },
+  { region: 'Bursa', project: '100.000 Adet Özel Ürün Kolisi', savings: '%18.2', saved: '58.000 ₺', time: '34 dk önce' },
+  { region: 'İzmir', project: 'C35 Hazır Beton & Demir Alımı', savings: '%13.5', saved: '820.000 ₺', time: '1 saat önce' },
+  { region: 'Kocaeli', project: 'CNC Talaşlı İmalat Yedek Parça', savings: '%15.1', saved: '195.000 ₺', time: '2 saat önce' },
+  { region: 'İstanbul', project: 'Kurumsal Personel Servis & Filo', savings: '%14.8', saved: '340.000 ₺', time: '3 saat önce' }
+]
+
+// 4 Ana B2B Sektörel Masası
+const b2bDesks = [
+  {
+    id: 'insaat',
+    title: 'İnşaat, Yapı & Şantiye Masası',
+    badge: '%16.5 Ortalama Tasarruf',
+    desc: 'Hazır beton, inşaat demiri, çelik konstrüksiyon, su/ısı yalıtımı ve yol altyapı ihaleleri.',
+    icon: 'Building2',
+    tags: ['Hazır Beton C30/35', 'Nervürlü Demir', 'Çelik Çatı', 'Dış Cephe Yalıtım', 'Asfalt & Altyapı'],
+    activeTenders: 'Canlı İhaleler Açık',
+    ctaLink: '/panel/ihale-olustur?kategori=insaat'
+  },
+  {
+    id: 'sanayi',
+    title: 'Sanayi, İmalat & Yedek Parça Masası',
+    badge: '%14.2 Ortalama Tasarruf',
+    desc: 'CNC fason talaşlı imalat, torna, freze, lazer sac kesim, hidrolik aksam ve endüstriyel kalıp.',
+    icon: 'Briefcase',
+    tags: ['CNC Talaşlı İmalat', 'Lazer Sac Kesim', 'Kaynaklı İmalat', 'Hidrolik Piston', 'Plastik Enjeksiyon'],
+    activeTenders: 'Onaylı Üretici Masası',
+    ctaLink: '/panel/ihale-olustur?kategori=sanayi'
+  },
+  {
+    id: 'lojistik',
+    title: 'Lojistik, Akaryakıt & Enerji Masası',
+    badge: '%12.8 Ortalama Tasarruf',
+    desc: 'Toptan motorin, endüstriyel elektrik, komple tır nakliyesi, antrepo ve GES santral kurulumu.',
+    icon: 'Globe2',
+    tags: ['Toptan Motorin', 'Komple Tır Taşımacılığı', 'Soğuk Hava Depolama', 'Sanayi Elektriği', 'Çatı GES Projeleri'],
+    activeTenders: 'Lojistik & Enerji Ağı',
+    ctaLink: '/panel/ihale-olustur?kategori=lojistik'
+  },
+  {
+    id: 'ambalaj',
+    title: 'Ambalaj, Gıda & Kurumsal Hizmet Masası',
+    badge: '%18.0 Ortalama Tasarruf',
+    desc: 'Oluklu mukavva koli, streç film, kurumsal tabldot yemek, tesis temizliği ve güvenlik hizmetleri.',
+    icon: 'Folder',
+    tags: ['Oluklu Koli & Kutu', 'Palet & Streç Film', 'Personel Tabldot Yemek', 'Endüstriyel Hijyen', 'Ofis & IT Ekipmanları'],
+    activeTenders: 'Hizmet & Sarf Masası',
+    ctaLink: '/panel/ihale-olustur?kategori=ambalaj'
+  }
+]
+
 // Tasarruf Hesaplama Modülü
 const annualVolume = ref(5000000)
 const savingsRate = 0.142
@@ -1016,7 +1083,407 @@ function toggleFilterSection(section: string) {
 
 <template>
   <div class="min-h-screen bg-slate-50 text-slate-900 flex flex-col">
-    <!-- 🟢 1. B2B EXPLORER SECTION (İHALE PAZARI & GEZGİNİ) -->
+    <!-- 🟢 1. ASYMMETRIC B2B HERO & CANLI EKSİLTME SİMÜLATÖRÜ -->
+    <section class="relative overflow-hidden border-b border-slate-200 bg-[#070F1E] text-white min-h-[640px]">
+      <!-- Background Video / Pattern -->
+      <ClientOnly>
+        <video 
+          v-if="cmsData.hero?.heroVideoUrl"
+          ref="heroVideoRef"
+          autoplay 
+          loop 
+          muted 
+          playsinline 
+          class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-25"
+        >
+          <source :src="cmsData.hero.heroVideoUrl" type="video/mp4" />
+        </video>
+      </ClientOnly>
+      <div 
+        v-if="!cmsData.hero?.heroVideoUrl" 
+        class="absolute inset-0 w-full h-full bg-cover bg-center z-0 opacity-15" 
+        style="background-image: url('/hero_port_background.png');"
+      ></div>
+
+      <!-- Gradient & Atmosphere -->
+      <div class="absolute inset-0 bg-gradient-to-r from-[#070F1E] via-[#0B172E]/90 to-[#070F1E]/80 z-0"></div>
+      <div class="absolute right-[-10%] top-[-20%] h-[500px] w-[500px] rounded-full bg-blue-500/10 blur-3xl z-10 pointer-events-none"></div>
+      <div class="absolute bottom-[-10%] left-[-5%] h-[400px] w-[400px] rounded-full bg-emerald-500/10 blur-3xl z-10 pointer-events-none"></div>
+
+      <div class="relative z-20 mx-auto grid max-w-7xl items-center gap-12 px-6 py-16 lg:py-24 lg:grid-cols-[1.15fr_0.85fr]">
+        <!-- Hero Left Content -->
+        <div class="text-left space-y-6">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-blue-500/10 border border-blue-400/30 text-xs font-black uppercase tracking-wider text-[#00C2FF]">
+            <span class="h-2 w-2 rounded-full bg-[#00C2FF] animate-pulse"></span>
+            <span>TCMB & BDDK UYUMLU KURUMSAL TEDARİK BORSASI</span>
+          </div>
+
+          <h1 class="text-3xl sm:text-5xl lg:text-5xl font-black leading-[1.12] tracking-tight text-white">
+            Tedarik Maliyetlerinizi <br class="hidden sm:inline" />
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00C2FF] via-white to-emerald-400">Canlı Eksiltme & Escrow</span> ile Düşürün.
+          </h1>
+
+          <p class="max-w-xl text-sm sm:text-base leading-relaxed text-slate-300 font-medium">
+            İnşaat, sanayi, lojistik ve kurumsal sarf alımlarınız için şartnamenizi yükleyin; onaylı B2B üreticilerden anında belgeli fiyat toplayıp tersine açık eksiltmeyle %18'e varan net tasarruf sağlayın.
+          </p>
+
+          <!-- Primary CTAs -->
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <NuxtLink 
+              to="/panel/ihale-olustur" 
+              class="flex items-center gap-2 rounded-2xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/30 bg-[#0052FF] hover:bg-blue-600 transition-all hover:scale-102 cursor-pointer"
+            >
+              <Plus :size="16" class="text-[#00C2FF]" />
+              <span>Ücretsiz İhale Başlat</span>
+            </NuxtLink>
+            <a 
+              href="#ihale-gezgini" 
+              class="flex items-center gap-2 rounded-2xl border border-slate-700 bg-slate-900/80 hover:bg-slate-800 px-6 py-4 text-xs font-black text-slate-200 hover:text-white transition-all cursor-pointer"
+            >
+              <span>Pazar Yerini İncele</span>
+              <ArrowRight :size="14" class="text-slate-400" />
+            </a>
+            <button
+              type="button"
+              @click="openHeroVideo('intro-3min')"
+              class="flex items-center gap-2.5 px-4 py-4 rounded-2xl text-xs font-bold text-slate-300 hover:text-white transition-all cursor-pointer"
+            >
+              <span class="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-[#00C2FF]">
+                <Play :size="12" class="fill-current translate-x-0.5" />
+              </span>
+              <span>3 Dk Video Turu</span>
+            </button>
+          </div>
+
+          <!-- Trust Badges Strip -->
+          <div class="pt-4 border-t border-slate-800/80 flex flex-wrap items-center gap-y-2 gap-x-6 text-[11px] font-bold text-slate-400">
+            <div class="flex items-center gap-1.5 text-emerald-400">
+              <ShieldCheck :size="14" />
+              <span>%100 Güvenli Havuz (Escrow)</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-slate-300">
+              <BadgeCheck :size="14" class="text-blue-400" />
+              <span>Doğrulanmış B2B Üreticiler</span>
+            </div>
+            <div class="flex items-center gap-1.5 text-slate-300">
+              <LockKeyhole :size="14" class="text-amber-400" />
+              <span>Zaman Damgalı E-Tutanak</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hero Right: İnteraktif B2B Tasarruf Hesaplayıcı & Canlı Simülatör -->
+        <div class="relative">
+          <div class="rounded-3xl border border-slate-700/80 bg-[#0B1528]/95 p-6 sm:p-7 shadow-2xl backdrop-blur-md text-left space-y-5">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div>
+                <span class="text-[9px] font-black uppercase tracking-wider text-[#00C2FF] flex items-center gap-1">
+                  <Sparkles :size="12" /> B2B TASARRUF VE EKSİLTME SİMÜLATÖRÜ
+                </span>
+                <h3 class="text-sm font-black text-white mt-0.5">Tahmini Şirket Kazancınızı Hesaplayın</h3>
+              </div>
+              <span class="px-2.5 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-mono font-black text-xs">
+                {{ currentSimSector.tag }}
+              </span>
+            </div>
+
+            <!-- Sektör Seçici Butonlar -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button
+                v-for="s in simSectors"
+                :key="s.id"
+                type="button"
+                @click="simSector = s.id"
+                class="p-2 rounded-xl text-[11px] font-bold border transition-all text-center cursor-pointer"
+                :class="simSector === s.id ? 'bg-[#0052FF] text-white border-blue-400 shadow-sm' : 'bg-slate-900/60 text-slate-400 border-slate-800 hover:text-slate-200 hover:bg-slate-800'"
+              >
+                {{ s.name }}
+              </button>
+            </div>
+
+            <!-- Bütçe Slider & Girişi -->
+            <div class="space-y-2">
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-slate-400 font-bold">Yıllık / Proje Satın Alma Bütçesi:</span>
+                <span class="font-mono font-black text-white text-sm sm:text-base">{{ simBudget.toLocaleString('tr-TR') }} ₺</span>
+              </div>
+              <input 
+                v-model.number="simBudget" 
+                type="range" 
+                min="100000" 
+                max="10000000" 
+                step="50000"
+                class="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-[#00C2FF]"
+              />
+              <div class="flex justify-between text-[10px] font-mono text-slate-500">
+                <span>100 Bin ₺</span>
+                <span>5 Milyon ₺</span>
+                <span>10 Milyon ₺</span>
+              </div>
+            </div>
+
+            <!-- Hesaplanan Tasarruf FinTech Kartı -->
+            <div class="p-4 rounded-2xl bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/30 flex items-center justify-between">
+              <div>
+                <span class="text-[10px] uppercase font-black text-emerald-400 tracking-wider block">TAHMİNİ NET TASARRUF</span>
+                <div class="text-2xl sm:text-3xl font-black font-mono text-emerald-300 mt-0.5">
+                  + {{ estimatedSavingsAmount.toLocaleString('tr-TR') }} ₺
+                </div>
+                <span class="text-[10px] text-slate-400 font-medium">Hedeflenen Fiyat: {{ estimatedFinalPrice.toLocaleString('tr-TR') }} ₺</span>
+              </div>
+              <NuxtLink
+                to="/panel/ihale-olustur"
+                class="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition shadow-md"
+              >
+                İhale Aç ↗
+              </NuxtLink>
+            </div>
+
+            <!-- Canlı Borsa Teklif Akışı (Örnek Eksiltme Simülasyonu) -->
+            <div class="space-y-2 border-t border-slate-800/80 pt-3">
+              <div class="flex justify-between items-center text-[10px] font-bold text-slate-400">
+                <span class="uppercase tracking-wider">Canlı Eksiltme Simülasyonu</span>
+                <span class="text-emerald-400 font-mono flex items-center gap-1">
+                  <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping"></span> 3 Tedarikçi Yarışta
+                </span>
+              </div>
+
+              <div class="space-y-1.5 font-mono text-[11px]">
+                <div class="p-2 rounded-xl bg-slate-900/90 border border-blue-500/30 flex justify-between items-center text-slate-200">
+                  <span class="flex items-center gap-1.5 text-blue-400 font-bold">
+                    <span class="h-1.5 w-1.5 rounded-full bg-blue-500"></span> Tedarikçi A (Önde)
+                  </span>
+                  <span class="font-black text-emerald-400">{{ estimatedFinalPrice.toLocaleString('tr-TR') }} ₺ (-{{ currentSimSector.tag }})</span>
+                </div>
+                <div class="p-2 rounded-xl bg-slate-900/50 border border-slate-800 flex justify-between items-center text-slate-400">
+                  <span>Tedarikçi B</span>
+                  <span>{{ Math.round(simBudget * (1 - currentSimSector.rate * 0.7)).toLocaleString('tr-TR') }} ₺</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Trust Strip (Alt Kurumsal Şerit) -->
+      <div class="relative border-t border-slate-800 bg-[#050B16] py-5">
+        <div class="mx-auto grid max-w-7xl gap-6 px-6 sm:grid-cols-2 lg:grid-cols-4 text-left">
+          <div v-for="(item, idx) in localizedTrustStrip" :key="idx" class="flex items-center gap-3">
+            <ShieldCheck v-if="idx === 0" class="text-emerald-400 shrink-0" :size="20" />
+            <LockKeyhole v-else-if="idx === 1" class="text-[#00C2FF] shrink-0" :size="20" />
+            <Scale v-else-if="idx === 2" class="text-amber-400 shrink-0" :size="20" />
+            <Globe2 v-else class="text-blue-400 shrink-0" :size="20" />
+            <div>
+              <div class="text-xs font-black text-white">{{ item.title }}</div>
+              <div class="text-[10px] text-slate-400">{{ item.desc }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🟢 2. CANLI B2B TASARRUF BANDI (PROCUREMENT TICKER) -->
+    <div class="bg-[#0F223D] border-b border-slate-800 py-3.5 px-6 overflow-x-auto custom-scrollbar">
+      <div class="mx-auto max-w-7xl flex items-center justify-between gap-6 min-w-max text-xs">
+        <div class="flex items-center gap-2 text-[#00C2FF] font-black uppercase text-[10px] tracking-wider shrink-0">
+          <span class="h-2 w-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span>SON TAMAMLANAN İHALELER:</span>
+        </div>
+        <div class="flex items-center gap-8 text-slate-300">
+          <div v-for="(tick, tIdx) in liveProcurementTicker" :key="tIdx" class="flex items-center gap-2 shrink-0">
+            <span class="font-bold text-white">{{ tick.region }}</span>
+            <span class="text-slate-400">{{ tick.project }}</span>
+            <span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono font-bold text-[10px]">{{ tick.savings }}</span>
+            <span class="text-emerald-400 font-bold font-mono">({{ tick.saved }})</span>
+            <span class="text-[9px] text-slate-500 font-mono">{{ tick.time }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🟢 3. SEKTÖREL İHALE MASALARI (BENTO-GRID 4 ANA MASA) -->
+    <section class="py-20 bg-white border-b border-slate-200">
+      <div class="mx-auto max-w-7xl px-6 text-left space-y-12">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+          <div>
+            <div class="inline-flex items-center gap-1.5 text-[10px] font-black text-blue-600 uppercase tracking-widest mb-1">
+              <span>B2B SEKTÖREL TEDARİK MASALARI</span>
+            </div>
+            <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+              Sektörünüze Özel İhale & Eksiltme Arenaları
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 font-medium mt-1 max-w-2xl">
+              Türkiye'nin onaylı üreticileri ve kurumsal alıcıları doğrudan bu masalarda buluşuyor.
+            </p>
+          </div>
+          <NuxtLink
+            to="/panel/ihale-olustur"
+            class="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-[#0F223D] hover:bg-blue-700 text-white text-xs font-black transition shadow-md self-start sm:self-auto"
+          >
+            <Plus :size="15" />
+            <span>Yeni İhale Başlat</span>
+          </NuxtLink>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div
+            v-for="desk in b2bDesks"
+            :key="desk.id"
+            class="p-6 rounded-3xl bg-slate-50/80 border border-slate-200 hover:border-blue-500 hover:bg-white hover:shadow-xl transition-all duration-300 flex flex-col justify-between group space-y-5"
+          >
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="h-12 w-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center border border-blue-100 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                  <Building2 v-if="desk.icon === 'Building2'" :size="22" />
+                  <Briefcase v-else-if="desk.icon === 'Briefcase'" :size="22" />
+                  <Globe2 v-else-if="desk.icon === 'Globe2'" :size="22" />
+                  <Folder v-else :size="22" />
+                </div>
+                <span class="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 font-bold text-[10px]">
+                  {{ desk.badge }}
+                </span>
+              </div>
+
+              <h3 class="text-base font-black text-slate-900 group-hover:text-blue-600 transition-colors">
+                {{ desk.title }}
+              </h3>
+
+              <p class="text-xs text-slate-500 leading-relaxed font-medium">
+                {{ desk.desc }}
+              </p>
+
+              <!-- Tags -->
+              <div class="flex flex-wrap gap-1.5 pt-1">
+                <span 
+                  v-for="tag in desk.tags" 
+                  :key="tag"
+                  class="px-2 py-0.5 rounded-lg bg-white border border-slate-200 text-[10px] font-bold text-slate-600"
+                >
+                  {{ tag }}
+                </span>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-200/80 flex items-center justify-between">
+              <span class="text-[10px] font-bold text-slate-400 font-mono">{{ desk.activeTenders }}</span>
+              <NuxtLink
+                :to="desk.ctaLink"
+                class="inline-flex items-center gap-1 text-xs font-black text-blue-600 group-hover:translate-x-1 transition-transform"
+              >
+                <span>İhale Aç</span>
+                <ArrowRight :size="13" />
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🟢 4. KURUMSAL DEĞER ÖNERİSİ & KARŞILAŞTIRMA MATRİSİ -->
+    <section class="py-20 bg-slate-50 border-b border-slate-200">
+      <div class="mx-auto max-w-7xl px-6 text-left space-y-12">
+        <div class="text-center max-w-2xl mx-auto space-y-2">
+          <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">NEDEN İHALECİBURADA?</span>
+          <h2 class="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+            Geleneksel Satın Alma vs İhaleciBurada Borsa Standardı
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 font-medium">
+            Maliyet, hız, yasal şeffaflık ve ödeme güvenliğinde yarattığımız kurumsal farklar.
+          </p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <!-- Sol Kart: Geleneksel Satın Alma -->
+          <div class="p-8 rounded-3xl bg-white border border-rose-200 shadow-sm space-y-6">
+            <div class="flex items-center justify-between border-b border-rose-100 pb-4">
+              <div>
+                <span class="text-[10px] font-black text-rose-600 uppercase tracking-wider">ESKİ YÖNTEM</span>
+                <h3 class="text-lg font-black text-slate-900 mt-0.5">Geleneksel Satın Alma Süreçleri</h3>
+              </div>
+              <span class="px-3 py-1 rounded-xl bg-rose-50 text-rose-700 font-bold text-xs">❌ Yüksek Risk & Maliyet</span>
+            </div>
+
+            <ul class="space-y-4 text-xs text-slate-600">
+              <li class="flex items-start gap-3">
+                <X :size="16" class="text-rose-500 shrink-0 mt-0.5" />
+                <div>
+                  <strong class="text-slate-800 block">Manuel ve Hantal E-posta Zinciri:</strong>
+                  Tedarikçilere tek tek telefon ve e-posta ile teklif sorma, günlerce bekleyen teklifler.
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <X :size="16" class="text-rose-500 shrink-0 mt-0.5" />
+                <div>
+                  <strong class="text-slate-800 block">Şeffaf Olmayan Kapalı Fiyatlandırma:</strong>
+                  Pazar dip fiyatını görememe, yüksek satın alma maliyetleri ve sınırlı pazar rekabeti.
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <X :size="16" class="text-rose-500 shrink-0 mt-0.5" />
+                <div>
+                  <strong class="text-slate-800 block">Açık Hesap & Peşinat Riski:</strong>
+                  Mal teslim alınmadan yapılan ödemelerde parayı geri alamama veya kusurlu mal riski.
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <X :size="16" class="text-rose-500 shrink-0 mt-0.5" />
+                <div>
+                  <strong class="text-slate-800 block">Denetim ve Kayıt İzi Eksikliği:</strong>
+                  Pazarlıkların e-postalarda kaybolması, bağımsız bilirkişi ve yönetim denetim zorluğu.
+                </div>
+              </li>
+            </ul>
+          </div>
+
+          <!-- Sağ Kart: İhaleciBurada B2B Borsası -->
+          <div class="p-8 rounded-3xl bg-[#0F223D] text-white border border-blue-500/40 shadow-xl space-y-6 relative overflow-hidden">
+            <div class="absolute right-0 top-0 h-40 w-40 bg-emerald-500/10 rounded-full blur-2xl"></div>
+
+            <div class="flex items-center justify-between border-b border-slate-700 pb-4 relative z-10">
+              <div>
+                <span class="text-[10px] font-black text-[#00C2FF] uppercase tracking-wider">YENİ NESİL STANDART</span>
+                <h3 class="text-lg font-black text-white mt-0.5">İhaleciBurada B2B Borsası</h3>
+              </div>
+              <span class="px-3 py-1 rounded-xl bg-emerald-500/20 text-emerald-300 font-bold text-xs border border-emerald-500/30">✓ %14 - %18 Net Tasarruf</span>
+            </div>
+
+            <ul class="space-y-4 text-xs text-slate-300 relative z-10">
+              <li class="flex items-start gap-3">
+                <CheckCircle2 :size="16" class="text-emerald-400 shrink-0 mt-0.5" />
+                <div>
+                  <strong class="text-white block">Saatler İçinde Belgeli Teklif Toplama:</strong>
+                  Tek şartname yüklemesi ile 81 ilden yüzlerce onaylı kurumsal tedarikçiye anında ulaşım.
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <CheckCircle2 :size="16" class="text-emerald-400 shrink-0 mt-0.5" />
+                <div>
+                  <strong class="text-white block">Canlı Eksiltme & Karşı Teklif Masası:</strong>
+                  Tersine eksiltme ile fiyatı kırma, anlık hedef fiyat ileterek canlı mutabakat sağlama.
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <CheckCircle2 :size="16" class="text-emerald-400 shrink-0 mt-0.5" />
+                <div>
+                  <strong class="text-white block">TCMB/BDDK Uyumlu Güvenli Havuz (Escrow):</strong>
+                  Ödeme havuzda kilitlenir; mal kabul ve irsaliye onayı verilmeden hakediş aktarılmaz.
+                </div>
+              </li>
+              <li class="flex items-start gap-3">
+                <CheckCircle2 :size="16" class="text-emerald-400 shrink-0 mt-0.5" />
+                <div>
+                  <strong class="text-white block">Kriptografik Zaman Damgalı E-Tutanak:</strong>
+                  Tüm teklif, pazarlık ve mutabakat süreci yasal geçerli resmi e-ihale tutanağına bağlanır.
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 🟢 5. B2B EXPLORER SECTION (İHALE PAZARI & GEZGİNİ) -->
     <section id="ihale-gezgini" class="border-b border-slate-200 bg-white py-16">
       <div class="mx-auto max-w-7xl px-6">
         <!-- Explorer Header -->
@@ -1515,186 +1982,6 @@ function toggleFilterSection(section: string) {
               </div>
             </div>
           </main>
-        </div>
-      </div>
-    </section>
-
-    <!-- 🟢 2. HERO SECTION -->
-    <section class="relative overflow-hidden border-b border-slate-200 bg-slate-100 min-h-[640px]">
-      <!-- Background Video -->
-      <ClientOnly>
-        <video 
-          v-if="cmsData.hero.heroVideoUrl"
-          ref="heroVideoRef"
-          autoplay 
-          loop 
-          muted 
-          playsinline 
-          class="absolute inset-0 w-full h-full object-cover z-0 pointer-events-none opacity-45"
-        >
-          <source :src="cmsData.hero.heroVideoUrl" type="video/mp4" />
-        </video>
-      </ClientOnly>
-      <!-- Fallback image background if video is not available -->
-      <div 
-        v-if="!cmsData.hero.heroVideoUrl" 
-        class="absolute inset-0 w-full h-full bg-cover bg-center z-0" 
-        style="background-image: url('/hero_port_background.png'); opacity: 0.15;"
-      ></div>
-
-      <!-- Color Overlay for clean typography readability -->
-      <div class="absolute inset-0 bg-gradient-to-b from-slate-50/80 via-white/85 to-white/95 z-0"></div>
-
-      <!-- Decorative circles -->
-      <div class="absolute right-[-10%] top-[-30%] h-[600px] w-[600px] rounded-full bg-blue-500/5 blur-3xl z-10"></div>
-      <div class="absolute bottom-[-30%] left-[-10%] h-[500px] w-[500px] rounded-full bg-cyan-500/5 blur-3xl z-10"></div>
-
-      <div class="relative z-20 mx-auto grid min-h-[640px] max-w-7xl items-center gap-16 px-6 py-20 lg:grid-cols-[1.1fr_0.9fr]">
-        <!-- Hero Left -->
-        <div class="text-left">
-          <div class="mb-6 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.18em] text-[#0052FF]">
-            <span class="h-px w-8 bg-[#0052FF]"></span>
-            {{ localizedHero.tagline }}
-          </div>
-          <h1 class="text-4xl font-black leading-[1.15] tracking-tight text-slate-900 sm:text-5xl lg:text-6xl">
-            {{ localizedHero.titleLine1 }}<br />
-            {{ localizedHero.titleLine2 }}<br />
-            <span class="font-serif italic font-medium text-[#0052FF]">{{ localizedHero.titleItalic }}</span>
-          </h1>
-          <p class="mt-6 max-w-xl text-base leading-relaxed text-slate-600">
-            {{ localizedHero.description }}
-          </p>
-          
-          <!-- Buttons -->
-          <div class="mt-8 flex flex-wrap items-center gap-3">
-            <NuxtLink to="/uyelik" class="flex items-center gap-2 rounded-xl px-6 py-4 text-xs font-black text-white shadow-xl shadow-blue-600/20 hover:opacity-95 transition-all bg-[#0F223D] hover:bg-[#0052FF]">
-              {{ 'Hemen kurumsal hesap aç' }}
-              <ArrowRight :size="15" class="text-[#00C2FF]" />
-            </NuxtLink>
-            <a href="#ihale-gezgini" class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/90 px-6 py-4 text-xs font-black text-slate-700 hover:bg-white hover:text-[#0052FF] transition-all">
-              {{ 'İhaleleri İncele' }}
-              <ArrowRight :size="15" />
-            </a>
-          </div>
-
-          <!-- Bottom Features Strip -->
-          <div class="mt-8 text-[9px] font-bold text-slate-500 uppercase tracking-widest flex flex-wrap gap-x-4 gap-y-2">
-            <template v-for="(badge, index) in localizedHero.badgeStrip" :key="index">
-              <span>{{ badge }}</span>
-              <span v-if="index < localizedHero.badgeStrip.length - 1" class="text-slate-300">•</span>
-            </template>
-          </div>
-
-          <!-- Video Button (Interactive Guide Modal Trigger) -->
-          <div class="mt-8">
-            <button
-              type="button"
-              @click="openHeroVideo('intro-3min')"
-              class="group flex items-center gap-3 text-xs font-bold text-slate-700 hover:text-blue-600 transition-all cursor-pointer select-none"
-            >
-              <span class="flex h-9 w-9 items-center justify-center rounded-full bg-blue-100 text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm group-hover:scale-110">
-                <Play :size="14" class="fill-current translate-x-0.5" />
-              </span>
-              <div class="text-left">
-                <span class="block font-black text-slate-900 group-hover:text-blue-600 transition-colors">
-                  {{ 'Video rehberlerini izle' }}
-                </span>
-                <span class="text-[10px] text-slate-400 font-medium group-hover:text-blue-500">
-                  3 Dakikada Türkçe Sesli B2B İhale Simülasyonu →
-                </span>
-              </div>
-            </button>
-          </div>
-        </div>
-
-        <!-- Hero Right (Live Card styled like the screenshot) -->
-        <div class="relative">
-          <div class="absolute -inset-8 rounded-full bg-blue-500/5 blur-3xl"></div>
-          
-          <div class="relative mx-auto max-w-[460px] rounded-3xl border border-slate-200/80 bg-white/95 p-6 premium-shadow backdrop-blur-sm text-left">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-              <div>
-                <span class="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-wider text-slate-400">
-                  <span class="h-1.5 w-1.5 rounded-full bg-blue-600"></span> {{ 'TEMSİLİ CANLI İHALE' }}
-                </span>
-                <h3 class="mt-1.5 text-base font-black text-slate-800">{{ localizedLiveTender.title }}</h3>
-              </div>
-              <div class="text-right">
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">{{ 'KALAN SÜRE' }}</span>
-                <div class="mt-1 font-mono text-sm font-black text-slate-800">{{ localizedLiveTender.remainingTime }}</div>
-              </div>
-            </div>
-
-            <!-- Price and Savings info -->
-            <div class="py-6 flex justify-between items-start">
-              <div>
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">{{ 'GÜNCEL EN İYİ TEKLİF' }}</span>
-                <div class="mt-1 text-4xl font-black text-slate-900 tracking-tight font-mono">
-                  {{ currencySymbol }}{{ localizedLiveTender.bestBid.toLocaleString('tr-TR') }}
-                </div>
-                <div class="mt-2 text-[10px] text-slate-400 font-bold">
-                  {{ 'AÇILIŞ FİYATI' }} <span class="font-mono text-slate-600 line-through">{{ currencySymbol }}{{ localizedLiveTender.openingPrice.toLocaleString('tr-TR') }}</span>
-                </div>
-              </div>
-              
-              <div class="text-right">
-                <div class="rounded-lg px-2.5 py-1 text-[9px] font-black" style="background: rgba(30,174,76,0.08); color: #1EAE4C;">
-                  {{ localizedLiveTender.savingsText }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Competitor List -->
-            <div class="space-y-2 border-t border-slate-100 pt-5">
-              <div class="text-[9px] font-black uppercase tracking-widest text-slate-400 mb-2">
-                {{ localizedLiveTender.competitors.length }} {{ 'TEDARİKÇİ YARIŞIYOR' }}
-              </div>
-              
-              <div 
-                v-for="comp in localizedLiveTender.competitors" 
-                :key="comp.name" 
-                class="flex items-center justify-between rounded-xl px-4 py-2.5"
-                :class="comp.leader ? 'border border-blue-200/60 bg-blue-50/40' : 'bg-white border border-slate-200/60'"
-              >
-                <div class="flex items-center gap-2.5 text-xs font-bold" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
-                  <span class="h-1.5 w-1.5 rounded-full" :class="comp.leader ? 'bg-blue-600' : 'bg-slate-300'"></span>
-                  {{ comp.name }}
-                  <span v-if="comp.leader" class="rounded bg-blue-100 px-1.5 py-0.5 text-[8px] font-black text-blue-700">{{ 'ÖNDE' }}</span>
-                </div>
-                <span class="font-mono font-bold text-xs" :class="comp.leader ? 'text-slate-800' : 'text-slate-500'">
-                  {{ currencySymbol }}{{ comp.price.toLocaleString('tr-TR') }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Bottom Tabs Inside Card -->
-            <div class="grid grid-cols-4 gap-1 mt-6 border-t border-slate-100 pt-4 text-center">
-              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ 'TALEP' }}</span>
-              <span class="text-[8px] font-black text-blue-600 py-1 border-b-2 border-blue-600">+ {{ 'TEKLİF' }}</span>
-              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ 'KARAR' }}</span>
-              <span class="text-[8px] font-black text-slate-400 py-1 hover:text-slate-700 cursor-pointer">{{ 'TESLİMAT' }}</span>
-            </div>
-
-            <div class="mt-4 text-center text-[9px] italic text-slate-400">
-              {{ 'Temsili veridir - Gerçek teklif değildir' }}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Trust Strip -->
-      <div class="relative border-t border-slate-200/80 bg-white/60 py-6 backdrop-blur-md">
-        <div class="mx-auto grid max-w-7xl gap-6 px-6 sm:grid-cols-2 lg:grid-cols-4 text-left">
-          <div v-for="(item, idx) in localizedTrustStrip" :key="idx" class="flex items-center gap-3">
-            <ShieldCheck v-if="idx === 0" class="text-blue-600 shrink-0" :size="22" />
-            <LockKeyhole v-else-if="idx === 1" class="text-blue-600 shrink-0" :size="22" />
-            <Scale v-else-if="idx === 2" class="text-blue-600 shrink-0" :size="22" />
-            <Globe2 v-else class="text-blue-600 shrink-0" :size="22" />
-            <div>
-              <div class="text-xs font-black text-slate-800">{{ item.title }}</div>
-              <div class="text-[10px] text-slate-500">{{ item.desc }}</div>
-            </div>
-          </div>
         </div>
       </div>
     </section>

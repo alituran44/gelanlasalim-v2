@@ -20,6 +20,8 @@ import {
   RotateCcw,
   Sparkles,
   Award,
+  MessageSquare,
+  Lock,
   X
 } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
@@ -589,16 +591,16 @@ function submitReview() {
       <div class="w-full max-w-lg rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden text-left p-6 sm:p-8 space-y-5">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div class="flex items-center gap-2.5">
-            <div class="h-10 w-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-lg">
-              💬
+            <div class="h-10 w-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
+              <MessageSquare :size="20" />
             </div>
             <div>
               <span class="text-[9px] font-black text-amber-600 uppercase tracking-wider block">B2B FİYAT PAZARLIĞI</span>
               <h3 class="text-base font-black text-slate-900">Karşı Teklif & Hedef Fiyat İlet</h3>
             </div>
           </div>
-          <button @click="showNegotiationModal = false" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl">
-            ✕
+          <button @click="showNegotiationModal = false" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl cursor-pointer">
+            <X :size="20" />
           </button>
         </div>
 
@@ -645,7 +647,7 @@ function submitReview() {
           <button
             type="button"
             @click="showNegotiationModal = false"
-            class="w-1/3 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition"
+            class="w-1/3 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition cursor-pointer"
           >
             Vazgeç
           </button>
@@ -654,7 +656,8 @@ function submitReview() {
             @click="submitCounterOffer"
             class="w-2/3 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs transition shadow-md flex items-center justify-center gap-2 cursor-pointer border border-amber-300"
           >
-            <span>💬 Karşı Teklifi Gönder & SMS İlet</span>
+            <Send :size="13" />
+            <span>Karşı Teklifi Gönder & SMS İlet</span>
           </button>
         </div>
       </div>

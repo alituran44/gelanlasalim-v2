@@ -359,24 +359,27 @@ function submitDispute() {
         </button>
         <button
           @click="activeTab = 'HAVUZDA_BLOKE'"
-          class="px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer shrink-0"
+          class="px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 flex items-center gap-1.5"
           :class="activeTab === 'HAVUZDA_BLOKE' ? 'bg-amber-500 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50'"
         >
-          🔒 Havuzda Bloke ({{ orders.filter(o => o.status === 'HAVUZDA_BLOKE').length }})
+          <Lock :size="12" />
+          <span>Havuzda Bloke ({{ orders.filter(o => o.status === 'HAVUZDA_BLOKE').length }})</span>
         </button>
         <button
           @click="activeTab = 'MAL_KABUL_BEKLIYOR'"
-          class="px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer shrink-0"
+          class="px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 flex items-center gap-1.5"
           :class="activeTab === 'MAL_KABUL_BEKLIYOR' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50'"
         >
-          📦 Mal Kabul Bekleyen ({{ orders.filter(o => o.status === 'MAL_KABUL_BEKLIYOR').length }})
+          <Package :size="12" />
+          <span>Mal Kabul Bekleyen ({{ orders.filter(o => o.status === 'MAL_KABUL_BEKLIYOR').length }})</span>
         </button>
         <button
           @click="activeTab = 'TAMAMLANDI'"
-          class="px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer shrink-0"
+          class="px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 flex items-center gap-1.5"
           :class="activeTab === 'TAMAMLANDI' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-50'"
         >
-          ✓ Tamamlanan ({{ orders.filter(o => o.status === 'TAMAMLANDI').length }})
+          <CheckCircle2 :size="12" />
+          <span>Tamamlanan ({{ orders.filter(o => o.status === 'TAMAMLANDI').length }})</span>
         </button>
       </div>
 
@@ -636,7 +639,9 @@ function submitDispute() {
               <h3 class="text-base font-black text-slate-900">İyzico / PayTR Escrow Güvencesi</h3>
             </div>
           </div>
-          <button @click="showPaymentModal = false" class="text-slate-400 hover:text-slate-700 p-2">✕</button>
+          <button @click="showPaymentModal = false" class="text-slate-400 hover:text-slate-700 p-2 cursor-pointer">
+            <X :size="18" />
+          </button>
         </div>
 
         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
@@ -689,7 +694,7 @@ function submitDispute() {
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-          <button @click="showPaymentModal = false" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl border border-slate-200">
+          <button @click="showPaymentModal = false" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl border border-slate-200 cursor-pointer">
             Vazgeç
           </button>
           <button
@@ -697,7 +702,8 @@ function submitDispute() {
             :disabled="isPaying"
             class="px-6 py-2.5 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-md flex items-center gap-2 cursor-pointer"
           >
-            <span v-if="!isPaying">🔒 Havuz Ödemesini Onayla</span>
+            <Lock v-if="!isPaying" :size="13" />
+            <span v-if="!isPaying">Havuz Ödemesini Onayla</span>
             <span v-else>İşlem Yapılıyor...</span>
           </button>
         </div>
@@ -719,7 +725,9 @@ function submitDispute() {
               <h3 class="text-base font-black text-slate-900">Hakedişi Tedarikçiye Aktar</h3>
             </div>
           </div>
-          <button @click="showReleaseModal = false" class="text-slate-400 hover:text-slate-700 p-2">✕</button>
+          <button @click="showReleaseModal = false" class="text-slate-400 hover:text-slate-700 p-2 cursor-pointer">
+            <X :size="18" />
+          </button>
         </div>
 
         <div class="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-200 space-y-2 text-xs">
@@ -750,7 +758,7 @@ function submitDispute() {
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-          <button @click="showReleaseModal = false" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl border border-slate-200">
+          <button @click="showReleaseModal = false" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl border border-slate-200 cursor-pointer">
             Vazgeç
           </button>
           <button
@@ -758,7 +766,8 @@ function submitDispute() {
             :disabled="isReleasing"
             class="px-6 py-2.5 text-xs font-black text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition shadow-md flex items-center gap-2 cursor-pointer"
           >
-            <span v-if="!isReleasing">✓ Mal Kabulü Onayla & Hakedişi Öde</span>
+            <CheckCircle2 v-if="!isReleasing" :size="13" />
+            <span v-if="!isReleasing">Mal Kabulü Onayla & Hakedişi Öde</span>
             <span v-else>Para Transfer Ediliyor...</span>
           </button>
         </div>
@@ -780,7 +789,9 @@ function submitDispute() {
               <h3 class="text-base font-black text-slate-900">İrsaliye & Lojistik Takibi</h3>
             </div>
           </div>
-          <button @click="showShippingModal = false" class="text-slate-400 hover:text-slate-700 p-2">✕</button>
+          <button @click="showShippingModal = false" class="text-slate-400 hover:text-slate-700 p-2 cursor-pointer">
+            <X :size="18" />
+          </button>
         </div>
 
         <div class="space-y-3">
@@ -801,14 +812,15 @@ function submitDispute() {
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-          <button @click="showShippingModal = false" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl border border-slate-200">
+          <button @click="showShippingModal = false" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl border border-slate-200 cursor-pointer">
             Vazgeç
           </button>
           <button
             @click="submitShipping"
-            class="px-6 py-2.5 text-xs font-black text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition shadow-md cursor-pointer"
+            class="px-6 py-2.5 text-xs font-black text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition shadow-md cursor-pointer flex items-center gap-2"
           >
-            🚚 Sevkiyatı Başlat
+            <Truck :size="14" />
+            <span>Sevkiyatı Başlat</span>
           </button>
         </div>
       </div>
@@ -829,7 +841,9 @@ function submitDispute() {
               <h3 class="text-base font-black text-slate-900">Escrow Hakem Heyeti İncelemesi</h3>
             </div>
           </div>
-          <button @click="showDisputeModal = false" class="text-slate-400 hover:text-slate-700 p-2">✕</button>
+          <button @click="showDisputeModal = false" class="text-slate-400 hover:text-slate-700 p-2 cursor-pointer">
+            <X :size="18" />
+          </button>
         </div>
 
         <div class="p-4 rounded-2xl bg-red-50/60 border border-red-200 text-xs text-red-900 space-y-1.5 font-medium">
@@ -842,14 +856,15 @@ function submitDispute() {
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
-          <button @click="showDisputeModal = false" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl border border-slate-200">
+          <button @click="showDisputeModal = false" class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 rounded-xl border border-slate-200 cursor-pointer">
             Vazgeç
           </button>
           <button
             @click="submitDispute"
-            class="px-6 py-2.5 text-xs font-black text-white bg-red-600 hover:bg-red-700 rounded-xl transition shadow-md cursor-pointer"
+            class="px-6 py-2.5 text-xs font-black text-white bg-red-600 hover:bg-red-700 rounded-xl transition shadow-md cursor-pointer flex items-center gap-2"
           >
-            ⚖️ Hakem Heyeti Talebini Gönder
+            <Scale :size="14" />
+            <span>Hakem Heyetine İlet</span>
           </button>
         </div>
       </div>

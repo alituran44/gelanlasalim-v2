@@ -16,6 +16,10 @@ import {
   MapPin, 
   Building2, 
   RotateCw,
+  Lock,
+  Truck,
+  MessageSquare,
+  ChevronRight,
   X 
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
@@ -254,9 +258,9 @@ function submitReview() {
               }"
             >
               {{ 
-                teklif.durum === 'onaylandi' ? '✓ Kabul Edildi' :
-                teklif.durum === 'pazarlik' ? '💬 Karşı Teklif Geldi' :
-                teklif.durum === 'reddedildi' ? '✕ Reddedildi' : 'Değerlendiriliyor'
+                teklif.durum === 'onaylandi' ? 'Kabul Edildi' :
+                teklif.durum === 'pazarlik' ? 'Karşı Teklif Geldi' :
+                teklif.durum === 'reddedildi' ? 'Reddedildi' : 'Değerlendiriliyor'
               }}
             </span>
 
@@ -270,7 +274,7 @@ function submitReview() {
                 class="rounded-xl px-4 py-2 text-xs font-black bg-amber-400 hover:bg-amber-500 text-slate-950 transition shadow-sm flex items-center gap-1.5 cursor-pointer border border-amber-300"
               >
                 <RotateCw :size="13" />
-                Revize Teklif Ver
+                <span>Revize Teklif Ver</span>
               </button>
 
               <!-- Onaylandıysa Değerlendirme & Mücbir Sebep -->
@@ -281,7 +285,7 @@ function submitReview() {
                   class="rounded-xl px-3 py-2 text-xs font-bold bg-white border border-slate-300 hover:bg-slate-50 text-slate-800 flex items-center gap-1 shadow-2xs"
                 >
                   <Star :size="13" class="text-amber-500 fill-amber-500" />
-                  Puanla
+                  <span>Puanla</span>
                 </button>
                 <button
                   type="button"
@@ -305,14 +309,16 @@ function submitReview() {
               ALICI FİRMA DOĞRUDAN İLETİŞİM & SEVKİYAT DETAYLARI (AÇILDI)
             </span>
             <div class="flex items-center gap-2">
-              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
-                🔒 Alıcı Ödemesi Havuzda Güvencede
+              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 flex items-center gap-1">
+                <Lock :size="11" class="text-emerald-600" />
+                <span>Alıcı Ödemesi Havuzda Güvencede</span>
               </span>
               <NuxtLink
                 to="/panel/siparis-teslimat"
                 class="text-[11px] font-black text-blue-600 hover:text-blue-800 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200 flex items-center gap-1"
               >
-                <span>🚚 Sevkiyatı Başlat (İrsaliye Gir)</span>
+                <Truck :size="13" class="text-blue-600" />
+                <span>Sevkiyatı Başlat (İrsaliye Gir)</span>
                 <ChevronRight :size="12" />
               </NuxtLink>
             </div>
@@ -340,7 +346,10 @@ function submitReview() {
 
         <!-- Pazarlık Geçmişi Kutusu -->
         <div v-if="teklif.pazarlikGecmisi && teklif.pazarlikGecmisi.length > 0" class="p-3.5 rounded-xl bg-amber-50/50 border border-amber-200/60 text-xs space-y-1.5">
-          <span class="text-[10px] font-black text-amber-700 uppercase tracking-wider block">💬 Pazarlık & Karşı Teklif Geçmişi</span>
+          <span class="text-[10px] font-black text-amber-700 uppercase tracking-wider flex items-center gap-1">
+            <MessageSquare :size="12" />
+            <span>Pazarlık & Karşı Teklif Geçmişi</span>
+          </span>
           <div v-for="(paz, pIdx) in teklif.pazarlikGecmisi" :key="pIdx" class="flex justify-between items-center text-slate-700 bg-white p-2 rounded-lg border border-amber-100">
             <span><strong>{{ paz.kim }}:</strong> {{ paz.mesaj }}</span>
             <span class="text-[10px] text-slate-400 font-mono shrink-0 ml-2">{{ paz.tarih }}</span>

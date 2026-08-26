@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight } from 'lucide-vue-next'
+import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight, Lock, Clock, CheckCircle2, AlertCircle } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale } from '~/composables/useLocale'
 
@@ -252,21 +252,24 @@ const statusTabs = computed(() => {
               <!-- Durum Rozeti -->
               <span 
                 v-if="tender.durum === 'closed' || tender.sure?.includes('Sonuçlandı') || tender.sure?.includes('Mutabakat')"
-                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1"
               >
-                🔒 Mutabakat Sağlandı
+                <Lock :size="11" />
+                <span>Mutabakat Sağlandı</span>
               </span>
               <span 
                 v-else-if="tender.durum === 'expired' || tender.sure?.includes('Süresi Doldu')"
-                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-slate-100 text-slate-700 border border-slate-300"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-slate-100 text-slate-700 border border-slate-300 flex items-center gap-1"
               >
-                ⌛ Süresi Doldu
+                <Clock :size="11" />
+                <span>Süresi Doldu</span>
               </span>
               <span 
                 v-else
-                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1"
               >
-                ✓ Yayında (Aktif)
+                <CheckCircle2 :size="11" />
+                <span>Yayında (Aktif)</span>
               </span>
             </div>
 
@@ -293,10 +296,11 @@ const statusTabs = computed(() => {
             v-if="tender.durum === 'closed' || tender.sure?.includes('Sonuçlandı') || tender.sure?.includes('Mutabakat')"
             type="button"
             @click="cancelTenderAgreement(tender)"
-            class="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold transition cursor-pointer"
+            class="px-3 py-1.5 rounded-xl bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-bold transition cursor-pointer flex items-center gap-1"
             title="Mutabakatı iptal edip ihaleyi tekrar teklife aç"
           >
-            ⚠️ Mutabakatı İptal Et
+            <AlertCircle :size="12" />
+            <span>Mutabakatı İptal Et</span>
           </button>
 
           <!-- Eğer Süresi Dolduysa: Tekrar İlan Ver Butonu -->
@@ -304,10 +308,11 @@ const statusTabs = computed(() => {
             v-else-if="tender.durum === 'expired' || tender.sure?.includes('Süresi Doldu')"
             type="button"
             @click="republishTender(tender)"
-            class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition cursor-pointer shadow-xs"
+            class="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition cursor-pointer shadow-xs flex items-center gap-1"
             title="İlanı 30 gün süreyle yeniden yayına al"
           >
-            🔄 Tekrar İlan Ver
+            <RotateCw :size="12" />
+            <span>Tekrar İlan Ver</span>
           </button>
 
           <!-- Gelen Tekliflere Git Linki -->

@@ -8,13 +8,15 @@ import {
   Lock, 
   FileText, 
   Plus, 
-  ArrowRight,
-  Sparkles,
-  ShieldCheck,
-  Clock,
-  Gift,
-  Zap,
-  X
+  ArrowRight, 
+  Sparkles, 
+  ShieldCheck, 
+  Clock, 
+  Gift, 
+  Zap, 
+  MessageSquare,
+  Send,
+  X 
 } from 'lucide-vue-next'
 import { locale } from '~/composables/useLocale'
 
@@ -380,8 +382,9 @@ onMounted(() => {
       <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-5 text-left">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
           <div>
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#0052FF] text-[10px] font-black uppercase tracking-wider mb-1.5">
-              <span>💬 CANLI PAZARLIK & TEKLİF AKIŞI</span>
+            <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#0052FF] text-[10px] font-black uppercase tracking-wider mb-1.5">
+              <MessageSquare :size="12" />
+              <span>CANLI PAZARLIK & TEKLİF AKIŞI</span>
             </div>
             <h2 class="text-lg font-black text-slate-800 tracking-tight">
               Firmanızın İhalelerine Gelen Son Teklifler
@@ -450,14 +453,16 @@ onMounted(() => {
                   class="w-full py-2 px-2.5 rounded-xl bg-red-50 hover:bg-red-100 border border-red-200 text-red-700 text-xs font-black transition flex items-center justify-center gap-1 cursor-pointer"
                   title="Anlaşmayı iptal edip ihaleyi tekrar teklife aç"
                 >
-                  <span>⚠️ Mutabakatı İptal Et (Teklife Aç)</span>
+                  <AlertCircle :size="13" />
+                  <span>Mutabakatı İptal Et (Teklife Aç)</span>
                 </button>
               </template>
 
               <!-- Elendiyse -->
               <template v-else-if="bid.status.includes('Elendi')">
-                <div class="w-full py-2 px-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 text-[11px] font-bold text-center">
-                  🔒 İhalede Başka Teklifle Anlaşıldı
+                <div class="w-full py-2 px-2.5 rounded-xl bg-slate-100 border border-slate-200 text-slate-500 text-[11px] font-bold text-center flex items-center justify-center gap-1">
+                  <Lock :size="12" />
+                  <span>İhalede Başka Teklifle Anlaşıldı</span>
                 </div>
               </template>
 
@@ -468,14 +473,16 @@ onMounted(() => {
                   @click="openNegotiationModal(bid)"
                   class="flex-1 py-2 px-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-300 text-amber-900 text-xs font-black transition flex items-center justify-center gap-1 cursor-pointer"
                 >
-                  <span>💬 Pazarlık</span>
+                  <MessageSquare :size="12" />
+                  <span>Pazarlık</span>
                 </button>
                 <button
                   type="button"
                   @click="acceptBid(bid)"
                   class="flex-1 py-2 px-2.5 rounded-xl bg-[#0052FF] hover:bg-blue-700 text-white text-xs font-black transition flex items-center justify-center gap-1 shadow-xs cursor-pointer"
                 >
-                  <span>✓ Kabul Et</span>
+                  <CheckCircle2 :size="12" />
+                  <span>Kabul Et</span>
                 </button>
               </template>
             </div>
@@ -821,16 +828,16 @@ onMounted(() => {
       <div class="w-full max-w-lg rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden text-left p-6 space-y-5">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div class="flex items-center gap-2.5">
-            <div class="h-10 w-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-lg">
-              💬
+            <div class="h-10 w-10 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center text-amber-600">
+              <MessageSquare :size="20" />
             </div>
             <div>
               <span class="text-[9px] font-black text-amber-600 uppercase tracking-wider block">B2B FİYAT PAZARLIĞI</span>
               <h3 class="text-sm font-black text-slate-900">Tedarikçi ile Pazarlık & Karşı Teklif</h3>
             </div>
           </div>
-          <button @click="showNegotiationModal = false" class="text-slate-400 hover:text-slate-700 transition">
-            ✕
+          <button @click="showNegotiationModal = false" class="text-slate-400 hover:text-slate-700 transition cursor-pointer">
+            <X :size="20" />
           </button>
         </div>
 
@@ -885,7 +892,7 @@ onMounted(() => {
           <button
             type="button"
             @click="showNegotiationModal = false"
-            class="w-1/3 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition"
+            class="w-1/3 py-3 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition cursor-pointer"
           >
             Vazgeç
           </button>
@@ -894,7 +901,8 @@ onMounted(() => {
             @click="submitCounterOffer"
             class="w-2/3 py-3 rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-black text-xs transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer border border-amber-300"
           >
-            <span>💬 Karşı Teklifi İlet</span>
+            <Send :size="13" />
+            <span>Karşı Teklifi İlet</span>
           </button>
         </div>
       </div>
