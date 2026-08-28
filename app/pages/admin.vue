@@ -119,7 +119,6 @@ export type AdminTab =
   | 'escrow_delivery'
   | 'disputes_desk'
   | 'categories'
-  | 'video_cms'
   | 'promo_codes'
   | 'audit_logs'
   | 'site_settings'
@@ -788,15 +787,6 @@ function removeSubmittedBid(index: number) {
               Sektör & Kategoriler
             </button>
 
-            <button 
-              @click="activeTab = 'video_cms'" 
-              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'video_cms' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
-            >
-              <Video :size="14" />
-              Video Rehberler & Akademi
-            </button>
-
             <!-- GROUP: İLETİŞİM & AI -->
             <div class="text-[9px] font-black text-teal-400 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
               <Bot :size="10" /> İLETİŞİM & AI ASİSTAN
@@ -954,7 +944,6 @@ function removeSubmittedBid(index: number) {
               <span v-else-if="activeTab === 'live_rooms'">🔴 Canlı Tersine Eksiltme Odası Operatörü</span>
               <span v-else-if="activeTab === 'escrow_delivery'">📦 Sipariş, Güvenli Havuz (Escrow) & Teslimat</span>
               <span v-else-if="activeTab === 'categories'">🏷️ B2B Sektör & Kategori Yönetimi</span>
-              <span v-else-if="activeTab === 'video_cms'">🎬 Video Rehberler & B2B Akademi CMS</span>
               <span v-else-if="activeTab === 'promo_codes'">🎟️ Kupon & Lansman Promosyon Kodları</span>
               <span v-else-if="activeTab === 'audit_logs'">🔒 Sistem Denetim İzi & Güvenlik Günlüğü</span>
               <span v-else-if="activeTab === 'site_settings'">⚙️ Site Genel Ayarları, SEO & Bakım Modu</span>
@@ -1511,38 +1500,6 @@ function removeSubmittedBid(index: number) {
                 <p class="text-[11px] text-slate-400 leading-relaxed">{{ cat.description }}</p>
                 <div class="text-[10px] text-blue-400 font-bold bg-blue-950/40 px-2 py-1 rounded inline-block">
                   {{ cat.activeTendersCount }} Aktif İhale
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ========================================================================= -->
-          <!-- TAB 5: VİDEO REHBERLER & AKADEMİ CMS -->
-          <!-- ========================================================================= -->
-          <div v-if="activeTab === 'video_cms'" class="space-y-6">
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
-                <Video :size="14" class="text-blue-500" /> B2B Akademi & Video Rehber İçerik Yönetimi
-              </h3>
-              <p class="text-[11px] text-slate-400">Sitede ve Hero butonunda açılan 4 ana rehber videosunun URL, başlık ve seslendirme metinlerini güncelleyin.</p>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div v-for="(v, idx) in formState.videoGuides" :key="idx" class="p-5 rounded-2xl border border-slate-800 bg-slate-950 space-y-3">
-                  <div class="flex items-center gap-2">
-                    <span class="text-[10px] font-mono bg-blue-950 text-blue-400 px-2 py-0.5 rounded font-bold">REHBER #{{ idx + 1 }}</span>
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-slate-500 mb-1">VİDEO BAŞLIĞI</label>
-                    <input v-model="v.title" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-900 p-2.5 text-xs text-white" />
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-slate-500 mb-1">AÇIKLAMA</label>
-                    <input v-model="v.desc" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-900 p-2.5 text-xs text-white" />
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-slate-500 mb-1">VİDEO MP4 / YOUTUBE BAĞLANTI URL'İ</label>
-                    <input v-model="v.videoUrl" type="text" placeholder="https://assets.mixkit.co/..." class="w-full rounded-lg border border-slate-800 bg-slate-900 p-2.5 text-xs text-white font-mono" />
-                  </div>
                 </div>
               </div>
             </div>
