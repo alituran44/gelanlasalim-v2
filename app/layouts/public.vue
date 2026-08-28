@@ -262,15 +262,15 @@ onMounted(() => {
     </main>
 
     <!-- ========================================================================= -->
-    <!-- 🛡️ 3. ZENGİN KURUMSAL VE HUKUKİ FOOTER ALANI -->
+    <!-- 🛡️ 3. ZENGİN KURUMSAL VE HUKUKİ FOOTER ALANI (13 YASAL SÖZLEŞME VE KÜNYE) -->
     <!-- ========================================================================= -->
     <footer class="mt-12 bg-[#050B16] border-t border-slate-800 text-slate-400 text-xs py-12">
       <div class="max-w-[1400px] mx-auto px-4 sm:px-6 space-y-10 text-left">
         
-        <!-- 4 Kolonlu Zengin Footer Izgarası -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <!-- ÜST KISIM: 4 KOLONLU ZENGİN FOOTER IZGARASI -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           
-          <!-- Kolon 1: Şirket ve Borsa Hakkında -->
+          <!-- Kolon 1: Şirket Künyesi (lg:col-span-1) -->
           <div class="space-y-3">
             <div class="flex items-center gap-2">
               <span class="text-xl">⚖️</span>
@@ -283,48 +283,68 @@ onMounted(() => {
               <div>📍 İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale</div>
               <div>🏛️ Çanakkale V.D. 4700854210</div>
               <div>📋 MERSİS: 0470085421000001</div>
+              <div>🏢 Ticaret Sicil: 14520</div>
+              <div>📨 KEP: ihaleciburada@hs01.kep.tr</div>
             </div>
           </div>
 
-          <!-- Kolon 2: Hızlı Bağlantılar -->
+          <!-- Kolon 2: Platform & Kurumsal (lg:col-span-1) -->
           <div class="space-y-3">
-            <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">PLATFORM</h4>
+            <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">KURUMSAL & PLATFORM</h4>
             <div class="flex flex-col gap-2 text-slate-300 text-[11px]">
               <NuxtLink to="/" class="hover:text-sky-400 transition-colors">▪ Ana Sayfa</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="hover:text-sky-400 transition-colors">▪ Hakkımızda & Vizyon</NuxtLink>
               <NuxtLink to="/pazar-yeri" class="hover:text-sky-400 transition-colors">▪ B2B Pazar Yeri</NuxtLink>
-              <NuxtLink to="/panel/ihale-olustur" class="hover:text-sky-400 transition-colors">▪ İhale Oluştur & Eksiltme</NuxtLink>
+              <NuxtLink to="/panel/ihale-olustur" class="hover:text-sky-400 transition-colors">▪ İhale Aç & Eksiltme</NuxtLink>
               <NuxtLink to="/abonelik" class="hover:text-sky-400 transition-colors">▪ Üyelik Paketleri</NuxtLink>
-              <NuxtLink to="/videolar" class="hover:text-sky-400 transition-colors">▪ Video Rehberler</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=kariyer" class="hover:text-sky-400 transition-colors">▪ Kariyer Fırsatları</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=is-ortakligi" class="hover:text-sky-400 transition-colors">▪ İş Ortaklığı & Komisyon</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-sky-400 transition-colors">▪ Blog & Makaleler</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=basin" class="hover:text-sky-400 transition-colors">▪ Basın Odası & Medya Kiti</NuxtLink>
             </div>
           </div>
 
-          <!-- Kolon 3: 13 Yasal Sözleşme -->
+          <!-- Kolon 3: Hukuki Sözleşmeler Bölüm 1 (lg:col-span-1) -->
           <div class="space-y-3">
-            <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">HUKUKİ SÖZLEŞMELER</h4>
+            <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">RESMİ SÖZLEŞMELER (I)</h4>
             <div class="flex flex-col gap-1.5 text-slate-300 text-[11px]">
-              <NuxtLink to="/sozlesmeler?tab=on-bilgilendirme" class="hover:text-amber-300 text-amber-200">▪ Ön Bilgilendirme Formu</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-blue-300 text-blue-200">▪ Mesafeli Satış Sözleşmesi</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=iptal-iade" class="hover:text-emerald-300 text-emerald-200">▪ İptal ve İade Koşulları</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-sky-400">▪ Gizlilik Politikası</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-sky-400">▪ KVKK Aydınlatma Metni</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=escrow" class="hover:text-sky-400">▪ Escrow Güvenli Havuz</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-sky-300">1. Kullanım Şartları & Hizmet (MSA)</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-sky-300">2. Gizlilik & Veri Güvenliği</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-sky-300">3. KVKK Aydınlatma & Veri İşleme (DPA)</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=on-bilgilendirme" class="hover:text-amber-300 text-amber-200">4. Ön Bilgilendirme Formu</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-blue-300 text-blue-200">5. Mesafeli Satış & Abonelik Sözleşmesi</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=iptal-iade" class="hover:text-emerald-300 text-emerald-200">6. İptal, İade ve Cayma Koşulları</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=teslimat" class="hover:text-sky-300">7. Teslimat ve Dijital İfa Politikası</NuxtLink>
             </div>
           </div>
 
-          <!-- Kolon 4: 7/24 Destek & Güvenlik -->
+          <!-- Kolon 4: Hukuki Sözleşmeler Bölüm 2 (lg:col-span-1) -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">RESMİ SÖZLEŞMELER (II)</h4>
+            <div class="flex flex-col gap-1.5 text-slate-300 text-[11px]">
+              <NuxtLink to="/sozlesmeler?tab=ihale-kurallari" class="hover:text-sky-300">8. B2B Eksiltme & İhale Kuralları</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=cerezler" class="hover:text-sky-300">9. Çerez Politikası & Takip Şartları</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=tedarikci-uyum" class="hover:text-sky-300">10. Tedarikçi Doğrulama & KYC Beyanı</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=sla" class="hover:text-sky-300">11. Servis Seviyesi Taahhüdü (SLA)</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=bilgi-guvenligi" class="hover:text-sky-300">12. Bilgi Güvenliği & ISO 27001</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=escrow" class="hover:text-sky-300">13. Güvenli Havuz (Escrow) Sözleşmesi</NuxtLink>
+            </div>
+          </div>
+
+          <!-- Kolon 5: Destek ve Güvenlik (lg:col-span-1) -->
           <div class="space-y-3">
             <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">DESTEK & İLETİŞİM</h4>
             <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2 text-[11px]">
               <div class="font-bold text-white flex items-center gap-1.5">
                 <span>📞</span>
-                <span>0850 840 86 95</span>
+                <a href="tel:08508408695" class="hover:underline text-emerald-400">0850 840 86 95</a>
               </div>
               <div class="text-slate-400">
                 <span>✉</span>
-                <span class="ml-1 text-sky-300">ihalcib@gmail.com</span>
+                <a href="mailto:ihalcib@gmail.com" class="ml-1 text-sky-300 hover:underline">ihalcib@gmail.com</a>
               </div>
               <div class="text-[10px] text-slate-500 pt-1 border-t border-slate-800">
-                Hafta İçi: 09:00 - 18:00 | 7/24 Online Destek
+                Hafta İçi: 09:00 - 18:00 | 7/24 Canlı Destek Masası
               </div>
             </div>
           </div>
@@ -335,7 +355,7 @@ onMounted(() => {
         <div class="pt-6 border-t border-slate-800/80 flex flex-col md:flex-row items-center justify-between gap-4">
           <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold">
             <ShieldCheck :size="16" />
-            <span>PayTR & iyzico 256-Bit SSL TLS 1.3 3D Secure Güvenli Ödeme</span>
+            <span>PayTR & iyzico 256-Bit SSL TLS 1.3 3D Secure Güvenli Ödeme Altyapısı</span>
           </div>
           <div>
             <PaymentBadges />
