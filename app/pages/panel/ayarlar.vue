@@ -77,6 +77,9 @@ onMounted(() => {
         companyForm.value.name = session.companyName || session.company
         companyForm.value.legalName = session.legalName || session.companyName || session.company
       }
+      if (session.description || session.about) companyForm.value.description = session.description || session.about
+      if (session.website) companyForm.value.website = session.website
+      if (session.city) companyForm.value.city = session.city
       if (session.taxNo) companyForm.value.taxNo = session.taxNo
       if (session.taxOffice) companyForm.value.taxOffice = session.taxOffice
       if (session.sectors) companyForm.value.sectors = Array.isArray(session.sectors) ? session.sectors.join(', ') : session.sectors
@@ -210,23 +213,47 @@ const profileForm = ref({
 
 // Company & Verification details
 const companyVerified = ref(false)
+const availableSectors = [
+  'Ambalaj, Koli & Plastik',
+  'İnşaat, Yapı & Şantiye',
+  'Sanayi, Makine & Metal',
+  'Lojistik, Nakliye & Depolama',
+  'Akaryakıt, Enerji & Madeni Yağ',
+  'Kırtasiye, Ofis & Teknoloji',
+  'Gıda, İkram & Hizmet',
+  'Tekstil & İş Güvenliği'
+]
+
 const companyForm = ref({
-  name: 'Ali Turan',
-  legalName: 'Ali Turan Ticaret A.Ş.',
+  name: 'Ali Turan Sanayi ve Ticaret Ltd. Şti.',
+  legalName: 'Ali Turan Sanayi ve Ticaret Anonim Şirketi',
+  description: 'Şirketimiz ambalaj, oluklu mukavva koli, inşaat malzemeleri ve lojistik tedarik alanında kurumsal müşterilere toptan imalat ve tedarik hizmeti sunmaktadır.',
   contactPerson: 'Ali Turan',
   phone: '0850 840 86 95',
   email: 'ihalcib@gmail.com',
   tcKimlik: '12345678901',
   taxNo: '4700854210',
   taxOffice: 'Çanakkale Vergi Dairesi',
-  sectors: 'Ambalaj & Kağıt, İnşaat & Yapı, Lojistik & Nakliye',
+  sectors: 'Ambalaj, Koli & Plastik, İnşaat, Yapı & Şantiye, Lojistik, Nakliye & Depolama',
   mersis: '0470-0854-2100-0001',
   sicilNo: '14520',
+  website: 'https://www.ihaleciburada.com',
   faturaAdresi: 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale',
+  city: 'Çanakkale',
   iban: 'TR56 0006 2000 0001 2345 6789 01',
   accountHolder: 'Ali Turan',
   is2FaEnabled: true
 })
+
+function toggleSectorTag(sec: string) {
+  let list = (companyForm.value.sectors || '').split(',').map((s: string) => s.trim()).filter(Boolean)
+  if (list.includes(sec)) {
+    list = list.filter((s: string) => s !== sec)
+  } else {
+    list.push(sec)
+  }
+  companyForm.value.sectors = list.join(', ')
+}
 
 function saveCompanyInfo() {
   if (typeof window !== 'undefined') {
@@ -234,6 +261,8 @@ function saveCompanyInfo() {
     session.company = companyForm.value.name
     session.companyName = companyForm.value.name
     session.legalName = companyForm.value.legalName
+    session.description = companyForm.value.description
+    session.about = companyForm.value.description
     session.taxNo = companyForm.value.taxNo
     session.taxOffice = companyForm.value.taxOffice
     session.sectors = companyForm.value.sectors
@@ -243,13 +272,15 @@ function saveCompanyInfo() {
     session.contactPerson = companyForm.value.contactPerson
     session.phone = companyForm.value.phone
     session.faturaAdresi = companyForm.value.faturaAdresi
+    session.website = companyForm.value.website
+    session.city = companyForm.value.city
     session.iban = companyForm.value.iban
     session.accountHolder = companyForm.value.accountHolder
     session.verified = true
     localStorage.setItem('userSession', JSON.stringify(session))
     userSession.value = session
   }
-  showToast("Kurumsal firma ve vergi bilgileriniz başarıyla kaydedildi.", "success")
+  showToast("Kurumsal firma, sektör ve açıklama bilgileriniz başarıyla kaydedildi.", "success")
 }
 
 // Document Upload status counters
@@ -579,8 +610,38 @@ function confirmAccountDelete() {
 // Profile save state
 const isSaved = ref(false)
 function saveProfile() {
+  if (typeof window !== 'undefined') {
+    const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    session.name = profileForm.value.name
+    session.firstName = profileForm.value.name
+    session.lastName = profileForm.value.surname
+    session.surname = profileForm.value.surname
+    session.phone = profileForm.value.phone
+    session.email = profileForm.value.email
+    session.title = profileForm.value.title
+    
+    // Company data
+    session.company = companyForm.value.name
+    session.companyName = companyForm.value.name
+    session.legalName = companyForm.value.legalName
+    session.description = companyForm.value.description
+    session.about = companyForm.value.description
+    session.sectors = companyForm.value.sectors
+    session.taxNo = companyForm.value.taxNo
+    session.taxOffice = companyForm.value.taxOffice
+    session.mersis = companyForm.value.mersis
+    session.sicilNo = companyForm.value.sicilNo
+    session.tcKimlik = companyForm.value.tcKimlik
+    session.faturaAdresi = companyForm.value.faturaAdresi
+    session.website = companyForm.value.website
+    session.city = companyForm.value.city
+    session.iban = companyForm.value.iban
+
+    localStorage.setItem('userSession', JSON.stringify(session))
+    userSession.value = session
+  }
   isSaved.value = true
-  showToast("Kişisel ve iletişim bilgileriniz başarıyla güncellendi.")
+  showToast("Profil, şirket tanıtım açıklaması ve sektör bilgileriniz başarıyla güncellendi.", "success")
   setTimeout(() => {
     isSaved.value = false
   }, 3000)
@@ -800,38 +861,44 @@ function saveProfile() {
               <div class="relative h-24 w-24 flex items-center justify-center">
                 <svg class="absolute transform -rotate-90 w-full h-full">
                   <circle cx="48" cy="48" r="40" stroke="#F1F5F9" stroke-width="8" fill="transparent" />
-                  <circle cx="48" cy="48" r="40" stroke="#3B82F6" stroke-width="8" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="150.7" />
+                  <circle cx="48" cy="48" r="40" stroke="#10B981" stroke-width="8" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="12.5" />
                 </svg>
-                <span class="text-base font-black text-slate-800">%40</span>
+                <span class="text-base font-black text-emerald-700 font-mono">%95</span>
               </div>
               <div>
                 <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">PROFİL KALİTE SKORU</span>
-                <span class="text-xs font-bold text-slate-700 block mt-0.5">Güven kaydınız</span>
+                <span class="text-xs font-bold text-emerald-700 block mt-0.5">✓ Onaylı & Güvenilir Kurumsal</span>
               </div>
             </div>
 
             <div class="md:col-span-3 space-y-3">
-              <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">SONRAKİ ADIMLAR</span>
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">KURUMSAL PROFİL DURUMU</span>
               <div class="space-y-2 text-[10px] font-bold">
-                <div class="text-slate-600 flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Fotoğraf ekleyin</div>
-                <div class="text-slate-600 flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Tanıtım videosu ekleyin</div>
-                <div class="text-emerald-600 flex items-center gap-2"><CheckCircle2 :size="10" /> Sektörler ekleyin</div>
-                <div class="text-slate-600 flex items-center gap-2"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span> Şirket açıklamasını tamamlayın</div>
+                <div class="text-emerald-600 flex items-center gap-2"><CheckCircle2 :size="12" /> Kurumsal firma yetkili bilgileri tanımlı</div>
+                <div :class="companyForm.sectors ? 'text-emerald-600' : 'text-slate-600'" class="flex items-center gap-2">
+                  <CheckCircle2 :size="12" /> Faaliyet sektörleri seçildi ({{ (companyForm.sectors || '').split(',').filter(Boolean).length }} Sektör)
+                </div>
+                <div :class="companyForm.description ? 'text-emerald-600' : 'text-slate-600'" class="flex items-center gap-2">
+                  <CheckCircle2 :size="12" /> Şirket faaliyet tanıtımı & açıklaması tamamlandı
+                </div>
+                <div :class="companyForm.taxNo ? 'text-emerald-600' : 'text-slate-600'" class="flex items-center gap-2">
+                  <CheckCircle2 :size="12" /> Vergi Dairesi ve VKN / MERSİS yasal kaydı girildi
+                </div>
               </div>
             </div>
           </div>
 
           <!-- Kişisel Bilgiler Form -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2"><User :size="14" /> Kişisel Bilgiler</h3>
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2"><User :size="14" class="text-blue-600" /> Kişisel Yetkili Bilgileri</h3>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">İsim</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Yetkili İsim</label>
                 <input v-model="profileForm.name" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
               </div>
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Soyisim</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Yetkili Soyisim</label>
                 <input v-model="profileForm.surname" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
               </div>
               <div>
@@ -839,31 +906,132 @@ function saveProfile() {
                 <input v-model="profileForm.email" type="email" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-slate-50 text-slate-400 outline-none" style="border-color: #E2E8F0;" disabled />
               </div>
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Telefon</label>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Yetkili Telefon</label>
                 <input v-model="profileForm.phone" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+              </div>
+            </div>
+          </div>
+
+          <!-- 🏢 ŞİRKET TANITIMI, SEKTÖRLER VE KURUMSAL BİLGİLER FORMU (KULLANICI TALEBİ) -->
+          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
+            <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                <Building2 :size="15" class="text-emerald-600" />
+                Şirket Bilgileri, Sektör ve Kurumsal Tanıtım
+              </h3>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-black">
+                ✓ Doğrulanmış Kurumsal Üye
+              </span>
+            </div>
+
+            <!-- Şirket Adı ve Yasal Unvan -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Şirket / Ticari Firma Adı</label>
+                <input v-model="companyForm.name" type="text" placeholder="Örn: Turan Ambalaj Sanayi Ltd. Şti." class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-bold text-slate-800" style="border-color: #E2E8F0;" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Resmi Yasal Unvan (Fatura)</label>
+                <input v-model="companyForm.legalName" type="text" placeholder="Örn: Turan Ambalaj Kağıt ve Plastik San. Tic. A.Ş." class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-bold text-slate-800" style="border-color: #E2E8F0;" />
+              </div>
+            </div>
+
+            <!-- Faaliyet Sektörleri (Çoklu Seçim & Etiketler) -->
+            <div class="space-y-2">
+              <label class="block text-[10px] font-black text-slate-500 uppercase">
+                Faaliyet Sektörleriniz (Tıklayarak Seçiniz / Kaldırınız)
+              </label>
+              <div class="flex flex-wrap gap-2 pt-1">
+                <button 
+                  v-for="sec in availableSectors" 
+                  :key="sec"
+                  type="button"
+                  @click="toggleSectorTag(sec)"
+                  class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs border"
+                  :class="companyForm.sectors.includes(sec) 
+                    ? 'bg-blue-600 text-white border-blue-600' 
+                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
+                >
+                  <Check v-if="companyForm.sectors.includes(sec)" :size="12" />
+                  <span>{{ sec }}</span>
+                </button>
+              </div>
+              <input 
+                v-model="companyForm.sectors" 
+                type="text" 
+                placeholder="Seçili sektörler (Virgülle ayırarak manuel de ekleyebilirsiniz)" 
+                class="w-full rounded-xl border px-4 py-2 text-xs bg-slate-50 text-slate-700 outline-none mt-2 font-medium" 
+                style="border-color: #E2E8F0;"
+              />
+            </div>
+
+            <!-- Şirket Faaliyet Tanıtımı ve Hakkında Açıklaması (Textarea) -->
+            <div class="space-y-1.5">
+              <label class="block text-[10px] font-black text-slate-500 uppercase">
+                Şirket Faaliyet Tanıtımı & Hakkında Açıklaması
+              </label>
+              <textarea 
+                v-model="companyForm.description" 
+                rows="4" 
+                placeholder="Şirketinizin faaliyet alanı, üretim/satış kapasitesi, referansları ve kurumsal tanıtım metnini buraya yazınız. İhale veren alıcılar ve tedarikçiler profilinizde bu açıklamayı görecektir..."
+                class="w-full rounded-xl border p-4 text-xs bg-white outline-none font-medium leading-relaxed" 
+                style="border-color: #E2E8F0;"
+              ></textarea>
+              <p class="text-[10px] text-slate-400">Şirket açıklaması güvenilirlik puanınızı ve ihale kazanma şansınızı artırır.</p>
+            </div>
+
+            <!-- Vergi, TC, Mersis, Sicil -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">T.C. Kimlik / VKN (Vergi No)</label>
+                <input v-model="companyForm.taxNo" type="text" placeholder="4700854210" class="w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono bg-white outline-none" style="border-color: #E2E8F0;" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Bağlı Vergi Dairesi</label>
+                <input v-model="companyForm.taxOffice" type="text" placeholder="Çanakkale V.D." class="w-full rounded-xl border px-3.5 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">MERSİS Numarası</label>
+                <input v-model="companyForm.mersis" type="text" placeholder="0470-0854-2100-0001" class="w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono bg-white outline-none" style="border-color: #E2E8F0;" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Ticaret Sicil No</label>
+                <input v-model="companyForm.sicilNo" type="text" placeholder="14520" class="w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono bg-white outline-none" style="border-color: #E2E8F0;" />
+              </div>
+            </div>
+
+            <!-- Web Sitesi & Tebligat Adresi -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Kurumsal Web Sitesi</label>
+                <input v-model="companyForm.website" type="text" placeholder="https://www.firmaadi.com" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+              </div>
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Şirket Tebligat & Fatura Adresi</label>
+                <input v-model="companyForm.faturaAdresi" type="text" placeholder="İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
               </div>
             </div>
           </div>
 
           <!-- Upload section -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2"><Camera :size="14" /> Tanıtım Galerisi</h3>
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2"><Camera :size="14" /> Tanıtım Galerisi & Şirket Logosu</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="rounded-xl border-2 border-dashed p-6 text-center space-y-3 flex flex-col items-center justify-center" style="border-color: #E2E8F0;">
                 <Camera :size="16" class="text-slate-400" />
-                <span class="text-xs font-bold text-slate-700">Fotoğraf Ekle</span>
-                <button type="button" @click="showToast('Fotoğraf yükleme arayüzü açıldı. Dosya bekleniyor...')" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold hover:bg-slate-50 transition" style="border-color: #E2E8F0;">Fotoğraf Yükle</button>
+                <span class="text-xs font-bold text-slate-700">Şirket Logosu / Fotoğraf Ekle</span>
+                <button type="button" @click="triggerDocUpload('profil_logo')" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold hover:bg-slate-50 transition cursor-pointer" style="border-color: #E2E8F0;">Fotoğraf Yükle</button>
               </div>
               <div class="rounded-xl border-2 border-dashed p-6 text-center space-y-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50/50 transition" @click="showToast('Sürükle-bırak video arayüzü etkin.')" style="border-color: #E2E8F0;">
                 <Video :size="16" class="text-slate-400" />
-                <span class="text-xs font-bold text-slate-700">Video Yüklemek İçin Tıklayın</span>
+                <span class="text-xs font-bold text-slate-700">Tanıtım Videosu Yüklemek İçin Tıklayın</span>
               </div>
             </div>
           </div>
 
           <div class="rounded-2xl border bg-white p-4 shadow-sm flex items-center justify-between" style="border-color: #E2E8F0;">
-            <span class="text-[10px] text-slate-400 font-bold">Tüm değişiklikleri kaydedin</span>
-            <button type="button" @click="saveProfile" class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-3 transition">Profili Güncelle</button>
+            <span class="text-[10px] text-slate-400 font-bold">Tüm profil, şirket açıklaması ve sektör değişikliklerini kaydedin</span>
+            <button type="button" @click="saveProfile" class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-3 transition cursor-pointer shadow-sm">Profili Güncelle & Kaydet</button>
           </div>
         </div>
 
