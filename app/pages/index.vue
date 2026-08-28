@@ -48,7 +48,7 @@ import {
 import PaymentBadges from '~/components/common/PaymentBadges.vue'
 
 definePageMeta({
-  layout: 'public'
+  layout: false
 })
 
 useSeoMeta({
@@ -959,44 +959,6 @@ onMounted(() => {
         </div>
       </div>
     </div>
-
-    <!-- ========================================================================= -->
-    <!-- 🛡️ 9. ALT KURUMSAL BİLGİ & FOOTER -->
-    <!-- ========================================================================= -->
-    <footer class="mt-8 bg-white border-t border-slate-300 text-slate-600 text-xs py-8">
-      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 space-y-6 text-left">
-        
-        <div class="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-200 pb-4">
-          <div>
-            <span class="font-black text-slate-800 text-sm block">İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş.</span>
-            <span class="text-[11px] text-slate-500">Çanakkale V.D. 4700854210 • MERSİS: 0470085421000001 • Ticaret Sicil No: 14520 • KEP: ihaleciburada@hs01.kep.tr</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 font-bold border border-emerald-300 text-[11px]">
-              ✓ 256-Bit SSL TLS 1.3
-            </span>
-          </div>
-        </div>
-
-        <div class="flex flex-wrap items-center justify-between gap-4">
-          <div class="flex flex-wrap gap-4 text-xs text-slate-600 font-semibold">
-            <NuxtLink to="/sozlesmeler?tab=on-bilgilendirme" class="hover:text-blue-700">Ön Bilgilendirme Formu</NuxtLink>
-            <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-blue-700">Mesafeli Satış Sözleşmesi</NuxtLink>
-            <NuxtLink to="/sozlesmeler?tab=iptal-iade" class="hover:text-blue-700">İptal ve İade Koşulları</NuxtLink>
-            <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-700">Gizlilik ve KVKK</NuxtLink>
-            <NuxtLink to="/hakkimizda" class="hover:text-blue-700">Hakkımızda</NuxtLink>
-          </div>
-          <div>
-            <PaymentBadges />
-          </div>
-        </div>
-
-        <div class="text-center text-slate-400 text-[11px]">
-          © 2026 İhaleciBurada.com — Tüm hakları saklıdır. Resmi ihale ve ilan verileri anlık senkronize edilmektedir.
-        </div>
-
-      </div>
-    </footer>
 
   </div>
 </template>
