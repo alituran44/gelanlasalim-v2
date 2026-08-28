@@ -294,6 +294,8 @@ function downloadAllSpecs(tender: any) {
     document.body.removeChild(element)
   }
 }
+
+const detailActiveTab = ref<'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'sonuc' | 'gecmis'>('ilan')
 </script>
 
 <template>
@@ -427,7 +429,11 @@ function downloadAllSpecs(tender: any) {
           class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl hover:border-blue-400 transition-all duration-300 flex flex-col justify-between group"
         >
           <!-- Image Box with Badges -->
-          <div class="relative h-44 w-full bg-slate-100 overflow-hidden">
+          <div 
+            @click="selectedTenderForDetail = tender"
+            class="relative h-44 w-full bg-slate-100 overflow-hidden cursor-pointer"
+            title="İhale detaylarını görüntüle"
+          >
             <img 
               :src="tender.image || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'" 
               :alt="tender.baslik"
@@ -476,7 +482,11 @@ function downloadAllSpecs(tender: any) {
                 </span>
               </div>
 
-              <h2 class="text-base font-black text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors">
+              <h2 
+                @click="selectedTenderForDetail = tender"
+                class="text-base font-black text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors cursor-pointer"
+                title="İhale detaylarını görüntüle"
+              >
                 {{ tender.baslik }}
               </h2>
 
@@ -698,71 +708,251 @@ function downloadAllSpecs(tender: any) {
       </div>
     </div>
 
-    <!-- TENDER DETAIL MODAL -->
-    <div v-if="selectedTenderForDetail" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl animate-fadeIn text-left">
+    <!-- TENDER DETAIL MODAL (EKAP STYLE FULL MULTI-TAB) -->
+    <div v-if="selectedTenderForDetail" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+      <div class="bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-y-auto p-5 sm:p-8 space-y-6 shadow-2xl animate-fadeIn text-left border border-slate-200">
+        
+        <!-- Header Top Row -->
         <div class="flex items-start justify-between gap-4 border-b pb-4 border-slate-100">
           <div>
-            <span class="text-xs font-black text-blue-600 uppercase tracking-wider block">{{ selectedTenderForDetail.kategori }}</span>
-            <h2 class="text-xl font-black text-slate-900 mt-1">{{ selectedTenderForDetail.baslik }}</h2>
-            <span class="text-xs text-slate-400 font-mono">İlan No: #{{ selectedTenderForDetail.id }} · {{ selectedTenderForDetail.city }}</span>
+            <div class="flex items-center gap-2">
+              <span class="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 text-[10px] font-mono font-black uppercase">
+                #{{ selectedTenderForDetail.id }}
+              </span>
+              <span class="text-xs font-black text-blue-600 uppercase tracking-wider">
+                {{ selectedTenderForDetail.kategori }}
+              </span>
+              <span class="text-[10px] text-slate-400 font-medium">
+                · {{ selectedTenderForDetail.city || 'Türkiye Geneli' }}
+              </span>
+            </div>
+            <h2 class="text-lg sm:text-2xl font-black text-slate-900 mt-1">
+              {{ selectedTenderForDetail.baslik }}
+            </h2>
           </div>
           <button @click="selectedTenderForDetail = null" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl cursor-pointer">
-            <X :size="20" />
+            <X :size="22" />
           </button>
         </div>
 
-        <div class="space-y-4 text-xs text-slate-600 leading-relaxed">
-          <div v-if="selectedTenderForDetail.durum === 'closed'" class="p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 font-bold flex items-center gap-2.5">
-            <AlertCircle :size="18" class="text-amber-600 shrink-0" />
-            <span>⚠️ Bu ihalede taraflar arasında mutabakat sağlanmıştır. Yeni teklif verilemez veya başka bir teklif onaylanamaz.</span>
-          </div>
-
+        <!-- EKAP Meta Info Strip (Görseldeki Format) -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
           <div>
-            <h4 class="font-black text-slate-800 text-sm mb-1">İhale Açıklaması & Şartname Özeti</h4>
-            <p class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
-              {{ selectedTenderForDetail.aciklama || 'Bu ihale için belirtilen standart teknik şartname kuralları geçerlidir.' }}
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">👥 Yüklenici / Alıcı</span>
+            <span class="font-bold text-slate-800">{{ selectedTenderForDetail.ownerCompany || selectedTenderForDetail.company || 'Doğrulanmış B2B Kurum' }}</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">🏢 İdare / Satın Alma</span>
+            <span class="font-bold text-slate-800">{{ selectedTenderForDetail.authority || 'İhaleciBurada Satın Alma Masası' }}</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">💰 İhale / Hedef Bedel</span>
+            <span class="font-mono font-black text-emerald-600 text-sm">{{ selectedTenderForDetail.butce || 'Açık Teklif' }}</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">📍 Konum</span>
+            <span class="font-bold text-slate-800">{{ selectedTenderForDetail.city || 'Ankara' }}</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">📅 Yayın Tarihi</span>
+            <span class="font-mono text-slate-700">{{ selectedTenderForDetail.yayinTarihi || '28.08.2026' }}</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">⏱️ Teklif Bitiş</span>
+            <span class="font-mono font-bold text-red-600">{{ selectedTenderForDetail.sure || '30.08.2026' }}</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">📅 İş Başlangıç / Bitiş</span>
+            <span class="font-mono text-slate-700">01.09.2026 / 30.09.2026</span>
+          </div>
+          <div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">🏷️ İhale Usulü</span>
+            <span class="font-bold text-blue-700">{{ selectedTenderForDetail.tur || 'Açık Eksiltme' }}</span>
+          </div>
+        </div>
+
+        <!-- 6 Interactive EKAP Sub-tabs (Görseldeki 6 Buton) -->
+        <div class="flex flex-wrap items-center gap-1.5 border-b border-slate-200 pb-3 text-xs font-black">
+          <button
+            type="button"
+            @click="detailActiveTab = 'ilan'"
+            class="px-3.5 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+            :class="detailActiveTab === 'ilan' ? 'bg-[#0F223D] text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+          >
+            <FileText :size="13" />
+            <span>📄 İhale İlanı</span>
+          </button>
+          <button
+            type="button"
+            @click="detailActiveTab = 'malzeme'"
+            class="px-3.5 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+            :class="detailActiveTab === 'malzeme' ? 'bg-[#0F223D] text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+          >
+            <Layers :size="13" />
+            <span>📦 Malzeme Listesi (1)</span>
+          </button>
+          <button
+            type="button"
+            @click="detailActiveTab = 'idari'"
+            class="px-3.5 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+            :class="detailActiveTab === 'idari' ? 'bg-[#0F223D] text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+          >
+            <ShieldCheck :size="13" />
+            <span>📜 İdari Şartname</span>
+          </button>
+          <button
+            type="button"
+            @click="detailActiveTab = 'sozlesme'"
+            class="px-3.5 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+            :class="detailActiveTab === 'sozlesme' ? 'bg-[#0F223D] text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+          >
+            <FileText :size="13" />
+            <span>🤝 Sözleşme Listesi (1)</span>
+          </button>
+          <button
+            type="button"
+            @click="detailActiveTab = 'sonuc'"
+            class="px-3.5 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+            :class="detailActiveTab === 'sonuc' ? 'bg-[#0F223D] text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+          >
+            <CheckCircle2 :size="13" />
+            <span>🏆 Sonuç İlanı</span>
+          </button>
+          <button
+            type="button"
+            @click="detailActiveTab = 'gecmis'"
+            class="px-3.5 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+            :class="detailActiveTab === 'gecmis' ? 'bg-[#0F223D] text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+          >
+            <RotateCcw :size="13" />
+            <span>⏱️ Benzer İhale Geçmişi</span>
+          </button>
+        </div>
+
+        <!-- Tab 1: İhale İlanı -->
+        <div v-if="detailActiveTab === 'ilan'" class="space-y-4 text-xs text-slate-700 leading-relaxed">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <h4 class="font-black text-slate-900 text-sm">İhale Konusu & Açıklama Metni</h4>
+            <p>{{ selectedTenderForDetail.aciklama || 'Bu ihale için belirtilen standart teknik şartname kuralları ve B2B satın alma şartları geçerlidir.' }}</p>
+          </div>
+          <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-200 text-blue-950 space-y-2">
+            <h5 class="font-black text-xs">Teklif Verme & İşlem Güvenliği</h5>
+            <p class="text-[11px] text-blue-900">Verilen teklifler ihale bitiş süresine kadar şifreli olarak saklanır. İhale süresi bittiğinde veya alıcı firma onay verdiğinde mutabakat sağlanır ve taraflar arasında güvenli havuz (Escrow) üzerinden resmi faturalandırma başlatılır.</p>
+          </div>
+        </div>
+
+        <!-- Tab 2: Malzeme Listesi -->
+        <div v-if="detailActiveTab === 'malzeme'" class="space-y-4 text-xs">
+          <div class="border border-slate-200 rounded-2xl overflow-hidden">
+            <table class="w-full text-left text-xs">
+              <thead class="bg-slate-100 text-slate-700 font-black">
+                <tr>
+                  <th class="p-3">Sıra</th>
+                  <th class="p-3">Malzeme / İş Kalemi</th>
+                  <th class="p-3">Metraj / Miktar</th>
+                  <th class="p-3">Birim</th>
+                  <th class="p-3">Birim Bütçe</th>
+                  <th class="p-3">Teknik Standart</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr>
+                  <td class="p-3 font-mono font-bold">01</td>
+                  <td class="p-3 font-bold text-slate-900">{{ selectedTenderForDetail.baslik }}</td>
+                  <td class="p-3 font-mono">1</td>
+                  <td class="p-3">Paket / Parti</td>
+                  <td class="p-3 font-mono font-black text-emerald-600">{{ selectedTenderForDetail.butce }}</td>
+                  <td class="p-3 text-slate-500">TSE / ISO 9001</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab 3: İdari Şartname -->
+        <div v-if="detailActiveTab === 'idari'" class="space-y-3 text-xs text-slate-700">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+              <span class="font-bold text-slate-800">Teslimat Lokasyonu:</span>
+              <span class="font-black text-slate-900">{{ selectedTenderForDetail.city || 'Türkiye Geneli' }}</span>
+            </div>
+            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+              <span class="font-bold text-slate-800">Ödeme Şartı:</span>
+              <span class="font-black text-emerald-600">TCMB/BDDK Uyumlu Güvenli Havuz (Escrow)</span>
+            </div>
+            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+              <span class="font-bold text-slate-800">Mal Muayene & Kabul:</span>
+              <span class="font-black text-slate-900">İrsaliye ve Fiziki Sayım Tutanağı ile 3 İş Günü</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-800">Gecikme Cezası:</span>
+              <span class="font-black text-slate-900">Günlük %0.1 (Binde Bir)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 4: Sözleşme Listesi -->
+        <div v-if="detailActiveTab === 'sozlesme'" class="space-y-3 text-xs text-slate-700">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <h4 class="font-black text-slate-900">Tip B2B Mal / Hizmet Satın Alma Sözleşmesi</h4>
+            <p class="text-slate-600">İhale onaylandığı anda alıcı ve satıcı arasında 6098 sayılı Türk Borçlar Kanunu ve 6102 sayılı TTK hükümleri uyarınca dijital olarak akdedilir.</p>
+          </div>
+        </div>
+
+        <!-- Tab 5: Sonuç İlanı -->
+        <div v-if="detailActiveTab === 'sonuc'" class="space-y-3 text-xs text-slate-700">
+          <div class="p-4 rounded-2xl border" :class="selectedTenderForDetail.durum === 'closed' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-emerald-50 border-emerald-200 text-emerald-900'">
+            <div class="font-black text-sm">
+              {{ selectedTenderForDetail.durum === 'closed' ? '🔒 İhale Sonuçlandı (Mutabakat Sağlandı)' : '🟢 İhale Canlı Yayında & Tekliflere Açık' }}
+            </div>
+            <p class="mt-1 text-xs">
+              Toplam {{ selectedTenderForDetail.teklifSayisi || 0 }} adet teklif iletilmiştir.
             </p>
           </div>
+        </div>
 
-          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-              <span class="text-[10px] text-slate-400 font-bold block">Hedef Bütçe</span>
-              <span class="font-black font-mono text-slate-800 text-sm">{{ selectedTenderForDetail.butce }}</span>
-            </div>
-            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-              <span class="text-[10px] text-slate-400 font-bold block">Durum / Süre</span>
-              <span class="font-black text-slate-800 text-sm">{{ selectedTenderForDetail.durum === 'closed' ? 'Mutabakat Sağlandı' : selectedTenderForDetail.sure }}</span>
-            </div>
-            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-              <span class="text-[10px] text-slate-400 font-bold block">Gelen Teklif</span>
-              <span class="font-black text-slate-800 text-sm">{{ selectedTenderForDetail.teklifSayisi }} Firma</span>
-            </div>
+        <!-- Tab 6: Benzer İhale Geçmişi -->
+        <div v-if="detailActiveTab === 'gecmis'" class="space-y-3 text-xs text-slate-700">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
+            <h4 class="font-black text-slate-900">Sektörel Piyasa & Emsal İhale Karşılaştırması</h4>
+            <p class="text-slate-600">{{ selectedTenderForDetail.kategori }} sektöründe son 30 günde tamamlanan ihalelerde ortalama %14.2 tedarik tasarrufu sağlanmıştır.</p>
           </div>
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
-          <button 
-            @click="selectedTenderForDetail = null" 
-            class="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
-          >
-            Kapat
-          </button>
+        <!-- Footer Actions -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
           <button
-            v-if="selectedTenderForDetail.durum !== 'closed' && selectedTenderForDetail.durum !== 'expired'"
-            @click="openBidModal(selectedTenderForDetail); selectedTenderForDetail = null"
-            class="px-6 py-2.5 rounded-xl bg-[#0F223D] hover:bg-blue-600 text-white font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
+            type="button"
+            @click="downloadAllSpecs(selectedTenderForDetail)"
+            class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer"
           >
-            <Send :size="13" />
-            Hemen Teklif Ver
+            <Download :size="14" />
+            <span>Şartname Dosyasını İndir (.TXT)</span>
           </button>
-          <button
-            v-else
-            disabled
-            class="px-6 py-2.5 rounded-xl bg-slate-300 text-slate-500 font-bold text-xs cursor-not-allowed"
-          >
-            Teklife Kapalı
-          </button>
+
+          <div class="flex items-center gap-2">
+            <button 
+              @click="selectedTenderForDetail = null" 
+              class="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
+            >
+              Kapat
+            </button>
+            <button
+              v-if="selectedTenderForDetail.durum !== 'closed' && selectedTenderForDetail.durum !== 'expired'"
+              @click="openBidModal(selectedTenderForDetail); selectedTenderForDetail = null"
+              class="px-6 py-2.5 rounded-xl bg-[#0052FF] hover:bg-blue-600 text-white font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
+            >
+              <Send :size="13" />
+              <span>Teklif Ver</span>
+            </button>
+            <button
+              v-else
+              disabled
+              class="px-6 py-2.5 rounded-xl bg-slate-300 text-slate-500 font-bold text-xs cursor-not-allowed"
+            >
+              Teklife Kapalı
+            </button>
+          </div>
         </div>
       </div>
     </div>
