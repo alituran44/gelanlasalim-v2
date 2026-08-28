@@ -144,7 +144,7 @@ export const DEFAULT_CMS_DATA = {
   ],
   supportSettings: {
     whatsappEnabled: true,
-    whatsappNumber: '908503080000',
+    whatsappNumber: '908508408695',
     whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale süreçleri ve 1 ay ücretsiz deneme paketi hakkında bilgi almak istiyorum.',
     aiEnabled: true,
     aiBotName: 'İhaleciBurada AI Asistanı',
@@ -175,7 +175,7 @@ export const DEFAULT_CMS_DATA = {
         id: 'trial-welcome',
         name: '🎉 1 Ay Ücretsiz Lansman Hoş Geldin & Aktivasyon',
         subject: 'İhaleciBurada.com: 1 Aylık %100 Ücretsiz Lansman Deneme Paketiniz Aktif!',
-        content: `Sayın Yetkili,\n\nİhaleciBurada B2B Canlı Eksiltme ve Satın Alma Platformu'na hoş geldiniz!\n\nLansmanımıza özel olarak tanımlanan 1 Aylık %100 Ücretsiz Kurumsal Deneme Paketiniz başarıyla aktifleştirildi.\n\n✓ 1 Ay Boyunca 0 ₺ Ücret (Kredi Kartı Gerekmez)\n✓ Sınırsız İhale Açma & Canlı Tersine Eksiltme\n✓ Doğrulanmış Kurumsal Firmalardan Belgeli Teklif Toplama\n✓ Geçerlilik Bitiş Tarihi: 25 Eylül 2026\n\nPanele gitmek ve ilk ihalenizi oluşturmak için: https://gelanlasalim-v2.vercel.app/panel\n\nSaygılarımızla,\nİhaleciBurada Müşteri Başarı Ekibi\nihalcib@gmail.com | 0850 308 00 00`
+        content: `Sayın Yetkili,\n\nİhaleciBurada B2B Canlı Eksiltme ve Satın Alma Platformu'na hoş geldiniz!\n\nLansmanımıza özel olarak tanımlanan 1 Aylık %100 Ücretsiz Kurumsal Deneme Paketiniz başarıyla aktifleştirildi.\n\n✓ 1 Ay Boyunca 0 ₺ Ücret (Kredi Kartı Gerekmez)\n✓ Sınırsız İhale Açma & Canlı Tersine Eksiltme\n✓ Doğrulanmış Kurumsal Firmalardan Belgeli Teklif Toplama\n✓ Geçerlilik Bitiş Tarihi: 25 Eylül 2026\n\nPanele gitmek ve ilk ihalenizi oluşturmak için: https://gelanlasalim-v2.vercel.app/panel\n\nSaygılarımızla,\nİhaleciBurada Müşteri Başarı Ekibi\nihalcib@gmail.com | 0850 840 86 95`
       },
       {
         id: 'new-tender',
@@ -211,7 +211,7 @@ export const DEFAULT_CMS_DATA = {
       taxNo: '43624665040',
       taxOffice: 'Çanakkale Vergi Dairesi',
       authorizedPerson: 'Ali Turan (Yönetici)',
-      phone: '0850 308 00 00',
+      phone: '0850 840 86 95',
       email: 'ali@turanbilisim.com',
       uploadedDocs: ['Vergi Levhası (2025/2026)', 'İmza Sirküleri', 'Ticaret Sicil Gazetesi'],
       status: 'pending',
@@ -354,7 +354,7 @@ export const DEFAULT_CMS_DATA = {
   ],
   auditLogs: [
     { id: 'LOG-9912', timestamp: '2026-08-23 02:10:14', userEmail: 'admin@ihaleciburada.com', action: 'Yönetici Girişi Yapıldı', ipAddress: '176.240.12.84', status: 'success', details: 'TLS 1.3 şifreli oturum başlatıldı.' },
-    { id: 'LOG-9911', timestamp: '2026-08-22 23:05:42', userEmail: 'admin@ihaleciburada.com', action: 'WhatsApp & AI Ayarları Güncellendi', ipAddress: '176.240.12.84', status: 'success', details: 'Numara: 908503080000 olarak kaydedildi.' },
+    { id: 'LOG-9911', timestamp: '2026-08-22 23:05:42', userEmail: 'admin@ihaleciburada.com', action: 'WhatsApp & AI Ayarları Güncellendi', ipAddress: '176.240.12.84', status: 'success', details: 'Numara: 908508408695 olarak kaydedildi.' },
     { id: 'LOG-9910', timestamp: '2026-08-22 22:58:19', userEmail: 'admin@ihaleciburada.com', action: '1 Ay Lansman Planı Yayına Alındı', ipAddress: '176.240.12.84', status: 'success', details: '0 TL bedelsiz deneme paketi aktif edildi.' },
     { id: 'LOG-9909', timestamp: '2026-08-22 21:40:05', userEmail: 'sistem@ihaleciburada.com', action: 'Otomatik Veritabanı Yedeği Alındı', ipAddress: '127.0.0.1', status: 'success', details: 'JSON veri yedeği disk alanına arşivlendi.' },
     { id: 'LOG-9908', timestamp: '2026-08-22 19:15:33', userEmail: 'ahmet@kalyon.com', action: 'KYC Belgesi Yüklendi', ipAddress: '88.241.90.11', status: 'warning', details: 'Vergi levhası inceleme kuyruğuna alındı.' }
@@ -366,7 +366,7 @@ export const DEFAULT_CMS_DATA = {
     metaDescription: 'B2B satın alma ihaleleri açın, canlı tersine eksiltme ile rekabetçi teklifler toplayın, kurumsal tedarik maliyetlerinizi %14.2 düşürün.',
     announcementTicker: '⚡ LANSMANA ÖZEL: Tüm alıcı ve tedarikçi firmalarımıza ilk 1 ay boyunca %100 ücretsiz kurumsal deneme paketi! Kredi kartı gerekmez, 0 ₺ bedelsiz anında aktivasyon.',
     googleAnalyticsId: 'G-IHALECIBURADA2026',
-    supportPhone: '0850 308 00 00',
+    supportPhone: '0850 840 86 95',
     supportEmail: 'ihalcib@gmail.com',
     primaryCurrency: 'TRY (₺)',
     allowGuestBrowsing: true,

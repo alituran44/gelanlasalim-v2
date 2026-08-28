@@ -129,7 +129,7 @@ function printDocument() {
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">Kurumsal Destek</span>
-              <strong class="text-blue-700 font-bold">0850 308 00 00</strong>
+              <strong class="text-blue-700 font-bold">0850 840 86 95</strong>
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">Resmi E-Posta</span>
@@ -488,7 +488,7 @@ function printDocument() {
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — VERİ SORUMLUSUNUN KİMLİĞİ VE İRTİBAT KANALLARI</h3>
                 <p>1.1. Veri Sorumlusu: İhaleciBurada B2B Elektronik İhale ve Ticaret Platformu İşleticisi.</p>
                 <p>1.2. Adres: İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</p>
-                <p>1.3. E-Posta: <strong>ihalcib@gmail.com</strong> | DPO İletişim: <strong>0850 308 00 00</strong></p>
+                <p>1.3. E-Posta: <strong>ihalcib@gmail.com</strong> | DPO İletişim: <strong>0850 840 86 95</strong></p>
               </section>
 
               <section class="space-y-2">
@@ -590,7 +590,7 @@ function printDocument() {
                   <p><strong>Merkez Adresi:</strong> İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</p>
                   <p><strong>Vergi Dairesi & No:</strong> Çanakkale Vergi Dairesi / VKN: 4700854210</p>
                   <p><strong>MERSİS Numarası:</strong> 0470085421000001 | <strong>Ticaret Sicil No:</strong> 14520</p>
-                  <p><strong>Telefon / Müşteri Destek:</strong> 0850 308 00 00 | <strong>E-Posta:</strong> ihalcib@gmail.com</p>
+                  <p><strong>Telefon / Müşteri Destek:</strong> 0850 840 86 95 | <strong>E-Posta:</strong> ihalcib@gmail.com</p>
                   <p><strong>KEP Adresi:</strong> ihaleciburada@hs01.kep.tr | <strong>Web Sitesi:</strong> https://ihaleciburada.com</p>
                 </div>
               </section>
@@ -624,7 +624,7 @@ function printDocument() {
 
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 5 — ŞİKAYET VE İTİRAZ KANALLARI</h3>
-                <p>5.1. Abone, hizmete ilişkin her türlü talep ve şikayetini <strong>0850 308 00 00</strong> no\'lu destek hattından veya <strong>ihalcib@gmail.com</strong> adresinden kurumsal müşteri temsilcilerimize iletebilir. Başvurular en geç 24 saat içinde yanıtlanır.</p>
+                <p>5.1. Abone, hizmete ilişkin her türlü talep ve şikayetini <strong>0850 840 86 95</strong> no\'lu destek hattından veya <strong>ihalcib@gmail.com</strong> adresinden kurumsal müşteri temsilcilerimize iletebilir. Başvurular en geç 24 saat içinde yanıtlanır.</p>
               </section>
             </div>
           </article>
@@ -644,7 +644,7 @@ function printDocument() {
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — TARAFLAR</h3>
-                <p>1.1. <strong>SATICI (Hizmet Sağlayıcı):</strong> İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş. (Adres: İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale | VKN: 4700854210 | MERSİS: 0470085421000001 | Tel: 0850 308 00 00 | E-posta: ihalcib@gmail.com)</p>
+                <p>1.1. <strong>SATICI (Hizmet Sağlayıcı):</strong> İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş. (Adres: İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale | VKN: 4700854210 | MERSİS: 0470085421000001 | Tel: 0850 840 86 95 | E-posta: ihalcib@gmail.com)</p>
                 <p>1.2. <strong>ALICI (Kurumsal Abone):</strong> Platform üzerinden elektronik ortamda sipariş oluşturan, fatura bilgilerini beyan eden ve ödeme yapan tüzel kişi veya tacir müşteri.</p>
               </section>
 
@@ -704,7 +704,7 @@ function printDocument() {
 
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — İPTAL VE İADE BAŞVURU SÜRECİ</h3>
-                <p>3.1. İade ve iptal talepleri, sipariş numarası ve fatura bilgileri belirtilerek <strong>ihalcib@gmail.com</strong> e-posta adresine veya <strong>0850 308 00 00</strong> çağrı merkezine yazılı olarak iletilmelidir.</p>
+                <p>3.1. İade ve iptal talepleri, sipariş numarası ve fatura bilgileri belirtilerek <strong>ihalcib@gmail.com</strong> e-posta adresine veya <strong>0850 840 86 95</strong> çağrı merkezine yazılı olarak iletilmelidir.</p>
                 <p>3.2. Müşteri hizmetleri ekibimiz başvuruyu en geç 2 (iki) iş günü içinde inceleyerek sonucu yazılı olarak bildirir.</p>
               </section>
 

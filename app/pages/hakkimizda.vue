@@ -82,7 +82,7 @@ definePageMeta({
 
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
             <span class="text-[10px] font-black text-slate-400 uppercase">Müşteri Destek & Çağrı</span>
-            <p class="font-bold text-blue-700">0850 308 00 00 / ihalcib@gmail.com</p>
+            <p class="font-bold text-blue-700">0850 840 86 95 / ihalcib@gmail.com</p>
           </div>
         </div>
 

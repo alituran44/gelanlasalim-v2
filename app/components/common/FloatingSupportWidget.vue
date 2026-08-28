@@ -26,7 +26,7 @@ const chatMessagesContainer = ref<HTMLDivElement | null>(null)
 const supportConfig = computed(() => {
   return cmsData.value?.supportSettings || {
     whatsappEnabled: true,
-    whatsappNumber: '908503080000',
+    whatsappNumber: '908508408695',
     whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale ve 1 ay ücretsiz deneme hakkında bilgi almak istiyorum.',
     aiEnabled: true,
     aiBotName: 'İhaleciBurada AI Asistanı',
@@ -36,7 +36,7 @@ const supportConfig = computed(() => {
 
 // WhatsApp Direct URL
 const whatsappUrl = computed(() => {
-  const num = (supportConfig.value.whatsappNumber || '908503080000').replace(/[^0-9]/g, '')
+  const num = (supportConfig.value.whatsappNumber || '908508408695').replace(/[^0-9]/g, '')
   const msg = encodeURIComponent(supportConfig.value.whatsappMessage || 'Merhaba')
   return `https://wa.me/${num}?text=${msg}`
 })

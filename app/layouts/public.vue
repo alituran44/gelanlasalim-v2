@@ -92,7 +92,7 @@ onMounted(() => {
           <span class="flex items-center gap-1">
             <span class="text-rose-600">📞</span>
             <strong>Destek:</strong> 
-            <a href="tel:08503080000" class="text-blue-700 hover:underline">0850 308 00 00</a> / +90 555 962 73 20
+            <a href="tel:08508408695" class="text-blue-700 hover:underline">0850 840 86 95</a> / 0850 840 86 95
           </span>
           <span class="hidden sm:flex items-center gap-1">
             <span class="text-indigo-600">✉</span>
@@ -317,7 +317,7 @@ onMounted(() => {
             <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2 text-[11px]">
               <div class="font-bold text-white flex items-center gap-1.5">
                 <span>📞</span>
-                <span>0850 308 00 00</span>
+                <span>0850 840 86 95</span>
               </div>
               <div class="text-slate-400">
                 <span>✉</span>

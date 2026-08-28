@@ -220,7 +220,7 @@ onMounted(() => {
         billingTaxNo.value = userSession.value.taxNumber || '4700854210'
         billingTaxOffice.value = userSession.value.taxOffice || 'Çanakkale Vergi Dairesi'
         billingAddress.value = userSession.value.address || 'İsmetpaşa Mah. Büyük Hamam Sok. No:52/1'
-        billingPhone.value = userSession.value.phone || '0850 308 00 00'
+        billingPhone.value = userSession.value.phone || '0850 840 86 95'
         billingEmail.value = userSession.value.email || 'ihalcib@gmail.com'
       }
     } catch (e) {

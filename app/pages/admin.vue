@@ -146,7 +146,7 @@ const formState = reactive(JSON.parse(JSON.stringify(cmsData.value)))
 if (!formState.supportSettings) {
   formState.supportSettings = {
     whatsappEnabled: true,
-    whatsappNumber: '908503080000',
+    whatsappNumber: '908508408695',
     whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale ve 1 ay ücretsiz deneme hakkında bilgi almak istiyorum.',
     aiEnabled: true,
     aiBotName: 'İhaleciBurada AI Asistanı',
@@ -210,7 +210,7 @@ if (!formState.siteSettings) {
     metaDescription: 'B2B satın alma ihaleleri açın, canlı tersine eksiltme ile rekabetçi teklifler toplayın.',
     announcementTicker: '⚡ LANSMANA ÖZEL: İlk 1 ay boyunca %100 ücretsiz kurumsal deneme paketi (0 ₺)!',
     googleAnalyticsId: 'G-IHALECIBURADA2026',
-    supportPhone: '0850 308 00 00',
+    supportPhone: '0850 840 86 95',
     supportEmail: 'ihalcib@gmail.com'
   }
 }

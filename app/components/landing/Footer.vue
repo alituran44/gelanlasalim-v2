@@ -202,7 +202,7 @@ const legalLinks = [
                 ihalcib@gmail.com
               </a>
               <div class="text-[#FF5938] font-bold">
-                📞 0850 308 00 00
+                📞 0850 840 86 95
               </div>
             </div>
           </div>

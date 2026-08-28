@@ -331,7 +331,7 @@ function submitReview() {
             </div>
             <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
               <span class="text-[10px] text-slate-400 font-bold block">İletişim Telefonu</span>
-              <a :href="`tel:${teklif.telefon || '+908503080000'}`" class="text-blue-600 font-bold hover:underline">{{ teklif.telefon || '0850 308 00 00' }}</a>
+              <a :href="`tel:${teklif.telefon || '+908508408695'}`" class="text-blue-600 font-bold hover:underline">{{ teklif.telefon || '0850 840 86 95' }}</a>
             </div>
             <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
               <span class="text-[10px] text-slate-400 font-bold block">E-Posta</span>
