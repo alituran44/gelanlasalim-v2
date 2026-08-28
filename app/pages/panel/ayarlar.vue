@@ -213,16 +213,113 @@ const profileForm = ref({
 
 // Company & Verification details
 const companyVerified = ref(false)
+
+const isSectorDropdownOpen = ref(false)
+const isSectorDropdownOpen2 = ref(false)
+const sectorSearchQuery = ref('')
+
 const availableSectors = [
-  'Ambalaj, Koli & Plastik',
-  'İnşaat, Yapı & Şantiye',
-  'Sanayi, Makine & Metal',
-  'Lojistik, Nakliye & Depolama',
-  'Akaryakıt, Enerji & Madeni Yağ',
-  'Kırtasiye, Ofis & Teknoloji',
-  'Gıda, İkram & Hizmet',
-  'Tekstil & İş Güvenliği'
+  // İnşaat & Yapı & Altyapı
+  'İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri',
+  'İnşaat Yapı ve Malzemeleri; Yardımcı/Destek Ürünler',
+  'Kanalizasyon - Boru - Su - Doğalgaz - Sıhhi Tesisat İhaleleri',
+  'Kent Mobilyaları - Prefabrik Yapılar - Doğrama İhaleleri',
+  'Mimarlık, İnşaat, Mühendislik ve Teftiş Hizmetleri',
+  'Madencilik, Temel Metaller ve İlgili Ürünler',
+  'Madencilik, Taşocakçılığı, İnşaat Ekipmanları İçin Kullanılan Makineler',
+  'Madencilik - Doğal Kaynaklar - Sondaj İhaleleri',
+  'Hırdavat - Nalburiye - Metal ve Plastik Ürünler İhaleleri',
+
+  // Sanayi, Makine & Enerji
+  'Sanayi Tipi Makineler',
+  'Endüstriyel Makine - Motor - Konveyör İhaleleri',
+  'Elektrikli Makine, Cihaz, Ekipman ve Sarf Malzemeleri; Aydınlatma',
+  'Enerji - Aydınlatma - Sinyalizasyon - Elektrik Tesisatı İhaleleri',
+  'Petrol Ürünleri, Yakıt, Elektrik ve Diğer Enerji Kaynakları',
+  'Petrol ve Gaz Endüstrisi ile İlgili Hizmetler',
+  'Akaryakıt, Enerji ve Madeni Yağ',
+  'Kimyasal Ürünler',
+
+  // Tesisat, Mekanik & Güvenlik
+  'Asansör - Yapı Otomasyon - Mekanik Güvenlik İhaleleri',
+  'Klima - Soğutma - Isıtma - Havalandırma Tesisatı İhaleleri',
+  'Yangın Algılama - Söndürme - İhbar Sistemleri İhaleleri',
+  'Güvenlik, Yangınla Mücadele, Polis ve Savunma Teçhizatı',
+  'Savunma Sanayi, Silah - Denizcilik - Havacılık İhaleleri',
+
+  // Lojistik, Nakliye & Taşıt
+  'Taşıt - İş Makinesi - Yedek Parça İhaleleri',
+  'Nakliye Araçları ve Nakliye İçin Yardımcı Ürünler',
+  'Lojistik, Nakliye ve Depolama Hizmetleri',
+  'Nakliye - Taşımacılık Hizmetleri - Servis İhaleleri',
+  'Nakliye Hizmetleri (Atık Taşımacılığı Hariç)',
+  'Destek ve Yardımcı Ulaştırmacılık Hizmetleri; Seyahat Acentası',
+  'Posta ve Telekomünikasyon Hizmetleri',
+
+  // Ambalaj, Kağıt & Matbaa
+  'Ambalaj, Koli, Kağıt ve Plastik Ürünleri',
+  'Matbaa - Toner - Kartuş - Ambalaj - Kırtasiye İhaleleri',
+  'Basılı Malzeme ve İlgili Ürünler',
+  'Mobilya ve Yazılım Paketleri Hariç, Ofis ve Bilgi İşlem Makineleri',
+
+  // Bilişim, IT & Telekom
+  'Bilişim, Yazılım, IT Ekipmanı ve Bilgi Sistemleri',
+  'IT Hizmetleri: Danışmanlık, Yazılım Geliştirme, İnternet ve Destek',
+  'Radyo, Televizyon, İletişim, Telekomünikasyon ve İlgili Ekipmanlar',
+  'Kurulum Hizmetleri (Yazılım Hariç)',
+
+  // Sağlık, Medikal & Kimya
+  'Tıbbi Cihazlar, İlaç ve Kişisel Bakım Ürünleri',
+  'Medikal ve Sağlık Sarf Malzemeleri',
+  'Laboratuar, Optik ve Hassas Ekipmanları (Gözlük Hariç)',
+  'Sağlık ve Sosyal Çalışma Hizmetleri',
+
+  // Gıda, Tarım & Hayvancılık
+  'Gıda, İçecekler, Tütün ve İlgili Ürünler',
+  'Gıda, İkram ve Yemek Hizmetleri (Catering)',
+  'Tarım, Çiftçilik, Balıkçılık, Ormancılık ve İlgili Ürünler',
+  'Tarım Makineleri',
+  'Tarım, Ormancılık, Bahçecilik, Su Ürünleri Yetiştiriciliği ve Arıcılık',
+  'Ormancılık, Bahçıvanlık, Bitki, Kozalak - Peyzaj İhaleleri',
+  'Hayvancılık - Veterinerlik - Hayvan Yemi İhaleleri',
+
+  // Tekstil, Tüketim & Çevre
+  'Deri ve Tekstil Kumaşlar, Plastik ve Kauçuk Malzemeler',
+  'Giyim, Ayakkabı, Bavul Eşyaları ve Aksesuarlar',
+  'Tekstil & İş Güvenliği Kıyafetleri',
+  'Mobilya (Ofis Mobilyaları Dahil), Mefruşat, Ev Aletleri ve Temizlik',
+  'Temizlik, Deterjan ve Hijyen Ürünleri',
+  'Kanalizasyon, Çöp Temizlik ve Çevre Hizmetleri',
+  'Toplanmış ve Arıtılmış Su',
+
+  // Hizmet & Kurumsal
+  'Mühendislik - Mimarlık - Danışmanlık İhaleleri',
+  'Ticari Hizmetler: Hukuk, Pazarlama, Danışmanlık, İşe Alma, Güvenlik',
+  'Finans ve Sigorta Hizmetleri',
+  'Emlakçılık Hizmetleri',
+  'Eğitim ve Öğrenim Hizmetleri',
+  'Turizm - Ödüllendirme Hizmetleri - Organizasyon İhaleleri',
+  'Otel, Restoran ve Perakende Ticaret Hizmetleri',
+  'Reklam - Tabela - Billboard - Tanıtım Materyalleri İhaleleri',
+  'Rekreasyon, Kültür ve Spor Amaçlı Hizmetler',
+  'Sanat Eserleri - Müzik Aletleri - Heykel - Maket İhaleleri',
+  'Onarım ve Bakım Hizmetleri',
+  'Kamu Yararına Hizmet ve Tesisler',
+  'Yönetim, Savunma ve Sosyal Güvenlik Hizmetleri'
 ]
+
+const selectedSectorsList = computed(() => {
+  return (companyForm.value.sectors || '')
+    .split(',')
+    .map((s: string) => s.trim())
+    .filter(Boolean)
+})
+
+const filteredAvailableSectors = computed(() => {
+  const q = sectorSearchQuery.value.trim().toLocaleLowerCase('tr')
+  if (!q) return availableSectors
+  return availableSectors.filter(s => s.toLocaleLowerCase('tr').includes(q))
+})
 
 const companyForm = ref({
   name: 'Ali Turan Sanayi ve Ticaret Ltd. Şti.',
@@ -234,7 +331,7 @@ const companyForm = ref({
   tcKimlik: '12345678901',
   taxNo: '4700854210',
   taxOffice: 'Çanakkale Vergi Dairesi',
-  sectors: 'Ambalaj, Koli & Plastik, İnşaat, Yapı & Şantiye, Lojistik, Nakliye & Depolama',
+  sectors: 'Ambalaj, Koli, Kağıt ve Plastik Ürünleri, İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri, Lojistik, Nakliye ve Depolama Hizmetleri',
   mersis: '0470-0854-2100-0001',
   sicilNo: '14520',
   website: 'https://www.ihaleciburada.com',
@@ -246,13 +343,23 @@ const companyForm = ref({
 })
 
 function toggleSectorTag(sec: string) {
-  let list = (companyForm.value.sectors || '').split(',').map((s: string) => s.trim()).filter(Boolean)
+  let list = [...selectedSectorsList.value]
   if (list.includes(sec)) {
     list = list.filter((s: string) => s !== sec)
   } else {
     list.push(sec)
   }
   companyForm.value.sectors = list.join(', ')
+}
+
+function selectAllFilteredSectors() {
+  const current = new Set(selectedSectorsList.value)
+  filteredAvailableSectors.value.forEach(s => current.add(s))
+  companyForm.value.sectors = Array.from(current).join(', ')
+}
+
+function clearAllSectors() {
+  companyForm.value.sectors = ''
 }
 
 function saveCompanyInfo() {
@@ -936,33 +1043,145 @@ function saveProfile() {
               </div>
             </div>
 
-            <!-- Faaliyet Sektörleri (Çoklu Seçim & Etiketler) -->
-            <div class="space-y-2">
-              <label class="block text-[10px] font-black text-slate-500 uppercase">
-                Faaliyet Sektörleriniz (Tıklayarak Seçiniz / Kaldırınız)
-              </label>
-              <div class="flex flex-wrap gap-2 pt-1">
-                <button 
-                  v-for="sec in availableSectors" 
-                  :key="sec"
-                  type="button"
-                  @click="toggleSectorTag(sec)"
-                  class="px-3 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-2xs border"
-                  :class="companyForm.sectors.includes(sec) 
-                    ? 'bg-blue-600 text-white border-blue-600' 
-                    : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'"
-                >
-                  <Check v-if="companyForm.sectors.includes(sec)" :size="12" />
-                  <span>{{ sec }}</span>
-                </button>
+            <!-- Faaliyet Sektörleri (Açılır Menü & Çoklu Seçim) -->
+            <div class="space-y-2 relative">
+              <div class="flex items-center justify-between">
+                <label class="block text-[10px] font-black text-slate-500 uppercase">
+                  Faaliyet Sektörleriniz (Açılır Menüden Çoklu Seçiniz)
+                </label>
+                <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
+                  {{ selectedSectorsList.length }} Sektör Seçili
+                </span>
               </div>
-              <input 
-                v-model="companyForm.sectors" 
-                type="text" 
-                placeholder="Seçili sektörler (Virgülle ayırarak manuel de ekleyebilirsiniz)" 
-                class="w-full rounded-xl border px-4 py-2 text-xs bg-slate-50 text-slate-700 outline-none mt-2 font-medium" 
-                style="border-color: #E2E8F0;"
-              />
+
+              <!-- Dropdown Trigger Button -->
+              <div class="relative">
+                <button
+                  type="button"
+                  @click="isSectorDropdownOpen = !isSectorDropdownOpen"
+                  class="w-full rounded-xl border px-4 py-3 text-xs bg-white flex items-center justify-between transition hover:border-blue-400 focus:ring-4 focus:ring-blue-500/10 cursor-pointer shadow-2xs"
+                  :class="isSectorDropdownOpen ? 'border-blue-600 ring-2 ring-blue-500/20' : 'border-slate-200'"
+                >
+                  <div class="flex items-center gap-2 truncate">
+                    <Building2 :size="15" class="text-blue-600 shrink-0" />
+                    <span v-if="selectedSectorsList.length === 0" class="text-slate-400 font-normal">
+                      Sektörleri seçmek için tıklayınız...
+                    </span>
+                    <span v-else class="text-slate-800 font-bold truncate">
+                      {{ selectedSectorsList.length }} Sektör Seçildi ({{ selectedSectorsList.slice(0, 2).join(', ') }}<span v-if="selectedSectorsList.length > 2"> ve {{ selectedSectorsList.length - 2 }} daha...</span>)
+                    </span>
+                  </div>
+                  <ChevronDown :size="16" class="text-slate-400 transition-transform duration-200 shrink-0 ml-2" :class="isSectorDropdownOpen ? 'rotate-180 text-blue-600' : ''" />
+                </button>
+
+                <!-- Dropdown Menu Overlay & List -->
+                <div
+                  v-if="isSectorDropdownOpen"
+                  class="absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-slate-200 bg-white shadow-2xl p-3 space-y-2.5 max-h-[380px] flex flex-col animate-fadeIn"
+                >
+                  <!-- Search Bar & Actions -->
+                  <div class="space-y-2 shrink-0">
+                    <div class="relative">
+                      <Search :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        v-model="sectorSearchQuery"
+                        type="text"
+                        placeholder="Sektör veya kategori ara... (Örn: İnşaat, Ambalaj, Gıda, IT)"
+                        class="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 text-xs outline-none focus:border-blue-500 bg-slate-50/60 font-medium"
+                      />
+                      <button
+                        v-if="sectorSearchQuery"
+                        type="button"
+                        @click="sectorSearchQuery = ''"
+                        class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    <div class="flex items-center justify-between text-[11px] font-bold text-slate-500 pt-1 border-b border-slate-100 pb-1.5">
+                      <span>{{ filteredAvailableSectors.length }} Sektör Listeleniyor</span>
+                      <div class="flex items-center gap-2">
+                        <button
+                          type="button"
+                          @click="selectAllFilteredSectors"
+                          class="text-blue-600 hover:underline cursor-pointer"
+                        >
+                          Tümünü Seç
+                        </button>
+                        <span>·</span>
+                        <button
+                          type="button"
+                          @click="clearAllSectors"
+                          class="text-rose-600 hover:underline cursor-pointer"
+                        >
+                          Seçimleri Temizle
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Scrollable Options List -->
+                  <div class="overflow-y-auto space-y-1 flex-1 pr-1 max-h-[200px]">
+                    <div
+                      v-for="sec in filteredAvailableSectors"
+                      :key="sec"
+                      @click="toggleSectorTag(sec)"
+                      class="flex items-center justify-between p-2 rounded-xl text-xs transition cursor-pointer"
+                      :class="selectedSectorsList.includes(sec) ? 'bg-blue-50/80 text-blue-900 font-bold border border-blue-200' : 'hover:bg-slate-50 text-slate-700 font-medium border border-transparent'"
+                    >
+                      <div class="flex items-center gap-2.5 truncate pr-2">
+                        <div
+                          class="w-4 h-4 rounded border flex items-center justify-center shrink-0 transition"
+                          :class="selectedSectorsList.includes(sec) ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300 bg-white'"
+                        >
+                          <Check v-if="selectedSectorsList.includes(sec)" :size="11" />
+                        </div>
+                        <span class="truncate text-xs">{{ sec }}</span>
+                      </div>
+                      <span v-if="selectedSectorsList.includes(sec)" class="text-[10px] text-blue-600 font-black shrink-0">✓ Seçili</span>
+                    </div>
+
+                    <div v-if="filteredAvailableSectors.length === 0" class="p-6 text-center text-slate-400 text-xs">
+                      "{{ sectorSearchQuery }}" ile eşleşen sektör bulunamadı.
+                    </div>
+                  </div>
+
+                  <!-- Dropdown Footer -->
+                  <div class="pt-2 border-t border-slate-100 flex items-center justify-between shrink-0">
+                    <span class="text-[10px] text-slate-400">Listeden istediğiniz kadar sektör seçebilirsiniz.</span>
+                    <button
+                      type="button"
+                      @click="isSectorDropdownOpen = false"
+                      class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer"
+                    >
+                      Tamamla
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Selected Sector Badges / Tags -->
+              <div v-if="selectedSectorsList.length > 0" class="flex flex-wrap gap-1.5 pt-2">
+                <span
+                  v-for="sec in selectedSectorsList"
+                  :key="sec"
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-blue-50 text-blue-800 text-xs font-bold border border-blue-200 transition group hover:bg-blue-100"
+                >
+                  <span>{{ sec }}</span>
+                  <button
+                    type="button"
+                    @click.stop="toggleSectorTag(sec)"
+                    class="text-blue-400 hover:text-rose-600 font-black cursor-pointer rounded-full p-0.5"
+                    title="Kaldır"
+                  >
+                    <X :size="12" />
+                  </button>
+                </span>
+              </div>
+              <p v-else class="text-[11px] text-slate-400 italic pt-1">
+                Henüz sektör seçilmedi. Firmanızın hizmet verdiği sektörleri yukarıdaki açılır menüden seçiniz.
+              </p>
             </div>
 
             <!-- Şirket Faaliyet Tanıtımı ve Hakkında Açıklaması (Textarea) -->
@@ -1159,13 +1378,141 @@ function saveProfile() {
                 <input v-model="companyForm.legalName" type="text" placeholder="Örn: Yılmaz Ambalaj Sanayi ve Ticaret A.Ş." class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
-              <!-- Faaliyet Sektörleri -->
-              <div class="md:col-span-2">
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
-                  FAALİYET SEKTÖRÜ / ALANLARI <span class="text-red-500">*</span>
-                </label>
-                <input v-model="companyForm.sectors" type="text" placeholder="Örn: Ambalaj & Kağıt, İnşaat & Yapı Malzemeleri, Lojistik" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800 font-medium" style="border-color: #E2E8F0;" />
-                <span class="text-[9px] text-slate-400 mt-1 block">İlgi alanınıza giren sektörleri virgülle ayırarak yazınız. Size uygun ihaleler bu sektörlere göre filtrelenir.</span>
+              <!-- Faaliyet Sektörleri (Açılır Menü & Çoklu Seçim) -->
+              <div class="md:col-span-2 space-y-2 relative">
+                <div class="flex items-center justify-between">
+                  <label class="block text-[10px] font-black text-slate-500 uppercase">
+                    FAALİYET SEKTÖRÜ / ALANLARI <span class="text-red-500">*</span>
+                  </label>
+                  <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
+                    {{ selectedSectorsList.length }} Sektör Seçili
+                  </span>
+                </div>
+
+                <div class="relative">
+                  <button
+                    type="button"
+                    @click="isSectorDropdownOpen2 = !isSectorDropdownOpen2"
+                    class="w-full rounded-xl border px-4 py-3 text-xs bg-white flex items-center justify-between transition hover:border-blue-400 focus:ring-4 focus:ring-blue-500/10 cursor-pointer shadow-2xs"
+                    :class="isSectorDropdownOpen2 ? 'border-blue-600 ring-2 ring-blue-500/20' : 'border-slate-200'"
+                  >
+                    <div class="flex items-center gap-2 truncate">
+                      <Building2 :size="15" class="text-blue-600 shrink-0" />
+                      <span v-if="selectedSectorsList.length === 0" class="text-slate-400 font-normal">
+                        Sektörleri seçmek için tıklayınız...
+                      </span>
+                      <span v-else class="text-slate-800 font-bold truncate">
+                        {{ selectedSectorsList.length }} Sektör Seçildi ({{ selectedSectorsList.slice(0, 2).join(', ') }}<span v-if="selectedSectorsList.length > 2"> ve {{ selectedSectorsList.length - 2 }} daha...</span>)
+                      </span>
+                    </div>
+                    <ChevronDown :size="16" class="text-slate-400 transition-transform duration-200 shrink-0 ml-2" :class="isSectorDropdownOpen2 ? 'rotate-180 text-blue-600' : ''" />
+                  </button>
+
+                  <!-- Dropdown Menu Overlay & List -->
+                  <div
+                    v-if="isSectorDropdownOpen2"
+                    class="absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-slate-200 bg-white shadow-2xl p-3 space-y-2.5 max-h-[380px] flex flex-col animate-fadeIn"
+                  >
+                    <!-- Search Bar & Actions -->
+                    <div class="space-y-2 shrink-0">
+                      <div class="relative">
+                        <Search :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                        <input
+                          v-model="sectorSearchQuery"
+                          type="text"
+                          placeholder="Sektör veya kategori ara... (Örn: İnşaat, Ambalaj, Gıda, IT)"
+                          class="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 text-xs outline-none focus:border-blue-500 bg-slate-50/60 font-medium"
+                        />
+                        <button
+                          v-if="sectorSearchQuery"
+                          type="button"
+                          @click="sectorSearchQuery = ''"
+                          class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      <div class="flex items-center justify-between text-[11px] font-bold text-slate-500 pt-1 border-b border-slate-100 pb-1.5">
+                        <span>{{ filteredAvailableSectors.length }} Sektör Listeleniyor</span>
+                        <div class="flex items-center gap-2">
+                          <button
+                            type="button"
+                            @click="selectAllFilteredSectors"
+                            class="text-blue-600 hover:underline cursor-pointer"
+                          >
+                            Tümünü Seç
+                          </button>
+                          <span>·</span>
+                          <button
+                            type="button"
+                            @click="clearAllSectors"
+                            class="text-rose-600 hover:underline cursor-pointer"
+                          >
+                            Seçimleri Temizle
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Scrollable Options List -->
+                    <div class="overflow-y-auto space-y-1 flex-1 pr-1 max-h-[200px]">
+                      <div
+                        v-for="sec in filteredAvailableSectors"
+                        :key="sec"
+                        @click="toggleSectorTag(sec)"
+                        class="flex items-center justify-between p-2 rounded-xl text-xs transition cursor-pointer"
+                        :class="selectedSectorsList.includes(sec) ? 'bg-blue-50/80 text-blue-900 font-bold border border-blue-200' : 'hover:bg-slate-50 text-slate-700 font-medium border border-transparent'"
+                      >
+                        <div class="flex items-center gap-2.5 truncate pr-2">
+                          <div
+                            class="w-4 h-4 rounded border flex items-center justify-center shrink-0 transition"
+                            :class="selectedSectorsList.includes(sec) ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300 bg-white'"
+                          >
+                            <Check v-if="selectedSectorsList.includes(sec)" :size="11" />
+                          </div>
+                          <span class="truncate text-xs">{{ sec }}</span>
+                        </div>
+                        <span v-if="selectedSectorsList.includes(sec)" class="text-[10px] text-blue-600 font-black shrink-0">✓ Seçili</span>
+                      </div>
+
+                      <div v-if="filteredAvailableSectors.length === 0" class="p-6 text-center text-slate-400 text-xs">
+                        "{{ sectorSearchQuery }}" ile eşleşen sektör bulunamadı.
+                      </div>
+                    </div>
+
+                    <!-- Dropdown Footer -->
+                    <div class="pt-2 border-t border-slate-100 flex items-center justify-between shrink-0">
+                      <span class="text-[10px] text-slate-400">İlgi alanınıza giren sektörleri seçiniz.</span>
+                      <button
+                        type="button"
+                        @click="isSectorDropdownOpen2 = false"
+                        class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer"
+                      >
+                        Tamamla
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Selected Sector Badges / Tags -->
+                <div v-if="selectedSectorsList.length > 0" class="flex flex-wrap gap-1.5 pt-1">
+                  <span
+                    v-for="sec in selectedSectorsList"
+                    :key="sec"
+                    class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-blue-50 text-blue-800 text-xs font-bold border border-blue-200 transition group hover:bg-blue-100"
+                  >
+                    <span>{{ sec }}</span>
+                    <button
+                      type="button"
+                      @click.stop="toggleSectorTag(sec)"
+                      class="text-blue-400 hover:text-rose-600 font-black cursor-pointer rounded-full p-0.5"
+                      title="Kaldır"
+                    >
+                      <X :size="12" />
+                    </button>
+                  </span>
+                </div>
               </div>
 
               <!-- Vergi Numarası / VKN -->
