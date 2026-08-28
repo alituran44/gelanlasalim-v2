@@ -295,7 +295,7 @@ function downloadAllSpecs(tender: any) {
   }
 }
 
-const detailActiveTab = ref<'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'sonuc' | 'gecmis'>('ilan')
+const detailActiveTab = ref<'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'firmalar' | 'sonuc' | 'gecmis'>('ilan')
 </script>
 
 <template>
@@ -318,6 +318,13 @@ const detailActiveTab = ref<'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'sonuc' 
         </div>
 
         <div class="flex flex-wrap items-center gap-3 shrink-0 relative z-10">
+          <NuxtLink
+            to="/firmalar"
+            class="flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs border border-slate-700 transition-all cursor-pointer"
+          >
+            <Building2 :size="15" class="text-amber-400" />
+            <span>🏢 Firmalar</span>
+          </NuxtLink>
           <NuxtLink
             to="/panel/ihale-olustur"
             class="flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-[#0052FF] hover:bg-blue-600 text-white font-black text-xs shadow-lg shadow-blue-600/30 transition-all hover:scale-102 cursor-pointer"
@@ -811,6 +818,15 @@ const detailActiveTab = ref<'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'sonuc' 
           </button>
           <button
             type="button"
+            @click="detailActiveTab = 'firmalar'"
+            class="px-3.5 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+            :class="detailActiveTab === 'firmalar' ? 'bg-[#0F223D] text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+          >
+            <Building2 :size="13" />
+            <span>🏢 Firmalar</span>
+          </button>
+          <button
+            type="button"
             @click="detailActiveTab = 'sonuc'"
             class="px-3.5 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5"
             :class="detailActiveTab === 'sonuc' ? 'bg-[#0F223D] text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
@@ -899,7 +915,36 @@ const detailActiveTab = ref<'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'sonuc' 
           </div>
         </div>
 
-        <!-- Tab 5: Sonuç İlanı -->
+        <!-- Tab 5: Firmalar (Doğrulanmış B2B Üye & Tedarikçi Firmalar) -->
+        <div v-if="detailActiveTab === 'firmalar'" class="space-y-4 text-xs text-slate-700 leading-relaxed">
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="flex items-center justify-between">
+              <span class="font-bold text-slate-500 uppercase text-[10px]">İhaleyi Açan Kurumsal Alıcı</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-black text-[10px] border border-emerald-200">✓ Onaylı Alıcı Firma</span>
+            </div>
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-black shrink-0">
+                <Building2 :size="20" />
+              </div>
+              <div>
+                <h5 class="font-black text-slate-900 text-sm">{{ selectedTenderForDetail.ownerCompany || selectedTenderForDetail.company || 'Doğrulanmış B2B Satın Alma Şirketi' }}</h5>
+                <span class="text-slate-500 text-[11px]">📍 {{ selectedTenderForDetail.city || 'Türkiye Geneli' }} · GİB Vergi & MERSİS Kaydı Doğrulanmış</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-blue-50/60 border border-blue-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <h5 class="font-black text-blue-950 text-xs">Bu Sektördeki Onaylı Tedarikçi Firmalar</h5>
+              <NuxtLink to="/firmalar" class="text-blue-700 hover:text-blue-900 font-bold text-[11px] underline">
+                Tüm B2B Firma Rehberini Aç →
+              </NuxtLink>
+            </div>
+            <p class="text-[11px] text-blue-900">Bu ihaleye teklif verebilecek {{ selectedTenderForDetail.kategori }} sektöründe kayıtlı doğrulanmış üretici ve toptancı firmalar sistem tarafından bildirimle davet edilir.</p>
+          </div>
+        </div>
+
+        <!-- Tab 6: Sonuç İlanı -->
         <div v-if="detailActiveTab === 'sonuc'" class="space-y-3 text-xs text-slate-700">
           <div class="p-4 rounded-2xl border" :class="selectedTenderForDetail.durum === 'closed' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-emerald-50 border-emerald-200 text-emerald-900'">
             <div class="font-black text-sm">
