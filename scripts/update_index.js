@@ -1,4 +1,6 @@
-<script setup lang="ts">
+const fs = require('fs');
+
+const content = `<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import {
   Search,
@@ -439,7 +441,7 @@ const quickBidNotes = ref('')
 
 function handleBidClick(tender: any) {
   if (!isLoggedIn.value) {
-    alert('⚠️ TEKLİF VEREBİLMEK İÇİN ÜYELİK GEREKLİDİR\n\nKurumsal teklifinizi iletmek için lütfen ücretsiz üye olun veya kurumsal hesabınıza giriş yapın.')
+    alert('⚠️ TEKLİF VEREBİLMEK İÇİN ÜYELİK GEREKLİDİR\\n\\nKurumsal teklifinizi iletmek için lütfen ücretsiz üye olun veya kurumsal hesabınıza giriş yapın.')
     activeModal.value = 'auth'
     return
   }
@@ -463,12 +465,12 @@ function submitQuickBid() {
     date: 'Şimdi'
   })
   activeModal.value = null
-  alert(`🎉 TEKLİFİNİZ BAŞARIYLA İLETİLDİ!\n\n${selectedTenderForBid.value.company} firmasına ${Number(quickBidPrice.value).toLocaleString('tr-TR')} ₺ tutarındaki teklifiniz anında ulaştırılmıştır.`)
+  alert(`🎉 TEKLİFİNİZ BAŞARIYLA İLETİLDİ!\\n\\n${selectedTenderForBid.value.company} firmasına ${Number(quickBidPrice.value).toLocaleString('tr-TR')} ₺ tutarındaki teklifiniz anında ulaştırılmıştır.`)
 }
 
 function handleCreateTenderClick() {
   if (!isLoggedIn.value) {
-    alert('⚠️ İHALE AÇABİLMEK İÇİN ÜYE GİRİŞİ GEREKLİDİR\n\nİhale yayınlamak için lütfen kurumsal hesabınızı oluşturun.')
+    alert('⚠️ İHALE AÇABİLMEK İÇİN ÜYE GİRİŞİ GEREKLİDİR\\n\\nİhale yayınlamak için lütfen kurumsal hesabınızı oluşturun.')
     activeModal.value = 'auth'
     return
   }
@@ -477,7 +479,7 @@ function handleCreateTenderClick() {
 
 function acceptBid(bid: any) {
   bid.status = 'Kabul Edildi ✓'
-  alert(`🎉 TEBRİKLER!\n\n${bid.bidderCompany} firmasının ${bid.amountFormatted} tutarındaki teklifini KABUL ettiniz. Zaman damgalı e-tutanak oluşturuldu.`)
+  alert(`🎉 TEBRİKLER!\\n\\n${bid.bidderCompany} firmasının ${bid.amountFormatted} tutarındaki teklifini KABUL ettiniz. Zaman damgalı e-tutanak oluşturuldu.`)
 }
 
 function rejectBid(bid: any) {
@@ -502,7 +504,7 @@ function submitCounterOffer() {
   }
   selectedBidForCounter.value.status = 'Karşı Teklif İletildi (Pazarlık) 💬'
   activeModal.value = null
-  alert(`💬 KARŞI TEKLİFİNİZ GÖNDERİLDİ!\n\n${selectedBidForCounter.value.bidderCompany} firmasına ${Number(counterPrice.value).toLocaleString('tr-TR')} ₺ hedef fiyat teklifiniz iletildi.`)
+  alert(`💬 KARŞI TEKLİFİNİZ GÖNDERİLDİ!\\n\\n${selectedBidForCounter.value.bidderCompany} firmasına ${Number(counterPrice.value).toLocaleString('tr-TR')} ₺ hedef fiyat teklifiniz iletildi.`)
 }
 
 const ratingStars = ref(5)
@@ -516,7 +518,7 @@ function openRateCompanyModal(company: any) {
 }
 
 function submitCompanyRating() {
-  alert(`⭐ TEŞEKKÜRLER!\n\n${selectedCompanyForRating.value.name || selectedCompanyForRating.value.companyName || selectedCompanyForRating.value.company || 'Firma'} için ${ratingStars.value} yıldızlı değerlendirmeniz başarıyla kaydedildi.`)
+  alert(`⭐ TEŞEKKÜRLER!\\n\\n${selectedCompanyForRating.value.name || selectedCompanyForRating.value.companyName || selectedCompanyForRating.value.company || 'Firma'} için ${ratingStars.value} yıldızlı değerlendirmeniz başarıyla kaydedildi.`)
   activeModal.value = null
 }
 
@@ -1466,3 +1468,7 @@ onMounted(() => {
   background: #334155;
 }
 </style>
+`;
+
+fs.writeFileSync('C:/Users/Hp/gelanlasalim-v2/app/pages/index.vue', content, 'utf8');
+console.log('Successfully written index.vue!');
