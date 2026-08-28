@@ -141,14 +141,14 @@ onMounted(() => {
           </svg>
         </NuxtLink>
 
-        <!-- SAĞ: TASLAKTAKİ ORİJİNAL MENÜ SEKMELERİ (TURUNCU / MAVİ) -->
-        <div class="flex flex-wrap items-center gap-1 text-white font-bold text-xs">
+        <!-- SAĞ: KURUMSAL ÜST MENÜ SEKMELERİ (DERİN KURUMSAL MAVİ / LACİVERT) -->
+        <div class="flex flex-wrap items-center gap-1.5 text-white font-bold text-xs">
           <!-- 1. Ana Sayfa -->
           <NuxtLink 
             to="/"
             @click="activeNavTab = 'anasayfa'" 
-            :class="activeNavTab === 'anasayfa' ? 'bg-[#0084B4] shadow-inner' : 'bg-[#0097CD] hover:bg-[#0084B4]'"
-            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+            :class="activeNavTab === 'anasayfa' ? 'bg-[#0F223D] border-b-2 border-amber-400 text-white shadow-inner' : 'bg-[#1E3A8A] hover:bg-[#172554] text-slate-100'"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <span>🏠 Ana Sayfa</span>
           </NuxtLink>
@@ -157,8 +157,8 @@ onMounted(() => {
           <NuxtLink 
             to="/panel/ayarlar" 
             @click="activeNavTab = 'profilim'" 
-            :class="activeNavTab === 'profilim' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
-            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+            :class="activeNavTab === 'profilim' ? 'bg-[#0F223D] border-b-2 border-amber-400 text-white' : 'bg-[#1E3A8A] hover:bg-[#172554] text-slate-100'"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <span>👤 Profilim</span>
           </NuxtLink>
@@ -167,8 +167,8 @@ onMounted(() => {
           <NuxtLink 
             to="/panel/bildirimler" 
             @click="activeNavTab = 'bildirimler'" 
-            :class="activeNavTab === 'bildirimler' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
-            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer relative"
+            :class="activeNavTab === 'bildirimler' ? 'bg-[#0F223D] border-b-2 border-amber-400 text-white' : 'bg-[#1E3A8A] hover:bg-[#172554] text-slate-100'"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer relative shadow-xs"
           >
             <span>🔔 Bildirimler</span>
             <span class="h-4 min-w-[16px] px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">3</span>
@@ -178,8 +178,8 @@ onMounted(() => {
           <NuxtLink 
             to="/panel/ilanlarim" 
             @click="activeNavTab = 'ilanlarim'" 
-            :class="activeNavTab === 'ilanlarim' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
-            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+            :class="activeNavTab === 'ilanlarim' ? 'bg-[#0F223D] border-b-2 border-amber-400 text-white' : 'bg-[#1E3A8A] hover:bg-[#172554] text-slate-100'"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <span>📑 Yayındaki İlanlarım</span>
           </NuxtLink>
@@ -188,8 +188,8 @@ onMounted(() => {
           <NuxtLink 
             to="/panel/gelen-teklifler" 
             @click="activeNavTab = 'gelen-teklifler'" 
-            :class="activeNavTab === 'gelen-teklifler' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
-            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+            :class="activeNavTab === 'gelen-teklifler' ? 'bg-[#0F223D] border-b-2 border-amber-400 text-white' : 'bg-[#1E3A8A] hover:bg-[#172554] text-slate-100'"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <span>📥 Gelen Teklifler</span>
           </NuxtLink>
@@ -198,8 +198,8 @@ onMounted(() => {
           <NuxtLink 
             to="/panel/yaptigim-teklifler" 
             @click="activeNavTab = 'verilen-teklifler'" 
-            :class="activeNavTab === 'verilen-teklifler' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
-            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+            :class="activeNavTab === 'verilen-teklifler' ? 'bg-[#0F223D] border-b-2 border-amber-400 text-white' : 'bg-[#1E3A8A] hover:bg-[#172554] text-slate-100'"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <span>📤 Verilen Teklifler</span>
           </NuxtLink>
@@ -208,8 +208,8 @@ onMounted(() => {
           <NuxtLink 
             to="/panel/firmalar" 
             @click="activeNavTab = 'firmalar'" 
-            :class="activeNavTab === 'firmalar' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
-            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+            :class="activeNavTab === 'firmalar' ? 'bg-[#0F223D] border-b-2 border-amber-400 text-white' : 'bg-[#1E3A8A] hover:bg-[#172554] text-slate-100'"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
             <span>🏢 Üye Firmalar</span>
           </NuxtLink>
@@ -220,30 +220,30 @@ onMounted(() => {
       <!-- ALT İKİNCİ ŞERİT: YENİ ÜYELİK, GİRİŞ YAP, MİSAFİR GİRİŞİ, ÜYELİK UZAT & İHALE AÇ -->
       <div class="max-w-[1400px] mx-auto mt-2 pt-2 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-3">
         
-        <!-- Sol: Butonlar Grubu -->
-        <div class="flex flex-wrap items-center gap-2">
+        <!-- Sol: Kurumsal Butonlar Grubu -->
+        <div class="flex flex-wrap items-center gap-2.5">
           <!-- 1. Yeni Üyelik -->
-          <NuxtLink to="/uyelik?tab=register" class="px-3.5 py-1.5 rounded bg-[#4CAF50] hover:bg-[#43A047] text-white font-bold text-xs shadow-xs flex items-center gap-1">
+          <NuxtLink to="/uyelik?tab=register" class="px-3.5 py-1.5 rounded-lg bg-[#059669] hover:bg-[#047857] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-emerald-700/30 transition">
             <span>👤+ Yeni üyelik</span>
           </NuxtLink>
 
           <!-- 2. Giriş Yap -->
-          <NuxtLink to="/uyelik?tab=login" class="px-3.5 py-1.5 rounded bg-[#0F223D] hover:bg-[#003057] text-white font-bold text-xs shadow-xs flex items-center gap-1">
+          <NuxtLink to="/uyelik?tab=login" class="px-3.5 py-1.5 rounded-lg bg-[#0F223D] hover:bg-[#1E293B] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-slate-700/40 transition">
             <span>🔑 Giriş Yap</span>
           </NuxtLink>
 
           <!-- 3. Misafir Girişi -->
-          <NuxtLink to="/uyelik?tab=guest" class="px-3.5 py-1.5 rounded bg-[#F59E0B] hover:bg-[#D97706] text-white font-bold text-xs shadow-xs flex items-center gap-1">
+          <NuxtLink to="/uyelik?tab=guest" class="px-3.5 py-1.5 rounded-lg bg-[#B45309] hover:bg-[#92400E] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-amber-700/30 transition">
             <span>👁️ Misafir Girişi</span>
           </NuxtLink>
 
           <!-- 4. Üyelik Uzat -->
-          <NuxtLink to="/abonelik" class="px-3.5 py-1.5 rounded bg-[#0288D1] hover:bg-[#0277BD] text-white font-bold text-xs shadow-xs flex items-center gap-1">
+          <NuxtLink to="/abonelik" class="px-3.5 py-1.5 rounded-lg bg-[#0284C7] hover:bg-[#0369A1] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-sky-700/30 transition">
             <span>🔄 Üyelik uzat</span>
           </NuxtLink>
 
           <!-- 5. İhale Aç -->
-          <NuxtLink to="/panel/ihale-olustur" class="px-3.5 py-1.5 rounded bg-[#FF5722] hover:bg-[#E64A19] text-white font-black text-xs shadow-xs flex items-center gap-1">
+          <NuxtLink to="/panel/ihale-olustur" class="px-4 py-1.5 rounded-lg bg-[#EA580C] hover:bg-[#C2410C] text-white font-black text-xs shadow-xs flex items-center gap-1 border border-orange-700/30 transition">
             <span>+ İhale Aç</span>
           </NuxtLink>
         </div>

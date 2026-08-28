@@ -452,16 +452,16 @@ function submitOffer() {
   <div class="min-h-screen bg-[#F0F2F5] text-slate-800 font-sans text-xs flex flex-col">
 
     <!-- ========================================================================= -->
-    <!-- 🔵 4'LÜ MAVİ ANA MENÜ ŞERİDİ (KULLANICI TALİMATI: İDARELER & KİK KALDIRILDI) -->
+    <!-- 🔵 4'LÜ KURUMSAL ANA MENÜ ŞERİDİ (KATEGORİLER, ŞEHİRLER, SEKTÖRLER, YÜKLENİCİLER) -->
     <!-- ========================================================================= -->
-    <div class="bg-[#0084B4] border-b border-[#00739D] text-white font-bold text-xs sticky top-[108px] z-40 shadow-xs">
+    <div class="bg-[#0F223D] border-b border-slate-800 text-white font-bold text-xs sticky top-[108px] z-40 shadow-sm">
       <div class="max-w-[1400px] mx-auto flex flex-wrap items-center">
         
         <!-- 1. KATEGORİLER -->
         <button 
           @click="activeSubMenu = 'kategoriler'" 
-          :class="activeSubMenu === 'kategoriler' ? 'bg-[#E1F5FE] text-[#0084B4] border-t-2 border-[#0084B4] font-black shadow-inner' : 'hover:bg-[#00739D] text-white'"
-          class="px-6 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-[#00739D]"
+          :class="activeSubMenu === 'kategoriler' ? 'bg-white text-[#0F223D] border-t-2 border-amber-500 font-black shadow-inner' : 'hover:bg-[#1E3A8A] text-slate-200'"
+          class="px-6 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-slate-800"
         >
           <span>📁 Kategoriler</span>
         </button>
@@ -469,8 +469,8 @@ function submitOffer() {
         <!-- 2. ŞEHİRLER -->
         <button 
           @click="activeSubMenu = 'sehirler'" 
-          :class="activeSubMenu === 'sehirler' ? 'bg-[#E1F5FE] text-[#0084B4] border-t-2 border-[#0084B4] font-black shadow-inner' : 'hover:bg-[#00739D] text-white'"
-          class="px-6 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-[#00739D]"
+          :class="activeSubMenu === 'sehirler' ? 'bg-white text-[#0F223D] border-t-2 border-amber-500 font-black shadow-inner' : 'hover:bg-[#1E3A8A] text-slate-200'"
+          class="px-6 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-slate-800"
         >
           <span>🏙️ Şehirler</span>
         </button>
@@ -478,8 +478,8 @@ function submitOffer() {
         <!-- 3. SEKTÖRLER -->
         <button 
           @click="activeSubMenu = 'sektorler'" 
-          :class="activeSubMenu === 'sektorler' ? 'bg-[#E1F5FE] text-[#0084B4] border-t-2 border-[#0084B4] font-black shadow-inner' : 'hover:bg-[#00739D] text-white'"
-          class="px-6 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-[#00739D]"
+          :class="activeSubMenu === 'sektorler' ? 'bg-white text-[#0F223D] border-t-2 border-amber-500 font-black shadow-inner' : 'hover:bg-[#1E3A8A] text-slate-200'"
+          class="px-6 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-slate-800"
         >
           <span>🏭 Sektörler</span>
         </button>
@@ -487,8 +487,8 @@ function submitOffer() {
         <!-- 4. YÜKLENİCİLER -->
         <button 
           @click="activeSubMenu = 'yukleniciler'" 
-          :class="activeSubMenu === 'yukleniciler' ? 'bg-[#E1F5FE] text-[#0084B4] border-t-2 border-[#0084B4] font-black shadow-inner' : 'hover:bg-[#00739D] text-white'"
-          class="px-6 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-[#00739D]"
+          :class="activeSubMenu === 'yukleniciler' ? 'bg-white text-[#0F223D] border-t-2 border-amber-500 font-black shadow-inner' : 'hover:bg-[#1E3A8A] text-slate-200'"
+          class="px-6 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-slate-800"
         >
           <span>👥 Yükleniciler</span>
         </button>
