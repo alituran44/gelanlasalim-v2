@@ -729,32 +729,60 @@ const supplierSteps = computed(() => [
 const activeSteps = computed(() => activeAudience.value === 'buyer' ? buyerSteps.value : supplierSteps.value)
 
 const localizedTenders = computed(() => {
-  const dynamicTenders = (cmsData.value?.dashboard?.tenders || []).map((dt: any, idx: number) => ({
+  let userCreatedList: any[] = []
+  if (typeof window !== 'undefined') {
+    try {
+      const keys = ['myTenders', 'userTenders', 'createdTenders', 'allTenders', 'customTenders']
+      for (const k of keys) {
+        const raw = localStorage.getItem(k)
+        if (raw) {
+          const parsed = JSON.parse(raw)
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            userCreatedList = [...userCreatedList, ...parsed]
+          }
+        }
+      }
+      // Benzersiz id'lere göre filtrele
+      const seen = new Set()
+      userCreatedList = userCreatedList.filter((item: any) => {
+        const id = item.id || item.title || item.baslik
+        if (seen.has(id)) return false
+        seen.add(id)
+        return true
+      })
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const dynamicTenders = (cmsData.value?.dashboard?.tenders || [])
+  const combined = [...userCreatedList, ...dynamicTenders]
+
+  return combined.map((dt: any, idx: number) => ({
     id: dt.id || (1000 + idx),
     featured: idx < 2,
-    title: dt.baslik,
-    company: dt.companyName || dt.firma || `${dt.city || 'Doğrulanmış'} Kurumsal Alıcı`,
+    title: dt.title || dt.baslik || dt.ihaleBasligi || 'Kurumsal Satın Alma İhalesi',
+    company: dt.company || dt.companyName || dt.firma || `${dt.city || 'Doğrulanmış'} Kurumsal Alıcı`,
     verified: true,
-    image: dt.image || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80',
+    image: dt.image || dt.images?.[0] || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80',
     images: dt.images || [dt.image || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80'],
-    category: dt.kategori?.split('/')[0]?.trim() || 'İnşaat ve Yapı',
-    sector: dt.kategori || 'Genel Satın Alma',
-    city: dt.city || 'Türkiye',
+    category: dt.category || dt.kategori?.split('/')[0]?.trim() || 'İnşaat ve Yapı',
+    sector: dt.sector || dt.kategori || 'Genel Satın Alma',
+    city: dt.city || dt.sehir || 'Türkiye',
     type: dt.type || 'Mal Alımı',
     method: dt.method || 'Canlı Eksiltme',
     pricing: dt.pricing || 'Toplam Bedel',
-    deadline: dt.sure || '7 gün kaldı',
-    daysLeft: 7,
-    offers: dt.teklifSayisi || 0,
-    value: dt.butce || 'Açık Eksiltme',
-    description: dt.aciklama || dt.baslik,
-    material_list: `1. ${dt.baslik} - Şartname gereğince teslimat`,
+    deadline: dt.deadline || dt.sure || '7 gün kaldı',
+    daysLeft: dt.daysLeft || 7,
+    offers: dt.offers || dt.teklifSayisi || dt.bidsCount || 0,
+    value: dt.budget || (dt.budgetNumeric ? `${Number(dt.budgetNumeric).toLocaleString('tr-TR')} ₺` : (dt.butce || 'Açık Eksiltme')),
+    description: dt.description || dt.aciklama || dt.title || dt.baslik,
+    material_list: `1. ${dt.title || dt.baslik} - Şartname gereğince teslimat`,
     admin_spec: '• İhale kapalı zarf usulü ile toplanıp canlı eksiltmeye açılacaktır.\n• İhaleciBurada güvenli havuz güvencesi geçerlidir.',
     tech_spec: '• Belgeli ve onaylı tedarikçi şartı aranmaktadır.\n• Tüm standartlara ve TSE normlarına uygunluk zorunludur.',
-    similar_history: 'Geçmiş Benzer İşlem: 1.200.000 ₺ ortalama tasarruf'
+    similar_history: 'Geçmiş Benzer İşlem: 1.200.000 ₺ ortalama tasarruf',
+    createdAt: dt.createdAt || (Date.now() - idx * 3600000)
   }))
-
-  return dynamicTenders
 })
 
 /* =========================================================
