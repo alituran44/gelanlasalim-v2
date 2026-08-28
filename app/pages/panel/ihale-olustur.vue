@@ -440,7 +440,7 @@ function handleSubmit() {
     <div class="mb-5 flex items-center justify-between">
       <NuxtLink to="/panel/ilanlarim" class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 transition">
         <ArrowLeft :size="14" />
-        {{ 'İlanlarıma Dön' }}
+        {{ 'İhalelerime Dön' }}
       </NuxtLink>
 
       <button type="button" @click="saveDraftManually" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer border border-slate-200 shadow-xs">
@@ -452,7 +452,7 @@ function handleSubmit() {
     <div class="mb-6">
       <h1 class="text-xl font-bold flex items-center gap-2" style="color: #0F172A;">
         <FilePlus2 class="text-blue-600" :size="22" />
-        {{ 'Yeni İhale İlanı Oluştur' }}
+        {{ 'Yeni İhale Talebi Oluştur' }}
       </h1>
       <p class="text-sm mt-0.5" style="color: #64748B;">Satın alma talebiniz için tedarikçilerden rekabetçi canlı teklifler toplayın</p>
     </div>
@@ -461,7 +461,7 @@ function handleSubmit() {
     <div v-if="showSuccess" class="mb-6 rounded-xl bg-emerald-50 border border-emerald-200 p-5 text-center transition-all animate-bounce">
       <CheckCircle2 class="text-emerald-500 mx-auto mb-2" :size="36" />
       <h3 class="text-sm font-bold text-emerald-800">İhale Başarıyla Oluşturuldu!</h3>
-      <p class="text-xs text-emerald-600 mt-1">İhale Kodu: <strong>{{ createdId }}</strong>. İlanlarım listesine yönlendiriliyorsunuz...</p>
+      <p class="text-xs text-emerald-600 mt-1">İhale Kodu: <strong>{{ createdId }}</strong>. İhalelerim listesine yönlendiriliyorsunuz...</p>
     </div>
 
     <!-- İhale Formu -->

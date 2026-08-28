@@ -116,7 +116,7 @@ const statusTabs = computed(() => {
   const expiredCount = tendersList.value.filter(t => t.durum === 'expired' || t.sure?.includes('Süresi Doldu')).length
 
   return [
-    { id: 'tum', label: 'Tüm İlanlarım', count: total },
+    { id: 'tum', label: 'Tüm İhalelerim', count: total },
     { id: 'aktif', label: 'Yayında (Aktif)', count: activeCount },
     { id: 'tamamlanan', label: 'Mutabakat Sağlanan', count: closedCount },
     { id: 'suresi_dolan', label: 'Süresi Dolanlar', count: expiredCount }

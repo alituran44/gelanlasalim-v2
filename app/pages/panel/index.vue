@@ -192,13 +192,13 @@ onMounted(() => {
     <!-- ========================================================================= -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       
-      <!-- Kart 1: İlanlarım -->
+      <!-- Kart 1: İhalelerim -->
       <NuxtLink to="/panel/ilanlarim" class="p-4 rounded-xl bg-white border border-slate-200 hover:border-blue-500 transition shadow-xs space-y-2 group">
         <div class="flex items-center justify-between text-slate-500">
-          <span class="text-xs font-bold uppercase">Yayındaki İlanlarım</span>
+          <span class="text-xs font-bold uppercase">Yayındaki İhalelerim</span>
           <FileText :size="18" class="text-blue-600 group-hover:scale-110 transition" />
         </div>
-        <div class="text-2xl font-black text-slate-800 font-mono">{{ myActiveTenders.length }} İlan</div>
+        <div class="text-2xl font-black text-slate-800 font-mono">{{ myActiveTenders.length }} İhale</div>
         <div class="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
           <span>● Aktif teklif toplanıyor</span>
         </div>
@@ -307,11 +307,11 @@ onMounted(() => {
     <!-- ========================================================================= -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       
-      <!-- Sol: Yayındaki İlanlarım -->
+      <!-- Sol: Yayındaki İhalelerim -->
       <div class="bg-white border border-slate-300 rounded-xl p-5 shadow-xs space-y-3">
         <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
           <h3 class="font-black text-sm text-slate-800 flex items-center gap-1.5">
-            <span>📑 Yayındaki İlanlarım</span>
+            <span>📑 Yayındaki İhalelerim</span>
           </h3>
           <NuxtLink to="/panel/ilanlarim" class="text-blue-600 hover:underline text-xs font-bold">
             Tümünü Gör ➔

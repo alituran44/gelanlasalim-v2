@@ -41,7 +41,7 @@ const sidebarMenus = computed(() => {
   if (locale.value === 'tr') {
     return [
       { title: "Genel Bakış", icon: LayoutDashboard, to: "/panel" },
-      { title: "İlanlarım", icon: ClipboardList, to: "/panel/ilanlarim" },
+      { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
       { title: "Firma & Evrak Yükleme", icon: Building2, to: "/panel/ayarlar?tab=sirket" },

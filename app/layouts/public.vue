@@ -174,14 +174,14 @@ onMounted(() => {
             <span class="h-4 min-w-[16px] px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">3</span>
           </NuxtLink>
 
-          <!-- 4. Yayındaki İlanlarım -->
+          <!-- 4. Yayındaki İhalelerim -->
           <NuxtLink 
             to="/panel/ilanlarim" 
             @click="activeNavTab = 'ilanlarim'" 
             :class="activeNavTab === 'ilanlarim' ? 'bg-[#0F223D] border-b-2 border-amber-400 text-white' : 'bg-[#1E3A8A] hover:bg-[#172554] text-slate-100'"
             class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
-            <span>📑 Yayındaki İlanlarım</span>
+            <span>📑 Yayındaki İhalelerim</span>
           </NuxtLink>
 
           <!-- 5. Gelen Teklifler -->
