@@ -9,9 +9,15 @@ import {
   Phone,
   Mail,
   Zap,
-  Key
+  Key,
+  ShieldCheck,
+  Building,
+  Scale,
+  FileText,
+  LockKeyhole
 } from 'lucide-vue-next'
 import FloatingSupportWidget from '~/components/common/FloatingSupportWidget.vue'
+import PaymentBadges from '~/components/common/PaymentBadges.vue'
 
 const userSession = ref<any>(null)
 const loginUsername = ref('')
@@ -75,7 +81,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#F0F2F5] font-sans text-slate-800 flex flex-col">
+  <div class="min-h-screen bg-[#F0F2F5] font-sans text-slate-800 flex flex-col justify-between">
     
     <!-- ========================================================================= -->
     <!-- 📞 1. EN ÜST İNCE BİLGİ ŞERİDİ (GÖRSELDEKİ BİREBİR ÜST BAR) -->
@@ -240,6 +246,95 @@ onMounted(() => {
     <main class="flex-1 w-full">
       <slot />
     </main>
+
+    <!-- ========================================================================= -->
+    <!-- 🛡️ 3. ZENGİN KURUMSAL VE HUKUKİ FOOTER ALANI -->
+    <!-- ========================================================================= -->
+    <footer class="mt-12 bg-[#050B16] border-t border-slate-800 text-slate-400 text-xs py-12">
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 space-y-10 text-left">
+        
+        <!-- 4 Kolonlu Zengin Footer Izgarası -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          
+          <!-- Kolon 1: Şirket ve Borsa Hakkında -->
+          <div class="space-y-3">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">⚖️</span>
+              <span class="text-base font-black text-white">İhaleciBurada.com</span>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-relaxed">
+              Türkiye'nin onaylı B2B tersine ihale ve doğrudan satın alma platformu. Kurumsal firmalar için güvenli ticaret, şeffaf eksiltme ve dijital sözleşme altyapısı.
+            </p>
+            <div class="pt-2 text-[11px] text-slate-300 space-y-1">
+              <div>📍 İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale</div>
+              <div>🏛️ Çanakkale V.D. 4700854210</div>
+              <div>📋 MERSİS: 0470085421000001</div>
+            </div>
+          </div>
+
+          <!-- Kolon 2: Hızlı Bağlantılar -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">PLATFORM</h4>
+            <div class="flex flex-col gap-2 text-slate-300 text-[11px]">
+              <NuxtLink to="/" class="hover:text-sky-400 transition-colors">▪ Ana Sayfa</NuxtLink>
+              <NuxtLink to="/pazar-yeri" class="hover:text-sky-400 transition-colors">▪ B2B Pazar Yeri</NuxtLink>
+              <NuxtLink to="/panel/ihale-olustur" class="hover:text-sky-400 transition-colors">▪ İhale Oluştur & Eksiltme</NuxtLink>
+              <NuxtLink to="/abonelik" class="hover:text-sky-400 transition-colors">▪ Üyelik Paketleri</NuxtLink>
+              <NuxtLink to="/videolar" class="hover:text-sky-400 transition-colors">▪ Video Rehberler</NuxtLink>
+            </div>
+          </div>
+
+          <!-- Kolon 3: 13 Yasal Sözleşme -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">HUKUKİ SÖZLEŞMELER</h4>
+            <div class="flex flex-col gap-1.5 text-slate-300 text-[11px]">
+              <NuxtLink to="/sozlesmeler?tab=on-bilgilendirme" class="hover:text-amber-300 text-amber-200">▪ Ön Bilgilendirme Formu</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-blue-300 text-blue-200">▪ Mesafeli Satış Sözleşmesi</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=iptal-iade" class="hover:text-emerald-300 text-emerald-200">▪ İptal ve İade Koşulları</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-sky-400">▪ Gizlilik Politikası</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-sky-400">▪ KVKK Aydınlatma Metni</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=escrow" class="hover:text-sky-400">▪ Escrow Güvenli Havuz</NuxtLink>
+            </div>
+          </div>
+
+          <!-- Kolon 4: 7/24 Destek & Güvenlik -->
+          <div class="space-y-3">
+            <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">DESTEK & İLETİŞİM</h4>
+            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2 text-[11px]">
+              <div class="font-bold text-white flex items-center gap-1.5">
+                <span>📞</span>
+                <span>0850 308 00 00</span>
+              </div>
+              <div class="text-slate-400">
+                <span>✉</span>
+                <span class="ml-1 text-sky-300">mail@ihaleciburada.com</span>
+              </div>
+              <div class="text-[10px] text-slate-500 pt-1 border-t border-slate-800">
+                Hafta İçi: 09:00 - 18:00 | 7/24 Online Destek
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Güvenlik Mührü ve Ödeme Kuruluşları (PayTR & iyzico 256-Bit SSL) -->
+        <div class="pt-6 border-t border-slate-800/80 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold">
+            <ShieldCheck :size="16" />
+            <span>PayTR & iyzico 256-Bit SSL TLS 1.3 3D Secure Güvenli Ödeme</span>
+          </div>
+          <div>
+            <PaymentBadges />
+          </div>
+        </div>
+
+        <!-- En Alt Telif Satırı -->
+        <div class="text-center text-slate-500 text-[11px] pt-4 border-t border-slate-800/50">
+          © 2026 İhaleciBurada.com — B2B Canlı Eksiltme & Satın Alma Platformu. Tüm Hakları Saklıdır.
+        </div>
+
+      </div>
+    </footer>
 
     <!-- Floating Destek Butonu -->
     <FloatingSupportWidget />
