@@ -427,24 +427,10 @@ const tenders = ref([
 ])
 
 function handleSelectFilter(item: string) {
-  selectedItemName.value = item
-  const el = document.getElementById('ihale-listesi-alani')
-  if (el) el.scrollIntoView({ behavior: 'smooth' })
-}
-
-function openTenderDetail(tender: any) {
-  selectedTenderModal.value = tender
-  quickOfferPrice.value = tender.cost.replace(/[^0-9]/g, '') ? String(Math.round(Number(tender.cost.replace(/[^0-9]/g, '')) * 0.95)) : ''
-  quickOfferNotes.value = ''
-}
-
-function submitOffer() {
-  if (!quickOfferPrice.value) {
-    alert('Lütfen teklif tutarınızı giriniz.')
-    return
-  }
-  alert(`✓ TEKLİFİNİZ BAŞARIYLA İLETİLDİ!\n\n${selectedTenderModal.value.no} numaralı "${selectedTenderModal.value.title}" ihalesine ${Number(quickOfferPrice.value).toLocaleString('tr-TR')} ₺ tutarındaki teklifiniz zaman damgalı tutanakla kaydedilmiştir.`)
-  selectedTenderModal.value = null
+  navigateTo({
+    path: '/pazar-yeri',
+    query: { q: item }
+  })
 }
 </script>
 
@@ -1066,138 +1052,6 @@ function submitOffer() {
         </div>
       </div>
 
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- 📋 7. GÜNCEL İHALE LİSTESİ (HER SEKMENİN ALTINDA YER ALIR) -->
-    <!-- ========================================================================= -->
-    <div id="ihale-listesi-alani" class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 py-4">
-      <div class="bg-white border border-slate-300 rounded-lg p-4 shadow-xs space-y-4 text-left">
-        
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
-          <div>
-            <h3 class="font-black text-base text-slate-800 flex items-center gap-2">
-              <span>📋 Güncel İhale & Satın Alma İlanları</span>
-              <span v-if="selectedItemName" class="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-bold">
-                {{ selectedItemName }}
-              </span>
-            </h3>
-            <p class="text-slate-500 text-xs mt-0.5">Şartnameleri inceleyebilir, resmi ihale dosyalarını görüntüleyebilir veya anında online teklif verebilirsiniz.</p>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-bold text-slate-600">{{ tenders.length }} İlan Listeleniyor</span>
-            <button v-if="selectedItemName" @click="selectedItemName = null" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">
-              ✕ Filtreyi Kaldır
-            </button>
-          </div>
-        </div>
-
-        <div class="space-y-3">
-          <div 
-            v-for="tender in tenders" 
-            :key="tender.id"
-            class="p-4 rounded-lg border border-slate-300 hover:border-[#0084B4] bg-white hover:bg-sky-50/30 transition-all duration-150 shadow-2xs space-y-3"
-          >
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
-              <div class="space-y-1">
-                <div class="flex items-center gap-2">
-                  <span class="px-2 py-0.5 rounded bg-[#0084B4] text-white font-mono font-black text-[10px]">
-                    İHALE NO: {{ tender.no }}
-                  </span>
-                  <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-700 font-bold text-[10px]">
-                    {{ tender.type }}
-                  </span>
-                  <span class="px-2 py-0.5 rounded bg-amber-50 border border-amber-300 text-amber-800 font-bold text-[10px]">
-                    {{ tender.method }}
-                  </span>
-                </div>
-                <h4 
-                  @click="openTenderDetail(tender)" 
-                  class="font-black text-sm sm:text-base text-slate-900 hover:text-blue-700 transition-colors cursor-pointer leading-snug"
-                >
-                  {{ tender.title }}
-                </h4>
-              </div>
-
-              <div class="flex items-center gap-2 shrink-0">
-                <button 
-                  @click="openTenderDetail(tender)" 
-                  class="px-4 py-2 rounded bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition shadow-xs flex items-center gap-1 cursor-pointer"
-                >
-                  <Zap :size="13" class="text-amber-300 fill-amber-300" />
-                  <span>Teklif Ver / İncele ➔</span>
-                </button>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-slate-600">
-              <div>
-                <span class="text-[10px] font-bold text-slate-400 block uppercase">İdare / Satın Alma Ekibi</span>
-                <span class="font-bold text-slate-800 block truncate">{{ tender.authority }}</span>
-              </div>
-              <div>
-                <span class="text-[10px] font-bold text-slate-400 block uppercase">Yaklaşık Maliyet / Bütçe</span>
-                <span class="font-black text-emerald-700 font-mono text-sm block">{{ tender.cost }}</span>
-              </div>
-              <div>
-                <span class="text-[10px] font-bold text-slate-400 block uppercase">İhale Tarihi & Saati</span>
-                <span class="font-bold text-rose-700 block font-mono">⏱️ {{ tender.date }}</span>
-              </div>
-              <div>
-                <span class="text-[10px] font-bold text-slate-400 block uppercase">İl & Teklif Sayısı</span>
-                <span class="font-bold text-slate-700 block">📍 {{ tender.city }} ({{ tender.bids }} Teklif)</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- 🪟 8. İHALE DETAY VE TEKLİF VERME MODALI -->
-    <!-- ========================================================================= -->
-    <div v-if="selectedTenderModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-white border border-slate-300 rounded-xl max-w-2xl w-full p-6 space-y-4 text-left shadow-2xl">
-        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
-          <div>
-            <span class="px-2 py-0.5 rounded bg-[#0084B4] text-white font-mono font-bold text-[10px]">
-              İHALE NO: {{ selectedTenderModal.no }}
-            </span>
-            <h3 class="text-base font-black text-slate-900 mt-1">{{ selectedTenderModal.title }}</h3>
-          </div>
-          <button @click="selectedTenderModal = null" class="text-slate-400 hover:text-slate-800 p-1 cursor-pointer"><X :size="20" /></button>
-        </div>
-
-        <div class="space-y-3 text-xs text-slate-700">
-          <div class="p-3 rounded bg-slate-50 border border-slate-200 space-y-1">
-            <div><strong>İdare:</strong> {{ selectedTenderModal.authority }}</div>
-            <div><strong>Konum:</strong> {{ selectedTenderModal.city }} / Türkiye</div>
-            <div><strong>Tahmini Bütçe:</strong> <span class="font-bold text-emerald-700 font-mono">{{ selectedTenderModal.cost }}</span></div>
-            <div><strong>İhale Tarihi:</strong> <span class="font-bold text-rose-700 font-mono">{{ selectedTenderModal.date }}</span></div>
-          </div>
-
-          <div>
-            <strong class="block mb-1 text-slate-800">Şartname ve İhale Özeti:</strong>
-            <p class="p-2.5 rounded bg-slate-50 border border-slate-200 text-slate-600 leading-relaxed">{{ selectedTenderModal.specText }}</p>
-          </div>
-
-          <div class="p-3 rounded border border-blue-200 bg-blue-50/50 space-y-2">
-            <label class="font-bold text-blue-900 block">Teklif Ettiğiniz Tutar (₺):</label>
-            <input v-model="quickOfferPrice" type="number" placeholder="Örn: 14200000" class="w-full p-2.5 bg-white border border-blue-300 rounded text-slate-900 font-mono font-black text-base" />
-            
-            <label class="font-bold text-blue-900 block mt-1">Teklif Notu & Teslimat Şartları:</label>
-            <textarea v-model="quickOfferNotes" rows="2" placeholder="Şartname uygunluğu, garanti ve nakliye detayları..." class="w-full p-2 bg-white border border-blue-300 rounded text-slate-800 text-xs"></textarea>
-          </div>
-
-          <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
-            <button @click="selectedTenderModal = null" class="px-4 py-2 rounded bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold cursor-pointer">Kapat</button>
-            <button @click="submitOffer" class="px-5 py-2 rounded bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs cursor-pointer shadow-xs">
-              Resmi Teklifi İlet ➔
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
 
   </div>

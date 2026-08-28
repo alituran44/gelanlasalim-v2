@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { 
   Search, 
   SlidersHorizontal, 
@@ -18,9 +18,14 @@ import {
   ShieldCheck,
   BadgeCheck,
   Layers,
-  FileCheck2,
+  RotateCcw,
+  Calendar,
+  Filter,
+  BarChart3,
   FileSpreadsheet,
-  X
+  Newspaper,
+  X,
+  Users
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
@@ -29,14 +34,31 @@ definePageMeta({
   layout: "public"
 })
 
+useSeoMeta({
+  title: 'İhale Portalı & Canlı Eksiltme Pazar Yeri - İhaleciBurada',
+  description: 'Türkiye genelinde güncel B2B ihaleleri, satın alma şartnameleri, malzeme listeleri ve sözleşme kayıtları.',
+  ogTitle: 'İhale Portalı & Canlı Eksiltme Pazar Yeri - İhaleciBurada',
+  ogDescription: 'Güncel B2B ihaleleri, satın alma şartnameleri, malzeme listeleri ve sözleşme kayıtları.'
+})
+
+const route = useRoute()
 const { cmsData, saveCmsData } = useCmsData()
 const { sendSms } = useNetGsm()
+
+const activeTab = ref<'guncel' | 'gecmis' | 'sonuc' | 'detayli'>('guncel')
+const viewMode = ref<'gelismis' | 'basit'>('gelismis')
+const hideRead = ref(false)
 
 const searchQuery = ref('')
 const selectedCategory = ref<string>('Tümü')
 const selectedMethod = ref<string>('Tümü')
+const selectedType = ref<string>('Tümü')
 const selectedCity = ref<string>('Tümü')
-const selectedSort = ref<'newest' | 'budget-desc' | 'budget-asc' | 'ending-soon'>('newest')
+const selectedCostRange = ref<string>('Tümü')
+const dateStart = ref('')
+const dateEnd = ref('')
+const selectedSort = ref<'otomatik' | 'views' | 'sozlesme' | 'sehir'>('otomatik')
+const currentPage = ref(1)
 
 const selectedTenderForDetail = ref<any>(null)
 const showSpecModal = ref(false)
@@ -45,8 +67,14 @@ const specActiveTab = ref<'malzeme' | 'idari' | 'teknik'>('malzeme')
 
 const showBidModal = ref(false)
 const selectedTenderForBid = ref<any>(null)
-
 const userSession = ref<any>({})
+
+const bidForm = ref({
+  fiyat: '',
+  sure: '7 gün',
+  notum: '',
+  firmaAdi: 'Ali Turan Sanayi ve Ticaret A.Ş.'
+})
 
 onMounted(() => {
   if (typeof window !== 'undefined') {
@@ -57,13 +85,16 @@ onMounted(() => {
       }
     } catch (e) {}
   }
-})
 
-const bidForm = ref({
-  fiyat: '',
-  sure: '7 gün',
-  notum: '',
-  firmaAdi: 'Ali Turan Sanayi ve Ticaret A.Ş.'
+  if (route.query.q) {
+    searchQuery.value = String(route.query.q)
+  }
+  if (route.query.search) {
+    searchQuery.value = String(route.query.search)
+  }
+  if (route.query.kategori) {
+    selectedCategory.value = String(route.query.kategori)
+  }
 })
 
 const allTenders = computed(() => {
@@ -72,59 +103,93 @@ const allTenders = computed(() => {
 
 const categories = [
   'Tümü',
-  'İnşaat ve Yapı',
-  'Sanayi ve Makine',
-  'Lojistik ve Taşımacılık',
-  'Ambalaj ve Kağıt',
-  'Bilgisayar ve Teknoloji',
-  'Gıda ve Hizmet',
-  'Enerji ve Altyapı'
+  'İnşaat - Altyapı - Üstyapı - Yapım İşi',
+  'Sanayi ve Makine Ekipmanları',
+  'Lojistik ve Nakliye Hizmetleri',
+  'Ambalaj, Koli ve Kağıt',
+  'Bilişim, Yazılım ve IT Ekipmanı',
+  'Enerji, Akaryakıt ve GES Tesisatı',
+  'Gıda, İkram ve Yemek Hizmetleri',
+  'Medikal ve Sağlık Sarf Malzemeleri'
+]
+
+const types = [
+  'Tümü',
+  'Mal Alımı',
+  'Hizmet Alımı',
+  'Yapım İşi',
+  'Danışmanlık'
 ]
 
 const methods = [
   'Tümü',
   'Açık İhale',
-  'Kapalı Zarf',
-  'Doğrudan Temin'
+  'Açık Eksiltme',
+  'Pazarlık Usulü (21/f)',
+  'Doğrudan Temin',
+  'Belli İstekliler'
 ]
 
 const cities = [
   'Tümü',
-  'İstanbul',
   'Ankara',
+  'İstanbul',
   'İzmir',
   'Bursa',
   'Kocaeli',
+  'Çanakkale',
   'Gaziantep',
-  'Adana'
+  'Adana',
+  'Tekirdağ',
+  'Antalya',
+  'Konya'
+]
+
+const costRanges = [
+  'Tümü',
+  '0 - 500.000 ₺',
+  '500.000 - 2.000.000 ₺',
+  '2.000.000 - 10.000.000 ₺',
+  '10.000.000 ₺ Üstü'
 ]
 
 const filteredTenders = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
   let list = allTenders.value.filter(t => {
-    // Category filter
+    if (activeTab.value === 'sonuc' && t.durum !== 'closed') {
+      return false
+    }
+    if (activeTab.value === 'gecmis' && t.durum !== 'closed' && t.durum !== 'expired') {
+      return false
+    }
+    if (activeTab.value === 'guncel' && t.durum === 'closed') {
+      return false
+    }
+
     if (selectedCategory.value !== 'Tümü' && !t.kategori?.toLowerCase().includes(selectedCategory.value.toLowerCase())) {
       return false
     }
 
-    // Method filter
-    if (selectedMethod.value !== 'Tümü' && !t.tur?.toLowerCase().includes(selectedMethod.value.toLowerCase()) && !t.type?.toLowerCase().includes(selectedMethod.value.toLowerCase())) {
+    if (selectedType.value !== 'Tümü' && !t.tur?.toLowerCase().includes(selectedType.value.toLowerCase()) && !t.type?.toLowerCase().includes(selectedType.value.toLowerCase())) {
       return false
     }
 
-    // City filter
+    if (selectedMethod.value !== 'Tümü' && !t.tur?.toLowerCase().includes(selectedMethod.value.toLowerCase()) && !t.method?.toLowerCase().includes(selectedMethod.value.toLowerCase())) {
+      return false
+    }
+
     if (selectedCity.value !== 'Tümü' && !t.city?.toLowerCase().includes(selectedCity.value.toLowerCase())) {
       return false
     }
 
-    // Search query
     if (q) {
       const matchTitle = (t.baslik || '').toLowerCase().includes(q)
       const matchCat = (t.kategori || '').toLowerCase().includes(q)
       const matchDesc = (t.aciklama || '').toLowerCase().includes(q)
       const matchCity = (t.city || '').toLowerCase().includes(q)
       const matchId = (t.id || '').toLowerCase().includes(q)
-      if (!matchTitle && !matchCat && !matchDesc && !matchCity && !matchId) {
+      const matchAuth = (t.authority || '').toLowerCase().includes(q)
+      if (!matchTitle && !matchCat && !matchDesc && !matchCity && !matchId && !matchAuth) {
         return false
       }
     }
@@ -132,15 +197,32 @@ const filteredTenders = computed(() => {
     return true
   })
 
-  // Sorting
-  if (selectedSort.value === 'budget-desc') {
+  if (selectedSort.value === 'sozlesme') {
     list.sort((a, b) => (parseInt(b.butce?.replace(/\D/g, '') || '0') - parseInt(a.butce?.replace(/\D/g, '') || '0')))
-  } else if (selectedSort.value === 'budget-asc') {
-    list.sort((a, b) => (parseInt(a.butce?.replace(/\D/g, '') || '0') - parseInt(b.butce?.replace(/\D/g, '') || '0')))
+  } else if (selectedSort.value === 'views') {
+    list.sort((a, b) => ((b.teklifSayisi || 0) - (a.teklifSayisi || 0)))
+  } else if (selectedSort.value === 'sehir') {
+    list.sort((a, b) => (a.city || '').localeCompare(b.city || ''))
   }
 
   return list
 })
+
+function openModalWithTab(tender: any, tab: 'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'firmalar' | 'sonuc' | 'gecmis') {
+  selectedTenderForDetail.value = tender
+  detailActiveTab.value = tab
+}
+
+function resetFilters() {
+  selectedCategory.value = 'Tümü'
+  selectedMethod.value = 'Tümü'
+  selectedType.value = 'Tümü'
+  selectedCity.value = 'Tümü'
+  selectedCostRange.value = 'Tümü'
+  searchQuery.value = ''
+  dateStart.value = ''
+  dateEnd.value = ''
+}
 
 function openSpecModal(tender: any) {
   selectedSpecTender.value = tender
@@ -294,425 +376,413 @@ function downloadAllSpecs(tender: any) {
     document.body.removeChild(element)
   }
 }
-
-const detailActiveTab = ref<'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'firmalar' | 'sonuc' | 'gecmis'>('ilan')
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-50 py-6 sm:py-10 px-3.5 sm:px-6 lg:px-8 text-left">
-    <div class="max-w-7xl mx-auto space-y-6 sm:space-y-8">
+  <div class="min-h-screen bg-[#F0F2F5] py-4 px-2 sm:px-4 text-left font-sans text-xs">
+    <div class="max-w-[1400px] mx-auto space-y-3">
       
-      <!-- Top Header & Terminal Banner -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-[#070F1E] p-5 sm:p-8 rounded-3xl text-white shadow-xl border border-slate-800 relative overflow-hidden">
-        <div class="absolute right-0 top-0 h-64 w-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-        <div class="space-y-2 relative z-10">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-[#00C2FF] text-xs font-black">
-            <span class="w-2 h-2 rounded-full bg-[#00C2FF] animate-pulse"></span>
-            B2B TİCARET & CANLI İHALE TERMİNALİ
-          </div>
-          <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white">İhale Pazarı & Pazar Yeri</h1>
-          <p class="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-            Türkiye genelinde doğrulanmış şirketlerin açtığı satın alma ihalelerini inceleyin, şartnameleri indirin ve güvenli havuz (Escrow) korumasıyla anında teklif verin.
-          </p>
+      <!-- 🔵 1. TOP SUB-TABS STRIP (GÖRSEL 2: GÜNCEL, GEÇMİŞ, SONUÇ, DETAYLI ARA) -->
+      <div class="flex items-center justify-between border-b border-slate-300 bg-white px-3 py-1.5 rounded-t-lg shadow-2xs">
+        <div class="flex items-center gap-1 sm:gap-2">
+          <button 
+            type="button"
+            @click="activeTab = 'guncel'"
+            :class="activeTab === 'guncel' ? 'bg-[#0084B4] text-white font-black shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold'"
+            class="px-3 sm:px-4 py-1.5 rounded text-xs transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <Clock :size="13" />
+            <span>Güncel</span>
+          </button>
+          <button 
+            type="button"
+            @click="activeTab = 'gecmis'"
+            :class="activeTab === 'gecmis' ? 'bg-[#0084B4] text-white font-black shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold'"
+            class="px-3 sm:px-4 py-1.5 rounded text-xs transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <RotateCcw :size="13" />
+            <span>Geçmiş</span>
+          </button>
+          <button 
+            type="button"
+            @click="activeTab = 'sonuc'"
+            :class="activeTab === 'sonuc' ? 'bg-[#0084B4] text-white font-black shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold'"
+            class="px-3 sm:px-4 py-1.5 rounded text-xs transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <CheckCircle2 :size="13" />
+            <span>Sonuç</span>
+          </button>
+          <button 
+            type="button"
+            @click="activeTab = 'detayli'"
+            :class="activeTab === 'detayli' ? 'bg-[#0084B4] text-white font-black shadow-xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold'"
+            class="px-3 sm:px-4 py-1.5 rounded text-xs transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <Search :size="13" />
+            <span>Detaylı Ara</span>
+          </button>
         </div>
 
-        <div class="flex flex-wrap items-center gap-3 shrink-0 relative z-10">
-          <NuxtLink
-            to="/firmalar"
-            class="flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs border border-slate-700 transition-all cursor-pointer"
+        <div class="flex items-center gap-2">
+          <NuxtLink 
+            to="/" 
+            class="px-3 py-1.5 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1"
           >
-            <Building2 :size="15" class="text-amber-400" />
-            <span>🏢 Firmalar</span>
-          </NuxtLink>
-          <NuxtLink
-            to="/panel/ihale-olustur"
-            class="flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-[#0052FF] hover:bg-blue-600 text-white font-black text-xs shadow-lg shadow-blue-600/30 transition-all hover:scale-102 cursor-pointer"
-          >
-            <Plus :size="16" class="text-[#00C2FF]" />
-            <span>Yeni İhale Başlat</span>
-          </NuxtLink>
-          <NuxtLink
-            to="/uyelik"
-            class="flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800 text-slate-200 hover:text-white font-bold text-xs border border-slate-700 transition-all"
-          >
-            <span>Kurumsal Üyelik</span>
+            <span>← Geri dön</span>
           </NuxtLink>
         </div>
       </div>
 
-      <!-- Trading Terminal Command Filter Bar -->
-      <div class="bg-white p-4 sm:p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-        <!-- Main Search & Sort Row -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-          <div class="md:col-span-8 relative">
-            <Search :size="18" class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input 
-              v-model="searchQuery"
-              type="text"
-              placeholder="İhale adı, malzeme (beton, demir, koli, fason), şehir veya ihale no ile ara..."
-              class="w-full pl-12 pr-10 py-3.5 rounded-2xl border border-slate-200 text-xs sm:text-sm outline-none transition focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 bg-slate-50/70"
-            />
-            <button 
-              v-if="searchQuery" 
-              @click="searchQuery = ''"
-              class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 text-xs font-bold"
-            >
-              ✕
-            </button>
-          </div>
-
-          <div class="md:col-span-4 flex items-center gap-2">
-            <select
-              v-model="selectedSort"
-              class="w-full py-3.5 px-4 rounded-2xl border border-slate-200 bg-slate-50/70 text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
-            >
-              <option value="newest">Sıralama: En Yeni İlanlar</option>
-              <option value="budget-desc">Bütçe: Yüksekten Düşüğe</option>
-              <option value="budget-asc">Bütçe: Düşükten Yükseğe</option>
-            </select>
-          </div>
-        </div>
-
-        <!-- Filter Dropdowns Row -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100">
+      <!-- 🎛️ 2. MULTI-FIELD SEARCH & FILTER BOX (GÖRSEL 2 FORMATI) -->
+      <div class="bg-white border border-slate-300 p-3 sm:p-4 rounded-b-lg shadow-2xs space-y-3">
+        <!-- 7-Field Filter Grid -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
           <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Sektör & Kategori</label>
-            <select
-              v-model="selectedCategory"
-              class="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
-            >
+            <label class="block text-[10px] font-bold text-slate-500 mb-1">Kategori:</label>
+            <select v-model="selectedCategory" class="w-full p-1.5 bg-white border border-slate-300 rounded text-slate-800 font-bold text-xs outline-none">
               <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">İhale Usulü</label>
-            <select
-              v-model="selectedMethod"
-              class="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
-            >
+            <label class="block text-[10px] font-bold text-slate-500 mb-1">Şehir:</label>
+            <select v-model="selectedCity" class="w-full p-1.5 bg-white border border-slate-300 rounded text-slate-800 font-bold text-xs outline-none">
+              <option v-for="ci in cities" :key="ci" :value="ci">{{ ci }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-500 mb-1">İhale türü:</label>
+            <select v-model="selectedType" class="w-full p-1.5 bg-white border border-slate-300 rounded text-slate-800 font-bold text-xs outline-none">
+              <option v-for="t in types" :key="t" :value="t">{{ t }}</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-500 mb-1">İhale usulü:</label>
+            <select v-model="selectedMethod" class="w-full p-1.5 bg-white border border-slate-300 rounded text-slate-800 font-bold text-xs outline-none">
               <option v-for="m in methods" :key="m" :value="m">{{ m }}</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1">Teslimat / Şehir</label>
-            <select
-              v-model="selectedCity"
-              class="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
-            >
-              <option v-for="ci in cities" :key="ci" :value="ci">{{ ci }}</option>
+            <label class="block text-[10px] font-bold text-slate-500 mb-1">Yaklaşık maliyet:</label>
+            <select v-model="selectedCostRange" class="w-full p-1.5 bg-white border border-slate-300 rounded text-slate-800 font-bold text-xs outline-none">
+              <option v-for="cr in costRanges" :key="cr" :value="cr">{{ cr }}</option>
             </select>
           </div>
-        </div>
 
-        <!-- Results Counter & Reset Strip -->
-        <div class="flex items-center justify-between pt-2 text-xs">
-          <div class="flex items-center gap-2">
-            <span class="px-2.5 py-1 rounded-lg bg-blue-50 text-blue-700 font-mono font-bold text-[11px]">
-              {{ filteredTenders.length }} Aktif Sonuç
-            </span>
-            <span v-if="selectedCategory !== 'Tümü' || selectedMethod !== 'Tümü' || selectedCity !== 'Tümü' || searchQuery" class="text-slate-400 text-[11px]">
-              (Filtrelenmiş sonuçlar)
-            </span>
-          </div>
-
-          <button
-            v-if="selectedCategory !== 'Tümü' || selectedMethod !== 'Tümü' || selectedCity !== 'Tümü' || searchQuery"
-            @click="selectedCategory = 'Tümü'; selectedMethod = 'Tümü'; selectedCity = 'Tümü'; searchQuery = ''"
-            class="text-xs font-bold text-rose-600 hover:underline cursor-pointer"
-          >
-            Filtreleri Sıfırla ✕
-          </button>
-        </div>
-      </div>
-
-      <!-- Tenders Grid (Terminal-Grade Card Layout) -->
-      <div v-if="filteredTenders.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div
-          v-for="tender in filteredTenders"
-          :key="tender.id"
-          class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl hover:border-blue-400 transition-all duration-300 flex flex-col justify-between group"
-        >
-          <!-- Image Box with Badges -->
-          <div 
-            @click="selectedTenderForDetail = tender"
-            class="relative h-44 w-full bg-slate-100 overflow-hidden cursor-pointer"
-            title="İhale detaylarını görüntüle"
-          >
-            <img 
-              :src="tender.image || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'" 
-              :alt="tender.baslik"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
-
-            <div class="absolute top-3 left-3">
-              <span class="px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md text-white text-[10px] font-mono font-black uppercase tracking-wider border border-white/20">
-                #{{ tender.id }}
-              </span>
-            </div>
-
-            <div class="absolute top-3 right-3">
-              <span 
-                class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 text-white"
-                :class="tender.durum === 'closed' ? 'bg-amber-600' : (tender.durum === 'expired' ? 'bg-slate-600' : 'bg-emerald-600')"
-              >
-                <span v-if="tender.durum === 'closed'">🔒 Mutabakat Sağlandı</span>
-                <span v-else-if="tender.durum === 'expired'">⌛ Süresi Doldu</span>
-                <span v-else>{{ tender.sure || 'Aktif İhale' }}</span>
-              </span>
-            </div>
-
-            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
-              <div class="flex items-center gap-1 font-bold">
-                <MapPin :size="13" class="text-[#00C2FF]" />
-                <span>{{ tender.city || 'Türkiye Geneli' }}</span>
-              </div>
-              <div class="flex items-center gap-1 font-bold">
-                <Tag :size="13" class="text-amber-400" />
-                <span>{{ tender.teklifSayisi || 0 }} Teklif</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Card Body -->
-          <div class="p-4 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
-            <div class="space-y-2">
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">
-                  {{ tender.kategori }}
-                </span>
-                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                  {{ tender.tur || 'Açık İhale' }}
-                </span>
-              </div>
-
-              <h2 
-                @click="selectedTenderForDetail = tender"
-                class="text-base font-black text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors cursor-pointer"
-                title="İhale detaylarını görüntüle"
-              >
-                {{ tender.baslik }}
-              </h2>
-
-              <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
-                {{ tender.aciklama || 'Şartnameye uygun teklifler kabul edilmektedir.' }}
-              </p>
-            </div>
-
-            <!-- Price, Spec Preview & Actions Footer -->
-            <div class="pt-4 border-t border-slate-100 space-y-3">
-              <div class="flex items-center justify-between">
-                <div>
-                  <span class="text-[10px] font-bold text-slate-400 uppercase block">Tahmini Hacim:</span>
-                  <span class="text-sm font-black font-mono text-slate-900">{{ tender.butce || 'Açık İhale' }}</span>
-                </div>
-                
-                <button
-                  type="button"
-                  @click="openSpecModal(tender)"
-                  class="flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-lg border border-blue-200 transition cursor-pointer"
-                >
-                  <FileText :size="13" />
-                  <span>Şartname İncele</span>
-                </button>
-              </div>
-
-              <div class="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  @click="selectedTenderForDetail = tender"
-                  class="w-full py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 transition text-center cursor-pointer"
-                >
-                  Detayları Gör
-                </button>
-                <button
-                  type="button"
-                  @click="openBidModal(tender)"
-                  :disabled="tender.durum === 'closed' || tender.durum === 'expired'"
-                  class="w-full py-2.5 rounded-xl text-xs font-black text-white transition text-center flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
-                  :class="tender.durum === 'closed' ? 'bg-amber-700/80 cursor-not-allowed' : (tender.durum === 'expired' ? 'bg-slate-400 cursor-not-allowed' : 'bg-[#0F223D] hover:bg-blue-600')"
-                >
-                  <Send :size="12" />
-                  <span>{{ tender.durum === 'closed' ? '🔒 Anlaşıldı' : (tender.durum === 'expired' ? '⌛ Süresi Doldu' : 'Teklif Ver') }}</span>
-                </button>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-      <!-- Clean Empty State -->
-      <div v-else class="bg-white rounded-3xl border border-slate-200 p-12 sm:p-16 text-center space-y-4 shadow-xs">
-        <div class="w-16 h-16 rounded-2xl bg-blue-50 text-[#0F223D] flex items-center justify-center mx-auto border border-blue-100">
-          <FileText :size="28" />
-        </div>
-        <div class="space-y-1.5 max-w-md mx-auto">
-          <h3 class="text-base font-black text-slate-800">
-            {{ allTenders.length === 0 ? 'Henüz Yayında İhale Bulunmuyor' : 'Aramanıza Uygun İhale Bulunamadı' }}
-          </h3>
-          <p class="text-xs text-slate-500 font-medium leading-relaxed">
-            {{ allTenders.length === 0 ? 'Platformda açılan onaylı yeni B2B satın alma ihaleleri ve canlı tersine eksiltmeler burada listelenecektir.' : `"${searchQuery}" kriterine veya seçili filtrelere ait ihale bulunamadı.` }}
-          </p>
-        </div>
-        <div class="pt-2 flex flex-wrap items-center justify-center gap-2">
-          <NuxtLink
-            to="/panel/ihale-olustur"
-            class="px-5 py-2.5 rounded-xl bg-[#0F223D] hover:bg-blue-600 text-white text-xs font-bold transition shadow-sm inline-flex items-center gap-1.5 cursor-pointer"
-          >
-            <Plus :size="14" />
-            <span>Yeni İhale Başlat</span>
-          </NuxtLink>
-          <button
-            v-if="allTenders.length > 0 && (searchQuery || selectedCategory !== 'Tümü')"
-            @click="searchQuery = ''; selectedCategory = 'Tümü'; selectedMethod = 'Tümü'; selectedCity = 'Tümü'"
-            class="px-5 py-2.5 rounded-xl bg-slate-100 text-slate-700 text-xs font-bold hover:bg-slate-200 transition cursor-pointer"
-          >
-            Filtreleri Temizle
-          </button>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- 🟢 INTERACTIVE ŞARTNAME & MALZEME LİSTESİ ÖNİZLEME MODALI -->
-    <div v-if="showSpecModal && selectedSpecTender" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-      <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl text-left">
-        <div class="flex items-start justify-between gap-4 border-b pb-4 border-slate-100">
           <div>
-            <span class="text-xs font-black text-blue-600 uppercase tracking-wider block">{{ selectedSpecTender.kategori }}</span>
-            <h2 class="text-xl font-black text-slate-900 mt-1">{{ selectedSpecTender.baslik }}</h2>
-            <span class="text-xs text-slate-400 font-mono">İhale Dosyası: #{{ selectedSpecTender.id }}</span>
-          </div>
-          <button @click="showSpecModal = false" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl cursor-pointer">
-            <X :size="20" />
-          </button>
-        </div>
-
-        <!-- Spec Modal Tabs -->
-        <div class="flex items-center gap-2 border-b border-slate-100 pb-3 text-xs font-black">
-          <button
-            type="button"
-            @click="specActiveTab = 'malzeme'"
-            class="px-4 py-2 rounded-xl transition cursor-pointer"
-            :class="specActiveTab === 'malzeme' ? 'bg-[#0F223D] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-          >
-            1. Malzeme Listesi & Metraj
-          </button>
-          <button
-            type="button"
-            @click="specActiveTab = 'idari'"
-            class="px-4 py-2 rounded-xl transition cursor-pointer"
-            :class="specActiveTab === 'idari' ? 'bg-[#0F223D] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-          >
-            2. İdari Şartname & Teslimat
-          </button>
-          <button
-            type="button"
-            @click="specActiveTab = 'teknik'"
-            class="px-4 py-2 rounded-xl transition cursor-pointer"
-            :class="specActiveTab === 'teknik' ? 'bg-[#0F223D] text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
-          >
-            3. Teknik Standartlar & ISO
-          </button>
-        </div>
-
-        <!-- Tab 1: Malzeme Listesi -->
-        <div v-if="specActiveTab === 'malzeme'" class="space-y-4 text-xs">
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-            <div class="font-bold text-slate-800">Kalem Açıklaması & Talep Detayı:</div>
-            <p class="text-slate-600 leading-relaxed">{{ selectedSpecTender.aciklama || 'Şartnamede yer alan standart malzeme ve üretim parametreleri geçerlidir.' }}</p>
+            <label class="block text-[10px] font-bold text-slate-500 mb-1">İhale içeriği:</label>
+            <input 
+              v-model="searchQuery" 
+              type="text" 
+              placeholder="Kelime ara" 
+              class="w-full p-1.5 bg-white border border-slate-300 rounded text-slate-800 font-bold text-xs outline-none"
+            />
           </div>
 
-          <div class="border border-slate-200 rounded-2xl overflow-hidden">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-slate-100 text-slate-700 font-black">
-                <tr>
-                  <th class="p-3">Sıra</th>
-                  <th class="p-3">Malzeme / İş Kalemi</th>
-                  <th class="p-3">Metraj / Miktar</th>
-                  <th class="p-3">Birim</th>
-                  <th class="p-3">Birim Bütçe</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-slate-100">
-                <tr>
-                  <td class="p-3 font-mono">01</td>
-                  <td class="p-3 font-bold text-slate-800">{{ selectedSpecTender.baslik }}</td>
-                  <td class="p-3 font-mono">1</td>
-                  <td class="p-3">Paket / Proje</td>
-                  <td class="p-3 font-mono text-emerald-600 font-black">{{ selectedSpecTender.butce }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Tab 2: İdari Şartname -->
-        <div v-if="specActiveTab === 'idari'" class="space-y-3 text-xs text-slate-600">
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-              <span class="font-bold text-slate-800">Teslimat Lokasyonu:</span>
-              <span class="font-black text-slate-900">{{ selectedSpecTender.city || 'Belirtilmedi' }}</span>
-            </div>
-            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-              <span class="font-bold text-slate-800">Ödeme Modeli:</span>
-              <span class="font-black text-emerald-600">TCMB/BDDK Uyumlu Güvenli Havuz (Escrow)</span>
-            </div>
-            <div class="flex items-center justify-between">
-              <span class="font-bold text-slate-800">Mal Kabul Kriteri:</span>
-              <span class="font-black text-slate-900">İrsaliye & Fiziksel Kalite Kontrol Tutanağı</span>
+          <div>
+            <label class="block text-[10px] font-bold text-slate-500 mb-1">Yayın tarihi:</label>
+            <div class="flex items-center gap-1">
+              <input v-model="dateStart" type="text" placeholder="gg.aa.yyyy" class="w-full p-1.5 bg-white border border-slate-300 rounded text-slate-800 text-[11px] outline-none" />
+              <Calendar :size="14" class="text-slate-400 shrink-0" />
             </div>
           </div>
         </div>
 
-        <!-- Tab 3: Teknik Standartlar -->
-        <div v-if="specActiveTab === 'teknik'" class="space-y-3 text-xs text-slate-600">
-          <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 space-y-2 text-blue-900">
-            <div class="font-black flex items-center gap-1.5">
-              <ShieldCheck :size="16" class="text-blue-600" />
-              <span>Zorunlu Kalite Belgeleri:</span>
-            </div>
-            <ul class="list-disc list-inside space-y-1 text-[11px] text-blue-800">
-              <li>TSE / CE / ISO 9001 Uygunluk Belgesi</li>
-              <li>Akredite Laboratuvar Test Raporları</li>
-              <li>İmalatçı Yeterlilik & Vergi Levhası Doğrulaması</li>
-            </ul>
-          </div>
-        </div>
+        <!-- Radios & Search Button Row -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-slate-200">
+          <div class="flex flex-wrap items-center gap-4 text-xs font-bold text-slate-700">
+            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" value="basit" v-model="viewMode" class="text-[#0084B4]" />
+              <span>Basit görünüm</span>
+            </label>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" value="gelismis" v-model="viewMode" class="text-[#0084B4]" />
+              <span>Gelişmiş görünüm</span>
+            </label>
 
-        <!-- Spec Modal Footer -->
-        <div class="flex items-center justify-between pt-4 border-t border-slate-100">
-          <button
-            type="button"
-            @click="downloadAllSpecs(selectedSpecTender)"
-            class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer"
-          >
-            <Download :size="14" />
-            <span>Şartname Dosyasını İndir (.TXT)</span>
-          </button>
+            <label class="inline-flex items-center gap-1.5 cursor-pointer ml-2">
+              <input type="checkbox" v-model="hideRead" class="text-[#0084B4]" />
+              <span>Okuduklarımı gizle</span>
+            </label>
+          </div>
 
           <div class="flex items-center gap-2">
             <button 
-              @click="showSpecModal = false" 
-              class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
+              type="button"
+              class="px-6 py-2 rounded bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
-              Kapat
-            </button>
-            <button
-              v-if="selectedSpecTender.durum !== 'closed' && selectedSpecTender.durum !== 'expired'"
-              @click="openBidModal(selectedSpecTender); showSpecModal = false"
-              class="px-6 py-2.5 rounded-xl bg-[#0052FF] hover:bg-blue-600 text-white font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
-            >
-              <Send :size="13" />
-              <span>Teklif Ver</span>
+              <span>Ara</span>
+              <Search :size="13" />
             </button>
           </div>
         </div>
       </div>
+
+      <!-- 🛠️ 3. ACTION TOOLBAR & FILTER TAGS -->
+      <div class="flex flex-wrap items-center justify-between gap-2 bg-white p-2.5 rounded-lg border border-slate-300 shadow-2xs">
+        <div class="flex flex-wrap items-center gap-1.5">
+          <button 
+            type="button"
+            @click="resetFilters" 
+            class="px-2.5 py-1 rounded border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1 cursor-pointer"
+          >
+            <X :size="12" />
+            <span>Sıfırla</span>
+          </button>
+
+          <span v-if="selectedCategory !== 'Tümü'" class="px-2.5 py-1 rounded bg-blue-50 border border-blue-200 text-blue-800 font-bold text-xs flex items-center gap-1">
+            <span>Kategori: {{ selectedCategory }}</span>
+            <button type="button" @click="selectedCategory = 'Tümü'" class="hover:text-red-600"><X :size="12" /></button>
+          </span>
+
+          <span v-if="searchQuery" class="px-2.5 py-1 rounded bg-blue-50 border border-blue-200 text-blue-800 font-bold text-xs flex items-center gap-1">
+            <span>Arama: "{{ searchQuery }}"</span>
+            <button type="button" @click="searchQuery = ''" class="hover:text-red-600"><X :size="12" /></button>
+          </span>
+
+          <button type="button" class="px-2.5 py-1 rounded border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1">
+            <Filter :size="12" />
+            <span>Filtrele</span>
+          </button>
+          <button type="button" class="px-2.5 py-1 rounded border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1">
+            <SlidersHorizontal :size="12" />
+            <span>Sırala</span>
+          </button>
+          <button type="button" @click="resetFilters" class="px-2.5 py-1 rounded border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1">
+            <RotateCcw :size="12" />
+            <span>Yenile</span>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-1.5">
+          <NuxtLink to="/panel/istatistikler" class="px-2.5 py-1 rounded border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1">
+            <BarChart3 :size="12" class="text-blue-600" />
+            <span>Analiz</span>
+          </NuxtLink>
+          <button type="button" @click="downloadAllSpecs({ id: 'TOPLU', baslik: 'Tum_Guncel_Ihaleler' })" class="px-2.5 py-1 rounded border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1">
+            <FileSpreadsheet :size="12" class="text-emerald-600" />
+            <span>Rapor</span>
+          </button>
+          <NuxtLink to="/firmalar" class="px-2.5 py-1 rounded border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1">
+            <Building2 :size="12" class="text-amber-500" />
+            <span>Firmalar</span>
+          </NuxtLink>
+        </div>
+      </div>
+
+      <!-- 📊 4. TOTAL COUNT BANNER -->
+      <div class="bg-sky-50/60 border border-sky-200 p-2.5 rounded-lg flex items-center justify-between text-slate-700 text-xs font-bold">
+        <div class="flex items-center gap-2">
+          <FileText :size="14" class="text-[#0084B4]" />
+          <span>Toplam:</span>
+          <span class="font-mono font-black text-slate-900 bg-white px-2 py-0.5 rounded border border-sky-300">
+            {{ filteredTenders.length }} ihale
+          </span>
+        </div>
+        <span class="text-slate-500 text-[11px]">Türkiye Geneli Canlı Kamu & Özel Sektör B2B İhaleleri</span>
+      </div>
+
+      <!-- 📑 5. SORTING BAR & PAGINATION -->
+      <div class="bg-white border border-slate-300 p-2 rounded-lg flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div class="flex flex-wrap items-center gap-3 font-bold text-slate-700">
+          <div class="flex items-center gap-1 bg-slate-100 px-2 py-1 rounded border border-slate-200">
+            <span>Sırala:</span>
+            <select v-model="selectedSort" class="bg-transparent font-bold outline-none text-slate-800">
+              <option value="otomatik">Otomatik</option>
+              <option value="views">Görüntülenme sayısı</option>
+              <option value="sozlesme">Sözleşme tarihi / Bütçe</option>
+              <option value="sehir">Şehir</option>
+            </select>
+          </div>
+
+          <button type="button" @click="selectedSort = 'views'" class="hover:text-blue-700 cursor-pointer">⇅ Görüntülenme sayısı</button>
+          <button type="button" @click="selectedSort = 'sozlesme'" class="hover:text-blue-700 cursor-pointer">⇅ Sözleşme tarihi</button>
+          <button type="button" @click="selectedSort = 'sehir'" class="hover:text-blue-700 cursor-pointer">⇅ Şehir</button>
+        </div>
+
+        <!-- Pagination -->
+        <div class="flex items-center gap-1 text-xs">
+          <button type="button" class="px-2 py-1 rounded border border-slate-300 bg-slate-50 hover:bg-slate-100 font-bold">|‹ İlk sayfa</button>
+          <button type="button" class="px-2 py-1 rounded border border-slate-300 bg-slate-50 hover:bg-slate-100 font-bold">‹ Önceki sayfa</button>
+          <select v-model="currentPage" class="p-1 rounded border border-slate-300 bg-white font-bold">
+            <option :value="1">1. Sayfa</option>
+            <option :value="2">2. Sayfa</option>
+          </select>
+          <button type="button" class="px-2 py-1 rounded border border-slate-300 bg-slate-50 hover:bg-slate-100 font-bold">Sonraki sayfa ›</button>
+          <button type="button" class="px-2 py-1 rounded border border-slate-300 bg-slate-50 hover:bg-slate-100 font-bold">Son sayfa ⏭</button>
+        </div>
+      </div>
+
+      <!-- 📋 6. TENDER CARDS (EKAP / İHALEBUL FORMATI - GÖRSEL 2 İLE BİREBİR) -->
+      <div v-if="filteredTenders.length > 0" class="space-y-3">
+        <div 
+          v-for="(tender, index) in filteredTenders" 
+          :key="tender.id"
+          class="bg-white border border-slate-300 hover:border-[#0084B4] rounded-lg p-3.5 sm:p-4 space-y-2.5 shadow-2xs transition-all duration-150"
+        >
+          <!-- Row 1: Number & Title -->
+          <div class="flex items-start justify-between gap-2 border-b border-slate-100 pb-2">
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded bg-sky-100 text-[#0084B4] font-mono font-black text-xs shrink-0">
+                # {{ index + 1 }}
+              </span>
+              <h3 
+                @click="openModalWithTab(tender, 'ilan')"
+                class="font-black text-sm sm:text-base text-[#0F223D] hover:text-[#0084B4] transition-colors cursor-pointer leading-snug"
+              >
+                {{ tender.id }}DT50*** - {{ tender.baslik }}
+              </h3>
+            </div>
+
+            <div class="shrink-0 flex items-center gap-1.5">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold" :class="tender.durum === 'closed' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'">
+                {{ tender.durum === 'closed' ? 'Tamamlandı' : '🟢 Canlı / Açık' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Row 2: Yüklenici & Sözleşme Bedeli -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div class="flex items-center gap-1.5 text-slate-700">
+              <Users :size="14" class="text-[#0084B4] shrink-0" />
+              <span class="font-bold text-slate-500">Yüklenici adı:</span>
+              <span class="font-bold text-slate-800 truncate">{{ tender.ownerCompany || 'Doğrulanmış B2B Kurumsal Firma' }}</span>
+            </div>
+
+            <div class="flex items-center sm:justify-end gap-1.5 text-xs">
+              <span class="font-bold text-slate-500">Sözleşme bedeli:</span>
+              <span class="font-mono font-black text-emerald-700 text-sm">{{ tender.butce || '***' }}</span>
+            </div>
+          </div>
+
+          <!-- Row 3: İdare Adı & Şehir -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div class="flex items-center gap-1.5 text-slate-700">
+              <Building2 :size="14" class="text-slate-400 shrink-0" />
+              <span class="font-bold text-slate-500">İdare adı:</span>
+              <span class="font-bold text-slate-800 truncate">{{ tender.authority || 'İhaleciBurada Satın Alma Masası' }}</span>
+            </div>
+
+            <div class="flex items-center sm:justify-end gap-1.5 text-xs text-slate-600 font-bold">
+              <MapPin :size="13" class="text-slate-400" />
+              <span>{{ tender.city || 'Ankara' }}</span>
+            </div>
+          </div>
+
+          <!-- Row 4: Dates and Badges Strip -->
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[11px] text-slate-600 pt-1 border-t border-slate-100">
+            <span>📅 <strong>Yayın tarihi:</strong> {{ tender.yayinTarihi || '28.08.2026' }}</span>
+            <span>⏱️ <strong>Teklif tarihi:</strong> <span class="text-rose-700 font-bold font-mono">{{ tender.sure || '30.08.2026' }}</span></span>
+            <span>📅 <strong>İş başlangıç:</strong> 01.09.2026</span>
+            <span>📅 <strong>İş bitiş:</strong> 30.09.2026</span>
+            <span>📝 <strong>Sözleşme tarihi:</strong> 28.08.2026</span>
+            <span class="px-2 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px] font-bold">🏷️ Ekap</span>
+            <span class="px-2 py-0.2 rounded bg-blue-50 text-blue-700 text-[10px] font-bold">🏷️ {{ tender.tur || 'Doğrudan temin' }}</span>
+          </div>
+
+          <!-- Row 5: 6 EKAP Sub-tabs / Action Buttons (GÖRSEL 2 FORMATI) -->
+          <div class="flex flex-wrap items-center justify-between gap-1.5 pt-2 border-t border-slate-200">
+            <div class="flex flex-wrap items-center gap-1.5">
+              <button 
+                type="button"
+                @click="openModalWithTab(tender, 'sozlesme')"
+                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
+              >
+                <FileText :size="12" />
+                <span>Sözleşme listesi (1)</span>
+              </button>
+
+              <button 
+                type="button"
+                @click="openModalWithTab(tender, 'malzeme')"
+                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
+              >
+                <Layers :size="12" />
+                <span>Malzeme Listesi (1)</span>
+              </button>
+
+              <button 
+                type="button"
+                @click="openModalWithTab(tender, 'ilan')"
+                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
+              >
+                <FileText :size="12" />
+                <span>İhale ilanı</span>
+              </button>
+
+              <button 
+                type="button"
+                @click="openModalWithTab(tender, 'sonuc')"
+                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
+              >
+                <CheckCircle2 :size="12" />
+                <span>Sonuç ilanı</span>
+              </button>
+
+              <button 
+                type="button"
+                @click="openModalWithTab(tender, 'idari')"
+                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
+              >
+                <ShieldCheck :size="12" />
+                <span>İdari Şartname</span>
+              </button>
+
+              <button 
+                type="button"
+                @click="openModalWithTab(tender, 'firmalar')"
+                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
+              >
+                <Building2 :size="12" />
+                <span>Firmalar</span>
+              </button>
+
+              <button 
+                type="button"
+                @click="openModalWithTab(tender, 'gecmis')"
+                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
+              >
+                <RotateCcw :size="12" />
+                <span>Benzer ihale geçmişi</span>
+              </button>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button
+                v-if="tender.durum !== 'closed' && tender.durum !== 'expired'"
+                type="button"
+                @click="openBidModal(tender)"
+                class="px-4 py-1.5 rounded bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition flex items-center gap-1 cursor-pointer shadow-xs"
+              >
+                <Send :size="12" />
+                <span>Teklif Ver</span>
+              </button>
+              <button
+                v-else
+                disabled
+                type="button"
+                class="px-4 py-1.5 rounded bg-slate-300 text-slate-500 font-bold text-xs cursor-not-allowed"
+              >
+                Teklife Kapalı
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div v-else class="bg-white border border-slate-300 rounded-lg p-10 text-center space-y-3">
+        <AlertCircle :size="36" class="mx-auto text-slate-400" />
+        <h3 class="font-black text-slate-800 text-sm">Aramanıza Uygun İhale Bulunamadı</h3>
+        <p class="text-slate-500 text-xs">Filtreleri sıfırlayarak tüm aktif ihaleleri görüntüleyebilirsiniz.</p>
+        <button type="button" @click="resetFilters" class="px-4 py-2 rounded bg-[#0084B4] text-white font-bold text-xs cursor-pointer">
+          Tüm İhaleleri Göster
+        </button>
+      </div>
+
     </div>
 
     <!-- TENDER DETAIL MODAL (EKAP STYLE FULL MULTI-TAB) -->
