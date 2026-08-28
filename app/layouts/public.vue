@@ -272,10 +272,31 @@ onMounted(() => {
           
           <!-- Kolon 1: Şirket Künyesi (lg:col-span-1) -->
           <div class="space-y-3">
-            <div class="flex items-center gap-2">
-              <span class="text-xl">⚖️</span>
-              <span class="text-base font-black text-white">İhaleciBurada.com</span>
-            </div>
+            <NuxtLink to="/" class="inline-block py-1 hover:opacity-95 transition" title="İhaleciBurada.com">
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 540 120" 
+                class="h-8 sm:h-9 w-auto max-w-[210px] object-contain drop-shadow-xs" 
+                fill="none" 
+                role="img" 
+                aria-label="İhaleciBurada.com"
+              >
+                <g transform="translate(10, 10)">
+                  <!-- Turuncu Nokta -->
+                  <circle cx="106" cy="18" r="14" fill="#FF5938" />
+                  <!-- 3 Adet Hız Çizgisi -->
+                  <path d="M 38 68 L 86 63 L 83 58 L 32 64 Z" fill="#0084FF" />
+                  <path d="M 18 84 L 78 78 L 75 73 L 12 80 Z" fill="#00C2FF" />
+                  <path d="M 0 98 L 70 91 L 67 86 L -4 94 Z" fill="#38BDF8" />
+                  <!-- Gövde -->
+                  <path d="M 94 33 C 90 33 82 37 81 40 L 89 40 C 97 40 94 48 91 58 L 79 97 C 76 107 84 105 91 101 C 101 95 108 78 114 55 C 117 42 110 33 94 33 Z" fill="#38BDF8" />
+                </g>
+                <!-- ihaleciburada Metni (Beyaz) -->
+                <text x="152" y="84" fill="#FFFFFF" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-1.2px">ihaleciburada</text>
+                <!-- .com Uzantısı (Mavi) -->
+                <text x="430" y="84" fill="#0084FF" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-0.8px">.com</text>
+              </svg>
+            </NuxtLink>
             <p class="text-[11px] text-slate-400 leading-relaxed">
               Türkiye'nin onaylı B2B tersine ihale ve doğrudan satın alma platformu. Kurumsal firmalar için güvenli ticaret, şeffaf eksiltme ve dijital sözleşme altyapısı.
             </p>
