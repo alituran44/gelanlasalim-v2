@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { 
   Inbox, 
   Shield, 
@@ -38,6 +38,141 @@ const { cmsData, saveCmsData } = useCmsData()
 const { sendSms } = useNetGsm()
 
 const ilanlar = computed(() => cmsData.value?.dashboard?.receivedBids || [])
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    // 1. If receivedBids is empty, populate with realistic default procurement tender bid groups
+    if (!cmsData.value.dashboard.receivedBids || cmsData.value.dashboard.receivedBids.length === 0) {
+      cmsData.value.dashboard.receivedBids = [
+        {
+          id: 'IHC-2026-101',
+          baslik: '100.000 Adet Çift Oluklu Baskılı Koli ve Ambalaj Malzemesi Alımı',
+          kategori: 'Ambalaj, Koli & Plastik',
+          bitis: '02.09.2026',
+          teklifler: [
+            {
+              id: 'TKF-891',
+              firma: 'Kalyon Ambalaj & Kağıt Sanayi A.Ş.',
+              fiyat: '340.000 ₺',
+              sure: '4 iş günü',
+              puan: 4.9,
+              durum: 'bekliyor',
+              yetkili: 'Ahmet Kalyoncu',
+              telefon: '0532 111 22 33',
+              eposta: 'satis@kalyonambalaj.com',
+              vergiDairesi: 'Büyük Mükellefler V.D. / 5840291823',
+              adres: 'Organize Sanayi Bölgesi 4. Cadde No:18 Kocaeli',
+              pazarlikGecmisi: []
+            },
+            {
+              id: 'TKF-892',
+              firma: 'Ege Karton Sanayi Ltd. Şti.',
+              fiyat: '355.000 ₺',
+              sure: '5 iş günü',
+              puan: 4.7,
+              durum: 'bekliyor',
+              yetkili: 'Mustafa Ege',
+              telefon: '0544 333 44 55',
+              eposta: 'teklif@egekarton.com',
+              vergiDairesi: 'İzmir Hasan Tahsin V.D. / 3491820491',
+              adres: 'Kemalpaşa OSB İzmir',
+              pazarlikGecmisi: []
+            },
+            {
+              id: 'TKF-893',
+              firma: 'Mega Oluklu Kutu Üretim A.Ş.',
+              fiyat: '368.000 ₺',
+              sure: '7 iş günü',
+              puan: 4.8,
+              durum: 'bekliyor',
+              yetkili: 'Selin Erdem',
+              telefon: '0555 888 99 00',
+              eposta: 'kurumsal@megakutu.com',
+              vergiDairesi: 'Çerkezköy V.D. / 8192039481',
+              adres: 'Çerkezköy OSB Tekirdağ',
+              pazarlikGecmisi: []
+            }
+          ]
+        },
+        {
+          id: 'IHC-2026-102',
+          baslik: '50 Ton Streç Film ve Palet Sabitleme Çemberi Temini',
+          kategori: 'Ambalaj, Koli & Plastik',
+          bitis: '08.09.2026',
+          teklifler: [
+            {
+              id: 'TKF-905',
+              firma: 'Marmara Plastik Üretim A.Ş.',
+              fiyat: '185.000 ₺',
+              sure: '3 iş günü',
+              puan: 5.0,
+              durum: 'bekliyor',
+              yetkili: 'Kemal Yıldırım',
+              telefon: '0533 777 88 99',
+              eposta: 'pazarlama@marmaraplastik.com',
+              vergiDairesi: 'Bursa Osmangazi V.D. / 6102938475',
+              adres: 'Nilüfer OSB Bursa',
+              pazarlikGecmisi: []
+            },
+            {
+              id: 'TKF-906',
+              firma: 'Aksan Endüstriyel Polimer Ltd.',
+              fiyat: '194.000 ₺',
+              sure: '6 iş günü',
+              puan: 4.6,
+              durum: 'bekliyor',
+              yetkili: 'Bülent Aksan',
+              telefon: '0530 222 33 44',
+              eposta: 'info@aksanpolimer.com',
+              vergiDairesi: 'Gebze V.D. / 1029384756',
+              adres: 'Gebze Plastikçiler OSB Kocaeli',
+              pazarlikGecmisi: []
+            }
+          ]
+        }
+      ]
+      saveCmsData(cmsData.value)
+    }
+
+    // 2. Also check if user has created their own tenders in localStorage.myTenders and ensure they exist in receivedBids with sample bids
+    const mySavedTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+    if (mySavedTenders.length > 0) {
+      mySavedTenders.forEach((mt: any) => {
+        const exists = cmsData.value.dashboard.receivedBids.some((rb: any) => rb.id === mt.id || rb.baslik === mt.baslik)
+        if (!exists) {
+          cmsData.value.dashboard.receivedBids.unshift({
+            id: mt.id || 'IHC-2026-99',
+            baslik: mt.baslik,
+            kategori: mt.kategori || 'Genel Tedarik',
+            bitis: mt.bitisTarihi || '15 gün',
+            teklifler: [
+              {
+                id: 'TKF-' + Math.floor(100 + Math.random() * 900),
+                firma: 'Kalyon Tedarik & Üretim A.Ş.',
+                fiyat: mt.butce && !mt.butce.includes('Belirtilmedi') ? mt.butce : '120.000 ₺',
+                sure: '5 iş günü',
+                puan: 4.9,
+                durum: 'bekliyor',
+                yetkili: 'Ahmet Kalyoncu',
+                telefon: '0532 111 22 33',
+                eposta: 'teklif@kalyontedarik.com',
+                vergiDairesi: 'Büyük Mükellefler V.D. / 5840291823',
+                adres: 'Organize Sanayi Bölgesi No:18 Kocaeli',
+                pazarlikGecmisi: []
+              }
+            ]
+          })
+        }
+      })
+      saveCmsData(cmsData.value)
+    }
+
+    // Default expand first tender so user instantly sees bids and approval actions
+    if (!expandedIlan.value && ilanlar.value.length > 0) {
+      expandedIlan.value = ilanlar.value[0].id
+    }
+  }
+})
 
 function toggle(id: string) {
   expandedIlan.value = expandedIlan.value === id ? null : id
