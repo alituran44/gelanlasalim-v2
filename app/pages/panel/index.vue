@@ -125,6 +125,20 @@ onMounted(() => {
       if (session.role) {
         userRole.value = session.role
       }
+
+      const savedMyTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+      if (savedMyTenders.length > 0) {
+        const mapped = savedMyTenders.map((t: any, index: number) => ({
+          id: t.id || index + 10,
+          no: t.id || `2026/${14600 + index}`,
+          title: t.baslik,
+          bidsCount: t.teklifSayisi || 0,
+          bestOffer: t.butce || 'Teklif Bekleniyor',
+          date: 'Aktif',
+          status: 'Yayında & Teklif Alıyor'
+        }))
+        myActiveTenders.value = [...mapped, ...myActiveTenders.value]
+      }
     } catch (e) {
       console.error(e)
     }

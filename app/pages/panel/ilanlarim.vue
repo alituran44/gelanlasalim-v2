@@ -240,13 +240,18 @@ const statusTabs = computed(() => {
         style="border-color: #E2E8F0;"
       >
         <div class="flex items-start gap-4">
-          <div 
-            class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border text-sm font-black"
-            :class="tender.durum === 'closed' ? 'bg-amber-50 text-amber-700 border-amber-200' : (tender.durum === 'expired' ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-blue-50 text-blue-600 border-blue-100')"
-          >
-            <FileText :size="20" />
+          <!-- İhale Kapak Görseli veya İkonu -->
+          <div class="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center shadow-2xs">
+            <img 
+              v-if="tender.image" 
+              :src="tender.image" 
+              :alt="tender.baslik" 
+              class="h-full w-full object-cover" 
+            />
+            <FileText v-else :size="22" class="text-blue-600" />
           </div>
-          <div>
+
+          <div class="flex-1 min-w-0">
             <div class="flex items-center gap-2 flex-wrap">
               <h3 class="font-bold text-sm text-slate-800">{{ tender.baslik }}</h3>
               <!-- Durum Rozeti -->
@@ -280,8 +285,13 @@ const statusTabs = computed(() => {
             
             <div class="flex flex-wrap items-center gap-3 mt-2 text-[10px] text-slate-500 font-medium">
               <span class="rounded bg-slate-100 px-2 py-0.5 font-bold uppercase tracking-wider text-[8px] text-slate-700">{{ tender.olusturma }}</span>
-              <span>{{ 'Bütçe:' }} {{ tender.butce }}</span>
+              <span>{{ 'Bütçe / Fiyat:' }} <strong>{{ tender.butce }}</strong></span>
               <span>{{ 'Kalan Süre / Durum:' }} <strong>{{ tender.durum === 'closed' ? 'Sonuçlandı (Mutabakat)' : tender.sure }}</strong></span>
+              
+              <!-- Ekli PDF / Şartname Dosyası Varsa -->
+              <span v-if="tender.files?.length || tender.documents?.length" class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-bold border border-blue-200">
+                📄 {{ (tender.files || tender.documents)[0]?.name || 'Şartname (PDF)' }}
+              </span>
             </div>
           </div>
         </div>

@@ -289,23 +289,19 @@ function handleFileChange(event: Event) {
     if (file.name.endsWith('.pdf')) fileType = 'pdf'
     else if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) fileType = 'excel'
 
-    const fileObj = {
-      name: file.name,
-      size: fileSizeMB,
-      progress: 0,
-      type: fileType
-    }
-
-    form.value.files.push(fileObj)
-
-    // Simulate progress bar upload
-    let interval = setInterval(() => {
-      if (fileObj.progress < 100) {
-        fileObj.progress += 20
-      } else {
-        clearInterval(interval)
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const dataUrl = (e.target?.result as string) || ''
+      const fileObj = {
+        name: file.name,
+        size: fileSizeMB,
+        progress: 100,
+        type: fileType,
+        url: dataUrl
       }
-    }, 150)
+      form.value.files.push(fileObj)
+    }
+    reader.readAsDataURL(file)
   }
 }
 
@@ -319,14 +315,14 @@ function handleSubmit() {
     return
   }
 
-  // Format budget with currency sign if entered, or mark as Open Reverse Auction
+  // Format budget or mark as Open Reverse Auction
   let budgetVal = form.value.butce ? form.value.butce.trim() : ''
   if (budgetVal) {
     if (!budgetVal.startsWith('₺') && !budgetVal.includes('₺') && !budgetVal.includes('$') && !budgetVal.includes('€')) {
       budgetVal = '₺' + budgetVal
     }
   } else {
-    budgetVal = 'Açık İhale'
+    budgetVal = 'Teklif Usulü (Açık İhale)'
   }
 
   const deliveryAddress = form.value.teslimatAdresi || `${form.value.sehir} Merkez Teslimat`
@@ -340,21 +336,43 @@ function handleSubmit() {
   const primaryImg = form.value.images[0]?.url || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'
   const imgList = form.value.images.map(img => img.url)
 
-  // Add to active tenders list
-  cmsData.value.dashboard.tenders.unshift({
+  let session: any = {}
+  if (typeof window !== 'undefined') {
+    try {
+      session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+  }
+  const ownerEmail = session.email || 'ihalcib@gmail.com'
+  const ownerName = session.name || session.firstName || 'Ali Turan'
+  const ownerCompany = session.companyName || session.company || 'Ali Turan Sanayi A.Ş.'
+
+  const tenderObject = {
     id: newId,
     baslik: form.value.baslik,
     kategori: combinedCategory,
+    mainCategory: form.value.kategori,
+    subCategory: subCat,
     sure: form.value.sure || '7 gün kaldı',
     teklifSayisi: 0,
     durum: 'active',
     butce: budgetVal,
     city: form.value.sehir || 'Balıkesir',
+    teslimatAdresi: deliveryAddress,
+    odemeYontemi: form.value.odemeYontemi,
     image: primaryImg,
-    images: imgList,
+    images: imgList.length > 0 ? imgList : [primaryImg],
+    files: form.value.files,
+    documents: form.value.files,
     aciklama: form.value.aciklama || form.value.baslik,
+    ownerEmail,
+    ownerName,
+    ownerCompany,
+    isMine: true,
     olusturma: 'Bugün'
-  })
+  }
+
+  // Add to active tenders list in CMS
+  cmsData.value.dashboard.tenders.unshift(tenderObject)
 
   // Create matching empty received bids slot
   cmsData.value.dashboard.receivedBids.unshift({
@@ -369,13 +387,33 @@ function handleSubmit() {
   // Persist to localStorage
   saveCmsData(cmsData.value)
 
+  if (typeof window !== 'undefined') {
+    try {
+      const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+      myTenders.unshift(tenderObject)
+      localStorage.setItem('myTenders', JSON.stringify(myTenders))
+
+      // Trigger automatic category notification
+      const notifications = JSON.parse(localStorage.getItem('userNotifications') || '[]')
+      notifications.unshift({
+        id: Date.now(),
+        title: 'Yeni İhale Başarıyla Açıldı',
+        desc: `"${form.value.baslik}" başlıklı satın alma talebiniz ilgili onaylı tedarikçilere iletildi.`,
+        date: 'Şimdi',
+        read: false,
+        type: 'tender'
+      })
+      localStorage.setItem('userNotifications', JSON.stringify(notifications))
+    } catch (e) {}
+  }
+
   // Clear draft
   clearDraft()
 
   showSuccess.value = true
   setTimeout(() => {
     router.push('/panel/ilanlarim')
-  }, 1800)
+  }, 1600)
 }
 </script>
 
