@@ -25,7 +25,12 @@ import {
   FileSpreadsheet,
   Newspaper,
   X,
-  Users
+  Users,
+  Star,
+  MessageSquare,
+  Phone,
+  Mail,
+  ExternalLink
 } from 'lucide-vue-next'
 import { useCmsData, DEFAULT_CMS_DATA } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
@@ -68,6 +73,7 @@ const specActiveTab = ref<'malzeme' | 'idari' | 'teknik'>('malzeme')
 
 const showBidModal = ref(false)
 const selectedTenderForBid = ref<any>(null)
+const selectedCompanyForProfile = ref<any>(null)
 const userSession = ref<any>({})
 
 const bidForm = ref({
@@ -240,6 +246,253 @@ function openSpecModal(tender: any) {
   selectedSpecTender.value = tender
   specActiveTab.value = 'malzeme'
   showSpecModal.value = true
+}
+
+const defaultCompaniesData: Record<string, any> = {
+  'kalyon & kolin inşaat ortak girişimi': {
+    name: 'Kalyon & Kolin İnşaat Ortak Girişimi',
+    shortName: 'Kalyon & Kolin O.G.',
+    badge: 'Doğrulanmış Ana Yüklenici',
+    rating: 4.9,
+    reviewCount: 54,
+    city: 'Çanakkale / İstanbul',
+    sector: 'İnşaat, Altyapı, Yapım İşi, Köprü ve Karayolu',
+    completedTenders: 42,
+    totalBids: 184,
+    tradeVolume: '148.5M ₺',
+    onTimeDelivery: '%99.1',
+    specCompliance: '%100',
+    avgResponseTime: '8 dk',
+    taxOffice: 'Çanakkale V.D. 4700854210',
+    mersis: '0470085421000001',
+    phone: '0850 840 86 95',
+    email: 'ihalcib@gmail.com',
+    address: 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale',
+    foundedYear: 2011,
+    description: 'Büyük ölçekli kamu ve özel sektör otoyol, köprü, tünel, viyadük ve ağır sanayi yapıları inşaatında Türkiye’nin lider mühendislik konsorsiyumu.',
+    reviews: [
+      { author: 'Karayolları 14. Bölge Md.', rating: 5, date: '22.08.2026', comment: '1.500 Ton B420C nervürlü demir sevkiyatını şantiyeye 3 gün erken teslim ettiler. Kalite belgeleri ve çekme testleri eksiksizdi.' },
+      { author: 'DMO Genel Müdürlüğü', rating: 4.9, date: '15.07.2026', comment: 'Şartnameye ve statik hesaplara harfiyen uyuldu. Escrow ödeme süreci son derece profesyonel yönetildi.' },
+      { author: 'Çanakkale İl Özel İdaresi', rating: 5, date: '02.06.2026', comment: 'Güvenilir, kurumsal ve zamanında teslimat yapan güçlü bir ortak.' }
+    ]
+  },
+  'hepsiburada & trendyol lojistik dağıtım a.ş.': {
+    name: 'Hepsiburada & Trendyol Lojistik Dağıtım A.Ş.',
+    shortName: 'E-Ticaret Lojistik A.Ş.',
+    badge: 'Doğrulanmış Kurumsal Alıcı',
+    rating: 4.8,
+    reviewCount: 68,
+    city: 'İstanbul',
+    sector: 'Ambalaj, Koli, Kağıt ve E-Ticaret Lojistiği',
+    completedTenders: 86,
+    totalBids: 312,
+    tradeVolume: '42.1M ₺',
+    onTimeDelivery: '%98.4',
+    specCompliance: '%99.2',
+    avgResponseTime: '12 dk',
+    taxOffice: 'Büyük Mükellefler V.D. 4810293847',
+    mersis: '0481029384700001',
+    phone: '0212 331 00 00',
+    email: 'satinalma@eticaretlojistik.com',
+    address: 'Maslak Mah. Büyükdere Cad. No:245 Sarıyer / İstanbul',
+    foundedYear: 2014,
+    description: 'E-ticaret sevkiyatları için çift oluklu kraft mukavva koli, ambalaj ve paketleme malzemeleri tedarik zinciri yöneticisi.',
+    reviews: [
+      { author: 'Marmara Kağıt Sanayi', rating: 5, date: '18.08.2026', comment: '100.000 adet koli teslimatı onaylandı, hakediş ödemesi aynı gün güvenli havuzdan aktarıldı.' },
+      { author: 'Turan Ambalaj A.Ş.', rating: 4.8, date: '28.07.2026', comment: 'Düzenli satın alma yapan ve şartname koşullarına sadık saygın bir alıcı.' }
+    ]
+  },
+  'turan enerji & güneş sistemleri a.ş.': {
+    name: 'Turan Enerji & Güneş Sistemleri A.Ş.',
+    shortName: 'Turan GES A.Ş.',
+    badge: 'Onaylı GES Müteahhidi',
+    rating: 5.0,
+    reviewCount: 31,
+    city: 'Çanakkale',
+    sector: 'Enerji, GES, TEDAŞ Onaylı Elektrik & Trafo',
+    completedTenders: 28,
+    totalBids: 94,
+    tradeVolume: '64.8M ₺',
+    onTimeDelivery: '%100',
+    specCompliance: '%100',
+    avgResponseTime: '5 dk',
+    taxOffice: 'Çanakkale V.D. 4700854210',
+    mersis: '0470085421000001',
+    phone: '0850 840 86 95',
+    email: 'ihalcib@gmail.com',
+    address: 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale',
+    foundedYear: 2016,
+    description: 'Endüstriyel çatı ve arazi Güneş Enerji Santralleri (GES), Tier-1 panel temini ve anahtar teslim EPC mühendislik hizmetleri.',
+    reviews: [
+      { author: 'Çanakkale Onsekiz Mart Ünv.', rating: 5, date: '26.08.2026', comment: '1.2 MW Çatı GES kurulumunu TEDAŞ onaylı olarak 45 günde devreye aldılar. Kusursuz işçilik.' }
+    ]
+  },
+  'asyaport liman işletmeleri a.ş.': {
+    name: 'Asyaport Liman İşletmeleri A.Ş.',
+    shortName: 'Asyaport Liman',
+    badge: 'Stratejik Lojistik Limanı',
+    rating: 4.9,
+    reviewCount: 45,
+    city: 'Tekirdağ',
+    sector: 'Lojistik, Konteyner Taşımacılığı, Liman & Antrepo',
+    completedTenders: 63,
+    totalBids: 215,
+    tradeVolume: '52.4M ₺',
+    onTimeDelivery: '%99.0',
+    specCompliance: '%100',
+    avgResponseTime: '15 dk',
+    taxOffice: 'Süleymanpaşa V.D. 3920192847',
+    mersis: '0392019284700001',
+    phone: '0282 258 00 00',
+    email: 'lojistik@asyaport.com.tr',
+    address: 'Barbaros Mah. Liman Cad. No:1 Süleymanpaşa / Tekirdağ',
+    foundedYear: 2010,
+    description: 'Marmara bölgesinin en büyük konteyner transit limanı ve 250+ tırlık entegre intermodal taşımacılık filosu.',
+    reviews: [
+      { author: 'Türkiye Kömür İşletmeleri', rating: 5, date: '19.08.2026', comment: '250 seferlik konteyner sevkiyatını hasarsız ve tam zamanında gerçekleştirdiler.' }
+    ]
+  },
+  'savunma sanayi tedarik ve imalat grubu': {
+    name: 'Savunma Sanayi Tedarik ve İmalat Grubu',
+    shortName: 'Savunma Sanayi Grubu',
+    badge: 'AS9100 Onaylı Üretici',
+    rating: 5.0,
+    reviewCount: 59,
+    city: 'Ankara',
+    sector: 'Sanayi & Makine, 5 Eksen CNC, Havacılık Parçaları',
+    completedTenders: 74,
+    totalBids: 198,
+    tradeVolume: '210.0M ₺',
+    onTimeDelivery: '%100',
+    specCompliance: '%100',
+    avgResponseTime: '10 dk',
+    taxOffice: 'Ostim V.D. 8192039485',
+    mersis: '0819203948500001',
+    phone: '0312 590 00 00',
+    email: 'savunma@tusas-tedarik.com.tr',
+    address: 'Ostim OSB 1200. Cad. No:45 Yenimahalle / Ankara',
+    foundedYear: 2008,
+    description: 'TUSAŞ, ASELSAN ve ROKETSAN standartlarında 5 eksen mikron hassasiyetli CNC talaşlı imalat ve kompozit işleme.',
+    reviews: [
+      { author: 'TUSAŞ Havacılık A.Ş.', rating: 5, date: '21.08.2026', comment: '5 eksen CNC dik işleme merkezi teslimatı ve kalibrasyonu başarıyla yapıldı.' }
+    ]
+  },
+  'teknopark bilişim sistemleri ltd.': {
+    name: 'Teknopark Bilişim Sistemleri Ltd.',
+    shortName: 'Teknopark Bilişim',
+    badge: 'Tier-3 Veri Merkezi Sağlayıcısı',
+    rating: 4.8,
+    reviewCount: 37,
+    city: 'İzmir',
+    sector: 'Bilişim, Sunucu, Storage, Ağ Donanımı',
+    completedTenders: 35,
+    totalBids: 128,
+    tradeVolume: '18.9M ₺',
+    onTimeDelivery: '%97.8',
+    specCompliance: '%100',
+    avgResponseTime: '7 dk',
+    taxOffice: 'Urla V.D. 7192038475',
+    mersis: '0719203847500001',
+    phone: '0232 765 43 21',
+    email: 'bilisim@teknopark.com.tr',
+    address: 'İYTE Kampüsü Teknopark A3 Blok No:12 Urla / İzmir',
+    foundedYear: 2017,
+    description: 'Kurumsal sunucu altyapıları, yüksek performanslı SAN veri depolama ve siber güvenlik donanımları tedarikçisi.',
+    reviews: [
+      { author: 'İYTE Rektörlüğü', rating: 4.8, date: '14.08.2026', comment: '150 adet kurumsal rack sunucu sorunsuz kuruldu.' }
+    ]
+  },
+  'doğrulanmış sağlık ekipmanları a.ş.': {
+    name: 'Doğrulanmış Sağlık Ekipmanları A.Ş.',
+    shortName: 'Sağlık Ekipmanları A.Ş.',
+    badge: 'CE / FDA Onaylı Medikal',
+    rating: 4.9,
+    reviewCount: 42,
+    city: 'Bursa',
+    sector: 'Medikal, Ventilatör, Hasta Başı Monitör',
+    completedTenders: 49,
+    totalBids: 167,
+    tradeVolume: '38.6M ₺',
+    onTimeDelivery: '%99.4',
+    specCompliance: '%100',
+    avgResponseTime: '11 dk',
+    taxOffice: 'Nilüfer V.D. 6182930485',
+    mersis: '0618293048500001',
+    phone: '0224 443 22 11',
+    email: 'medikal@bursasaglik.com.tr',
+    address: 'Nilüfer Organize Sanayi Bölgesi Pembe Cad. No:8 Bursa',
+    foundedYear: 2013,
+    description: 'Yoğun bakım ventilatörleri, EKG hasta monitörleri ve akredite tıbbi cihaz kalibrasyon ve sarf tedariki.',
+    reviews: [
+      { author: 'Bursa İl Sağlık Müdürlüğü', rating: 5, date: '27.08.2026', comment: '40 adet yoğun bakım ventilatör cihazı montaj ve eğitimiyle teslim edildi.' }
+    ]
+  },
+  'gosb yönetim & sosyal hizmetler a.ş.': {
+    name: 'GOSB Yönetim & Sosyal Hizmetler A.Ş.',
+    shortName: 'GOSB Sosyal Hizmetler',
+    badge: 'ISO 22000 Gıda Güvenliği',
+    rating: 4.7,
+    reviewCount: 51,
+    city: 'Kocaeli',
+    sector: 'Gıda, Yemek, Tabldot, Catering',
+    completedTenders: 58,
+    totalBids: 204,
+    tradeVolume: '27.3M ₺',
+    onTimeDelivery: '%96.9',
+    specCompliance: '%99.0',
+    avgResponseTime: '14 dk',
+    taxOffice: 'Gebze V.D. 5182930485',
+    mersis: '0518293048500001',
+    phone: '0262 677 00 00',
+    email: 'catering@gosb.org.tr',
+    address: 'Gebze Organize Sanayi Bölgesi İhsan Dede Cad. No:114 Gebze / Kocaeli',
+    foundedYear: 2005,
+    description: 'Organize sanayi bölgeleri ve kurumsal fabrikalar için günlük 10.000 kişilik endüstriyel tabldot yemek üretimi.',
+    reviews: [
+      { author: 'GOSB Fabrikalar Birliği', rating: 4.7, date: '25.08.2026', comment: '2.500 kişilik 4 kap tabldot menüsü hijyen ve lezzet standartlarına tam uygundur.' }
+    ]
+  }
+}
+
+function getCompanyData(name: string) {
+  const key = (name || '').trim().toLowerCase()
+  if (defaultCompaniesData[key]) {
+    return defaultCompaniesData[key]
+  }
+  return {
+    name: name || 'Doğrulanmış Kurumsal Firma A.Ş.',
+    shortName: name ? name.split(' ')[0] + ' A.Ş.' : 'Kurumsal Firma',
+    badge: 'Doğrulanmış B2B Üye',
+    rating: 4.9,
+    reviewCount: 38,
+    city: 'Çanakkale / Türkiye',
+    sector: 'İnşaat, Sanayi, Lojistik, Ambalaj & Ticaret',
+    completedTenders: 26,
+    totalBids: 112,
+    tradeVolume: '34.5M ₺',
+    onTimeDelivery: '%98.7',
+    specCompliance: '%100',
+    avgResponseTime: '10 dk',
+    taxOffice: 'Çanakkale V.D. 4700854210',
+    mersis: '0470085421000001',
+    phone: '0850 840 86 95',
+    email: 'ihalcib@gmail.com',
+    address: 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale',
+    foundedYear: 2015,
+    description: 'İhaleciBurada B2B platformunda doğrulanmış, GİB vergi ve sicil kaydı onaylı kurumsal tedarikçi ve alıcı firma.',
+    reviews: [
+      { author: 'Doğrulanmış Kamu / B2B Alıcı', rating: 5, date: '20.08.2026', comment: 'Şartnameye ve teslimat takvimine tam uyum sağlandı. Escrow güvenceli ödeme sorunsuz tamamlandı.' },
+      { author: 'Marmara Bölge Satın Alma Masası', rating: 4.8, date: '12.07.2026', comment: 'Güvenilir, kaliteli malzeme temini yapan ve iletişimi hızlı bir kurumsal firma.' }
+    ]
+  }
+}
+
+function openCompanyModal(companyName: string, tender?: any) {
+  const comp = { ...getCompanyData(companyName) }
+  if (tender) {
+    comp.currentTender = tender
+  }
+  selectedCompanyForProfile.value = comp
 }
 
 function openBidModal(tender: any) {
@@ -817,8 +1070,20 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             <div class="flex items-center gap-1.5 text-slate-700">
               <Users :size="14" class="text-[#0084B4] shrink-0" />
-              <span class="font-bold text-slate-500">Yüklenici adı:</span>
-              <span class="font-bold text-slate-800 truncate">{{ tender.ownerCompany || 'Doğrulanmış B2B Kurumsal Firma' }}</span>
+              <span class="font-bold text-slate-500 shrink-0">Yüklenici adı:</span>
+              <button
+                type="button"
+                @click="openCompanyModal(tender.ownerCompany || 'Kalyon & Kolin İnşaat Ortak Girişimi', tender)"
+                class="font-black text-[#0F223D] hover:text-[#0084B4] hover:underline transition-colors cursor-pointer text-left truncate flex items-center gap-1.5"
+                title="Şirket İtibar ve İhale Profilini İncele"
+              >
+                <span class="truncate">{{ tender.ownerCompany || 'Doğrulanmış B2B Kurumsal Firma' }}</span>
+                <span class="px-1.5 py-0.2 rounded bg-amber-50 text-amber-800 text-[10px] font-black border border-amber-200 inline-flex items-center gap-0.5 shrink-0 shadow-2xs">
+                  <Star :size="9" class="fill-amber-400 text-amber-500" />
+                  {{ getCompanyData(tender.ownerCompany).rating }}
+                </span>
+                <span class="text-[10px] text-blue-600 font-bold hidden md:inline shrink-0">({{ getCompanyData(tender.ownerCompany).completedTenders }} İhale)</span>
+              </button>
             </div>
 
             <div class="flex items-center sm:justify-end gap-1.5 text-xs">
@@ -831,8 +1096,15 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
             <div class="flex items-center gap-1.5 text-slate-700">
               <Building2 :size="14" class="text-slate-400 shrink-0" />
-              <span class="font-bold text-slate-500">İdare adı:</span>
-              <span class="font-bold text-slate-800 truncate">{{ tender.authority || 'İhaleciBurada Satın Alma Masası' }}</span>
+              <span class="font-bold text-slate-500 shrink-0">İdare adı:</span>
+              <button
+                type="button"
+                @click="openCompanyModal(tender.authority, tender)"
+                class="font-bold text-slate-800 hover:text-blue-700 hover:underline transition-colors cursor-pointer text-left truncate"
+                title="İdare Profilini İncele"
+              >
+                {{ tender.authority || 'İhaleciBurada Satın Alma Masası' }}
+              </button>
             </div>
 
             <div class="flex items-center sm:justify-end gap-1.5 text-xs text-slate-600 font-bold">
@@ -1257,19 +1529,36 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
 
         <!-- Tab 5: Firmalar -->
         <div v-if="detailActiveTab === 'firmalar'" class="space-y-4 text-xs text-slate-700 leading-relaxed">
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+          <div 
+            @click="openCompanyModal(selectedTenderForDetail.ownerCompany || selectedTenderForDetail.company, selectedTenderForDetail)"
+            class="p-4 rounded-2xl bg-slate-50 hover:bg-blue-50/50 border border-slate-200 hover:border-blue-300 transition-all space-y-3 cursor-pointer group shadow-2xs"
+          >
             <div class="flex items-center justify-between">
-              <span class="font-bold text-slate-500 uppercase text-[10px]">İhaleyi Açan Kurumsal Alıcı</span>
-              <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-black text-[10px] border border-emerald-200">✓ Onaylı Kurumsal Hesap</span>
+              <span class="font-bold text-slate-500 uppercase text-[10px]">İhaleyi Açan Kurumsal Alıcı / Yüklenici</span>
+              <div class="flex items-center gap-1.5">
+                <span class="px-2 py-0.5 rounded bg-amber-50 text-amber-800 text-[10px] font-black border border-amber-200 inline-flex items-center gap-0.5">
+                  <Star :size="10" class="fill-amber-400 text-amber-500" />
+                  {{ getCompanyData(selectedTenderForDetail.ownerCompany).rating }}
+                </span>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-black text-[10px] border border-emerald-200">✓ Onaylı Kurumsal Hesap</span>
+              </div>
             </div>
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-black shrink-0">
-                <Building2 :size="20" />
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-[#0F223D] to-blue-700 text-white flex items-center justify-center font-black shrink-0 shadow-xs">
+                  <Building2 :size="22" />
+                </div>
+                <div>
+                  <h5 class="font-black text-slate-900 text-sm group-hover:text-blue-700 transition flex items-center gap-1.5">
+                    <span>{{ selectedTenderForDetail.ownerCompany || selectedTenderForDetail.company || 'Doğrulanmış B2B Satın Alma Şirketi' }}</span>
+                    <span class="text-[10px] text-blue-600 font-bold">({{ getCompanyData(selectedTenderForDetail.ownerCompany).completedTenders }} İhale)</span>
+                  </h5>
+                  <span class="text-slate-500 text-[11px]">📍 {{ selectedTenderForDetail.city || 'Türkiye Geneli' }} · GİB Vergi & MERSİS Kaydı Doğrulanmış</span>
+                </div>
               </div>
-              <div>
-                <h5 class="font-black text-slate-900 text-sm">{{ selectedTenderForDetail.ownerCompany || selectedTenderForDetail.company || 'Doğrulanmış B2B Satın Alma Şirketi' }}</h5>
-                <span class="text-slate-500 text-[11px]">📍 {{ selectedTenderForDetail.city || 'Türkiye Geneli' }} · GİB Vergi & MERSİS Kaydı Doğrulanmış</span>
-              </div>
+              <button type="button" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-blue-700 font-bold text-xs group-hover:bg-blue-600 group-hover:text-white transition shrink-0">
+                Profili Gör →
+              </button>
             </div>
           </div>
 
@@ -1442,6 +1731,168 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             <Send :size="13" />
             Teklifi Gönder & NetGSM SMS İlet
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 🏢 ŞİRKET / YÜKLENİCİ DETAYLI İTİBAR VE PERFORMANS PROFİLİ MODALI -->
+    <div v-if="selectedCompanyForProfile" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4">
+      <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto p-5 sm:p-8 space-y-6 shadow-2xl animate-fadeIn text-left border border-slate-200">
+        
+        <!-- Header Top Row -->
+        <div class="flex items-start justify-between gap-4 border-b pb-4 border-slate-100">
+          <div class="flex items-start gap-3.5">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0F223D] to-blue-700 text-white flex items-center justify-center font-black text-xl shadow-md shrink-0">
+              <Building2 :size="28" />
+            </div>
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black border border-emerald-200 flex items-center gap-1">
+                  <ShieldCheck :size="12" />
+                  {{ selectedCompanyForProfile.badge }}
+                </span>
+                <span class="text-xs text-slate-500 font-medium">
+                  📍 {{ selectedCompanyForProfile.city }} · Kuruluş: {{ selectedCompanyForProfile.foundedYear }}
+                </span>
+              </div>
+              <h2 class="text-lg sm:text-2xl font-black text-slate-900 mt-1">
+                {{ selectedCompanyForProfile.name }}
+              </h2>
+            </div>
+          </div>
+          <button @click="selectedCompanyForProfile = null" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl cursor-pointer">
+            <X :size="22" />
+          </button>
+        </div>
+
+        <!-- 🌟 4'LÜ PERFORMANS & YILDIZ İSTATİSTİK ŞERİDİ -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <!-- 1. Yıldız Puanı -->
+          <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 text-center space-y-1">
+            <span class="text-[10px] font-bold text-amber-800 uppercase block">Yıldız Puanı</span>
+            <div class="flex items-center justify-center gap-1 font-black text-xl text-amber-900">
+              <Star :size="18" class="fill-amber-400 text-amber-500" />
+              <span>{{ selectedCompanyForProfile.rating }}</span>
+              <span class="text-xs text-amber-700 font-normal">/ 5.0</span>
+            </div>
+            <span class="text-[10px] text-amber-700 font-bold block">{{ selectedCompanyForProfile.reviewCount }} Değerlendirme</span>
+          </div>
+
+          <!-- 2. Tamamlanan İhale -->
+          <div class="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200 text-center space-y-1">
+            <span class="text-[10px] font-bold text-blue-800 uppercase block">Tamamlanan İhale</span>
+            <div class="font-black text-xl text-blue-950 font-mono">
+              {{ selectedCompanyForProfile.completedTenders }}
+            </div>
+            <span class="text-[10px] text-blue-700 font-bold block">Başarılı Sözleşme</span>
+          </div>
+
+          <!-- 3. Toplam Teklif Sayısı -->
+          <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-1">
+            <span class="text-[10px] font-bold text-slate-500 uppercase block">Toplam Teklif</span>
+            <div class="font-black text-xl text-slate-900 font-mono">
+              {{ selectedCompanyForProfile.totalBids }}
+            </div>
+            <span class="text-[10px] text-slate-500 font-bold block">İhale Katılımı</span>
+          </div>
+
+          <!-- 4. Toplam İş Hacmi -->
+          <div class="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-center space-y-1">
+            <span class="text-[10px] font-bold text-emerald-800 uppercase block">Toplam İş Hacmi</span>
+            <div class="font-black text-xl text-emerald-700 font-mono">
+              {{ selectedCompanyForProfile.tradeVolume }}
+            </div>
+            <span class="text-[10px] text-emerald-700 font-bold block">Escrow Hacmi</span>
+          </div>
+        </div>
+
+        <!-- 🛡️ RESMİ DOĞRULAMA VE KURUMSAL BİLGİLER -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
+          <h4 class="font-black text-slate-900 text-xs uppercase tracking-wider flex items-center gap-1.5">
+            <BadgeCheck :size="15" class="text-blue-600" />
+            <span>Doğrulanmış Kurumsal Sicil & İletişim Bilgileri</span>
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 block uppercase">Faaliyet Sektörleri:</span>
+              <span class="font-bold text-slate-800">{{ selectedCompanyForProfile.sector }}</span>
+            </div>
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 block uppercase">Vergi Dairesi / VKN:</span>
+              <span class="font-mono font-bold text-slate-800">{{ selectedCompanyForProfile.taxOffice }}</span>
+            </div>
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 block uppercase">MERSİS Numarası:</span>
+              <span class="font-mono font-bold text-slate-800">{{ selectedCompanyForProfile.mersis }}</span>
+            </div>
+            <div>
+              <span class="text-[10px] font-bold text-slate-400 block uppercase">İletişim Telefon & E-Posta:</span>
+              <span class="font-bold text-slate-800">{{ selectedCompanyForProfile.phone }} · {{ selectedCompanyForProfile.email }}</span>
+            </div>
+          </div>
+          <div class="pt-2 border-t border-slate-200 flex flex-wrap items-center gap-4 text-[11px] font-bold text-slate-600">
+            <span class="text-emerald-700">✓ Zamanında Teslimat: {{ selectedCompanyForProfile.onTimeDelivery }}</span>
+            <span class="text-blue-700">✓ Şartname Uyumu: {{ selectedCompanyForProfile.specCompliance }}</span>
+            <span class="text-purple-700">✓ Ortalama Yanıt Süresi: {{ selectedCompanyForProfile.avgResponseTime }}</span>
+          </div>
+        </div>
+
+        <!-- 💬 MÜŞTERİ & İDARE DEĞERLENDİRMELERİ -->
+        <div class="space-y-3">
+          <div class="flex items-center justify-between">
+            <h4 class="font-black text-slate-900 text-xs uppercase tracking-wider flex items-center gap-1.5">
+              <Star :size="14" class="text-amber-500 fill-amber-400" />
+              <span>Son Alıcı / İdare Değerlendirmeleri ({{ selectedCompanyForProfile.reviews?.length || 0 }})</span>
+            </h4>
+            <span class="text-[11px] font-bold text-emerald-700">✓ Doğrulanmış Sözleşme Yorumları</span>
+          </div>
+
+          <div class="space-y-2">
+            <div
+              v-for="(rev, rIdx) in selectedCompanyForProfile.reviews"
+              :key="rIdx"
+              class="p-3.5 rounded-2xl bg-white border border-slate-200 space-y-1.5 shadow-2xs"
+            >
+              <div class="flex items-center justify-between text-xs">
+                <span class="font-black text-slate-900">{{ rev.author }}</span>
+                <div class="flex items-center gap-1 text-amber-500 font-bold">
+                  <span>{{ rev.rating }}</span>
+                  <div class="flex">
+                    <Star v-for="i in 5" :key="i" :size="11" class="fill-amber-400 text-amber-400" />
+                  </div>
+                  <span class="text-[10px] text-slate-400 font-normal ml-1">({{ rev.date }})</span>
+                </div>
+              </div>
+              <p class="text-xs text-slate-600 italic">"{{ rev.comment }}"</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-100">
+          <NuxtLink
+            to="/firmalar"
+            class="px-4 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer"
+          >
+            <Building2 :size="14" />
+            <span>Tüm Firma Rehberini Aç</span>
+          </NuxtLink>
+
+          <div class="flex items-center gap-2">
+            <button 
+              @click="selectedCompanyForProfile = null" 
+              class="px-5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
+            >
+              Kapat
+            </button>
+            <NuxtLink
+              to="/panel/mesajlar"
+              class="px-5 py-2 rounded-xl bg-[#0052FF] hover:bg-blue-600 text-white font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
+            >
+              <Send :size="13" />
+              <span>Mesaj Gönder / Teklif İste</span>
+            </NuxtLink>
+          </div>
         </div>
       </div>
     </div>

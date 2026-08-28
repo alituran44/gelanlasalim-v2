@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { Plus, Search, MapPin, Building2, User, Star, X, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-vue-next'
 
@@ -32,6 +32,33 @@ const sectors = [
 const verifiedFirms = ref([
   {
     id: 1,
+    name: 'Kalyon & Kolin İnşaat Ortak Girişimi',
+    sector: 'İnşaat & Yapı',
+    city: 'Çanakkale',
+    district: 'Merkez',
+    verified: true,
+    rating: 4.9,
+    reviewCount: 54,
+    badge: 'Doğrulanmış Ana Yüklenici',
+    description: 'Büyük ölçekli kamu ve özel sektör otoyol, köprü, tünel, viyadük ve ağır sanayi yapıları inşaatında Türkiye’nin lider mühendislik konsorsiyumu.',
+    capacity: 'Yıllık 4.5 Milyon Ton Agrega & Çelik İşleme',
+    taxOffice: 'Çanakkale V.D.',
+    mersis: '0470-0854-2100-0001',
+    phone: '0850 840 86 95',
+    email: 'ihalcib@gmail.com',
+    completedTenders: 42,
+    totalBids: 184,
+    tradeVolume: '148.5M ₺',
+    onTimeDelivery: '%99.1',
+    specCompliance: '%100',
+    avgResponseTime: '8 dk',
+    reviews: [
+      { author: 'Karayolları 14. Bölge Md.', rating: 5, date: '22.08.2026', comment: '1.500 Ton B420C nervürlü demir sevkiyatını şantiyeye 3 gün erken teslim ettiler. Kalite belgeleri eksiksizdi.' },
+      { author: 'DMO Genel Müdürlüğü', rating: 4.9, date: '15.07.2026', comment: 'Şartnameye ve statik hesaplara harfiyen uyuldu. Escrow ödeme süreci son derece profesyonel yönetildi.' }
+    ]
+  },
+  {
+    id: 2,
     name: 'Turan Ambalaj ve Oluklu Mukavva San. A.Ş.',
     sector: 'Ambalaj & Koli',
     city: 'Çanakkale',
@@ -46,97 +73,119 @@ const verifiedFirms = ref([
     mersis: '0470-0854-2100-0001',
     phone: '0850 840 86 95',
     email: 'ihalcib@gmail.com',
-    completedTenders: 34
-  },
-  {
-    id: 2,
-    name: 'Atlas Hazır Beton & Çimento San. Tic. Ltd.',
-    sector: 'İnşaat & Yapı',
-    city: 'İstanbul',
-    district: 'Tuzla',
-    verified: true,
-    rating: 4.8,
-    reviewCount: 62,
-    badge: 'Kurumsal Tedarikçi',
-    description: 'C25/30 - C35/45 santral hazır beton, kırmataş agrega ve şantiye sevkiyatı.',
-    capacity: 'Günlük 3.500 m³ Döküm',
-    taxOffice: 'Tuzla V.D.',
-    mersis: '0123-4567-8901-0001',
-    phone: '0216 444 00 22',
-    email: 'tedarik@atlasbeton.com.tr',
-    completedTenders: 51
+    completedTenders: 34,
+    totalBids: 142,
+    tradeVolume: '28.4M ₺',
+    onTimeDelivery: '%98.9',
+    specCompliance: '%100',
+    avgResponseTime: '10 dk',
+    reviews: [
+      { author: 'E-Ticaret Lojistik Masası', rating: 5, date: '18.08.2026', comment: '100.000 adet koli teslimatı onaylandı, hakediş ödemesi sorunsuz aktarıldı.' }
+    ]
   },
   {
     id: 3,
-    name: 'Metalsan Çelik Konstrüksiyon & Profil A.Ş.',
-    sector: 'Sanayi & Makine',
-    city: 'Kocaeli',
-    district: 'Gebze',
+    name: 'Hepsiburada & Trendyol Lojistik Dağıtım A.Ş.',
+    sector: 'Ambalaj & Koli',
+    city: 'İstanbul',
+    district: 'Sarıyer',
     verified: true,
-    rating: 5.0,
-    reviewCount: 29,
-    badge: 'Stratejik İmalatçı',
-    description: 'Ağır sanayi çelik yapı elemanları, NPI/NPU profiller ve lazer kesim sac işleme.',
-    capacity: 'Aylık 850 Ton Çelik',
-    taxOffice: 'Gebze İhtisas V.D.',
-    mersis: '0987-6543-2100-0001',
-    phone: '0262 644 11 00',
-    email: 'info@metalsancelik.com',
-    completedTenders: 27
+    rating: 4.8,
+    reviewCount: 68,
+    badge: 'Doğrulanmış Kurumsal Alıcı',
+    description: 'E-ticaret sevkiyatları için çift oluklu kraft mukavva koli, ambalaj ve paketleme malzemeleri tedarik zinciri yöneticisi.',
+    capacity: '5.000.000 Paket/Ay Lojistik Hacmi',
+    taxOffice: 'Büyük Mükellefler V.D.',
+    mersis: '0481-0293-8470-0001',
+    phone: '0212 331 00 00',
+    email: 'satinalma@eticaretlojistik.com',
+    completedTenders: 86,
+    totalBids: 312,
+    tradeVolume: '42.1M ₺',
+    onTimeDelivery: '%98.4',
+    specCompliance: '%99.2',
+    avgResponseTime: '12 dk',
+    reviews: [
+      { author: 'Marmara Kağıt Sanayi', rating: 5, date: '18.08.2026', comment: 'Düzenli satın alma yapan ve şartname koşullarına sadık saygın bir alıcı.' }
+    ]
   },
   {
     id: 4,
-    name: 'Lojix Global Taşımacılık ve Antrepo Hizmetleri',
-    sector: 'Lojistik & Nakliye',
-    city: 'İzmir',
-    district: 'Aliağa',
+    name: 'Turan Enerji & Güneş Sistemleri A.Ş.',
+    sector: 'Enerji & Akaryakıt',
+    city: 'Çanakkale',
+    district: 'Merkez',
     verified: true,
-    rating: 4.7,
-    reviewCount: 38,
-    badge: 'Doğrulanmış Lojistik',
-    description: 'Özmal 80 tır filosu ile 81 ile parsiyel, komple ve gümrüklü antrepo taşımacılığı.',
-    capacity: '80 Özmal Çekici & Dorse',
-    taxOffice: 'Aliağa V.D.',
-    mersis: '0345-6789-1234-0001',
-    phone: '0232 878 99 00',
-    email: 'operasyon@lojixglobal.com',
-    completedTenders: 42
+    rating: 5.0,
+    reviewCount: 31,
+    badge: 'Onaylı GES Müteahhidi',
+    description: 'Endüstriyel çatı ve arazi Güneş Enerji Santralleri (GES), Tier-1 panel temini ve anahtar teslim EPC mühendislik hizmetleri.',
+    capacity: 'Yıllık 35 MWp Kurulu Güç Kapasitesi',
+    taxOffice: 'Çanakkale V.D.',
+    mersis: '0470-0854-2100-0001',
+    phone: '0850 840 86 95',
+    email: 'ihalcib@gmail.com',
+    completedTenders: 28,
+    totalBids: 94,
+    tradeVolume: '64.8M ₺',
+    onTimeDelivery: '%100',
+    specCompliance: '%100',
+    avgResponseTime: '5 dk',
+    reviews: [
+      { author: 'Çanakkale Onsekiz Mart Ünv.', rating: 5, date: '26.08.2026', comment: '1.2 MW Çatı GES kurulumunu TEDAŞ onaylı olarak 45 günde devreye aldılar.' }
+    ]
   },
   {
     id: 5,
-    name: 'PetroTek Madeni Yağ & Endüstriyel Akaryakıt',
-    sector: 'Enerji & Akaryakıt',
-    city: 'Ankara',
-    district: 'Ostim',
+    name: 'Asyaport Liman İşletmeleri A.Ş.',
+    sector: 'Lojistik & Nakliye',
+    city: 'Tekirdağ',
+    district: 'Süleymanpaşa',
     verified: true,
     rating: 4.9,
-    reviewCount: 41,
-    badge: 'Enerji Dağıtıcısı',
-    description: 'Şantiye ve fabrika tesisleri için toptan motorin ve ISO sertifikalı hidrolik yağ ikmali.',
-    capacity: 'Aylık 2.000.000 Litre İkmal',
-    taxOffice: 'Ostim V.D.',
-    mersis: '0765-4321-9876-0001',
-    phone: '0312 385 44 20',
-    email: 'satinalma@petrotek.com.tr',
-    completedTenders: 39
+    reviewCount: 45,
+    badge: 'Stratejik Lojistik Limanı',
+    description: 'Marmara bölgesinin en büyük konteyner transit limanı ve 250+ tırlık entegre intermodal taşımacılık filosu.',
+    capacity: '2.5 Milyon TEU Yıllık Elleçleme Kapasitesi',
+    taxOffice: 'Süleymanpaşa V.D.',
+    mersis: '0392-0192-8470-0001',
+    phone: '0282 258 00 00',
+    email: 'lojistik@asyaport.com.tr',
+    completedTenders: 63,
+    totalBids: 215,
+    tradeVolume: '52.4M ₺',
+    onTimeDelivery: '%99.0',
+    specCompliance: '%100',
+    avgResponseTime: '15 dk',
+    reviews: [
+      { author: 'Türkiye Kömür İşletmeleri', rating: 5, date: '19.08.2026', comment: '250 seferlik konteyner sevkiyatını hasarsız ve tam zamanında gerçekleştirdiler.' }
+    ]
   },
   {
     id: 6,
-    name: 'BuroTech Ofis Kırtasiye & Bilişim Çözümleri',
-    sector: 'Kırtasiye & Ofis',
-    city: 'Bursa',
-    district: 'Nilüfer',
+    name: 'Savunma Sanayi Tedarik ve İmalat Grubu',
+    sector: 'Sanayi & Makine',
+    city: 'Ankara',
+    district: 'Ostim',
     verified: true,
-    rating: 4.8,
-    reviewCount: 33,
-    badge: 'Kurumsal Tedarikçi',
-    description: 'A4 fotokopi kağıdı, toner kartuş, ofis sarf ve IT donanım toptan dağıtımı.',
-    capacity: '50.000 Koli/Ay Kağıt Sevkiyatı',
-    taxOffice: 'Nilüfer V.D.',
-    mersis: '0543-2198-7654-0001',
-    phone: '0224 452 77 88',
-    email: 'kurumsal@burotech.com.tr',
-    completedTenders: 19
+    rating: 5.0,
+    reviewCount: 59,
+    badge: 'AS9100 Onaylı Üretici',
+    description: 'TUSAŞ, ASELSAN ve ROKETSAN standartlarında 5 eksen mikron hassasiyetli CNC talaşlı imalat ve kompozit işleme.',
+    capacity: 'Aylık 1.200 Adet Havacılık Komponenti',
+    taxOffice: 'Ostim V.D.',
+    mersis: '0819-2039-4850-0001',
+    phone: '0312 590 00 00',
+    email: 'savunma@tusas-tedarik.com.tr',
+    completedTenders: 74,
+    totalBids: 198,
+    tradeVolume: '210.0M ₺',
+    onTimeDelivery: '%100',
+    specCompliance: '%100',
+    avgResponseTime: '10 dk',
+    reviews: [
+      { author: 'TUSAŞ Havacılık A.Ş.', rating: 5, date: '21.08.2026', comment: '5 eksen CNC dik işleme merkezi teslimatı ve kalibrasyonu başarıyla yapıldı.' }
+    ]
   }
 ])
 
@@ -249,7 +298,7 @@ const selectedFirmForModal = ref<any>(null)
           <div class="space-y-3">
             <div class="flex items-start justify-between gap-2">
               <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-2xl bg-blue-50 border border-blue-100 text-[#0052FF] flex items-center justify-center font-black text-base shadow-xs shrink-0">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#0F223D] to-blue-700 text-white flex items-center justify-center font-black text-base shadow-xs shrink-0">
                   <Building2 :size="22" />
                 </div>
                 <div>
@@ -261,18 +310,31 @@ const selectedFirmForModal = ref<any>(null)
               </div>
             </div>
 
+            <!-- Star Rating Strip -->
+            <div class="flex items-center gap-2 pt-1">
+              <div class="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-black">
+                <Star :size="12" class="fill-amber-400 text-amber-500" />
+                <span>{{ firm.rating || 4.9 }}</span>
+              </div>
+              <span class="text-[11px] text-slate-500 font-bold">({{ firm.reviewCount || 38 }} Değerlendirme)</span>
+            </div>
+
             <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
               {{ firm.description }}
             </p>
 
             <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100 space-y-1.5 text-[11px]">
               <div class="flex items-center justify-between text-slate-600">
-                <span class="font-medium">Kapasite / Üretim:</span>
-                <span class="font-bold text-slate-900">{{ firm.capacity }}</span>
+                <span class="font-medium">Tamamlanan İhale:</span>
+                <span class="font-mono font-black text-blue-900">{{ firm.completedTenders }} Başarılı İhale</span>
               </div>
               <div class="flex items-center justify-between text-slate-600">
-                <span class="font-medium">Tamamlanan İhale:</span>
-                <span class="font-mono font-bold text-emerald-600">{{ firm.completedTenders }} İhale</span>
+                <span class="font-medium">Toplam Teklif:</span>
+                <span class="font-mono font-bold text-slate-800">{{ firm.totalBids || 120 }} Teklif Katılımı</span>
+              </div>
+              <div class="flex items-center justify-between text-slate-600">
+                <span class="font-medium">İş / Ticaret Hacmi:</span>
+                <span class="font-mono font-black text-emerald-600">{{ firm.tradeVolume || '35.0M ₺' }}</span>
               </div>
               <div class="flex items-center justify-between text-slate-600">
                 <span class="font-medium">Konum:</span>
@@ -300,16 +362,19 @@ const selectedFirmForModal = ref<any>(null)
 
       <!-- Company Profile Modal -->
       <div v-if="selectedFirmForModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl animate-fadeIn text-left border border-slate-200">
+        <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl animate-fadeIn text-left border border-slate-200">
           <div class="flex items-start justify-between gap-4 border-b pb-4 border-slate-100">
-            <div class="flex items-center gap-3">
-              <div class="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-200 text-[#0052FF] flex items-center justify-center font-black text-xl shrink-0">
+            <div class="flex items-center gap-3.5">
+              <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#0F223D] to-blue-700 text-white flex items-center justify-center font-black text-xl shrink-0 shadow-md">
                 <Building2 :size="28" />
               </div>
               <div>
-                <span class="text-xs font-black text-blue-600 uppercase">{{ selectedFirmForModal.sector }}</span>
-                <h2 class="text-lg sm:text-xl font-black text-slate-900">{{ selectedFirmForModal.name }}</h2>
-                <span class="text-xs text-slate-400">📍 {{ selectedFirmForModal.district }}, {{ selectedFirmForModal.city }}</span>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-black text-blue-600 uppercase">{{ selectedFirmForModal.sector }}</span>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black border border-emerald-200">✓ {{ selectedFirmForModal.badge }}</span>
+                </div>
+                <h2 class="text-lg sm:text-2xl font-black text-slate-900 mt-0.5">{{ selectedFirmForModal.name }}</h2>
+                <span class="text-xs text-slate-500">📍 {{ selectedFirmForModal.district }}, {{ selectedFirmForModal.city }}</span>
               </div>
             </div>
             <button @click="selectedFirmForModal = null" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl cursor-pointer">
@@ -317,35 +382,89 @@ const selectedFirmForModal = ref<any>(null)
             </button>
           </div>
 
+          <!-- 4-Stat Strip -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="p-3.5 rounded-2xl bg-amber-50/70 border border-amber-200 text-center space-y-1">
+              <span class="text-[10px] font-bold text-amber-800 uppercase block">Yıldız Skoru</span>
+              <div class="flex items-center justify-center gap-1 font-black text-xl text-amber-900">
+                <Star :size="18" class="fill-amber-400 text-amber-500" />
+                <span>{{ selectedFirmForModal.rating || 4.9 }}</span>
+              </div>
+              <span class="text-[10px] text-amber-700 font-bold block">{{ selectedFirmForModal.reviewCount || 38 }} Değerlendirme</span>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200 text-center space-y-1">
+              <span class="text-[10px] font-bold text-blue-800 uppercase block">Tamamlanan İhale</span>
+              <div class="font-black text-xl text-blue-950 font-mono">
+                {{ selectedFirmForModal.completedTenders }}
+              </div>
+              <span class="text-[10px] text-blue-700 font-bold block">Başarılı Sözleşme</span>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-center space-y-1">
+              <span class="text-[10px] font-bold text-slate-500 uppercase block">Toplam Teklif</span>
+              <div class="font-black text-xl text-slate-900 font-mono">
+                {{ selectedFirmForModal.totalBids || 120 }}
+              </div>
+              <span class="text-[10px] text-slate-500 font-bold block">İhale Katılımı</span>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200 text-center space-y-1">
+              <span class="text-[10px] font-bold text-emerald-800 uppercase block">Toplam İş Hacmi</span>
+              <div class="font-black text-xl text-emerald-700 font-mono">
+                {{ selectedFirmForModal.tradeVolume || '35.0M ₺' }}
+              </div>
+              <span class="text-[10px] text-emerald-700 font-bold block">Escrow Hacmi</span>
+            </div>
+          </div>
+
           <div class="space-y-4 text-xs text-slate-700 leading-relaxed">
             <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-              <h4 class="font-black text-slate-900 text-sm">Şirket Faaliyet Özeti & Kurumsal Tanıtım</h4>
+              <h4 class="font-black text-slate-900 text-xs uppercase tracking-wider">Şirket Faaliyet Özeti & Kurumsal Tanıtım</h4>
               <p>{{ selectedFirmForModal.description }}</p>
             </div>
 
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-                <span class="text-[10px] text-slate-400 font-bold uppercase block">Vergi Dairesi</span>
+                <span class="text-[10px] text-slate-400 font-bold uppercase block">Vergi Dairesi / VKN</span>
                 <span class="font-black text-slate-800 text-xs">{{ selectedFirmForModal.taxOffice }}</span>
               </div>
               <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-                <span class="text-[10px] text-slate-400 font-bold uppercase block">MERSİS No</span>
+                <span class="text-[10px] text-slate-400 font-bold uppercase block">MERSİS Numarası</span>
                 <span class="font-black font-mono text-slate-800 text-xs">{{ selectedFirmForModal.mersis }}</span>
               </div>
               <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
-                <span class="text-[10px] text-slate-400 font-bold uppercase block">Tamamlanan İhale</span>
-                <span class="font-black font-mono text-emerald-600 text-xs">{{ selectedFirmForModal.completedTenders }} İhale</span>
+                <span class="text-[10px] text-slate-400 font-bold uppercase block">İletişim & Destek</span>
+                <span class="font-bold text-slate-800 text-xs">{{ selectedFirmForModal.phone }}</span>
               </div>
             </div>
 
-            <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-950 flex items-center justify-between gap-3">
-              <div class="flex items-center gap-2 font-bold">
-                <ShieldCheck :size="18" class="text-emerald-600" />
-                <span>GİB Vergi Levhası ve Ticaret Sicil Doğrulaması Onaylı</span>
+            <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex flex-wrap items-center gap-4 text-[11px] font-bold">
+              <span class="text-emerald-700">✓ Zamanında Teslimat: {{ selectedFirmForModal.onTimeDelivery || '%99.0' }}</span>
+              <span class="text-blue-700">✓ Şartname Uyumu: {{ selectedFirmForModal.specCompliance || '%100' }}</span>
+              <span class="text-purple-700">✓ Yanıt Süresi: {{ selectedFirmForModal.avgResponseTime || '10 dk' }}</span>
+            </div>
+
+            <!-- Reviews -->
+            <div v-if="selectedFirmForModal.reviews && selectedFirmForModal.reviews.length > 0" class="space-y-2.5 pt-2">
+              <h4 class="font-black text-slate-900 text-xs uppercase tracking-wider flex items-center gap-1.5">
+                <Star :size="13" class="fill-amber-400 text-amber-500" />
+                <span>Doğrulanmış Alıcı & İdare Yorumları</span>
+              </h4>
+              <div
+                v-for="(rev, rIdx) in selectedFirmForModal.reviews"
+                :key="rIdx"
+                class="p-3.5 rounded-2xl bg-white border border-slate-200 space-y-1 shadow-2xs"
+              >
+                <div class="flex items-center justify-between text-xs font-bold">
+                  <span class="text-slate-900">{{ rev.author }}</span>
+                  <div class="flex items-center gap-1 text-amber-500">
+                    <Star v-for="i in 5" :key="i" :size="10" class="fill-amber-400 text-amber-400" />
+                    <span class="text-[10px] text-slate-400 font-normal ml-1">({{ rev.date }})</span>
+                  </div>
+                </div>
+                <p class="text-xs text-slate-600 italic">"{{ rev.comment }}"</p>
               </div>
-              <span class="px-2.5 py-1 rounded-md bg-emerald-600 text-white font-bold text-[10px]">
-                Mavi Rozetli Üye
-              </span>
             </div>
           </div>
 
