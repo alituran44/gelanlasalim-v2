@@ -61,6 +61,7 @@ const selectedSort = ref<'otomatik' | 'views' | 'sozlesme' | 'sehir'>('otomatik'
 const currentPage = ref(1)
 
 const selectedTenderForDetail = ref<any>(null)
+const detailActiveTab = ref<'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'firmalar' | 'sonuc' | 'gecmis'>('ilan')
 const showSpecModal = ref(false)
 const selectedSpecTender = ref<any>(null)
 const specActiveTab = ref<'malzeme' | 'idari' | 'teknik'>('malzeme')
@@ -374,18 +375,175 @@ async function submitBid() {
   alert(`🎉 TEKLİFİNİZ BAŞARIYLA İLETİLDİ!\n\n"${tender.baslik}" ihalesine ${formattedPrice} tutarındaki teklifiniz kapalı zarf usulü ile alıcıya sunuldu. NetGSM SMS bilgilendirmesi yapıldı.`)
 }
 
+function downloadFile(filename: string, content: string, mimeType: string = 'text/plain;charset=utf-8') {
+  if (typeof document === 'undefined') return
+  const blob = new Blob([content], { type: mimeType })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+  URL.revokeObjectURL(url)
+}
+
+function downloadIhaleIlani(tender: any) {
+  const content = `================================================================================
+                    T.C. B2B TİCARET VE İHALE PORTALI
+                     İHALECİBURADA RESMİ İHALE İLANI
+================================================================================
+
+İhale Kayıt No (İKN)    : ${tender.id}
+İhale Başlığı            : ${tender.baslik}
+Sektör & Kategori       : ${tender.kategori}
+İdare / Kurum           : ${tender.authority || 'İhaleciBurada Satın Alma Masası'}
+İhaleyi Açan Kurum      : ${tender.ownerCompany || 'Doğrulanmış B2B Kurumsal Alıcı'}
+İhale Usulü             : ${tender.tur || 'Açık İhale'}
+İhale Türü              : ${tender.type || 'Mal / Hizmet Alımı'}
+Yaklaşık Maliyet / Bütçe: ${tender.butce || 'Açık Teklif'}
+İhale Lokasyonu / İl    : ${tender.city || 'Türkiye Geneli'}
+İlan Yayın Tarihi       : ${tender.yayinTarihi || '28.08.2026'}
+Son Teklif Tarihi       : ${tender.sure || '30.08.2026'}
+
+--------------------------------------------------------------------------------
+1. İHALENİN KONUSU VE TEKNİK KAPSAMI
+--------------------------------------------------------------------------------
+${tender.aciklama || 'Bu ihale şartnamesinde yer alan tüm teknik detaylar ve mevzuat kriterleri geçerlidir.'}
+
+--------------------------------------------------------------------------------
+2. İHALEYE KATILMA ŞARTLARI VE İSTENEN BELGELER
+--------------------------------------------------------------------------------
+a) Vergi Levhası ve Faaliyet Belgesi (Son 3 ay içinde alınmış olmalıdır).
+b) İmza Sirküleri veya İmza Beyannamesi.
+c) TSE / ISO Kalite Uygunluk Belgeleri.
+d) Geçici Teminat Mektubu veya Güvenli Havuz (Escrow) Bloke Teminatı.
+
+--------------------------------------------------------------------------------
+3. TEKLİF VERME VE DEĞERLENDİRME USULÜ
+--------------------------------------------------------------------------------
+Teklifler İhaleciBurada platformu üzerinden kapalı zarf usulü veya canlı eksiltme
+modülüyle toplanacaktır. İhale süresi bitiminde en avantajlı fiyat ve teknik yeterlilik
+sahibi yüklenici ile sözleşme akdedilecektir.
+
+Resmi Belge Doğrulama Kodu: IHC-${String(tender.id).replace('/', '-')}-${Math.floor(1000 + Math.random()*9000)}
+Belge Tanzim Tarihi: ${new Date().toLocaleDateString('tr-TR')}
+`
+  downloadFile(`Ihale_Ilani_${String(tender.id).replace('/', '_')}.txt`, content)
+}
+
+function downloadMalzemeListesi(tender: any) {
+  const csvContent = `\uFEFFSıra No;Malzeme / İş Kalemi;Miktar;Birim;Tahmini Birim Fiyat;Toplam Bütçe;Teknik Standart;Teslimat Yeri
+1;${tender.baslik};1;Parti / Paket;${tender.butce};${tender.butce};TSE / ISO 9001;${tender.city || 'Şantiye Teslimi'}
+2;Sigortalı Nakliye, Taşıma ve Saha İndirme;1;Hizmet;Dahil;Dahil;Kasko & CMR Sigortalı;${tender.city || 'Şantiye Teslimi'}
+3;Akredite Kalite Kontrol ve Muayene Kabul Raporu;1;Paket;Dahil;Dahil;TSE Standart Uygunluk;${tender.city || 'Şantiye Teslimi'}
+`
+  downloadFile(`Malzeme_Listesi_${String(tender.id).replace('/', '_')}.csv`, csvContent, 'text/csv;charset=utf-8;')
+}
+
+function downloadIdariSartname(tender: any) {
+  const content = `================================================================================
+                    İHALECİBURADA B2B ELEKTRONİK İHALE SİSTEMİ
+                             İDARİ ŞARTNAME METNİ
+================================================================================
+
+İhale No : ${tender.id}
+İşin Adı : ${tender.baslik}
+İşin Yeri: ${tender.city || 'Türkiye Geneli'}
+
+MADDE 1 - İHALE SAHİBİ VE İDAREYE İLİŞKİN BİLGİLER
+1.1. İdare: ${tender.authority || 'İhaleciBurada Satın Alma Masası'}
+1.2. İhaleyi Açan Kurum: ${tender.ownerCompany || 'Doğrulanmış B2B Kurumsal Alıcı'}
+
+MADDE 2 - İHALENİN USULÜ VE TEKLİFİN ŞEKLİ
+2.1. İhale Usulü: ${tender.tur || 'Açık Eksiltme ve Doğrudan Temin'}
+2.2. Teklifler platform üzerinden 256-bit TLS şifrelemeyle kapalı zarf formatında alınır.
+
+MADDE 3 - SÖZLEŞME BEDELİ VE ÖDEME ESASLARI
+3.1. Yaklaşık Bütçe: ${tender.butce}
+3.2. Ödemeler, mal ve hizmet muayene kabul tutanağının tanzimini müteakip
+     TCMB lisanslı Güvenli Ticaret Havuz (Escrow) hesabından yüklenici IBAN'ına aktarılır.
+
+MADDE 4 - TESLİMAT VE MUAYENE KABUL
+4.1. Mallar şantiye/depo adresine hasarsız olarak teslim edilecek,
+     3 (üç) iş günü içinde oluşturulacak heyet tarafından fiziki ve teknik muayenesi yapılacaktır.
+
+MADDE 5 - CEZAİ HÜKÜMLER VE ANLAŞMAZLIKLAR
+5.1. Mücbir sebepler haricinde geciken her takvim günü için sözleşme bedelinin %0.1'i oranında ceza kesilir.
+5.2. İhtilaf vukuunda Çanakkale / İstanbul Mahkemeleri ve İcra Daireleri yetkilidir.
+
+Tanzim Tarihi: ${new Date().toLocaleDateString('tr-TR')}
+`
+  downloadFile(`Idari_Sartname_${String(tender.id).replace('/', '_')}.txt`, content)
+}
+
+function downloadSozlesme(tender: any) {
+  const content = `================================================================================
+                    TİP B2B MAL VE HİZMET SATIN ALMA SÖZLEŞMESİ
+================================================================================
+
+Sözleşme Kayıt No : SOZ-${String(tender.id).replace('/', '-')}-2026
+İhale Konusu      : ${tender.baslik}
+Alıcı Taraf       : ${tender.ownerCompany || 'Alıcı Kurumsal Firma'}
+Yüklenici Taraf   : İhaleyi Kazanan Onaylı Tedarikçi Firma
+Sözleşme Tutarı   : ${tender.butce}
+Yürürlük Tarihi   : ${new Date().toLocaleDateString('tr-TR')}
+
+1. TARAFLARIN HAK VE YÜKÜMLÜLÜKLERİ:
+Yüklenici, işbu sözleşme konusu mal ve hizmeti teknik şartnamede belirtilen kalitede ve
+sürede teslim etmeyi; Alıcı ise şartnameye uygun teslimat sonrasında bedeli Güvenli Havuz
+aracılığıyla eksiksiz ödemeyi taahhüt eder.
+
+2. GÜVENCE VE BLOKE:
+İhale bedeli alıcı tarafından TCMB/BDDK güvenceli emanet hesaba yatırılmış olup, teslimat
+onayından önce tedarikçiye ve alıcıya karşılıklı güvence sağlamaktadır.
+
+3. KANUNİ DAYANAK:
+İşbu sözleşme 6098 sayılı Türk Borçlar Kanunu, 6102 sayılı TTK ve 6563 sayılı Elektronik
+Ticaretin Düzenlenmesi Hakkında Kanun hükümlerine tabidir.
+`
+  downloadFile(`Sozlesme_Metni_${String(tender.id).replace('/', '_')}.txt`, content)
+}
+
+function downloadSonucIlani(tender: any) {
+  const content = `================================================================================
+                    İHALE SONUÇ BİLDİRİMİ VE MUTABAKAT TUTANAĞI
+================================================================================
+
+İhale No          : ${tender.id}
+İhale Başlığı     : ${tender.baslik}
+İhale Durumu      : ${tender.durum === 'closed' ? 'SONUÇLANDI / SÖZLEŞME İMZALANDI' : 'DEĞERLENDİRME AŞAMASINDA'}
+Kazanan Yüklenici : ${tender.ownerCompany || 'En Avantajlı Teklif Sahibi Yüklenici'}
+Sözleşme Bedeli   : ${tender.butce}
+Toplam Teklif     : ${tender.teklifSayisi || 0} Firma Katıldı
+Tasarruf Oranı    : %14.2 Ortalama Maliyet Tasarrufu
+Sonuçlanma Tarihi : ${new Date().toLocaleDateString('tr-TR')}
+`
+  downloadFile(`Sonuc_Ilani_${String(tender.id).replace('/', '_')}.txt`, content)
+}
+
 function downloadAllSpecs(tender: any) {
-  let content = `========================================================\nİHALECİBURADA.COM - RESMİ İHALE ŞARTNAME VE MALZEME PAKETİ\nİhale No: ${tender.id}\nİhale Başlığı: ${tender.baslik}\nKategori: ${tender.kategori}\nŞehir: ${tender.city || 'Türkiye Geneli'}\nBütçe: ${tender.butce || 'Açık İhale'}\n========================================================\n\n1. İHALE METNİ VE GENEL ŞARTLAR:\n${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}\n\n2. MALZEME LİSTESİ & METRAJ:\n- Kalem 1: Standart şartname metrajına uygun malzeme ve işçilik.\n\n3. İDARİ VE TEKNİK ŞARTLAR:\n- Teslimat süresine ve irsaliye kabul kriterlerine uygunluk esastır.\n- Hakediş ödemesi TCMB/BDDK mevzuatına uygun Güvenli Havuz (Escrow) hesabında korunacaktır.\n========================================================\n`
-  
-  if (typeof document !== 'undefined') {
-    const element = document.createElement('a')
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content))
-    element.setAttribute('download', `Sartname_Paketi_${tender.id}.txt`)
-    element.style.display = 'none'
-    document.body.appendChild(element)
-    element.click()
-    document.body.removeChild(element)
-  }
+  let content = `========================================================
+İHALECİBURADA.COM - RESMİ İHALE ŞARTNAME VE MALZEME PAKETİ
+İhale No: ${tender.id}
+İhale Başlığı: ${tender.baslik}
+Kategori: ${tender.kategori}
+Şehir: ${tender.city || 'Türkiye Geneli'}
+Bütçe: ${tender.butce || 'Açık İhale'}
+========================================================
+
+1. İHALE METNİ VE GENEL ŞARTLAR:
+${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
+
+2. MALZEME LİSTESİ & METRAJ:
+- Kalem 1: Standart şartname metrajına uygun malzeme ve işçilik.
+
+3. İDARİ VE TEKNİK ŞARTLAR:
+- Teslimat süresine ve irsaliye kabul kriterlerine uygunluk esastır.
+- Hakediş ödemesi TCMB/BDDK mevzuatına uygun Güvenli Havuz (Escrow) hesabında korunacaktır.
+========================================================
+`
+  downloadFile(`Sartname_Paketi_${String(tender.id).replace('/', '_')}.txt`, content)
 }
 </script>
 
@@ -694,70 +852,71 @@ function downloadAllSpecs(tender: any) {
             <span class="px-2 py-0.2 rounded bg-blue-50 text-blue-700 text-[10px] font-bold">🏷️ {{ tender.tur || 'Doğrudan temin' }}</span>
           </div>
 
-          <!-- Row 5: 6 EKAP Sub-tabs / Action Buttons (GÖRSEL 2 FORMATI) -->
+          <!-- Row 5: 7 EKAP Sub-tabs / Action Buttons (Görsel 1 ile birebir) -->
           <div class="flex flex-wrap items-center justify-between gap-1.5 pt-2 border-t border-slate-200">
             <div class="flex flex-wrap items-center gap-1.5">
               <button 
                 type="button"
-                @click="openModalWithTab(tender, 'sozlesme')"
-                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
+                @click="openModalWithTab(tender, 'ilan')"
+                class="px-2.5 py-1 rounded bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200 shadow-2xs"
               >
-                <FileText :size="12" />
-                <span>Sözleşme listesi (1)</span>
+                <FileText :size="12" class="text-purple-600" />
+                <span>📄 İhale İlanı</span>
               </button>
 
               <button 
                 type="button"
                 @click="openModalWithTab(tender, 'malzeme')"
-                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
+                class="px-2.5 py-1 rounded bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200 shadow-2xs"
               >
-                <Layers :size="12" />
-                <span>Malzeme Listesi (1)</span>
-              </button>
-
-              <button 
-                type="button"
-                @click="openModalWithTab(tender, 'ilan')"
-                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
-              >
-                <FileText :size="12" />
-                <span>İhale ilanı</span>
-              </button>
-
-              <button 
-                type="button"
-                @click="openModalWithTab(tender, 'sonuc')"
-                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
-              >
-                <CheckCircle2 :size="12" />
-                <span>Sonuç ilanı</span>
+                <Layers :size="12" class="text-amber-600" />
+                <span>📦 Malzeme Listesi (1)</span>
               </button>
 
               <button 
                 type="button"
                 @click="openModalWithTab(tender, 'idari')"
-                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
+                class="px-2.5 py-1 rounded bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200 shadow-2xs"
               >
-                <ShieldCheck :size="12" />
-                <span>İdari Şartname</span>
+                <ShieldCheck :size="12" class="text-emerald-600" />
+                <span>📜 İdari Şartname</span>
+              </button>
+
+              <button 
+                type="button"
+                @click="openModalWithTab(tender, 'sozlesme')"
+                class="px-2.5 py-1 rounded bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200 shadow-2xs"
+              >
+                <FileText :size="12" class="text-amber-500" />
+                <span>🤝 Sözleşme Listesi (1)</span>
               </button>
 
               <button 
                 type="button"
                 @click="openModalWithTab(tender, 'firmalar')"
-                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
+                class="px-2.5 py-1 rounded bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200 shadow-2xs"
               >
-                <Building2 :size="12" />
-                <span>Firmalar</span>
+                <Building2 :size="12" class="text-blue-600" />
+                <span>🏢 Firmalar</span>
+              </button>
+
+              <button 
+                type="button"
+                @click="openModalWithTab(tender, 'sonuc')"
+                class="px-2.5 py-1 rounded transition flex items-center gap-1 cursor-pointer border shadow-2xs font-bold"
+                :class="tender.durum === 'closed' ? 'bg-[#0F223D] text-white border-[#0F223D]' : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'"
+              >
+                <CheckCircle2 :size="12" :class="tender.durum === 'closed' ? 'text-amber-400' : 'text-slate-500'" />
+                <span>🏆 Sonuç İlanı</span>
               </button>
 
               <button 
                 type="button"
                 @click="openModalWithTab(tender, 'gecmis')"
-                class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200"
+                class="px-2.5 py-1 rounded bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-200 shadow-2xs"
               >
-                <RotateCcw :size="12" />
-                <span>Benzer ihale geçmişi</span>
+                <RotateCcw :size="12" class="text-purple-500" />
+                <span>⏱️ Benzer İhale Geçmişi</span>
               </button>
             </div>
 
@@ -928,38 +1087,95 @@ function downloadAllSpecs(tender: any) {
 
         <!-- Tab 1: İhale İlanı -->
         <div v-if="detailActiveTab === 'ilan'" class="space-y-4 text-xs text-slate-700 leading-relaxed">
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-            <h4 class="font-black text-slate-900 text-sm">İhale Konusu & Açıklama Metni</h4>
-            <p>{{ selectedTenderForDetail.aciklama || 'Bu ihale için belirtilen standart teknik şartname kuralları ve B2B satın alma şartları geçerlidir.' }}</p>
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <h4 class="font-black text-slate-900 text-sm">Resmi İhale İlan Metni & Kapsamı</h4>
+              <button
+                type="button"
+                @click="downloadIhaleIlani(selectedTenderForDetail)"
+                class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition flex items-center gap-1 cursor-pointer shadow-xs"
+              >
+                <Download :size="12" />
+                <span>İhale İlanını İndir (.TXT)</span>
+              </button>
+            </div>
+            <p>{{ selectedTenderForDetail.aciklama || 'Bu ihale şartnamesinde yer alan teknik kriterler, teslimat takvimi ve kalite standartları uyarınca mal / hizmet alımı yapılacaktır.' }}</p>
           </div>
-          <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-200 text-blue-950 space-y-2">
-            <h5 class="font-black text-xs">Teklif Verme & İşlem Güvenliği</h5>
-            <p class="text-[11px] text-blue-900">Verilen teklifler ihale bitiş süresine kadar şifreli olarak saklanır. İhale süresi bittiğinde veya alıcı firma onay verdiğinde mutabakat sağlanır ve taraflar arasında güvenli havuz (Escrow) üzerinden resmi faturalandırma başlatılır.</p>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1.5">
+              <span class="font-black text-slate-800 text-xs block">İstenen Yeterlilik Belgeleri</span>
+              <ul class="list-disc list-inside space-y-1 text-[11px] text-slate-600">
+                <li>Güncel Vergi Levhası ve Faaliyet Belgesi</li>
+                <li>İmza Sirküleri / Yetki Belgesi</li>
+                <li>TSE / ISO Kalite Uygunluk Sertifikası</li>
+                <li>Geçici Teminat Mektubu / Güvenli Havuz Blokesi</li>
+              </ul>
+            </div>
+
+            <div class="p-3.5 rounded-xl bg-blue-50/60 border border-blue-200 space-y-1.5 text-blue-950">
+              <span class="font-black text-xs block">Şifreli Teklif & Escrow Güvencesi</span>
+              <p class="text-[11px] text-blue-900 leading-relaxed">
+                Tüm teklifler 256-bit şifreleme ile ihale bitiş anına kadar gizli tutulur. Kabul edilen teklifin ödemesi TCMB/BDDK mevzuatına uygun Güvenli Havuz (Escrow) hesabında korunur.
+              </p>
+            </div>
           </div>
         </div>
 
         <!-- Tab 2: Malzeme Listesi -->
         <div v-if="detailActiveTab === 'malzeme'" class="space-y-4 text-xs">
-          <div class="border border-slate-200 rounded-2xl overflow-hidden">
+          <div class="flex items-center justify-between">
+            <h4 class="font-black text-slate-900 text-sm">İhale Kalemleri & Metraj Cetveli</h4>
+            <button
+              type="button"
+              @click="downloadMalzemeListesi(selectedTenderForDetail)"
+              class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] transition flex items-center gap-1 cursor-pointer shadow-xs"
+            >
+              <FileSpreadsheet :size="12" />
+              <span>Malzeme Listesini Excel İndir (.CSV)</span>
+            </button>
+          </div>
+
+          <div class="border border-slate-200 rounded-2xl overflow-hidden shadow-2xs">
             <table class="w-full text-left text-xs">
-              <thead class="bg-slate-100 text-slate-700 font-black">
+              <thead class="bg-slate-100 text-slate-700 font-black border-b border-slate-200">
                 <tr>
                   <th class="p-3">Sıra</th>
                   <th class="p-3">Malzeme / İş Kalemi</th>
-                  <th class="p-3">Metraj / Miktar</th>
+                  <th class="p-3">Miktar</th>
                   <th class="p-3">Birim</th>
-                  <th class="p-3">Birim Bütçe</th>
+                  <th class="p-3">Tahmini Bütçe</th>
                   <th class="p-3">Teknik Standart</th>
+                  <th class="p-3">Teslimat</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100">
-                <tr>
-                  <td class="p-3 font-mono font-bold">01</td>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3 font-mono font-bold text-slate-500">01</td>
                   <td class="p-3 font-bold text-slate-900">{{ selectedTenderForDetail.baslik }}</td>
-                  <td class="p-3 font-mono">1</td>
-                  <td class="p-3">Paket / Parti</td>
+                  <td class="p-3 font-mono font-bold">1</td>
+                  <td class="p-3 text-slate-600">Paket / Parti</td>
                   <td class="p-3 font-mono font-black text-emerald-600">{{ selectedTenderForDetail.butce }}</td>
-                  <td class="p-3 text-slate-500">TSE / ISO 9001</td>
+                  <td class="p-3 text-slate-600">TSE / ISO 9001</td>
+                  <td class="p-3 font-bold text-slate-700">{{ selectedTenderForDetail.city || 'Şantiye Teslimi' }}</td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3 font-mono font-bold text-slate-500">02</td>
+                  <td class="p-3 font-bold text-slate-800">Sigortalı Nakliye, Taşıma ve Saha İndirme</td>
+                  <td class="p-3 font-mono font-bold">1</td>
+                  <td class="p-3 text-slate-600">Hizmet</td>
+                  <td class="p-3 font-mono font-bold text-slate-500">Dahil</td>
+                  <td class="p-3 text-slate-600">CMR / Nakliyat Sigortası</td>
+                  <td class="p-3 font-bold text-slate-700">{{ selectedTenderForDetail.city || 'Şantiye Teslimi' }}</td>
+                </tr>
+                <tr class="hover:bg-slate-50">
+                  <td class="p-3 font-mono font-bold text-slate-500">03</td>
+                  <td class="p-3 font-bold text-slate-800">Akredite Kalite Kontrol & Muayene Kabul Tutanağı</td>
+                  <td class="p-3 font-mono font-bold">1</td>
+                  <td class="p-3 text-slate-600">Paket</td>
+                  <td class="p-3 font-mono font-bold text-slate-500">Dahil</td>
+                  <td class="p-3 text-slate-600">TSE Normları</td>
+                  <td class="p-3 font-bold text-slate-700">3 İş Günü Muayene</td>
                 </tr>
               </tbody>
             </table>
@@ -967,41 +1183,84 @@ function downloadAllSpecs(tender: any) {
         </div>
 
         <!-- Tab 3: İdari Şartname -->
-        <div v-if="detailActiveTab === 'idari'" class="space-y-3 text-xs text-slate-700">
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+        <div v-if="detailActiveTab === 'idari'" class="space-y-4 text-xs text-slate-700">
+          <div class="flex items-center justify-between">
+            <h4 class="font-black text-slate-900 text-sm">İdari ve Hukuki Satın Alma Şartnamesi</h4>
+            <button
+              type="button"
+              @click="downloadIdariSartname(selectedTenderForDetail)"
+              class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition flex items-center gap-1 cursor-pointer shadow-xs"
+            >
+              <Download :size="12" />
+              <span>İdari Şartnameyi İndir (.TXT)</span>
+            </button>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
             <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-              <span class="font-bold text-slate-800">Teslimat Lokasyonu:</span>
-              <span class="font-black text-slate-900">{{ selectedTenderForDetail.city || 'Türkiye Geneli' }}</span>
+              <span class="font-bold text-slate-700">1. Teslimat Lokasyonu ve Şekli:</span>
+              <span class="font-black text-slate-900">{{ selectedTenderForDetail.city || 'Türkiye Geneli' }} (Şantiye / Depo Teslimi)</span>
             </div>
             <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-              <span class="font-bold text-slate-800">Ödeme Şartı:</span>
-              <span class="font-black text-emerald-600">TCMB/BDDK Uyumlu Güvenli Havuz (Escrow)</span>
+              <span class="font-bold text-slate-700">2. Ödeme ve Hakediş Şartı:</span>
+              <span class="font-black text-emerald-700">TCMB/BDDK Uyumlu Güvenli Havuz (Escrow) Bloke Ödeme</span>
             </div>
             <div class="flex items-center justify-between border-b border-slate-200 pb-2">
-              <span class="font-bold text-slate-800">Mal Muayene & Kabul:</span>
+              <span class="font-bold text-slate-700">3. Mal Muayene ve Kabul Süreci:</span>
               <span class="font-black text-slate-900">İrsaliye ve Fiziki Sayım Tutanağı ile 3 İş Günü</span>
             </div>
+            <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+              <span class="font-bold text-slate-700">4. Teminat ve Güvence Oranı:</span>
+              <span class="font-black text-slate-900">%3 Geçici Teminat / %6 Kesin Teminat Mektubu</span>
+            </div>
             <div class="flex items-center justify-between">
-              <span class="font-bold text-slate-800">Gecikme Cezası:</span>
-              <span class="font-black text-slate-900">Günlük %0.1 (Binde Bir)</span>
+              <span class="font-bold text-slate-700">5. Gecikme Cezası Hükümleri:</span>
+              <span class="font-black text-rose-700">Mücbir sebep hariç günlük %0.1 (Binde Bir)</span>
             </div>
           </div>
         </div>
 
         <!-- Tab 4: Sözleşme Listesi -->
-        <div v-if="detailActiveTab === 'sozlesme'" class="space-y-3 text-xs text-slate-700">
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-            <h4 class="font-black text-slate-900">Tip B2B Mal / Hizmet Satın Alma Sözleşmesi</h4>
-            <p class="text-slate-600">İhale onaylandığı anda alıcı ve satıcı arasında 6098 sayılı Türk Borçlar Kanunu ve 6102 sayılı TTK hükümleri uyarınca dijital olarak akdedilir.</p>
+        <div v-if="detailActiveTab === 'sozlesme'" class="space-y-4 text-xs text-slate-700">
+          <div class="flex items-center justify-between">
+            <h4 class="font-black text-slate-900 text-sm">Resmi Tip Mal / Hizmet Satın Alma Sözleşmesi</h4>
+            <button
+              type="button"
+              @click="downloadSozlesme(selectedTenderForDetail)"
+              class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition flex items-center gap-1 cursor-pointer shadow-xs"
+            >
+              <Download :size="12" />
+              <span>Sözleşme Metnini İndir (.TXT)</span>
+            </button>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 border-b border-slate-200 pb-3">
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 block uppercase">Sözleşme Kayıt No</span>
+                <span class="font-mono font-bold text-slate-800">SOZ-{{ selectedTenderForDetail.id }}-2026</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 block uppercase">Sözleşme Bedeli</span>
+                <span class="font-mono font-black text-emerald-600">{{ selectedTenderForDetail.butce }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 block uppercase">Yasal Dayanak</span>
+                <span class="font-bold text-slate-800">6098 s. TBK / 6102 s. TTK</span>
+              </div>
+            </div>
+            <p class="text-slate-600 text-xs leading-relaxed">
+              İhale onaylandığı anda alıcı ve kazanan tedarikçi arasında dijital zaman damgalı sözleşme akdedilir. Hakediş bedeli onaylı teslimat sonrasında aktarılır.
+            </p>
           </div>
         </div>
 
-        <!-- Tab 5: Firmalar (Doğrulanmış B2B Üye & Tedarikçi Firmalar) -->
+        <!-- Tab 5: Firmalar -->
         <div v-if="detailActiveTab === 'firmalar'" class="space-y-4 text-xs text-slate-700 leading-relaxed">
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
             <div class="flex items-center justify-between">
               <span class="font-bold text-slate-500 uppercase text-[10px]">İhaleyi Açan Kurumsal Alıcı</span>
-              <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-black text-[10px] border border-emerald-200">✓ Onaylı Alıcı Firma</span>
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 font-black text-[10px] border border-emerald-200">✓ Onaylı Kurumsal Hesap</span>
             </div>
             <div class="flex items-center gap-3">
               <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-black shrink-0">
@@ -1026,22 +1285,48 @@ function downloadAllSpecs(tender: any) {
         </div>
 
         <!-- Tab 6: Sonuç İlanı -->
-        <div v-if="detailActiveTab === 'sonuc'" class="space-y-3 text-xs text-slate-700">
+        <div v-if="detailActiveTab === 'sonuc'" class="space-y-4 text-xs text-slate-700">
+          <div class="flex items-center justify-between">
+            <h4 class="font-black text-slate-900 text-sm">İhale Sonuç ve Mutabakat Raporu</h4>
+            <button
+              type="button"
+              @click="downloadSonucIlani(selectedTenderForDetail)"
+              class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition flex items-center gap-1 cursor-pointer shadow-xs"
+            >
+              <Download :size="12" />
+              <span>Sonuç Belgesini İndir (.TXT)</span>
+            </button>
+          </div>
+
           <div class="p-4 rounded-2xl border" :class="selectedTenderForDetail.durum === 'closed' ? 'bg-amber-50 border-amber-200 text-amber-900' : 'bg-emerald-50 border-emerald-200 text-emerald-900'">
             <div class="font-black text-sm">
-              {{ selectedTenderForDetail.durum === 'closed' ? '🔒 İhale Sonuçlandı (Mutabakat Sağlandı)' : '🟢 İhale Canlı Yayında & Tekliflere Açık' }}
+              {{ selectedTenderForDetail.durum === 'closed' ? '🔒 İhale Sonuçlandı (Mutabakat Sağlandı)' : '🟢 İhale Canlı Yayında & Teklif Alımına Açık' }}
             </div>
             <p class="mt-1 text-xs">
-              Toplam {{ selectedTenderForDetail.teklifSayisi || 0 }} adet teklif iletilmiştir.
+              Bu ihaleye şu ana kadar toplam <strong>{{ selectedTenderForDetail.teklifSayisi || 0 }} adet</strong> kurumsal teklif iletilmiştir.
             </p>
           </div>
         </div>
 
-        <!-- Tab 6: Benzer İhale Geçmişi -->
-        <div v-if="detailActiveTab === 'gecmis'" class="space-y-3 text-xs text-slate-700">
+        <!-- Tab 7: Benzer İhale Geçmişi -->
+        <div v-if="detailActiveTab === 'gecmis'" class="space-y-4 text-xs text-slate-700">
+          <h4 class="font-black text-slate-900 text-sm">Sektörel Piyasa & Emsal İhale Fiyat Geçmişi</h4>
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2">
-            <h4 class="font-black text-slate-900">Sektörel Piyasa & Emsal İhale Karşılaştırması</h4>
-            <p class="text-slate-600">{{ selectedTenderForDetail.kategori }} sektöründe son 30 günde tamamlanan ihalelerde ortalama %14.2 tedarik tasarrufu sağlanmıştır.</p>
+            <p class="text-slate-700"><strong>{{ selectedTenderForDetail.kategori }}</strong> sektöründe son dönemde tamamlanan emsal ihalelerde gerçekleşen fiyat rekabeti ve ortalama tasarruf analizi:</p>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-2 text-center">
+              <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                <span class="text-[10px] text-slate-400 font-bold block">Ortalama Teklif Sayısı</span>
+                <span class="font-black text-sm text-slate-900">8.4 Firma</span>
+              </div>
+              <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                <span class="text-[10px] text-slate-400 font-bold block">Ortalama Tasarruf</span>
+                <span class="font-black text-sm text-emerald-600">%14.2 İndirim</span>
+              </div>
+              <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                <span class="text-[10px] text-slate-400 font-bold block">Tamamlanma Süresi</span>
+                <span class="font-black text-sm text-blue-600">Ortalama 4.2 Gün</span>
+              </div>
+            </div>
           </div>
         </div>
 
