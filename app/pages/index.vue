@@ -64,7 +64,7 @@ useSeoMeta({
 
 // ==================== MENÜ SEÇİMİ (SADECE 4 ANA MENÜ) ====================
 // Kullanıcı talimatı: KİK Kararları ve İdareler kaldırıldı, sadece bu 4 menü aktif!
-const activeSubMenu = ref<'kategoriler' | 'sehirler' | 'sektorler' | 'yukleniciler'>('kategoriler')
+const activeSubMenu = ref<'kategoriler' | 'sehirler' | 'sektorler' | 'firmalar'>('kategoriler')
 const activeTimeTab = ref('guncel')
 
 // Arama Filtreleri
@@ -470,13 +470,13 @@ function handleSelectFilter(item: string) {
           <span>🏭 Sektörler</span>
         </button>
 
-        <!-- 4. YÜKLENİCİLER -->
+        <!-- 4. FİRMALAR -->
         <button 
-          @click="activeSubMenu = 'yukleniciler'" 
-          :class="activeSubMenu === 'yukleniciler' ? 'bg-white text-[#0F223D] border-t-2 border-amber-500 font-black shadow-inner' : 'hover:bg-[#1E3A8A] text-slate-200'"
+          @click="activeSubMenu = 'firmalar'" 
+          :class="activeSubMenu === 'firmalar' ? 'bg-white text-[#0F223D] border-t-2 border-amber-500 font-black shadow-inner' : 'hover:bg-[#1E3A8A] text-slate-200'"
           class="px-6 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-slate-800"
         >
-          <span>👥 Yükleniciler</span>
+          <span>🏢 Firmalar</span>
         </button>
 
       </div>
@@ -937,15 +937,15 @@ function handleSelectFilter(item: string) {
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 👥 SEKME 4: YÜKLENİCİLER (GÖRSEL 4: YÜKLENİCİ LİSTESİ VE ANALİZ) -->
+    <!-- 🏢 SEKME 4: FİRMALAR (GÖRSEL 4: FİRMA LİSTESİ VE DİZİNİ) -->
     <!-- ========================================================================= -->
-    <div v-if="activeSubMenu === 'yukleniciler'" class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 py-4 space-y-4">
+    <div v-if="activeSubMenu === 'firmalar'" class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 py-4 space-y-4">
       
-      <!-- Yüklenici Arama Konsolu -->
+      <!-- Firma Arama Konsolu -->
       <div class="bg-white border border-slate-300 rounded-lg p-4 shadow-xs space-y-3">
         <div class="flex items-center justify-between border-b border-slate-200 pb-2">
           <span class="inline-flex items-center gap-1 px-3 py-1 rounded bg-slate-100 font-black text-slate-800 text-xs border border-slate-300">
-            🔍 Yüklenici Ara
+            🔍 Firma Ara
           </span>
           <button @click="activeSubMenu = 'kategoriler'" class="px-3 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs border border-slate-300">
             ⬅ Geri Dön
@@ -959,11 +959,13 @@ function handleSelectFilter(item: string) {
               <option value="Tümü">Tümü</option>
               <option value="İnşaat">İnşaat</option>
               <option value="Sağlık">Sağlık</option>
+              <option value="Sanayi & Makine">Sanayi & Makine</option>
+              <option value="Lojistik">Lojistik</option>
             </select>
           </div>
 
           <div class="flex items-center gap-3">
-            <label class="w-24 font-bold text-slate-600 text-right">Yüklenici adı:</label>
+            <label class="w-24 font-bold text-slate-600 text-right">Firma adı:</label>
             <input v-model="contractorSearchName" type="text" placeholder="Kelime ara" class="flex-1 p-2 bg-white border border-slate-300 rounded" />
           </div>
 
@@ -984,7 +986,7 @@ function handleSelectFilter(item: string) {
       <!-- Toplam Bulunan Sayacı & Sayfalama Üst -->
       <div class="bg-white border border-slate-300 rounded-lg p-3 shadow-xs space-y-3">
         <div class="text-center font-bold text-slate-700 border-b border-slate-200 pb-2">
-          📑 Toplam bulunan: <strong>431.471</strong>
+          📑 Toplam bulunan: <strong>431.471 Onaylı Firma</strong>
         </div>
 
         <div class="flex items-center justify-center gap-2 text-xs">
@@ -999,13 +1001,13 @@ function handleSelectFilter(item: string) {
           <button class="px-2.5 py-1 rounded border border-slate-300 bg-slate-50 font-bold">Son sayfa ⏭</button>
         </div>
 
-        <!-- Yükleniciler Tablosu -->
+        <!-- Firmalar Tablosu -->
         <div class="overflow-x-auto">
           <table class="w-full text-left text-xs border-collapse">
             <thead>
               <tr class="bg-slate-100 text-slate-700 border-y border-slate-300 font-black">
                 <th class="py-2.5 px-3 w-8">#</th>
-                <th class="py-2.5 px-3">Yüklenici adı</th>
+                <th class="py-2.5 px-3">Firma adı</th>
                 <th class="py-2.5 px-3 text-center">Katıldığı ihaleler ⇅</th>
                 <th class="py-2.5 px-3 text-center">Devam eden işler ⇅</th>
                 <th class="py-2.5 px-3 text-center">Tamamlanan işler ⇅</th>
@@ -1016,23 +1018,25 @@ function handleSelectFilter(item: string) {
               <tr v-for="c in filteredContractors" :key="c.id" class="hover:bg-sky-50/50 transition">
                 <td class="py-3 px-3 font-bold text-slate-500">{{ c.id }}</td>
                 <td class="py-3 px-3 font-bold text-slate-800">
-                  {{ c.name }}
+                  <NuxtLink to="/firmalar" class="hover:text-[#0084B4] hover:underline">
+                    {{ c.name }}
+                  </NuxtLink>
                 </td>
                 <td class="py-3 px-3 text-center">
                   <span class="font-bold block text-slate-700">{{ c.bidsCount }} İhale</span>
-                  <button class="mt-1 px-2 py-0.5 rounded border border-sky-400 bg-sky-50 text-sky-800 text-[10px] font-bold">📊 Listele</button>
+                  <NuxtLink to="/pazar-yeri" class="mt-1 inline-block px-2 py-0.5 rounded border border-sky-400 bg-sky-50 text-sky-800 text-[10px] font-bold">📊 Listele</NuxtLink>
                 </td>
                 <td class="py-3 px-3 text-center">
                   <span class="font-bold block text-slate-700">{{ c.activeCount }} İhale</span>
-                  <button class="mt-1 px-2 py-0.5 rounded border border-blue-400 bg-blue-50 text-blue-800 text-[10px] font-bold">📊 Listele</button>
+                  <NuxtLink to="/pazar-yeri" class="mt-1 inline-block px-2 py-0.5 rounded border border-blue-400 bg-blue-50 text-blue-800 text-[10px] font-bold">📊 Listele</NuxtLink>
                 </td>
                 <td class="py-3 px-3 text-center">
                   <span class="font-bold block text-slate-700">{{ c.completedCount }} İhale</span>
-                  <button class="mt-1 px-2 py-0.5 rounded border border-emerald-400 bg-emerald-50 text-emerald-800 text-[10px] font-bold">📊 Listele</button>
+                  <NuxtLink to="/pazar-yeri?tab=sonuc" class="mt-1 inline-block px-2 py-0.5 rounded border border-emerald-400 bg-emerald-50 text-emerald-800 text-[10px] font-bold">📊 Listele</NuxtLink>
                 </td>
                 <td class="py-3 px-3 text-center">
                   <span class="font-bold block text-slate-400">***</span>
-                  <button class="mt-1 px-2 py-0.5 rounded border border-indigo-400 bg-indigo-50 text-indigo-800 text-[10px] font-bold">📈 Analiz</button>
+                  <NuxtLink to="/panel/istatistikler" class="mt-1 inline-block px-2 py-0.5 rounded border border-indigo-400 bg-indigo-50 text-indigo-800 text-[10px] font-bold">📈 Analiz</NuxtLink>
                 </td>
               </tr>
             </tbody>
