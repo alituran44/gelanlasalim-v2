@@ -141,61 +141,77 @@ onMounted(() => {
           </svg>
         </NuxtLink>
 
-        <!-- SAĞ: TURUNCU / MAVİ MENÜ SEKMELERİ -->
+        <!-- SAĞ: TASLAKTAKİ ORİJİNAL MENÜ SEKMELERİ (TURUNCU / MAVİ) -->
         <div class="flex flex-wrap items-center gap-1 text-white font-bold text-xs">
+          <!-- 1. Ana Sayfa -->
           <NuxtLink 
             to="/"
             @click="activeNavTab = 'anasayfa'" 
             :class="activeNavTab === 'anasayfa' ? 'bg-[#0084B4] shadow-inner' : 'bg-[#0097CD] hover:bg-[#0084B4]'"
-            class="px-4 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
           >
-            <span>🏠 Anasayfa</span>
+            <span>🏠 Ana Sayfa</span>
           </NuxtLink>
           
+          <!-- 2. Profilim -->
           <NuxtLink 
-            to="/panel/bildirimler" 
-            @click="activeNavTab = 'bultenler'" 
-            :class="activeNavTab === 'bultenler' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
-            class="px-4 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+            to="/panel/ayarlar" 
+            @click="activeNavTab = 'profilim'" 
+            :class="activeNavTab === 'profilim' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
           >
-            <span>📑 Bültenlerim</span>
+            <span>👤 Profilim</span>
           </NuxtLink>
 
-          <NuxtLink 
-            to="/panel/istatistikler" 
-            @click="activeNavTab = 'okuduklarim'" 
-            :class="activeNavTab === 'okuduklarim' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
-            class="px-4 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
-          >
-            <span>👁️ Okuduklarım</span>
-          </NuxtLink>
-
-          <NuxtLink 
-            to="/panel/tekliflerim" 
-            @click="activeNavTab = 'takip'" 
-            :class="activeNavTab === 'takip' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
-            class="px-4 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
-          >
-            <span>⭐ Takip listem</span>
-          </NuxtLink>
-
-          <NuxtLink 
-            to="/sozlesmeler" 
-            @click="activeNavTab = 'sozlesme'" 
-            :class="activeNavTab === 'sozlesme' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
-            class="px-4 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
-          >
-            <span>🏆 Sözleşme listem</span>
-          </NuxtLink>
-
+          <!-- 3. Bildirimler -->
           <NuxtLink 
             to="/panel/bildirimler" 
             @click="activeNavTab = 'bildirimler'" 
             :class="activeNavTab === 'bildirimler' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
-            class="px-4 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer relative"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer relative"
           >
             <span>🔔 Bildirimler</span>
             <span class="h-4 min-w-[16px] px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">3</span>
+          </NuxtLink>
+
+          <!-- 4. Yayındaki İlanlarım -->
+          <NuxtLink 
+            to="/panel/ilanlarim" 
+            @click="activeNavTab = 'ilanlarim'" 
+            :class="activeNavTab === 'ilanlarim' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>📑 Yayındaki İlanlarım</span>
+          </NuxtLink>
+
+          <!-- 5. Gelen Teklifler -->
+          <NuxtLink 
+            to="/panel/gelen-teklifler" 
+            @click="activeNavTab = 'gelen-teklifler'" 
+            :class="activeNavTab === 'gelen-teklifler' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>📥 Gelen Teklifler</span>
+          </NuxtLink>
+
+          <!-- 6. Verilen Teklifler -->
+          <NuxtLink 
+            to="/panel/yaptigim-teklifler" 
+            @click="activeNavTab = 'verilen-teklifler'" 
+            :class="activeNavTab === 'verilen-teklifler' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>📤 Verilen Teklifler</span>
+          </NuxtLink>
+
+          <!-- 7. Üye Firmalar -->
+          <NuxtLink 
+            to="/panel/firmalar" 
+            @click="activeNavTab = 'firmalar'" 
+            :class="activeNavTab === 'firmalar' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
+            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>🏢 Üye Firmalar</span>
           </NuxtLink>
         </div>
 
