@@ -36,6 +36,9 @@ type TabKey =
   | 'gizlilik' 
   | 'ihale-kurallari'
   | 'mesafeli-satis'
+  | 'on-bilgilendirme'
+  | 'iptal-iade'
+  | 'teslimat'
   | 'cerezler'
   | 'tedarikci-uyum'
   | 'sla'
@@ -95,6 +98,51 @@ function printDocument() {
         </div>
       </div>
 
+      <!-- PAYTR & İYZİCO RESMİ SATICI KÜNYESİ (MERCHANT IDENTITY & REGISTRATION BANNER) -->
+      <div class="mb-8 rounded-3xl bg-white border border-slate-200 p-6 sm:p-7 shadow-xs">
+        <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div class="space-y-1.5 max-w-2xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-900 border border-blue-200 text-[10px] font-black uppercase tracking-wider">
+              <ShieldCheck :size="13" class="text-blue-600" />
+              <span>T.C. TİCARET BAKANLIĞI & VERGİ SİCİLİNE KAYITLI RESMİ ŞİRKET BİLGİLERİ</span>
+            </div>
+            <h2 class="text-lg font-black text-slate-900 tracking-tight">
+              İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş.
+            </h2>
+            <p class="text-xs text-slate-500 font-medium leading-relaxed">
+              Platformumuz 6563 Sayılı Elektronik Ticaret Kanunu, 6102 Sayılı Türk Ticaret Kanunu ve 6493 Sayılı Ödeme Hizmetleri mevzuatına tam uyumlu olarak TCMB & BDDK lisanslı ödeme geçitleri (PayTR, iyzico) altyapısıyla faaliyet göstermektedir.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full lg:w-auto text-[11px] font-medium text-slate-700 shrink-0">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-[9px] font-black text-slate-400 block uppercase">Vergi Dairesi & VKN</span>
+              <strong class="text-slate-900 font-mono">Çanakkale / 4700854210</strong>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-[9px] font-black text-slate-400 block uppercase">MERSİS No</span>
+              <strong class="text-slate-900 font-mono">0470085421000001</strong>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-[9px] font-black text-slate-400 block uppercase">Ticaret Sicil No</span>
+              <strong class="text-slate-900 font-mono">14520</strong>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-[9px] font-black text-slate-400 block uppercase">Kurumsal Destek</span>
+              <strong class="text-blue-700 font-bold">0850 308 00 00</strong>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-[9px] font-black text-slate-400 block uppercase">Resmi E-Posta</span>
+              <strong class="text-slate-900">ihalecib@gmail.com</strong>
+            </div>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
+              <span class="text-[9px] font-black text-slate-400 block uppercase">KEP Adresi</span>
+              <strong class="text-slate-900 font-mono">ihaleciburada@hs01.kep.tr</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         <!-- Sidebar Navigation (4 cols) -->
@@ -135,12 +183,12 @@ function printDocument() {
             </button>
 
             <button 
-              @click="setTab('ihale-kurallari')"
+              @click="setTab('on-bilgilendirme')"
               class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'ihale-kurallari' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
+              :class="activeTab === 'on-bilgilendirme' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
             >
-              <Gavel :size="14" />
-              <span>{{ '4. B2B Eksiltme & İhale Kuralları' }}</span>
+              <FileText :size="14" class="text-amber-500" />
+              <span>{{ '4. Ön Bilgilendirme Formu' }}</span>
             </button>
 
             <button 
@@ -153,12 +201,39 @@ function printDocument() {
             </button>
 
             <button 
+              @click="setTab('iptal-iade')"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
+              :class="activeTab === 'iptal-iade' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
+            >
+              <Award :size="14" class="text-emerald-500" />
+              <span>{{ '6. İptal, İade ve Cayma Koşulları' }}</span>
+            </button>
+
+            <button 
+              @click="setTab('teslimat')"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
+              :class="activeTab === 'teslimat' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
+            >
+              <Server :size="14" class="text-blue-500" />
+              <span>{{ '7. Teslimat ve Dijital İfa Politikası' }}</span>
+            </button>
+
+            <button 
+              @click="setTab('ihale-kurallari')"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
+              :class="activeTab === 'ihale-kurallari' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
+            >
+              <Gavel :size="14" />
+              <span>{{ '8. B2B Eksiltme & İhale Kuralları' }}</span>
+            </button>
+
+            <button 
               @click="setTab('cerezler')"
               class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
               :class="activeTab === 'cerezler' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
             >
               <CookieIcon :size="14" />
-              <span>{{ '6. Çerez Politikası & Takip Şartları' }}</span>
+              <span>{{ '9. Çerez Politikası & Takip Şartları' }}</span>
             </button>
 
             <button 
@@ -167,7 +242,7 @@ function printDocument() {
               :class="activeTab === 'tedarikci-uyum' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
             >
               <UserCheck :size="14" />
-              <span>{{ '7. Tedarikçi Doğrulama & KYC Beyanı' }}</span>
+              <span>{{ '10. Tedarikçi Doğrulama & KYC Beyanı' }}</span>
             </button>
 
             <button 
@@ -176,7 +251,7 @@ function printDocument() {
               :class="activeTab === 'sla' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
             >
               <Server :size="14" />
-              <span>{{ '8. Servis Seviyesi Taahhüdü (SLA)' }}</span>
+              <span>{{ '11. Servis Seviyesi Taahhüdü (SLA)' }}</span>
             </button>
 
             <button 
@@ -185,7 +260,7 @@ function printDocument() {
               :class="activeTab === 'bilgi-guvenligi' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
             >
               <Lock :size="14" />
-              <span>{{ '9. Bilgi Güvenliği & ISO 27001 Standardı' }}</span>
+              <span>{{ '12. Bilgi Güvenliği & ISO 27001 Standardı' }}</span>
             </button>
 
             <button 
@@ -194,7 +269,7 @@ function printDocument() {
               :class="activeTab === 'escrow' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
             >
               <ShieldCheck :size="14" />
-              <span>{{ '10. Güvenli Havuz (Escrow) & Ödeme Sözleşmesi' }}</span>
+              <span>{{ '13. Güvenli Havuz (Escrow) & Ödeme Sözleşmesi' }}</span>
             </button>
           </div>
 
@@ -491,11 +566,74 @@ function printDocument() {
             </div>
           </article>
 
+          <!-- 4. ÖN BİLGİLENDİRME FORMU (PRE-INFORMATION FORM) -->
+          <article v-if="activeTab === 'on-bilgilendirme'" class="space-y-6">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-3 py-1 bg-amber-50 text-amber-800 font-mono text-xs font-bold rounded-lg border border-amber-200">PAYTR & İYZİCO ZORUNLU FORMU</span>
+              <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">6563 SK & MESAFELİ SÖZLEŞMELER</span>
+              <span class="text-xs text-slate-400">Yürürlük: 2026.08</span>
+            </div>
+
+            <h1 class="text-2xl font-black tracking-tight text-slate-900">
+              {{ '4. Ön Bilgilendirme Formu' }}
+            </h1>
+            
+            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
+              {{ 'İşbu Ön Bilgilendirme Formu, 6502 sayılı Tüketicinin Korunması Hakkında Kanun, 6563 sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümleri uyarınca, ALICI / ABONE\'nin sipariş onayından önce bilgilendirilmesi amacıyla hazırlanmıştır.' }}
+            </p>
+
+            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — SATICI / HİZMET SAĞLAYICI BİLGİLERİ</h3>
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 font-medium">
+                  <p><strong>Ticaret Unvanı:</strong> İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş.</p>
+                  <p><strong>Merkez Adresi:</strong> İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</p>
+                  <p><strong>Vergi Dairesi & No:</strong> Çanakkale Vergi Dairesi / VKN: 4700854210</p>
+                  <p><strong>MERSİS Numarası:</strong> 0470085421000001 | <strong>Ticaret Sicil No:</strong> 14520</p>
+                  <p><strong>Telefon / Müşteri Destek:</strong> 0850 308 00 00 | <strong>E-Posta:</strong> ihalecib@gmail.com</p>
+                  <p><strong>KEP Adresi:</strong> ihaleciburada@hs01.kep.tr | <strong>Web Sitesi:</strong> https://ihaleciburada.com</p>
+                </div>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — HİZMETİN TEMEL NİTELİKLERİ VE FİYATLANDIRMA</h3>
+                <p>2.1. <strong>Hizmet Türü:</strong> Bulut tabanlı B2B e-ihale açma, teklif toplama, canlı tersine eksiltme (reverse auction), tedarikçi KYC doğrulama ve satın alma analitik raporlama yazılımı aboneliğidir.</p>
+                <p>2.2. <strong>Paketler ve Toplam Fiyat (Tüm Vergiler Dahil):</strong></p>
+                <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                  <li><strong>1 Ay Lansman Deneme Paketi:</strong> 0,00 ₺ (Ücretsiz)</li>
+                  <li><strong>1 Aylık Standart Paket:</strong> 900,00 ₺ (%20 KDV Dahil)</li>
+                  <li><strong>3 Aylık Çeyrek Paket:</strong> 1.800,00 ₺ (%20 KDV Dahil)</li>
+                  <li><strong>6 Aylık Yarı Yıl Paketi:</strong> 2.700,00 ₺ (%20 KDV Dahil)</li>
+                  <li><strong>9 Aylık Kurumsal Avantaj Paketi:</strong> 3.600,00 ₺ (%20 KDV Dahil)</li>
+                </ul>
+                <p>2.3. Satın alınan dijital pakete ilişkin bedel, seçilen ödeme kanalına göre (Kredi Kartı 3D Secure / Havale-EFT) peşin olarak tahsil edilir.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — TESLİMAT VE İFA BİLGİLERİ</h3>
+                <p>3.1. Hizmet tamamen dijital ortamda sunulmakta olup herhangi bir fiziksel kargo teslimatı bulunmamaktadır.</p>
+                <p>3.2. Ödeme onayı lisanslı ödeme kuruluşu (PayTR, iyzico) veya banka tarafından teyit edildiği anda, abonenin kullanıcı hesabı anında ve otomatik olarak aktif edilir. Giriş bilgileri ve aktivasyon onayı kayıtlı e-posta adresine iletilir.</p>
+                <p>3.3. E-Fatura / e-Arşiv faturası, Vergi Usul Kanunu uyarınca en geç yedi (7) gün içinde abonenin şirket unvanı ve VKN/TCKN bilgileriyle düzenlenerek e-posta ile gönderilir.</p>
+              </section>
+
+              <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — CAYMA HAKKI VE İADE İSTİSNALARI</h3>
+                <p>4.1. <strong>B2B İstisnası:</strong> İşbu hizmet ticari işletmeler ve tacirler arasında akdedilmekte olup 6502 sayılı Tüketici Kanunu hükümleri uygulanmaz.</p>
+                <p>4.2. <strong>Dijital İfa İstisnası:</strong> Mesafeli Sözleşmeler Yönetmeliği Madde 15/1-ğ bendi uyarınca; <em>"Elektronik ortamda anında ifa edilen hizmetler veya tüketiciye anında teslim edilen gayrimaddi mallara ilişkin sözleşmeler"</em> kapsamında cayma hakkı kullanılamaz. Ancak teknik hata veya mükerrer çekim durumlarında tam iade derhal yapılır.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 5 — ŞİKAYET VE İTİRAZ KANALLARI</h3>
+                <p>5.1. Abone, hizmete ilişkin her türlü talep ve şikayetini <strong>0850 308 00 00</strong> no\'lu destek hattından veya <strong>ihalecib@gmail.com</strong> adresinden kurumsal müşteri temsilcilerimize iletebilir. Başvurular en geç 24 saat içinde yanıtlanır.</p>
+              </section>
+            </div>
+          </article>
+
           <!-- 5. MESAFELİ SATIŞ VE ABONELİK (DISTANCE SALES AGREEMENT) -->
           <article v-if="activeTab === 'mesafeli-satis'" class="space-y-6">
             <div class="flex flex-wrap items-center gap-2">
               <span class="px-3 py-1 bg-indigo-50 text-indigo-800 font-mono text-xs font-bold rounded-lg border border-indigo-200">B2B TİCARİ ABONELİK</span>
-              <span class="px-3 py-1 bg-slate-100 text-slate-800 font-mono text-xs font-bold rounded-lg border border-slate-200">1 AY ÜCRETSİZ LANSMAN</span>
+              <span class="px-3 py-1 bg-slate-100 text-slate-800 font-mono text-xs font-bold rounded-lg border border-slate-200">PAYTR & İYZİCO 3D SECURE</span>
               <span class="text-xs text-slate-400">Yürürlük: 2026.08</span>
             </div>
 
@@ -505,29 +643,119 @@ function printDocument() {
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — TARAFLAR VE TİCARİ NİTELİK</h3>
-                <p>1.1. <strong>Hizmet Sağlayıcı:</strong> İhaleciBurada B2B Elektronik İhale ve Ticaret Platformu İşleticisi.</p>
-                <p>1.2. <strong>Abone (Müşteri):</strong> Platform üzerinde kurumsal üyelik hesabı açan, ihale açma veya teklif verme hakkı sağlayan abonelik paketini satın alan tüzel kişi veya tacir.</p>
-                <p>1.3. <strong>B2B Niteliği ve Tüketici Kanunu İstisnası:</strong> İşbu Sözleşme iki tacir arasında akdedilmiş ticari bir sözleşmedir. 6502 Sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği hükümleri (14 günlük genel tüketici cayma hakkı) işbu sözleşmeye UYGULANMAZ.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — TARAFLAR</h3>
+                <p>1.1. <strong>SATICI (Hizmet Sağlayıcı):</strong> İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş. (Adres: İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale | VKN: 4700854210 | MERSİS: 0470085421000001 | Tel: 0850 308 00 00 | E-posta: ihalecib@gmail.com)</p>
+                <p>1.2. <strong>ALICI (Kurumsal Abone):</strong> Platform üzerinden elektronik ortamda sipariş oluşturan, fatura bilgilerini beyan eden ve ödeme yapan tüzel kişi veya tacir müşteri.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — ABONELİK PAKETLERİ, 1 AY LANSMAN DENEMESİ VE FATURALANDIRMA</h3>
-                <p>2.1. Platformda 1 Ay Lansman Denemesi 0 ₺ olarak sunulur. Süre bitiminde kurumsal kullanıcılar 3 Aylık Çeyrek Paket, 6 Aylık Yarı Yıl Paketi veya 9 Aylık Kurumsal Paket seçeneklerinden birini tercih edebilir.</p>
-                <p>2.2. Abonelik ücretleri kredi kartı (3D Secure), havale/EFT veya kurumsal Sanal POS kanallarıyla peşin tahsil edilir. Faturalar ödeme onayını takiben yedi (7) iş günü içinde e-Fatura/e-Arşiv olarak düzenlenerek kurumsal e-posta adresine iletilir.</p>
-                <p>2.3. TTK Madde 18/3 uyarınca faturanın tebliğinden itibaren sekiz (8) gün içinde itiraz edilmeyen faturalar kesinleşir.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — SÖZLEŞMENİN KONUSU VE KAPSAMI</h3>
+                <p>2.1. İşbu Sözleşme, ALICI\'nın SATICI\'ya ait https://ihaleciburada.com internet sitesi üzerinden elektronik ortamda siparişini verdiği, nitelikleri ve satış fiyatı belirtilen kurumsal B2B e-ihale ve canlı eksiltme platformu abonelik hizmetinin satışı, ödemesi, ifası ve teslimine ilişkin tarafların hak ve yükümlülüklerini düzenler.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — ÖDEME YÖNTEMLERİ, LİSANSLI ÖDEME KURULUŞLARI VE GÜVENLİK</h3>
+                <p>3.1. Ödemeler; TCMB ve BDDK lisanslı ödeme kuruluşları (PayTR Ödeme ve Elektronik Para Kuruluşu A.Ş. ve iyzico / İyzi Ödeme ve Elektronik Para Hizmetleri A.Ş.) altyapısı üzerinden 256-bit SSL şifrelemeli 3D Secure güvenli ödeme protokolüyle gerçekleştirilir.</p>
+                <p>3.2. SATICI hiçbir şart altında ALICI\'nın kredi kartı numarasını, son kullanma tarihini veya CVV kodunu sunucularında tutmaz veya saklamaz.</p>
               </section>
 
               <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — DİJİTAL HİZMETİN ANINDA İFASI VE İADE İSTİSNASI</h3>
-                <p>3.1. Kurumsal üyelik paketine ait yazılım erişim yetkileri, ihale modülleri ve analitik araçlar ödeme onaylandığı anda derhal ifa edilerek kullanıma açıldığından, aktif fatura dönemine ait abonelik bedellerinde kısmi veya tam iade yapılmaz.</p>
-                <p>3.2. Kullanıcı dilediği zaman yönetim paneli üzerinden otomatik yenilemeyi durdurabilir; bu durumda paket süresi sonuna kadar kullanım devam eder ve sonraki dönem karttan çekim yapılmaz.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — ANINDA DİJİTAL İFA VE FATURALANDIRMA</h3>
+                <p>4.1. Hizmet dijital ortamda anında ifa edilir. Ödemenin başarıyla tamamlanmasıyla birlikte kurumsal panel erişimi anında aktif hale gelir.</p>
+                <p>4.2. Sipariş sırasında ALICI tarafından beyan edilen Vergi Dairesi, VKN / TCKN ve Ticaret Unvanı bilgileri esas alınarak 213 sayılı VUK uyarınca e-Fatura / e-Arşiv faturası düzenlenir ve e-posta ile tebliğ edilir.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — FESİH, HESAP DONDURMA VE YETKİLİ MAHKEME</h3>
-                <p>4.1. Kullanıcı\'nın platform kurallarını, etik ilkeleri veya rekabet mevzuatını ihlal etmesi halinde Şirket aboneliği tek taraflı olarak derhal feshetme ve hesabı dondurma hakkına sahiptir.</p>
-                <p>4.2. Uyuşmazlıklarda İstanbul ve Balıkesir Mahkemeleri ile İcra Daireleri münhasıran yetkilidir.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 5 — UYUŞMAZLIKLARIN ÇÖZÜMÜ VE YETKİLİ MAHKEME</h3>
+                <p>5.1. İşbu Sözleşme\'den doğabilecek her türlü ticari ve hukuki uyuşmazlıkta Türk Hukuku uygulanır. İstanbul ve Çanakkale / Balıkesir Mahkemeleri ve İcra Daireleri münhasıran yetkilidir.</p>
+              </section>
+            </div>
+          </article>
+
+          <!-- 6. İPTAL, İADE VE CAYMA KOŞULLARI (CANCELLATION & REFUND POLICY) -->
+          <article v-if="activeTab === 'iptal-iade'" class="space-y-6">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-3 py-1 bg-emerald-50 text-emerald-800 font-mono text-xs font-bold rounded-lg border border-emerald-200">PAYTR & İYZİCO İADE ŞARTLARI</span>
+              <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">ŞEFFAF GERİ ÖDEME SÜRECİ</span>
+              <span class="text-xs text-slate-400">Yürürlük: 2026.08</span>
+            </div>
+
+            <h1 class="text-2xl font-black tracking-tight text-slate-900">
+              {{ '6. İptal, İade ve Cayma Koşulları Politikası' }}
+            </h1>
+            
+            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
+              {{ 'İhaleciBurada B2B Elektronik İhale Platformu üzerinden satın alınan kurumsal abonelik paketleri, yazılım lisansları ve dijital hizmetlerin iptal, iade ve geri ödeme prosedürlerine ilişkin yasal bilgilendirme metnidir.' }}
+            </p>
+
+            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — DİJİTAL HİZMETLERDE CAYMA VE İADE HAKKI ESASLARI</h3>
+                <p>1.1. İhaleciBurada platformu üzerinden sunulan hizmetler; kurumsal üyelik, ihale açma, teklif verme ve dijital analitik yazılım kullanım haklarını kapsayan gayrimaddi dijital hizmetlerdir.</p>
+                <p>1.2. <strong>Yasal İstisna:</strong> 29188 sayılı Resmi Gazete\'de yayımlanan Mesafeli Sözleşmeler Yönetmeliği\'nin 15. Maddesinin 1. Fıkrasının (ğ) bendi uyarınca; <em>"Elektronik ortamda anında ifa edilen hizmetler veya tüketiciye anında teslim edilen gayrimaddi mallara ilişkin sözleşmeler"</em> cayma hakkının istisnaları arasında yer almaktadır. Kullanıcı hesabı aktive edilip yazılım araçları kullanıma açıldıktan sonra re\'sen cayma hakkı kullanılamaz.</p>
+              </section>
+
+              <section class="space-y-2 bg-emerald-50/60 p-4 rounded-xl border border-emerald-200">
+                <h3 class="font-bold text-emerald-950 text-sm">MADDE 2 — İADE YAPILABİLECEK HALLER VE KOŞULLAR</h3>
+                <p>2.1. <strong>Mükerrer / Hatalı Çekimler:</strong> Sistem veya banka kaynaklı teknik nedenlerle aynı sipariş için birden fazla tahsilat yapılması halinde, mükerrer tahsil edilen tutar herhangi bir kesinti yapılmaksızın 24 saat içinde derhal ve re\'sen iade edilir.</p>
+                <p>2.2. <strong>Teknik Arıza ve Hizmetin Başlatılamaması:</strong> Ödeme yapılmasına rağmen platform kaynaklı bir arıza nedeniyle kullanıcının hesabının 48 saat içinde aktif edilememesi ve sorunun giderilememesi halinde, abonenin talebi üzerine ödenen tutarın %100\'ü kesintisiz iade edilir.</p>
+                <p>2.3. <strong>Henüz Kullanılmamış ve Aktive Edilmemiş Paketler:</strong> Satın alma anından itibaren 14 gün içinde sisteme hiç giriş yapılmamış, hiçbir ihale açılmamış veya teklif verilmemiş olması şartıyla yazılı başvuru üzerine iade değerlendirmeye alınır.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — İPTAL VE İADE BAŞVURU SÜRECİ</h3>
+                <p>3.1. İade ve iptal talepleri, sipariş numarası ve fatura bilgileri belirtilerek <strong>ihalecib@gmail.com</strong> e-posta adresine veya <strong>0850 308 00 00</strong> çağrı merkezine yazılı olarak iletilmelidir.</p>
+                <p>3.2. Müşteri hizmetleri ekibimiz başvuruyu en geç 2 (iki) iş günü içinde inceleyerek sonucu yazılı olarak bildirir.</p>
+              </section>
+
+              <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — GERİ ÖDEME SÜRESİ VE PARANIN HESABA GEÇMESİ</h3>
+                <p>4.1. Onaylanan iadeler, ödemenin yapıldığı orijinal yöntemle (PayTR / iyzico Sanal POS veya Banka Havalesi) derhal işleme alınır.</p>
+                <p>4.2. <strong>Kredi Kartı ile Yapılan Ödemeler:</strong> İade işlemi tarafımızdan lisanslı ödeme kuruluşuna anında iletilir. Bankaların işlem süreçlerine bağlı olarak tutar <strong>3 ila 7 iş günü</strong> (bazı bankalarda en geç 14 gün) içinde kart ekstrenize yansır.</p>
+                <p>4.3. <strong>Banka Havalesi / EFT ile Yapılan Ödemeler:</strong> İade onayını takiben <strong>1 ila 3 iş günü</strong> içinde ödemenin geldiği şirkete ait IBAN hesabına aktarılır.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 5 — ABONELİK YENİLEME İPTALİ</h3>
+                <p>5.1. Abone, yönetim paneli üzerinden dilediği zaman bir sonraki döneme ait otomatik yenilemeyi iptal edebilir. İptal işlemi yapıldığında mevcut paket süresi sonuna kadar kullanım hakkı devam eder, süre bitiminde ise karttan herhangi bir tahsilat yapılmaz.</p>
+              </section>
+            </div>
+          </article>
+
+          <!-- 7. TESLİMAT VE DİJİTAL İFA POLİTİKASI (DELIVERY POLICY) -->
+          <article v-if="activeTab === 'teslimat'" class="space-y-6">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">ANINDA DİJİTAL AKTİVASYON</span>
+              <span class="px-3 py-1 bg-emerald-50 text-emerald-800 font-mono text-xs font-bold rounded-lg border border-emerald-200">SIFIR KARGO BEDELİ</span>
+              <span class="text-xs text-slate-400">Yürürlük: 2026.08</span>
+            </div>
+
+            <h1 class="text-2xl font-black tracking-tight text-slate-900">
+              {{ '7. Teslimat ve Dijital İfa Politikası' }}
+            </h1>
+            
+            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
+              {{ 'İhaleciBurada platformu üzerinden satın alınan tüm abonelik ve yazılım lisanslarının teslimat, ifa ve kullanıcıya erişim sağlama koşullarını düzenleyen resmi politikadır.' }}
+            </p>
+
+            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — TESLİMAT ŞEKLİ VE KARGO BİLGİSİ</h3>
+                <p>1.1. İhaleciBurada, tamamen bulut tabanlı bir B2B SaaS (Software as a Service) platformudur. Platformda satılan hiçbir paket için fiziksel kargo teslimatı, kutulu ürün veya kurye gönderimi bulunmamaktadır.</p>
+                <p>1.2. Herhangi bir kargo ücreti, taşıma bedeli veya fiziksel teslimat masrafı tahsil edilmez.</p>
+              </section>
+
+              <section class="space-y-2 bg-blue-50/60 p-4 rounded-xl border border-blue-200">
+                <h3 class="font-bold text-blue-950 text-sm">MADDE 2 — DİJİTAL İFA VE AKTİVASYON SÜRESİ</h3>
+                <p>2.1. <strong>Kredi Kartı ile Yapılan Ödemelerde:</strong> PayTR veya iyzico 3D Secure ödeme onayının alındığı anda sistem kullanıcının abonelik yetkilerini <strong>anında (0 saniye gecikmeyle)</strong> aktif eder.</p>
+                <p>2.2. <strong>Banka Havalesi / EFT ile Yapılan Ödemelerde:</strong> Banka hesabımıza geçen tutar muhasebe birimimizce teyit edildiği anda (mesai saatlerinde en geç 30 dakika içinde) abonelik aktifleştirilir.</p>
+                <p>2.3. Aktivasyon tamamlandığında kullanıcıya sistemde kayıtlı e-posta ve SMS üzerinden "Aboneliğiniz Aktifleştirildi" bilgilendirmesi gönderilir.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — FATURA TESLİMATI</h3>
+                <p>3.1. Yapılan tüm ödemelere ilişkin e-Fatura / e-Arşiv faturaları, Gelir İdaresi Başkanlığı (GİB) standartlarına uygun olarak en geç yedi (7) iş günü içerisinde düzenlenerek abonenin kurumsal e-posta adresine iletilir.</p>
+                <p>3.2. Abone dilediği zaman yönetim panelindeki "Abonelik ve Faturalarım" sekmesinden geçmiş faturalarını PDF olarak indirebilir.</p>
               </section>
             </div>
           </article>

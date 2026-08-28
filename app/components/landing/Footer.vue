@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { Facebook, Instagram, Linkedin, Mail, CheckCircle2, ArrowRight } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
+import PaymentBadges from '~/components/common/PaymentBadges.vue'
 
 const { cmsData, saveCmsData } = useCmsData()
 
@@ -49,10 +50,13 @@ const companyLinks = [
 ]
 const legalLinks = [
   { label: "Kullanım Şartları (MSA)", to: "/sozlesmeler?tab=kullanim" },
+  { label: "Ön Bilgilendirme Formu", to: "/sozlesmeler?tab=on-bilgilendirme" },
+  { label: "Mesafeli Satış & Abonelik", to: "/sozlesmeler?tab=mesafeli-satis" },
+  { label: "İptal ve İade Koşulları", to: "/sozlesmeler?tab=iptal-iade" },
+  { label: "Teslimat ve Dijital İfa", to: "/sozlesmeler?tab=teslimat" },
   { label: "Gizlilik & Ticari Sır", to: "/sozlesmeler?tab=gizlilik" },
   { label: "KVKK Aydınlatma & DPA", to: "/sozlesmeler?tab=kvkk" },
   { label: "Canlı Eksiltme Kuralları", to: "/sozlesmeler?tab=ihale-kurallari" },
-  { label: "Mesafeli Satış & Abonelik", to: "/sozlesmeler?tab=mesafeli-satis" },
   { label: "Çerez Politikası", to: "/sozlesmeler?tab=cerezler" },
   { label: "Tedarikçi KYC & Uyum", to: "/sozlesmeler?tab=tedarikci-uyum" },
   { label: "SLA Taahhüdü (%99.9)", to: "/sozlesmeler?tab=sla" },
@@ -172,7 +176,7 @@ const legalLinks = [
         <div class="md:col-span-3 flex flex-col gap-3 text-left">
           <h4 class="text-xs font-black uppercase text-blue-900 tracking-wider flex items-center gap-1">
             <span>HUKUKİ & SÖZLEŞMELER</span>
-            <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-mono">10 Tab</span>
+            <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-mono">13 Tab</span>
           </h4>
           <div class="grid grid-cols-1 gap-1.5 text-xs font-medium text-slate-700">
             <NuxtLink v-for="item in legalLinks" :key="item.to" :to="item.to" class="hover:text-blue-600 transition-colors flex items-center gap-1.5">
@@ -185,9 +189,13 @@ const legalLinks = [
         <!-- Column 5: Contact & Support Hours (md:col-span-2) -->
         <div class="md:col-span-2 flex flex-col gap-4 text-left">
           <div class="space-y-2">
-            <h4 class="text-xs font-black uppercase tracking-wider text-blue-900">İLETİŞİM</h4>
-            <p class="text-xs leading-relaxed text-slate-500 font-medium whitespace-pre-line">
-              İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale
+            <h4 class="text-xs font-black uppercase tracking-wider text-blue-900">ŞİRKET BİLGİLERİ</h4>
+            <p class="text-[10px] leading-relaxed text-slate-600 font-medium">
+              <strong class="text-slate-900 block">İhaleciBurada Platform A.Ş.</strong>
+              İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale<br />
+              <span class="text-slate-500">Çanakkale V.D. / VKN: 4700854210</span><br />
+              <span class="text-slate-500 font-mono">MERSİS: 0470085421000001</span><br />
+              <span class="text-slate-500">KEP: ihaleciburada@hs01.kep.tr</span>
             </p>
             <div class="text-xs font-bold text-slate-700 space-y-1 pt-1">
               <a href="mailto:ihalecib@gmail.com" class="block hover:text-blue-600 transition-colors">
@@ -210,23 +218,35 @@ const legalLinks = [
 
       </div>
 
-      <hr class="border-slate-200 my-10" />
+      <!-- Payment Gateways & Brand Seals -->
+      <div class="mt-8 pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+        <div class="text-slate-500 font-medium text-[11px] flex items-center gap-2">
+          <span class="text-emerald-600 font-bold">✓ PayTR & iyzico 3D Secure</span>
+          <span>•</span>
+          <span>TCMB & BDDK Lisanslı Güvenli Ödeme Altyapısı</span>
+        </div>
+        <PaymentBadges />
+      </div>
+
+      <hr class="border-slate-200 my-8" />
 
       <!-- Bottom Legal Ribbon -->
-      <div class="flex flex-col lg:flex-row items-center justify-between gap-6 text-[10px] text-slate-400 font-medium uppercase tracking-wider">
-        <div>© 2026 İhaleciBurada. Tüm Hakları Saklıdır.</div>
+      <div class="flex flex-col lg:flex-row items-center justify-between gap-6 text-[10px] text-slate-400 font-medium tracking-wide">
+        <div>© 2026 İhaleciBurada.com. Tüm Hakları Saklıdır.</div>
         <div class="flex flex-wrap gap-x-4 gap-y-2 justify-center lg:justify-end">
+          <NuxtLink to="/sozlesmeler?tab=on-bilgilendirme" class="hover:text-blue-600 transition-colors font-bold text-amber-600">Ön Bilgilendirme Formu</NuxtLink>
+          <span class="text-slate-300">•</span>
+          <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-blue-600 transition-colors font-bold text-blue-700">Mesafeli Satış</NuxtLink>
+          <span class="text-slate-300">•</span>
+          <NuxtLink to="/sozlesmeler?tab=iptal-iade" class="hover:text-blue-600 transition-colors font-bold text-emerald-600">İptal ve İade</NuxtLink>
+          <span class="text-slate-300">•</span>
+          <NuxtLink to="/sozlesmeler?tab=teslimat" class="hover:text-blue-600 transition-colors">Teslimat</NuxtLink>
+          <span class="text-slate-300">•</span>
           <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors">Kullanım Koşulları</NuxtLink>
           <span class="text-slate-300">•</span>
           <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors">Gizlilik</NuxtLink>
           <span class="text-slate-300">•</span>
           <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors">KVKK</NuxtLink>
-          <span class="text-slate-300">•</span>
-          <NuxtLink to="/sozlesmeler?tab=ihale-kurallari" class="hover:text-blue-600 transition-colors">İhale Kuralları</NuxtLink>
-          <span class="text-slate-300">•</span>
-          <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-blue-600 transition-colors">Mesafeli Satış</NuxtLink>
-          <span class="text-slate-300">•</span>
-          <NuxtLink to="/sozlesmeler?tab=tedarikci-uyum" class="hover:text-blue-600 transition-colors">Tedarikçi KYC</NuxtLink>
           <span class="text-slate-300">•</span>
           <NuxtLink to="/sozlesmeler?tab=escrow" class="hover:text-blue-600 transition-colors">Escrow</NuxtLink>
         </div>

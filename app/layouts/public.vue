@@ -27,6 +27,7 @@ import {
 import { useCmsData } from '~/composables/useCmsData'
 import { locale, setLocale, detectLocale, t } from '~/composables/useLocale'
 import FloatingSupportWidget from '~/components/common/FloatingSupportWidget.vue'
+import PaymentBadges from '~/components/common/PaymentBadges.vue'
 
 const { cmsData } = useCmsData()
 const mobileMenuOpen = ref(false)
@@ -596,11 +597,23 @@ const activeTenders = computed(() => {
           <div class="md:col-span-3 flex flex-col gap-3 text-left">
             <h4 class="text-xs font-black uppercase text-[#00C2FF] tracking-wider flex items-center gap-1.5">
               <span>HUKUKİ & SÖZLEŞMELER</span>
-              <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-900/60 text-blue-300 font-mono">10 Sözleşme</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-900/60 text-blue-300 font-mono">13 Sözleşme</span>
             </h4>
             <div class="grid grid-cols-1 gap-1.5 text-[11px] font-medium text-slate-300">
               <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
                 <span class="text-[#00C2FF] text-[9px]">▪</span> Kullanım Şartları (MSA)
+              </NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=on-bilgilendirme" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5 text-amber-300 font-semibold">
+                <span class="text-amber-400 text-[9px]">▪</span> Ön Bilgilendirme Formu
+              </NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5 text-blue-200 font-semibold">
+                <span class="text-[#00C2FF] text-[9px]">▪</span> Mesafeli Satış & Abonelik
+              </NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=iptal-iade" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5 text-emerald-300 font-semibold">
+                <span class="text-emerald-400 text-[9px]">▪</span> İptal ve İade Koşulları
+              </NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=teslimat" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
+                <span class="text-[#00C2FF] text-[9px]">▪</span> Teslimat ve Dijital İfa
               </NuxtLink>
               <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
                 <span class="text-[#00C2FF] text-[9px]">▪</span> Gizlilik & Ticari Sır Politikası
@@ -610,9 +623,6 @@ const activeTenders = computed(() => {
               </NuxtLink>
               <NuxtLink to="/sozlesmeler?tab=ihale-kurallari" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
                 <span class="text-[#00C2FF] text-[9px]">▪</span> Canlı Eksiltme Kuralları
-              </NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
-                <span class="text-[#00C2FF] text-[9px]">▪</span> Mesafeli Satış & Abonelik
               </NuxtLink>
               <NuxtLink to="/sozlesmeler?tab=cerezler" class="hover:text-[#00C2FF] transition-colors py-0.5 flex items-center gap-1.5">
                 <span class="text-[#00C2FF] text-[9px]">▪</span> Çerez (Cookie) Politikası
@@ -632,18 +642,22 @@ const activeTenders = computed(() => {
             </div>
           </div>
 
-          <!-- Column 5: Contact details (md:col-span-2) -->
+          <!-- Column 5: Contact details & Merchant Info (md:col-span-2) -->
           <div class="md:col-span-2 flex flex-col gap-4 text-left">
             <div class="space-y-2">
-              <h4 class="text-xs font-black uppercase tracking-wider text-[#00C2FF]">İLETİŞİM</h4>
-              <p class="text-[11px] leading-relaxed text-slate-400 font-medium whitespace-pre-line">
-                İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye
+              <h4 class="text-xs font-black uppercase tracking-wider text-[#00C2FF]">ŞİRKET KÜNYESİ</h4>
+              <p class="text-[10px] leading-relaxed text-slate-300 font-medium">
+                <strong class="text-white block">İhaleciBurada Platform A.Ş.</strong>
+                İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale<br />
+                <span class="text-slate-400">Çanakkale V.D. / VKN: 4700854210</span><br />
+                <span class="text-slate-400 font-mono">MERSİS: 0470085421000001</span><br />
+                <span class="text-slate-400">KEP: ihaleciburada@hs01.kep.tr</span>
               </p>
-              <div class="text-[11px] font-bold text-slate-200 space-y-1.5 pt-1">
+              <div class="text-[11px] font-bold text-slate-200 space-y-1 pt-1">
                 <a href="mailto:ihalecib@gmail.com" class="block hover:text-[#00C2FF] py-0.5">
                   ihalecib@gmail.com
                 </a>
-                <div class="pt-0.5 text-[#FF5938] font-bold">
+                <div class="text-[#FF5938] font-bold">
                   📞 0850 308 00 00
                 </div>
               </div>
@@ -660,7 +674,22 @@ const activeTenders = computed(() => {
 
         </div>
 
-        <hr class="border-slate-800 my-10" />
+        <!-- PAYMENT BRAND LOGOS & SECURITY TRUST SEAL STRIP (PAYTR & İYZİCO ONBOARDING AUDIT) -->
+        <div class="mt-10 pt-8 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+          <div class="flex items-center gap-3 text-slate-400 text-[11px] font-bold">
+            <span class="flex items-center gap-1.5 text-emerald-400">
+              <ShieldCheck :size="16" />
+              PayTR & iyzico 256-Bit SSL 3D Secure
+            </span>
+            <span>•</span>
+            <span class="text-slate-300">TCMB & BDDK Lisanslı Güvenli Ödeme Altyapısı</span>
+          </div>
+
+          <!-- Official Payment Gateways & Card Badges (Visa, MasterCard, Troy, iyzico, PayTR, SSL) -->
+          <PaymentBadges />
+        </div>
+
+        <hr class="border-slate-800 my-8" />
 
         <!-- Bottom Legal Bar -->
         <div class="flex flex-col lg:flex-row items-center justify-between gap-6 text-[10px] text-slate-400 font-medium">
@@ -669,20 +698,20 @@ const activeTenders = computed(() => {
           </div>
           
           <!-- Quick Legal Links Bar -->
-          <div class="flex flex-wrap gap-x-4 gap-y-2 justify-center lg:justify-end text-[10.5px] text-slate-400 font-medium">
+          <div class="flex flex-wrap gap-x-3 gap-y-2 justify-center lg:justify-end text-[10.5px] text-slate-400 font-medium">
+            <NuxtLink to="/sozlesmeler?tab=on-bilgilendirme" class="hover:text-[#00C2FF] transition-colors text-amber-300 font-bold">Ön Bilgilendirme Formu</NuxtLink>
+            <span class="text-slate-700">•</span>
+            <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-[#00C2FF] transition-colors text-blue-300 font-bold">Mesafeli Satış</NuxtLink>
+            <span class="text-slate-700">•</span>
+            <NuxtLink to="/sozlesmeler?tab=iptal-iade" class="hover:text-[#00C2FF] transition-colors text-emerald-300 font-bold">İptal ve İade</NuxtLink>
+            <span class="text-slate-700">•</span>
+            <NuxtLink to="/sozlesmeler?tab=teslimat" class="hover:text-[#00C2FF] transition-colors">Teslimat Şartları</NuxtLink>
+            <span class="text-slate-700">•</span>
             <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-[#00C2FF] transition-colors">Kullanım Koşulları</NuxtLink>
             <span class="text-slate-700">•</span>
             <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-[#00C2FF] transition-colors">Gizlilik</NuxtLink>
             <span class="text-slate-700">•</span>
             <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-[#00C2FF] transition-colors">KVKK</NuxtLink>
-            <span class="text-slate-700">•</span>
-            <NuxtLink to="/sozlesmeler?tab=ihale-kurallari" class="hover:text-[#00C2FF] transition-colors">İhale Kuralları</NuxtLink>
-            <span class="text-slate-700">•</span>
-            <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-[#00C2FF] transition-colors">Mesafeli Satış</NuxtLink>
-            <span class="text-slate-700">•</span>
-            <NuxtLink to="/sozlesmeler?tab=cerezler" class="hover:text-[#00C2FF] transition-colors">Çerezler</NuxtLink>
-            <span class="text-slate-700">•</span>
-            <NuxtLink to="/sozlesmeler?tab=tedarikci-uyum" class="hover:text-[#00C2FF] transition-colors">Tedarikçi KYC</NuxtLink>
             <span class="text-slate-700">•</span>
             <NuxtLink to="/sozlesmeler?tab=escrow" class="hover:text-[#00C2FF] transition-colors">Escrow Güvenli Havuz</NuxtLink>
           </div>

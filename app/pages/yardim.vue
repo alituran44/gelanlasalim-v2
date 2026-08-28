@@ -19,9 +19,12 @@ function playVideo(id: string) {
 
 const faqs = [
   { q: "İhaleciBurada.com B2B İhale Platformu nedir?", a: "İhaleciBurada.com, kurumsal alıcılar ile doğrulanmış tedarikçileri canlı tersine ihale (eksiltme) arenasında buluşturan dijital satın alma platformudur." },
+  { q: "Ödeme altyapınız güvenli mi? Hangi yöntemler destekleniyor?", a: "Ödemeleriniz TCMB ve BDDK lisanslı ödeme kuruluşları (PayTR ve iyzico) güvencesiyle 256-Bit SSL şifrelemeli 3D Secure protokolü üzerinden gerçekleşir. Troy, Visa, MasterCard, American Express ve kurumsal banka havalesi desteklenmektedir. Kart bilgileriniz asla sunucularımızda saklanmaz." },
+  { q: "Abonelik iptali ve iade koşulları nelerdir?", a: "B2B dijital SaaS platformumuzda satın alınan paketler anında aktive edilir. Mükerrer çekimlerde 24 saatte kesintisiz iade yapılır. Henüz sisteme giriş yapmamış veya aktif ihale başlatmamış hesaplar için 14 gün içinde yazılı başvuru ile iade talebi oluşturulabilir. İadeler kredi kartına 3-7 iş günü, banka hesabına 1-3 iş gününde yansır." },
+  { q: "E-Faturam ne zaman düzenlenir?", a: "Ödemenizin tamamlanmasını takiben faturanız beyan ettiğiniz şirket unvanı, vergi dairesi ve VKN/TCKN bilgileriyle 213 sayılı VUK uyarınca en geç 7 iş günü içinde e-Fatura/e-Arşiv olarak düzenlenip kurumsal e-posta adresinize iletilir." },
   { q: "Tersine ihale (canlı eksiltme) sistemi nasıl çalışır?", a: "Alıcı firma satın almak istediği ürün veya hizmet için şartname ve bütçesini belirler. Tedarikçiler canlı sürede teklif vererek fiyat eksiltir; en uygun teklif sahibi ihaleyi kazanır." },
   { q: "Firmaların doğrulanması ve güvenliği nasıl sağlanır?", a: "Platforma üye olan her şirketin vergi kimlik numarası, MERSİS bilgileri ve kurumsal belgeleri kontrol edilerek 'Onaylı Üye' rozeti tanımlanır." },
-  { q: "Alıcı olarak üyelik komisyonu ödemem gerekiyor mu?", a: "Hayır. İhaleciBurada platformunda alıcı şirketler için üyelik ve ihale açma süreçleri tamamen ücretsizdir." }
+  { q: "Alıcı olarak üyelik komisyonu ödemem gerekiyor mu?", a: "Hayır. İhaleciBurada platformunda alıcı şirketler için üyelik ve ihale açma süreçleri lansmana özel tamamen ücretsizdir." }
 ]
 
 const videoCards = [

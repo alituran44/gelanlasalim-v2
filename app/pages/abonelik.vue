@@ -22,6 +22,7 @@ import {
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale, t } from '~/composables/useLocale'
+import PaymentBadges from '~/components/common/PaymentBadges.vue'
 
 definePageMeta({
   layout: 'public'
@@ -180,6 +181,16 @@ const selectedPackage = ref<any>(null)
 const isCheckoutOpen = ref(false)
 const activePaymentChannel = ref<string>('paytr')
 
+// Corporate Billing Information Fields (Mandatory for PayTR / iyzico)
+const billingCompanyTitle = ref('')
+const billingTaxNo = ref('')
+const billingTaxOffice = ref('')
+const billingAddress = ref('')
+const billingCity = ref('İstanbul')
+const billingDistrict = ref('Kadıköy')
+const billingPhone = ref('')
+const billingEmail = ref('')
+
 // Checkout Form Fields
 const cardName = ref('')
 const cardNumber = ref('')
@@ -190,7 +201,11 @@ const transferName = ref('')
 
 const isProcessing = ref(false)
 const showSuccessScreen = ref(false)
+
+// Compliance Checkboxes (Mandatory for PayTR / iyzico)
+const preInfoApproved = ref(true)
 const distanceSalesApproved = ref(true)
+const refundPolicyApproved = ref(true)
 
 onMounted(() => {
   if (typeof window !== 'undefined') {
@@ -201,6 +216,12 @@ onMounted(() => {
         const fullName = (userSession.value.firstName || '') + ' ' + (userSession.value.lastName || '')
         transferName.value = fullName.trim()
         cardName.value = fullName.trim()
+        billingCompanyTitle.value = userSession.value.companyName || (fullName.trim() ? fullName.trim() + ' Ticaret' : 'Örnek Sanayi ve Ticaret A.Ş.')
+        billingTaxNo.value = userSession.value.taxNumber || '4700854210'
+        billingTaxOffice.value = userSession.value.taxOffice || 'Çanakkale Vergi Dairesi'
+        billingAddress.value = userSession.value.address || 'İsmetpaşa Mah. Büyük Hamam Sok. No:52/1'
+        billingPhone.value = userSession.value.phone || '0850 308 00 00'
+        billingEmail.value = userSession.value.email || 'ihalecib@gmail.com'
       }
     } catch (e) {
       console.error('Failed to load user session', e)
@@ -234,8 +255,8 @@ function openCheckout(pkg: any) {
 }
 
 function handlePayment() {
-  if (!distanceSalesApproved.value) {
-    alert(locale.value === 'tr' ? 'Lütfen Mesafeli Satış Sözleşmesini onaylayınız.' : 'Please agree to the Distance Sales Terms.')
+  if (!preInfoApproved.value || !distanceSalesApproved.value || !refundPolicyApproved.value) {
+    alert(locale.value === 'tr' ? 'Lütfen Ön Bilgilendirme Formu, Mesafeli Satış Sözleşmesi ve İptal/İade Koşullarını onaylayınız.' : 'Please accept all legal agreements and distance sales terms.')
     return
   }
 
@@ -250,7 +271,17 @@ function handlePayment() {
       current.subscriptionPlan = selectedPackage.value?.name
       current.subscriptionRegion = paymentRegion.value
       current.isTrial = selectedPackage.value?.isTrial || false
-      current.trialExpiresAt = '25 Eylül 2026'
+      current.trialExpiresAt = '28 Eylül 2026'
+      current.billingInfo = {
+        title: billingCompanyTitle.value,
+        taxNo: billingTaxNo.value,
+        taxOffice: billingTaxOffice.value,
+        address: billingAddress.value,
+        city: billingCity.value,
+        district: billingDistrict.value,
+        phone: billingPhone.value,
+        email: billingEmail.value
+      }
       localStorage.setItem('userSession', JSON.stringify(current))
     }
   }, selectedPackage.value?.isTrial ? 600 : 1200)
@@ -526,13 +557,79 @@ function completeCheckout() {
               </div>
             </div>
 
-            <!-- PAID SCREEN -->
-            <div v-else-if="!showSuccessScreen" class="space-y-6">
+            <!-- PAID SCREEN (PAYTR & İYZİCO FULL COMPLIANCE) -->
+            <div v-else-if="!showSuccessScreen" class="space-y-5 text-left">
+              
+              <!-- Order Summary & Tax Breakdown Box -->
+              <div class="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 text-xs space-y-2">
+                <div class="flex items-center justify-between text-slate-700">
+                  <span>Seçilen Paket / Hizmet:</span>
+                  <strong class="text-slate-900">{{ selectedPackage?.name }}</strong>
+                </div>
+                <div class="flex items-center justify-between text-slate-500 text-[11px]">
+                  <span>Net Hizmet Tutarı:</span>
+                  <span>{{ currencySymbol }}{{ ((selectedPackage?.price || 0) / 1.2).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
+                </div>
+                <div class="flex items-center justify-between text-slate-500 text-[11px]">
+                  <span>Hesaplanan KDV (%20):</span>
+                  <span>{{ currencySymbol }}{{ ((selectedPackage?.price || 0) - ((selectedPackage?.price || 0) / 1.2)).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
+                </div>
+                <hr class="border-blue-200" />
+                <div class="flex items-center justify-between text-slate-900 font-black text-sm">
+                  <span>Toplam Ödenecek (KDV Dahil):</span>
+                  <span class="text-blue-700 font-mono">{{ currencySymbol }}{{ (selectedPackage?.price || 0).toLocaleString('tr-TR') }},00</span>
+                </div>
+              </div>
+
+              <!-- Corporate Billing Information Form (Zorunlu Fatura Bilgileri) -->
+              <div class="space-y-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
+                    <Building2 :size="12" class="text-blue-600" />
+                    <span>E-FATURA / ŞİRKET BİLGİLERİ</span>
+                  </span>
+                  <span class="text-[9px] font-bold text-blue-600 bg-blue-100/60 px-2 py-0.5 rounded">GİB Uyumlu</span>
+                </div>
+
+                <div class="grid grid-cols-1 gap-2.5 text-xs">
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Şirket Ticaret Unvanı / Ad Soyad *</label>
+                    <input v-model="billingCompanyTitle" type="text" placeholder="Örn: ABC Sanayi ve Ticaret Ltd. Şti." class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white focus:border-blue-600 focus:outline-none" required />
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Vergi Dairesi *</label>
+                      <input v-model="billingTaxOffice" type="text" placeholder="Çanakkale V.D." class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white focus:border-blue-600 focus:outline-none" required />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] font-bold text-slate-600 mb-0.5">VKN / TCKN *</label>
+                      <input v-model="billingTaxNo" type="text" placeholder="4700854210" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white font-mono focus:border-blue-600 focus:outline-none" required />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Fatura Tebligat Adresi *</label>
+                    <input v-model="billingAddress" type="text" placeholder="İsmetpaşa Mah. Taşöz Apt. No:52/1" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white focus:border-blue-600 focus:outline-none" required />
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="block text-[10px] font-bold text-slate-600 mb-0.5">İl / Şehir *</label>
+                      <input v-model="billingCity" type="text" placeholder="Çanakkale" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white focus:border-blue-600 focus:outline-none" required />
+                    </div>
+                    <div>
+                      <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Fatura E-Posta *</label>
+                      <input v-model="billingEmail" type="email" placeholder="muhasebe@firma.com" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white focus:border-blue-600 focus:outline-none" required />
+                    </div>
+                  </div>
+                </div>
+              </div>
               
               <!-- Payment Channels Switcher -->
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">
-                  {{ 'ÖDEME KANALI SEÇİN' }}
+                  {{ 'GÜVENLİ ÖDEME ALTYAPISI SEÇİN' }}
                 </label>
                 
                 <!-- Domestic Gateways -->
@@ -540,7 +637,7 @@ function completeCheckout() {
                   <button 
                     @click="activePaymentChannel = 'paytr'"
                     class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1 cursor-pointer"
-                    :class="activePaymentChannel === 'paytr' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
+                    :class="activePaymentChannel === 'paytr' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-xs' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
                   >
                     <CreditCard :size="16" />
                     <span class="text-[10px]">PayTR 3D</span>
@@ -549,16 +646,16 @@ function completeCheckout() {
                   <button 
                     @click="activePaymentChannel = 'iyzico'"
                     class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1 cursor-pointer"
-                    :class="activePaymentChannel === 'iyzico' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
+                    :class="activePaymentChannel === 'iyzico' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-xs' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
                   >
                     <CreditCard :size="16" />
-                    <span class="text-[10px]">iyzico</span>
+                    <span class="text-[10px]">iyzico Korumalı</span>
                   </button>
 
                   <button 
                     @click="activePaymentChannel = 'bank_transfer'"
                     class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1 cursor-pointer"
-                    :class="activePaymentChannel === 'bank_transfer' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
+                    :class="activePaymentChannel === 'bank_transfer' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-xs' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
                   >
                     <Building :size="16" />
                     <span class="text-[10px]">Havale / EFT</span>
@@ -597,40 +694,46 @@ function completeCheckout() {
               </div>
 
               <!-- Credit Card Form (Domestic & Stripe/PayPal) -->
-              <div v-if="activePaymentChannel !== 'bank_transfer' && activePaymentChannel !== 'swift'" class="space-y-4">
+              <div v-if="activePaymentChannel !== 'bank_transfer' && activePaymentChannel !== 'swift'" class="space-y-3">
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">{{ 'Kart Üzerindeki İsim' }}</label>
-                  <input v-model="cardName" type="text" placeholder="John Doe" class="w-full rounded-xl border border-slate-200 p-3 text-xs focus:border-blue-600 focus:outline-none" />
+                  <label class="block text-[10px] font-bold text-slate-600 mb-1">{{ 'Kart Üzerindeki İsim Soyisim' }}</label>
+                  <input v-model="cardName" type="text" placeholder="Ahmet Yılmaz" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs focus:border-blue-600 focus:outline-none" />
                 </div>
 
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 mb-1">{{ 'Kart Numarası' }}</label>
-                  <input v-model="cardNumber" type="text" placeholder="4543 0000 0000 0000" class="w-full rounded-xl border border-slate-200 p-3 text-xs font-mono focus:border-blue-600 focus:outline-none" />
+                  <label class="block text-[10px] font-bold text-slate-600 mb-1">{{ 'Kart Numarası (Tüm Yerli ve Yabancı Kartlar)' }}</label>
+                  <input v-model="cardNumber" type="text" placeholder="5400 0000 0000 0000" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-mono focus:border-blue-600 focus:outline-none" />
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-3">
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">{{ 'Son Kullanma (AA/YY)' }}</label>
-                    <input v-model="cardExpiry" type="text" placeholder="12/28" class="w-full rounded-xl border border-slate-200 p-3 text-xs font-mono focus:border-blue-600 focus:outline-none" />
+                    <label class="block text-[10px] font-bold text-slate-600 mb-1">{{ 'Son Kullanma (AA/YY)' }}</label>
+                    <input v-model="cardExpiry" type="text" placeholder="12/28" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-mono focus:border-blue-600 focus:outline-none" />
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 mb-1">CVC / CVV</label>
-                    <input v-model="cardCvc" type="text" placeholder="888" class="w-full rounded-xl border border-slate-200 p-3 text-xs font-mono focus:border-blue-600 focus:outline-none" />
+                    <label class="block text-[10px] font-bold text-slate-600 mb-1">Güvenlik Kodu (CVC / CVV)</label>
+                    <input v-model="cardCvc" type="text" placeholder="888" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-mono focus:border-blue-600 focus:outline-none" />
                   </div>
+                </div>
+
+                <!-- 3D Secure Trust Note -->
+                <div class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[10px] text-slate-500 font-medium">
+                  <ShieldCheck :size="15" class="text-emerald-600 shrink-0" />
+                  <span>İşleminiz bankanızın SMS 3D Secure onay sayfası üzerinden 256-Bit SSL ile güvenle tamamlanacaktır.</span>
                 </div>
               </div>
 
               <!-- Bank Transfer (Domestic) -->
-              <div v-else-if="activePaymentChannel === 'bank_transfer'" class="space-y-4">
+              <div v-else-if="activePaymentChannel === 'bank_transfer'" class="space-y-3">
                 <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-2">
-                  <div class="font-bold text-slate-800">Garanti BBVA TR - İhaleciBurada Bilişim A.Ş.</div>
+                  <div class="font-bold text-slate-800">Garanti BBVA TR — İhaleciBurada Bilişim A.Ş.</div>
                   <div class="font-mono text-blue-700 font-bold select-all text-[11px]">TR91 0006 2000 0001 2345 6789 99</div>
-                  <div class="text-[10px] text-slate-500">Açıklama kısmına firma vergi numaranızı yazınız.</div>
+                  <div class="text-[10px] text-slate-500">Açıklama alanına firmanızın vergi numarasını veya unvanını yazınız.</div>
                 </div>
               </div>
 
               <!-- SWIFT Wire Transfer (International) -->
-              <div v-else-if="activePaymentChannel === 'swift'" class="space-y-4">
+              <div v-else-if="activePaymentChannel === 'swift'" class="space-y-3">
                 <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-2">
                   <div class="font-bold text-slate-800">Garanti Bank International SWIFT Account</div>
                   <div class="font-mono text-blue-700 font-bold select-all text-[11px]">IBAN: TR44 0006 2000 0001 9999 8888 77</div>
@@ -647,29 +750,55 @@ function completeCheckout() {
                 <CheckCircle2 :size="36" />
               </div>
               <h3 class="text-lg font-black text-slate-900">
-                {{ selectedPackage?.isTrial ? '🎉 1 Aylık Ücretsiz Denemeniz Aktif!' : 'Abonelik İşlemi Başarılı!' }}
+                {{ selectedPackage?.isTrial ? '🎉 1 Aylık Ücretsiz Denemeniz Aktif!' : 'Abonelik ve Ödeme İşlemi Başarılı!' }}
               </h3>
               <p class="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
                 {{ selectedPackage?.isTrial 
                   ? '1 ay boyunca tüm kurumsal B2B ihale ve canlı eksiltme modüllerini 0 ₺ bedelle sınırsız kullanabilirsiniz.'
-                  : 'Faturanız oluşturuldu ve kurumsal panel erişiminiz anında aktifleştirildi.' 
+                  : 'Ödemeniz PayTR / iyzico onayından geçti. E-Faturanız oluşturuldu ve kurumsal panel erişiminiz anında aktifleştirildi.' 
                 }}
               </p>
             </div>
 
           </div>
 
-          <!-- Modal Footer -->
-          <div class="p-6 bg-slate-50 border-t border-slate-100">
-            <div v-if="!showSuccessScreen" class="mb-3 flex items-center justify-center gap-2 text-[10px] text-slate-500 font-bold">
-              <input v-model="distanceSalesApproved" type="checkbox" id="modal-distance-check" class="rounded border-slate-300 cursor-pointer" />
-              <label for="modal-distance-check" class="cursor-pointer">
-                {{ 'Koşulları onaylayarak ' }}
-                <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" target="_blank" class="text-blue-600 underline">
-                  {{ 'Kullanım ve Hizmet Şartlarını' }}
-                </NuxtLink>
-                {{ ' kabul etmiş olursunuz.' }}
-              </label>
+          <!-- Modal Footer with PayTR & iyzico Required Checkboxes -->
+          <div class="p-5 bg-slate-50 border-t border-slate-100 space-y-3 text-left">
+            <div v-if="!showSuccessScreen" class="space-y-1.5 text-[10px] text-slate-600 font-medium">
+              <!-- Checkbox 1: Ön Bilgilendirme Formu -->
+              <div class="flex items-start gap-2">
+                <input v-model="preInfoApproved" type="checkbox" id="modal-pre-info-check" class="mt-0.5 rounded border-slate-300 text-blue-600 cursor-pointer" />
+                <label for="modal-pre-info-check" class="cursor-pointer">
+                  <NuxtLink to="/sozlesmeler?tab=on-bilgilendirme" target="_blank" class="text-blue-600 underline font-bold">
+                    Ön Bilgilendirme Formu
+                  </NuxtLink>'nu okudum ve kabul ediyorum.
+                </label>
+              </div>
+
+              <!-- Checkbox 2: Mesafeli Satış Sözleşmesi -->
+              <div class="flex items-start gap-2">
+                <input v-model="distanceSalesApproved" type="checkbox" id="modal-distance-check" class="mt-0.5 rounded border-slate-300 text-blue-600 cursor-pointer" />
+                <label for="modal-distance-check" class="cursor-pointer">
+                  <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" target="_blank" class="text-blue-600 underline font-bold">
+                    Mesafeli Satış ve Abonelik Sözleşmesi
+                  </NuxtLink>'ni okudum ve onaylıyorum.
+                </label>
+              </div>
+
+              <!-- Checkbox 3: İptal ve İade Koşulları -->
+              <div class="flex items-start gap-2">
+                <input v-model="refundPolicyApproved" type="checkbox" id="modal-refund-check" class="mt-0.5 rounded border-slate-300 text-blue-600 cursor-pointer" />
+                <label for="modal-refund-check" class="cursor-pointer">
+                  <NuxtLink to="/sozlesmeler?tab=iptal-iade" target="_blank" class="text-blue-600 underline font-bold">
+                    İptal, İade ve Cayma Koşulları Politikası
+                  </NuxtLink>'nı okudum ve kabul ediyorum.
+                </label>
+              </div>
+            </div>
+
+            <!-- Payment Brand Trust Badges Strip -->
+            <div v-if="!showSuccessScreen" class="pt-2 border-t border-slate-200/60 flex items-center justify-center">
+              <PaymentBadges />
             </div>
 
             <button 
@@ -679,9 +808,9 @@ function completeCheckout() {
               class="w-full py-3.5 text-white font-black text-xs rounded-xl transition shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               :class="selectedPackage?.isTrial ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-blue-900 hover:bg-blue-950'"
             >
-              <span v-if="isProcessing">{{ selectedPackage?.isTrial ? 'Deneme Aktifleştiriliyor...' : 'Ödeme Doğrulanıyor...' }}</span>
+              <span v-if="isProcessing">{{ selectedPackage?.isTrial ? 'Deneme Aktifleştiriliyor...' : '3D Secure Doğrulanıyor...' }}</span>
               <span v-else-if="selectedPackage?.isTrial">{{ '1 AYLIK ÜCRETSİZ DENEMEYİ HEMEN BAŞLAT (0 ₺)' }}</span>
-              <span v-else>{{ currencySymbol }}{{ selectedPackage?.price.toLocaleString('tr-TR') }} {{ 'Güvenli Ödeme Yap' }}</span>
+              <span v-else>{{ currencySymbol }}{{ selectedPackage?.price.toLocaleString('tr-TR') }} {{ 'Güvenli 3D Ödeme Yap' }}</span>
               <ArrowRight v-if="!isProcessing" :size="14" />
             </button>
 
