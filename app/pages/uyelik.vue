@@ -416,24 +416,12 @@ function handleGuestEntry() {
 
         <!-- REGISTRATION FORM -->
         <div v-if="activeTab === 'register'">
-          <!-- e-Devlet & OAuth Giriş Butonları -->
+          <!-- OAuth Giriş Butonları -->
           <div class="space-y-2 mb-5">
-            <!-- e-Devlet Kapısı SSO Giriş (Resmi Kurumsal Giriş) -->
-            <button
-              type="button"
-              @click="handleEDevletAuth"
-              class="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-red-700 bg-red-600 hover:bg-red-700 text-white py-3 text-xs font-black transition shadow-md shadow-red-900/10 cursor-pointer"
-            >
-              <div class="h-5 w-5 rounded-full bg-white text-red-600 flex items-center justify-center text-[10px] font-black">
-                TR
-              </div>
-              <span>{{ '🇹🇷 e-Devlet Kapısı ile Hızlı Kaydol / Giriş Yap' }}</span>
-            </button>
-
             <button
               type="button"
               @click="handleOAuth('google')"
-              class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50"
+              class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer"
               style="border-color: #E2E8F0; color: #374151;"
             >
               <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
@@ -647,21 +635,10 @@ function handleGuestEntry() {
 
         <!-- LOGIN FORM -->
         <div v-else-if="activeTab === 'login'">
-          <!-- e-Devlet & OAuth Butonları -->
+          <!-- OAuth Butonları -->
           <div class="space-y-2 mb-5">
-            <button
-              type="button"
-              @click="handleEDevletAuth"
-              class="flex w-full items-center justify-center gap-3 rounded-xl border-2 border-red-700 bg-red-600 hover:bg-red-700 text-white py-3 text-xs font-black transition shadow-md shadow-red-900/10 cursor-pointer"
-            >
-              <div class="h-5 w-5 rounded-full bg-white text-red-600 flex items-center justify-center text-[10px] font-black">
-                TR
-              </div>
-              <span>{{ '🇹🇷 e-Devlet Kapısı ile Doğrulanmış Giriş' }}</span>
-            </button>
-
             <button type="button" @click="handleOAuth('google')"
-              class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50"
+              class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer"
               style="border-color: #E2E8F0; color: #374151;">
               <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
               {{ 'Google ile Giriş Yap' }}
