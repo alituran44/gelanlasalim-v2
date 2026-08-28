@@ -26,6 +26,22 @@ const activeTab = ref<'login' | 'register' | 'guest' | 'forgot'>('register')
 const showCookieConsent = ref(true)
 const registerStep = ref<1 | 2>(1)
 
+function parseJwt(token: string) {
+  try {
+    const base64Url = token.split('.')[1]
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    )
+    return JSON.parse(jsonPayload)
+  } catch (e) {
+    return null
+  }
+}
+
 onMounted(() => {
   detectLocale()
   if (route.query.tab === 'guest') {
@@ -34,6 +50,49 @@ onMounted(() => {
     activeTab.value = 'login'
   } else if (route.query.tab === 'register') {
     activeTab.value = 'register'
+  }
+
+  // Google Identity Services (GSI) One-Tap Entegrasyonu
+  if (typeof window !== 'undefined') {
+    const checkGsi = setInterval(() => {
+      if ((window as any).google?.accounts?.id) {
+        clearInterval(checkGsi)
+        try {
+          (window as any).google.accounts.id.initialize({
+            client_id: '616649314930-qn4lj8sruj1f79lc7fqaqt619i37jpjp.apps.googleusercontent.com',
+            callback: (response: any) => {
+              if (response.credential) {
+                const user = parseJwt(response.credential)
+                if (user) {
+                  localStorage.setItem('userSession', JSON.stringify({
+                    email: user.email,
+                    firstName: user.given_name || user.name,
+                    lastName: user.family_name || '',
+                    name: user.name,
+                    picture: user.picture,
+                    company: userRole.value === 'company' ? (user.name + ' San. Tic. A.Ş.') : 'Bireysel Üye',
+                    companyName: userRole.value === 'company' ? (user.name + ' San. Tic. A.Ş.') : 'Bireysel Üye',
+                    role: userRole.value || 'company',
+                    verified: true,
+                    isGoogleAuth: true,
+                    authProvider: 'google',
+                    isPremium: true,
+                    subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
+                  }))
+                  router.push('/panel')
+                }
+              }
+            },
+            auto_select: false
+          })
+          (window as any).google.accounts.id.prompt()
+        } catch (e) {
+          console.warn('Google GSI init warning', e)
+        }
+      }
+    }, 300)
+
+    setTimeout(() => clearInterval(checkGsi), 6000)
   }
 })
 
