@@ -28,7 +28,8 @@ import {
   Award,
   Sliders,
   Building,
-  Globe
+  Globe,
+  ShieldCheck
 } from "lucide-vue-next"
 import { locale, detectLocale, setLocale } from '~/composables/useLocale'
 
@@ -79,47 +80,25 @@ function logout() {
 const sidebarMenus = computed(() => {
   if (locale.value === 'tr') {
     return [
-      { title: "Yönetim Paneli", icon: LayoutDashboard, to: "/panel" },
-      { title: "Pazar Yeri", icon: ShoppingBag, to: "/panel/pazar-yeri" },
-      { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
-      { 
-        title: "Tekliflerim", 
-        icon: Send, 
-        isDropdown: true,
-        children: [
-          { title: "Aldığım Teklifler (Gelen)", icon: Inbox, to: "/panel/gelen-teklifler" },
-          { title: "Verdiğim Teklifler (Yaptığım)", icon: Send, to: "/panel/yaptigim-teklifler" }
-        ]
-      },
-      { title: "Sipariş & Teslimat", icon: Package, to: "/panel/siparis-teslimat" },
-      { title: "Canlı Etkinlikler", icon: Tv, to: "/panel/canli-etkinlikler" },
-      { title: "İstatistikler", icon: BarChart3, to: "/panel/istatistikler" },
-      { title: "Döviz Kurları", icon: Coins, to: "/panel/doviz-kurlari" },
-      { title: "Kurumsal Firmalar", icon: Building2, to: "/panel/firmalar" },
-      { title: "Ekip & Yetki", icon: Users, to: "/panel/ekip-yetki" },
-      { title: "Hesap & Ayarlar", icon: Settings, to: "/panel/ayarlar" },
+      { title: "Genel Bakış", icon: LayoutDashboard, to: "/panel" },
+      { title: "İlanlarım", icon: ClipboardList, to: "/panel/ilanlarim" },
+      { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
+      { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
+      { title: "Firma & Evrak Yükleme", icon: ShieldCheck, to: "/panel/ayarlar?tab=sirket", badge: "Evrak Yükle" },
+      { title: "Üye Firmalar", icon: Building2, to: "/panel/firmalar" },
+      { title: "Bildirimler", icon: Bell, to: "/panel/bildirimler" },
+      { title: "Profil & Hesap", icon: Settings, to: "/panel/ayarlar?tab=kisisel" }
     ]
   } else {
     return [
       { title: "Dashboard", icon: LayoutDashboard, to: "/panel" },
-      { title: "Marketplace", icon: ShoppingBag, to: "/panel/pazar-yeri" },
       { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
-      { 
-        title: "My Bids", 
-        icon: Send, 
-        isDropdown: true,
-        children: [
-          { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
-          { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" }
-        ]
-      },
-      { title: "Orders & Shipping", icon: Package, to: "/panel/siparis-teslimat" },
-      { title: "Live Auctions", icon: Tv, to: "/panel/canli-etkinlikler" },
-      { title: "Analytics", icon: BarChart3, to: "/panel/istatistikler" },
-      { title: "Exchange Rates", icon: Coins, to: "/panel/doviz-kurlari" },
+      { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
+      { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" },
+      { title: "Company & Documents", icon: ShieldCheck, to: "/panel/ayarlar?tab=sirket", badge: "Upload Docs" },
       { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
-      { title: "Team & Permissions", icon: Users, to: "/panel/ekip-yetki" },
-      { title: "Account Center", icon: Settings, to: "/panel/ayarlar" },
+      { title: "Notifications", icon: Bell, to: "/panel/bildirimler" },
+      { title: "Account & Profile", icon: Settings, to: "/panel/ayarlar?tab=kisisel" }
     ]
   }
 })
