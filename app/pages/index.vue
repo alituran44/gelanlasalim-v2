@@ -41,13 +41,9 @@ import {
   Award,
   RefreshCw,
   ExternalLink,
-  MessageCircle,
-  Camera,
-  Filter,
-  DollarSign,
-  Layers,
-  ThumbsUp,
-  Share2
+  Calendar,
+  Folder,
+  FolderOpen
 } from 'lucide-vue-next'
 import PaymentBadges from '~/components/common/PaymentBadges.vue'
 
@@ -56,176 +52,180 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'İhaleciBurada — Letgo Kolaylığında B2B Teklif & Pazarlık Borsası',
-  description: 'Tıpkı Letgo kolaylığında: İhtiyacını ilan ver, anında kurumsal teklifler al, mesajla pazarlık yap ve el sıkış!'
+  title: 'İhaleciBurada.com — Türkiye’nin En Kapsamlı İhale ve Satın Alma Portalı',
+  description: 'Günlük ihaleler, kamu ve özel sektör satın alma ilanları, şartnameler, doğrudan teklif verme ve sonuç takip sistemi.'
 })
 
-// ==================== STATE ====================
-const searchQuery = ref('')
-const selectedCategory = ref('all')
-const selectedCity = ref('all')
-const searchMode = ref<'all' | 'buyer' | 'seller'>('all')
+// ==================== STATE MANAGEMENT ====================
+const activeNavTab = ref('anasayfa') // 'anasayfa' | 'bultenler' | 'okuduklarim' | 'takip' | 'sozlesme' | 'bildirimler'
+const activeSubMenu = ref('kategoriler') // 'kategoriler' | 'sehirler' | 'sektorler' | 'idareler' | 'yukleniciler' | 'kik'
+const activeTimeTab = ref('guncel') // 'guncel' | 'gecmis' | 'sonuc' | 'detayli'
 
-// Modallar
-const showNewTenderModal = ref(false)
-const showChatModal = ref(false)
-const showProfileModal = ref(false)
-const showRateModal = ref(false)
-const activeChatTender = ref<any>(null)
-const activeChatMessages = ref<any[]>([])
-const newChatMessage = ref('')
-const offerInputPrice = ref('')
-const counterOfferInputPrice = ref('')
-const isBargaining = ref(false)
+// Hızlı Arama Filtreleri
+const filterCategory = ref('Tümü')
+const filterCity = ref('Tümü')
+const filterType = ref('Tümü')
+const filterMethod = ref('Tümü')
+const filterCost = ref('Tümü')
+const filterKeyword = ref('')
+const filterStartDate = ref('')
+const filterEndDate = ref('')
+const searchScope = ref('icerik')
+const viewMode = ref<'gelismis' | 'basit'>('gelismis')
+const readMode = ref<'goster' | 'gizle'>('goster')
 
-// Kullanıcı Oturumu
-const userSession = ref<any>({
-  companyName: 'Metropol İnşaat A.Ş.',
-  phone: '0850 308 00 00',
-  city: 'Çanakkale',
-  rating: 4.9,
-  ratingCount: 84
-})
+// Giriş Formu
+const loginUsername = ref('')
+const loginPassword = ref('')
+const userSession = ref<any>(null)
 
-// Letgo Tarzı Yatay İkon Kategorileri
-const iconCategories = [
-  { slug: 'all', name: 'Tümü', icon: '🌐' },
-  { slug: 'insaat', name: 'İnşaat & Yapı', icon: '🏗️' },
-  { slug: 'sanayi', name: 'Sanayi & Makine', icon: '⚙️' },
-  { slug: 'ambalaj', name: 'Ambalaj & Koli', icon: '📦' },
-  { slug: 'lojistik', name: 'Lojistik & Nakliye', icon: '🚚' },
-  { slug: 'enerji', name: 'Enerji & GES', icon: '⚡' },
-  { slug: 'tarim', name: 'Tarım & Gıda', icon: '🌾' },
-  { slug: 'bilisim', name: 'Bilişim & Yazılım', icon: '💻' },
-  { slug: 'diger', name: 'Diğer Sektörler', icon: '🏷️' }
+function handleLogin() {
+  if (!loginUsername.value || !loginPassword.value) {
+    alert('Lütfen kullanıcı adı ve şifrenizi giriniz.')
+    return
+  }
+  const session = {
+    username: loginUsername.value,
+    companyName: loginUsername.value.includes('@') ? loginUsername.value.split('@')[0] : loginUsername.value,
+    role: 'member'
+  }
+  userSession.value = session
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('userSession', JSON.stringify(session))
+  }
+  alert(`✓ Hoş geldiniz, ${session.companyName}!`)
+}
+
+function handleLogout() {
+  userSession.value = null
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('userSession')
+  }
+}
+
+// Seçili Kategori / Modal İnceleme
+const selectedCategoryName = ref<string | null>(null)
+const selectedTenderModal = ref<any>(null)
+const quickOfferPrice = ref('')
+const quickOfferNotes = ref('')
+
+// 2 Sütunlu İhale Kategorileri (Görseldeki Birebir Liste ve İhale Sayıları)
+const categoryListLeft = [
+  { id: 1, name: 'İnşaat - Altyapı - Üstyapı - Yapım işi ve Yıkım ihaleleri', count: 2103, tag: 'insaat' },
+  { id: 2, name: 'Kanalizasyon - Boru - Su - Doğalgaz - Sıhhi Tesisat ihaleleri', count: 618, tag: 'tesisat' },
+  { id: 3, name: 'Kent Mobilyaları - Prefabrik Yapılar - Doğrama ihaleleri', count: 442, tag: 'prefabrik' },
+  { id: 4, name: 'Mühendislik - Mimarlık - Danışmanlık ihaleleri', count: 165, tag: 'muhendislik' },
+  { id: 5, name: 'Madencilik - Doğal Kaynaklar - Sondaj ihaleleri', count: 33, tag: 'maden' },
+  { id: 6, name: 'Hırdavat - Nalburiye - Metal ve Plastik Ürünler ihaleleri', count: 838, tag: 'hirdavat' },
+  { id: 7, name: 'Enerji - Aydınlatma - Sinyalizasyon - Elektrik Tesisatı ihaleleri', count: 737, tag: 'enerji' },
+  { id: 8, name: 'Yangın Algılama - Söndürme - İhbar Sistemleri ihaleleri', count: 75, tag: 'yangin' },
+  { id: 9, name: 'Asansör - Yapı Otomasyon - Mekanik Güvenlik ihaleleri', count: 107, tag: 'asansor' },
+  { id: 10, name: 'Klima - Soğutma - Isıtma - Havalandırma Tesisatı ihaleleri', count: 237, tag: 'hvac' },
+  { id: 11, name: 'Endüstriyel Makine - Motor - Konveyör ihaleleri', count: 756, tag: 'makine' },
+  { id: 12, name: 'Savunma Sanayi, Silah - Denizcilik - Havacılık ihaleleri', count: 82, tag: 'savunma' }
 ]
 
-// Canlı İlanlar (Letgo Kart Akışı)
-const tenders = ref([
+const categoryListRight = [
+  { id: 13, name: 'Sağlık - İlaç - Kozmetik - Medikal ihaleleri', count: 2615, tag: 'saglik' },
+  { id: 14, name: 'Tıbbi Cihaz - Laboratuvar - Hastane Ekipmanları ihaleleri', count: 1399, tag: 'tibbi' },
+  { id: 15, name: 'Akaryakıt - Gazyağı - Madeni Yağ ihaleleri', count: 143, tag: 'akaryakit' },
+  { id: 16, name: 'Odun - Kömür - Katıyakıt ihaleleri', count: 66, tag: 'yakit' },
+  { id: 17, name: 'Gıda - Tarım Ürünleri - Yiyecek - İçecek ihaleleri', count: 582, tag: 'gida' },
+  { id: 18, name: 'Hazır Yemek - Lokantacılık ihaleleri', count: 89, tag: 'yemek' },
+  { id: 19, name: 'Elektronik - Ölçü Aletleri - İletişim - Bilgisayar ihaleleri', count: 859, tag: 'elektronik' },
+  { id: 20, name: 'Yazılım - Bilgi Yönetim Hizmetleri - Bilişim ihaleleri', count: 243, tag: 'yazilim' },
+  { id: 21, name: 'Uydu Takip - Kamera - Scada - Haberleşme Sistemleri ihaleleri', count: 151, tag: 'kamera' },
+  { id: 22, name: 'Temizlik - İlaçlama - Geri Dönüşüm ihaleleri', count: 317, tag: 'temizlik' },
+  { id: 23, name: 'Kimyasal Maddeler - Dezenfektan - Gübre ihaleleri', count: 260, tag: 'kimya' },
+  { id: 24, name: 'Tekstil - Giyim - Spor Ekipmanları ihaleleri', count: 381, tag: 'tekstil' }
+]
+
+// Aktif İhale Listesi (Gerçek Veriler ve Örnek İhaleler)
+const rawTenders = ref([
   {
-    id: 1,
-    title: '1.500 Ton Nervürlü İnşaat Demiri Alımı',
-    company: 'Metropol İnşaat Taahhüt A.Ş.',
-    companyPhone: '0850 308 00 00',
-    rating: 4.9,
-    ratingCount: 128,
-    category: 'insaat',
-    categoryName: 'İnşaat & Yapı',
-    price: '14.500.000 ₺',
-    priceNumeric: 14500000,
-    priceType: 'Hedef Bütçe',
+    id: 101,
+    no: '2026/14589',
+    title: '1.500 Ton B420C Nervürlü İnşaat Demiri ve Hasır Çelik Temini İşi',
+    authority: 'Karayolları 14. Bölge Müdürlüğü / Çanakkale Köprü Bağlantı Şantiyesi',
     city: 'Çanakkale',
-    timeAgo: '15 dk önce',
-    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80',
-    description: 'Şantiye teslimi TSE belgeli 12 metre nervürlü inşaat demiri aranıyor. Anında nakit/teminatlı ödeme.',
-    bidsCount: 6,
-    status: 'Aktif Pazarlık 💬',
-    createdAt: Date.now() - 1000 * 60 * 15
+    category: 'İnşaat - Altyapı - Üstyapı - Yapım işi ve Yıkım ihaleleri',
+    type: 'Mal Alımı',
+    method: 'Açık İhale (4734 / 19. Madde)',
+    cost: '14.500.000 ₺',
+    date: '05.09.2026 14:00',
+    daysLeft: 8,
+    status: 'Güncel İhale',
+    specText: 'TSE 708 normlarına uygun nervürlü donatı çeliği temini ve şantiyeye nakli.',
+    bids: 7
   },
   {
-    id: 2,
-    title: '100.000 Adet Çift Oluklu Taşıma Kolisi',
-    company: 'Global Retail Dağıtım A.Ş.',
-    companyPhone: '0212 555 10 20',
-    rating: 4.8,
-    ratingCount: 64,
-    category: 'ambalaj',
-    categoryName: 'Ambalaj & Koli',
-    price: '350.000 ₺',
-    priceNumeric: 350000,
-    priceType: 'Hedef Fiyat',
+    id: 102,
+    no: '2026/14590',
+    title: '100.000 Adet Çift Oluklu Baskılı Koli ve Ambalaj Malzemesi Alımı',
+    authority: 'Devlet Malzeme Ofisi (DMO) Genel Müdürlüğü',
     city: 'İstanbul',
-    timeAgo: '40 dk önce',
-    image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&auto=format&fit=crop&q=80',
-    description: 'Özel logo baskılı 60x40x40 e-ticaret sevkiyat kolisi üretimi. Numune onayından sonra hemen sipariş.',
-    bidsCount: 9,
-    status: 'Aktif Pazarlık 💬',
-    createdAt: Date.now() - 1000 * 60 * 40
+    category: 'Hırdavat - Nalburiye - Metal ve Plastik Ürünler ihaleleri',
+    type: 'Mal Alımı',
+    method: 'Açık Eksiltme',
+    cost: '350.000 ₺',
+    date: '02.09.2026 11:30',
+    daysLeft: 5,
+    status: 'Güncel İhale',
+    specText: 'E-ticaret ve lojistik sevkiyatlarına uygun dopel kraft koli üretimi.',
+    bids: 12
   },
   {
-    id: 3,
-    title: 'Fabrika Çatısı 1.2 MW Güneş Enerji Santrali (GES)',
-    company: 'Anadolu Döküm Sanayi Ltd.',
-    companyPhone: '0262 444 80 90',
-    rating: 4.9,
-    ratingCount: 95,
-    category: 'enerji',
-    categoryName: 'Enerji & GES',
-    price: '18.200.000 ₺',
-    priceNumeric: 18200000,
-    priceType: 'Yaklaşık Maliyet',
-    city: 'Kocaeli',
-    timeAgo: '1 saat önce',
-    image: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=800&auto=format&fit=crop&q=80',
-    description: 'Anahtar teslim çatı GES kurulumu, invertör ve TEDAŞ onay süreçleri dahil teklif toplanmaktadır.',
-    bidsCount: 4,
-    status: 'Aktif Pazarlık 💬',
-    createdAt: Date.now() - 1000 * 60 * 60
+    id: 103,
+    no: '2026/14591',
+    title: 'Üniversite Hastanesi Binası 1.2 MW Çatı Güneş Enerji Santrali (GES) Yapım İşi',
+    authority: 'Çanakkale Onsekiz Mart Üniversitesi Rektörlüğü',
+    city: 'Çanakkale',
+    category: 'Enerji - Aydınlatma - Sinyalizasyon - Elektrik Tesisatı ihaleleri',
+    type: 'Yapım İşi',
+    method: 'Açık İhale',
+    cost: '18.200.000 ₺',
+    date: '10.09.2026 10:00',
+    daysLeft: 13,
+    status: 'Güncel İhale',
+    specText: 'Anahtar teslim panel, inverter, pano temini ve TEDAŞ onay süreçleri.',
+    bids: 4
   },
   {
-    id: 4,
-    title: '50 Seferlik Liman - Fabrika Konteyner Taşımacılığı',
-    company: 'Marmara Kimya İthalat A.Ş.',
-    companyPhone: '0282 333 40 50',
-    rating: 4.7,
-    ratingCount: 41,
-    category: 'lojistik',
-    categoryName: 'Lojistik & Nakliye',
-    price: '450.000 ₺',
-    priceNumeric: 450000,
-    priceType: 'Toplam Bütçe',
+    id: 104,
+    no: '2026/14592',
+    title: '250 Seferlik Liman İçi ve Şehirlerarası Konteyner Lojistik Hizmeti',
+    authority: 'Türkiye Kömür İşletmeleri Kurumu',
     city: 'Tekirdağ',
-    timeAgo: '2 saat önce',
-    image: 'https://images.unsplash.com/photo-1586528116493-a029325540fa?w=800&auto=format&fit=crop&q=80',
-    description: 'Asyaport çıkışlı Çorlu fabrika sahasına 40ft konteyner nakliyesi. Günlük 4 araç düzenli sevkiyat.',
-    bidsCount: 8,
-    status: 'Aktif Pazarlık 💬',
-    createdAt: Date.now() - 1000 * 60 * 120
+    category: 'Klima - Soğutma - Isıtma - Havalandırma Tesisatı ihaleleri',
+    type: 'Hizmet Alımı',
+    method: 'Pazarlık Usulü (21/f)',
+    cost: '1.250.000 ₺',
+    date: '01.09.2026 15:00',
+    daysLeft: 4,
+    status: 'Güncel İhale',
+    specText: '40ft konteynerlerin limandan tesis sahasına güvenli nakliyesi.',
+    bids: 9
   },
   {
-    id: 5,
-    title: 'CNC 5 Eksen Dik İşleme Merkezi Makine Alımı',
-    company: 'Savunma ve Havacılık Pres A.Ş.',
-    companyPhone: '0312 800 90 00',
-    rating: 5.0,
-    ratingCount: 33,
-    category: 'sanayi',
-    categoryName: 'Sanayi & Makine',
-    price: '6.800.000 ₺',
-    priceNumeric: 6800000,
-    priceType: 'Satın Alma Bütçesi',
+    id: 105,
+    no: '2026/14593',
+    title: 'Yüksek Hassasiyetli 5 Eksen CNC Freze ve Dik İşleme Merkezi Alımı',
+    authority: 'TUSAŞ Havacılık ve Uzay Sanayii A.Ş.',
     city: 'Ankara',
-    timeAgo: '3 saat önce',
-    image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=800&auto=format&fit=crop&q=80',
-    description: 'Havacılık standartlarında parça imalatı için 5 eksen CNC işleme merkezi alınacaktır.',
-    bidsCount: 3,
-    status: 'Aktif Pazarlık 💬',
-    createdAt: Date.now() - 1000 * 60 * 180
-  },
-  {
-    id: 6,
-    title: '500 Ton Organik Sıvı Solucan Gübresi Alımı',
-    company: 'Doğa Tarım ve Seracılık A.Ş.',
-    companyPhone: '0242 700 11 22',
-    rating: 4.8,
-    ratingCount: 50,
-    category: 'tarim',
-    categoryName: 'Tarım & Gıda',
-    price: '850.000 ₺',
-    priceNumeric: 850000,
-    priceType: 'Bütçe',
-    city: 'Antalya',
-    timeAgo: '4 saat önce',
-    image: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=800&auto=format&fit=crop&q=80',
-    description: 'Sera üretiminde kullanılmak üzere sertifikalı sıvı organik gübre tedarikçisi aranıyor.',
-    bidsCount: 5,
-    status: 'Aktif Pazarlık 💬',
-    createdAt: Date.now() - 1000 * 60 * 240
+    category: 'Endüstriyel Makine - Motor - Konveyör ihaleleri',
+    type: 'Mal Alımı',
+    method: 'Belli İstekliler Arasında',
+    cost: '6.800.000 ₺',
+    date: '15.09.2026 14:00',
+    daysLeft: 18,
+    status: 'Güncel İhale',
+    specText: 'Havacılık parçaları üretimine tam uyumlu 5 eksen CNC işleme tezgahı.',
+    bids: 3
   }
 ])
 
-// localStorage'dan eklenen ilanları da yükle
-function loadStoredTenders() {
+// LocalStorage'dan kullanıcının açtığı ilanları da ekle
+function loadUserTenders() {
   if (typeof window !== 'undefined') {
     try {
       const raw = localStorage.getItem('myTenders') || localStorage.getItem('userTenders')
@@ -233,26 +233,22 @@ function loadStoredTenders() {
         const parsed = JSON.parse(raw)
         if (Array.isArray(parsed) && parsed.length > 0) {
           const formatted = parsed.map((item: any, idx: number) => ({
-            id: item.id || (5000 + idx),
-            title: item.title || item.baslik || 'Özel B2B İhale İlanı',
-            company: item.company || userSession.value.companyName,
-            companyPhone: item.phone || userSession.value.phone,
-            rating: 4.9,
-            ratingCount: 12,
-            category: 'diger',
-            categoryName: item.category || 'Özel Kategori',
-            price: item.budget || (item.budgetNumeric ? Number(item.budgetNumeric).toLocaleString('tr-TR') + ' ₺' : 'Pazarlıklı'),
-            priceNumeric: item.budgetNumeric || 100000,
-            priceType: 'Hedef Bütçe',
-            city: item.city || item.sehir || 'Türkiye',
-            timeAgo: 'Yeni İlan ⚡',
-            image: item.image || 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=800&auto=format&fit=crop&q=80',
-            description: item.description || item.aciklama || item.title,
-            bidsCount: 0,
+            id: item.id || (9000 + idx),
+            no: `2026/${50000 + idx}`,
+            title: item.title || item.baslik || 'Özel B2B Satın Alma İhalesi',
+            authority: item.company || 'Doğrulanmış B2B İhale Sahibi Firma',
+            city: item.city || item.sehir || 'Çanakkale',
+            category: item.category || 'İnşaat - Altyapı - Üstyapı - Yapım işi ve Yıkım ihaleleri',
+            type: 'Mal / Hizmet Alımı',
+            method: 'Doğrudan Teklif / Canlı Eksiltme',
+            cost: item.budget || (item.budgetNumeric ? Number(item.budgetNumeric).toLocaleString('tr-TR') + ' ₺' : 'Pazarlıklı'),
+            date: 'Güncel',
+            daysLeft: 7,
             status: 'Yeni İlan ⚡',
-            createdAt: item.createdAt || Date.now()
+            specText: item.description || item.aciklama || item.title,
+            bids: item.bidsCount || 0
           }))
-          tenders.value = [...formatted, ...tenders.value]
+          rawTenders.value = [...formatted, ...rawTenders.value]
         }
       }
     } catch (e) {
@@ -261,669 +257,746 @@ function loadStoredTenders() {
   }
 }
 
-// Filtrelenmiş İlanlar
-const filteredTenders = computed(() => {
-  return tenders.value.filter(item => {
-    if (searchQuery.value) {
-      const q = searchQuery.value.toLocaleLowerCase('tr').trim()
-      const inTitle = item.title.toLocaleLowerCase('tr').includes(q)
-      const inCompany = item.company.toLocaleLowerCase('tr').includes(q)
-      const inDesc = item.description.toLocaleLowerCase('tr').includes(q)
-      if (!inTitle && !inCompany && !inDesc) return false
+// Filtrelenmiş İhaleler Listesi
+const filteredTendersList = computed(() => {
+  return rawTenders.value.filter(t => {
+    // Kategori
+    if (selectedCategoryName.value && !t.category.includes(selectedCategoryName.value) && !selectedCategoryName.value.includes(t.category)) {
+      // Eğer kategoriye tıklandıysa
     }
-
-    if (selectedCategory.value !== 'all') {
-      if (item.category !== selectedCategory.value) return false
+    if (filterCategory.value !== 'Tümü' && !t.category.includes(filterCategory.value)) {
+      return false
     }
-
-    if (selectedCity.value !== 'all') {
-      if (item.city !== selectedCity.value) return false
+    // Şehir
+    if (filterCity.value !== 'Tümü' && t.city !== filterCity.value) {
+      return false
     }
-
+    // Kelime Arama
+    if (filterKeyword.value) {
+      const q = filterKeyword.value.toLocaleLowerCase('tr').trim()
+      const inTitle = t.title.toLocaleLowerCase('tr').includes(q)
+      const inNo = t.no.toLocaleLowerCase('tr').includes(q)
+      const inAuth = t.authority.toLocaleLowerCase('tr').includes(q)
+      if (!inTitle && !inNo && !inAuth) return false
+    }
     return true
-  }).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+  })
 })
 
-// ==================== LETGO SOHBET & PAZARLIK MASASI ====================
-function openChatForTender(tender: any) {
-  activeChatTender.value = tender
-  offerInputPrice.value = String(Math.round(tender.priceNumeric * 0.95))
-  counterOfferInputPrice.value = ''
-  isBargaining.value = false
-
-  // Örnek başlangıç sohbeti
-  activeChatMessages.value = [
-    {
-      id: 1,
-      sender: tender.company,
-      isMe: false,
-      text: `Merhaba! "${tender.title}" ilanımız için şartnameye uygun teklifinizi veya sorularınızı buradan iletebilirsiniz.`,
-      time: '10:00'
-    },
-    {
-      id: 2,
-      sender: 'Sistem',
-      isSystem: true,
-      text: `💰 İlan Sahibi Hedef Bütçesi: ${tender.price} | 📍 Konum: ${tender.city}`,
-      time: '10:01'
-    }
-  ]
-
-  showChatModal.value = true
+function selectCategory(catName: string) {
+  selectedCategoryName.value = catName
+  filterCategory.value = catName
+  // Sayfayı ihale listesine kaydır
+  const el = document.getElementById('ihale-listesi-alani')
+  if (el) el.scrollIntoView({ behavior: 'smooth' })
 }
 
-function sendTextMessage() {
-  if (!newChatMessage.value.trim()) return
-  activeChatMessages.value.push({
-    id: Date.now(),
-    sender: userSession.value.companyName,
-    isMe: true,
-    text: newChatMessage.value.trim(),
-    time: 'Şimdi'
-  })
-  newChatMessage.value = ''
-
-  // Karşı taraftan otomatik gerçekçi yanıt simülasyonu
-  setTimeout(() => {
-    activeChatMessages.value.push({
-      id: Date.now() + 1,
-      sender: activeChatTender.value.company,
-      isMe: false,
-      text: 'Mesajınızı aldık. Teknik ekibimiz şartname uygunluğunu inceliyor; fiyat teklifinizi onaylayabilir veya karşı teklif sunabiliriz.',
-      time: 'Şimdi'
-    })
-  }, 1200)
+function openTenderDetail(tender: any) {
+  selectedTenderModal.value = tender
+  quickOfferPrice.value = tender.cost.replace(/[^0-9]/g, '') ? String(Math.round(Number(tender.cost.replace(/[^0-9]/g, '')) * 0.95)) : ''
+  quickOfferNotes.value = ''
 }
 
-function makeOffer() {
-  if (!offerInputPrice.value) {
+function submitOffer() {
+  if (!quickOfferPrice.value) {
     alert('Lütfen teklif tutarınızı giriniz.')
     return
   }
-  const priceFormatted = Number(offerInputPrice.value).toLocaleString('tr-TR') + ' ₺'
-  activeChatMessages.value.push({
-    id: Date.now(),
-    sender: userSession.value.companyName,
-    isMe: true,
-    isOffer: true,
-    offerAmount: priceFormatted,
-    text: `⚡ TEKLİF SUNDUM: ${priceFormatted}`,
-    time: 'Şimdi'
-  })
-
-  setTimeout(() => {
-    activeChatMessages.value.push({
-      id: Date.now() + 1,
-      sender: activeChatTender.value.company,
-      isMe: false,
-      isCounterOffer: true,
-      counterAmount: Number(Number(offerInputPrice.value) * 1.02).toLocaleString('tr-TR') + ' ₺',
-      text: `💬 Teklifinizi gördük. ${Number(Number(offerInputPrice.value) * 1.02).toLocaleString('tr-TR')} ₺ yaparsanız hemen el sıkışıp sözleşmeyi imzalayabiliriz!`,
-      time: 'Şimdi'
-    })
-  }, 1500)
-}
-
-function acceptDeal() {
-  alert(`🤝 TEBRİKLER! EL SIKIŞILDI VE ANLAŞMA SAĞLANDI!\n\n${activeChatTender.value.company} ile mutabakat sağlandı. Zaman damgalı e-tutanak ve fatura bilgileri oluşturuldu.`)
-  activeChatMessages.value.push({
-    id: Date.now(),
-    sender: 'Sistem',
-    isSystem: true,
-    text: `🎉 TEBRİKLER! İKİ TARAF DA ANLAŞTI VE EL SIKIŞILDI 🤝 (İhale Kilitlendi)`,
-    time: 'Şimdi'
-  })
-}
-
-// ==================== LETGO TARZI 30 SANİYEDE İLAN VER ====================
-const newTenderForm = ref({
-  title: '',
-  category: 'insaat',
-  budget: '',
-  city: 'Çanakkale',
-  description: '',
-  phone: '0850 308 00 00'
-})
-
-function submitNewTender() {
-  if (!newTenderForm.value.title || !newTenderForm.value.budget) {
-    alert('Lütfen ilan başlığı ve bütçenizi giriniz.')
-    return
-  }
-
-  const createdItem = {
-    id: Date.now(),
-    title: newTenderForm.value.title,
-    company: userSession.value.companyName,
-    companyPhone: newTenderForm.value.phone,
-    rating: 5.0,
-    ratingCount: 1,
-    category: newTenderForm.value.category,
-    categoryName: iconCategories.find(c => c.slug === newTenderForm.value.category)?.name || 'Genel',
-    price: Number(newTenderForm.value.budget).toLocaleString('tr-TR') + ' ₺',
-    priceNumeric: Number(newTenderForm.value.budget),
-    priceType: 'Hedef Bütçe',
-    city: newTenderForm.value.city,
-    timeAgo: 'Az önce',
-    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80',
-    description: newTenderForm.value.description || newTenderForm.value.title,
-    bidsCount: 0,
-    status: 'Yayında ⚡',
-    createdAt: Date.now()
-  }
-
-  // Listeye en üste ekle
-  tenders.value.unshift(createdItem)
-
-  // LocalStorage'a kaydet
-  if (typeof window !== 'undefined') {
-    try {
-      const existing = JSON.parse(localStorage.getItem('myTenders') || '[]')
-      existing.unshift(createdItem)
-      localStorage.setItem('myTenders', JSON.stringify(existing))
-    } catch (e) {
-      console.error(e)
-    }
-  }
-
-  showNewTenderModal.value = false
-  newTenderForm.value = {
-    title: '',
-    category: 'insaat',
-    budget: '',
-    city: 'Çanakkale',
-    description: '',
-    phone: '0850 308 00 00'
-  }
-
-  alert('🎉 İLANINIZ LETGO HIZIYLA ANINDA YAYINA ALINDI!\n\nTedarikçiler anında ilanınızı görüp teklif ve mesaj göndermeye başlayabilir.')
+  alert(`✓ TEKLİFİNİZ BAŞARIYLA İLETİLDİ!\n\n${selectedTenderModal.value.no} numaralı "${selectedTenderModal.value.title}" ihalesine ${Number(quickOfferPrice.value).toLocaleString('tr-TR')} ₺ tutarındaki teklifiniz zaman damgalı tutanakla kaydedilmiştir.`)
+  selectedTenderModal.value = null
 }
 
 onMounted(() => {
-  loadStoredTenders()
+  if (typeof window !== 'undefined') {
+    const raw = localStorage.getItem('userSession')
+    if (raw) {
+      try { userSession.value = JSON.parse(raw) } catch {}
+    }
+  }
+  loadUserTenders()
 })
 </script>
 
 <template>
-  <div class="min-h-screen bg-[#070a13] text-slate-100 font-sans selection:bg-emerald-500 selection:text-slate-950 flex flex-col">
+  <div class="min-h-screen bg-[#F0F2F5] text-slate-800 font-sans text-xs flex flex-col">
 
     <!-- ========================================================================= -->
-    <!-- 🟢 1. LETGO TARZI ULTRA SADE ÜST BAR (SEARCH + İLAN VER + SOHBET) -->
+    <!-- 📞 1. EN ÜST İNCE BİLGİ ŞERİDİ (GÖRSELDEKİ BİREBİR ÜST BAR) -->
     <!-- ========================================================================= -->
-    <header class="sticky top-0 z-40 bg-[#0B1528]/95 backdrop-blur-md border-b border-slate-800 text-white shadow-xl">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-16 gap-3 sm:gap-4">
-
-          <!-- LOGO (LETGO STİLİ DİNAMİK ROZET) -->
-          <NuxtLink to="/" class="flex items-center gap-2.5 shrink-0 group">
-            <div class="h-10 w-10 rounded-2xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-blue-600 flex items-center justify-center font-black text-xl text-slate-950 shadow-lg group-hover:scale-105 transition-transform">
-              🤝
-            </div>
-            <div>
-              <span class="text-lg font-black tracking-tight text-white block leading-tight">İhaleci<span class="text-emerald-400">Burada</span></span>
-              <span class="text-[9px] font-bold text-slate-400 tracking-wider block">B2B TEKLİF & PAZARLIK</span>
-            </div>
+    <div class="bg-white border-b border-slate-300 py-1 px-4 sm:px-6 text-[11px] text-slate-600">
+      <div class="max-w-[1400px] mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-6">
+          <span>📞 <strong>Destek:</strong> <a href="tel:08503080000" class="text-blue-700 hover:underline">0850 308 00 00</a> / +90 555 962 73 20</span>
+          <span class="hidden sm:inline">✉ <strong>E-posta:</strong> <a href="mailto:mail@ihaleciburada.com" class="text-blue-700 hover:underline">mail@ihaleciburada.com</a></span>
+        </div>
+        <div>
+          <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="px-2.5 py-0.5 rounded border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold transition flex items-center gap-1">
+            <span>Kurumsal bilgiler</span> <ArrowRight :size="11" />
           </NuxtLink>
+        </div>
+      </div>
+    </div>
 
-          <!-- ORTA: LETGO ARAMA ÇUBUĞU (NE ARIYORSUNUZ?) -->
-          <div class="flex-1 max-w-xl relative hidden md:block">
-            <Search :size="16" class="absolute left-4 top-3 text-slate-400" />
-            <input 
-              v-model="searchQuery" 
-              type="text" 
-              placeholder="Ne satın almak veya satmak istiyorsunuz? (Demir, Koli, Trafo, Lojistik...)" 
-              class="w-full pl-11 pr-4 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition shadow-inner"
-            />
-            <button 
-              v-if="searchQuery" 
-              @click="searchQuery = ''" 
-              class="absolute right-3 top-2.5 text-slate-400 hover:text-white"
-            >
-              <X :size="14" />
-            </button>
+    <!-- ========================================================================= -->
+    <!-- 🏛️ 2. ANA HEADER: LOGO, RENKLİ MENÜ SEKMELERİ & HIZLI ÜYE GİRİŞİ -->
+    <!-- ========================================================================= -->
+    <header class="bg-white border-b border-slate-300 pt-2 pb-2 px-4 sm:px-6 shadow-xs">
+      <div class="max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center justify-between gap-3">
+
+        <!-- SOL: LOGO (İHALECİBURADA.COM - ÇEKİÇLİ VE B2B SİMGELİ) -->
+        <NuxtLink to="/" class="flex items-center gap-3 shrink-0 group">
+          <div class="h-11 w-11 rounded-xl bg-gradient-to-tr from-[#0084B4] to-[#00A3C4] flex items-center justify-center font-black text-2xl text-white shadow-md">
+            ⚖️
           </div>
-
-          <!-- SAĞ: ŞEHİR + + İLAN VER + SOHBETLERİM -->
-          <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-            
-            <!-- ŞEHİR SEÇİCİ -->
-            <select 
-              v-model="selectedCity" 
-              class="hidden sm:block px-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none focus:border-emerald-500 cursor-pointer"
-            >
-              <option value="all">📍 Tüm Türkiye</option>
-              <option value="Çanakkale">📍 Çanakkale</option>
-              <option value="İstanbul">📍 İstanbul</option>
-              <option value="Ankara">📍 Ankara</option>
-              <option value="İzmir">📍 İzmir</option>
-              <option value="Kocaeli">📍 Kocaeli</option>
-              <option value="Bursa">📍 Bursa</option>
-            </select>
-
-            <!-- LETGO: + İLAN VER (BÜYÜK VE PARLAK BUTON) -->
-            <button 
-              @click="showNewTenderModal = true" 
-              class="px-4 sm:px-5 py-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs sm:text-sm font-black shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 transition active:scale-95 flex items-center gap-1.5 cursor-pointer"
-            >
-              <Plus :size="16" class="stroke-[3]" />
-              <span>İlan Ver</span>
-            </button>
-
-            <!-- PROFİL / FİRMA -->
-            <button 
-              @click="showProfileModal = true" 
-              class="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
-              title="Profilim ve İlanlarım"
-            >
-              <User :size="15" class="text-emerald-400" />
-              <span class="hidden md:inline">Profilim</span>
-            </button>
-
+          <div>
+            <div class="text-2xl font-black tracking-tight text-[#0084B4] leading-tight flex items-center">
+              <span>ihaleci</span><span class="text-[#1EAE4C]">burada</span><span class="text-slate-600 text-base font-bold">.com</span>
+            </div>
+            <span class="text-[9px] font-bold text-slate-500 tracking-wider block uppercase">TÜRKİYE'NİN RESMİ B2B İHALE VE SATIN ALMA PORTALI</span>
           </div>
+        </NuxtLink>
 
+        <!-- SAĞ: TURUNCU / MAVİ MENÜ SEKMELERİ -->
+        <div class="flex flex-wrap items-center gap-1 text-white font-bold text-xs">
+          <button 
+            @click="activeNavTab = 'anasayfa'" 
+            :class="activeNavTab === 'anasayfa' ? 'bg-[#0084B4] shadow-inner' : 'bg-[#0097CD] hover:bg-[#0084B4]'"
+            class="px-4 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>🏠 Anasayfa</span>
+          </button>
+          
+          <button 
+            @click="activeNavTab = 'bultenler'" 
+            :class="activeNavTab === 'bultenler' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
+            class="px-4 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>📑 Bültenlerim</span>
+          </button>
+
+          <button 
+            @click="activeNavTab = 'okuduklarim'" 
+            :class="activeNavTab === 'okuduklarim' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
+            class="px-4 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>👁️ Okuduklarım</span>
+          </button>
+
+          <button 
+            @click="activeNavTab = 'takip'" 
+            :class="activeNavTab === 'takip' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
+            class="px-4 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>⭐ Takip listem</span>
+          </button>
+
+          <button 
+            @click="activeNavTab = 'sozlesme'" 
+            :class="activeNavTab === 'sozlesme' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
+            class="px-4 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer"
+          >
+            <span>🏆 Sözleşme listem</span>
+          </button>
+
+          <button 
+            @click="activeNavTab = 'bildirimler'" 
+            :class="activeNavTab === 'bildirimler' ? 'bg-[#E65100]' : 'bg-[#F57C00] hover:bg-[#E65100]'"
+            class="px-4 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer relative"
+          >
+            <span>🔔 Bildirimler</span>
+            <span class="h-4 min-w-[16px] px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">3</span>
+          </button>
         </div>
 
-        <!-- MOBİL ARAMA ÇUBUĞU -->
-        <div class="pb-3 md:hidden">
-          <div class="relative">
-            <Search :size="14" class="absolute left-3.5 top-2.5 text-slate-400" />
-            <input 
-              v-model="searchQuery" 
-              type="text" 
-              placeholder="Ne arıyorsunuz? (Demir, Koli, Lojistik...)" 
-              class="w-full pl-9 pr-3 py-2 bg-slate-900 border border-slate-700 rounded-xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
-            />
-          </div>
+      </div>
+
+      <!-- ALT İKİNCİ ŞERİT: YENİ ÜYELİK & HIZLI GİRİŞ FORMU -->
+      <div class="max-w-[1400px] mx-auto mt-2 pt-2 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-3">
+        
+        <!-- Sol: Yeni Üyelik & Üyelik Uzat -->
+        <div class="flex items-center gap-2">
+          <NuxtLink to="/uyelik" class="px-3 py-1.5 rounded bg-[#4CAF50] hover:bg-[#43A047] text-white font-bold text-xs shadow-xs flex items-center gap-1">
+            <span>👤+ Yeni üyelik</span>
+          </NuxtLink>
+          <NuxtLink to="/abonelik" class="px-3 py-1.5 rounded bg-[#0288D1] hover:bg-[#0277BD] text-white font-bold text-xs shadow-xs flex items-center gap-1">
+            <span>🔄 Üyelik uzat</span>
+          </NuxtLink>
+          <NuxtLink to="/panel/ihale-olustur" class="px-3 py-1.5 rounded bg-[#FF5722] hover:bg-[#E64A19] text-white font-black text-xs shadow-xs flex items-center gap-1">
+            <span>+ İhale Aç</span>
+          </NuxtLink>
+        </div>
+
+        <!-- Sağ: Hızlı Üye Girişi -->
+        <div v-if="!userSession" class="flex flex-wrap items-center gap-1.5 text-xs">
+          <span class="font-bold text-slate-700 flex items-center gap-1">👤 Üye girişi:</span>
+          <input 
+            v-model="loginUsername" 
+            type="text" 
+            placeholder="Kullanıcı adı / E-posta" 
+            class="px-2.5 py-1 bg-white border border-slate-300 rounded text-xs text-slate-800 focus:outline-none focus:border-blue-500 w-36 sm:w-44" 
+          />
+          <input 
+            v-model="loginPassword" 
+            type="password" 
+            placeholder="Şifre" 
+            class="px-2.5 py-1 bg-white border border-slate-300 rounded text-xs text-slate-800 focus:outline-none focus:border-blue-500 w-28 sm:w-32" 
+          />
+          <button 
+            @click="handleLogin" 
+            class="px-3 py-1 bg-[#4CAF50] hover:bg-[#43A047] text-white font-bold rounded text-xs transition cursor-pointer"
+          >
+            Giriş ➔
+          </button>
+          <button 
+            @click="alert('Şifre sıfırlama linki e-postanıza gönderilecektir.')" 
+            class="px-3 py-1 bg-[#D32F2F] hover:bg-[#C62828] text-white font-bold rounded text-xs transition cursor-pointer"
+          >
+            🔑 Şifremi Unuttum
+          </button>
+        </div>
+
+        <!-- Oturum Açıkken -->
+        <div v-else class="flex items-center gap-3 text-xs">
+          <span class="font-bold text-slate-700">👤 {{ userSession.companyName || userSession.username }}</span>
+          <NuxtLink to="/panel" class="px-2.5 py-1 rounded bg-blue-600 text-white font-bold">Yönetim Paneli</NuxtLink>
+          <button @click="handleLogout" class="px-2.5 py-1 rounded bg-red-100 text-red-700 font-bold border border-red-300">Çıkış</button>
         </div>
 
       </div>
     </header>
 
     <!-- ========================================================================= -->
-    <!-- 🔘 2. LETGO TARZI YATAY KATEGORİ ŞERİDİ (DAİRESEL İKONLAR) -->
+    <!-- 🔵 3. MAVİ KATEGORİ VE MODÜL ŞERİDİ (GÖRSELDEKİ KOYU MAVİ BUTONLAR) -->
     <!-- ========================================================================= -->
-    <div class="bg-[#0B1528] border-b border-slate-800/80 py-3.5 px-4 sm:px-6 lg:px-8">
-      <div class="max-w-7xl mx-auto flex items-center gap-2.5 sm:gap-4 overflow-x-auto custom-scrollbar pb-1">
+    <div class="bg-[#0084B4] border-b border-[#00739D] text-white font-bold text-xs">
+      <div class="max-w-[1400px] mx-auto flex flex-wrap items-center">
+        
         <button 
-          v-for="cat in iconCategories" 
-          :key="cat.slug"
-          @click="selectedCategory = cat.slug" 
-          :class="selectedCategory === cat.slug ? 'bg-emerald-500 text-slate-950 font-black shadow-md shadow-emerald-500/20 scale-105' : 'bg-slate-900/90 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800'"
-          class="px-4 py-2 rounded-2xl text-xs font-bold transition-all flex items-center gap-2 whitespace-nowrap shrink-0 cursor-pointer"
+          @click="activeSubMenu = 'kategoriler'" 
+          :class="activeSubMenu === 'kategoriler' ? 'bg-[#E1F5FE] text-[#0084B4] border-t-2 border-[#0084B4] font-black' : 'hover:bg-[#00739D] text-white'"
+          class="px-5 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-[#00739D]"
         >
-          <span class="text-base">{{ cat.icon }}</span>
-          <span>{{ cat.name }}</span>
+          <span>📁 Kategoriler</span>
         </button>
+
+        <button 
+          @click="activeSubMenu = 'sehirler'" 
+          :class="activeSubMenu === 'sehirler' ? 'bg-[#E1F5FE] text-[#0084B4] font-black' : 'hover:bg-[#00739D] text-white'"
+          class="px-5 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-[#00739D]"
+        >
+          <span>🏙️ Şehirler</span>
+        </button>
+
+        <button 
+          @click="activeSubMenu = 'sektorler'" 
+          :class="activeSubMenu === 'sektorler' ? 'bg-[#E1F5FE] text-[#0084B4] font-black' : 'hover:bg-[#00739D] text-white'"
+          class="px-5 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-[#00739D]"
+        >
+          <span>🏭 Sektörler</span>
+        </button>
+
+        <button 
+          @click="activeSubMenu = 'idareler'" 
+          :class="activeSubMenu === 'idareler' ? 'bg-[#E1F5FE] text-[#0084B4] font-black' : 'hover:bg-[#00739D] text-white'"
+          class="px-5 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-[#00739D]"
+        >
+          <span>🏛️ İdareler / Kurumlar</span>
+        </button>
+
+        <button 
+          @click="activeSubMenu = 'yukleniciler'" 
+          :class="activeSubMenu === 'yukleniciler' ? 'bg-[#E1F5FE] text-[#0084B4] font-black' : 'hover:bg-[#00739D] text-white'"
+          class="px-5 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-[#00739D]"
+        >
+          <span>👥 Yükleniciler & Firmalar</span>
+        </button>
+
+        <button 
+          @click="activeSubMenu = 'kik'" 
+          :class="activeSubMenu === 'kik' ? 'bg-[#E1F5FE] text-[#0084B4] font-black' : 'hover:bg-[#00739D] text-white'"
+          class="px-5 py-2.5 transition flex items-center gap-1.5 cursor-pointer"
+        >
+          <span>⚖️ KİK Kararları & Mevzuat</span>
+        </button>
+
       </div>
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 🛍️ 3. LETGO KART VİTRİNİ (GRID DÜZENİ: GÖRSEL + FİYAT + PAZARLIK YAP BUTONU) -->
+    <!-- 🔍 4. GELİŞMİŞ İHALE ARAMA VE FİLTRELEME KONSOLU (GÖRSELDEKİ BİREBİR TABLO) -->
     <!-- ========================================================================= -->
-    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
-      
-      <!-- BAŞLIK & İLAN SAYISI -->
-      <div class="flex items-center justify-between">
-        <div>
-          <h2 class="text-lg sm:text-xl font-black text-white flex items-center gap-2">
-            <span>Canlı B2B İlanlar & Fırsatlar</span>
-            <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-mono font-bold">
-              {{ filteredTenders.length }} İlan
-            </span>
-          </h2>
-          <p class="text-xs text-slate-400 mt-0.5">İstediğin ilana tıkla, doğrudan firma ile <strong>canlı mesajlaş ve pazarlık yap!</strong></p>
-        </div>
-      </div>
-
-      <!-- LETGO KART IZGARASI (GRID: 1 - 2 - 3 SÜTUN) -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-        <div 
-          v-for="tender in filteredTenders" 
-          :key="tender.id"
-          class="bg-[#0d1117] border border-slate-800 hover:border-emerald-500/50 rounded-3xl overflow-hidden transition-all duration-200 shadow-xl hover:shadow-2xl flex flex-col justify-between group"
-        >
+    <div class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 py-4">
+      <div class="bg-white border border-slate-300 rounded-lg p-4 shadow-xs space-y-4">
+        
+        <!-- ÜST ZAMAN SEKMELERİ VE SAĞ ARAMA KUTUSU -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-3 border-b border-slate-200 pb-3">
           
-          <!-- ÜST: GÖRSEL & KONUM & ZAMAN -->
-          <div class="relative h-48 w-full overflow-hidden bg-slate-900">
-            <img 
-              :src="tender.image" 
-              :alt="tender.title" 
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-            <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80"></div>
-            
-            <!-- Kategori Rozeti -->
-            <span class="absolute top-3 left-3 px-2.5 py-1 rounded-xl bg-slate-950/80 backdrop-blur-xs text-emerald-400 text-[10px] font-black border border-slate-700/60 shadow-md">
-              {{ tender.categoryName }}
-            </span>
-
-            <!-- Şehir & Zaman -->
-            <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] font-bold text-slate-200">
-              <span class="flex items-center gap-1 bg-slate-950/70 px-2 py-0.5 rounded-lg backdrop-blur-2xs">
-                📍 {{ tender.city }}
-              </span>
-              <span class="text-slate-400 font-mono text-[10px]">
-                ⏱️ {{ tender.timeAgo }}
-              </span>
-            </div>
-          </div>
-
-          <!-- ORTA: FİYAT + BAŞLIK + AÇIKLAMA -->
-          <div class="p-5 space-y-3 flex-1 flex flex-col justify-between text-left">
-            <div class="space-y-1.5">
-              <!-- BÜYÜK LETGO FİYAT / BÜTÇE ETİKETİ -->
-              <div class="flex items-baseline justify-between">
-                <span class="text-xl sm:text-2xl font-black font-mono text-emerald-400 tracking-tight">
-                  {{ tender.price }}
-                </span>
-                <span class="text-[10px] uppercase font-bold text-slate-500">
-                  {{ tender.priceType }}
-                </span>
-              </div>
-
-              <!-- İlan Başlığı -->
-              <h3 class="text-sm sm:text-base font-black text-white group-hover:text-emerald-400 transition-colors leading-snug line-clamp-2">
-                {{ tender.title }}
-              </h3>
-
-              <!-- Açıklama -->
-              <p class="text-xs text-slate-400 line-clamp-2 leading-relaxed">
-                {{ tender.description }}
-              </p>
-            </div>
-
-            <!-- FİRMA BİLGİSİ VE PUANI -->
-            <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs">
-              <div class="min-w-0 pr-2">
-                <span class="text-[10px] text-slate-500 uppercase block font-bold">İlan Sahibi</span>
-                <span class="font-bold text-white block truncate">{{ tender.company }}</span>
-              </div>
-              <span class="px-2 py-0.5 rounded-md bg-amber-500/15 text-amber-300 font-bold text-[11px] shrink-0">
-                ⭐ {{ tender.rating }}
-              </span>
-            </div>
-          </div>
-
-          <!-- ALT AKSİYON: LETGO PAZARLIK YAP & TEKLİF VER BUTONU -->
-          <div class="p-4 bg-slate-900/60 border-t border-slate-800/60 flex items-center gap-2">
+          <!-- Zaman Butonları -->
+          <div class="flex items-center gap-1 text-xs font-bold">
             <button 
-              @click="openChatForTender(tender)" 
-              class="flex-1 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 text-xs font-black shadow-md hover:shadow-emerald-500/20 transition active:scale-98 flex items-center justify-center gap-2 cursor-pointer"
+              @click="activeTimeTab = 'guncel'" 
+              :class="activeTimeTab === 'guncel' ? 'bg-slate-100 text-blue-700 border-b-2 border-blue-600' : 'text-slate-600 hover:bg-slate-50'"
+              class="px-3.5 py-1.5 rounded transition flex items-center gap-1 cursor-pointer"
             >
-              <MessageCircle :size="15" class="fill-slate-950" />
-              <span>Pazarlık Yap & Teklif Ver 💬</span>
+              <span>🕒 Güncel</span>
+            </button>
+            <button 
+              @click="activeTimeTab = 'gecmis'" 
+              :class="activeTimeTab === 'gecmis' ? 'bg-slate-100 text-blue-700 border-b-2 border-blue-600' : 'text-slate-600 hover:bg-slate-50'"
+              class="px-3.5 py-1.5 rounded transition flex items-center gap-1 cursor-pointer"
+            >
+              <span>📅 Geçmiş</span>
+            </button>
+            <button 
+              @click="activeTimeTab = 'sonuc'" 
+              :class="activeTimeTab === 'sonuc' ? 'bg-slate-100 text-blue-700 border-b-2 border-blue-600' : 'text-slate-600 hover:bg-slate-50'"
+              class="px-3.5 py-1.5 rounded transition flex items-center gap-1 cursor-pointer"
+            >
+              <span>🎯 Sonuç</span>
+            </button>
+            <button 
+              @click="activeTimeTab = 'detayli'" 
+              :class="activeTimeTab === 'detayli' ? 'bg-slate-100 text-blue-700 border-b-2 border-blue-600' : 'text-slate-600 hover:bg-slate-50'"
+              class="px-3.5 py-1.5 rounded transition flex items-center gap-1 cursor-pointer"
+            >
+              <span>🔍 Detaylı Ara</span>
+            </button>
+          </div>
+
+          <!-- Sağ: Kelime Arama -->
+          <div class="flex items-center gap-1 w-full md:w-auto">
+            <input 
+              v-model="filterKeyword" 
+              type="text" 
+              placeholder="Kelime ara..." 
+              class="px-3 py-1.5 bg-white border border-slate-300 rounded text-xs text-slate-800 focus:outline-none focus:border-blue-500 flex-1 md:w-60"
+            />
+            <select v-model="searchScope" class="px-2 py-1.5 bg-slate-50 border border-slate-300 rounded text-xs text-slate-700">
+              <option value="icerik">İçerik</option>
+              <option value="baslik">Başlık</option>
+              <option value="no">İhale No</option>
+              <option value="idare">İdare Adı</option>
+            </select>
+            <button class="px-4 py-1.5 bg-[#0084B4] hover:bg-[#00739D] text-white font-bold rounded text-xs flex items-center gap-1 cursor-pointer">
+              <Search :size="13" />
+              <span>Ara</span>
             </button>
           </div>
 
         </div>
-      </div>
 
-    </main>
-
-    <!-- ========================================================================= -->
-    <!-- 💬 4. LETGO SOHBET & ANLIK PAZARLIK ÇEKMECESİ (DRAWER / CHAT MODAL) -->
-    <!-- ========================================================================= -->
-    <div v-if="showChatModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-      <div class="bg-[#0d1117] border border-slate-800 rounded-3xl max-w-2xl w-full h-[620px] max-h-[90vh] flex flex-col justify-between shadow-2xl overflow-hidden">
-        
-        <!-- SOHBET ÜST BAR: İLAN BİLGİSİ & FİRMA -->
-        <div class="p-4 bg-[#0B1528] border-b border-slate-800 flex items-center justify-between text-left">
-          <div class="flex items-center gap-3">
-            <div class="h-10 w-10 rounded-xl overflow-hidden bg-slate-800 shrink-0">
-              <img :src="activeChatTender?.image" class="w-full h-full object-cover" />
-            </div>
-            <div>
-              <div class="flex items-center gap-2">
-                <h3 class="text-sm font-black text-white">{{ activeChatTender?.company }}</h3>
-                <span class="px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 text-[10px] font-bold">⭐ {{ activeChatTender?.rating }}</span>
-              </div>
-              <p class="text-xs text-emerald-400 font-mono font-bold mt-0.5">
-                {{ activeChatTender?.title }} (Bütçe: {{ activeChatTender?.price }})
-              </p>
-            </div>
+        <!-- 7'Lİ ARAMA VE SEÇİM DROPDOWN'LARI (GÖRSELDEKİ BİREBİR GRID) -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2.5 text-xs text-slate-700">
+          
+          <!-- Kategori -->
+          <div>
+            <label class="font-bold block mb-1 text-slate-600">Kategori:</label>
+            <select v-model="filterCategory" class="w-full p-1.5 bg-white border border-slate-300 rounded text-xs">
+              <option value="Tümü">Tümü</option>
+              <option value="İnşaat">İnşaat - Altyapı</option>
+              <option value="Sağlık">Sağlık & Medikal</option>
+              <option value="Enerji">Enerji & Elektrik</option>
+              <option value="Gıda">Gıda & Tarım</option>
+              <option value="Makine">Endüstriyel Makine</option>
+              <option value="Hırdavat">Hırdavat & Metal</option>
+            </select>
           </div>
-          <button @click="showChatModal = false" class="text-slate-400 hover:text-white p-1 cursor-pointer"><X :size="20" /></button>
+
+          <!-- Şehir -->
+          <div>
+            <label class="font-bold block mb-1 text-slate-600">Şehir:</label>
+            <select v-model="filterCity" class="w-full p-1.5 bg-white border border-slate-300 rounded text-xs">
+              <option value="Tümü">Tümü</option>
+              <option value="Çanakkale">Çanakkale</option>
+              <option value="İstanbul">İstanbul</option>
+              <option value="Ankara">Ankara</option>
+              <option value="İzmir">İzmir</option>
+              <option value="Kocaeli">Kocaeli</option>
+              <option value="Bursa">Bursa</option>
+              <option value="Tekirdağ">Tekirdağ</option>
+            </select>
+          </div>
+
+          <!-- İhale Türü -->
+          <div>
+            <label class="font-bold block mb-1 text-slate-600">İhale türü:</label>
+            <select v-model="filterType" class="w-full p-1.5 bg-white border border-slate-300 rounded text-xs">
+              <option value="Tümü">Tümü</option>
+              <option value="Mal Alımı">Mal Alımı</option>
+              <option value="Hizmet Alımı">Hizmet Alımı</option>
+              <option value="Yapım İşi">Yapım İşi</option>
+              <option value="Danışmanlık">Danışmanlık</option>
+            </select>
+          </div>
+
+          <!-- İhale Usulü -->
+          <div>
+            <label class="font-bold block mb-1 text-slate-600">İhale usulü:</label>
+            <select v-model="filterMethod" class="w-full p-1.5 bg-white border border-slate-300 rounded text-xs">
+              <option value="Tümü">Tümü</option>
+              <option value="Açık İhale">Açık İhale</option>
+              <option value="Pazarlık Usulü">Pazarlık Usulü</option>
+              <option value="Belli İstekliler">Belli İstekliler</option>
+              <option value="Doğrudan Temin">Doğrudan Temin</option>
+            </select>
+          </div>
+
+          <!-- Yaklaşık Maliyet -->
+          <div>
+            <label class="font-bold block mb-1 text-slate-600">Yaklaşık maliyet:</label>
+            <select v-model="filterCost" class="w-full p-1.5 bg-white border border-slate-300 rounded text-xs">
+              <option value="Tümü">Tümü</option>
+              <option value="1">0 - 500.000 ₺</option>
+              <option value="2">500.000 ₺ - 5.000.000 ₺</option>
+              <option value="3">5.000.000 ₺ ve üzeri</option>
+            </select>
+          </div>
+
+          <!-- İhale İçeriği -->
+          <div>
+            <label class="font-bold block mb-1 text-slate-600">İhale içeriği:</label>
+            <input v-model="filterKeyword" type="text" placeholder="Kelime ara" class="w-full p-1.5 bg-white border border-slate-300 rounded text-xs" />
+          </div>
+
+          <!-- Yayın Tarihi -->
+          <div>
+            <label class="font-bold block mb-1 text-slate-600">Yayın tarihi:</label>
+            <input v-model="filterStartDate" type="date" class="w-full p-1 bg-white border border-slate-300 rounded text-[11px]" />
+          </div>
+
         </div>
 
-        <!-- SOHBET MESAJ AKIŞI -->
-        <div class="flex-1 p-4 overflow-y-auto space-y-3 custom-scrollbar text-xs">
+        <!-- RADYO BUTONLARI VE MAVİ ARA BUTONU -->
+        <div class="flex flex-wrap items-center justify-between pt-2 border-t border-slate-200 gap-3">
+          <div class="flex flex-wrap items-center gap-4 text-xs font-semibold text-slate-700">
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" value="basit" v-model="viewMode" name="viewMode" class="accent-blue-600" />
+              <span>Basit görünüm</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" value="gelismis" v-model="viewMode" name="viewMode" class="accent-blue-600" />
+              <span>Gelişmiş görünüm</span>
+            </label>
+            <span class="text-slate-300">|</span>
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" value="gizle" v-model="readMode" name="readMode" class="accent-blue-600" />
+              <span>Okuduklarımı gizle</span>
+            </label>
+            <label class="flex items-center gap-1.5 cursor-pointer">
+              <input type="radio" value="goster" v-model="readMode" name="readMode" class="accent-blue-600" />
+              <span>Okuduklarımı göster</span>
+            </label>
+          </div>
+
+          <button class="px-6 py-2 rounded bg-[#0084B4] hover:bg-[#00739D] text-white font-bold text-xs flex items-center gap-1.5 shadow-xs cursor-pointer">
+            <Search :size="14" />
+            <span>Ara 🔍</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- ⚡ 5. GÜNLÜK İHALE SAYAÇLARI (GÖRSELDEKİ 3 MAVİ KUTU) -->
+    <!-- ========================================================================= -->
+    <div class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 py-2">
+      <div class="bg-white border border-slate-300 rounded-lg p-3 shadow-xs space-y-2">
+        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-slate-100 text-slate-700 font-black text-xs border border-slate-300">
+          ⚡ Günlük
+        </span>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+          <!-- 1. Bugün Yayınlananlar -->
+          <div class="p-2.5 rounded border border-sky-300 bg-sky-50 flex items-center justify-between hover:bg-sky-100 transition cursor-pointer">
+            <span class="font-bold text-sky-900 text-xs flex items-center gap-1.5">
+              <Search :size="14" class="text-sky-700" />
+              <span>Bugün yayınlananlar</span>
+            </span>
+            <span class="px-2.5 py-0.5 rounded-full bg-white border border-sky-300 text-sky-800 font-black text-xs font-mono shadow-2xs">
+              2.215 İhale
+            </span>
+          </div>
+
+          <!-- 2. Bugün Yapılacaklar -->
+          <div class="p-2.5 rounded border border-blue-300 bg-blue-50 flex items-center justify-between hover:bg-blue-100 transition cursor-pointer">
+            <span class="font-bold text-blue-900 text-xs flex items-center gap-1.5">
+              <Search :size="14" class="text-blue-700" />
+              <span>Bugün yapılacaklar</span>
+            </span>
+            <span class="px-2.5 py-0.5 rounded-full bg-white border border-blue-300 text-blue-800 font-black text-xs font-mono shadow-2xs">
+              2.627 İhale
+            </span>
+          </div>
+
+          <!-- 3. Bugün Sonuçlananlar -->
+          <div class="p-2.5 rounded border border-emerald-300 bg-emerald-50 flex items-center justify-between hover:bg-emerald-100 transition cursor-pointer">
+            <span class="font-bold text-emerald-900 text-xs flex items-center gap-1.5">
+              <Search :size="14" class="text-emerald-700" />
+              <span>Bugün sonuçlananlar</span>
+            </span>
+            <span class="px-2.5 py-0.5 rounded-full bg-white border border-emerald-300 text-emerald-800 font-black text-xs font-mono shadow-2xs">
+              1.681 İhale
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 📁 6. İHALE KATEGORİLERİ (GÖRSELDEKİ 2 SÜTUNLU RESMİ LİSTE) -->
+    <!-- ========================================================================= -->
+    <div class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 py-2">
+      <div class="bg-white border border-slate-300 rounded-lg p-4 shadow-xs space-y-3">
+        
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+          <h3 class="font-black text-sm text-slate-800 flex items-center gap-1.5">
+            <Folder :size="16" class="text-[#0084B4]" />
+            <span>Kategoriler</span>
+          </h3>
+          <span class="text-xs text-slate-500 font-bold">Toplam: <strong>24 Ana Sektör</strong></span>
+        </div>
+
+        <!-- 2 SÜTUNLU LİSTE -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-x-6 gap-y-1.5 text-xs">
           
-          <div 
-            v-for="msg in activeChatMessages" 
-            :key="msg.id"
-            class="flex flex-col"
-            :class="msg.isMe ? 'items-end' : (msg.isSystem ? 'items-center' : 'items-start')"
-          >
-            <!-- Sistem Mesajı -->
-            <div v-if="msg.isSystem" class="px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 text-[11px] text-center max-w-md">
-              {{ msg.text }}
-            </div>
-
-            <!-- Teklif / Karşı Teklif Baloncuğu -->
+          <!-- SOL SÜTUN (12 KATEGORİ) -->
+          <div class="space-y-1.5">
             <div 
-              v-else-if="msg.isOffer || msg.isCounterOffer"
-              class="p-4 rounded-2xl max-w-sm space-y-2 text-left shadow-lg border"
-              :class="msg.isMe ? 'bg-emerald-950/80 border-emerald-500 text-emerald-100' : 'bg-blue-950/80 border-blue-500 text-blue-100'"
+              v-for="cat in categoryListLeft" 
+              :key="cat.id"
+              class="p-2 rounded border border-slate-200 hover:border-blue-400 bg-slate-50/70 hover:bg-sky-50/60 flex items-center justify-between transition group"
             >
-              <div class="flex items-center justify-between">
-                <span class="text-[10px] font-black uppercase tracking-wider">{{ msg.isCounterOffer ? '💬 KARŞI TEKLİF' : '⚡ RESMİ TEKLİF' }}</span>
-                <span class="text-[10px] opacity-70">{{ msg.time }}</span>
+              <div 
+                @click="selectCategory(cat.name)" 
+                class="flex items-center gap-2 flex-1 cursor-pointer pr-2"
+              >
+                <Folder :size="14" class="text-[#0084B4] shrink-0 group-hover:scale-110 transition-transform" />
+                <span class="font-bold text-slate-700 group-hover:text-blue-700 truncate">{{ cat.name }}</span>
               </div>
-              <div class="text-xl font-black font-mono">
-                {{ msg.offerAmount || msg.counterAmount }}
-              </div>
-              <p class="text-xs opacity-90">{{ msg.text }}</p>
 
-              <!-- El Sıkış & Anlaş Butonu -->
-              <div v-if="!msg.isMe" class="pt-2 border-t border-blue-800/60 flex gap-2">
-                <button 
-                  @click="acceptDeal" 
-                  class="w-full py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition cursor-pointer flex items-center justify-center gap-1"
+              <div class="flex items-center gap-1.5 shrink-0">
+                <span class="px-2 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[11px] text-slate-700 shadow-2xs">
+                  {{ cat.count.toLocaleString('tr-TR') }} İhale
+                </span>
+                <select class="p-1 rounded border border-slate-300 bg-white text-[11px] font-semibold text-slate-600 focus:outline-none cursor-pointer">
+                  <option>Günlük ⌄</option>
+                  <option>Haftalık</option>
+                  <option>Tümü</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- SAĞ SÜTUN (12 KATEGORİ) -->
+          <div class="space-y-1.5">
+            <div 
+              v-for="cat in categoryListRight" 
+              :key="cat.id"
+              class="p-2 rounded border border-slate-200 hover:border-blue-400 bg-slate-50/70 hover:bg-sky-50/60 flex items-center justify-between transition group"
+            >
+              <div 
+                @click="selectCategory(cat.name)" 
+                class="flex items-center gap-2 flex-1 cursor-pointer pr-2"
+              >
+                <Folder :size="14" class="text-[#0084B4] shrink-0 group-hover:scale-110 transition-transform" />
+                <span class="font-bold text-slate-700 group-hover:text-blue-700 truncate">{{ cat.name }}</span>
+              </div>
+
+              <div class="flex items-center gap-1.5 shrink-0">
+                <span class="px-2 py-0.5 rounded border border-slate-300 bg-white font-mono font-bold text-[11px] text-slate-700 shadow-2xs">
+                  {{ cat.count.toLocaleString('tr-TR') }} İhale
+                </span>
+                <select class="p-1 rounded border border-slate-300 bg-white text-[11px] font-semibold text-slate-600 focus:outline-none cursor-pointer">
+                  <option>Günlük ⌄</option>
+                  <option>Haftalık</option>
+                  <option>Tümü</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 📋 7. GÜNCEL İHALE VE SATIN ALMA TABLOSU (EKAP / İHALECİLER LİSTE ALANI) -->
+    <!-- ========================================================================= -->
+    <div id="ihale-listesi-alani" class="max-w-[1400px] w-full mx-auto px-4 sm:px-6 py-4">
+      <div class="bg-white border border-slate-300 rounded-lg p-4 shadow-xs space-y-4 text-left">
+        
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
+          <div>
+            <h3 class="font-black text-base text-slate-800 flex items-center gap-2">
+              <span>📋 Güncel İhale & Satın Alma İlanları</span>
+              <span v-if="selectedCategoryName" class="text-xs px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-bold">
+                {{ selectedCategoryName }}
+              </span>
+            </h3>
+            <p class="text-slate-500 text-xs mt-0.5">Şartnameleri inceleyebilir, resmi ihale dosyalarını indirebilir veya anında online teklif verebilirsiniz.</p>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-bold text-slate-600">{{ filteredTendersList.length }} İlan Listeleniyor</span>
+            <button v-if="selectedCategoryName" @click="selectedCategoryName = null; filterCategory = 'Tümü'" class="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold">
+              ✕ Filtreyi Kaldır
+            </button>
+          </div>
+        </div>
+
+        <!-- İHALE TABLOSU / KARTLARI -->
+        <div class="space-y-3">
+          <div 
+            v-for="tender in filteredTendersList" 
+            :key="tender.id"
+            class="p-4 rounded-lg border border-slate-300 hover:border-[#0084B4] bg-white hover:bg-sky-50/30 transition-all duration-150 shadow-2xs space-y-3"
+          >
+            <!-- Üst Başlık & İhale No -->
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
+              <div class="space-y-1">
+                <div class="flex items-center gap-2">
+                  <span class="px-2 py-0.5 rounded bg-[#0084B4] text-white font-mono font-black text-[10px]">
+                    İHALE NO: {{ tender.no }}
+                  </span>
+                  <span class="px-2 py-0.5 rounded bg-slate-100 border border-slate-300 text-slate-700 font-bold text-[10px]">
+                    {{ tender.type }}
+                  </span>
+                  <span class="px-2 py-0.5 rounded bg-amber-50 border border-amber-300 text-amber-800 font-bold text-[10px]">
+                    {{ tender.method }}
+                  </span>
+                </div>
+                <h4 
+                  @click="openTenderDetail(tender)" 
+                  class="font-black text-sm sm:text-base text-slate-900 hover:text-blue-700 transition-colors cursor-pointer leading-snug"
                 >
-                  <Handshake :size="14" />
-                  <span>Kabul Et & Anlaş 🤝</span>
+                  {{ tender.title }}
+                </h4>
+              </div>
+
+              <!-- Teklif Ver & İncele Butonu -->
+              <div class="flex items-center gap-2 shrink-0">
+                <button 
+                  @click="openTenderDetail(tender)" 
+                  class="px-4 py-2 rounded bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition shadow-xs flex items-center gap-1 cursor-pointer"
+                >
+                  <Zap :size="13" class="text-amber-300 fill-amber-300" />
+                  <span>Teklif Ver / İncele ➔</span>
                 </button>
               </div>
             </div>
 
-            <!-- Standart Sohbet Baloncuğu -->
-            <div 
-              v-else
-              class="p-3 rounded-2xl max-w-xs sm:max-w-md text-left leading-relaxed"
-              :class="msg.isMe ? 'bg-emerald-600 text-slate-950 font-medium rounded-tr-xs' : 'bg-slate-800 text-slate-100 font-medium rounded-tl-xs'"
-            >
-              <p>{{ msg.text }}</p>
-              <span class="text-[9px] opacity-70 block text-right mt-1 font-mono">{{ msg.time }}</span>
+            <!-- Alt Bilgiler: İdare, Şehir, Maliyet, İhale Tarihi -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-slate-600">
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 block uppercase">İdare / Satın Alma Ekibi</span>
+                <span class="font-bold text-slate-800 block truncate">{{ tender.authority }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 block uppercase">Yaklaşık Maliyet / Bütçe</span>
+                <span class="font-black text-emerald-700 font-mono text-sm block">{{ tender.cost }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 block uppercase">İhale Tarihi & Saati</span>
+                <span class="font-bold text-rose-700 block font-mono">⏱️ {{ tender.date }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 block uppercase">İl & Teklif Sayısı</span>
+                <span class="font-bold text-slate-700 block">📍 {{ tender.city }} ({{ tender.bids }} Teklif)</span>
+              </div>
             </div>
 
           </div>
-
-        </div>
-
-        <!-- SOHBET ALT: HIZLI TEKLİF VERME VE MESAJ GÖNDERME -->
-        <div class="p-3 bg-[#0B1528] border-t border-slate-800 space-y-2">
-          
-          <!-- HIZLI PAZARLIK / TEKLİF ÇUBUĞU (LETGO STİLİ) -->
-          <div class="flex items-center gap-2 bg-slate-900 p-2 rounded-2xl border border-slate-800">
-            <span class="text-[11px] font-bold text-emerald-400 pl-2 shrink-0">Fiyat Teklifi:</span>
-            <input 
-              v-model="offerInputPrice" 
-              type="number" 
-              placeholder="Örn: 14000000" 
-              class="flex-1 bg-transparent text-xs text-white font-mono font-bold focus:outline-none"
-            />
-            <button 
-              @click="makeOffer" 
-              class="px-3.5 py-1.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs transition cursor-pointer"
-            >
-              Teklif Gönder ⚡
-            </button>
-          </div>
-
-          <!-- MESAJ YAZMA KUTUSU -->
-          <div class="flex items-center gap-2">
-            <input 
-              v-model="newChatMessage" 
-              @keyup.enter="sendTextMessage"
-              type="text" 
-              placeholder="Mesajınızı yazın (Örn: Kaç günde teslim edebilirsiniz?)..." 
-              class="flex-1 px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-2xl text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
-            />
-            <button 
-              @click="sendTextMessage" 
-              class="px-4 py-2.5 rounded-2xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition cursor-pointer flex items-center gap-1"
-            >
-              <Send :size="14" />
-              <span>Gönder</span>
-            </button>
-          </div>
-
         </div>
 
       </div>
     </div>
 
     <!-- ========================================================================= -->
-    <!-- ➕ 5. LETGO TARZI 30 SANİYEDE İLAN VERME MODALI -->
+    <!-- 🪟 8. İHALE DETAY VE TEKLİF VERME MODALI -->
     <!-- ========================================================================= -->
-    <div v-if="showNewTenderModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-[#0d1117] border border-slate-800 rounded-3xl max-w-lg w-full p-6 space-y-4 text-left shadow-2xl">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <div class="flex items-center gap-2">
-            <span class="text-xl">⚡</span>
-            <div>
-              <h3 class="text-base font-black text-white">Hemen İlan Ver (30 Saniyede)</h3>
-              <p class="text-xs text-slate-400">İhtiyacınızı yazın, tedarikçilerden anında teklif toplayın</p>
-            </div>
+    <div v-if="selectedTenderModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-xs flex items-center justify-center p-4">
+      <div class="bg-white border border-slate-300 rounded-xl max-w-2xl w-full p-6 space-y-4 text-left shadow-2xl">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+          <div>
+            <span class="px-2 py-0.5 rounded bg-[#0084B4] text-white font-mono font-bold text-[10px]">
+              İHALE NO: {{ selectedTenderModal.no }}
+            </span>
+            <h3 class="text-base font-black text-slate-900 mt-1">{{ selectedTenderModal.title }}</h3>
           </div>
-          <button @click="showNewTenderModal = false" class="text-slate-400 hover:text-white p-1 cursor-pointer"><X :size="18" /></button>
+          <button @click="selectedTenderModal = null" class="text-slate-400 hover:text-slate-800 p-1 cursor-pointer"><X :size="20" /></button>
         </div>
 
-        <div class="space-y-3 text-xs">
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold block mb-1">Ne Satın Almak veya Yaptırmak İstiyorsunuz?</label>
-            <input 
-              v-model="newTenderForm.title" 
-              type="text" 
-              placeholder="Örn: 500 Ton Çimento, 50.000 Koli, Forklift Kiralama..." 
-              class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-white font-bold"
-            />
-          </div>
-
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="text-[10px] text-slate-400 font-bold block mb-1">Kategori</label>
-              <select v-model="newTenderForm.category" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white">
-                <option value="insaat">🏗️ İnşaat & Yapı</option>
-                <option value="sanayi">⚙️ Sanayi & Makine</option>
-                <option value="ambalaj">📦 Ambalaj & Koli</option>
-                <option value="lojistik">🚚 Lojistik & Nakliye</option>
-                <option value="enerji">⚡ Enerji & GES</option>
-                <option value="tarim">🌾 Tarım & Gıda</option>
-                <option value="diger">🏷️ Diğer Sektörler</option>
-              </select>
-            </div>
-
-            <div>
-              <label class="text-[10px] text-slate-400 font-bold block mb-1">Şehir</label>
-              <select v-model="newTenderForm.city" class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white">
-                <option value="Çanakkale">Çanakkale</option>
-                <option value="İstanbul">İstanbul</option>
-                <option value="Ankara">Ankara</option>
-                <option value="İzmir">İzmir</option>
-                <option value="Kocaeli">Kocaeli</option>
-                <option value="Bursa">Bursa</option>
-              </select>
-            </div>
+        <div class="space-y-3 text-xs text-slate-700">
+          <div class="p-3 rounded bg-slate-50 border border-slate-200 space-y-1">
+            <div><strong>İdare:</strong> {{ selectedTenderModal.authority }}</div>
+            <div><strong>Konum:</strong> {{ selectedTenderModal.city }} / Türkiye</div>
+            <div><strong>Tahmini Bütçe:</strong> <span class="font-bold text-emerald-700 font-mono">{{ selectedTenderModal.cost }}</span></div>
+            <div><strong>İhale Tarihi:</strong> <span class="font-bold text-rose-700 font-mono">{{ selectedTenderModal.date }}</span></div>
           </div>
 
           <div>
-            <label class="text-[10px] text-slate-400 font-bold block mb-1">Hedef Bütçeniz veya Yaklaşık Fiyat (₺)</label>
-            <input 
-              v-model="newTenderForm.budget" 
-              type="number" 
-              placeholder="Örn: 250000" 
-              class="w-full p-3 bg-slate-900 border border-slate-700 rounded-xl text-emerald-400 font-mono font-black text-base"
-            />
+            <strong class="block mb-1 text-slate-800">Şartname ve İhale Özeti:</strong>
+            <p class="p-2.5 rounded bg-slate-50 border border-slate-200 text-slate-600 leading-relaxed">{{ selectedTenderModal.specText }}</p>
           </div>
 
-          <div>
-            <label class="text-[10px] text-slate-400 font-bold block mb-1">Detaylar / Şartlar (Opsiyonel)</label>
-            <textarea 
-              v-model="newTenderForm.description" 
-              rows="2" 
-              placeholder="Teslimat yeri, fatura şartları, malzeme özellikleri..." 
-              class="w-full p-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white"
-            ></textarea>
+          <!-- Teklif Giriş Formu -->
+          <div class="p-3 rounded border border-blue-200 bg-blue-50/50 space-y-2">
+            <label class="font-bold text-blue-900 block">Teklif Ettiğiniz Tutar (₺):</label>
+            <input v-model="quickOfferPrice" type="number" placeholder="Örn: 14200000" class="w-full p-2.5 bg-white border border-blue-300 rounded text-slate-900 font-mono font-black text-base" />
+            
+            <label class="font-bold text-blue-900 block mt-1">Teklif Notu & Teslimat Şartları:</label>
+            <textarea v-model="quickOfferNotes" rows="2" placeholder="Şartname uygunluğu, garanti ve nakliye detayları..." class="w-full p-2 bg-white border border-blue-300 rounded text-slate-800 text-xs"></textarea>
           </div>
 
-          <button 
-            @click="submitNewTender" 
-            class="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-sm transition shadow-lg mt-2 cursor-pointer"
-          >
-            İlanı Hemen Yayına Al ➔
-          </button>
+          <div class="flex justify-end gap-2 pt-2 border-t border-slate-200">
+            <button @click="selectedTenderModal = null" class="px-4 py-2 rounded bg-slate-200 hover:bg-slate-300 text-slate-800 font-bold cursor-pointer">Kapat</button>
+            <button @click="submitOffer" class="px-5 py-2 rounded bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs cursor-pointer shadow-xs">
+              Resmi Teklifi İlet ➔
+            </button>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 👤 6. KULLANICI PROFİLİ VE İLANLARIM MODALI -->
+    <!-- 🛡️ 9. ALT KURUMSAL BİLGİ & FOOTER -->
     <!-- ========================================================================= -->
-    <div v-if="showProfileModal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-xs flex items-center justify-center p-4">
-      <div class="bg-[#0d1117] border border-slate-800 rounded-3xl max-w-md w-full p-6 space-y-4 text-left shadow-2xl">
-        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-          <h3 class="text-base font-black text-white">👤 Profilim & Firma Bilgilerim</h3>
-          <button @click="showProfileModal = false" class="text-slate-400 hover:text-white p-1 cursor-pointer"><X :size="18" /></button>
-        </div>
-
-        <div class="space-y-3 text-xs">
-          <div class="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
-            <h4 class="font-black text-white text-sm">{{ userSession.companyName }}</h4>
-            <p class="text-slate-400">📞 {{ userSession.phone }} | 📍 {{ userSession.city }}</p>
-            <span class="inline-block px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold text-[10px] mt-1">
-              ⭐ {{ userSession.rating }} / 5.0 ({{ userSession.ratingCount }} Değerlendirme)
+    <footer class="mt-8 bg-white border-t border-slate-300 text-slate-600 text-xs py-8">
+      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 space-y-6 text-left">
+        
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 border-b border-slate-200 pb-4">
+          <div>
+            <span class="font-black text-slate-800 text-sm block">İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş.</span>
+            <span class="text-[11px] text-slate-500">Çanakkale V.D. 4700854210 • MERSİS: 0470085421000001 • Ticaret Sicil No: 14520 • KEP: ihaleciburada@hs01.kep.tr</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded bg-emerald-50 text-emerald-800 font-bold border border-emerald-300 text-[11px]">
+              ✓ 256-Bit SSL TLS 1.3
             </span>
           </div>
+        </div>
 
-          <NuxtLink to="/panel" class="block w-full py-2.5 text-center rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold transition">
-            Gelişmiş Yönetim Paneline Geç ➔
-          </NuxtLink>
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex flex-wrap gap-4 text-xs text-slate-600 font-semibold">
+            <NuxtLink to="/sozlesmeler?tab=on-bilgilendirme" class="hover:text-blue-700">Ön Bilgilendirme Formu</NuxtLink>
+            <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-blue-700">Mesafeli Satış Sözleşmesi</NuxtLink>
+            <NuxtLink to="/sozlesmeler?tab=iptal-iade" class="hover:text-blue-700">İptal ve İade Koşulları</NuxtLink>
+            <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-700">Gizlilik ve KVKK</NuxtLink>
+            <NuxtLink to="/hakkimizda" class="hover:text-blue-700">Hakkımızda</NuxtLink>
+          </div>
+          <div>
+            <PaymentBadges />
+          </div>
         </div>
-      </div>
-    </div>
 
-    <!-- ========================================================================= -->
-    <!-- 🛡️ 7. SADE VE ŞIK ALT BİLGİ (FOOTER) -->
-    <!-- ========================================================================= -->
-    <footer class="mt-12 bg-[#050B16] border-t border-slate-800 text-slate-400 text-xs py-8">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div class="text-center sm:text-left">
-          <span class="font-black text-white block">İhaleciBurada B2B Borsa Platformu</span>
-          <span class="text-[11px] text-slate-500">© 2026 İhaleciBurada A.Ş. • Canlı B2B Teklif, Pazarlık ve Anlaşma Arayüzü</span>
+        <div class="text-center text-slate-400 text-[11px]">
+          © 2026 İhaleciBurada.com — Tüm hakları saklıdır. Resmi ihale ve ilan verileri anlık senkronize edilmektedir.
         </div>
-        <div class="flex items-center gap-2">
-          <PaymentBadges />
-        </div>
+
       </div>
     </footer>
 
   </div>
 </template>
-
-<style scoped>
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #0d1117;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #1e293b;
-  border-radius: 4px;
-}
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #334155;
-}
-</style>
