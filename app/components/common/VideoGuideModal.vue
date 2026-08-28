@@ -57,7 +57,7 @@ const videoCatalogue: VideoGuide[] = [
   {
     id: 'intro-3min',
     title: '3 Dakikada İhaleciBurada Rehberi',
-    subtitle: 'Ters ihale modeli, canlı eksiltme mantığı ve %14.2 ortalama tedarik tasarrufu sağlama adımları.',
+    subtitle: 'Ters ihale modeli, ihale ve satın alma mantığı ve %14.2 ortalama tedarik tasarrufu sağlama adımları.',
     duration: '03:15',
     totalSeconds: 195,
     badge: 'TEMEL BAŞLANGIÇ',
@@ -79,7 +79,7 @@ const videoCatalogue: VideoGuide[] = [
         subtitleText: 'Tüm tedarikçiler GİB vergi levhası ve MERSİS kayıtlarından onaylanmış güvenilir kurumsal firmalardır.'
       },
       {
-        title: 'Bölüm 3: Canlı Eksiltme Arenasında Rekabet',
+        title: 'Bölüm 3: İhale ve Satın Alma Arenasında Rekabet',
         startSeconds: 100,
         description: 'Tedarikçiler geri sayım süresince anlık fiyat kırarak en avantajlı teklifi sunmak için yarışır.',
         subtitleText: 'Fiyatlar şeffaf şekilde anlık düşer; alıcı bütçesine en uygun optimum maliyet koşuluna kolayca ulaşır.'
@@ -145,7 +145,7 @@ const videoCatalogue: VideoGuide[] = [
   {
     id: 'teklif-verme',
     title: 'Nasıl Teklif Verilir & Arenaya Katılınır?',
-    subtitle: 'Tedarikçi olarak aktif ihaleleri filtreleme, şartname inceleme ve canlı eksiltmede fiyat kırma.',
+    subtitle: 'Tedarikçi olarak aktif ihaleleri filtreleme, şartname inceleme ve ihale ve satın almade fiyat kırma.',
     duration: '02:50',
     totalSeconds: 170,
     badge: 'TEDARİKÇİ REHBERİ',
@@ -173,10 +173,10 @@ const videoCatalogue: VideoGuide[] = [
         subtitleText: 'Birim fiyatlarınızı yazdığınızda KDV dahil toplam teklif tutarı ve teslim süresi taahhüdünüz oluşturulur.'
       },
       {
-        title: 'Adım 4: Canlı Eksiltme Arenasında Yarışma',
+        title: 'Adım 4: İhale ve Satın Alma Arenasında Yarışma',
         startSeconds: 130,
         description: 'Geri sayım biterken rakiplerinizin önüne geçmek için teklifinizi anlık olarak güncelleyin.',
-        subtitleText: 'Yeşil liderlik rozetini korumak için canlı eksiltme ekranında rekabetçi teklifinizi verin ve ihaleyi kazanın.'
+        subtitleText: 'Yeşil liderlik rozetini korumak için ihale ve satın alma ekranında rekabetçi teklifinizi verin ve ihaleyi kazanın.'
       }
     ],
     checklist: [
@@ -650,7 +650,7 @@ watch(() => props.initialVideoId, (newVal) => {
                 <div v-else-if="currentVideo.id === 'teklif-verme'" class="w-full max-w-md space-y-3">
                   <div class="rounded-2xl border border-amber-500/30 bg-slate-900/90 p-4 shadow-xl backdrop-blur-md text-left transition-all">
                     <div class="flex items-center justify-between text-xs mb-2">
-                      <span class="font-bold text-white">Canlı Eksiltme Teklif Girişi</span>
+                      <span class="font-bold text-white">İhale ve Satın Alma Teklif Girişi</span>
                       <span class="text-amber-400 font-mono font-bold text-[10px]">Lider Teklif: ₺385.000</span>
                     </div>
                     <div class="space-y-2 text-[11px]">

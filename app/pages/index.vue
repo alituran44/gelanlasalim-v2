@@ -168,7 +168,7 @@ const ihaleUsulleri = [
 
 const teklifTurleri = [
   { name: 'E-İhale İhaleleri', count: 5081 },
-  { name: 'E-Eksiltme İhaleleri', count: 98 },
+  { name: 'E-İhale İhaleleri', count: 98 },
   { name: 'Kısmi Teklif Verilebilir İhaleleri', count: 1082 },
   { name: 'Kısmi Teklif Verilemez İhaleleri', count: 7874 },
   { name: 'Birim Fiyat Usulü İhaleleri', count: 5706 },
@@ -376,7 +376,7 @@ const tenders = ref([
     city: 'İstanbul',
     category: 'Matbaa - Toner - Kartuş - Ambalaj - Kırtasiye İhaleleri',
     type: 'Mal Alımı',
-    method: 'Açık Eksiltme',
+    method: 'Açık İhale',
     cost: '350.000 ₺',
     date: '02.09.2026 11:30',
     specText: 'E-ticaret ve lojistik sevkiyatlarına uygun dopel kraft koli üretimi.',

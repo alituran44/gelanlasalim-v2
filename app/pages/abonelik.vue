@@ -234,7 +234,7 @@ const freeTrialPackage = {
   name: '1 Ay Ücretsiz Lansman Deneme Paketi',
   price: 0,
   monthly: '0,00 ₺ / ay',
-  desc: 'Lansmana özel ilk 1 ay boyunca sınırsız ihale açma, teklif verme, canlı eksiltme ve tüm analiz modülleri %100 ücretsizdir.',
+  desc: 'Lansmana özel ilk 1 ay boyunca sınırsız ihale açma, teklif verme, ihale ve satın alma ve tüm analiz modülleri %100 ücretsizdir.',
   isTrial: true,
   isPromo: true
 }
@@ -388,7 +388,7 @@ function completeCheckout() {
                 name: '1 AY ÜCRETSİZ KURUMSAL DENEME',
                 price: 0,
                 isTrial: true,
-                desc: 'Lansmana özel 1 ay sınırsız ihale ve canlı eksiltme erişimi.'
+                desc: 'Lansmana özel 1 ay sınırsız ihale ve ihale ve satın alma erişimi.'
               })"
               class="w-full lg:w-auto px-8 py-4 rounded-2xl bg-[#1EAE4C] hover:bg-[#188C3D] text-white font-black text-sm transition-all shadow-xl shadow-[#1EAE4C]/30 flex items-center justify-center gap-2 cursor-pointer transform hover:scale-105"
             >
@@ -544,7 +544,7 @@ function completeCheckout() {
                 </div>
                 <hr class="border-emerald-200/60" />
                 <ul class="space-y-2 text-xs text-slate-700 font-medium">
-                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> Sınırsız B2B İhale Açma & Canlı Eksiltme</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> Sınırsız B2B İhale Açma & İhale ve Satın Alma</li>
                   <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> Doğrulanmış Firmalardan Belgeli Teklif Toplama</li>
                   <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> 1 Ay Boyunca %0 Komisyon, 0 ₺ Bedel</li>
                   <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> 25 Eylül 2026 Tarihine Kadar Tam Erişim</li>
@@ -754,7 +754,7 @@ function completeCheckout() {
               </h3>
               <p class="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
                 {{ selectedPackage?.isTrial 
-                  ? '1 ay boyunca tüm kurumsal B2B ihale ve canlı eksiltme modüllerini 0 ₺ bedelle sınırsız kullanabilirsiniz.'
+                  ? '1 ay boyunca tüm kurumsal B2B ihale ve ihale ve satın alma modüllerini 0 ₺ bedelle sınırsız kullanabilirsiniz.'
                   : 'Ödemeniz PayTR / iyzico onayından geçti. E-Faturanız oluşturuldu ve kurumsal panel erişiminiz anında aktifleştirildi.' 
                 }}
               </p>

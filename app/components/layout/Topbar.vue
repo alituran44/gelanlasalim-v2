@@ -95,7 +95,7 @@ const pageTitle = computed(() => {
       '/panel/yaptigim-teklifler': 'Verdiğim Teklifler (Yaptığım)',
       '/panel/tekliflerim': 'Teklif Yönetim Merkezi',
       '/panel/siparis-teslimat': 'Sipariş & Teslimat (Escrow)',
-      '/panel/canli-etkinlikler': 'Canlı Eksiltme Arenası',
+      '/panel/canli-etkinlikler': 'İhale ve Satın Alma Arenası',
       '/panel/istatistikler': 'Analitik & Raporlar',
       '/panel/doviz-kurlari': 'Döviz & Emtia Kurları',
       '/panel/firmalar': 'Onaylı Kurumsal Firmalar',

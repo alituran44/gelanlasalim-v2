@@ -22,7 +22,7 @@ const faqs = [
   { q: "Ödeme altyapınız güvenli mi? Hangi yöntemler destekleniyor?", a: "Ödemeleriniz TCMB ve BDDK lisanslı ödeme kuruluşları (PayTR ve iyzico) güvencesiyle 256-Bit SSL şifrelemeli 3D Secure protokolü üzerinden gerçekleşir. Troy, Visa, MasterCard, American Express ve kurumsal banka havalesi desteklenmektedir. Kart bilgileriniz asla sunucularımızda saklanmaz." },
   { q: "Abonelik iptali ve iade koşulları nelerdir?", a: "B2B dijital SaaS platformumuzda satın alınan paketler anında aktive edilir. Mükerrer çekimlerde 24 saatte kesintisiz iade yapılır. Henüz sisteme giriş yapmamış veya aktif ihale başlatmamış hesaplar için 14 gün içinde yazılı başvuru ile iade talebi oluşturulabilir. İadeler kredi kartına 3-7 iş günü, banka hesabına 1-3 iş gününde yansır." },
   { q: "E-Faturam ne zaman düzenlenir?", a: "Ödemenizin tamamlanmasını takiben faturanız beyan ettiğiniz şirket unvanı, vergi dairesi ve VKN/TCKN bilgileriyle 213 sayılı VUK uyarınca en geç 7 iş günü içinde e-Fatura/e-Arşiv olarak düzenlenip kurumsal e-posta adresinize iletilir." },
-  { q: "Tersine ihale (canlı eksiltme) sistemi nasıl çalışır?", a: "Alıcı firma satın almak istediği ürün veya hizmet için şartname ve bütçesini belirler. Tedarikçiler canlı sürede teklif vererek fiyat eksiltir; en uygun teklif sahibi ihaleyi kazanır." },
+  { q: "Tersine ihale (ihale ve satın alma) sistemi nasıl çalışır?", a: "Alıcı firma satın almak istediği ürün veya hizmet için şartname ve bütçesini belirler. Tedarikçiler canlı sürede teklif vererek fiyat eksiltir; en uygun teklif sahibi ihaleyi kazanır." },
   { q: "Firmaların doğrulanması ve güvenliği nasıl sağlanır?", a: "Platforma üye olan her şirketin vergi kimlik numarası, MERSİS bilgileri ve kurumsal belgeleri kontrol edilerek 'Onaylı Üye' rozeti tanımlanır." },
   { q: "Alıcı olarak üyelik komisyonu ödemem gerekiyor mu?", a: "Hayır. İhaleciBurada platformunda alıcı şirketler için üyelik ve ihale açma süreçleri lansmana özel tamamen ücretsizdir." }
 ]
@@ -31,7 +31,7 @@ const videoCards = [
   {
     id: 'intro-3min',
     title: '3 Dakikada İhaleciBurada Tanıtımı',
-    desc: 'Ters ihale modeli, canlı eksiltme kuralları ve tedarik tasarrufu sağlama.',
+    desc: 'Ters ihale modeli, ihale ve satın alma kuralları ve tedarik tasarrufu sağlama.',
     duration: '03:15',
     badge: 'GENEL TANITIM',
     thumbnail: 'https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80',
@@ -48,7 +48,7 @@ const videoCards = [
   },
   {
     id: 'teklif-verme',
-    title: 'Nasıl Teklif Verilir & Canlı Eksiltme',
+    title: 'Nasıl Teklif Verilir & İhale ve Satın Alma',
     desc: 'Tedarikçi olarak ihaleye katılma, birim fiyat girme ve anlık fiyat kırma.',
     duration: '02:50',
     badge: 'TEDARİKÇİ REHBERİ',

@@ -358,9 +358,9 @@ function printDocument() {
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — TANIMLAR VE HUKUKİ STATÜ</h3>
                 <p>1.1. <strong>Platform:</strong> Mülkiyeti, fikri hakları ve işletme yetkisi münhasıran Şirket\'e ait olan internet sitesi, mobil arayüzler, API servisleri, bulut tabanlı e-ihale motorları ve bağlı tüm yazılım ekosistemini ifade eder.</p>
                 <p>1.2. <strong>Aracı Hizmet Sağlayıcı:</strong> 6563 Sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun Madde 2/1-d uyarınca, başkalarına ait iktisadi ve ticari faaliyetlerin yapılmasına elektronik ticaret ortamını sağlayan Şirket\'tir.</p>
-                <p>1.3. <strong>Alıcı (İhale Sahibi):</strong> Kendi ticari gereksinimleri doğrultusunda mal, hizmet veya yapım işi satın almak üzere Platform üzerinde teknik şartname yükleyerek ihale veya tersine canlı eksiltme başlatan onaylı tüzel kişi kullanıcıdır.</p>
+                <p>1.3. <strong>Alıcı (İhale Sahibi):</strong> Kendi ticari gereksinimleri doğrultusunda mal, hizmet veya yapım işi satın almak üzere Platform üzerinde teknik şartname yükleyerek ihale veya tersine ihale ve satın alma başlatan onaylı tüzel kişi kullanıcıdır.</p>
                 <p>1.4. <strong>Tedarikçi (Teklif Veren):</strong> Alıcı tarafından açılan ihalelere şartnameye uygun teknik ve mali teklif sunan, fiyat indirim adımlarını takip eden ve eksiltmeye katılan onaylı işletmedir.</p>
-                <p>1.5. <strong>Canlı Eksiltme (Reverse Auction):</strong> Belirlenen ihale süresi zarfında tedarikçilerin anlık olarak fiyat düşürdüğü, en düşük teklifin sistem tarafından otomatik olarak sıralandığı dinamik e-ihale yarışıdır.</p>
+                <p>1.5. <strong>İhale ve Satın Alma (Reverse Auction):</strong> Belirlenen ihale süresi zarfında tedarikçilerin anlık olarak fiyat düşürdüğü, en düşük teklifin sistem tarafından otomatik olarak sıralandığı dinamik e-ihale yarışıdır.</p>
                 <p>1.6. <strong>Şartname:</strong> Alıcı tarafından talep edilen mal/hizmetin teknik özelliklerini, teslimat yerini, ödeme vadesini ve kabul kriterlerini belirleyen bağlayıcı teknik dokümandır.</p>
               </section>
 
@@ -383,7 +383,7 @@ function printDocument() {
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — İHALE AÇMA, TEKLİFLERİN BAĞLAYICILIĞI VE SEÇİM SERBESTİSİ</h3>
                 <p>4.1. <strong>İcaba Davet Niteliği:</strong> Alıcı\'nın açtığı ihale hukuken "icaba davet" mahiyetindedir. Alıcı, şartnamede aksi açıkça belirtilmedikçe ihaleyi dilediği aşamada gerekçe göstermeksizin iptal etmekte, ertelemekte veya en düşük teklifi veren yerine teslimat vadesi, kalite veya referans kriterlerine göre başka bir tedarikçiyi tercih etmekte tamamen serbesttir. Bu durum Tedarikçi\'ye herhangi bir tazminat hakkı vermez.</p>
-                <p>4.2. <strong>Teklifin Bağlayıcılığı (Kesin İcap):</strong> Tedarikçi\'nin canlı eksiltme süresince verdiği her fiyat teklifi kesin, geri alınamaz ve bağlayıcı bir ticari taahhüttür (icap). Tedarikçi, ihaleyi kazandıktan sonra haklı bir mücbir sebep olmaksızın teklifinden dönemez, fiyat artıramaz, şartname harici ek maliyet talep edemez.</p>
+                <p>4.2. <strong>Teklifin Bağlayıcılığı (Kesin İcap):</strong> Tedarikçi\'nin ihale ve satın alma süresince verdiği her fiyat teklifi kesin, geri alınamaz ve bağlayıcı bir ticari taahhüttür (icap). Tedarikçi, ihaleyi kazandıktan sonra haklı bir mücbir sebep olmaksızın teklifinden dönemez, fiyat artıramaz, şartname harici ek maliyet talep edemez.</p>
                 <p>4.3. İhale mutabakatı sağlandığında sistem tarafından otomatik olarak zaman damgalı Dijital İhale Tutanağı düzenlenir ve taraflara e-posta/panel yoluyla iletilir.</p>
               </section>
 
@@ -529,7 +529,7 @@ function printDocument() {
             </div>
 
             <h1 class="text-2xl font-black tracking-tight text-slate-900">
-              {{ '4. B2B Canlı Eksiltme, Ters İhale ve Rekabet Standartları Sözleşmesi' }}
+              {{ '4. B2B İhale ve Satın Alma, Ters İhale ve Rekabet Standartları Sözleşmesi' }}
             </h1>
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
@@ -540,7 +540,7 @@ function printDocument() {
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">KURAL 2 — CANLI EKSİLTME MEKANİZMASI VE MİNİMUM İNDİRİM ADIMI</h3>
+                <h3 class="font-bold text-slate-900 text-sm">KURAL 2 — İHALE VE SATIN ALMA MEKANİZMASI VE MİNİMUM İNDİRİM ADIMI</h3>
                 <p>2.1. Canlı eksiltmede tedarikçiler başlangıç tavan fiyatından aşağı doğru en az sistem tarafından belirlenen veya Alıcı tarafından tanımlanan "Minimum İndirim Adımı" tutarı kadar indirim yaparak teklif sunabilir.</p>
                 <p>2.2. Sistemde teklif veren firma, anlık olarak kendisinden daha iyi teklif verilip verilmediğini ve sıralamasını görür; ancak diğer teklif sahiplerinin unvanlarını göremez.</p>
               </section>
@@ -553,14 +553,14 @@ function printDocument() {
 
               <section class="space-y-2 bg-red-50/60 p-4 rounded-xl border border-red-200">
                 <h3 class="font-bold text-red-950 text-sm">KURAL 4 — TEKLİFİN BAĞLAYICILIĞI, CAYMA YASAĞI VE ZARAR TAZMİNİ</h3>
-                <p>4.1. <strong>Geri Dönülemez Ticari Taahhüt:</strong> Tedarikçinin canlı eksiltmede sisteme girdiği her fiyat teklifi bağlayıcı bir ticari taahhüttür (icap). İhaleyi kazanan tedarikçi teklifinden cayamaz, fiyat artıramaz, şartnameye aykırı şart öne süremez.</p>
+                <p>4.1. <strong>Geri Dönülemez Ticari Taahhüt:</strong> Tedarikçinin ihale ve satın almade sisteme girdiği her fiyat teklifi bağlayıcı bir ticari taahhüttür (icap). İhaleyi kazanan tedarikçi teklifinden cayamaz, fiyat artıramaz, şartnameye aykırı şart öne süremez.</p>
                 <p>4.2. <strong>Tedarikçinin Cayması Halinde Sorumluluk:</strong> İhaleyi kazandıktan sonra taahhüdünü yerine getirmeyen Tedarikçi, Alıcı\'nın bu nedenle ikinci en iyi teklif sahibiyle çalışmak zorunda kalmasından doğacak fiyat farkı zararını (müspet zarar) doğrudan Alıcı\'ya tazmin etmekle yükümlüdür.</p>
                 <p>4.3. <strong>Platformun Sorumsuzluğu:</strong> Alıcı ile Tedarikçi arasındaki bu cayma uyuşmazlığında Platform tazminat ödeyicisi veya kefil değildir.</p>
               </section>
 
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">KURAL 5 — İHALE SONUÇLANDIRMA VE ALICININ SEÇİM SERBESTİSİ</h3>
-                <p>5.1. Alıcı, canlı eksiltme sonunda en düşük teklifi veren tedarikçiyi seçmek zorunda değildir; teslimat vadesi, finansal güç, referanslar veya teknik uygunluk kriterlerine göre teklifler arasından serbestçe seçim yapabilir veya ihaleyi sonuçsuz bırakabilir.</p>
+                <p>5.1. Alıcı, ihale ve satın alma sonunda en düşük teklifi veren tedarikçiyi seçmek zorunda değildir; teslimat vadesi, finansal güç, referanslar veya teknik uygunluk kriterlerine göre teklifler arasından serbestçe seçim yapabilir veya ihaleyi sonuçsuz bırakabilir.</p>
                 <p>5.2. İhalenin iptal edilmesi veya başka bir firmanın tercih edilmesi nedeniyle tedarikçiler Alıcı\'dan veya Platform\'dan teklif hazırlık masrafı veya kar mahrumiyeti talep edemez.</p>
               </section>
             </div>
@@ -650,7 +650,7 @@ function printDocument() {
 
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — SÖZLEŞMENİN KONUSU VE KAPSAMI</h3>
-                <p>2.1. İşbu Sözleşme, ALICI\'nın SATICI\'ya ait https://ihaleciburada.com internet sitesi üzerinden elektronik ortamda siparişini verdiği, nitelikleri ve satış fiyatı belirtilen kurumsal B2B e-ihale ve canlı eksiltme platformu abonelik hizmetinin satışı, ödemesi, ifası ve teslimine ilişkin tarafların hak ve yükümlülüklerini düzenler.</p>
+                <p>2.1. İşbu Sözleşme, ALICI\'nın SATICI\'ya ait https://ihaleciburada.com internet sitesi üzerinden elektronik ortamda siparişini verdiği, nitelikleri ve satış fiyatı belirtilen kurumsal B2B e-ihale ve ihale ve satın alma platformu abonelik hizmetinin satışı, ödemesi, ifası ve teslimine ilişkin tarafların hak ve yükümlülüklerini düzenler.</p>
               </section>
 
               <section class="space-y-2">
@@ -782,7 +782,7 @@ function printDocument() {
               <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
                 <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 3 — ÇEREZ YÖNETİMİ VE TEKNİK SORUMSUZLUK</h3>
                 <p>3.1. Tarayıcı ayarlarınızdan (Chrome, Edge, Safari, Firefox) çerez izinlerini dilediğiniz an değiştirebilir, silebilir veya engelleyebilirsiniz.</p>
-                <p>3.2. Zorunlu oturum çerezlerinin kullanıcı tarafından engellenmesi durumunda ihale paneline giriş yapılamamasından, canlı eksiltme fiyatlarının anlık güncellenememesinden veya teklif iletim gecikmelerinden Platform sorumlu tutulamaz.</p>
+                <p>3.2. Zorunlu oturum çerezlerinin kullanıcı tarafından engellenmesi durumunda ihale paneline giriş yapılamamasından, ihale ve satın alma fiyatlarının anlık güncellenememesinden veya teklif iletim gecikmelerinden Platform sorumlu tutulamaz.</p>
               </section>
             </div>
           </article>
@@ -842,7 +842,7 @@ function printDocument() {
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 1 — KAPSAM VE %99.9 ERİŞİLEBİLİRLİK TAAHHÜDÜ</h3>
-                <p>1.1. İhaleciBurada, e-ihale motorları, canlı eksiltme teklif kabul sunucuları ve Escrow API ağ geçitlerinin aylık takvim bazında en az <strong>%99.9</strong> kesintisiz çalışacağını taahhüt eder.</p>
+                <p>1.1. İhaleciBurada, e-ihale motorları, ihale ve satın alma teklif kabul sunucuları ve Escrow API ağ geçitlerinin aylık takvim bazında en az <strong>%99.9</strong> kesintisiz çalışacağını taahhüt eder.</p>
                 <p>1.2. <strong>Kesinti Hesabına Dahil Edilmeyen Haller:</strong> Önceden duyurulan planlı gece bakımları (01:00 - 05:00), telekomünikasyon omurga arızaları, genel internet erişim problemleri, siber saldırılar (DDoS) ve mücbir sebep halleri SLA kesinti süresine dahil edilmez.</p>
               </section>
 
@@ -938,7 +938,7 @@ function printDocument() {
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">BİZ KİMİZ?</h3>
-                <p>Sanayi, inşaat, lojistik, ambalaj ve kurumsal sarf sektörlerinde onaylı üretici ve alıcıları buluşturuyoruz. Zaman damgalı canlı eksiltme altyapımız ile satın alma maliyetlerinde ortalama %14.2 tasarruf sağlarken, alıcı ve tedarikçiler arasındaki ticareti hızlandırıyoruz.</p>
+                <p>Sanayi, inşaat, lojistik, ambalaj ve kurumsal sarf sektörlerinde onaylı üretici ve alıcıları buluşturuyoruz. Zaman damgalı ihale ve satın alma altyapımız ile satın alma maliyetlerinde ortalama %14.2 tasarruf sağlarken, alıcı ve tedarikçiler arasındaki ticareti hızlandırıyoruz.</p>
               </section>
 
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
@@ -1068,7 +1068,7 @@ function printDocument() {
                   <span>STRATEJİ & TASARRUF</span> • <span class="text-slate-400">2026.08</span>
                 </div>
                 <h3 class="font-black text-slate-900 text-sm hover:text-blue-600 transition cursor-pointer">
-                  Tersine Canlı Eksiltme (Reverse Auction) ile Satın Alma Maliyetlerini %18 Düşürmenin 5 Adımı
+                  Tersine İhale ve Satın Alma (Reverse Auction) ile Satın Alma Maliyetlerini %18 Düşürmenin 5 Adımı
                 </h3>
                 <p class="text-xs text-slate-600 leading-relaxed">
                   Geleneksel kapalı teklif yöntemine kıyasla dinamik eksiltme motorları, tedarikçiler arasında anlık şeffaf rekabet yaratarak satın alma birim maliyetlerini ciddi oranda aşağı çekmektedir...

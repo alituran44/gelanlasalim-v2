@@ -11,7 +11,7 @@ const tenders = computed(() => {
     title: t.baslik,
     company: t.companyName || t.firma || `${t.city || 'Doğrulanmış'} Kurumsal Alıcı`,
     city: t.city || 'Türkiye Geneli',
-    budget: t.butce || 'Açık Eksiltme',
+    budget: t.butce || 'Açık İhale',
     category: t.kategori?.split('/')[0]?.trim() || 'Satın Alma'
   }))
 })

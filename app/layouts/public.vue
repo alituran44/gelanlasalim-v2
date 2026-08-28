@@ -217,54 +217,40 @@ onMounted(() => {
 
       </div>
 
-      <!-- ALT İKİNCİ ŞERİT: YENİ ÜYELİK & HIZLI GİRİŞ FORMU -->
+      <!-- ALT İKİNCİ ŞERİT: YENİ ÜYELİK, GİRİŞ YAP, MİSAFİR GİRİŞİ, ÜYELİK UZAT & İHALE AÇ -->
       <div class="max-w-[1400px] mx-auto mt-2 pt-2 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-3">
         
-        <!-- Sol: Yeni Üyelik, Üyelik Uzat & İhale Aç -->
-        <div class="flex items-center gap-2">
-          <NuxtLink to="/uyelik" class="px-3 py-1.5 rounded bg-[#4CAF50] hover:bg-[#43A047] text-white font-bold text-xs shadow-xs flex items-center gap-1">
+        <!-- Sol: Butonlar Grubu -->
+        <div class="flex flex-wrap items-center gap-2">
+          <!-- 1. Yeni Üyelik -->
+          <NuxtLink to="/uyelik?tab=register" class="px-3.5 py-1.5 rounded bg-[#4CAF50] hover:bg-[#43A047] text-white font-bold text-xs shadow-xs flex items-center gap-1">
             <span>👤+ Yeni üyelik</span>
           </NuxtLink>
-          <NuxtLink to="/abonelik" class="px-3 py-1.5 rounded bg-[#0288D1] hover:bg-[#0277BD] text-white font-bold text-xs shadow-xs flex items-center gap-1">
+
+          <!-- 2. Giriş Yap -->
+          <NuxtLink to="/uyelik?tab=login" class="px-3.5 py-1.5 rounded bg-[#0F223D] hover:bg-[#003057] text-white font-bold text-xs shadow-xs flex items-center gap-1">
+            <span>🔑 Giriş Yap</span>
+          </NuxtLink>
+
+          <!-- 3. Misafir Girişi -->
+          <NuxtLink to="/uyelik?tab=guest" class="px-3.5 py-1.5 rounded bg-[#F59E0B] hover:bg-[#D97706] text-white font-bold text-xs shadow-xs flex items-center gap-1">
+            <span>👁️ Misafir Girişi</span>
+          </NuxtLink>
+
+          <!-- 4. Üyelik Uzat -->
+          <NuxtLink to="/abonelik" class="px-3.5 py-1.5 rounded bg-[#0288D1] hover:bg-[#0277BD] text-white font-bold text-xs shadow-xs flex items-center gap-1">
             <span>🔄 Üyelik uzat</span>
           </NuxtLink>
-          <NuxtLink to="/panel/ihale-olustur" class="px-3 py-1.5 rounded bg-[#FF5722] hover:bg-[#E64A19] text-white font-black text-xs shadow-xs flex items-center gap-1">
+
+          <!-- 5. İhale Aç -->
+          <NuxtLink to="/panel/ihale-olustur" class="px-3.5 py-1.5 rounded bg-[#FF5722] hover:bg-[#E64A19] text-white font-black text-xs shadow-xs flex items-center gap-1">
             <span>+ İhale Aç</span>
           </NuxtLink>
         </div>
 
-        <!-- Sağ: Hızlı Üye Girişi (Giriş Yapılmamışsa) -->
-        <div v-if="!isLoggedIn" class="flex flex-wrap items-center gap-1.5 text-xs">
-          <span class="font-bold text-slate-700 flex items-center gap-1">👤 Üye girişi:</span>
-          <input 
-            v-model="loginUsername" 
-            type="text" 
-            placeholder="Kullanıcı adı / E-posta" 
-            class="px-2.5 py-1 bg-white border border-slate-300 rounded text-xs text-slate-800 focus:outline-none focus:border-blue-500 w-36 sm:w-44" 
-          />
-          <input 
-            v-model="loginPassword" 
-            type="password" 
-            placeholder="Şifre" 
-            class="px-2.5 py-1 bg-white border border-slate-300 rounded text-xs text-slate-800 focus:outline-none focus:border-blue-500 w-28 sm:w-32" 
-          />
-          <button 
-            @click="handleLogin" 
-            class="px-3 py-1 bg-[#4CAF50] hover:bg-[#43A047] text-white font-bold rounded text-xs transition cursor-pointer"
-          >
-            Giriş ➔
-          </button>
-          <button 
-            @click="alert('Şifre sıfırlama linki e-postanıza gönderilecektir.')" 
-            class="px-3 py-1 bg-[#D32F2F] hover:bg-[#C62828] text-white font-bold rounded text-xs transition cursor-pointer"
-          >
-            🔑 Şifremi Unuttum
-          </button>
-        </div>
-
         <!-- Sağ: Giriş Yapılmışsa Kullanıcı Profili ve Çıkış -->
-        <div v-else class="flex items-center gap-3 text-xs">
-          <span class="font-bold text-slate-700">👤 {{ userSession.companyName || userSession.username }}</span>
+        <div v-if="isLoggedIn" class="flex items-center gap-3 text-xs">
+          <span class="font-bold text-slate-700">👤 {{ userSession?.companyName || userSession?.name || userSession?.username }}</span>
           <NuxtLink to="/panel" class="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold">Yönetim Paneli</NuxtLink>
           <button @click="handleLogout" class="px-2.5 py-1 rounded bg-red-100 hover:bg-red-200 text-red-700 font-bold border border-red-300 cursor-pointer">Çıkış</button>
         </div>
@@ -314,7 +300,7 @@ onMounted(() => {
               </svg>
             </NuxtLink>
             <p class="text-[11px] text-slate-400 leading-relaxed">
-              Türkiye'nin onaylı B2B tersine ihale ve doğrudan satın alma platformu. Kurumsal firmalar için güvenli ticaret, şeffaf eksiltme ve dijital sözleşme altyapısı.
+              Türkiye'nin onaylı B2B ihale ve doğrudan satın alma platformu. Kurumsal firmalar için güvenli ticaret, şeffaf teklif ve dijital sözleşme altyapısı.
             </p>
             <div class="pt-2 text-[11px] text-slate-300 space-y-1">
               <div>📍 İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale</div>
@@ -332,7 +318,7 @@ onMounted(() => {
               <NuxtLink to="/" class="hover:text-sky-400 transition-colors">▪ Ana Sayfa</NuxtLink>
               <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="hover:text-sky-400 transition-colors">▪ Hakkımızda & Vizyon</NuxtLink>
               <NuxtLink to="/pazar-yeri" class="hover:text-sky-400 transition-colors">▪ B2B Pazar Yeri</NuxtLink>
-              <NuxtLink to="/panel/ihale-olustur" class="hover:text-sky-400 transition-colors">▪ İhale Aç & Eksiltme</NuxtLink>
+              <NuxtLink to="/panel/ihale-olustur" class="hover:text-sky-400 transition-colors">▪ İhale Aç & Teklif Al</NuxtLink>
               <NuxtLink to="/abonelik" class="hover:text-sky-400 transition-colors">▪ Üyelik Paketleri</NuxtLink>
               <NuxtLink to="/sozlesmeler?tab=kariyer" class="hover:text-sky-400 transition-colors">▪ Kariyer Fırsatları</NuxtLink>
               <NuxtLink to="/sozlesmeler?tab=is-ortakligi" class="hover:text-sky-400 transition-colors">▪ İş Ortaklığı & Komisyon</NuxtLink>
@@ -359,7 +345,7 @@ onMounted(() => {
           <div class="space-y-3">
             <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">RESMİ SÖZLEŞMELER (II)</h4>
             <div class="flex flex-col gap-1.5 text-slate-300 text-[11px]">
-              <NuxtLink to="/sozlesmeler?tab=ihale-kurallari" class="hover:text-sky-300">8. B2B Eksiltme & İhale Kuralları</NuxtLink>
+              <NuxtLink to="/sozlesmeler?tab=ihale-kurallari" class="hover:text-sky-300">8. B2B İhale ve Satın Alma Kuralları</NuxtLink>
               <NuxtLink to="/sozlesmeler?tab=cerezler" class="hover:text-sky-300">9. Çerez Politikası & Takip Şartları</NuxtLink>
               <NuxtLink to="/sozlesmeler?tab=tedarikci-uyum" class="hover:text-sky-300">10. Tedarikçi Doğrulama & KYC Beyanı</NuxtLink>
               <NuxtLink to="/sozlesmeler?tab=sla" class="hover:text-sky-300">11. Servis Seviyesi Taahhüdü (SLA)</NuxtLink>
@@ -401,7 +387,7 @@ onMounted(() => {
 
         <!-- En Alt Telif Satırı -->
         <div class="text-center text-slate-500 text-[11px] pt-4 border-t border-slate-800/50">
-          © 2026 İhaleciBurada.com — B2B Canlı Eksiltme & Satın Alma Platformu. Tüm Hakları Saklıdır.
+          © 2026 İhaleciBurada.com — B2B İhale ve Satın Alma & Satın Alma Platformu. Tüm Hakları Saklıdır.
         </div>
 
       </div>

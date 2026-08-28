@@ -7,7 +7,7 @@ export const DEFAULT_CMS_DATA = {
     titleLine1: 'İhale Aç.',
     titleLine2: 'Teklif Topla.',
     titleItalic: "İhaleci Burada.",
-    description: 'İhaleciBurada.com; e-ihale, canlı eksiltme, teklif toplama ve doğrudan fiyat pazarlığı süreçlerinizi tek platformda dijitalleştirir. Maliyetlerinizi düşürün, rekabetçi tekliflerle tasarruf edin.',
+    description: 'İhaleciBurada.com; e-ihale, ihale ve satın alma, teklif toplama ve doğrudan fiyat pazarlığı süreçlerinizi tek platformda dijitalleştirir. Maliyetlerinizi düşürün, rekabetçi tekliflerle tasarruf edin.',
     badgeStrip: [
       'KVKK & GDPR UYUMLU',
       'BELGE DENETİMİ & ZAMAN DAMGASI',
@@ -94,8 +94,8 @@ export const DEFAULT_CMS_DATA = {
   ],
   videoGuides: [
     { title: 'Nasıl Kayıt Olunur?', desc: 'Adım adım üyelik ve firma kaydı rehberi', videoUrl: '' },
-    { title: 'Nasıl İhale Açılır?', desc: 'İlk canlı eksiltme ihalenizi dakikalar içinde başlatın', videoUrl: '' },
-    { title: 'Nasıl Teklif Verilir?', desc: 'Tedarikçi olarak canlı eksiltmeye katılma rehberi', videoUrl: '' },
+    { title: 'Nasıl İhale Açılır?', desc: 'İlk ihale ve satın alma ihalenizi dakikalar içinde başlatın', videoUrl: '' },
+    { title: 'Nasıl Teklif Verilir?', desc: 'Tedarikçi olarak ihale ve satın almaye katılma rehberi', videoUrl: '' },
     { title: 'Yönetim Paneli Rehberi', desc: 'Kontrol panelini ve raporlamaları etkin kullanma', videoUrl: '' }
   ],
   dashboard: {
@@ -149,7 +149,7 @@ export const DEFAULT_CMS_DATA = {
     aiEnabled: true,
     aiBotName: 'İhaleciBurada AI Asistanı',
     aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel 1 Ay %100 Ücretsiz Deneme süreciniz hakkında size nasıl yardımcı olabilirim?',
-    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın. Kullanıcılara 1 ay ücretsiz deneme, ihale açma, teklif verme, canlı eksiltme konularında yardımcı ol.'
+    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın. Kullanıcılara 1 ay ücretsiz deneme, ihale açma, teklif verme, ihale ve satın alma konularında yardımcı ol.'
   },
   crmSettings: {
     leads: [
@@ -175,7 +175,7 @@ export const DEFAULT_CMS_DATA = {
         id: 'trial-welcome',
         name: '🎉 1 Ay Ücretsiz Lansman Hoş Geldin & Aktivasyon',
         subject: 'İhaleciBurada.com: 1 Aylık %100 Ücretsiz Lansman Deneme Paketiniz Aktif!',
-        content: `Sayın Yetkili,\n\nİhaleciBurada B2B Canlı Eksiltme ve Satın Alma Platformu'na hoş geldiniz!\n\nLansmanımıza özel olarak tanımlanan 1 Aylık %100 Ücretsiz Kurumsal Deneme Paketiniz başarıyla aktifleştirildi.\n\n✓ 1 Ay Boyunca 0 ₺ Ücret (Kredi Kartı Gerekmez)\n✓ Sınırsız İhale Açma & Canlı Tersine Eksiltme\n✓ Doğrulanmış Kurumsal Firmalardan Belgeli Teklif Toplama\n✓ Geçerlilik Bitiş Tarihi: 25 Eylül 2026\n\nPanele gitmek ve ilk ihalenizi oluşturmak için: https://gelanlasalim-v2.vercel.app/panel\n\nSaygılarımızla,\nİhaleciBurada Müşteri Başarı Ekibi\nihalcib@gmail.com | 0850 840 86 95`
+        content: `Sayın Yetkili,\n\nİhaleciBurada B2B İhale ve Satın Alma ve Satın Alma Platformu'na hoş geldiniz!\n\nLansmanımıza özel olarak tanımlanan 1 Aylık %100 Ücretsiz Kurumsal Deneme Paketiniz başarıyla aktifleştirildi.\n\n✓ 1 Ay Boyunca 0 ₺ Ücret (Kredi Kartı Gerekmez)\n✓ Sınırsız İhale Açma & Canlı Tersine Eksiltme\n✓ Doğrulanmış Kurumsal Firmalardan Belgeli Teklif Toplama\n✓ Geçerlilik Bitiş Tarihi: 25 Eylül 2026\n\nPanele gitmek ve ilk ihalenizi oluşturmak için: https://gelanlasalim-v2.vercel.app/panel\n\nSaygılarımızla,\nİhaleciBurada Müşteri Başarı Ekibi\nihalcib@gmail.com | 0850 840 86 95`
       },
       {
         id: 'new-tender',
@@ -186,7 +186,7 @@ export const DEFAULT_CMS_DATA = {
       {
         id: 'live-auction',
         name: '⚡ Canlı Tersine Eksiltme Başladı & Teklif Uyarısı',
-        subject: 'Canlı Eksiltme Başladı: İhalede Fiyatlar Düşüyor!',
+        subject: 'İhale ve Satın Alma Başladı: İhalede Fiyatlar Düşüyor!',
         content: `Sayın İhale Katılımcısı,\n\nKayıt olduğunuz ihalenin CANLI TERSİNE EKSİLTME (Canlı Pazarlık) seansı başlamıştır.\n\nAnlık Lider Teklif: [Lider Fiyat]\nKalan Süre: [Süre]\n\nCanlı odaya bağlanmak ve yeni teklifinizi vermek için:\nhttps://gelanlasalim-v2.vercel.app/panel/canli-etkinlikler\n\nBol kazançlı ihaleler dileriz,\nİhaleciBurada.com`
       },
       {
@@ -362,7 +362,7 @@ export const DEFAULT_CMS_DATA = {
   siteSettings: {
     maintenanceMode: false,
     maintenanceNotice: 'Platformumuzda planlı altyapı güçlendirme çalışması yapılmaktadır. Sistem en kısa sürede tekrar aktif olacaktır.',
-    metaTitle: 'İhaleciBurada.com | Türkiye’nin Öncü B2B Canlı Eksiltme & Satın Alma Platformu',
+    metaTitle: 'İhaleciBurada.com | Türkiye’nin Öncü B2B İhale ve Satın Alma & Satın Alma Platformu',
     metaDescription: 'B2B satın alma ihaleleri açın, canlı tersine eksiltme ile rekabetçi teklifler toplayın, kurumsal tedarik maliyetlerinizi %14.2 düşürün.',
     announcementTicker: '⚡ LANSMANA ÖZEL: Tüm alıcı ve tedarikçi firmalarımıza ilk 1 ay boyunca %100 ücretsiz kurumsal deneme paketi! Kredi kartı gerekmez, 0 ₺ bedelsiz anında aktivasyon.',
     googleAnalyticsId: 'G-IHALECIBURADA2026',

@@ -32,10 +32,10 @@ definePageMeta({
           KURUMSAL ŞİRKET PROFİLİ & VİZYON
         </span>
         <h1 class="text-3xl sm:text-4xl font-black tracking-tight text-slate-900">
-          Türkiye'nin Yeni Nesil B2B Canlı Eksiltme ve Ters İhale Arenası
+          Türkiye'nin Yeni Nesil B2B İhale ve Satın Alma ve Ters İhale Arenası
         </h1>
         <p class="text-xs sm:text-sm text-slate-600 font-medium leading-relaxed">
-          İhaleciBurada; satın alma yapan kurumsal alıcılar ile onaylı B2B üretici ve tedarikçileri şeffaf, rekabetçi ve zaman damgalı canlı eksiltme müzayedelerinde buluşturan güvenli tedarik ekosistemidir.
+          İhaleciBurada; satın alma yapan kurumsal alıcılar ile onaylı B2B üretici ve tedarikçileri şeffaf, rekabetçi ve zaman damgalı ihale ve satın alma müzayedelerinde buluşturan güvenli tedarik ekosistemidir.
         </p>
       </div>
 

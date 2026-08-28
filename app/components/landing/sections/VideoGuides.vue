@@ -21,7 +21,7 @@ const guides = [
   {
     id: 'intro-3min',
     title: '3 Dakikada İhaleciBurada Tanıtımı',
-    desc: 'Ters ihale modeli, canlı eksiltme mantığı ve %14.2 ortalama tedarik tasarrufu sağlama rehberi.',
+    desc: 'Ters ihale modeli, ihale ve satın alma mantığı ve %14.2 ortalama tedarik tasarrufu sağlama rehberi.',
     duration: '03:15',
     badge: 'TEMEL BAŞLANGIÇ',
     category: 'Ters İhale & B2B',
@@ -41,7 +41,7 @@ const guides = [
   {
     id: 'teklif-verme',
     title: 'Nasıl Teklif Verilir & Arenaya Katılınır?',
-    desc: 'Tedarikçi olarak aktif ihaleleri filtreleme, birim fiyat girişi ve canlı eksiltmede fiyat kırma.',
+    desc: 'Tedarikçi olarak aktif ihaleleri filtreleme, birim fiyat girişi ve ihale ve satın almade fiyat kırma.',
     duration: '02:50',
     badge: 'TEDARİKÇİ REHBERİ',
     category: 'Teklif & Eksiltme',
@@ -91,7 +91,7 @@ function openVideo(id: string) {
             Sitenin Kullanımı İçin Video Rehberler
           </h2>
           <p class="mt-2 text-sm text-slate-400 max-w-2xl font-medium">
-            İhale açmaktan canlı eksiltmeye katılmaya, şartname yüklemekten kurumsal doğrulamaya kadar tüm adımları interaktif video simülasyonlarıyla izleyin.
+            İhale açmaktan ihale ve satın almaye katılmaya, şartname yüklemekten kurumsal doğrulamaya kadar tüm adımları interaktif video simülasyonlarıyla izleyin.
           </p>
         </div>
 

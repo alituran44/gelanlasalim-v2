@@ -117,10 +117,10 @@ function generateBotResponse(userQuery: string) {
     replyText = '🎁 Lansmanımıza özel olarak ilk 1 AY boyunca tüm alıcı ve tedarikçi firmalarımıza sistem %100 ÜCRETSİZDİR! Kredi kartı bilgisi gerekmez, 0 komisyon ile sınırsız ihale açabilir ve teklif verebilirsiniz.'
     actionLink = { text: '1 Ay Ücretsiz Denemeyi Başlat →', url: '/abonelik' }
   } else if (q.includes('ihale aç') || q.includes('ihale nasıl') || q.includes('satın alma') || q.includes('talep')) {
-    replyText = '📢 İhale açmak çok kolay! Şartnamenizi ve malzeme miktarınızı belirleyerek dakikalar içinde canlı eksiltmeli B2B ihale başlatabilirsiniz. Doğrulanmış üreticiler size anında belgeli teklif sunar.'
+    replyText = '📢 İhale açmak çok kolay! Şartnamenizi ve malzeme miktarınızı belirleyerek dakikalar içinde ihale ve satın almali B2B ihale başlatabilirsiniz. Doğrulanmış üreticiler size anında belgeli teklif sunar.'
     actionLink = { text: 'Hemen İhale Oluştur →', url: '/panel/ihale-olustur' }
   } else if (q.includes('teklif ver') || q.includes('tedarikçi') || q.includes('üretici') || q.includes('ihale bul')) {
-    replyText = '💼 Tedarikçi olarak Pazar Yeri bölümündeki aktif alım ilanlarını filtreleyebilir, şartnameleri inceleyip doğrudan karşı teklif veya canlı eksiltmeye katılabilirsiniz.'
+    replyText = '💼 Tedarikçi olarak Pazar Yeri bölümündeki aktif alım ilanlarını filtreleyebilir, şartnameleri inceleyip doğrudan karşı teklif veya ihale ve satın almaye katılabilirsiniz.'
     actionLink = { text: 'Yayındaki İhaleleri İncele →', url: '/pazar-yeri' }
   } else if (q.includes('eksiltme') || q.includes('tersine') || q.includes('nasıl çalışır')) {
     replyText = '⚡ Canlı Tersine Eksiltme; alıcının belirlediği tavan fiyattan tedarikçilerin canlı sürede fiyat kırarak (eksiltme yaparak) yarıştığı şeffaf bir dijital pazarlık odasıdır. Alıcıya ortalama %14.2 tasarruf sağlar!'
@@ -129,7 +129,7 @@ function generateBotResponse(userQuery: string) {
     replyText = '💬 Müşteri temsilcimizle doğrudan WhatsApp üzerinden görüşmek için aşağıdaki bağlantıyı kullanabilirsiniz. 7/24 hizmetinizdeyiz!'
     actionLink = { text: 'WhatsApp Canlı Desteğe Bağlan →', url: whatsappUrl.value }
   } else {
-    replyText = `Sorunuz için teşekkürler! İhaleciBurada platformunda 1 ay ücretsiz lansman denemesi ile ihale açabilir, kurumsal teklif toplayabilir veya canlı eksiltme yapabilirsiniz. Daha detaylı canlı bilgi için WhatsApp hattımıza da yazabilirsiniz.`
+    replyText = `Sorunuz için teşekkürler! İhaleciBurada platformunda 1 ay ücretsiz lansman denemesi ile ihale açabilir, kurumsal teklif toplayabilir veya ihale ve satın alma yapabilirsiniz. Daha detaylı canlı bilgi için WhatsApp hattımıza da yazabilirsiniz.`
     actionLink = { text: 'Tüm Video Rehberleri İncele →', url: '/videolar' }
   }
 

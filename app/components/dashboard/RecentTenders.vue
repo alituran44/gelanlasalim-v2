@@ -10,7 +10,7 @@ const tenders = computed(() => {
     id: t.id || idx,
     title: t.baslik,
     company: t.companyName || t.firma || `${t.city || 'Kurumsal'} Alıcı`,
-    budget: t.butce || 'Açık Eksiltme',
+    budget: t.butce || 'Açık İhale',
     status: t.durum === 'closed' ? 'Kapandı' : 'Aktif',
     date: t.olusturma || 'Bugün'
   }))

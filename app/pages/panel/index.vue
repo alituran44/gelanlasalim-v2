@@ -928,7 +928,7 @@ onMounted(() => {
             <span>1 AYLIK ÜCRETSİZ DENEME SÜRENİZ SONA ERDİ</span>
           </div>
           <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            İhalelere ve Canlı Eksiltmeye Kesintisiz Devam Edin!
+            İhalelere ve İhale ve Satın Almaye Kesintisiz Devam Edin!
           </h2>
           <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
             Sayın <strong class="text-white">{{ companyName }}</strong> yetkilisi, 1 aylık ücretsiz deneme sürecinizi tamamladınız. Canlı eksiltmelerle ortalama <strong class="text-emerald-400">%14.2 satın alma tasarrufu</strong> elde etmeye, yeni ihale açmaya ve doğrulanmış B2B üreticilerden teklif toplamaya devam etmek için kurumsal üyeliğinizi hemen başlatın.
@@ -987,7 +987,7 @@ onMounted(() => {
         <div class="p-4 rounded-2xl bg-black/30 border border-white/5 space-y-2">
           <div class="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Abonelikle Kesintisiz Açık Kalacak Özellikler:</div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-300">
-            <div class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-400 shrink-0" /> Sınırsız B2B İhale ve Canlı Eksiltme</div>
+            <div class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-400 shrink-0" /> Sınırsız B2B İhale ve İhale ve Satın Alma</div>
             <div class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-400 shrink-0" /> Doğrulanmış Kurumsal Üretici Ağı</div>
             <div class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-400 shrink-0" /> Anlık NetGSM SMS & E-posta Alarmları</div>
             <div class="flex items-center gap-2"><CheckCircle2 :size="14" class="text-emerald-400 shrink-0" /> Güvenli Sözleşme & Escrow Ödeme</div>

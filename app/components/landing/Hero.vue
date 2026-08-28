@@ -14,7 +14,7 @@ import { ArrowRight, ShieldCheck, Sparkles, Building2, TrendingUp } from 'lucide
           </div>
 
           <h1 class="text-4xl sm:text-6xl font-black leading-tight tracking-tight text-white">
-            Binlerce Doğrulanmış Firmadan <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00C2FF] to-emerald-400">Teklif Al</span>, Canlı Eksiltme ile Yarıştır.
+            Binlerce Doğrulanmış Firmadan <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#00C2FF] to-emerald-400">Teklif Al</span>, İhale ve Satın Alma ile Yarıştır.
           </h1>
 
           <p class="max-w-xl text-base text-slate-300 font-medium leading-relaxed">

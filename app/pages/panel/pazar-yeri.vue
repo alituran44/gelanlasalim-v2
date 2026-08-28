@@ -70,7 +70,7 @@ const categories = [
 
 const methods = [
   'Tümü',
-  'Açık Eksiltme',
+  'Açık İhale',
   'Kapalı Zarf',
   'Doğrudan Temin'
 ]
@@ -231,7 +231,7 @@ async function submitBid() {
 }
 
 function downloadAllSpecs(tender: any) {
-  let content = `========================================================\nİHALECİBURADA.COM - RESMİ İHALE ŞARTNAME VE MALZEME PAKETİ\nİhale No: ${tender.id}\nİhale Başlığı: ${tender.baslik}\nKategori: ${tender.kategori}\nŞehir: ${tender.city || 'Türkiye Geneli'}\nBütçe: ${tender.butce || 'Açık Eksiltme'}\n========================================================\n\n1. İHALE METNİ VE GENEL ŞARTLAR:\n${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}\n\n2. MALZEME LİSTESİ & METRAJ:\n- Kalem 1: Standart şartname metrajına uygun malzeme ve işçilik.\n\n3. İDARİ VE TEKNİK ŞARTLAR:\n- Teslimat süresine ve irsaliye kabul kriterlerine uygunluk esastır.\n- Hakediş ödemesi TCMB/BDDK mevzuatına uygun Güvenli Havuz (Escrow) hesabında korunacaktır.\n========================================================\n`
+  let content = `========================================================\nİHALECİBURADA.COM - RESMİ İHALE ŞARTNAME VE MALZEME PAKETİ\nİhale No: ${tender.id}\nİhale Başlığı: ${tender.baslik}\nKategori: ${tender.kategori}\nŞehir: ${tender.city || 'Türkiye Geneli'}\nBütçe: ${tender.butce || 'Açık İhale'}\n========================================================\n\n1. İHALE METNİ VE GENEL ŞARTLAR:\n${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}\n\n2. MALZEME LİSTESİ & METRAJ:\n- Kalem 1: Standart şartname metrajına uygun malzeme ve işçilik.\n\n3. İDARİ VE TEKNİK ŞARTLAR:\n- Teslimat süresine ve irsaliye kabul kriterlerine uygunluk esastır.\n- Hakediş ödemesi TCMB/BDDK mevzuatına uygun Güvenli Havuz (Escrow) hesabında korunacaktır.\n========================================================\n`
   
   if (typeof document !== 'undefined') {
     const element = document.createElement('a')
@@ -259,7 +259,7 @@ function downloadAllSpecs(tender: any) {
         </div>
         <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white">Canlı İhale Pazarı</h1>
         <p class="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-          Aktif satın alma taleplerini inceleyin, şartnameleri indirin ve şirketiniz adına kapalı zarf veya canlı eksiltme teklifi iletin.
+          Aktif satın alma taleplerini inceleyin, şartnameleri indirin ve şirketiniz adına kapalı zarf veya ihale ve satın alma teklifi iletin.
         </p>
       </div>
 
@@ -414,7 +414,7 @@ function downloadAllSpecs(tender: any) {
                 {{ tender.kategori }}
               </span>
               <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                {{ tender.tur || 'Açık Eksiltme' }}
+                {{ tender.tur || 'Açık İhale' }}
               </span>
             </div>
 
@@ -432,7 +432,7 @@ function downloadAllSpecs(tender: any) {
             <div class="flex items-center justify-between">
               <div>
                 <span class="text-[10px] font-bold text-slate-400 uppercase block">Tahmini Hacim:</span>
-                <span class="text-sm font-black font-mono text-slate-900">{{ tender.butce || 'Açık Eksiltme' }}</span>
+                <span class="text-sm font-black font-mono text-slate-900">{{ tender.butce || 'Açık İhale' }}</span>
               </div>
               
               <button

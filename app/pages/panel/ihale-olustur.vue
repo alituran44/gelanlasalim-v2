@@ -326,7 +326,7 @@ function handleSubmit() {
       budgetVal = '₺' + budgetVal
     }
   } else {
-    budgetVal = 'Açık Eksiltme'
+    budgetVal = 'Açık İhale'
   }
 
   const deliveryAddress = form.value.teslimatAdresi || `${form.value.sehir} Merkez Teslimat`

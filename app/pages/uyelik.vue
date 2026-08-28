@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   Handshake,
@@ -32,7 +32,15 @@ onMounted(() => {
     activeTab.value = 'guest'
   } else if (route.query.tab === 'login') {
     activeTab.value = 'login'
+  } else if (route.query.tab === 'register') {
+    activeTab.value = 'register'
   }
+})
+
+watch(() => route.query.tab, (newTab) => {
+  if (newTab === 'guest') activeTab.value = 'guest'
+  else if (newTab === 'login') activeTab.value = 'login'
+  else if (newTab === 'register') activeTab.value = 'register'
 })
 
 // Guest Access Fields
@@ -333,10 +341,10 @@ function handleGuestEntry() {
           <Sparkles :size="12" /> {{ 'B2B Tedarik Çözümü' }}
         </div>
         <h2 class="mt-6 text-3xl font-black text-white leading-tight md:text-4xl lg:text-5xl tracking-tight">
-          {{ 'Tedarik Maliyetinizi Canlı Eksiltme ile Düşürün' }}
+          {{ 'Tedarik Maliyetinizi Dijital İhale ile Düşürün' }}
         </h2>
         <p class="mt-4 max-w-md text-xs text-slate-400 leading-relaxed font-medium">
-          {{ 'İhaleciBurada arenasında rekabet kurallarını siz belirlersiniz. İlanınızı yayınlayın, onaylı satıcılar anlık fiyat kırarak yarışsın.' }}
+          {{ 'İhaleciBurada platformunda rekabet kurallarını siz belirlersiniz. İlanınızı yayınlayın, onaylı satıcılar teklif vererek yarışsın.' }}
         </p>
 
         <!-- Feature List -->
@@ -355,8 +363,8 @@ function handleGuestEntry() {
               <Zap :size="14" />
             </div>
             <div>
-              <h4 class="text-xs font-bold text-white">{{ 'Canlı Eksiltme Teknolojisi' }}</h4>
-              <p class="text-[10px] text-slate-400">{{ 'Şeffaf zaman damgalı teklif yarışı ile maksimum tasarruf sağlayın.' }}</p>
+              <h4 class="text-xs font-bold text-white">{{ 'Online Teklif ve İhale Sistemi' }}</h4>
+              <p class="text-[10px] text-slate-400">{{ 'Şeffaf zaman damgalı teklif süreci ile maksimum tasarruf sağlayın.' }}</p>
             </div>
           </div>
           <div class="flex items-start gap-3">
@@ -684,29 +692,6 @@ function handleGuestEntry() {
               <ChevronRight v-if="!isSubmitting" :size="14" />
             </button>
           </form>
-
-          <!-- Hızlı Demo Girişleri -->
-          <div class="mt-6 pt-6 border-t" style="border-color: #F1F5F9;">
-            <label class="text-[9px] font-black uppercase tracking-wider text-slate-400 block mb-2 text-center">{{ 'HIZLI DEMO GİRİŞLERİ' }}</label>
-            <div class="grid grid-cols-2 gap-3">
-              <button 
-                type="button" 
-                @click="handleDemoLogin('company')"
-                class="flex flex-col items-center justify-center p-3 rounded-xl border border-dashed border-blue-200 bg-blue-50/10 hover:bg-blue-50 text-center transition cursor-pointer"
-              >
-                <span class="text-xs font-bold text-blue-700">{{ '🏢 Firma Demosu' }}</span>
-                <span class="text-[8px] text-slate-500 mt-0.5">{{ 'İhale Aç & Yönet' }}</span>
-              </button>
-              <button 
-                type="button" 
-                @click="handleDemoLogin('individual')"
-                class="flex flex-col items-center justify-center p-3 rounded-xl border border-dashed border-emerald-200 bg-emerald-50/10 hover:bg-emerald-50 text-center transition cursor-pointer"
-              >
-                <span class="text-xs font-bold text-emerald-700">{{ '👤 Kullanıcı Demosu' }}</span>
-                <span class="text-[8px] text-slate-500 mt-0.5">{{ 'Bireysel İlan & Teklif' }}</span>
-              </button>
-            </div>
-          </div>
         </div>
 
         <!-- ŞİFREMİ UNUTTUM EKRANI (FORGOT PASSWORD FLOW) -->

@@ -151,7 +151,7 @@ if (!formState.supportSettings) {
     aiEnabled: true,
     aiBotName: 'İhaleciBurada AI Asistanı',
     aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel 1 Ay %100 Ücretsiz Deneme süreciniz hakkında size nasıl yardımcı olabilirim?',
-    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın. Kullanıcılara 1 ay ücretsiz deneme, ihale açma, teklif verme, canlı eksiltme konularında yardımcı ol.'
+    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın. Kullanıcılara 1 ay ücretsiz deneme, ihale açma, teklif verme, ihale ve satın alma konularında yardımcı ol.'
   }
 }
 
@@ -206,7 +206,7 @@ if (!formState.siteSettings) {
   formState.siteSettings = {
     maintenanceMode: false,
     maintenanceNotice: 'Platformumuzda planlı bakım çalışması yapılmaktadır.',
-    metaTitle: 'İhaleciBurada.com | Türkiye’nin Öncü B2B Canlı Eksiltme & Satın Alma Platformu',
+    metaTitle: 'İhaleciBurada.com | Türkiye’nin Öncü B2B İhale ve Satın Alma & Satın Alma Platformu',
     metaDescription: 'B2B satın alma ihaleleri açın, canlı tersine eksiltme ile rekabetçi teklifler toplayın.',
     announcementTicker: '⚡ LANSMANA ÖZEL: İlk 1 ay boyunca %100 ücretsiz kurumsal deneme paketi (0 ₺)!',
     googleAnalyticsId: 'G-IHALECIBURADA2026',
@@ -597,7 +597,7 @@ function removeSubmittedBid(index: number) {
         <div class="flex flex-col items-center mb-8">
           <img src="/logo.png" alt="İhaleciBurada Logo" class="h-10 w-auto brightness-0 invert" />
           <h2 class="mt-4 text-lg font-black tracking-tight text-white">İhaleciBurada Yönetim & Operasyon Suite</h2>
-          <p class="text-xs text-slate-400 mt-1 text-center">Kurumsal KYC, Canlı Eksiltme, Escrow Teslimat, CRM ve E-Posta Merkezi.</p>
+          <p class="text-xs text-slate-400 mt-1 text-center">Kurumsal KYC, İhale ve Satın Alma, Escrow Teslimat, CRM ve E-Posta Merkezi.</p>
         </div>
 
         <form @submit.prevent="handleLogin" class="space-y-4">
@@ -708,7 +708,7 @@ function removeSubmittedBid(index: number) {
               class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'live_rooms' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <span class="flex items-center gap-2.5"><Activity :size="14" /> Canlı Eksiltme Odası</span>
+              <span class="flex items-center gap-2.5"><Activity :size="14" /> İhale ve Satın Alma Odası</span>
               <span class="h-2 w-2 rounded-full bg-rose-500 animate-ping"></span>
             </button>
 
@@ -956,7 +956,7 @@ function removeSubmittedBid(index: number) {
               <div class="p-5 rounded-2xl border border-blue-900/50 bg-blue-950/20">
                 <span class="text-[10px] font-black text-blue-400 uppercase tracking-wider">AKTİF İHALE SAYISI</span>
                 <div class="text-2xl font-black text-blue-400 mt-1.5">{{ formState.dashboard?.tenders?.length || 48 }}+</div>
-                <span class="text-[11px] text-blue-300 font-bold mt-1 block">Canlı Eksiltme Yayında</span>
+                <span class="text-[11px] text-blue-300 font-bold mt-1 block">İhale ve Satın Alma Yayında</span>
               </div>
               <div class="p-5 rounded-2xl border border-amber-900/50 bg-amber-950/20">
                 <span class="text-[10px] font-black text-amber-400 uppercase tracking-wider">ONAY BEKLEYEN KYC EVRAKLARI</span>
@@ -982,7 +982,7 @@ function removeSubmittedBid(index: number) {
                 </button>
                 <button @click="activeTab = 'live_rooms'" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-rose-500/50 transition text-left cursor-pointer">
                   <Activity :size="18" class="text-rose-400 mb-2" />
-                  <div class="text-xs font-bold text-white">Canlı Eksiltme Yönet</div>
+                  <div class="text-xs font-bold text-white">İhale ve Satın Alma Yönet</div>
                   <div class="text-[10px] text-slate-400 mt-0.5">Odalara +5 dk ekle / sonuçlandır</div>
                 </button>
                 <button @click="activeTab = 'email_center'" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-blue-500/50 transition text-left cursor-pointer">

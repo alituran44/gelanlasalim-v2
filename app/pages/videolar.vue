@@ -25,7 +25,7 @@ useSeoMeta({
   title: 'Video Rehberler & Akademi — İhaleciBurada',
   description: 'İhaleciBurada B2B platformunun kullanımını 5 adımda anlatan görüntülü video simülasyonları ve rehberleri.',
   ogTitle: 'Video Rehberler & Akademi — İhaleciBurada',
-  ogDescription: 'İhale açma, canlı eksiltmeye katılma, şartname yükleme ve kurumsal doğrulama video eğitimleri.'
+  ogDescription: 'İhale açma, ihale ve satın almaye katılma, şartname yükleme ve kurumsal doğrulama video eğitimleri.'
 })
 
 const showModal = ref(false)
@@ -36,7 +36,7 @@ const videos = [
   {
     id: 'intro-3min',
     title: '3 Dakikada İhaleciBurada Tanıtımı',
-    subtitle: 'Ters ihale modeli, canlı eksiltme kuralları ve ortalama %14.2 tedarik tasarrufu sağlama rehberi.',
+    subtitle: 'Ters ihale modeli, ihale ve satın alma kuralları ve ortalama %14.2 tedarik tasarrufu sağlama rehberi.',
     duration: '03:15',
     category: 'genel',
     badge: 'TEMEL BAŞLANGIÇ',
@@ -71,7 +71,7 @@ const videos = [
   },
   {
     id: 'teklif-verme',
-    title: 'Nasıl Teklif Verilir & Canlı Eksiltme',
+    title: 'Nasıl Teklif Verilir & İhale ve Satın Alma',
     subtitle: 'Tedarikçi olarak aktif ihaleleri filtreleme, birim fiyat teklifi hazırlama ve canlı arenada fiyat kırma.',
     duration: '02:50',
     category: 'satici',
@@ -159,7 +159,7 @@ const filteredVideos = computed(() => {
         </h1>
 
         <p class="text-xs sm:text-sm text-slate-400 font-medium leading-relaxed">
-          İhaleciBurada platformunda ihale açma, teklif verme, canlı eksiltme arenası ve kurumsal doğrulama adımlarını interaktif video simülasyonlarıyla adım adım izleyin.
+          İhaleciBurada platformunda ihale açma, teklif verme, ihale ve satın alma arenası ve kurumsal doğrulama adımlarını interaktif video simülasyonlarıyla adım adım izleyin.
         </p>
 
         <!-- Category Filters -->
@@ -226,7 +226,7 @@ const filteredVideos = computed(() => {
             <div class="space-y-2 pt-2 text-xs text-slate-300">
               <div class="flex items-center gap-2">
                 <CheckCircle2 :size="14" class="text-emerald-400" />
-                <span>Ters ihale ve canlı eksiltme çalışma prensibi</span>
+                <span>Ters ihale ve ihale ve satın alma çalışma prensibi</span>
               </div>
               <div class="flex items-center gap-2">
                 <CheckCircle2 :size="14" class="text-emerald-400" />
