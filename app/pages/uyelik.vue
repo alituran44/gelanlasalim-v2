@@ -201,7 +201,7 @@ function handleOAuth(provider = 'google') {
   if (typeof window !== 'undefined' && (window as any).google?.accounts?.oauth2) {
     try {
       const client = (window as any).google.accounts.oauth2.initTokenClient({
-        client_id: '965824103842-8r2m8v3v8v9q9q9q9q9q9q9q9q9q.apps.googleusercontent.com',
+        client_id: '616649314930-qn4lj8sruj1f79lc7fqaqt619i37jpjp.apps.googleusercontent.com',
         scope: 'email profile openid',
         callback: async (response: any) => {
           if (response.access_token) {
