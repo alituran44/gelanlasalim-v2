@@ -114,17 +114,31 @@ onMounted(() => {
     <header class="bg-white border-b border-slate-300 pt-2 pb-2 px-4 sm:px-6 shadow-xs sticky top-0 z-50">
       <div class="max-w-[1400px] mx-auto flex flex-col lg:flex-row items-center justify-between gap-3">
 
-        <!-- SOL: LOGO (İHALECİBURADA.COM) -->
-        <NuxtLink to="/" class="flex items-center gap-3 shrink-0 group py-1">
-          <div class="h-11 w-11 rounded-xl bg-gradient-to-tr from-[#0084B4] to-[#00A3C4] flex items-center justify-center font-black text-2xl text-white shadow-md">
-            ⚖️
-          </div>
-          <div>
-            <div class="text-2xl font-black tracking-tight text-[#0084B4] leading-tight flex items-center">
-              <span>ihaleci</span><span class="text-[#1EAE4C]">burada</span><span class="text-slate-600 text-base font-bold">.com</span>
-            </div>
-            <span class="text-[9px] font-bold text-slate-500 tracking-wider block uppercase">TÜRKİYE'NİN RESMİ B2B İHALE VE SATIN ALMA PORTALI</span>
-          </div>
+        <!-- SOL: ORİJİNAL MARKA LOGOSU (İHALECİBURADA.COM) -->
+        <NuxtLink to="/" class="flex items-center gap-3.5 hover:opacity-95 transition shrink-0 group py-1" title="İhaleciBurada.com Ana Sayfa">
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            viewBox="0 0 540 120" 
+            class="h-10 sm:h-12 w-auto max-w-[230px] sm:max-w-[260px] object-contain drop-shadow-xs group-hover:scale-102 transition-transform duration-200" 
+            fill="none" 
+            role="img" 
+            aria-label="İhaleciBurada.com"
+          >
+            <g transform="translate(10, 10)">
+              <!-- Turuncu Nokta -->
+              <circle cx="106" cy="18" r="14" fill="#FF5938" />
+              <!-- 3 Adet Hız Çizgisi -->
+              <path d="M 38 68 L 86 63 L 83 58 L 32 64 Z" fill="#0052FF" />
+              <path d="M 18 84 L 78 78 L 75 73 L 12 80 Z" fill="#0084FF" />
+              <path d="M 0 98 L 70 91 L 67 86 L -4 94 Z" fill="#00C2FF" />
+              <!-- Koyu Lacivert Gövde -->
+              <path d="M 94 33 C 90 33 82 37 81 40 L 89 40 C 97 40 94 48 91 58 L 79 97 C 76 107 84 105 91 101 C 101 95 108 78 114 55 C 117 42 110 33 94 33 Z" fill="#0B1E3B" />
+            </g>
+            <!-- ihaleciburada Metni -->
+            <text x="152" y="84" fill="#0B1E3B" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-1.2px">ihaleciburada</text>
+            <!-- .com Uzantısı -->
+            <text x="430" y="84" fill="#0052FF" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-0.8px">.com</text>
+          </svg>
         </NuxtLink>
 
         <!-- SAĞ: TURUNCU / MAVİ MENÜ SEKMELERİ -->
