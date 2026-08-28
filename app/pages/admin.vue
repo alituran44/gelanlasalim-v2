@@ -168,11 +168,11 @@ if (!formState.crmSettings) {
 if (!formState.emailSettings) {
   formState.emailSettings = {
     senderName: 'İhaleciBurada B2B Operasyon',
-    senderEmail: 'ihalecib@gmail.com',
-    replyToEmail: 'ihalecib@gmail.com',
+    senderEmail: 'ihalcib@gmail.com',
+    replyToEmail: 'ihalcib@gmail.com',
     smtpHost: 'smtp.gmail.com',
     smtpPort: 587,
-    smtpUser: 'ihalecib@gmail.com',
+    smtpUser: 'ihalcib@gmail.com',
     subscribers: [],
     templates: []
   }
@@ -211,7 +211,7 @@ if (!formState.siteSettings) {
     announcementTicker: '⚡ LANSMANA ÖZEL: İlk 1 ay boyunca %100 ücretsiz kurumsal deneme paketi (0 ₺)!',
     googleAnalyticsId: 'G-IHALECIBURADA2026',
     supportPhone: '0850 308 00 00',
-    supportEmail: 'ihalecib@gmail.com'
+    supportEmail: 'ihalcib@gmail.com'
   }
 }
 
@@ -1771,7 +1771,7 @@ function removeSubmittedBid(index: number) {
             <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
               <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
                 <Mail :size="16" class="text-blue-500" />
-                <h3 class="text-sm font-black text-white">ihalecib@gmail.com Gönderici Yapılandırması</h3>
+                <h3 class="text-sm font-black text-white">ihalcib@gmail.com Gönderici Yapılandırması</h3>
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>

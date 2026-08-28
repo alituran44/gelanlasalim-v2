@@ -97,7 +97,7 @@ onMounted(() => {
           <span class="hidden sm:flex items-center gap-1">
             <span class="text-indigo-600">✉</span>
             <strong>E-posta:</strong> 
-            <a href="mailto:mail@ihaleciburada.com" class="text-blue-700 hover:underline">mail@ihaleciburada.com</a>
+            <a href="mailto:ihalcib@gmail.com" class="text-blue-700 hover:underline">ihalcib@gmail.com</a>
           </span>
         </div>
         <div>
@@ -321,7 +321,7 @@ onMounted(() => {
               </div>
               <div class="text-slate-400">
                 <span>✉</span>
-                <span class="ml-1 text-sky-300">mail@ihaleciburada.com</span>
+                <span class="ml-1 text-sky-300">ihalcib@gmail.com</span>
               </div>
               <div class="text-[10px] text-slate-500 pt-1 border-t border-slate-800">
                 Hafta İçi: 09:00 - 18:00 | 7/24 Online Destek

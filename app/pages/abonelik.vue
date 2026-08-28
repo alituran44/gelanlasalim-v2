@@ -221,7 +221,7 @@ onMounted(() => {
         billingTaxOffice.value = userSession.value.taxOffice || 'Çanakkale Vergi Dairesi'
         billingAddress.value = userSession.value.address || 'İsmetpaşa Mah. Büyük Hamam Sok. No:52/1'
         billingPhone.value = userSession.value.phone || '0850 308 00 00'
-        billingEmail.value = userSession.value.email || 'ihalecib@gmail.com'
+        billingEmail.value = userSession.value.email || 'ihalcib@gmail.com'
       }
     } catch (e) {
       console.error('Failed to load user session', e)
