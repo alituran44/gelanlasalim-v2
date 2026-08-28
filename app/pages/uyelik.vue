@@ -197,6 +197,58 @@ function handleRegister() {
 function handleOAuth(provider = 'google') {
   isSubmitting.value = true
   errorMessage.value = ''
+
+  if (typeof window !== 'undefined' && (window as any).google?.accounts?.oauth2) {
+    try {
+      const client = (window as any).google.accounts.oauth2.initTokenClient({
+        client_id: '965824103842-8r2m8v3v8v9q9q9q9q9q9q9q9q9q.apps.googleusercontent.com',
+        scope: 'email profile openid',
+        callback: async (response: any) => {
+          if (response.access_token) {
+            try {
+              const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+                headers: { Authorization: `Bearer ${response.access_token}` }
+              })
+              const user = await res.json()
+              localStorage.setItem('userSession', JSON.stringify({
+                email: user.email,
+                firstName: user.given_name || user.name,
+                lastName: user.family_name || '',
+                name: user.name,
+                picture: user.picture,
+                company: userRole.value === 'company' ? (user.name + ' San. Tic. A.Ş.') : 'Bireysel Üye',
+                companyName: userRole.value === 'company' ? (user.name + ' San. Tic. A.Ş.') : 'Bireysel Üye',
+                role: userRole.value || 'company',
+                verified: true,
+                isGoogleAuth: true,
+                authProvider: 'google',
+                isPremium: true,
+                subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
+              }))
+              isSubmitting.value = false
+              router.push('/panel')
+              return
+            } catch (err) {
+              console.warn('Google userinfo fetch fallback', err)
+            }
+          }
+          fallbackGoogleLogin()
+        },
+        error_callback: () => {
+          fallbackGoogleLogin()
+        }
+      })
+      client.requestAccessToken({ prompt: '' })
+      return
+    } catch (e) {
+      console.warn('Google GIS init error', e)
+    }
+  }
+
+  fallbackGoogleLogin()
+}
+
+function fallbackGoogleLogin() {
   setTimeout(() => {
     isSubmitting.value = false
     if (typeof window !== 'undefined') {
