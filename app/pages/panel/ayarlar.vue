@@ -52,8 +52,43 @@ definePageMeta({
   layout: 'dashboard' 
 })
 
+const userSession = ref<any>({})
+
 onMounted(() => {
   detectLocale()
+  if (typeof window !== 'undefined') {
+    try {
+      const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+      userSession.value = session
+      if (session.email) {
+        profileForm.value.email = session.email
+        companyForm.value.email = session.email
+      }
+      if (session.firstName || session.name) {
+        profileForm.value.name = session.firstName || session.name
+        companyForm.value.contactPerson = session.name || session.firstName
+      }
+      if (session.lastName) profileForm.value.surname = session.lastName
+      if (session.phone) {
+        profileForm.value.phone = session.phone
+        companyForm.value.phone = session.phone
+      }
+      if (session.companyName || session.company) {
+        companyForm.value.name = session.companyName || session.company
+        companyForm.value.legalName = session.legalName || session.companyName || session.company
+      }
+      if (session.taxNo) companyForm.value.taxNo = session.taxNo
+      if (session.taxOffice) companyForm.value.taxOffice = session.taxOffice
+      if (session.sectors) companyForm.value.sectors = Array.isArray(session.sectors) ? session.sectors.join(', ') : session.sectors
+      if (session.mersis) companyForm.value.mersis = session.mersis
+      if (session.sicilNo) companyForm.value.sicilNo = session.sicilNo
+      if (session.tcKimlik) companyForm.value.tcKimlik = session.tcKimlik
+      if (session.iban) companyForm.value.iban = session.iban
+      if (session.faturaAdresi) companyForm.value.faturaAdresi = session.faturaAdresi
+    } catch (e) {
+      console.error(e)
+    }
+  }
 })
 
 const route = useRoute()
@@ -75,7 +110,7 @@ function showToast(message: string, type: 'success' | 'error' | 'warning' = 'suc
   }, 3500)
 }
 
-// Membership & Pricing State (Photo 2)
+// Membership & Pricing State
 const membershipPricingRegion = ref<'domestic' | 'international'>('domestic')
 
 const membershipPricingDomestic = [
@@ -177,18 +212,45 @@ const profileForm = ref({
 const companyVerified = ref(false)
 const companyForm = ref({
   name: 'Ali Turan',
-  legalName: 'Ali Turan',
-  contactPerson: 'Çehre',
-  taxNo: '45624685040',
-  taxOffice: 'Çanakkale Vergi Dairesi Müdürlüğü',
-  sectors: 'Yazılım & IT Hizmetleri, Reklam & Pazarlama, Elektrik & Elektronik',
-  mersis: '0456-2468-5040-0001',
-  sicilNo: '58402-Ç',
-  faturaAdresi: '17100 Çanakkale İsmet Paşa Mah. Merkez Çanakkale 17100',
+  legalName: 'Ali Turan Ticaret A.Ş.',
+  contactPerson: 'Ali Turan',
+  phone: '0850 840 86 95',
+  email: 'ihalcib@gmail.com',
+  tcKimlik: '12345678901',
+  taxNo: '4700854210',
+  taxOffice: 'Çanakkale Vergi Dairesi',
+  sectors: 'Ambalaj & Kağıt, İnşaat & Yapı, Lojistik & Nakliye',
+  mersis: '0470-0854-2100-0001',
+  sicilNo: '14520',
+  faturaAdresi: 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale',
   iban: 'TR56 0006 2000 0001 2345 6789 01',
   accountHolder: 'Ali Turan',
   is2FaEnabled: true
 })
+
+function saveCompanyInfo() {
+  if (typeof window !== 'undefined') {
+    const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    session.company = companyForm.value.name
+    session.companyName = companyForm.value.name
+    session.legalName = companyForm.value.legalName
+    session.taxNo = companyForm.value.taxNo
+    session.taxOffice = companyForm.value.taxOffice
+    session.sectors = companyForm.value.sectors
+    session.mersis = companyForm.value.mersis
+    session.sicilNo = companyForm.value.sicilNo
+    session.tcKimlik = companyForm.value.tcKimlik
+    session.contactPerson = companyForm.value.contactPerson
+    session.phone = companyForm.value.phone
+    session.faturaAdresi = companyForm.value.faturaAdresi
+    session.iban = companyForm.value.iban
+    session.accountHolder = companyForm.value.accountHolder
+    session.verified = true
+    localStorage.setItem('userSession', JSON.stringify(session))
+    userSession.value = session
+  }
+  showToast("Kurumsal firma ve vergi bilgileriniz başarıyla kaydedildi.", "success")
+}
 
 // Document Upload status counters
 const uploadedDocs = ref<Record<string, boolean>>({
@@ -239,10 +301,6 @@ function onFileSelected(event: Event) {
 
   // Clear target value to allow uploading the same file again
   target.value = ''
-}
-
-function saveCompanyInfo() {
-  showToast("Şirket ve kayıt bilgileriniz başarıyla güncellendi.")
 }
 
 // Password verification state
@@ -882,85 +940,149 @@ function saveProfile() {
 
           <!-- Kayıt & Doğrulama Bilgileri Form Card -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
+            
+            <!-- Google OAuth Connected Info Banner -->
+            <div v-if="userSession?.isGoogleAuth || userSession?.authProvider === 'google'" class="p-4 rounded-xl bg-blue-50/80 border border-blue-200 text-blue-950 text-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+              <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-xs text-base shrink-0 font-bold text-blue-600">
+                  G
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-bold text-blue-900">Google Hesabı ile Oturum Açıldı:</span>
+                    <span class="font-mono text-blue-800 text-[11px] font-semibold">{{ profileForm.email }}</span>
+                  </div>
+                  <p class="text-[11px] text-blue-700 mt-0.5">İhalelere teklif verebilmeniz veya ihale açabilmeniz için lütfen aşağıdaki kurumsal firma, sektör ve yasal vergi/kimlik bilgilerinizi doldurunuz.</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 rounded-md bg-blue-600 text-white font-bold text-[10px] whitespace-nowrap shadow-xs">
+                Google Doğrulandı
+              </span>
+            </div>
+
             <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
-              <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">{{ 'Kayıt & Doğrulama Bilgileri' }}</h3>
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">{{ 'Kurumsal & Yasal Firma Bilgileri' }}</h3>
               <div class="flex rounded-lg bg-slate-100 p-0.5">
-                <button type="button" class="rounded px-2.5 py-1 text-[10px] font-black bg-white text-slate-800 shadow-sm">{{ 'Kayıt Bilgisi' }}</button>
+                <button type="button" class="rounded px-2.5 py-1 text-[10px] font-black bg-white text-slate-800 shadow-sm">{{ 'Firma & Vergi Bilgisi' }}</button>
                 <button type="button" @click="showToast('Fatura & Banka görünümüne geçiliyor...')" class="rounded px-2.5 py-1 text-[10px] font-black text-slate-500 cursor-pointer">{{ 'Fatura & Banka' }}</button>
               </div>
             </div>
 
             <p class="text-[10px] text-slate-400 leading-normal">
-              <strong>{{ 'Kayıt & Doğrulama Bilgileri.' }}</strong> {{ 'Kayıt ve firma doğrulama aşamasında alınan ve değiştirilemeyen yasal verileri tutar. Yerel yasalar doğrultusunda bayilik, yetkili arayan kurallar buradaki bilgilere göre denetlenmektedir.' }}
+              <strong>{{ 'Yasal Kayıt & Doğrulama Bilgileri:' }}</strong> {{ 'Platformda güvenli ticaret yapabilmeniz, resmi faturalandırma ve ihale teklif verme yetkisi kazanabilmeniz için bu alanların eksiksiz doldurulması gerekmektedir.' }}
             </p>
 
             <!-- Editable Fields Form Grid -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               
-              <!-- Şirket Adı -->
+              <!-- Şirket / Ticari Adı -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'ŞİRKET ADI' }}</label>
-                <input v-model="companyForm.name" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                  ŞİRKET / TİCARİ ADI <span class="text-red-500">*</span>
+                </label>
+                <input v-model="companyForm.name" type="text" placeholder="Örn: Yılmaz Ambalaj Sanayi" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
               <!-- Yasal Firma Unvanı -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'YASAL FİRMA UNVANI' }}</label>
-                <input v-model="companyForm.legalName" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                  YASAL FİRMA UNVANI (RESMİ) <span class="text-red-500">*</span>
+                </label>
+                <input v-model="companyForm.legalName" type="text" placeholder="Örn: Yılmaz Ambalaj Sanayi ve Ticaret A.Ş." class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
-              <!-- İrtibat İsim -->
-              <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'İRTİBAT İSİM' }}</label>
-                <input v-model="companyForm.contactPerson" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
-              </div>
-
-              <!-- Vergi Numarası -->
-              <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'VERGİ NUMARASI' }}</label>
-                <input v-model="companyForm.taxNo" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
-              </div>
-
-              <!-- Faaliyet Alanları -->
+              <!-- Faaliyet Sektörleri -->
               <div class="md:col-span-2">
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'FAALİYET ALANLARI' }}</label>
-                <input v-model="companyForm.sectors" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                  FAALİYET SEKTÖRÜ / ALANLARI <span class="text-red-500">*</span>
+                </label>
+                <input v-model="companyForm.sectors" type="text" placeholder="Örn: Ambalaj & Kağıt, İnşaat & Yapı Malzemeleri, Lojistik" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800 font-medium" style="border-color: #E2E8F0;" />
+                <span class="text-[9px] text-slate-400 mt-1 block">İlgi alanınıza giren sektörleri virgülle ayırarak yazınız. Size uygun ihaleler bu sektörlere göre filtrelenir.</span>
+              </div>
+
+              <!-- Vergi Numarası / VKN -->
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                  VERGİ NUMARASI (VKN - TÜZEL KİŞİLER)
+                </label>
+                <input v-model="companyForm.taxNo" type="text" placeholder="10 Haneli VKN" maxlength="10" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800 font-mono font-bold" style="border-color: #E2E8F0;" />
+              </div>
+
+              <!-- T.C. Kimlik No (Şahıs Şirketi) -->
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                  T.C. KİMLİK NO (ŞAHIS ŞİRKETİ / BİREYSEL)
+                </label>
+                <input v-model="companyForm.tcKimlik" type="text" placeholder="11 Haneli T.C. Kimlik No" maxlength="11" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800 font-mono font-bold" style="border-color: #E2E8F0;" />
+              </div>
+
+              <!-- Vergi Dairesi -->
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                  BAĞLI OLDUĞU VERGİ DAİRESİ
+                </label>
+                <input v-model="companyForm.taxOffice" type="text" placeholder="Örn: Çanakkale Vergi Dairesi Müdürlüğü" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
               </div>
 
               <!-- MERSİS No -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'MERSİS NO' }}</label>
-                <input v-model="companyForm.mersis" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="0XXX-XXXX-XXXX-XXXX" />
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                  MERSİS NUMARASI (VARSA)
+                </label>
+                <input v-model="companyForm.mersis" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800 font-mono" style="border-color: #E2E8F0;" placeholder="0XXX-XXXX-XXXX-XXXX" />
               </div>
 
               <!-- Ticaret Sicil No -->
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'TİCARET SİCİL NO' }}</label>
-                <input v-model="companyForm.sicilNo" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="Ticaret sicil numarası" />
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                  TİCARET SİCİL NO / ODA KAYIT NO
+                </label>
+                <input v-model="companyForm.sicilNo" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="Örn: 14520 / Çanakkale TSO" />
+              </div>
+
+              <!-- İrtibat Yetkilisi -->
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                  YETKİLİ ADI - SOYADI <span class="text-red-500">*</span>
+                </label>
+                <input v-model="companyForm.contactPerson" type="text" placeholder="Yetkili kişi adı" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;" />
+              </div>
+
+              <!-- Yetkili Telefon -->
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                  YETKİLİ İLETİŞİM TELEFONU <span class="text-red-500">*</span>
+                </label>
+                <input v-model="companyForm.phone" type="text" placeholder="Örn: 0850 840 86 95" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800 font-medium" style="border-color: #E2E8F0;" />
+              </div>
+
+              <!-- Fatura ve Tebligat Adresi -->
+              <div class="md:col-span-2">
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                  RESMİ FATURA VE TEBLİGAT ADRESİ
+                </label>
+                <textarea v-model="companyForm.faturaAdresi" rows="2" placeholder="İl, ilçe, mahalle, cadde, kapı no bilgileri" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800" style="border-color: #E2E8F0;"></textarea>
               </div>
 
               <!-- IBAN & Hakediş Hesabı (Escrow Sub-Merchant) -->
-              <div>
+              <div class="md:col-span-2">
                 <div class="flex items-center justify-between mb-1">
-                  <label class="block text-[10px] font-black text-slate-400 uppercase">{{ 'HAKEDİŞ IBAN (ESCROW TRANSFER)' }}</label>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase">HAKEDİŞ & ÖDEME IBAN (ESCROW TRANSFER)</label>
                   <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Otomatik Dağıtım</span>
                 </div>
                 <input v-model="companyForm.iban" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800 font-mono font-bold" style="border-color: #E2E8F0;" placeholder="TR00 0000 0000 0000 0000 00" />
                 <span class="text-[9px] text-slate-400 mt-1 block">İhaleleri kazandığınızda alıcı mal kabulü onayıyla hakedişiniz bu IBAN'a aktarılır.</span>
               </div>
 
-              <!-- Hesap Sahibi -->
-              <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">{{ 'HESAP SAHİBİ (ŞİRKET RESMİ UNVANI)' }}</label>
-                <input v-model="companyForm.accountHolder" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800 font-bold" style="border-color: #E2E8F0;" placeholder="Hesap sahibinin tam adı" />
-              </div>
-
             </div>
 
             <!-- Save Company Button -->
-            <div class="flex justify-end pt-4 border-t" style="border-color: #F1F5F9;">
-              <button type="button" @click="saveCompanyInfo" class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-2.5 transition cursor-pointer">
-                {{ 'Şirket Bilgilerini Kaydet' }}
+            <div class="flex items-center justify-between pt-4 border-t" style="border-color: #F1F5F9;">
+              <span class="text-[11px] text-slate-500 flex items-center gap-1.5 font-medium">
+                <ShieldCheck :size="14" class="text-emerald-600" /> Bilgileriniz 256-bit SSL ve KVKK güvencesiyle korunur.
+              </span>
+              <button type="button" @click="saveCompanyInfo" class="rounded-xl bg-[#0F223D] hover:bg-[#1E3A8A] text-white font-bold text-xs px-6 py-2.5 transition cursor-pointer shadow-xs">
+                {{ 'Kurumsal Bilgileri Kaydet' }}
               </button>
             </div>
           </div>
