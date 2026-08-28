@@ -694,10 +694,10 @@ function removeSubmittedBid(index: number) {
     </div>
 
     <!-- AUTHORIZED WORKSPACE -->
-    <div v-else class="flex-grow flex flex-col md:flex-row">
+    <div v-else class="flex-1 flex flex-col md:flex-row w-full min-h-screen">
       
       <!-- SIDEBAR -->
-      <aside class="w-full md:w-68 border-r border-slate-800 bg-slate-900 flex flex-col justify-between shrink-0">
+      <aside class="w-full md:w-72 lg:w-80 border-r border-slate-800 bg-slate-900 flex flex-col justify-between shrink-0 md:min-h-screen">
         <div>
           <!-- Header -->
           <div class="px-6 py-5 border-b border-slate-800 flex items-center justify-between">
@@ -902,7 +902,7 @@ function removeSubmittedBid(index: number) {
               :class="activeTab === 'db_tenders' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
               <Folder :size="14" />
-              İlanlarım (Tenders)
+              İhalelerim (Tenders)
             </button>
 
             <button 
@@ -943,7 +943,7 @@ function removeSubmittedBid(index: number) {
       </aside>
 
       <!-- MAIN WORKSPACE -->
-      <main class="flex-1 p-6 md:p-8 overflow-y-auto max-h-screen text-left">
+      <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto min-h-screen text-left bg-slate-950">
         
         <!-- Header Toolbar -->
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-slate-800 gap-4 mb-6">
