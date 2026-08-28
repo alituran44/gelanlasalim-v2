@@ -27,7 +27,7 @@ import {
   X,
   Users
 } from 'lucide-vue-next'
-import { useCmsData } from '~/composables/useCmsData'
+import { useCmsData, DEFAULT_CMS_DATA } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
 
 definePageMeta({
@@ -83,6 +83,15 @@ onMounted(() => {
       if (userSession.value.companyName || userSession.value.company) {
         bidForm.value.firmaAdi = userSession.value.companyName || userSession.value.company
       }
+
+      if (!cmsData.value?.dashboard?.tenders || cmsData.value.dashboard.tenders.length === 0) {
+        if (!cmsData.value.dashboard) {
+          cmsData.value.dashboard = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA.dashboard))
+        } else {
+          cmsData.value.dashboard.tenders = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA.dashboard.tenders))
+        }
+        saveCmsData(cmsData.value)
+      }
     } catch (e) {}
   }
 
@@ -98,7 +107,9 @@ onMounted(() => {
 })
 
 const allTenders = computed(() => {
-  return cmsData.value?.dashboard?.tenders || []
+  const list = cmsData.value?.dashboard?.tenders || []
+  if (list.length > 0) return list
+  return DEFAULT_CMS_DATA.dashboard.tenders || []
 })
 
 const categories = [

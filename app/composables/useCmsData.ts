@@ -99,7 +99,152 @@ export const DEFAULT_CMS_DATA = {
     { title: 'Yönetim Paneli Rehberi', desc: 'Kontrol panelini ve raporlamaları etkin kullanma', videoUrl: '' }
   ],
   dashboard: {
-    tenders: [],
+    tenders: [
+      {
+        id: '2026/14589',
+        baslik: '1.500 Ton B420C Nervürlü İnşaat Demiri ve Hasır Çelik Temini İşi',
+        authority: 'Karayolları 14. Bölge Müdürlüğü / Çanakkale Köprü Bağlantı Şantiyesi',
+        ownerCompany: 'Kalyon & Kolin İnşaat Ortak Girişimi',
+        city: 'Çanakkale',
+        kategori: 'İnşaat - Altyapı - Üstyapı - Yapım İşi',
+        tur: 'Açık İhale',
+        type: 'Mal Alımı',
+        method: 'Açık İhale',
+        butce: '14.500.000 ₺',
+        sure: '05.09.2026 14:00',
+        yayinTarihi: '28.08.2026',
+        aciklama: 'TSE 708 normlarına uygun B420C kalite nervürlü donatı çeliği temini, laboratuvar çekme testleri ve şantiye sahasına indirme dahil anahtar teslim alımı.',
+        durum: 'open',
+        teklifSayisi: 7,
+        image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'
+      },
+      {
+        id: '2026/14590',
+        baslik: '100.000 Adet Çift Oluklu Baskılı Koli ve Ambalaj Malzemesi Alımı',
+        authority: 'Devlet Malzeme Ofisi (DMO) Genel Müdürlüğü',
+        ownerCompany: 'Hepsiburada & Trendyol Lojistik Dağıtım A.Ş.',
+        city: 'İstanbul',
+        kategori: 'Ambalaj, Koli ve Kağıt',
+        tur: 'Açık İhale',
+        type: 'Mal Alımı',
+        method: 'Açık İhale',
+        butce: '350.000 ₺',
+        sure: '02.09.2026 11:30',
+        yayinTarihi: '27.08.2026',
+        aciklama: 'E-ticaret ve lojistik sevkiyatlarına uygun dopel kraft çift oluklu mukavva koli üretimi ve 5 ana depoya dağıtımı.',
+        durum: 'open',
+        teklifSayisi: 12,
+        image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=60'
+      },
+      {
+        id: '2026/14591',
+        baslik: 'Üniversite Hastanesi Binası 1.2 MW Çatı Güneş Enerji Santrali (GES) Yapım İşi',
+        authority: 'Çanakkale Onsekiz Mart Üniversitesi Rektörlüğü',
+        ownerCompany: 'Turan Enerji & Güneş Sistemleri A.Ş.',
+        city: 'Çanakkale',
+        kategori: 'Enerji, Akaryakıt ve GES Tesisatı',
+        tur: 'Açık Eksiltme',
+        type: 'Yapım İşi',
+        method: 'Açık Eksiltme',
+        butce: '18.200.000 ₺',
+        sure: '10.09.2026 10:00',
+        yayinTarihi: '26.08.2026',
+        aciklama: 'Tier-1 monokristal güneş panelleri, inverter sistemleri ve TEDAŞ onaylı trafo bağlantısı dahil anahtar teslim çatı GES kurulumu.',
+        durum: 'open',
+        teklifSayisi: 4,
+        image: 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=600&auto=format&fit=crop&q=60'
+      },
+      {
+        id: '2026/14592',
+        baslik: '250 Seferlik Liman İçi ve Şehirlerarası Konteyner Lojistik Hizmeti',
+        authority: 'Türkiye Kömür İşletmeleri Kurumu',
+        ownerCompany: 'Asyaport Liman İşletmeleri A.Ş.',
+        city: 'Tekirdağ',
+        kategori: 'Lojistik ve Nakliye Hizmetleri',
+        tur: 'Pazarlık Usulü (21/f)',
+        type: 'Hizmet Alımı',
+        method: 'Pazarlık Usulü (21/f)',
+        butce: '1.250.000 ₺',
+        sure: '01.09.2026 15:00',
+        yayinTarihi: '28.08.2026',
+        aciklama: '40ft High Cube konteynerlerin Tekirdağ liman sahasından Marmara bölgesi dağıtım depolarına sigortalı taşınması.',
+        durum: 'open',
+        teklifSayisi: 9,
+        image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=60'
+      },
+      {
+        id: '2026/14593',
+        baslik: 'Yüksek Hassasiyetli 5 Eksen CNC Freze ve Dik İşleme Merkezi Alımı',
+        authority: 'TUSAŞ Havacılık ve Uzay Sanayii A.Ş.',
+        ownerCompany: 'Savunma Sanayi Tedarik ve İmalat Grubu',
+        city: 'Ankara',
+        kategori: 'Sanayi ve Makine Ekipmanları',
+        tur: 'Belli İstekliler',
+        type: 'Mal Alımı',
+        method: 'Belli İstekliler',
+        butce: '6.800.000 ₺',
+        sure: '15.09.2026 14:00',
+        yayinTarihi: '25.08.2026',
+        aciklama: 'Havacılık ve savunma sanayii toleranslarına uygun 5 eksen eşzamanlı CNC işleme merkezi temini, montajı ve operatör eğitimi.',
+        durum: 'open',
+        teklifSayisi: 3,
+        image: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=60'
+      },
+      {
+        id: '2026/14594',
+        baslik: '150 Adet Kurumsal Sunucu (Server) ve Veri Depolama (Storage) Alımı',
+        authority: 'İzmir Yüksek Teknoloji Enstitüsü (İYTE)',
+        ownerCompany: 'Teknopark Bilişim Sistemleri Ltd.',
+        city: 'İzmir',
+        kategori: 'Bilişim, Yazılım ve IT Ekipmanı',
+        tur: 'Açık İhale',
+        type: 'Mal Alımı',
+        method: 'Açık İhale',
+        butce: '4.500.000 ₺',
+        sure: '08.09.2026 16:00',
+        yayinTarihi: '27.08.2026',
+        aciklama: 'Tier-3 veri merkezi gereksinimlerine uygun çift işlemcili rack tipi sunucular ve 500TB SAN depolama ünitesi alımı.',
+        durum: 'open',
+        teklifSayisi: 6,
+        image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&auto=format&fit=crop&q=60'
+      },
+      {
+        id: '2026/14595',
+        baslik: 'Şehir Hastanesi Yoğun Bakım Ünitesi 40 Adet Ventilatör ve Monitör Cihazı Alımı',
+        authority: 'Bursa İl Sağlık Müdürlüğü',
+        ownerCompany: 'Doğrulanmış Sağlık Ekipmanları A.Ş.',
+        city: 'Bursa',
+        kategori: 'Medikal ve Sağlık Sarf Malzemeleri',
+        tur: 'Doğrudan Temin',
+        type: 'Mal Alımı',
+        method: 'Doğrudan Temin',
+        butce: '3.200.000 ₺',
+        sure: '04.09.2026 12:00',
+        yayinTarihi: '28.08.2026',
+        aciklama: 'CE ve FDA onaylı, 2 yıl tam kapsamlı garantili hasta başı monitör ve invaziv mekanik ventilatör seti.',
+        durum: 'open',
+        teklifSayisi: 5,
+        image: 'https://images.unsplash.com/photo-1516549655169-df83a0774514?w=600&auto=format&fit=crop&q=60'
+      },
+      {
+        id: '2026/14596',
+        baslik: 'Organize Sanayi Bölgesi 2.500 Kişilik Günlük 4 Kap Tabldot Yemek Hizmeti',
+        authority: 'Gebze Organize Sanayi Bölgesi (GOSB)',
+        ownerCompany: 'GOSB Yönetim & Sosyal Hizmetler A.Ş.',
+        city: 'Kocaeli',
+        kategori: 'Gıda, İkram ve Yemek Hizmetleri',
+        tur: 'Açık Eksiltme',
+        type: 'Hizmet Alımı',
+        method: 'Açık Eksiltme',
+        butce: '2.850.000 ₺',
+        sure: '30.08.2026 17:00',
+        yayinTarihi: '25.08.2026',
+        aciklama: 'ISO 22000 gıda güvenliği standartlarına uygun günlük öğle ve akşam tabldot yemek üretimi ve taşımalı yemek servisi.',
+        durum: 'open',
+        teklifSayisi: 8,
+        image: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=600&auto=format&fit=crop&q=60'
+      }
+    ],
     receivedBids: [],
     submittedBids: [],
     disputes: [],
@@ -403,6 +548,11 @@ export function useCmsData() {
           localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
         } else {
           cmsDataRef.value = JSON.parse(saved)
+          if (!cmsDataRef.value.dashboard?.tenders || cmsDataRef.value.dashboard.tenders.length === 0) {
+            if (!cmsDataRef.value.dashboard) cmsDataRef.value.dashboard = { ...DEFAULT_CMS_DATA.dashboard }
+            cmsDataRef.value.dashboard.tenders = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA.dashboard.tenders))
+            localStorage.setItem('cmsData', JSON.stringify(cmsDataRef.value))
+          }
         }
       } catch (e) {
         cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
