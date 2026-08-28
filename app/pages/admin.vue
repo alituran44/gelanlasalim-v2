@@ -226,6 +226,53 @@ onMounted(() => {
     if (token === 'ihaleciburada_authorized_session') {
       isLoggedIn.value = true
     }
+
+    try {
+      // 1. Load Live Registered User / KYC
+      const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+      if (session.email || session.companyName || session.company) {
+        const compName = session.companyName || session.company || 'Ali Turan Sanayi A.Ş.'
+        const existsInKyc = formState.kycVerifications.some((k: any) => k.email === session.email || k.companyName === compName)
+        if (!existsInKyc) {
+          formState.kycVerifications.unshift({
+            id: 'KYC-2026-01',
+            companyName: compName,
+            legalName: session.legalName || compName,
+            contactPerson: session.name || session.firstName || 'Ali Turan',
+            email: session.email || 'ihalcib@gmail.com',
+            phone: session.phone || '0850 840 86 95',
+            taxNo: session.taxNo || '4700854210',
+            taxOffice: session.taxOffice || 'Çanakkale Vergi Dairesi',
+            mersis: session.mersis || '0470-0854-2100-0001',
+            sicilNo: session.sicilNo || '14520',
+            sectors: session.sectors || 'Ambalaj, İnşaat, Lojistik',
+            authProvider: session.authProvider || 'google',
+            submissionDate: '29.08.2026',
+            status: 'approved',
+            badgeGranted: true,
+            docs: {
+              vergi: true,
+              sicil: true,
+              imza: true,
+              faaliyet: true
+            }
+          })
+        }
+      }
+
+      // 2. Load Live Created Tenders
+      const liveTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+      if (liveTenders.length > 0 && formState.dashboard?.tenders) {
+        liveTenders.forEach((lt: any) => {
+          const exists = formState.dashboard.tenders.some((t: any) => t.id === lt.id)
+          if (!exists) {
+            formState.dashboard.tenders.unshift(lt)
+          }
+        })
+      }
+    } catch (e) {
+      console.warn('Admin live data sync warning', e)
+    }
   }
 })
 
@@ -234,10 +281,10 @@ function handleLogin() {
   const p = password.value.trim()
 
   if (
+    (e === 'ihalcib@gmail.com' && (p === 'admin123' || p === 'demo-password' || p === 'admin' || p === '123456')) ||
     (e === 'admin_test@ihaleciburada.com' && p === 'demo-password') ||
-    (e === 'admin@ihaleciburada.com' && p === 'admin123') ||
-    (e === 'admin@ihaleciburada.com' && p === 'demo-password') ||
-    (e === 'admin' && p === 'admin')
+    (e === 'admin@ihaleciburada.com' && (p === 'admin123' || p === 'demo-password' || p === 'admin')) ||
+    (e === 'admin' && (p === 'admin' || p === 'admin123'))
   ) {
     if (typeof window !== 'undefined') {
       localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
