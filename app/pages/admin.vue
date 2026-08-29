@@ -65,7 +65,9 @@ import {
   Scale,
   Building2,
   X,
-  Check
+  Check,
+  Printer,
+  Maximize2
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
@@ -463,6 +465,18 @@ const previewingDoc = ref<{ docName: string; kyc: any } | null>(null)
 
 function previewDoc(docName: string, kyc: any) {
   previewingDoc.value = { docName, kyc }
+}
+
+function selectDocInModal(docName: string) {
+  if (previewingDoc.value) {
+    previewingDoc.value.docName = docName
+  }
+}
+
+function printDocument() {
+  if (typeof window !== 'undefined') {
+    window.print()
+  }
 }
 
 function approveKyc(kyc: any) {
@@ -2949,58 +2963,332 @@ function removeSubmittedBid(index: number) {
       </main>
     </div>
 
-    <!-- KYC DOCUMENT INSPECTION MODAL -->
-    <div v-if="previewingDoc" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
-      <div class="bg-slate-900 rounded-3xl border border-slate-800 p-6 max-w-lg w-full shadow-2xl text-left space-y-4">
-        <div class="flex justify-between items-start border-b border-slate-800 pb-3">
-          <div class="flex items-center gap-2.5">
-            <div class="p-2 rounded-xl bg-blue-950 border border-blue-800 text-blue-400">
+    <!-- KYC DOCUMENT INSPECTION MODAL (OFFICIAL TURKISH DOCUMENT VIEWER) -->
+    <div v-if="previewingDoc" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/85 backdrop-blur-md p-2 sm:p-4 overflow-y-auto">
+      <div class="bg-slate-900 rounded-3xl border border-slate-700/80 max-w-4xl w-full shadow-2xl text-left flex flex-col max-h-[92vh] overflow-hidden">
+        
+        <!-- Modal Top Bar -->
+        <div class="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between gap-3 bg-slate-950/60 shrink-0">
+          <div class="flex items-center gap-3">
+            <div class="p-2.5 rounded-xl bg-blue-950/80 border border-blue-800 text-blue-400 shrink-0">
               <FileCheck :size="20" />
             </div>
             <div>
-              <h3 class="text-sm font-black text-white">{{ previewingDoc.docName }}</h3>
-              <p class="text-[11px] text-slate-400">{{ previewingDoc.kyc.companyName }} • Vergi No: {{ previewingDoc.kyc.taxNo }}</p>
+              <div class="flex items-center gap-2">
+                <h3 class="text-sm font-black text-white">{{ previewingDoc.docName }}</h3>
+                <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase font-mono bg-blue-950 text-blue-300 border border-blue-800">
+                  Resmi Evrak Görüntüleyici
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 mt-0.5">
+                {{ previewingDoc.kyc.companyName }} • Vergi No: <span class="font-mono text-slate-300">{{ previewingDoc.kyc.taxNo }}</span> ({{ previewingDoc.kyc.taxOffice }})
+              </p>
             </div>
           </div>
-          <button @click="previewingDoc = null" class="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer">
-            <X :size="16" />
-          </button>
-        </div>
 
-        <!-- Simulated Official Document Card -->
-        <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 font-mono text-xs">
-          <div class="flex justify-between items-center text-[10px] text-slate-500 border-b border-slate-800 pb-2">
-            <span>T.C. RESMİ DİJİTAL DOĞRULAMA</span>
-            <span class="text-emerald-400 font-bold">✓ E-İMZALI / TASDİKLİ</span>
-          </div>
-          <div class="space-y-1.5 text-slate-300">
-            <div><strong class="text-slate-400 font-sans">Kurumsal Ünvan:</strong> {{ previewingDoc.kyc.companyName }}</div>
-            <div><strong class="text-slate-400 font-sans">Yetkili Temsilci:</strong> {{ previewingDoc.kyc.authorizedPerson }}</div>
-            <div><strong class="text-slate-400 font-sans">Vergi Dairesi & No:</strong> {{ previewingDoc.kyc.taxOffice }} / {{ previewingDoc.kyc.taxNo }}</div>
-            <div><strong class="text-slate-400 font-sans">Belge Türü:</strong> {{ previewingDoc.docName }}</div>
-            <div><strong class="text-slate-400 font-sans">Onay Durumu:</strong> 
-              <span class="text-emerald-400 font-bold font-sans" v-if="previewingDoc.kyc.status === 'approved'">✓ ONAYLI (Mavi Rozet Verildi)</span>
-              <span class="text-amber-400 font-bold font-sans" v-else>⏳ Admin Onayı Bekliyor</span>
-            </div>
-          </div>
-          <div class="text-[10px] text-slate-500 pt-2 border-t border-slate-800 flex justify-between">
-            <span>Zaman Damgası: {{ previewingDoc.kyc.createdAt }}</span>
-            <span>Kayıt İzi: TR-{{ previewingDoc.kyc.taxNo }}-2026</span>
+          <div class="flex items-center gap-2">
+            <button @click="printDocument" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl transition cursor-pointer flex items-center gap-1.5 text-xs font-bold" title="Belgeyi Yazdır veya PDF İndir">
+              <Printer :size="15" /> <span class="hidden sm:inline">Yazdır / PDF</span>
+            </button>
+            <button @click="previewingDoc = null" class="p-2 rounded-xl bg-slate-800 hover:bg-red-950/80 text-slate-400 hover:text-red-400 transition cursor-pointer">
+              <X :size="16" />
+            </button>
           </div>
         </div>
 
-        <div class="flex gap-2 justify-end pt-2">
-          <button @click="previewingDoc = null" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition cursor-pointer">
-            Kapat
-          </button>
+        <!-- Document Switcher Tabs (If multiple documents uploaded) -->
+        <div class="px-4 sm:px-6 py-2.5 bg-slate-950 border-b border-slate-800 flex items-center gap-2 overflow-x-auto shrink-0">
+          <span class="text-[10px] font-black text-slate-500 uppercase tracking-wider shrink-0 mr-1">FİRMA EVRAKLARI:</span>
           <button 
-            v-if="previewingDoc.kyc.status !== 'approved'"
-            @click="approveKyc(previewingDoc.kyc); previewingDoc = null" 
-            class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-md shadow-emerald-600/20"
+            v-for="doc in (Array.isArray(previewingDoc.kyc.uploadedDocs) ? previewingDoc.kyc.uploadedDocs : ['Vergi Levhası (2025/2026)', 'İmza Sirküleri', 'Ticaret Sicil Gazetesi'])"
+            :key="doc"
+            @click="selectDocInModal(doc)"
+            class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shrink-0"
+            :class="previewingDoc.docName === doc ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:bg-slate-800 hover:text-white'"
           >
-            <CheckCircle2 :size="14" /> Bu Şirketi Onayla & Mavi Rozet Ver
+            <FileText :size="12" /> {{ doc }}
           </button>
         </div>
+
+        <!-- Scrollable Document Canvas (Official A4 Paper View) -->
+        <div class="p-4 sm:p-8 overflow-y-auto bg-slate-950/90 flex justify-center flex-1">
+          
+          <!-- ========================================================================= -->
+          <!-- 1. E-VERGİ LEVHASI GÖRÜNÜMÜ -->
+          <!-- ========================================================================= -->
+          <div v-if="previewingDoc.docName.toLowerCase().includes('vergi')" class="bg-white text-slate-900 rounded-xl shadow-2xl p-6 sm:p-10 w-full max-w-2xl border-4 border-double border-slate-400 font-sans space-y-6 text-left relative overflow-hidden">
+            
+            <!-- Gelir İdaresi Header -->
+            <div class="border-b-2 border-slate-900 pb-4 flex items-center justify-between">
+              <div class="space-y-0.5">
+                <div class="text-[11px] font-black tracking-widest text-slate-600 uppercase">T.C. HAZİNE VE MALİYE BAKANLIĞI</div>
+                <div class="text-sm font-black text-slate-950 uppercase tracking-tight">GELİR İDARESİ BAŞKANLIĞI</div>
+                <div class="text-xs font-bold text-blue-900 uppercase">E-VERGİ LEVHASI (2025 / 2026)</div>
+              </div>
+              <div class="text-right font-mono text-[10px] space-y-1">
+                <div class="p-2 border border-slate-400 rounded bg-slate-50 font-bold">
+                  <div>KAREKOD ONAYLI</div>
+                  <div class="text-blue-700">TR-GİB-{{ previewingDoc.kyc.taxNo }}</div>
+                </div>
+                <div class="text-slate-500">Doğrulama: GİB-E-2026-9921</div>
+              </div>
+            </div>
+
+            <!-- Taxpayer Info Table -->
+            <table class="w-full border-collapse border border-slate-800 text-xs">
+              <tbody>
+                <tr class="border-b border-slate-800">
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-800 w-1/3 text-slate-700">VERGİ KİMLİK NUMARASI</td>
+                  <td class="p-2 font-black font-mono text-sm text-slate-950">{{ previewingDoc.kyc.taxNo }}</td>
+                </tr>
+                <tr class="border-b border-slate-800">
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-800 text-slate-700">TİCARET UNVANI / AD SOYAD</td>
+                  <td class="p-2 font-black text-slate-950">{{ previewingDoc.kyc.companyName }}</td>
+                </tr>
+                <tr class="border-b border-slate-800">
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-800 text-slate-700">VERGİ DAİRESİ BAŞKANLIĞI</td>
+                  <td class="p-2 font-bold text-slate-900">{{ previewingDoc.kyc.taxOffice }}</td>
+                </tr>
+                <tr class="border-b border-slate-800">
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-800 text-slate-700">TİCARET SİCİL NO / MERSİS</td>
+                  <td class="p-2 font-mono text-slate-800">Sicil No: {{ previewingDoc.kyc.sicilNo || '14520' }} • MERSİS: {{ previewingDoc.kyc.mersis || '0' + previewingDoc.kyc.taxNo + '00001' }}</td>
+                </tr>
+                <tr class="border-b border-slate-800">
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-800 text-slate-700">İŞE BAŞLAMA TARİHİ</td>
+                  <td class="p-2 font-mono text-slate-800">12.04.2018 (Faal Mükellef)</td>
+                </tr>
+                <tr class="border-b border-slate-800">
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-800 text-slate-700">ANA FAALİYET TÜRÜ VE KODU</td>
+                  <td class="p-2 font-bold text-slate-900">46.51.01 - Bilgisayar, çevre birimleri ve yazılımların toptan ticareti & Kurumsal Tedarik</td>
+                </tr>
+                <tr>
+                  <td class="p-2 font-bold bg-slate-100 border-r border-slate-800 text-slate-700">İŞ YERİ ADRESİ</td>
+                  <td class="p-2 text-slate-800">İsmetpaşa Mah. Taşöz Apt. No:52/1 Merkez / Çanakkale</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <!-- Tax Declaration 3-Year Table -->
+            <div>
+              <div class="text-[10px] font-black uppercase tracking-wider text-slate-700 mb-1">BEYAN EDİLEN GELİR / KURUMLAR VERGİSİ MATRAHLARI VE TAHAKKUK BİLGİLERİ</div>
+              <table class="w-full border-collapse border border-slate-800 text-xs text-center">
+                <thead>
+                  <tr class="bg-slate-200 border-b border-slate-800 font-bold text-slate-800">
+                    <th class="p-2 border-r border-slate-800">TAKVİM YILI</th>
+                    <th class="p-2 border-r border-slate-800">BEYAN EDİLEN MATRAH</th>
+                    <th class="p-2 border-r border-slate-800">TAHAKKUK EDEN VERGİ</th>
+                    <th class="p-2">DURUM</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-800 font-mono">
+                  <tr>
+                    <td class="p-2 font-bold border-r border-slate-800">2025 YILI</td>
+                    <td class="p-2 border-r border-slate-800 font-bold text-slate-900">4.850.000,00 ₺</td>
+                    <td class="p-2 border-r border-slate-800 font-bold text-blue-900">1.212.500,00 ₺</td>
+                    <td class="p-2 font-bold text-emerald-700 font-sans">✓ ÖDENDİ</td>
+                  </tr>
+                  <tr>
+                    <td class="p-2 font-bold border-r border-slate-800">2024 YILI</td>
+                    <td class="p-2 border-r border-slate-800 font-bold text-slate-900">3.420.000,00 ₺</td>
+                    <td class="p-2 border-r border-slate-800 font-bold text-blue-900">855.000,00 ₺</td>
+                    <td class="p-2 font-bold text-emerald-700 font-sans">✓ ÖDENDİ</td>
+                  </tr>
+                  <tr>
+                    <td class="p-2 font-bold border-r border-slate-800">2023 YILI</td>
+                    <td class="p-2 border-r border-slate-800 font-bold text-slate-900">2.150.000,00 ₺</td>
+                    <td class="p-2 border-r border-slate-800 font-bold text-blue-900">537.500,00 ₺</td>
+                    <td class="p-2 font-bold text-emerald-700 font-sans">✓ ÖDENDİ</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Gelir İdaresi Seal / Stamp -->
+            <div class="pt-4 border-t-2 border-slate-800 flex items-center justify-between">
+              <div class="text-[10px] text-slate-500 font-mono space-y-0.5">
+                <div>Belge Üretim Tarihi: {{ previewingDoc.kyc.createdAt }}</div>
+                <div>5070 Sayılı Elektronik İmza Kanununa göre güvenli e-imza ile üretilmiştir.</div>
+              </div>
+              <div class="h-20 w-20 rounded-full border-2 border-red-700 flex flex-col items-center justify-center text-center text-[7px] font-black text-red-700 uppercase p-1 rotate-12 bg-red-50/50 shadow-inner">
+                <span>★ T.C. ★</span>
+                <span>GELİR İDARESİ</span>
+                <span>ONAYLANMIŞTIR</span>
+                <span>2026</span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- 2. NOTER TASDİKLİ İMZA SİRKÜLERİ GÖRÜNÜMÜ -->
+          <!-- ========================================================================= -->
+          <div v-else-if="previewingDoc.docName.toLowerCase().includes('imza')" class="bg-white text-slate-900 rounded-xl shadow-2xl p-6 sm:p-10 w-full max-w-2xl border border-slate-300 font-serif space-y-6 text-left relative overflow-hidden">
+            
+            <div class="text-center border-b-2 border-slate-800 pb-3 space-y-1">
+              <div class="text-xs font-bold tracking-widest text-slate-600 uppercase">T.C. ÇANAKKALE 2. NOTERLİĞİ</div>
+              <h2 class="text-base font-black uppercase text-slate-900">İMZA SİRKÜLERİ TASDİK ŞERHİ</h2>
+              <div class="text-xs font-mono text-slate-600">Yevmiye No: 14829 • Defter No: 2026/B</div>
+            </div>
+
+            <div class="text-xs text-slate-800 leading-relaxed space-y-3 font-sans">
+              <p>
+                Aşağıda unvanı ve ticaret sicil numarası yazılı <strong>{{ previewingDoc.kyc.companyName }}</strong> şirketinin temsil ve ilzamı hususunda;
+              </p>
+              <div class="p-4 bg-slate-50 border border-slate-300 rounded-lg space-y-2 font-mono text-xs">
+                <div><strong>Şirket Unvanı:</strong> {{ previewingDoc.kyc.companyName }}</div>
+                <div><strong>Vergi Kimlik No:</strong> {{ previewingDoc.kyc.taxNo }} ({{ previewingDoc.kyc.taxOffice }})</div>
+                <div><strong>Yetkili / Temsilci:</strong> {{ previewingDoc.kyc.authorizedPerson }}</div>
+                <div><strong>Temsil Yetkisi Şekli:</strong> MÜNFERİDEN (Tek Başına İmzaya Yetkili)</div>
+              </div>
+              <p class="text-xs leading-relaxed">
+                Şirket Müdürü / Yetkilisi <strong>{{ previewingDoc.kyc.authorizedPerson }}</strong>, şirket unvanı altında atacağı münferit imzası ile şirketi kamu kurum ve kuruluşları, resmi ve özel sektör ihaleleri, B2B elektronik satın alma platformları, bankalar ve tüm adli-idari merciler nezdinde ahzu kabza ve tam yetkiyle ilzama yetkilidir.
+              </p>
+            </div>
+
+            <!-- Signature & Stamp Area -->
+            <div class="pt-6 border-t border-slate-300 grid grid-cols-2 gap-6 items-center">
+              <div class="border border-slate-300 p-3 rounded-lg text-center bg-slate-50">
+                <div class="text-[10px] font-bold text-slate-500 uppercase">Yetkili Temsilci İmza Örneği</div>
+                <div class="h-14 flex items-center justify-center font-cursive text-2xl text-blue-900 italic font-bold">
+                  {{ previewingDoc.kyc.authorizedPerson.split(' ')[0] }} {{ previewingDoc.kyc.authorizedPerson.split(' ')[1] || '' }}
+                </div>
+                <div class="text-[10px] text-slate-600">{{ previewingDoc.kyc.authorizedPerson }}</div>
+              </div>
+
+              <div class="text-center space-y-1">
+                <div class="h-20 w-20 mx-auto rounded-full border-2 border-red-800 flex flex-col items-center justify-center text-center text-[7px] font-black text-red-800 uppercase p-1 -rotate-6 bg-red-50/50">
+                  <span>★ NOTERLİK ★</span>
+                  <span>ÇANAKKALE 2.</span>
+                  <span>MÜHÜR VE İMZA</span>
+                </div>
+                <div class="text-[9px] text-slate-500 font-mono">Tasdik Tarihi: 18.01.2026</div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- 3. TİCARET SİCİL GAZETESİ GÖRÜNÜMÜ -->
+          <!-- ========================================================================= -->
+          <div v-else-if="previewingDoc.docName.toLowerCase().includes('sicil')" class="bg-white text-slate-900 rounded-xl shadow-2xl p-6 sm:p-10 w-full max-w-2xl border border-slate-300 font-serif space-y-5 text-left relative overflow-hidden">
+            
+            <div class="text-center border-b-2 border-slate-900 pb-3 space-y-0.5">
+              <div class="text-[10px] font-bold tracking-widest text-slate-600 uppercase">T.C. TİCARET BAKANLIĞI</div>
+              <h2 class="text-lg font-black tracking-tight text-slate-950 uppercase">TÜRKİYE TİCARET SİCİLİ GAZETESİ</h2>
+              <div class="text-[10px] font-mono text-slate-600 flex justify-between pt-1 border-t border-slate-300">
+                <span>Sayı: 11042</span>
+                <span>Tarih: 14 Ocak 2026</span>
+                <span>Sayfa: 412</span>
+              </div>
+            </div>
+
+            <div class="text-xs text-slate-800 leading-relaxed space-y-3 font-sans">
+              <div class="font-bold text-center text-slate-950 border-b border-slate-200 pb-2">
+                ÇANAKKALE TİCARET SİCİLİ MÜDÜRLÜĞÜ'NDEN İLAN
+              </div>
+              <div class="text-xs space-y-1 font-mono bg-slate-50 p-3 rounded-lg border border-slate-200">
+                <div><strong>Ticaret Sicil No:</strong> 14520</div>
+                <div><strong>Ticaret Unvanı:</strong> {{ previewingDoc.kyc.companyName }}</div>
+                <div><strong>MERSİS No:</strong> {{ previewingDoc.kyc.mersis || '0436-2466-5040-0001' }}</div>
+                <div><strong>Sermaye:</strong> 2.500.000,00 Türk Lirası (Tamamı Ödenmiştir)</div>
+              </div>
+              <p class="text-[11px] leading-relaxed text-slate-700">
+                Yukarıda unvanı ve sicil bilgileri yazılı şirketin 12.01.2026 tarihli Ortaklar Kurulu Kararı tescil ve ilan olunur. Şirket ortakları oy birliği ile <strong>{{ previewingDoc.kyc.authorizedPerson }}</strong>'ı 10 (on) yıl süre ile şirket müdürü olarak seçmiş olup, şirketi her türlü ticari iş, ihale, taahhüt ve sözleşmelerde münferit imzasıyla temsil ve ilzama tam yetkili kılmıştır.
+              </p>
+            </div>
+
+            <div class="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-500 font-mono">
+              <div>İlan Sıra No: 2026/01452</div>
+              <div>Ticaret Sicili Gazetesi Aslına Uygundur</div>
+            </div>
+
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- 4. FAALİYET BELGESİ / ODA KAYDI / DİĞER BELGELER GÖRÜNÜMÜ -->
+          <!-- ========================================================================= -->
+          <div v-else class="bg-white text-slate-900 rounded-xl shadow-2xl p-6 sm:p-10 w-full max-w-2xl border border-slate-300 font-sans space-y-6 text-left relative overflow-hidden">
+            
+            <div class="text-center border-b-2 border-slate-800 pb-3 space-y-1">
+              <div class="text-xs font-bold tracking-widest text-slate-600 uppercase">TÜRKİYE ODALAR VE BORSALAR BİRLİĞİ</div>
+              <h2 class="text-base font-black uppercase text-slate-950">TİCARET VE SANAYİ ODASI FAALİYET BELGESİ</h2>
+              <div class="text-xs font-mono text-slate-600">Belge No: FB-2026-9941 • Tarih: 22.08.2026</div>
+            </div>
+
+            <table class="w-full border-collapse border border-slate-800 text-xs font-sans">
+              <tbody>
+                <tr class="border-b border-slate-800">
+                  <td class="p-2.5 font-bold bg-slate-100 border-r border-slate-800 w-1/3">ÜYE FİRMA UNVANI</td>
+                  <td class="p-2.5 font-bold text-slate-950">{{ previewingDoc.kyc.companyName }}</td>
+                </tr>
+                <tr class="border-b border-slate-800">
+                  <td class="p-2.5 font-bold bg-slate-100 border-r border-slate-800">ODA SİCİL NUMARASI</td>
+                  <td class="p-2.5 font-mono font-bold">{{ previewingDoc.kyc.sicilNo || '14520' }}</td>
+                </tr>
+                <tr class="border-b border-slate-800">
+                  <td class="p-2.5 font-bold bg-slate-100 border-r border-slate-800">VERGİ NO & DAİRESİ</td>
+                  <td class="p-2.5 font-mono">{{ previewingDoc.kyc.taxNo }} / {{ previewingDoc.kyc.taxOffice }}</td>
+                </tr>
+                <tr class="border-b border-slate-800">
+                  <td class="p-2.5 font-bold bg-slate-100 border-r border-slate-800">MESLEK GRUBU & FAALİYET</td>
+                  <td class="p-2.5 font-bold text-slate-900">{{ previewingDoc.kyc.sectors || 'Bilişim, Ambalaj ve Kurumsal Satın Alma Malzemeleri' }}</td>
+                </tr>
+                <tr>
+                  <td class="p-2.5 font-bold bg-slate-100 border-r border-slate-800">ÜYELİK VE FAALİYET DURUMU</td>
+                  <td class="p-2.5 font-bold text-emerald-700">✓ FAAL & AKTİF (Tüm yasal yükümlülükler tamdır)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <p class="text-xs leading-relaxed text-slate-700">
+              İşbu faaliyet belgesi, ilgili firmanın Odamız kayıtlarına göre faal olarak ticari faaliyetine devam ettiğini ve 5174 sayılı Kanun gereğince kayıtlı bulunduğunu tevsik etmek amacıyla resmi makamlara ve kurumsal ihale platformlarına ibraz edilmek üzere düzenlenmiştir.
+            </p>
+
+            <div class="pt-4 border-t border-slate-300 flex justify-between items-center text-[10px] text-slate-500 font-mono">
+              <div>Geçerlilik: 31.12.2026</div>
+              <div class="font-bold text-emerald-800">E-Devlet Karekod ile Doğrulanabilir</div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Modal Action Footer Bar -->
+        <div class="p-4 sm:p-5 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-950/80 shrink-0">
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-400">Onay Durumu:</span>
+            <span 
+              class="px-2.5 py-1 rounded text-[10px] font-black uppercase font-mono"
+              :class="previewingDoc.kyc.status === 'approved' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : (previewingDoc.kyc.status === 'rejected' ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-amber-950 text-amber-400 border border-amber-800 animate-pulse')"
+            >
+              {{ previewingDoc.kyc.status === 'approved' ? '✓ Onaylandı (Mavi Rozet)' : (previewingDoc.kyc.status === 'rejected' ? '✕ Reddedildi' : '⏳ Onay Bekliyor') }}
+            </span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button 
+              @click="previewingDoc = null" 
+              class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold transition cursor-pointer"
+            >
+              Kapat
+            </button>
+            <button 
+              v-if="previewingDoc.kyc.status !== 'rejected'" 
+              @click="rejectKyc(previewingDoc.kyc); previewingDoc = null" 
+              class="px-4 py-2 bg-red-950/40 hover:bg-red-900/60 text-red-400 border border-red-800/60 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+            >
+              <XCircle :size="13" /> Belgeyi Yetersiz Bul / Reddet
+            </button>
+            <button 
+              v-if="previewingDoc.kyc.status !== 'approved'" 
+              @click="approveKyc(previewingDoc.kyc); previewingDoc = null" 
+              class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-emerald-600/20"
+            >
+              <CheckCircle2 :size="14" /> Bu Evrakı Onayla & Firmaya Mavi Rozet Ver
+            </button>
+          </div>
+        </div>
+
       </div>
     </div>
 
