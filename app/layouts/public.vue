@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { 
   ArrowRight, 
@@ -18,6 +18,7 @@ import {
 } from 'lucide-vue-next'
 import FloatingSupportWidget from '~/components/common/FloatingSupportWidget.vue'
 import PaymentBadges from '~/components/common/PaymentBadges.vue'
+import Footer from '~/components/landing/Footer.vue'
 
 const userSession = ref<any>(null)
 const loginUsername = ref('')
@@ -264,134 +265,9 @@ onMounted(() => {
     </main>
 
     <!-- ========================================================================= -->
-    <!-- 🛡️ 3. ZENGİN KURUMSAL VE HUKUKİ FOOTER ALANI (13 YASAL SÖZLEŞME VE KÜNYE) -->
+    <!-- 🛡️ 3. MODERN KURUMSAL VE HUKUKİ FOOTER ALANI -->
     <!-- ========================================================================= -->
-    <footer class="mt-12 bg-[#050B16] border-t border-slate-800 text-slate-400 text-xs py-12">
-      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 space-y-10 text-left">
-        
-        <!-- ÜST KISIM: 4 KOLONLU ZENGİN FOOTER IZGARASI -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-          
-          <!-- Kolon 1: Şirket Künyesi (lg:col-span-1) -->
-          <div class="space-y-3">
-            <NuxtLink to="/" class="inline-block py-1 hover:opacity-95 transition" title="İhaleciBurada.com">
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                viewBox="0 0 540 120" 
-                class="h-8 sm:h-9 w-auto max-w-[210px] object-contain drop-shadow-xs" 
-                fill="none" 
-                role="img" 
-                aria-label="İhaleciBurada.com"
-              >
-                <g transform="translate(10, 10)">
-                  <!-- Turuncu Nokta -->
-                  <circle cx="106" cy="18" r="14" fill="#FF5938" />
-                  <!-- 3 Adet Hız Çizgisi -->
-                  <path d="M 38 68 L 86 63 L 83 58 L 32 64 Z" fill="#0084FF" />
-                  <path d="M 18 84 L 78 78 L 75 73 L 12 80 Z" fill="#00C2FF" />
-                  <path d="M 0 98 L 70 91 L 67 86 L -4 94 Z" fill="#38BDF8" />
-                  <!-- Gövde -->
-                  <path d="M 94 33 C 90 33 82 37 81 40 L 89 40 C 97 40 94 48 91 58 L 79 97 C 76 107 84 105 91 101 C 101 95 108 78 114 55 C 117 42 110 33 94 33 Z" fill="#38BDF8" />
-                </g>
-                <!-- ihaleciburada Metni (Beyaz) -->
-                <text x="152" y="84" fill="#FFFFFF" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-1.2px">ihaleciburada</text>
-                <!-- .com Uzantısı (Mavi) -->
-                <text x="430" y="84" fill="#0084FF" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-0.8px">.com</text>
-              </svg>
-            </NuxtLink>
-            <p class="text-[11px] text-slate-400 leading-relaxed">
-              Türkiye'nin onaylı B2B ihale ve doğrudan satın alma platformu. Kurumsal firmalar için güvenli ticaret, şeffaf teklif ve dijital sözleşme altyapısı.
-            </p>
-            <div class="pt-2 text-[11px] text-slate-300 space-y-1">
-              <div>📍 İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale</div>
-              <div>🏛️ Çanakkale V.D. 4700854210</div>
-              <div>📋 MERSİS: 0470085421000001</div>
-              <div>🏢 Ticaret Sicil: 14520</div>
-              <div>📨 KEP: ihaleciburada@hs01.kep.tr</div>
-            </div>
-          </div>
-
-          <!-- Kolon 2: Platform & Kurumsal (lg:col-span-1) -->
-          <div class="space-y-3">
-            <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">KURUMSAL & PLATFORM</h4>
-            <div class="flex flex-col gap-2 text-slate-300 text-[11px]">
-              <NuxtLink to="/" class="hover:text-sky-400 transition-colors">▪ Ana Sayfa</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="hover:text-sky-400 transition-colors">▪ Hakkımızda & Vizyon</NuxtLink>
-              <NuxtLink to="/pazar-yeri" class="hover:text-sky-400 transition-colors">▪ B2B Pazar Yeri</NuxtLink>
-              <NuxtLink to="/panel/ihale-olustur" class="hover:text-sky-400 transition-colors">▪ İhale Aç & Teklif Al</NuxtLink>
-              <NuxtLink to="/abonelik" class="hover:text-sky-400 transition-colors">▪ Üyelik Paketleri</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=kariyer" class="hover:text-sky-400 transition-colors">▪ Kariyer Fırsatları</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=is-ortakligi" class="hover:text-sky-400 transition-colors">▪ İş Ortaklığı & Komisyon</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=blog" class="hover:text-sky-400 transition-colors">▪ Blog & Makaleler</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=basin" class="hover:text-sky-400 transition-colors">▪ Basın Odası & Medya Kiti</NuxtLink>
-            </div>
-          </div>
-
-          <!-- Kolon 3: Hukuki Sözleşmeler Bölüm 1 (lg:col-span-1) -->
-          <div class="space-y-3">
-            <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">RESMİ SÖZLEŞMELER (I)</h4>
-            <div class="flex flex-col gap-1.5 text-slate-300 text-[11px]">
-              <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-sky-300">1. Kullanım Şartları & Hizmet (MSA)</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-sky-300">2. Gizlilik & Veri Güvenliği</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-sky-300">3. KVKK Aydınlatma & Veri İşleme (DPA)</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=on-bilgilendirme" class="hover:text-amber-300 text-amber-200">4. Ön Bilgilendirme Formu</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-blue-300 text-blue-200">5. Mesafeli Satış & Abonelik Sözleşmesi</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=iptal-iade" class="hover:text-emerald-300 text-emerald-200">6. İptal, İade ve Cayma Koşulları</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=teslimat" class="hover:text-sky-300">7. Teslimat ve Dijital İfa Politikası</NuxtLink>
-            </div>
-          </div>
-
-          <!-- Kolon 4: Hukuki Sözleşmeler Bölüm 2 (lg:col-span-1) -->
-          <div class="space-y-3">
-            <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">RESMİ SÖZLEŞMELER (II)</h4>
-            <div class="flex flex-col gap-1.5 text-slate-300 text-[11px]">
-              <NuxtLink to="/sozlesmeler?tab=ihale-kurallari" class="hover:text-sky-300">8. B2B İhale ve Satın Alma Kuralları</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=cerezler" class="hover:text-sky-300">9. Çerez Politikası & Takip Şartları</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=tedarikci-uyum" class="hover:text-sky-300">10. Tedarikçi Doğrulama & KYC Beyanı</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=sla" class="hover:text-sky-300">11. Servis Seviyesi Taahhüdü (SLA)</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=bilgi-guvenligi" class="hover:text-sky-300">12. Bilgi Güvenliği & ISO 27001</NuxtLink>
-              <NuxtLink to="/sozlesmeler?tab=escrow" class="hover:text-sky-300">13. Güvenli Havuz (Escrow) Sözleşmesi</NuxtLink>
-            </div>
-          </div>
-
-          <!-- Kolon 5: Destek ve Güvenlik (lg:col-span-1) -->
-          <div class="space-y-3">
-            <h4 class="text-xs font-black uppercase text-sky-400 tracking-wider">DESTEK & İLETİŞİM</h4>
-            <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 space-y-2 text-[11px]">
-              <div class="font-bold text-white flex items-center gap-1.5">
-                <span>📞</span>
-                <a href="tel:08508408695" class="hover:underline text-emerald-400">0850 840 86 95</a>
-              </div>
-              <div class="text-slate-400">
-                <span>✉</span>
-                <a href="mailto:ihalecib@gmail.com" class="ml-1 text-sky-300 hover:underline">ihalecib@gmail.com</a>
-              </div>
-              <div class="text-[10px] text-slate-500 pt-1 border-t border-slate-800">
-                Hafta İçi: 09:00 - 18:00 | 7/24 Canlı Destek Masası
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- Güvenlik Mührü ve Ödeme Kuruluşları (PayTR & iyzico 256-Bit SSL) -->
-        <div class="pt-6 border-t border-slate-800/80 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-2 text-emerald-400 text-xs font-bold">
-            <ShieldCheck :size="16" />
-            <span>PayTR & iyzico 256-Bit SSL TLS 1.3 3D Secure Güvenli Ödeme Altyapısı</span>
-          </div>
-          <div>
-            <PaymentBadges />
-          </div>
-        </div>
-
-        <!-- En Alt Telif Satırı -->
-        <div class="text-center text-slate-500 text-[11px] pt-4 border-t border-slate-800/50">
-          © 2026 İhaleciBurada.com — B2B İhale ve Satın Alma & Satın Alma Platformu. Tüm Hakları Saklıdır.
-        </div>
-
-      </div>
-    </footer>
+    <Footer />
 
     <!-- Floating Destek Butonu -->
     <FloatingSupportWidget />
