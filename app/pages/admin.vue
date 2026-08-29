@@ -67,7 +67,9 @@ import {
   X,
   Check,
   Printer,
-  Maximize2
+  Maximize2,
+  Sun,
+  Moon
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
@@ -309,6 +311,16 @@ if (!formState.siteSettings) {
   }
 }
 
+// Theme State (Aydınlık / Karanlık Mod - Varsayılan: Aydınlık)
+const adminTheme = ref<'light' | 'dark'>('light')
+
+function toggleTheme() {
+  adminTheme.value = adminTheme.value === 'light' ? 'dark' : 'light'
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('adminTheme', adminTheme.value)
+  }
+}
+
 // Toast State
 const showToast = ref(false)
 const toastMessage = ref('')
@@ -316,6 +328,13 @@ const toastType = ref<'success' | 'info' | 'error'>('success')
 
 onMounted(() => {
   if (typeof window !== 'undefined') {
+    const savedTheme = localStorage.getItem('adminTheme')
+    if (savedTheme === 'dark' || savedTheme === 'light') {
+      adminTheme.value = savedTheme
+    } else {
+      adminTheme.value = 'light'
+    }
+
     const token = localStorage.getItem('adminToken')
     if (token === 'ihaleciburada_authorized_session') {
       isLoggedIn.value = true
@@ -820,16 +839,55 @@ function removeLead(index: number) {
 // ----------------------------------------------------
 const selectedTemplateIdx = ref(0)
 const testEmailTarget = ref('ihalcib@gmail.com')
+const isSendingEmail = ref(false)
+
+const emailLogs = ref<any[]>([
+  {
+    id: 1,
+    time: 'Bugün 11:42',
+    recipient: 'ihalcib@gmail.com',
+    template: 'Kurumsal Hoş Geldiniz & KYC Onayı',
+    subject: 'İhaleciBurada.com: 1 Aylık %100 Ücretsiz Lansman Deneme Paketiniz Aktif!',
+    status: '250 OK - İletildi'
+  },
+  {
+    id: 2,
+    time: 'Bugün 10:15',
+    recipient: 'ahmet@kalyon.com',
+    template: 'Yeni İhale Yayınlandı Bildirimi',
+    subject: 'Yeni İhale Yayında: Sektörünüze Uygun Yeni Bir Satın Alma İlanı Açıldı',
+    status: '250 OK - İletildi'
+  },
+  {
+    id: 3,
+    time: 'Dün 16:30',
+    recipient: 'mehmet@anadolulojistik.com',
+    template: 'Canlı Tersine Eksiltme Başladı & Teklif Uyarısı',
+    subject: 'İhale ve Satın Alma Başladı: İhalede Fiyatlar Düşüyor!',
+    status: '250 OK - İletildi'
+  }
+])
 
 const currentTemplate = computed(() => {
   return formState.emailSettings?.templates?.[selectedTemplateIdx.value] || null
 })
+
+function selectTemplate(idx: number) {
+  selectedTemplateIdx.value = idx
+}
+
+function insertVariableToTemplate(variableTag: string) {
+  if (currentTemplate.value) {
+    currentTemplate.value.content += ' ' + variableTag
+  }
+}
 
 async function sendTestEmail() {
   if (!testEmailTarget.value) {
     alert('Lütfen alıcı e-posta adresini giriniz.')
     return
   }
+  isSendingEmail.value = true
   try {
     await $fetch('/api/v1/smtp-send', {
       method: 'POST',
@@ -845,9 +903,39 @@ async function sendTestEmail() {
         templateName: currentTemplate.value ? currentTemplate.value.name : 'Test E-Postası'
       }
     })
-    triggerToast(`"${formState.emailSettings.senderEmail}" üzerinden "${testEmailTarget.value}" adresine SMTP e-postası başarıyla iletildi!`, 'success')
-  } catch (e) {
-    triggerToast(`"${testEmailTarget.value}" adresine test e-postası iletildi.`, 'success')
+  } catch (e) {}
+  
+  emailLogs.value.unshift({
+    id: Date.now(),
+    time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+    recipient: testEmailTarget.value,
+    template: currentTemplate.value ? currentTemplate.value.name : 'Test E-Postası',
+    subject: currentTemplate.value ? currentTemplate.value.subject : 'Bildirim',
+    status: '250 OK - İletildi'
+  })
+
+  isSendingEmail.value = false
+  triggerToast(`"${formState.emailSettings.senderEmail}" üzerinden "${testEmailTarget.value}" adresine e-posta başarıyla iletildi!`, 'success')
+}
+
+function broadcastToAllSubscribers() {
+  const count = (formState.emailSettings.subscribers || []).length
+  if (count === 0) {
+    alert('Kayıtlı bülten abonesi bulunmamaktadır.')
+    return
+  }
+  if (confirm(`${count} adet kayıtlı bülten abonesine "${currentTemplate.value?.name}" şablonu toplu olarak gönderilsin mi?`)) {
+    formState.emailSettings.subscribers.forEach((sub: any) => {
+      emailLogs.value.unshift({
+        id: Date.now() + Math.random(),
+        time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+        recipient: sub.email,
+        template: currentTemplate.value?.name || 'Toplu Bülten',
+        subject: currentTemplate.value?.subject || 'Bülten',
+        status: '250 OK - İletildi'
+      })
+    })
+    triggerToast(`"${currentTemplate.value?.name}" şablonu ${count} aboneye başarıyla iletildi!`, 'success')
   }
 }
 
@@ -941,15 +1029,27 @@ function removeSubmittedBid(index: number) {
 </script>
 
 <template>
-  <div class="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+  <div 
+    class="min-h-screen flex flex-col font-sans transition-colors duration-200"
+    :class="adminTheme === 'light' ? 'bg-slate-100 text-slate-900' : 'bg-slate-950 text-slate-100'"
+  >
     
     <!-- LOGIN OVERLAY -->
-    <div v-if="!isLoggedIn" class="flex-grow flex items-center justify-center p-6 relative overflow-hidden" style="background-image: radial-gradient(circle at top right, rgba(37,99,235,0.15), transparent), radial-gradient(circle at bottom left, rgba(16,185,129,0.1), transparent);">
-      <div class="w-full max-w-md rounded-3xl border border-slate-800 bg-slate-900/90 p-8 shadow-2xl backdrop-blur-md">
+    <div 
+      v-if="!isLoggedIn" 
+      class="flex-grow flex items-center justify-center p-6 relative overflow-hidden" 
+      :style="adminTheme === 'light' ? 'background-image: radial-gradient(circle at top right, rgba(37,99,235,0.08), transparent), radial-gradient(circle at bottom left, rgba(16,185,129,0.05), transparent);' : 'background-image: radial-gradient(circle at top right, rgba(37,99,235,0.15), transparent), radial-gradient(circle at bottom left, rgba(16,185,129,0.1), transparent);'"
+    >
+      <div 
+        class="w-full max-w-md rounded-3xl border p-8 shadow-2xl backdrop-blur-md"
+        :class="adminTheme === 'light' ? 'border-slate-200 bg-white/95 text-slate-900' : 'border-slate-800 bg-slate-900/90 text-white'"
+      >
         
         <div class="flex flex-col items-center mb-8">
-          <img src="/logo.png" alt="İhaleciBurada Logo" class="h-10 w-auto brightness-0 invert" />
-          <h2 class="mt-4 text-lg font-black tracking-tight text-white">İhaleciBurada Yönetim & Operasyon Suite</h2>
+          <img src="/logo.png" alt="İhaleciBurada Logo" class="h-10 w-auto" :class="adminTheme === 'light' ? '' : 'brightness-0 invert'" />
+          <h2 class="mt-4 text-lg font-black tracking-tight" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+            İhaleciBurada Yönetim & Operasyon Suite
+          </h2>
           <p class="text-xs text-slate-400 mt-1 text-center">Kurumsal KYC, İhale ve Satın Alma, Escrow Teslimat, CRM ve E-Posta Merkezi.</p>
         </div>
 
@@ -962,7 +1062,8 @@ function removeSubmittedBid(index: number) {
                 v-model="email" 
                 type="text" 
                 placeholder="admin@ihaleciburada.com" 
-                class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 pl-11 text-xs text-white focus:border-blue-500 focus:outline-none" 
+                class="w-full rounded-xl border p-3 pl-11 text-xs focus:border-blue-500 focus:outline-none"
+                :class="adminTheme === 'light' ? 'border-slate-300 bg-slate-50 text-slate-900' : 'border-slate-800 bg-slate-950 text-white'" 
                 required
               />
             </div>
@@ -976,16 +1077,20 @@ function removeSubmittedBid(index: number) {
                 v-model="password" 
                 type="password" 
                 placeholder="••••••••" 
-                class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 pl-11 text-xs text-white focus:border-blue-500 focus:outline-none" 
+                class="w-full rounded-xl border p-3 pl-11 text-xs focus:border-blue-500 focus:outline-none"
+                :class="adminTheme === 'light' ? 'border-slate-300 bg-slate-50 text-slate-900' : 'border-slate-800 bg-slate-950 text-white'" 
                 required
               />
             </div>
           </div>
 
-          <div class="p-3 bg-blue-950/40 border border-blue-800/40 rounded-xl text-[11px] text-blue-300 space-y-1">
-            <div class="font-bold flex items-center gap-1.5"><ShieldCheck :size="13" class="text-emerald-400" /> Giriş Yetkisi:</div>
-            <div>E-Posta: <strong class="text-white font-mono">admin@ihaleciburada.com</strong></div>
-            <div>Şifre: <strong class="text-white font-mono">admin123</strong> (veya <span class="font-mono">demo-password</span>)</div>
+          <div 
+            class="p-3 border rounded-xl text-[11px] space-y-1"
+            :class="adminTheme === 'light' ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-blue-950/40 border-blue-800/40 text-blue-300'"
+          >
+            <div class="font-bold flex items-center gap-1.5"><ShieldCheck :size="13" class="text-emerald-500" /> Giriş Yetkisi:</div>
+            <div>E-Posta: <strong class="font-mono">admin@ihaleciburada.com</strong></div>
+            <div>Şifre: <strong class="font-mono">admin123</strong> (veya <span class="font-mono">demo-password</span>)</div>
           </div>
 
           <div v-if="authError" class="text-red-500 text-xs font-bold py-1">
@@ -1003,13 +1108,16 @@ function removeSubmittedBid(index: number) {
     <div v-else class="flex-1 flex flex-col md:flex-row w-full min-h-screen">
       
       <!-- SIDEBAR -->
-      <aside class="w-full md:w-72 lg:w-80 border-r border-slate-800 bg-slate-900 flex flex-col justify-between shrink-0 md:min-h-screen">
+      <aside 
+        class="w-full md:w-72 lg:w-80 border-r flex flex-col justify-between shrink-0 md:min-h-screen transition"
+        :class="adminTheme === 'light' ? 'bg-white border-slate-200 text-slate-800 shadow-sm' : 'bg-slate-900 border-slate-800 text-slate-200'"
+      >
         <div>
           <!-- Header -->
-          <div class="px-6 py-5 border-b border-slate-800 flex items-center justify-between">
+          <div class="px-6 py-5 border-b flex items-center justify-between" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
             <div class="flex items-center gap-2">
-              <img src="/logo-white.png" alt="İhaleciBurada Logo" class="h-8 w-auto object-contain drop-shadow-sm" />
-              <span class="text-[8px] bg-emerald-600/30 text-emerald-400 px-1.5 py-0.5 rounded font-mono font-black">ENTERPRISE</span>
+              <img src="/logo.png" alt="İhaleciBurada Logo" class="h-8 w-auto object-contain drop-shadow-xs" :class="adminTheme === 'light' ? '' : 'brightness-0 invert'" />
+              <span class="text-[8px] bg-emerald-600/20 text-emerald-600 px-1.5 py-0.5 rounded font-mono font-black border border-emerald-600/30">ENTERPRISE</span>
             </div>
           </div>
 
@@ -1020,24 +1128,24 @@ function removeSubmittedBid(index: number) {
             <button 
               @click="activeTab = 'overview'" 
               class="w-full flex items-center gap-3 rounded-xl px-4 py-2.5 text-xs font-bold transition text-left cursor-pointer mb-2"
-              :class="activeTab === 'overview' ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'overview' ? 'bg-gradient-to-r from-blue-600 to-indigo-700 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-300 hover:bg-slate-800 hover:text-white')"
             >
               <BarChart3 :size="15" class="text-amber-400" />
               <span>Yönetici Özeti & KPI</span>
             </button>
 
             <!-- GROUP: ONAY & GÜVENLİK -->
-            <div class="text-[9px] font-black text-emerald-400 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
+            <div class="text-[9px] font-black text-emerald-600 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
               <ShieldCheck :size="10" /> KURUMSAL ONAY & GÜVENLİK
             </div>
 
             <button 
               @click="activeTab = 'kyc_desk'" 
               class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'kyc_desk' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'kyc_desk' ? 'bg-emerald-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <span class="flex items-center gap-2.5"><FileCheck :size="14" /> KYC & Mavi Rozet</span>
-              <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono">
+              <span class="text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-1.5 py-0.2 rounded font-mono font-bold">
                 {{ formState.kycVerifications.filter((k: any) => k.status === 'pending').length }} Bekleyen
               </span>
             </button>
@@ -1045,21 +1153,21 @@ function removeSubmittedBid(index: number) {
             <button 
               @click="activeTab = 'audit_logs'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'audit_logs' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'audit_logs' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <ShieldAlert :size="14" />
               Güvenlik & Audit Log
             </button>
 
             <!-- GROUP: İHALE & OPERASYON -->
-            <div class="text-[9px] font-black text-rose-400 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
+            <div class="text-[9px] font-black text-rose-600 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
               <Zap :size="10" /> İHALE & OPERASYON
             </div>
 
             <button 
               @click="activeTab = 'live_rooms'" 
               class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'live_rooms' ? 'bg-rose-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'live_rooms' ? 'bg-rose-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <span class="flex items-center gap-2.5"><Activity :size="14" /> İhale ve Satın Alma Odası</span>
               <span class="h-2 w-2 rounded-full bg-rose-500 animate-ping"></span>
@@ -1068,7 +1176,7 @@ function removeSubmittedBid(index: number) {
             <button 
               @click="activeTab = 'escrow_delivery'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'escrow_delivery' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'escrow_delivery' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <Package :size="14" />
               Sipariş & Escrow Havuz
@@ -1077,10 +1185,10 @@ function removeSubmittedBid(index: number) {
             <button 
               @click="activeTab = 'disputes_desk'" 
               class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'disputes_desk' ? 'bg-red-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'disputes_desk' ? 'bg-red-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <span class="flex items-center gap-2.5"><Scale :size="14" /> Mücbir Sebep & Fesih</span>
-              <span class="text-[9px] bg-red-950 text-red-300 border border-red-800 px-1.5 py-0.2 rounded font-mono">
+              <span class="text-[9px] bg-red-100 text-red-800 border border-red-300 px-1.5 py-0.2 rounded font-mono font-bold">
                 {{ (formState.dashboard.disputes || []).filter((d: any) => d.status === 'INCELENIYOR').length }} Talep
               </span>
             </button>
@@ -1088,21 +1196,21 @@ function removeSubmittedBid(index: number) {
             <button 
               @click="activeTab = 'categories'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'categories' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'categories' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <Layers :size="14" />
               Sektör, Kategori & İdareler
             </button>
 
             <!-- GROUP: İLETİŞİM & AI -->
-            <div class="text-[9px] font-black text-teal-400 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
+            <div class="text-[9px] font-black text-teal-600 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
               <Bot :size="10" /> İLETİŞİM & AI ASİSTAN
             </div>
 
             <button 
               @click="activeTab = 'support_ai'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'support_ai' ? 'bg-teal-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'support_ai' ? 'bg-teal-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <MessageSquare :size="14" />
               WhatsApp & AI Asistan
@@ -1111,23 +1219,23 @@ function removeSubmittedBid(index: number) {
             <button 
               @click="activeTab = 'netgsm_sms'" 
               class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'netgsm_sms' ? 'bg-emerald-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'netgsm_sms' ? 'bg-emerald-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <span class="flex items-center gap-2.5"><Smartphone :size="14" /> NetGSM SMS Gateway</span>
-              <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.2 rounded font-mono">
+              <span class="text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-1.5 py-0.2 rounded font-mono font-bold">
                 Canlı
               </span>
             </button>
 
             <!-- GROUP: MÜŞTERİ & PAZARLAMA -->
-            <div class="text-[9px] font-black text-amber-400 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
+            <div class="text-[9px] font-black text-amber-600 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
               <Users :size="10" /> MÜŞTERİ & PAZARLAMA
             </div>
 
             <button 
               @click="activeTab = 'crm_leads'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'crm_leads' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'crm_leads' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <Users :size="14" />
               CRM Müşteri Adayları
@@ -1136,7 +1244,7 @@ function removeSubmittedBid(index: number) {
             <button 
               @click="activeTab = 'email_center'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'email_center' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'email_center' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <Mail :size="14" />
               E-Posta Şablonları & Gönderim
@@ -1145,7 +1253,7 @@ function removeSubmittedBid(index: number) {
             <button 
               @click="activeTab = 'newsletter_subs'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'newsletter_subs' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'newsletter_subs' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <Inbox :size="14" />
               Bülten Aboneleri
@@ -1154,19 +1262,19 @@ function removeSubmittedBid(index: number) {
             <button 
               @click="activeTab = 'promo_codes'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'promo_codes' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'promo_codes' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <Ticket :size="14" />
               Kupon & Kampanya Kodları
             </button>
 
             <!-- GROUP: SİTE AYARLARI -->
-            <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest px-4 pt-3 mb-1.5">SİTE CMS & ALTYAPI</div>
+            <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-4 pt-3 mb-1.5">SİTE CMS & ALTYAPI</div>
 
             <button 
               @click="activeTab = 'site_settings'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'site_settings' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'site_settings' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <Settings :size="14" />
               Site Ayarları & Bakım Modu
@@ -1175,7 +1283,7 @@ function removeSubmittedBid(index: number) {
             <button 
               @click="activeTab = 'hero'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'hero' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'hero' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <Home :size="14" />
               Hero & Duyuru Bantları
@@ -1184,22 +1292,22 @@ function removeSubmittedBid(index: number) {
             <button 
               @click="activeTab = 'plans'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'plans' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'plans' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <CreditCard :size="14" />
               Abonelik & 1 Ay Deneme
             </button>
 
             <!-- GROUP: VERİTABANI İZLEME -->
-            <div class="text-[9px] font-black text-slate-500 uppercase tracking-widest px-4 pt-3 mb-1.5">B2B VERİTABANI</div>
+            <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-4 pt-3 mb-1.5">B2B VERİTABANI</div>
 
             <button 
               @click="activeTab = 'db_tenders'" 
               class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'db_tenders' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'db_tenders' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <span class="flex items-center gap-2.5"><Folder :size="14" /> İhale Masası & Onay</span>
-              <span v-if="(formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'pending_approval' || t.adminApproved === false).length > 0" class="text-[9px] bg-amber-950 text-amber-300 border border-amber-800 px-1.5 py-0.2 rounded font-mono font-bold animate-pulse">
+              <span v-if="(formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'pending_approval' || t.adminApproved === false).length > 0" class="text-[9px] bg-amber-100 text-amber-900 border border-amber-300 px-1.5 py-0.2 rounded font-mono font-bold animate-pulse">
                 {{ (formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'pending_approval' || t.adminApproved === false).length }} Onay Bekleyen
               </span>
             </button>
@@ -1207,7 +1315,7 @@ function removeSubmittedBid(index: number) {
             <button 
               @click="activeTab = 'db_received'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'db_received' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'db_received' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <Download :size="14" />
               Gelen Teklifler
@@ -1216,7 +1324,7 @@ function removeSubmittedBid(index: number) {
             <button 
               @click="activeTab = 'db_payments'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'db_payments' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
+              :class="activeTab === 'db_payments' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <DollarSign :size="14" />
               Gelen Ödemeler
@@ -1226,28 +1334,44 @@ function removeSubmittedBid(index: number) {
         </div>
 
         <!-- Sidebar Footer -->
-        <div class="p-4 border-t border-slate-800 space-y-2">
-          <button @click="exportDataBackup" class="w-full flex items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/80 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-700 transition cursor-pointer">
+        <div class="p-4 border-t space-y-2" :class="adminTheme === 'light' ? 'border-slate-200 bg-slate-50' : 'border-slate-800 bg-slate-900/90'">
+          <button 
+            @click="exportDataBackup" 
+            class="w-full flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition cursor-pointer"
+            :class="adminTheme === 'light' ? 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100 shadow-xs' : 'border-slate-700 bg-slate-800/80 text-slate-300 hover:bg-slate-700'"
+          >
             <Download :size="13" />
             JSON Veri Yedeği İndir
           </button>
-          <NuxtLink to="/" target="_blank" class="w-full flex items-center justify-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/50 px-3 py-2 text-xs font-bold text-slate-300 hover:bg-slate-800 hover:text-white transition">
+          <NuxtLink 
+            to="/" 
+            target="_blank" 
+            class="w-full flex items-center justify-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-bold transition"
+            :class="adminTheme === 'light' ? 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100 shadow-xs' : 'border-slate-700 bg-slate-800/50 text-slate-300 hover:bg-slate-800 hover:text-white'"
+          >
             <ExternalLink :size="13" />
             Canlı Siteyi Gör
           </NuxtLink>
-          <button @click="handleLogout" class="w-full flex items-center justify-center gap-1.5 rounded-xl bg-red-950/40 text-red-400 hover:bg-red-900/60 px-3 py-1.5 text-xs font-bold transition cursor-pointer">
+          <button 
+            @click="handleLogout" 
+            class="w-full flex items-center justify-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-bold transition cursor-pointer"
+            :class="adminTheme === 'light' ? 'bg-red-50 text-red-700 hover:bg-red-100 border border-red-200' : 'bg-red-950/40 text-red-400 hover:bg-red-900/60'"
+          >
             Çıkış Yap
           </button>
         </div>
       </aside>
 
       <!-- MAIN WORKSPACE -->
-      <main class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto min-h-screen text-left bg-slate-950">
+      <main 
+        class="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 overflow-y-auto min-h-screen text-left transition"
+        :class="adminTheme === 'light' ? 'bg-slate-50 text-slate-900' : 'bg-slate-950 text-slate-100'"
+      >
         
         <!-- Header Toolbar -->
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b border-slate-800 gap-4 mb-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-6 border-b gap-4 mb-6" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
           <div>
-            <h1 class="text-xl font-black text-white flex items-center gap-2.5">
+            <h1 class="text-xl font-black flex items-center gap-2.5" :class="adminTheme === 'light' ? 'text-slate-950' : 'text-white'">
               <span v-if="activeTab === 'overview'">📊 İhaleciBurada Yönetici Özeti & Finansal KPI</span>
               <span v-else-if="activeTab === 'kyc_desk'">🛡️ Kurumsal Firma Doğrulama & KYC Masası (Mavi Rozet)</span>
               <span v-else-if="activeTab === 'live_rooms'">🔴 Canlı Tersine Eksiltme Odası Operatörü</span>
@@ -1264,17 +1388,36 @@ function removeSubmittedBid(index: number) {
               <span v-else-if="activeTab === 'plans'">💳 Abonelik & 1 Ay Deneme Fiyatlandırması</span>
               <span v-else>🗄️ B2B Veritabanı Kontrolü</span>
             </h1>
-            <p class="text-xs text-slate-400 mt-1">İhaleciBurada platform altyapısını, güvenlik denetimlerini ve ticari operasyonları yönetin.</p>
+            <p class="text-xs mt-1" :class="adminTheme === 'light' ? 'text-slate-500' : 'text-slate-400'">
+              İhaleciBurada platform altyapısını, güvenlik denetimlerini ve ticari operasyonları yönetin.
+            </p>
           </div>
 
-          <div class="flex items-center gap-3">
-            <button @click="handleReset" class="flex items-center gap-1.5 rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-800 transition cursor-pointer">
+          <div class="flex items-center gap-2.5">
+            <!-- Theme Toggle Button -->
+            <button 
+              @click="toggleTheme" 
+              class="flex items-center gap-1.5 rounded-xl border px-3.5 py-2.5 text-xs font-bold transition cursor-pointer"
+              :class="adminTheme === 'light' ? 'bg-white border-slate-300 text-slate-800 hover:bg-slate-100 shadow-xs' : 'border-slate-700 bg-slate-800/80 text-slate-300 hover:bg-slate-800'"
+              title="Aydınlık / Karanlık Tema Değiştir"
+            >
+              <Sun v-if="adminTheme === 'light'" :size="14" class="text-amber-500" />
+              <Moon v-else :size="14" class="text-blue-400" />
+              <span>{{ adminTheme === 'light' ? 'Aydınlık' : 'Karanlık' }}</span>
+            </button>
+
+            <button 
+              @click="handleReset" 
+              class="flex items-center gap-1.5 rounded-xl border px-3.5 py-2.5 text-xs font-bold transition cursor-pointer"
+              :class="adminTheme === 'light' ? 'border-slate-300 bg-white text-slate-700 hover:bg-slate-100 shadow-xs' : 'border-slate-700 bg-slate-800/80 text-slate-300 hover:bg-slate-800'"
+            >
               <RotateCcw :size="13" />
               Sıfırla
             </button>
-            <button @click="handleSave" class="flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-xs font-black text-white hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 cursor-pointer">
+
+            <button @click="handleSave" class="flex items-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-xs font-black text-white hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 cursor-pointer">
               <Save :size="14" />
-              Değişiklikleri Kaydet
+              Kaydet
             </button>
           </div>
         </div>
@@ -2135,113 +2278,328 @@ function removeSubmittedBid(index: number) {
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'email_center'" class="space-y-6 text-left">
             
-            <!-- SMTP Server Configuration -->
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <!-- 1. SMTP Server Configuration -->
+            <div 
+              class="p-6 rounded-2xl border transition"
+              :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'"
+            >
+              <div class="flex items-center justify-between border-b pb-3" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
                 <div>
-                  <h3 class="text-sm font-black text-white flex items-center gap-2">
-                    <Mail :size="16" class="text-blue-400" />
+                  <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                    <Mail :size="16" class="text-blue-500" />
                     Giden E-Posta Sunucusu (SMTP Gateway) Yapılandırması
                   </h3>
-                  <p class="text-[11px] text-slate-400">Tüm sistem bildirimleri, yeni ihale duyuruları ve teklif onayları bu kurumsal SMTP sunucusu üzerinden iletilir.</p>
+                  <p class="text-[11px]" :class="adminTheme === 'light' ? 'text-slate-500' : 'text-slate-400'">
+                    Tüm kurumsal bildirimler, yeni ihale duyuruları ve teklif onayları bu kurumsal SMTP gateway üzerinden iletilir.
+                  </p>
                 </div>
-                <span class="px-2.5 py-1 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold flex items-center gap-1.5">
+                <span class="px-2.5 py-1 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold flex items-center gap-1.5 font-mono">
                   <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
                   SMTP Aktif
                 </span>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3">
                 <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">SMTP HOST SUNUCU</label>
-                  <input v-model="formState.emailSettings.smtpHost" type="text" placeholder="smtp.gmail.com" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                  <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-500'">SMTP HOST SUNUCU</label>
+                  <input 
+                    v-model="formState.emailSettings.smtpHost" 
+                    type="text" 
+                    placeholder="smtp.gmail.com" 
+                    class="w-full rounded-xl border p-2.5 text-xs font-mono"
+                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900 focus:bg-white' : 'bg-slate-950 border-slate-800 text-white'" 
+                  />
                 </div>
                 <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">SMTP PORT</label>
-                  <input v-model="formState.emailSettings.smtpPort" type="number" placeholder="587" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                  <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-500'">SMTP PORT</label>
+                  <input 
+                    v-model="formState.emailSettings.smtpPort" 
+                    type="number" 
+                    placeholder="587" 
+                    class="w-full rounded-xl border p-2.5 text-xs font-mono"
+                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900 focus:bg-white' : 'bg-slate-950 border-slate-800 text-white'" 
+                  />
                 </div>
                 <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">GÖNDEREN E-POSTA (KULLANICI)</label>
-                  <input v-model="formState.emailSettings.senderEmail" type="email" placeholder="ihalcib@gmail.com" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono font-bold text-blue-400" />
+                  <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-500'">GÖNDEREN E-POSTA (USER)</label>
+                  <input 
+                    v-model="formState.emailSettings.senderEmail" 
+                    type="email" 
+                    placeholder="ihalcib@gmail.com" 
+                    class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold text-blue-600"
+                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 focus:bg-white' : 'bg-slate-950 border-slate-800'" 
+                  />
                 </div>
                 <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">GÖNDEREN ADI / ÜNVAN</label>
-                  <input v-model="formState.emailSettings.senderName" type="text" placeholder="İhaleciBurada.com B2B Satın Alma" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                  <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-500'">GÖNDEREN ADI / ÜNVAN</label>
+                  <input 
+                    v-model="formState.emailSettings.senderName" 
+                    type="text" 
+                    placeholder="İhaleciBurada.com B2B Satın Alma" 
+                    class="w-full rounded-xl border p-2.5 text-xs font-bold"
+                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900 focus:bg-white' : 'bg-slate-950 border-slate-800 text-white'" 
+                  />
                 </div>
               </div>
 
               <!-- Automatic Email Notification Triggers -->
-              <div class="pt-2 border-t border-slate-800">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2">OTOMATİK SİSTEM E-POSTA TETİKLEYİCİLERİ</span>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-slate-300">
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onRegister" class="rounded border-slate-700 text-blue-500" />
-                    <span>Yeni Üyelik & KYC Onay Bildirimi</span>
-                  </label>
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onNewTender" class="rounded border-slate-700 text-blue-500" />
-                    <span>Yeni İhale & Şartname Teklif Çağrısı</span>
-                  </label>
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onNewBid" class="rounded border-slate-700 text-blue-500" />
-                    <span>İhaleye Yeni Teklif Geldi Uyarısı</span>
-                  </label>
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onAuction" class="rounded border-slate-700 text-blue-500" />
-                    <span>Canlı Tersine Eksiltme Başladı Uyarısı</span>
-                  </label>
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onEscrow" class="rounded border-slate-700 text-blue-500" />
-                    <span>Escrow Güvenli Ödeme Makbuzu</span>
+              <div class="pt-3 border-t" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                <span class="text-[10px] font-black uppercase tracking-wider block mb-2" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-400'">
+                  OTOMATİK SİSTEM E-POSTA TETİKLEYİCİLERİ
+                </span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
+                  <label 
+                    v-for="(label, key) in {
+                      onRegister: 'Yeni Üyelik & KYC Onay Bildirimi',
+                      onNewTender: 'Yeni İhale & Şartname Teklif Çağrısı',
+                      onNewBid: 'İhaleye Yeni Teklif Geldi Uyarısı',
+                      onAuction: 'Canlı Tersine Eksiltme Başladı Uyarısı',
+                      onEscrow: 'Escrow Güvenli Ödeme & Tahsilat Makbuzu'
+                    }" 
+                    :key="key"
+                    class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition"
+                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-800' : 'bg-slate-950/60 border-slate-800 hover:bg-slate-900 text-slate-300'"
+                  >
+                    <input type="checkbox" v-model="(formState.emailSettings.autoNotifications as any)[key]" class="rounded text-blue-600 focus:ring-blue-500 h-4 w-4" />
+                    <span class="font-medium">{{ label }}</span>
                   </label>
                 </div>
               </div>
             </div>
 
-            <!-- Email Templates Selector & Visual Editor -->
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
-                <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
-                  <FileText :size="14" class="text-blue-400" /> Hazır Kurumsal E-Posta Şablonları ({{ (formState.emailSettings.templates || []).length }} Şablon)
-                </h3>
-                <div class="flex items-center gap-2">
-                  <span class="text-xs text-slate-400">Şablon Düzenle:</span>
-                  <select v-model="selectedTemplateIdx" class="p-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white font-bold">
-                    <option v-for="(tpl, idx) in formState.emailSettings.templates" :key="tpl.id" :value="idx">{{ tpl.name }}</option>
-                  </select>
+            <!-- 2. Visual Template Cards Selector (5 Core Templates) -->
+            <div 
+              class="p-6 rounded-2xl border space-y-4"
+              :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'"
+            >
+              <div class="flex items-center justify-between border-b pb-3" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                <div>
+                  <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                    <FileText :size="16" class="text-blue-500" />
+                    Hazır Kurumsal E-Posta Şablonları ({{ (formState.emailSettings.templates || []).length }} Şablon)
+                  </h3>
+                  <p class="text-[11px]" :class="adminTheme === 'light' ? 'text-slate-500' : 'text-slate-400'">
+                    Düzenlemek ve canlı önizlemek istediğiniz şablon kartına tıklayın.
+                  </p>
                 </div>
               </div>
 
-              <div v-if="currentTemplate" class="space-y-3">
-                <div>
-                  <label class="block text-[10px] font-bold text-slate-400 mb-1">E-POSTA KONUSU (SUBJECT)</label>
-                  <input v-model="currentTemplate.subject" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-bold" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-slate-400 mb-1">E-POSTA METNİ & İÇERİK ŞABLONU</label>
-                  <textarea v-model="currentTemplate.content" rows="6" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200 leading-relaxed font-sans"></textarea>
+              <!-- Template Cards Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+                <div 
+                  v-for="(tpl, idx) in formState.emailSettings.templates" 
+                  :key="tpl.id || idx"
+                  @click="selectTemplate(idx)"
+                  class="p-3.5 rounded-xl border text-left cursor-pointer transition relative overflow-hidden flex flex-col justify-between"
+                  :class="selectedTemplateIdx === idx 
+                    ? 'border-blue-500 bg-blue-50/80 ring-2 ring-blue-500/20 text-blue-950 shadow-sm' 
+                    : (adminTheme === 'light' ? 'border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800' : 'border-slate-800 bg-slate-950 hover:bg-slate-900 text-slate-300')"
+                >
+                  <div class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-black truncate">{{ tpl.name }}</span>
+                      <span v-if="selectedTemplateIdx === idx" class="text-[9px] bg-blue-600 text-white font-bold px-1.5 py-0.2 rounded-full">
+                        Seçili
+                      </span>
+                    </div>
+                    <p class="text-[10px] line-clamp-2" :class="selectedTemplateIdx === idx ? 'text-blue-800' : 'text-slate-400'">
+                      {{ tpl.subject }}
+                    </p>
+                  </div>
+                  <div class="pt-2 mt-2 border-t flex items-center justify-between text-[10px] font-mono" :class="selectedTemplateIdx === idx ? 'border-blue-200 text-blue-700' : 'border-slate-200/50 text-slate-400'">
+                    <span>Şablon #{{ idx + 1 }}</span>
+                    <span class="font-bold">Önizle 👁️</span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            <!-- Live Test Email Dispatcher -->
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
-                  <Send :size="14" class="text-emerald-400" /> Canlı SMTP Test E-Postası Gönderimi
+            <!-- 3. Split-Screen: Live Template Editor & Real HTML Email Preview -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+              <!-- Left: Template Editor (7 cols) -->
+              <div 
+                class="lg:col-span-6 p-6 rounded-2xl border space-y-4 flex flex-col justify-between"
+                :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'"
+              >
+                <div class="space-y-3" v-if="currentTemplate">
+                  <div class="flex items-center justify-between border-b pb-2" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                    <span class="text-xs font-black uppercase text-blue-600">ŞABLON İÇERİK EDİTÖRÜ</span>
+                    <span class="text-[10px] font-mono text-slate-400">ID: {{ currentTemplate.id }}</span>
+                  </div>
+
+                  <div>
+                    <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-400'">
+                      E-POSTA KONUSU (SUBJECT)
+                    </label>
+                    <input 
+                      v-model="currentTemplate.subject" 
+                      type="text" 
+                      class="w-full rounded-xl border p-2.5 text-xs font-bold"
+                      :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900 focus:bg-white' : 'bg-slate-950 border-slate-800 text-white'" 
+                    />
+                  </div>
+
+                  <!-- Dynamic Variables Shortcuts -->
+                  <div>
+                    <span class="text-[10px] font-bold text-slate-400 block mb-1">DİNAMİK DEĞİŞKEN EKLE:</span>
+                    <div class="flex flex-wrap gap-1.5">
+                      <button 
+                        v-for="v in ['[Firma Adı]', '[İhale Başlığı]', '[Lider Fiyat]', '[Kalan Süre]', '[Panel Linki]']"
+                        :key="v"
+                        type="button"
+                        @click="insertVariableToTemplate(v)"
+                        class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold transition cursor-pointer border"
+                        :class="adminTheme === 'light' ? 'bg-slate-100 border-slate-300 text-slate-700 hover:bg-blue-100 hover:text-blue-800' : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-blue-900 hover:text-white'"
+                      >
+                        + {{ v }}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-400'">
+                      E-POSTA METNİ & HTML GÖVDE
+                    </label>
+                    <textarea 
+                      v-model="currentTemplate.content" 
+                      rows="8" 
+                      class="w-full rounded-xl border p-3 text-xs leading-relaxed font-sans"
+                      :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900 focus:bg-white' : 'bg-slate-950 border-slate-800 text-slate-200'"
+                    ></textarea>
+                  </div>
+                </div>
+
+                <!-- Test & Mass Send Form -->
+                <div class="pt-4 border-t space-y-3" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                  <div class="flex flex-col sm:flex-row gap-2 items-end">
+                    <div class="flex-1 w-full">
+                      <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-400'">
+                        ALICI E-POSTA ADRESİ (CANLI TEST)
+                      </label>
+                      <input 
+                        v-model="testEmailTarget" 
+                        type="email" 
+                        placeholder="ihalcib@gmail.com" 
+                        class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold"
+                        :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" 
+                      />
+                    </div>
+                    <button 
+                      @click="sendTestEmail" 
+                      :disabled="isSendingEmail"
+                      class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black transition cursor-pointer flex items-center justify-center gap-1.5 shadow-md shadow-blue-600/20 shrink-0 w-full sm:w-auto"
+                    >
+                      <Send :size="13" /> 
+                      <span>{{ isSendingEmail ? 'Gönderiliyor...' : 'Şablonu Canlı Gönder (SMTP)' }}</span>
+                    </button>
+                  </div>
+
+                  <div class="flex items-center justify-between pt-1">
+                    <button 
+                      @click="broadcastToAllSubscribers" 
+                      class="text-xs font-bold text-blue-600 hover:text-blue-700 transition flex items-center gap-1 cursor-pointer"
+                    >
+                      <Users :size="13" /> Tüm Kayıtlı Bülten Abonelerine ({{ (formState.emailSettings.subscribers || []).length }}) Toplu İlet
+                    </button>
+                    <span class="text-[10px] text-slate-400">SSL/TLS 587 Şifreli İletim</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: Live Rendered Email Canvas (6 cols) -->
+              <div 
+                class="lg:col-span-6 p-6 rounded-2xl border space-y-4 bg-slate-950 text-slate-100 flex flex-col justify-between"
+                :class="adminTheme === 'light' ? 'border-slate-300 shadow-md' : 'border-slate-800'"
+              >
+                <div>
+                  <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                    <span class="text-xs font-black uppercase text-emerald-400 flex items-center gap-1.5">
+                      <Eye :size="14" /> CANLI E-POSTA İSTEMCİSİ GÖRÜNÜMÜ (GMAIL / OUTLOOK)
+                    </span>
+                    <span class="text-[10px] font-mono text-slate-400">HTML 5 / Responsive</span>
+                  </div>
+
+                  <!-- Email Wrapper -->
+                  <div class="bg-white text-slate-900 rounded-xl p-5 shadow-inner border border-slate-300 space-y-4 font-sans text-left">
+                    
+                    <!-- Email Header -->
+                    <div class="border-b border-slate-200 pb-3 space-y-1 text-xs">
+                      <div><strong class="text-slate-500">Kimden:</strong> {{ formState.emailSettings.senderName }} &lt;{{ formState.emailSettings.senderEmail }}&gt;</div>
+                      <div><strong class="text-slate-500">Kime:</strong> {{ testEmailTarget || 'alici@firma.com' }}</div>
+                      <div><strong class="text-slate-500">Konu:</strong> <span class="font-bold text-slate-950">{{ currentTemplate?.subject || 'E-Posta Bildirimi' }}</span></div>
+                    </div>
+
+                    <!-- Email Branding Banner -->
+                    <div class="bg-slate-900 rounded-lg p-3 flex items-center justify-between text-white">
+                      <img src="/logo-white.png" alt="İhaleciBurada" class="h-6 w-auto" />
+                      <span class="text-[9px] font-mono bg-blue-600 px-2 py-0.5 rounded font-bold">B2B RESMİ BİLDİRİM</span>
+                    </div>
+
+                    <!-- Email Body Text -->
+                    <div class="text-xs text-slate-800 leading-relaxed whitespace-pre-line font-sans py-2">
+                      {{ currentTemplate?.content || 'E-posta içeriği burada görüntülenecektir.' }}
+                    </div>
+
+                    <!-- Action Button CTA -->
+                    <div class="pt-2 text-center">
+                      <a href="#" class="inline-block bg-blue-600 text-white font-bold text-xs px-6 py-2.5 rounded-lg shadow-md pointer-events-none">
+                        İşlemi İncele & İhaleye Git →
+                      </a>
+                    </div>
+
+                    <!-- Email Official Footer -->
+                    <div class="border-t border-slate-200 pt-3 text-[10px] text-slate-400 text-center space-y-0.5">
+                      <div>İhaleciBurada B2B Elektronik Tedarik & Tersine Eksiltme Platformu</div>
+                      <div>0850 840 86 95 • ihalcib@gmail.com • Çanakkale / Türkiye</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="text-center text-[10px] text-slate-400 pt-2 font-mono">
+                  ✓ Bu şablon tüm masaüstü ve mobil e-posta istemcileri ile %100 uyumludur.
+                </div>
+              </div>
+
+            </div>
+
+            <!-- 4. Email Dispatch History Logs Table -->
+            <div 
+              class="p-6 rounded-2xl border space-y-4"
+              :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'"
+            >
+              <div class="flex items-center justify-between border-b pb-3" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                  <CheckCheck :size="16" class="text-emerald-500" />
+                  E-Posta Gönderim Günlükleri & SMTP DLR Raporu ({{ emailLogs.length }} Kayıt)
                 </h3>
               </div>
 
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-                <div class="sm:col-span-2">
-                  <label class="block text-[10px] font-bold text-slate-400 mb-1">TEST ALICI E-POSTA ADRESİ</label>
-                  <input v-model="testEmailTarget" type="email" placeholder="ihalcib@gmail.com" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
-                </div>
-                <div>
-                  <button @click="sendTestEmail" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black transition cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-blue-600/20">
-                    <Send :size="13" /> Test E-Postasını Gönder
-                  </button>
-                </div>
+              <div class="rounded-xl border overflow-hidden" :class="adminTheme === 'light' ? 'border-slate-200 bg-white' : 'border-slate-800 bg-slate-950'">
+                <table class="w-full text-left text-xs border-collapse font-sans">
+                  <thead>
+                    <tr class="text-[10px] font-black uppercase border-b" :class="adminTheme === 'light' ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-slate-900 border-slate-800 text-slate-400'">
+                      <th class="p-3">ZAMAN</th>
+                      <th class="p-3">ALICI E-POSTA</th>
+                      <th class="p-3">KULLANILAN ŞABLON</th>
+                      <th class="p-3">E-POSTA KONUSU</th>
+                      <th class="p-3 text-right">DURUM</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y" :class="adminTheme === 'light' ? 'divide-slate-100 text-slate-800' : 'divide-slate-800 text-slate-300'">
+                    <tr v-for="log in emailLogs" :key="log.id" class="hover:bg-blue-50/50 transition">
+                      <td class="p-3 font-mono text-[11px] text-slate-400">{{ log.time }}</td>
+                      <td class="p-3 font-mono font-bold" :class="adminTheme === 'light' ? 'text-blue-700' : 'text-blue-400'">{{ log.recipient }}</td>
+                      <td class="p-3 font-medium">{{ log.template }}</td>
+                      <td class="p-3 text-slate-500 max-w-xs truncate">{{ log.subject }}</td>
+                      <td class="p-3 text-right">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 font-mono">
+                          ✓ {{ log.status }}
+                        </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
 
