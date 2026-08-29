@@ -41,27 +41,18 @@ const platformLinks = [
 ]
 
 const companyLinks = [
-  { label: "Hakkımızda", to: "/sozlesmeler?tab=hakkimizda" },
-  { label: "Kariyer", to: "/sozlesmeler?tab=kariyer" },
-  { label: "Blog", to: "/sozlesmeler?tab=blog" },
-  { label: "Basın Odası", to: "/sozlesmeler?tab=basin" },
-  { label: "İletişim", to: "/yardim" },
-  { label: "İş Ortaklığı Programı", to: "/sozlesmeler?tab=is-ortakligi" }
+  { label: "Hakkımızda & Vizyon", to: "/sozlesmeler?tab=hakkimizda" },
+  { label: "Firma Doğrulama (KYC)", to: "/firma-dogrulama" },
+  { label: "Pazar Yeri & İlanlar", to: "/pazar-yeri" },
+  { label: "Müşteri Hizmetleri & İletişim", to: "/yardim" }
 ]
+
 const legalLinks = [
-  { label: "Kullanım Şartları (MSA)", to: "/sozlesmeler?tab=kullanim" },
-  { label: "Ön Bilgilendirme Formu", to: "/sozlesmeler?tab=on-bilgilendirme" },
-  { label: "Mesafeli Satış & Abonelik", to: "/sozlesmeler?tab=mesafeli-satis" },
-  { label: "İptal ve İade Koşulları", to: "/sozlesmeler?tab=iptal-iade" },
-  { label: "Teslimat ve Dijital İfa", to: "/sozlesmeler?tab=teslimat" },
-  { label: "Gizlilik & Ticari Sır", to: "/sozlesmeler?tab=gizlilik" },
-  { label: "KVKK Aydınlatma & DPA", to: "/sozlesmeler?tab=kvkk" },
-  { label: "İhale ve Satın Alma Kuralları", to: "/sozlesmeler?tab=ihale-kurallari" },
-  { label: "Çerez Politikası", to: "/sozlesmeler?tab=cerezler" },
-  { label: "Tedarikçi KYC & Uyum", to: "/sozlesmeler?tab=tedarikci-uyum" },
-  { label: "SLA Taahhüdü (%99.9)", to: "/sozlesmeler?tab=sla" },
-  { label: "Bilgi Güvenliği (ISO 27001)", to: "/sozlesmeler?tab=bilgi-guvenligi" },
-  { label: "Escrow Güvenli Havuz", to: "/sozlesmeler?tab=escrow" }
+  { label: "Kullanım Şartları & Hizmet Sözleşmesi", to: "/sozlesmeler?tab=kullanim" },
+  { label: "Gizlilik & KVKK Aydınlatma Metni", to: "/sozlesmeler?tab=gizlilik" },
+  { label: "Mesafeli Satış & Abonelik Sözleşmesi", to: "/sozlesmeler?tab=mesafeli-satis" },
+  { label: "B2B İhale ve Satın Alma Kuralları", to: "/sozlesmeler?tab=ihale-kurallari" },
+  { label: "Çerez (Cookie) Politikası", to: "/sozlesmeler?tab=cerezler" }
 ]
 </script>
 
@@ -176,9 +167,8 @@ const legalLinks = [
         <div class="md:col-span-3 flex flex-col gap-3 text-left">
           <h4 class="text-xs font-black uppercase text-blue-900 tracking-wider flex items-center gap-1">
             <span>HUKUKİ & SÖZLEŞMELER</span>
-            <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 font-mono">13 Tab</span>
           </h4>
-          <div class="grid grid-cols-1 gap-1.5 text-xs font-medium text-slate-700">
+          <div class="grid grid-cols-1 gap-2 text-xs font-medium text-slate-700">
             <NuxtLink v-for="item in legalLinks" :key="item.to" :to="item.to" class="hover:text-blue-600 transition-colors flex items-center gap-1.5">
               <span class="text-blue-600 text-[10px]">▪</span>
               <span>{{ item.label }}</span>
@@ -234,21 +224,15 @@ const legalLinks = [
       <div class="flex flex-col lg:flex-row items-center justify-between gap-6 text-[10px] text-slate-400 font-medium tracking-wide">
         <div>© 2026 İhaleciBurada.com. Tüm Hakları Saklıdır.</div>
         <div class="flex flex-wrap gap-x-4 gap-y-2 justify-center lg:justify-end">
-          <NuxtLink to="/sozlesmeler?tab=on-bilgilendirme" class="hover:text-blue-600 transition-colors font-bold text-amber-600">Ön Bilgilendirme Formu</NuxtLink>
+          <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors">Kullanım Şartları</NuxtLink>
           <span class="text-slate-300">•</span>
-          <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-blue-600 transition-colors font-bold text-blue-700">Mesafeli Satış</NuxtLink>
+          <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors">Gizlilik & KVKK</NuxtLink>
           <span class="text-slate-300">•</span>
-          <NuxtLink to="/sozlesmeler?tab=iptal-iade" class="hover:text-blue-600 transition-colors font-bold text-emerald-600">İptal ve İade</NuxtLink>
+          <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-blue-600 transition-colors font-bold text-blue-700">Mesafeli Satış & Abonelik</NuxtLink>
           <span class="text-slate-300">•</span>
-          <NuxtLink to="/sozlesmeler?tab=teslimat" class="hover:text-blue-600 transition-colors">Teslimat</NuxtLink>
+          <NuxtLink to="/sozlesmeler?tab=ihale-kurallari" class="hover:text-blue-600 transition-colors">B2B İhale Kuralları</NuxtLink>
           <span class="text-slate-300">•</span>
-          <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-600 transition-colors">Kullanım Koşulları</NuxtLink>
-          <span class="text-slate-300">•</span>
-          <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-600 transition-colors">Gizlilik</NuxtLink>
-          <span class="text-slate-300">•</span>
-          <NuxtLink to="/sozlesmeler?tab=kvkk" class="hover:text-blue-600 transition-colors">KVKK</NuxtLink>
-          <span class="text-slate-300">•</span>
-          <NuxtLink to="/sozlesmeler?tab=escrow" class="hover:text-blue-600 transition-colors">Escrow</NuxtLink>
+          <NuxtLink to="/sozlesmeler?tab=cerezler" class="hover:text-blue-600 transition-colors">Çerezler</NuxtLink>
         </div>
       </div>
     </div>

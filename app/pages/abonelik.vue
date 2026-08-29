@@ -764,34 +764,24 @@ function completeCheckout() {
 
           <!-- Modal Footer with PayTR & iyzico Required Checkboxes -->
           <div class="p-5 bg-slate-50 border-t border-slate-100 space-y-3 text-left">
-            <div v-if="!showSuccessScreen" class="space-y-1.5 text-[10px] text-slate-600 font-medium">
-              <!-- Checkbox 1: Ön Bilgilendirme Formu -->
-              <div class="flex items-start gap-2">
-                <input v-model="preInfoApproved" type="checkbox" id="modal-pre-info-check" class="mt-0.5 rounded border-slate-300 text-blue-600 cursor-pointer" />
-                <label for="modal-pre-info-check" class="cursor-pointer">
-                  <NuxtLink to="/sozlesmeler?tab=on-bilgilendirme" target="_blank" class="text-blue-600 underline font-bold">
-                    Ön Bilgilendirme Formu
-                  </NuxtLink>'nu okudum ve kabul ediyorum.
-                </label>
-              </div>
-
-              <!-- Checkbox 2: Mesafeli Satış Sözleşmesi -->
+            <div v-if="!showSuccessScreen" class="space-y-2 text-[10px] text-slate-600 font-medium">
+              <!-- Checkbox 1: Mesafeli Satış & Abonelik Sözleşmesi (Ön Bilgilendirme ve İptal/İade Dahil) -->
               <div class="flex items-start gap-2">
                 <input v-model="distanceSalesApproved" type="checkbox" id="modal-distance-check" class="mt-0.5 rounded border-slate-300 text-blue-600 cursor-pointer" />
                 <label for="modal-distance-check" class="cursor-pointer">
                   <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" target="_blank" class="text-blue-600 underline font-bold">
-                    Mesafeli Satış ve Abonelik Sözleşmesi
-                  </NuxtLink>'ni okudum ve onaylıyorum.
+                    Mesafeli Satış, Ön Bilgilendirme ve İptal/İade Sözleşmesi
+                  </NuxtLink>'ni okudum ve tüm şartları onaylıyorum.
                 </label>
               </div>
 
-              <!-- Checkbox 3: İptal ve İade Koşulları -->
+              <!-- Checkbox 2: Gizlilik ve KVKK Aydınlatma Metni -->
               <div class="flex items-start gap-2">
-                <input v-model="refundPolicyApproved" type="checkbox" id="modal-refund-check" class="mt-0.5 rounded border-slate-300 text-blue-600 cursor-pointer" />
-                <label for="modal-refund-check" class="cursor-pointer">
-                  <NuxtLink to="/sozlesmeler?tab=iptal-iade" target="_blank" class="text-blue-600 underline font-bold">
-                    İptal, İade ve Cayma Koşulları Politikası
-                  </NuxtLink>'nı okudum ve kabul ediyorum.
+                <input v-model="preInfoApproved" type="checkbox" id="modal-privacy-check" class="mt-0.5 rounded border-slate-300 text-blue-600 cursor-pointer" />
+                <label for="modal-privacy-check" class="cursor-pointer">
+                  <NuxtLink to="/sozlesmeler?tab=gizlilik" target="_blank" class="text-blue-600 underline font-bold">
+                    Gizlilik Politikası ve KVKK Aydınlatma Metni
+                  </NuxtLink>'ni okudum ve kabul ediyorum.
                 </label>
               </div>
             </div>

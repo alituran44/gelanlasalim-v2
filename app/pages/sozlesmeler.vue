@@ -5,22 +5,14 @@ import {
   FileText, 
   Shield, 
   Info, 
-  Briefcase, 
-  Award, 
-  BookOpen, 
   ArrowLeft, 
   Printer, 
-  Download, 
-  Lock, 
-  CheckCircle2, 
   Scale, 
   Gavel, 
   Cookie as CookieIcon, 
-  UserCheck, 
-  Server, 
   ShieldCheck 
 } from 'lucide-vue-next'
-import { locale, detectLocale } from '~/composables/useLocale'
+import { detectLocale } from '~/composables/useLocale'
 
 definePageMeta({
   layout: 'public'
@@ -29,38 +21,38 @@ definePageMeta({
 const route = useRoute()
 const router = useRouter()
 
-type TabKey = 
-  | 'hakkimizda' 
-  | 'kvkk' 
+export type TabKey = 
   | 'kullanim' 
   | 'gizlilik' 
-  | 'ihale-kurallari'
   | 'mesafeli-satis'
-  | 'on-bilgilendirme'
-  | 'iptal-iade'
-  | 'teslimat'
+  | 'ihale-kurallari'
   | 'cerezler'
-  | 'tedarikci-uyum'
-  | 'sla'
-  | 'bilgi-guvenligi'
-  | 'escrow'
-  | 'kariyer' 
-  | 'is-ortakligi' 
-  | 'blog'
-  | 'basin'
+  | 'hakkimizda'
 
 const activeTab = ref<TabKey>('kullanim')
+
+function normalizeTab(rawTab: string | undefined): TabKey {
+  if (!rawTab) return 'kullanim'
+  const t = rawTab.toLowerCase()
+  if (t === 'kullanim' || t === 'sla' || t === 'tedarikci-uyum') return 'kullanim'
+  if (t === 'gizlilik' || t === 'kvkk' || t === 'bilgi-guvenligi') return 'gizlilik'
+  if (t === 'mesafeli-satis' || t === 'on-bilgilendirme' || t === 'iptal-iade' || t === 'teslimat') return 'mesafeli-satis'
+  if (t === 'ihale-kurallari' || t === 'escrow') return 'ihale-kurallari'
+  if (t === 'cerezler' || t === 'cookies') return 'cerezler'
+  if (t === 'hakkimizda' || t === 'kariyer' || t === 'is-ortakligi' || t === 'blog' || t === 'basin') return 'hakkimizda'
+  return 'kullanim'
+}
 
 onMounted(() => {
   detectLocale()
   if (route.query.tab) {
-    activeTab.value = route.query.tab as TabKey
+    activeTab.value = normalizeTab(route.query.tab as string)
   }
 })
 
 watch(() => route.query.tab, (newTab) => {
   if (newTab) {
-    activeTab.value = newTab as TabKey
+    activeTab.value = normalizeTab(newTab as string)
   }
 })
 
@@ -148,178 +140,70 @@ function printDocument() {
         <!-- Sidebar Navigation (4 cols) -->
         <div class="lg:col-span-4 space-y-4">
           
-          <!-- Legal Contracts Group -->
-          <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-1 shadow-xs">
+          <!-- Legal Contracts Group (5 Essential Tabs) -->
+          <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-1.5 shadow-xs">
             <div class="text-[10px] font-black text-blue-900 uppercase tracking-widest px-3 mb-2 flex items-center gap-1.5">
               <Scale :size="13" class="text-blue-600" />
-              <span>{{ 'RESMİ SÖZLEŞMELER & HUKUKİ EVRAKLAR' }}</span>
+              <span>RESMİ SÖZLEŞMELER (5 TEMEL BELGE)</span>
             </div>
 
             <button 
               @click="setTab('kullanim')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'kullanim' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'kullanim' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
             >
-              <FileText :size="14" />
-              <span>{{ '1. Kullanım Şartları & Hizmet Sözleşmesi' }}</span>
+              <FileText :size="15" />
+              <span>1. Kullanım Şartları & Hizmet Sözleşmesi</span>
             </button>
 
             <button 
               @click="setTab('gizlilik')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'gizlilik' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'gizlilik' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
             >
-              <Shield :size="14" />
-              <span>{{ '2. Gizlilik & Veri Güvenliği Politikası' }}</span>
-            </button>
-
-            <button 
-              @click="setTab('kvkk')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'kvkk' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
-            >
-              <ShieldCheck :size="14" />
-              <span>{{ '3. KVKK Aydınlatma & Veri İşleme (DPA)' }}</span>
-            </button>
-
-            <button 
-              @click="setTab('on-bilgilendirme')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'on-bilgilendirme' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
-            >
-              <FileText :size="14" class="text-amber-500" />
-              <span>{{ '4. Ön Bilgilendirme Formu' }}</span>
+              <Shield :size="15" />
+              <span>2. Gizlilik Politikası & KVKK Aydınlatma</span>
             </button>
 
             <button 
               @click="setTab('mesafeli-satis')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'mesafeli-satis' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'mesafeli-satis' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
             >
-              <CheckCircle2 :size="14" />
-              <span>{{ '5. Mesafeli Satış & Abonelik Sözleşmesi' }}</span>
-            </button>
-
-            <button 
-              @click="setTab('iptal-iade')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'iptal-iade' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
-            >
-              <Award :size="14" class="text-emerald-500" />
-              <span>{{ '6. İptal, İade ve Cayma Koşulları' }}</span>
-            </button>
-
-            <button 
-              @click="setTab('teslimat')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'teslimat' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
-            >
-              <Server :size="14" class="text-blue-500" />
-              <span>{{ '7. Teslimat ve Dijital İfa Politikası' }}</span>
+              <ShieldCheck :size="15" />
+              <span>3. Mesafeli Satış & Abonelik Sözleşmesi</span>
             </button>
 
             <button 
               @click="setTab('ihale-kurallari')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'ihale-kurallari' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'ihale-kurallari' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
             >
-              <Gavel :size="14" />
-              <span>{{ '8. B2B Eksiltme & İhale Kuralları' }}</span>
+              <Gavel :size="15" />
+              <span>4. B2B İhale ve Satın Alma Kuralları</span>
             </button>
 
             <button 
               @click="setTab('cerezler')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'cerezler' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'cerezler' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
             >
-              <CookieIcon :size="14" />
-              <span>{{ '9. Çerez Politikası & Takip Şartları' }}</span>
-            </button>
-
-            <button 
-              @click="setTab('tedarikci-uyum')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'tedarikci-uyum' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
-            >
-              <UserCheck :size="14" />
-              <span>{{ '10. Tedarikçi Doğrulama & KYC Beyanı' }}</span>
-            </button>
-
-            <button 
-              @click="setTab('sla')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'sla' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
-            >
-              <Server :size="14" />
-              <span>{{ '11. Servis Seviyesi Taahhüdü (SLA)' }}</span>
-            </button>
-
-            <button 
-              @click="setTab('bilgi-guvenligi')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'bilgi-guvenligi' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
-            >
-              <Lock :size="14" />
-              <span>{{ '12. Bilgi Güvenliği & ISO 27001 Standardı' }}</span>
-            </button>
-
-            <button 
-              @click="setTab('escrow')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'escrow' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
-            >
-              <ShieldCheck :size="14" />
-              <span>{{ '13. Güvenli Havuz (Escrow) & Ödeme Sözleşmesi' }}</span>
+              <CookieIcon :size="15" />
+              <span>5. Çerez (Cookie) Politikası</span>
             </button>
           </div>
 
-          <!-- Corporate Info Group -->
+          <!-- Corporate Info Group (1 About Tab) -->
           <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-1 shadow-xs">
-            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 mb-2">{{ 'KURUMSAL & GENEL BİLGİ' }}</div>
+            <div class="text-[10px] font-black text-slate-400 uppercase tracking-widest px-3 mb-2">KURUMSAL BİLGİ</div>
             
             <button 
               @click="setTab('hakkimizda')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'hakkimizda' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'hakkimizda' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
             >
-              <Info :size="14" />
-              <span>{{ 'Hakkımızda & Vizyon' }}</span>
-            </button>
-
-            <button 
-              @click="setTab('kariyer')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'kariyer' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
-            >
-              <Briefcase :size="14" />
-              <span>{{ 'Kariyer Fırsatları' }}</span>
-            </button>
-
-            <button 
-              @click="setTab('is-ortakligi')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'is-ortakligi' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
-            >
-              <Award :size="14" />
-              <span>{{ 'İş Ortaklığı & Komisyon' }}</span>
-            </button>
-
-            <button 
-              @click="setTab('blog')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'blog' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
-            >
-              <BookOpen :size="14" />
-              <span>{{ 'Blog & Makaleler' }}</span>
-            </button>
-
-            <button 
-              @click="setTab('basin')"
-              class="w-full flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-bold transition text-left"
-              :class="activeTab === 'basin' ? 'bg-blue-900 text-white' : 'text-slate-700 hover:bg-slate-100'"
-            >
-              <FileText :size="14" />
-              <span>{{ 'Basın Odası & Medya Kiti' }}</span>
+              <Info :size="15" />
+              <span>Hakkımızda & Vizyonumuz</span>
             </button>
           </div>
         </div>
@@ -330,10 +214,10 @@ function printDocument() {
           <!-- Document Header Tag -->
           <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
             <span class="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100">
-              OFFICIAL B2B LEGAL DOCUMENT · REVISION 2026.08
+              RESMİ HUKUKİ METİN · YÜRÜRLÜK TARİHİ: 2026.08
             </span>
             <span class="text-[11px] font-mono font-bold text-slate-400">
-              MERSİS: 0392094182900018
+              MERSİS: 0470085421000001
             </span>
           </div>
 
@@ -643,296 +527,115 @@ function printDocument() {
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — TARAFLAR</h3>
-                <p>1.1. <strong>SATICI (Hizmet Sağlayıcı):</strong> İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş. (Adres: İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale | VKN: 4700854210 | MERSİS: 0470085421000001 | Tel: 0850 840 86 95 | E-posta: ihalcib@gmail.com)</p>
-                <p>1.2. <strong>ALICI (Kurumsal Abone):</strong> Platform üzerinden elektronik ortamda sipariş oluşturan, fatura bilgilerini beyan eden ve ödeme yapan tüzel kişi veya tacir müşteri.</p>
-              </section>
-
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — SÖZLEŞMENİN KONUSU VE KAPSAMI</h3>
-                <p>2.1. İşbu Sözleşme, ALICI\'nın SATICI\'ya ait https://ihaleciburada.com internet sitesi üzerinden elektronik ortamda siparişini verdiği, nitelikleri ve satış fiyatı belirtilen kurumsal B2B e-ihale ve ihale ve satın alma platformu abonelik hizmetinin satışı, ödemesi, ifası ve teslimine ilişkin tarafların hak ve yükümlülüklerini düzenler.</p>
-              </section>
-
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — ÖDEME YÖNTEMLERİ, LİSANSLI ÖDEME KURULUŞLARI VE GÜVENLİK</h3>
-                <p>3.1. Ödemeler; TCMB ve BDDK lisanslı ödeme kuruluşları (PayTR Ödeme ve Elektronik Para Kuruluşu A.Ş. ve iyzico / İyzi Ödeme ve Elektronik Para Hizmetleri A.Ş.) altyapısı üzerinden 256-bit SSL şifrelemeli 3D Secure güvenli ödeme protokolüyle gerçekleştirilir.</p>
-                <p>3.2. SATICI hiçbir şart altında ALICI\'nın kredi kartı numarasını, son kullanma tarihini veya CVV kodunu sunucularında tutmaz veya saklamaz.</p>
-              </section>
-
-              <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — ANINDA DİJİTAL İFA VE FATURALANDIRMA</h3>
-                <p>4.1. Hizmet dijital ortamda anında ifa edilir. Ödemenin başarıyla tamamlanmasıyla birlikte kurumsal panel erişimi anında aktif hale gelir.</p>
-                <p>4.2. Sipariş sırasında ALICI tarafından beyan edilen Vergi Dairesi, VKN / TCKN ve Ticaret Unvanı bilgileri esas alınarak 213 sayılı VUK uyarınca e-Fatura / e-Arşiv faturası düzenlenir ve e-posta ile tebliğ edilir.</p>
-              </section>
-
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 5 — UYUŞMAZLIKLARIN ÇÖZÜMÜ VE YETKİLİ MAHKEME</h3>
-                <p>5.1. İşbu Sözleşme\'den doğabilecek her türlü ticari ve hukuki uyuşmazlıkta Türk Hukuku uygulanır. İstanbul ve Çanakkale / Balıkesir Mahkemeleri ve İcra Daireleri münhasıran yetkilidir.</p>
-              </section>
-            </div>
-          </article>
-
-          <!-- 6. İPTAL, İADE VE CAYMA KOŞULLARI (CANCELLATION & REFUND POLICY) -->
-          <article v-if="activeTab === 'iptal-iade'" class="space-y-6">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="px-3 py-1 bg-emerald-50 text-emerald-800 font-mono text-xs font-bold rounded-lg border border-emerald-200">PAYTR & İYZİCO İADE ŞARTLARI</span>
-              <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">ŞEFFAF GERİ ÖDEME SÜRECİ</span>
-              <span class="text-xs text-slate-400">Yürürlük: 2026.08</span>
-            </div>
-
-            <h1 class="text-2xl font-black tracking-tight text-slate-900">
-              {{ '6. İptal, İade ve Cayma Koşulları Politikası' }}
-            </h1>
-            
-            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-              {{ 'İhaleciBurada B2B Elektronik İhale Platformu üzerinden satın alınan kurumsal abonelik paketleri, yazılım lisansları ve dijital hizmetlerin iptal, iade ve geri ödeme prosedürlerine ilişkin yasal bilgilendirme metnidir.' }}
-            </p>
-
-            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — DİJİTAL HİZMETLERDE CAYMA VE İADE HAKKI ESASLARI</h3>
-                <p>1.1. İhaleciBurada platformu üzerinden sunulan hizmetler; kurumsal üyelik, ihale açma, teklif verme ve dijital analitik yazılım kullanım haklarını kapsayan gayrimaddi dijital hizmetlerdir.</p>
-                <p>1.2. <strong>Yasal İstisna:</strong> 29188 sayılı Resmi Gazete\'de yayımlanan Mesafeli Sözleşmeler Yönetmeliği\'nin 15. Maddesinin 1. Fıkrasının (ğ) bendi uyarınca; <em>"Elektronik ortamda anında ifa edilen hizmetler veya tüketiciye anında teslim edilen gayrimaddi mallara ilişkin sözleşmeler"</em> cayma hakkının istisnaları arasında yer almaktadır. Kullanıcı hesabı aktive edilip yazılım araçları kullanıma açıldıktan sonra re\'sen cayma hakkı kullanılamaz.</p>
-              </section>
-
-              <section class="space-y-2 bg-emerald-50/60 p-4 rounded-xl border border-emerald-200">
-                <h3 class="font-bold text-emerald-950 text-sm">MADDE 2 — İADE YAPILABİLECEK HALLER VE KOŞULLAR</h3>
-                <p>2.1. <strong>Mükerrer / Hatalı Çekimler:</strong> Sistem veya banka kaynaklı teknik nedenlerle aynı sipariş için birden fazla tahsilat yapılması halinde, mükerrer tahsil edilen tutar herhangi bir kesinti yapılmaksızın 24 saat içinde derhal ve re\'sen iade edilir.</p>
-                <p>2.2. <strong>Teknik Arıza ve Hizmetin Başlatılamaması:</strong> Ödeme yapılmasına rağmen platform kaynaklı bir arıza nedeniyle kullanıcının hesabının 48 saat içinde aktif edilememesi ve sorunun giderilememesi halinde, abonenin talebi üzerine ödenen tutarın %100\'ü kesintisiz iade edilir.</p>
-                <p>2.3. <strong>Henüz Kullanılmamış ve Aktive Edilmemiş Paketler:</strong> Satın alma anından itibaren 14 gün içinde sisteme hiç giriş yapılmamış, hiçbir ihale açılmamış veya teklif verilmemiş olması şartıyla yazılı başvuru üzerine iade değerlendirmeye alınır.</p>
-              </section>
-
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — İPTAL VE İADE BAŞVURU SÜRECİ</h3>
-                <p>3.1. İade ve iptal talepleri, sipariş numarası ve fatura bilgileri belirtilerek <strong>ihalcib@gmail.com</strong> e-posta adresine veya <strong>0850 840 86 95</strong> çağrı merkezine yazılı olarak iletilmelidir.</p>
-                <p>3.2. Müşteri hizmetleri ekibimiz başvuruyu en geç 2 (iki) iş günü içinde inceleyerek sonucu yazılı olarak bildirir.</p>
-              </section>
-
-              <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — GERİ ÖDEME SÜRESİ VE PARANIN HESABA GEÇMESİ</h3>
-                <p>4.1. Onaylanan iadeler, ödemenin yapıldığı orijinal yöntemle (PayTR / iyzico Sanal POS veya Banka Havalesi) derhal işleme alınır.</p>
-                <p>4.2. <strong>Kredi Kartı ile Yapılan Ödemeler:</strong> İade işlemi tarafımızdan lisanslı ödeme kuruluşuna anında iletilir. Bankaların işlem süreçlerine bağlı olarak tutar <strong>3 ila 7 iş günü</strong> (bazı bankalarda en geç 14 gün) içinde kart ekstrenize yansır.</p>
-                <p>4.3. <strong>Banka Havalesi / EFT ile Yapılan Ödemeler:</strong> İade onayını takiben <strong>1 ila 3 iş günü</strong> içinde ödemenin geldiği şirkete ait IBAN hesabına aktarılır.</p>
-              </section>
-
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 5 — ABONELİK YENİLEME İPTALİ</h3>
-                <p>5.1. Abone, yönetim paneli üzerinden dilediği zaman bir sonraki döneme ait otomatik yenilemeyi iptal edebilir. İptal işlemi yapıldığında mevcut paket süresi sonuna kadar kullanım hakkı devam eder, süre bitiminde ise karttan herhangi bir tahsilat yapılmaz.</p>
-              </section>
-            </div>
-          </article>
-
-          <!-- 7. TESLİMAT VE DİJİTAL İFA POLİTİKASI (DELIVERY POLICY) -->
-          <article v-if="activeTab === 'teslimat'" class="space-y-6">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">ANINDA DİJİTAL AKTİVASYON</span>
-              <span class="px-3 py-1 bg-emerald-50 text-emerald-800 font-mono text-xs font-bold rounded-lg border border-emerald-200">SIFIR KARGO BEDELİ</span>
-              <span class="text-xs text-slate-400">Yürürlük: 2026.08</span>
-            </div>
-
-            <h1 class="text-2xl font-black tracking-tight text-slate-900">
-              {{ '7. Teslimat ve Dijital İfa Politikası' }}
-            </h1>
-            
-            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-              {{ 'İhaleciBurada platformu üzerinden satın alınan tüm abonelik ve yazılım lisanslarının teslimat, ifa ve kullanıcıya erişim sağlama koşullarını düzenleyen resmi politikadır.' }}
-            </p>
-
-            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — TESLİMAT ŞEKLİ VE KARGO BİLGİSİ</h3>
-                <p>1.1. İhaleciBurada, tamamen bulut tabanlı bir B2B SaaS (Software as a Service) platformudur. Platformda satılan hiçbir paket için fiziksel kargo teslimatı, kutulu ürün veya kurye gönderimi bulunmamaktadır.</p>
-                <p>1.2. Herhangi bir kargo ücreti, taşıma bedeli veya fiziksel teslimat masrafı tahsil edilmez.</p>
               </section>
 
               <section class="space-y-2 bg-blue-50/60 p-4 rounded-xl border border-blue-200">
-                <h3 class="font-bold text-blue-950 text-sm">MADDE 2 — DİJİTAL İFA VE AKTİVASYON SÜRESİ</h3>
-                <p>2.1. <strong>Kredi Kartı ile Yapılan Ödemelerde:</strong> PayTR veya iyzico 3D Secure ödeme onayının alındığı anda sistem kullanıcının abonelik yetkilerini <strong>anında (0 saniye gecikmeyle)</strong> aktif eder.</p>
-                <p>2.2. <strong>Banka Havalesi / EFT ile Yapılan Ödemelerde:</strong> Banka hesabımıza geçen tutar muhasebe birimimizce teyit edildiği anda (mesai saatlerinde en geç 30 dakika içinde) abonelik aktifleştirilir.</p>
-                <p>2.3. Aktivasyon tamamlandığında kullanıcıya sistemde kayıtlı e-posta ve SMS üzerinden "Aboneliğiniz Aktifleştirildi" bilgilendirmesi gönderilir.</p>
+                <h3 class="font-bold text-blue-950 text-sm">MADDE 3 — ANINDA DİJİTAL İFA VE TESLİMAT</h3>
+                <p>3.1. Hizmet tamamen dijital ortamda sunulmakta olup herhangi bir fiziksel kargo teslimatı veya kargo bedeli bulunmamaktadır.</p>
+                <p>3.2. PayTR / iyzico 3D Secure ödeme onayı alındığı anda veya 1 Aylık Ücretsiz Deneme başlatıldığında, abonenin kullanıcı hesabı <strong>anında (0 saniye gecikmeyle)</strong> aktif edilir.</p>
+                <p>3.3. E-Fatura / e-Arşiv faturası en geç 7 iş günü içerisinde düzenlenerek abonenin e-posta adresine iletilir.</p>
               </section>
 
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — FATURA TESLİMATI</h3>
-                <p>3.1. Yapılan tüm ödemelere ilişkin e-Fatura / e-Arşiv faturaları, Gelir İdaresi Başkanlığı (GİB) standartlarına uygun olarak en geç yedi (7) iş günü içerisinde düzenlenerek abonenin kurumsal e-posta adresine iletilir.</p>
-                <p>3.2. Abone dilediği zaman yönetim panelindeki "Abonelik ve Faturalarım" sekmesinden geçmiş faturalarını PDF olarak indirebilir.</p>
-              </section>
-            </div>
-          </article>
-
-          <!-- 6. ÇEREZ POLİTİKASI (COOKIE POLICY) -->
-          <article v-if="activeTab === 'cerezler'" class="space-y-6">
-            <h1 class="text-2xl font-black tracking-tight text-slate-900">
-              {{ '6. Çerez (Cookie) ve Oturum Güvenliği Politikası' }}
-            </h1>
-
-            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 1 — ÇEREZLERİN KULLANIM AMACI VE MEKANİZMASI</h3>
-                <p>1.1. Çerezler (Cookies), platformumuzu ziyaret ettiğinizde tarayıcınız aracılığıyla cihazınıza kaydedilen küçük metin dosyalarıdır. Çerezler; oturum güvenliğinin sağlanması, canlı websocket bağlantısının kopmaması, dil ve tema tercihlerinizin hatırlanması ve sistem hızının optimize edilmesi amacıyla kullanılır.</p>
-              </section>
-
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 2 — KULLANILAN ÇEREZ KATEGORİLERİ</h3>
-                <p>2.1. <strong>Zorunlu ve Güvenlik Çerezleri:</strong> Kullanıcı girişi, 2FA kimlik doğrulama tokenları ve CSRF (Cross-Site Request Forgery) saldırı önleme mekanizmaları için teknik olarak şarttır; kapatılamaz.</p>
-                <p>2.2. <strong>İşlevsellik Çerezleri:</strong> Dil seçimi (TR/EN), pazar yeri filtreleme tercihleri ve ihale listeleme görünüm ayarlarını depolar.</p>
-                <p>2.3. <strong>Performans ve Hata Analiz Çerezleri:</strong> Sayfa yükleme hızlarını, websocket gecikme sürelerini ve sunucu yanıt sürelerini anonim olarak ölçümleyerek kesintisiz ihale altyapısı sağlar.</p>
-              </section>
-
-              <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 3 — ÇEREZ YÖNETİMİ VE TEKNİK SORUMSUZLUK</h3>
-                <p>3.1. Tarayıcı ayarlarınızdan (Chrome, Edge, Safari, Firefox) çerez izinlerini dilediğiniz an değiştirebilir, silebilir veya engelleyebilirsiniz.</p>
-                <p>3.2. Zorunlu oturum çerezlerinin kullanıcı tarafından engellenmesi durumunda ihale paneline giriş yapılamamasından, ihale ve satın alma fiyatlarının anlık güncellenememesinden veya teklif iletim gecikmelerinden Platform sorumlu tutulamaz.</p>
-              </section>
-            </div>
-          </article>
-
-          <!-- 7. TEDARİKÇİ DOĞRULAMA (SUPPLIER KYC CHARTER) -->
-          <article v-if="activeTab === 'tedarikci-uyum'" class="space-y-6">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">MAVİ ONAY ROZETİ</span>
-              <span class="px-3 py-1 bg-amber-50 text-amber-800 font-mono text-xs font-bold rounded-lg border border-amber-200">KEFALET / GARANTİ DEĞİLDİR</span>
-              <span class="text-xs text-slate-400">Revizyon: 2026.08</span>
-            </div>
-
-            <h1 class="text-2xl font-black tracking-tight text-slate-900">
-              {{ '7. Tedarikçi Kalifikasyonu, Uyum ve KYC Beyannamesi' }}
-            </h1>
-
-            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">STANDART 1 — ZORUNLU KURUMSAL BELGELER VE ŞEKLİ DOĞRULAMA</h3>
-                <p>1.1. İhaleciBurada'da "Mavi Onaylı Tedarikçi" rozeti almak için firmaların şu resmi evrakları sisteme yüklemesi şarttır:</p>
-                <ul class="list-disc pl-5 space-y-1 text-slate-600">
-                  <li>Son takvim yılına ait onaylı Vergi Levhası</li>
-                  <li>Ticaret Sicil Gazetesi kuruluş ve son pay/temsil dağılım nüshası</li>
-                  <li>Şirket yetkililerine ait Noter Onaylı İmza Sirküleri</li>
-                  <li>Bağlı bulunulan Ticaret veya Sanayi Odası Faaliyet Belgesi (Son 6 ay)</li>
-                </ul>
-                <p>1.2. Sahte, süresi dolmuş veya tahrif edilmiş evrak sunan firmaların üyelikleri derhal iptal edilir ve TCK Madde 204 uyarınca Cumhuriyet Başsavcılığı'na suç duyurusunda bulunulur.</p>
-              </section>
-
-              <section class="space-y-2 bg-amber-50/60 p-4 rounded-xl border border-amber-200">
-                <h3 class="font-bold text-amber-950 text-sm">STANDART 2 — MAVİ ONAY ROZETİNİN HUKUKİ NİTELİĞİ (KRİTİK SORUMSUZLUK BEYANI)</h3>
-                <p>2.1. Platform üzerindeki <strong>"Mavi Onay Rozeti"</strong>, yalnızca firmanın ibraz ettiği resmi evrakların şeklen sisteme yüklendiğini ve vergi dairesi kaydının faal olduğunu gösterir.</p>
-                <p>2.2. Mavi Rozet; tedarikçi firmanın mali gücüne, iflas etmeyeceğine, malı ayıpsız teslim edeceğine, borçlarını ödeyeceğine veya ticari güvenilirliğine Şirket\'in <strong>kefil, garantör veya sigortacı olduğu anlamına KESİNLİKLE GELMEZ</strong>.</p>
-                <p>2.3. Alıcı firma, sipariş vermeden ve sözleşme akdetmeden önce Türk Ticaret Kanunu Madde 18/2 uyarınca basiretli bir tacir gibi hareket ederek tedarikçi hakkında kendi istihbaratını ve değerlendirmesini yapmakla yükümlüdür.</p>
-              </section>
-
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">STANDART 3 — İŞ AHLAKI, ÇEVRE VE YASAL UYUM TAAHHÜDÜ</h3>
-                <p>3.1. Tedarikçiler; çocuk işçi çalıştırmama, çevre koruma mevzuatına tam uyum, iş sağlığı ve güvenliği kuralları ile rüşvet/yolsuzlukla mücadele ilkelerine bağlı kalacaklarını peşinen taahhüt eder.</p>
-                <p>3.2. Sahte ürün, standart dışı malzeme veya şartnameye aykırı sevkiyat yapan tedarikçilerin Mavi Rozeti derhal iptal edilir ve sistem geneline ihlal kaydı işlenir.</p>
-              </section>
-            </div>
-          </article>
-
-          <!-- 8. SLA (SERVICE LEVEL AGREEMENT) -->
-          <article v-if="activeTab === 'sla'" class="space-y-6">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="px-3 py-1 bg-emerald-50 text-emerald-800 font-mono text-xs font-bold rounded-lg border border-emerald-200">%99.9 UPTIME TAAHHÜDÜ</span>
-              <span class="px-3 py-1 bg-slate-100 text-slate-800 font-mono text-xs font-bold rounded-lg border border-slate-200">YALNIZCA HİZMET KREDİSİ TAZMİNİ</span>
-              <span class="text-xs text-slate-400">SLA Sürüm: 2026.08</span>
-            </div>
-
-            <h1 class="text-2xl font-black tracking-tight text-slate-900">
-              {{ '8. Servis Seviyesi Taahhüdü ve Sistem Kesintisizliği (SLA)' }}
-            </h1>
-
-            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 1 — KAPSAM VE %99.9 ERİŞİLEBİLİRLİK TAAHHÜDÜ</h3>
-                <p>1.1. İhaleciBurada, e-ihale motorları, ihale ve satın alma teklif kabul sunucuları ve Escrow API ağ geçitlerinin aylık takvim bazında en az <strong>%99.9</strong> kesintisiz çalışacağını taahhüt eder.</p>
-                <p>1.2. <strong>Kesinti Hesabına Dahil Edilmeyen Haller:</strong> Önceden duyurulan planlı gece bakımları (01:00 - 05:00), telekomünikasyon omurga arızaları, genel internet erişim problemleri, siber saldırılar (DDoS) ve mücbir sebep halleri SLA kesinti süresine dahil edilmez.</p>
-              </section>
-
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 2 — HATA SINIFLANDIRMASI VE MÜDAHALE SÜRELERİ</h3>
-                <p>2.1. <strong>Kritik Seviye 1 (Canlı eksiltme motorunun durması veya ödeme geçidi hatası):</strong> Müdahale süresi &lt; 15 dakika, hedef çözüm süresi &lt; 2 saat.</p>
-                <p>2.2. <strong>Yüksek Seviye 2 (Tekil sayfa, filtre veya raporlama arızası):</strong> Müdahale süresi &lt; 1 saat, hedef çözüm süresi &lt; 6 saat.</p>
-                <p>2.3. <strong>Normal Seviye 3 (Genel soru, kılavuz ve kullanım desteği):</strong> Mesai saatleri içinde &lt; 2 saat içinde geri dönüş.</p>
-              </section>
-
-              <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 3 — SLA İHLALİNDE TEK TAZMİNAT: HİZMET KREDİSİ (NAKİT İADE YAPILMAZ)</h3>
-                <p>3.1. Mücbir sebepler hariç aylık erişilebilirlik oranının %99.0\'ın altına düşmesi durumunda Şirket nakit tazminat ödemez; yalnızca abonenin bir sonraki fatura dönemine mahsuben %10 Hizmet Kredisi tanımlar.</p>
-                <p>3.2. Kesintiden doğduğu iddia edilen kar kaybı, kaçırılan ihale fırsatı veya ticari zararlar için hiçbir tazminat talebinde bulunulamaz.</p>
-              </section>
-            </div>
-          </article>
-
-          <!-- 9. BİLGİ GÜVENLİĞİ POLİTİKASI (INFO SECURITY) -->
-          <article v-if="activeTab === 'bilgi-guvenligi'" class="space-y-6">
-            <h1 class="text-2xl font-black tracking-tight text-slate-900">
-              {{ '9. Bilgi Güvenliği Politikası (ISO/IEC 27001:2022 Standartları)' }}
-            </h1>
-
-            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">İLKE 1 — BGYS STANDARTLARI VE VERİ ŞİFRELEME</h3>
-                <p>1.1. İhaleciBurada platform altyapısı, ISO/IEC 27001:2022 uluslararası bilgi güvenliği yönetim sistemi standartlarına tam uyumlu olarak işletilmektedir.</p>
-                <p>1.2. Veritabanı ve yedekleme sistemleri AES-256 algoritmasıyla şifrelenir. API ve web trafiği uçtan uca TLS 1.3 protokolleri ile korunur.</p>
-                <p>1.3. Sistem bağımsız yetkili siber güvenlik firmaları tarafından periyodik olarak sızma testlerine (pentest) tabi tutulur.</p>
-              </section>
-
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">İLKE 2 — ERİŞİM KONTROLÜ, 2FA VE KULLANICI YÜKÜMLÜLÜĞÜ</h3>
-                <p>2.1. Tüm kurumsal panel girişlerinde SMS OTP ve e-Devlet kimlik doğrulama katmanları desteklenmektedir.</p>
-                <p>2.2. Kullanıcı, 2FA kodlarını, şifrelerini ve API anahtarlarını gizli tutmakla yükümlüdür. Yetkisiz giriş şüphesi durumunda derhal Platform\'a yazılı bildirim yapılmalıdır.</p>
-              </section>
-
-              <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm">İLKE 3 — SİBER OLAY BİLDİRİMİ VE USOM/KVKK ENTEGRASYONU</h3>
-                <p>3.1. Olası bir siber güvenlik olayı tespit edildiğinde, mevzuatın öngördüğü yasal süreler içinde Ulusal Siber Olaylara Müdahale Merkezi (USOM) ve Kişisel Verileri Koruma Kurumu\'na (KVKK) resmi bildirimler yapılır.</p>
-              </section>
-            </div>
-          </article>
-
-          <!-- 10. GÜVENLİ HAVUZ (ESCROW) VE PAZARYERİ ÖDEME ARACILIK SÖZLEŞMESİ -->
-          <article v-if="activeTab === 'escrow'" class="space-y-6">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="px-3 py-1 bg-emerald-50 text-emerald-800 font-mono text-xs font-bold rounded-lg border border-emerald-200">6493 SAYILI KANUN & TCMB</span>
-              <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">LİSANSLI ÖDEME KURULUŞU GÜVENCESİ</span>
-              <span class="text-xs text-slate-400">Yürürlük: 2026.08</span>
-            </div>
-
-            <h1 class="text-2xl font-black tracking-tight text-slate-900">
-              {{ '10. B2B Pazaryeri Güvenli Havuz (Escrow) ve Ödeme Aracılık Sözleşmesi' }}
-            </h1>
-
-            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               <section class="space-y-2 bg-emerald-50/60 p-4 rounded-xl border border-emerald-200">
-                <h3 class="font-bold text-emerald-950 text-sm">MADDE 1 — PLATFORMUN BANKA OLMADIĞI VURGUSU (TCMB & BDDK KORUMASI)</h3>
-                <p>1.1. Şirket bir banka, finansal kuruluş veya ödeme kuruluşu DEĞİLDİR. Platform mevduat toplamaz, faiz işletmez, kredi vermez ve emanet para tutmaz.</p>
-                <p>1.2. Güvenli Havuz (Escrow) ve Otomatik Para Bölme (Split Payment) işlemleri; 6493 Sayılı Kanun kapsamında TCMB ve BDDK tarafından lisanslanmış yetkili ödeme kuruluşları (PayTR, İyzico vb.) aracılığıyla yürütülür.</p>
+                <h3 class="font-bold text-emerald-950 text-sm">MADDE 4 — CAYMA HAKKI, İADE VE GERİ ÖDEME KOŞULLARI</h3>
+                <p>4.1. <strong>Dijital İfa İstisnası:</strong> Mesafeli Sözleşmeler Yönetmeliği Madde 15/1-ğ uyarınca elektronik ortamda anında ifa edilen gayrimaddi hizmetlerde re'sen cayma hakkı bulunmamaktadır.</p>
+                <p>4.2. <strong>İade Yapılacak Haller:</strong> Mükerrer/hatalı çekimlerde tutar 24 saat içinde kesintisiz iade edilir. Platform kaynaklı arıza nedeniyle hesabın 48 saat aktif edilememesi halinde bedel %100 kesintisiz iade edilir.</p>
+                <p>4.3. <strong>Geri Ödeme Süresi:</strong> Onaylanan iadeler kredi kartına 3-7 iş günü, banka havalesine 1-3 iş günü içinde yansıtılır.</p>
               </section>
 
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — BLOKE, SEVKİYAT VE SERBEST BIRAKMA AŞAMALARI</h3>
-                <p>2.1. <strong>Havuz Bloke Aşaması:</strong> İhalede mutabakat sağlandığında Alıcı ihale bedelini lisanslı havuz hesabına yatırır; tutar lisanslı kuruluş güvencesinde bloke edilir.</p>
-                <p>2.2. <strong>Sevkiyat Aşaması:</strong> Tedarikçi malı şartnameye uygun sevk ederek sevk irsaliyesi/kargo takip belgesini sisteme yükler.</p>
-                <p>2.3. <strong>Mal Kabul ve Hakediş Aktarımı:</strong> Alıcı malı muayene edip sistem üzerinden mal kabul onayını verdiğinde havuzdaki bloke çözülür; platform hizmet aracılık komisyonu kesildikten sonra kalan net hakediş tutarı otomatik olarak Tedarikçinin banka IBAN hesabına aktarılır.</p>
-              </section>
-
-              <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — ONAY SONRASI TAM SORUMSUZLUK VE UYUŞMAZLIK HAKEM HEYETİ</h3>
-                <p>3.1. <strong>Onay Sonrası Sorumsuzluk:</strong> Alıcı mal kabul onayını verdikten sonra blokaj çözülmüş olacağından, sonradan ortaya çıkacak gizli ayıp, eksiklik veya gecikme cezaları nedeniyle Platform\'dan geri ödeme talep edilemez. Alıcı doğrudan Tedarikçi\'ye yasal başvuru yapmalıdır.</p>
-                <p>3.2. <strong>Uyuşmazlık Bildirimi:</strong> Mal kabul onayından önce Alıcı uyuşmazlık bildirirse havuzdaki bloke çözülmez; Platform Escrow Hakem Heyeti teknik inceleme başlatır. Hakem Heyeti kararı yalnızca havuzdaki tutarın idari olarak serbest bırakılması veya iadesine ilişkin olup mahkeme hükmü yerine geçmez.</p>
-              </section>
-
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — VERGİSEL VE FATURA SORUMLULUKLARI</h3>
-                <p>4.1. Satışa konu mal/hizmetin asıl faturası, KDV, tevkifat ve stopaj beyanları münhasıran Tedarikçi ile Alıcı arasındadır. Şirket yalnızca tahsil ettiği aracılık hizmet komisyonu için Tedarikçiye e-Fatura düzenler.</p>
+                <h3 class="font-bold text-slate-900 text-sm">MADDE 5 — ABONELİK YENİLEME VE İPTAL</h3>
+                <p>5.1. Abone, panel üzerinden dilediği an bir sonraki döneme ait otomatik yenilemeyi iptal edebilir. Süre bitimine kadar hakları korunur, ek ücret tahsil edilmez.</p>
               </section>
             </div>
           </article>
 
-          <!-- 11. HAKKIMIZDA & VİZYON -->
-          <article v-if="activeTab === 'hakkimizda'" class="space-y-6">
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ 'Hakkımızda, Misyon ve Vizyonumuz' }}</h1>
+          <!-- ========================================================================= -->
+          <!-- 4. B2B İHALE, TERSİNE EKSİLTME & ESCROW GÜVENLİK KURALLARI -->
+          <!-- ========================================================================= -->
+          <article v-if="activeTab === 'ihale-kurallari'" class="space-y-6">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-3 py-1 bg-red-50 text-red-800 font-mono text-xs font-bold rounded-lg border border-red-200">MANİPÜLASYON & KARTEL YASAĞI</span>
+              <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">ANTİ-SNİPİNG (+2 DK SÜRE UZATMA)</span>
+              <span class="px-3 py-1 bg-emerald-50 text-emerald-800 font-mono text-xs font-bold rounded-lg border border-emerald-200">TCMB ESCROW BLOKE VE HAKEDİŞ</span>
+            </div>
+
+            <h1 class="text-2xl font-black tracking-tight text-slate-900">
+              4. B2B İhale, Tersine Eksiltme ve Escrow Güvenlik Kuralları
+            </h1>
             
             <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-              {{ 'İhaleciBurada, Türkiye genelindeki kurumsal satın alma ve tedarik operasyonlarını şeffaf, rekabetçi ve tamamen dijital bir borsaya dönüştüren bağımsız B2B e-ihale platformudur.' }}
+              Platformumuzda düzenlenen tüm satın alma ihaleleri, canlı tersine eksiltmeler, tedarikçi teklif verme süreçleri ve Escrow güvenli havuz ödeme mutabakatı işbu kurallara tabidir.
+            </p>
+
+            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">KURAL 1 — İHALE AÇMA, ŞARTNAME VE TAVAN BÜTÇE</h3>
+                <p>1.1. Alıcı firma; talep ettiği ürün/hizmetin teknik özelliklerini, metrajını, teslimat adresini, kabul şartlarını ve başlangıç tavan bütçesini eksiksiz girmelidir.</p>
+                <p>1.2. İhale canlı yayına alındıktan ve teklif toplanmaya başlandıktan sonra şartnamede esaslı değişiklik yapılamaz.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">KURAL 2 — CANLI TERSİNE EKSİLTME VE DİNAMİK SÜRE UZATMA (+2 DK)</h3>
+                <p>2.1. Canlı eksiltmede tedarikçiler başlangıç tavan fiyatından aşağı doğru en az tanımlanan "Minimum İndirim Adımı" kadar indirim yaparak teklif sunar.</p>
+                <p>2.2. <strong>Anti-Sniping:</strong> İhalenin bitimine son iki (2) dakika kala yeni bir en iyi teklif gelirse, sistem süreyi otomatik olarak +2 dakika uzatır.</p>
+              </section>
+
+              <section class="space-y-2 bg-red-50/60 p-4 rounded-xl border border-red-200">
+                <h3 class="font-bold text-red-950 text-sm">KURAL 3 — TEKLİFİN KESİN BAĞLAYICILIĞI VE FİYAT FARKI TAZMİNİ</h3>
+                <p>3.1. Tedarikçinin ihale ve satın almade verdiği her fiyat teklifi bağlayıcı bir ticari taahhüttür (icap). Kazanan tedarikçi teklifinden cayamayacağı gibi fiyat artıramaz.</p>
+                <p>3.2. Cayma halinde tedarikçi, Alıcı'nın ikinci teklif sahibiyle çalışmasından doğacak fiyat farkı zararını doğrudan Alıcı'ya tazmin etmekle yükümlüdür.</p>
+              </section>
+
+              <section class="space-y-2 bg-emerald-50/60 p-4 rounded-xl border border-emerald-200">
+                <h3 class="font-bold text-emerald-950 text-sm">KURAL 4 — ESCROW GÜVENLİ HAVUZ VE HAKEDİŞ AKTARIMI</h3>
+                <p>4.1. İhale mutabakatında Alıcı bedeli TCMB lisanslı güvenli havuz hesabına yatırır; tutar bloke edilir.</p>
+                <p>4.2. Tedarikçi malı sevk edip sevk irsaliyesini yükler. Alıcı malı muayene edip mal kabul onayını verdiğinde havuzdaki bloke çözülerek hakediş Tedarikçiye aktarılır.</p>
+                <p>4.3. Şirket bir banka değildir; fonlar lisanslı ödeme kuruluşu (PayTR/iyzico) nezdinde güvence altındadır.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">KURAL 5 — MAVİ ONAY ROZETİ (KYC) SORUMSUZLUK BEYANI</h3>
+                <p>5.1. Mavi Rozet, firmanın ibraz ettiği resmi evrakların (Vergi Levhası, İmza Sirküleri, Faaliyet Belgesi) şeklen yüklendiğini gösterir; firmanın mali gücüne veya borç ödeme kabiliyetine Platform'un kefil olduğu anlamına gelmez.</p>
+              </section>
+            </div>
+          </article>
+
+          <!-- ========================================================================= -->
+          <!-- 5. ÇEREZ (COOKIE) POLİTİKASI -->
+          <!-- ========================================================================= -->
+          <article v-if="activeTab === 'cerezler'" class="space-y-6">
+            <h1 class="text-2xl font-black tracking-tight text-slate-900">
+              5. Çerez (Cookie) ve Oturum Güvenliği Politikası
+            </h1>
+
+            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 1 — ÇEREZLERİN KULLANIM AMACI</h3>
+                <p>1.1. Çerezler; oturum güvenliğinin sağlanması, canlı websocket ihale bağlantısının kopmaması, dil ve tema tercihlerinizin hatırlanması ve sistem hızının optimize edilmesi amacıyla kullanılır.</p>
+              </section>
+
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 2 — ÇEREZ KATEGORİLERİ</h3>
+                <p>2.1. <strong>Zorunlu & Güvenlik Çerezleri:</strong> 2FA kimlik doğrulama tokenları ve CSRF saldırı önleme mekanizmaları için şarttır; kapatılamaz.</p>
+                <p>2.2. <strong>İşlevsellik & Performans Çerezleri:</strong> Tema (Aydınlık/Karanlık) ve pazar yeri filtre tercihlerini saklar.</p>
+              </section>
+
+              <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 3 — ÇEREZ YÖNETİMİ</h3>
+                <p>3.1. Tarayıcı ayarlarınızdan çerez izinlerini dilediğiniz an değiştirebilirsiniz. Zorunlu oturum çerezlerinin kapatılması halinde canlı ihale odalarına giriş yapılamaz.</p>
+              </section>
+            </div>
+          </article>
+
+          <!-- ========================================================================= -->
+          <!-- 6. HAKKIMIZDA & VİZYON -->
+          <!-- ========================================================================= -->
+          <article v-if="activeTab === 'hakkimizda'" class="space-y-6">
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Hakkımızda, Misyon ve Vizyonumuz</h1>
+            
+            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
+              İhaleciBurada, Türkiye genelindeki kurumsal satın alma ve tedarik operasyonlarını şeffaf, rekabetçi ve tamamen dijital bir borsaya dönüştüren bağımsız B2B e-ihale platformudur.
             </p>
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
@@ -960,170 +663,6 @@ function printDocument() {
                   <p class="text-[11px] text-slate-600">TCMB uyumlu Escrow koruması, doğrulanmış KYC firmaları ve sıfır komisyonlu alıcı desteği.</p>
                 </div>
               </div>
-            </div>
-          </article>
-
-          <!-- 12. KARİYER -->
-          <article v-if="activeTab === 'kariyer'" class="space-y-6">
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ 'Kariyer Fırsatları & Kültürümüz' }}</h1>
-            
-            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-              {{ 'Türkiye\'nin B2B satın alma ve tedarik ekosistemini yeniden yazan ekibimizin bir parçası olmak ister misiniz? Sürekli büyüyen yetenekli kadromuza yeni takım arkadaşları arıyoruz.' }}
-            </p>
-
-            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">BİZİMLE ÇALIŞMANIN AYRICALIKLARI</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-slate-700">
-                  <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center gap-2">
-                    <span class="text-emerald-500 font-black">✓</span>
-                    <span>Hibrit ve Esnek Çalışma Modeli</span>
-                  </div>
-                  <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center gap-2">
-                    <span class="text-emerald-500 font-black">✓</span>
-                    <span>Kapsamlı Özel Sağlık Sigortası</span>
-                  </div>
-                  <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center gap-2">
-                    <span class="text-emerald-500 font-black">✓</span>
-                    <span>Yıllık Teknoloji ve Eğitim Bütçesi</span>
-                  </div>
-                  <div class="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center gap-2">
-                    <span class="text-emerald-500 font-black">✓</span>
-                    <span>Başarı ve Hacim Odaklı Performans Primi</span>
-                  </div>
-                </div>
-              </section>
-
-              <section class="space-y-3">
-                <h3 class="font-bold text-slate-900 text-sm">AÇIK POZİSYONLAR</h3>
-                <div class="space-y-2">
-                  <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-                    <div>
-                      <h4 class="font-black text-slate-900 text-xs">Senior Fullstack Engineer (Vue / Nuxt / Node.js)</h4>
-                      <p class="text-[11px] text-slate-500">İstanbul / Balıkesir / Uzaktan • Tam Zamanlı</p>
-                    </div>
-                    <a href="mailto:kariyer@ihaleciburada.com?subject=Basvuru-Fullstack" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition">Başvur</a>
-                  </div>
-
-                  <div class="p-4 bg-white rounded-2xl border border-slate-200 shadow-xs flex items-center justify-between">
-                    <div>
-                      <h4 class="font-black text-slate-900 text-xs">B2B Kurumsal Portföy & Satış Yöneticisi</h4>
-                      <p class="text-[11px] text-slate-500">İstanbul & Marmara Bölgesi • Saha & Hibrit</p>
-                    </div>
-                    <a href="mailto:kariyer@ihaleciburada.com?subject=Basvuru-Satis" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition">Başvur</a>
-                  </div>
-                </div>
-              </section>
-            </div>
-          </article>
-
-          <!-- 13. İŞ ORTAKLIĞI -->
-          <article v-if="activeTab === 'is-ortakligi'" class="space-y-6">
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ 'İş Ortaklığı ve Gelir Paylaşım Programı' }}</h1>
-            
-            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-              {{ 'ERP yazılım şirketleri, satın alma danışmanları, sanayi odası temsilcileri ve kurumsal iş geliştiriciler için tasarlanan yüksek kazançlı iş ortaklığı programımız.' }}
-            </p>
-
-            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">İŞ ORTAĞI MODELLERİ VE KAZANÇ ORANLARI</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div class="p-4 bg-blue-50/60 rounded-2xl border border-blue-200 space-y-2">
-                    <span class="text-[10px] font-black uppercase text-blue-700">ERP & YAZILIM ENTEGRATÖRLERİ</span>
-                    <h4 class="font-black text-slate-900 text-xs">API Entegrasyon Ortaklığı</h4>
-                    <p class="text-[11px] text-slate-600">Logo Tiger, SAP, Mikro ve Dynamics entegrasyonu sağlayan ortaklarımıza her aktif müşteri başına düzenli gelir paylaşımı.</p>
-                  </div>
-
-                  <div class="p-4 bg-emerald-50/60 rounded-2xl border border-emerald-200 space-y-2">
-                    <span class="text-[10px] font-black uppercase text-emerald-700">KURUMSAL SATIN ALMA DANIŞMANLARI</span>
-                    <h4 class="font-black text-slate-900 text-xs">%20'ye Varan Komisyon Paylaşımı</h4>
-                    <p class="text-[11px] text-slate-600">Portföyünüzdeki şirketleri platforma kazandırın, tamamlanan her ihale hacminden ve abonelikten düzenli pay alın.</p>
-                  </div>
-                </div>
-              </section>
-
-              <div class="p-5 bg-[#0F223D] text-white rounded-2xl space-y-3">
-                <h4 class="font-black text-sm text-white">İş Ortaklığı Başvurusu Yapın</h4>
-                <p class="text-xs text-slate-300">Kurumsal temsilcimiz sizinle 24 saat içinde iletişime geçerek özel gelir paylaşım modelini ve entegrasyon API anahtarlarını tanımlasın.</p>
-                <a href="mailto:isortakligi@ihaleciburada.com" class="inline-block px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl text-xs transition">
-                  İş Ortaklığı Başvuru Formu İletin ↗
-                </a>
-              </div>
-            </div>
-          </article>
-
-          <!-- 14. BLOG & MAKALELER -->
-          <article v-if="activeTab === 'blog'" class="space-y-6">
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ 'B2B Satın Alma Blogu & Sektörel Analizler' }}</h1>
-            
-            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-              {{ 'Kurumsal satın alma yöneticileri, tedarik zinciri liderleri ve finans direktörleri için hazırladığımız güncel rehberler ve piyasa analizleri.' }}
-            </p>
-
-            <div class="space-y-4 border-t border-slate-100 pt-4">
-              <!-- Makale 1 -->
-              <div class="p-5 bg-white rounded-2xl border border-slate-200 hover:border-blue-400 shadow-xs transition space-y-2">
-                <div class="flex items-center gap-2 text-[10px] font-bold text-blue-600">
-                  <span>STRATEJİ & TASARRUF</span> • <span class="text-slate-400">2026.08</span>
-                </div>
-                <h3 class="font-black text-slate-900 text-sm hover:text-blue-600 transition cursor-pointer">
-                  Tersine İhale ve Satın Alma (Reverse Auction) ile Satın Alma Maliyetlerini %18 Düşürmenin 5 Adımı
-                </h3>
-                <p class="text-xs text-slate-600 leading-relaxed">
-                  Geleneksel kapalı teklif yöntemine kıyasla dinamik eksiltme motorları, tedarikçiler arasında anlık şeffaf rekabet yaratarak satın alma birim maliyetlerini ciddi oranda aşağı çekmektedir...
-                </p>
-              </div>
-
-              <!-- Makale 2 -->
-              <div class="p-5 bg-white rounded-2xl border border-slate-200 hover:border-blue-400 shadow-xs transition space-y-2">
-                <div class="flex items-center gap-2 text-[10px] font-bold text-emerald-600">
-                  <span>FİNTECH & GÜVENLİK</span> • <span class="text-slate-400">2026.08</span>
-                </div>
-                <h3 class="font-black text-slate-900 text-sm hover:text-blue-600 transition cursor-pointer">
-                  B2B Ticarette Escrow (Güvenli Havuz) ile Tahsilat ve Teslimat Risklerini Sıfırlamak
-                </h3>
-                <p class="text-xs text-slate-600 leading-relaxed">
-                  TCMB ve BDDK lisanslı ödeme kuruluşları güvencesinde çalışan güvenli havuz modeli, mal teslim edilene kadar parayı, para ödenene kadar malı güvence altına alarak ticari ihtilafları önler...
-                </p>
-              </div>
-            </div>
-          </article>
-
-          <!-- 15. BASIN ODASI & MEDYA KİTİ -->
-          <article v-if="activeTab === 'basin'" class="space-y-6">
-            <h1 class="text-2xl font-black text-slate-900 tracking-tight">{{ 'Basın Odası & Kurumsal Medya Kiti' }}</h1>
-            
-            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-              {{ 'İhaleciBurada hakkında basın bültenleri, haberler, yönetici biyografileri ve yüksek çözünürlüklü vektörel marka varlıkları.' }}
-            </p>
-
-            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
-              <section class="space-y-3">
-                <h3 class="font-bold text-slate-900 text-sm">İNDİRİLEBİLİR MARKA VE LOGO PAKETİ</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <a href="/logo.png" download class="p-4 bg-slate-50 hover:bg-slate-100 rounded-2xl border border-slate-200 flex items-center justify-between transition">
-                    <div>
-                      <h4 class="font-black text-slate-900 text-xs">Vektörel Logo (Açık Zemin / Light)</h4>
-                      <p class="text-[10px] text-slate-500">Şeffaf PNG / Yüksek Çözünürlük</p>
-                    </div>
-                    <Download :size="16" class="text-blue-600" />
-                  </a>
-
-                  <a href="/logo-white.png" download class="p-4 bg-[#0F223D] hover:bg-[#152B4D] text-white rounded-2xl border border-slate-800 flex items-center justify-between transition">
-                    <div>
-                      <h4 class="font-black text-white text-xs">Vektörel Logo (Koyu Zemin / Dark)</h4>
-                      <p class="text-[10px] text-slate-400">Beyaz Metin & Turkuaz Vurgu</p>
-                    </div>
-                    <Download :size="16" class="text-emerald-400" />
-                  </a>
-                </div>
-              </section>
-
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">BASIN İRTİBAT & RÖPORTAJ TALEPLERİ</h3>
-                <p>Medya ve basın mensupları bülten talepleri ve röportajlar için <strong>basin@ihaleciburada.com</strong> adresinden iletişim kurabilir.</p>
-              </section>
             </div>
           </article>
 
