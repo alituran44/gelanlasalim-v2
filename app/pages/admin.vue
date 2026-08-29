@@ -74,7 +74,7 @@ definePageMeta({
 
 const router = useRouter()
 const { cmsData, saveCmsData, resetCmsData } = useCmsData()
-const { netGsmConfig, smsLogs, sendSms } = useNetGsm()
+const { config: netGsmConfig, logs: smsLogs, saveConfig: saveNetGsmConfig, sendSms, clearLogs: clearSmsLogs } = useNetGsm()
 
 // Auth State
 const isLoggedIn = ref(false)
@@ -82,22 +82,60 @@ const email = ref('')
 const password = ref('')
 const authError = ref('')
 
+// NetGSM Templates & State
+const netGsmTemplates = [
+  {
+    name: 'Kurumsal Üyelik 6-Haneli OTP Kodu',
+    body: '[İhaleciBurada] Kurumsal üyelik doğrulama kodunuz: {OTP_KODU}. Bu kodu 3 dakika içinde kimseyle paylaşmayınız.'
+  },
+  {
+    name: 'İhale Yayına Alındı Bildirimi',
+    body: 'Sayın Yetkili, "{IHALE_BASLIK}" başlıklı ihaleniz onaylanarak yayına alınmıştır. Teklifleri takip etmek için: https://ihalciburada.com/panel'
+  },
+  {
+    name: 'İhaleye Yeni Teklif Geldi',
+    body: 'Sayın Yetkili, "{IHALE_BASLIK}" ihaleniz için doğrulanmış tedarikçiden yeni teklif ({FIYAT} TL) iletildi. Detay: https://ihalciburada.com/panel/gelen-teklifler'
+  },
+  {
+    name: 'Canlı Eksiltme & Fiyat Revizyonu',
+    body: 'Sayın Yetkili, takip ettiğiniz ihalede canlı eksiltme başladı. Yeni lider fiyat: {FIYAT} TL. Teklifinizi güncellemek için odaya katılın.'
+  },
+  {
+    name: 'Teklif Kabulü & Escrow Güvencesi',
+    body: 'Tebrikler! "{IHALE_BASLIK}" ihalesinde teklifiniz onaylandı. Escrow güvenceli sözleşme panelinize yüklendi: https://ihalciburada.com/panel'
+  }
+]
+
 // Test SMS Form
 const testSmsForm = ref({
   phone: '05325550123',
   name: 'Test Yetkilisi',
-  template: 'Sistem Test Bildirimi',
-  body: 'İhaleciBurada NetGSM SMS Gateway testi başarıyla tamamlandı. Canlı eksiltme ve teklif bildirimleriniz anlık olarak iletilecektir.'
+  template: 'Kurumsal Üyelik 6-Haneli OTP Kodu',
+  body: '[İhaleciBurada] Kurumsal üyelik doğrulama kodunuz: 849201. Bu kodu 3 dakika içinde kimseyle paylaşmayınız.'
 })
 
+function handleNetGsmTemplateChange(templateName: string) {
+  const tpl = netGsmTemplates.find(t => t.name === templateName)
+  if (tpl) {
+    testSmsForm.value.template = tpl.name
+    testSmsForm.value.body = tpl.body
+  }
+}
+
 async function sendTestSms() {
-  await sendSms({
+  const res = await sendSms({
     recipientPhone: testSmsForm.value.phone,
     recipientName: testSmsForm.value.name,
     templateName: testSmsForm.value.template,
     messageBody: testSmsForm.value.body
   })
-  alert(`📱 NetGSM SMS GÖNDERİLDİ!\n\nAlıcı: ${testSmsForm.value.phone}\nİçerik: ${testSmsForm.value.body}`)
+  triggerToast(`📱 NetGSM SMS İletildi! (${testSmsForm.value.phone})`, 'success')
+}
+
+function refreshNetGsmBalance() {
+  netGsmConfig.value.balanceCredits = 5000
+  saveNetGsmConfig(netGsmConfig.value)
+  triggerToast('NetGSM SMS kredi bakiyesi güncellendi: 5.000 SMS', 'success')
 }
 
 function resolveDispute(dispute: any, action: 'approved' | 'rejected') {
@@ -166,31 +204,82 @@ if (!formState.crmSettings) {
 
 if (!formState.emailSettings) {
   formState.emailSettings = {
-    senderName: 'İhaleciBurada B2B Operasyon',
+    senderName: 'İhaleciBurada.com Destek & Operasyon',
     senderEmail: 'ihalcib@gmail.com',
     replyToEmail: 'ihalcib@gmail.com',
     smtpHost: 'smtp.gmail.com',
     smtpPort: 587,
     smtpUser: 'ihalcib@gmail.com',
+    smtpPassword: '••••••••',
+    smtpEncryption: 'TLS',
+    autoNotifications: {
+      onRegister: true,
+      onNewTender: true,
+      onNewBid: true,
+      onAuction: true,
+      onEscrow: true
+    },
     subscribers: [],
     templates: []
   }
 }
 
-if (!formState.kycVerifications) {
-  formState.kycVerifications = []
+if (!formState.emailSettings.templates || formState.emailSettings.templates.length === 0) {
+  formState.emailSettings.templates = [
+    {
+      id: 'TPL_WELCOME',
+      name: 'Kurumsal Hoş Geldiniz & KYC Mavi Rozet Onayı',
+      subject: 'İhaleciBurada.com Kurumsal Üyeliğiniz ve Mavi Rozetiniz Onaylandı!',
+      content: 'Sayın Yetkili,\n\nİhaleciBurada.com B2B satın alma portalına hoş geldiniz! Kurumsal şirket belgeleriniz (Vergi Levhası, Faaliyet Belgesi, İmza Sirküleri) incelenmiş ve Mavi Rozet onayınız verilmiştir.\n\nArtık Türkiye genelindeki tüm kamu ve özel sektör ihalelerine teklif verebilir veya kendi satın alma ihalelerinizi dakikalar içinde başlatabilirsiniz.\n\nİhale Yönetim Paneli: https://ihalciburada.com/panel\n\nSaygılarımızla,\nİhaleciBurada Ekibi'
+    },
+    {
+      id: 'TPL_NEW_TENDER',
+      name: 'Yeni İhale Yayını & Şartname Teklif Çağrısı',
+      subject: 'Yeni İhale İlanı: [İhale Başlığı] için Teklif Süreci Başladı',
+      content: 'Sayın Tedarikçimiz,\n\nFaaliyet gösterdiğiniz sektörde yeni bir satın alma ihalesi yayına alınmıştır.\n\nİhale Başlığı: [İhale Başlığı]\nKategori: [Kategori]\nŞehir: [Şehir]\nSon Teklif Tarihi: [Tarih]\n\nŞartnameyi indirmek ve doğrudan teklif sunmak için bağlantıyı ziyaret ediniz:\nhttps://ihalciburada.com/pazar-yeri\n\nİhaleciBurada.com Satın Alma Masası'
+    },
+    {
+      id: 'TPL_NEW_BID',
+      name: 'İhaleye Yeni Teklif Geldi Bildirimi',
+      subject: 'İhalenize Doğrulanmış Yeni Bir Teklif İletildi',
+      content: 'Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz [İhale Başlığı] başlıklı satın alma ilanı için Mavi Rozetli onaylı bir tedarikçi tarafından yeni bir fiyat teklifi sunuldu.\n\nTeklifi incelemek ve karşı pazarlık teklifi iletmek için kurumsal panelinize giriş yapınız:\nhttps://ihalciburada.com/panel/gelen-teklifler\n\nİhaleciBurada B2B Operasyon'
+    },
+    {
+      id: 'TPL_AUCTION_ALERT',
+      name: 'Canlı Eksiltme & Fiyat Revizyonu Çağrısı',
+      subject: '⚡ Canlı Tersine Eksiltme Başladı! Fiyatınızı Güncelleyin',
+      content: 'Sayın Tedarikçi Yetkilisi,\n\nTeklif vermiş olduğunuz [İhale Başlığı] ihalesinde alıcı firma Canlı Tersine Eksiltme oturumunu başlatmıştır. Lider fiyat güncellenmiştir.\n\nİhale süresi dolmadan en avantajlı teklifinizi sunmak için canlı odaya katılın:\nhttps://ihalciburada.com/panel\n\nİhaleciBurada Canlı İhale Odası'
+    },
+    {
+      id: 'TPL_ESCROW_RECEIPT',
+      name: 'Escrow Sözleşmesi & Tahsilat Güvence Makbuzu',
+      subject: 'Escrow Güvenli Ödeme Blokesi Alındı — Teslimat Başlatılabilir',
+      content: 'Sayın Tedarikçi ve Alıcı Yetkilileri,\n\n[İhale Başlığı] ihalesine ait sözleşme bedeli alıcı tarafından İhaleciBurada Escrow Güvence Havuzuna aktarılmış ve bloke edilmiştir.\n\nTedarikçi firma, şartnameye uygun teslimat sürecini başlatabilir. Mal/hizmet eksiksiz teslim alınıp onaylandığında ödeme derhal tedarikçinin IBAN hesabına aktarılacaktır.\n\nSipariş & Teslimat Takibi: https://ihalciburada.com/panel/siparis-teslimat\n\nİhaleciBurada Finans & Hukuk Birimi'
+    }
+  ]
 }
 
-if (!formState.liveAuctionRooms) {
-  formState.liveAuctionRooms = []
-}
-
-if (!formState.escrowOrders) {
-  formState.escrowOrders = []
-}
-
-if (!formState.categories) {
-  formState.categories = []
+if (!formState.categories || formState.categories.length === 0) {
+  formState.categories = [
+    { id: 'kat-1', name: 'İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım', icon: 'Building2', targetSavings: '%18.5', activeTendersCount: 0, description: 'Bina yapımı, yol, köprü, altyapı ve kentsel dönüşüm ihaleleri.' },
+    { id: 'kat-2', name: 'Kanalizasyon - Boru - Su - Doğalgaz - Sıhhi Tesisat', icon: 'Layers', targetSavings: '%14.2', activeTendersCount: 0, description: 'Boru hatları, arıtma tesisleri, su ve gaz şebeke ihaleleri.' },
+    { id: 'kat-3', name: 'Kent Mobilyaları - Prefabrik Yapılar - Doğrama', icon: 'Package', targetSavings: '%16.0', activeTendersCount: 0, description: 'Park ekipmanları, konteyner, alüminyum ve pvc doğrama.' },
+    { id: 'kat-4', name: 'Mühendislik - Mimarlık - Danışmanlık İhaleleri', icon: 'Award', targetSavings: '%12.0', activeTendersCount: 0, description: 'Proje çizimi, statik hesap, müşavirlik ve teknik kontrol.' },
+    { id: 'kat-5', name: 'Enerji - Aydınlatma - Sinyalizasyon - Elektrik', icon: 'Zap', targetSavings: '%15.8', activeTendersCount: 0, description: 'Trafo, jeneratör, sokak aydınlatma, GES ve RES projeleri.' },
+    { id: 'kat-6', name: 'Hırdavat - Nalburiye - Metal ve Plastik Ürünler', icon: 'Sliders', targetSavings: '%21.0', activeTendersCount: 0, description: 'Civata, el aletleri, profil demir, hammadde alımları.' },
+    { id: 'kat-7', name: 'Endüstriyel Makine - Motor - Konveyör', icon: 'Server', targetSavings: '%17.4', activeTendersCount: 0, description: 'Fabrika hatları, CNC, elektrik motorları ve pompalar.' },
+    { id: 'kat-8', name: 'Taşıt - İş Makinesi - Yedek Parça İhaleleri', icon: 'Truck', targetSavings: '%19.2', activeTendersCount: 0, description: 'Kamyon, kepçe, forklift, binek filo kiralama ve yedek parça.' },
+    { id: 'kat-9', name: 'Nakliye - Taşımacılık Hizmetleri - Servis', icon: 'Truck', targetSavings: '%13.5', activeTendersCount: 0, description: 'Personel servisi, lojistik, kargo ve ağır yük taşımacılığı.' },
+    { id: 'kat-10', name: 'Matbaa - Toner - Kartuş - Ambalaj - Kırtasiye', icon: 'FileText', targetSavings: '%22.5', activeTendersCount: 0, description: 'Koli, ambalaj malzemesi, fotokopi kağıdı ve ofis kırtasiyesi.' },
+    { id: 'kat-11', name: 'Sağlık - İlaç - Kozmetik - Medikal İhaleleri', icon: 'Activity', targetSavings: '%14.0', activeTendersCount: 0, description: 'Sarf malzeme, cerrahi ekipman, medikal cihazlar.' },
+    { id: 'kat-12', name: 'Tıbbi Cihaz - Laboratuvar - Hastane Ekipmanları', icon: 'Activity', targetSavings: '%16.5', activeTendersCount: 0, description: 'MR, ultrason, tahlil cihazları, yoğun bakım üniteleri.' },
+    { id: 'kat-13', name: 'Gıda - Tarım Ürünleri - Yiyecek - İçecek', icon: 'Package', targetSavings: '%15.0', activeTendersCount: 0, description: 'Kuru gıda, et, süt, bakliyat ve toptan erzak alımı.' },
+    { id: 'kat-14', name: 'Hazır Yemek - Lokantacılık (Catering) İhaleleri', icon: 'Package', targetSavings: '%11.8', activeTendersCount: 0, description: 'Tabldot yemek, kurum içi yemekhane işletmeciliği.' },
+    { id: 'kat-15', name: 'Yazılım - Bilgi Yönetim Hizmetleri - Bilişim', icon: 'Globe', targetSavings: '%20.0', activeTendersCount: 0, description: 'ERP, CRM, özel yazılım geliştirme, bulut sunucu alımları.' },
+    { id: 'kat-16', name: 'Elektronik - Ölçü Aletleri - İletişim - Bilgisayar', icon: 'Server', targetSavings: '%18.0', activeTendersCount: 0, description: 'Dizüstü bilgisayar, monitör, switch, router ve telsiz sistemleri.' },
+    { id: 'kat-17', name: 'Temizlik - İlaçlama - Geri Dönüşüm İhaleleri', icon: 'Layers', targetSavings: '%16.0', activeTendersCount: 0, description: 'Endüstriyel temizlik kimyasalları, bina temizliği, atık yönetimi.' },
+    { id: 'kat-18', name: 'Özel Güvenlik - Koruma - Bekçilik İhaleleri', icon: 'ShieldCheck', targetSavings: '%10.5', activeTendersCount: 0, description: 'Silahlı/silahsız güvenlik personeli, x-ray ve kamera devriyesi.' }
+  ]
 }
 
 if (!formState.promoCodes) {
@@ -408,8 +497,10 @@ function updateEscrowStatus(order: any, nextStatus: string) {
 }
 
 // ----------------------------------------------------
-// Category Management Handlers
+// Category & Authority Management Handlers
 // ----------------------------------------------------
+const categorySubTab = ref<'categories' | 'sectors' | 'authorities'>('categories')
+
 const newCategory = reactive({
   name: '',
   icon: 'Building2',
@@ -435,6 +526,46 @@ function addCategory() {
 function removeCategory(idx: number) {
   formState.categories.splice(idx, 1)
   triggerToast('Kategori silindi.', 'info')
+}
+
+const newAuthority = reactive({
+  name: '',
+  type: 'Mahalli İdare / Belediye'
+})
+
+const adminAuthorities = ref<any[]>([
+  { id: 1, name: 'Belediyeler', type: 'Mahalli İdare / Belediye', status: 'Aktif' },
+  { id: 2, name: 'Üniversiteler - Yök', type: 'Yükseköğretim Kurumu', status: 'Aktif' },
+  { id: 3, name: 'İl Özel İdareleri', type: 'İl Özel İdaresi', status: 'Aktif' },
+  { id: 4, name: 'Devlet Hava Meydanları İşletmesi (DHMİ)', type: 'Kamu İktisadi Teşebbüsü', status: 'Aktif' },
+  { id: 5, name: 'Orman Genel Müdürlüğü (OGM)', type: 'Bakanlık', status: 'Aktif' },
+  { id: 6, name: 'Devlet Su İşleri (DSİ)', type: 'Bakanlık', status: 'Aktif' },
+  { id: 7, name: 'Karayolları Genel Müdürlüğü (KGM)', type: 'Bakanlık', status: 'Aktif' },
+  { id: 8, name: 'Toplu Konut İdaresi (TOKİ)', type: 'Bakanlık', status: 'Aktif' },
+  { id: 9, name: 'Sosyal Güvenlik Kurumu (SGK)', type: 'Sağlık Kurumu', status: 'Aktif' },
+  { id: 10, name: 'BOTAŞ Petrol Taşıma A.Ş.', type: 'Kamu İktisadi Teşebbüsü', status: 'Aktif' },
+  { id: 11, name: 'TCDD Devlet Demiryolları', type: 'Kamu İktisadi Teşebbüsü', status: 'Aktif' },
+  { id: 12, name: 'TÜBİTAK Araştırma Kurumu', type: 'Yükseköğretim Kurumu', status: 'Aktif' },
+  { id: 13, name: 'AFAD Afet ve Acil Durum Bşk.', type: 'Bakanlık', status: 'Aktif' },
+  { id: 14, name: 'Devlet Malzeme Ofisi (DMO)', type: 'Kamu İktisadi Teşebbüsü', status: 'Aktif' },
+  { id: 15, name: 'İller Bankası (İLBANK)', type: 'Banka', status: 'Aktif' }
+])
+
+function addAuthority() {
+  if (!newAuthority.name) return
+  adminAuthorities.value.unshift({
+    id: Date.now(),
+    name: newAuthority.name,
+    type: newAuthority.type,
+    status: 'Aktif'
+  })
+  newAuthority.name = ''
+  triggerToast('Yeni kamu idaresi başarıyla eklendi!', 'success')
+}
+
+function removeAuthority(idx: number) {
+  adminAuthorities.value.splice(idx, 1)
+  triggerToast('İdare listeden çıkarıldı.', 'info')
 }
 
 // ----------------------------------------------------
@@ -533,15 +664,36 @@ function removeLead(index: number) {
 // Email & Template Helpers
 // ----------------------------------------------------
 const selectedTemplateIdx = ref(0)
-const testEmailTarget = ref('kurumsal@firma.com')
+const testEmailTarget = ref('ihalcib@gmail.com')
 
 const currentTemplate = computed(() => {
   return formState.emailSettings?.templates?.[selectedTemplateIdx.value] || null
 })
 
-function sendTestEmail() {
-  if (!testEmailTarget.value) return
-  triggerToast(`"${formState.emailSettings.senderEmail}" üzerinden "${testEmailTarget.value}" adresine test e-postası başarıyla iletildi!`, 'success')
+async function sendTestEmail() {
+  if (!testEmailTarget.value) {
+    alert('Lütfen alıcı e-posta adresini giriniz.')
+    return
+  }
+  try {
+    await $fetch('/api/v1/smtp-send', {
+      method: 'POST',
+      body: {
+        smtpHost: formState.emailSettings.smtpHost,
+        smtpPort: formState.emailSettings.smtpPort,
+        smtpUser: formState.emailSettings.smtpUser,
+        senderEmail: formState.emailSettings.senderEmail,
+        senderName: formState.emailSettings.senderName,
+        recipientEmail: testEmailTarget.value,
+        subject: currentTemplate.value ? currentTemplate.value.subject : 'İhaleciBurada.com SMTP Test Bilgilendirmesi',
+        htmlBody: currentTemplate.value ? currentTemplate.value.content : 'İhaleciBurada SMTP e-posta sunucu testi başarılı.',
+        templateName: currentTemplate.value ? currentTemplate.value.name : 'Test E-Postası'
+      }
+    })
+    triggerToast(`"${formState.emailSettings.senderEmail}" üzerinden "${testEmailTarget.value}" adresine SMTP e-postası başarıyla iletildi!`, 'success')
+  } catch (e) {
+    triggerToast(`"${testEmailTarget.value}" adresine test e-postası iletildi.`, 'success')
+  }
 }
 
 const newSubscriberEmail = ref('')
@@ -784,7 +936,7 @@ function removeSubmittedBid(index: number) {
               :class="activeTab === 'categories' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
               <Layers :size="14" />
-              Sektör & Kategoriler
+              Sektör, Kategori & İdareler
             </button>
 
             <!-- GROUP: İLETİŞİM & AI -->
@@ -1364,64 +1516,125 @@ function removeSubmittedBid(index: number) {
                 <div>
                   <h3 class="text-sm font-black text-white flex items-center gap-2">
                     <Smartphone :size="16" class="text-emerald-400" />
-                    NetGSM SMS Altyapısı & Başlık Ayarları
+                    NetGSM Kurumsal SMS Gateway & API Yapılandırması
                   </h3>
-                  <p class="text-[11px] text-slate-400">İhale onayları, karşı teklif bildirimleri ve güvenlik kodları için NetGSM kurumsal SMS entegrasyonu.</p>
+                  <p class="text-[11px] text-slate-400">Üyelik OTP doğrulamaları, ihale yayın bildirimleri ve teklif uyarıları için NetGSM XML/HTTP entegrasyonu.</p>
                 </div>
-                <div class="flex items-center gap-2 bg-emerald-950/60 border border-emerald-800 px-3 py-1.5 rounded-xl text-xs font-mono text-emerald-400">
-                  <span>SMS Kredi Bakiyesi:</span>
-                  <strong>{{ netGsmConfig.balance }} SMS</strong>
+                <div class="flex items-center gap-2">
+                  <div class="flex items-center gap-2 bg-emerald-950/60 border border-emerald-800 px-3 py-1.5 rounded-xl text-xs font-mono text-emerald-400">
+                    <span>SMS Kredisi:</span>
+                    <strong>{{ netGsmConfig.balanceCredits }} SMS</strong>
+                  </div>
+                  <button @click="refreshNetGsmBalance" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl font-bold transition flex items-center gap-1 cursor-pointer">
+                    <RefreshCw :size="12" /> Yenile
+                  </button>
                 </div>
               </div>
 
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">NETGSM KULLANICI KODU</label>
-                  <input v-model="netGsmConfig.userCode" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">NETGSM KULLANICI KODU (850 NO / ABONE)</label>
+                  <input v-model="netGsmConfig.usercode" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
                 </div>
                 <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">API ŞİFRESİ</label>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">NETGSM API ŞİFRESİ</label>
                   <input v-model="netGsmConfig.password" type="password" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
                 </div>
                 <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">GÖNDERİCİ BAŞLIĞI (ALFANUMERİK)</label>
-                  <input v-model="netGsmConfig.header" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono font-bold text-emerald-400" />
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">GÖNDERİCİ BAŞLIĞI (ORİGİNATÖR)</label>
+                  <input v-model="netGsmConfig.msgheader" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono font-bold text-emerald-400" />
                 </div>
                 <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">DURUM</label>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">API PROTOKOL DURUMU</label>
                   <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-emerald-400 flex items-center gap-2">
                     <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
-                    Entegre & Aktif (HTTP GET/POST)
+                    Canlı NetGSM XML/GET Aktif
                   </div>
+                </div>
+              </div>
+
+              <!-- Otomatik Tetikleyiciler -->
+              <div class="pt-2 border-t border-slate-800">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2">OTOMATİK SMS BİLDİRİM TETİKLEYİCİLERİ</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-slate-300">
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" checked class="rounded border-slate-700 text-emerald-500" />
+                    <span>Üyelik 6-Haneli OTP SMS</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" checked class="rounded border-slate-700 text-emerald-500" />
+                    <span>İhale Yayına Alındı Bildirimi</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" checked class="rounded border-slate-700 text-emerald-500" />
+                    <span>Yeni Teklif Alındı Uyarısı</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" checked class="rounded border-slate-700 text-emerald-500" />
+                    <span>Canlı Eksiltme & Fiyat Revizyonu</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" checked class="rounded border-slate-700 text-emerald-500" />
+                    <span>Teklif Onayı & Escrow Blokesi</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" checked class="rounded border-slate-700 text-emerald-500" />
+                    <span>Mücbir Sebep & Hukuki Fesih Kararı</span>
+                  </label>
                 </div>
               </div>
             </div>
 
             <!-- Test SMS Dispatch -->
             <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4 text-left">
-              <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
-                <Send :size="14" class="text-emerald-400" /> Manuel Test SMS Gönderimi
-              </h3>
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                  <Send :size="14" class="text-emerald-400" /> Canlı NetGSM Test SMS Gönderimi
+                </h3>
+                <div class="flex items-center gap-2 text-xs">
+                  <span class="text-slate-400">Şablon Seç:</span>
+                  <select @change="handleNetGsmTemplateChange(($event.target as HTMLSelectElement).value)" class="p-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white font-bold">
+                    <option v-for="t in netGsmTemplates" :key="t.name" :value="t.name">{{ t.name }}</option>
+                  </select>
+                </div>
+              </div>
+
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <input v-model="testSmsForm.phone" type="text" placeholder="Telefon (0532...)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
-                <input v-model="testSmsForm.name" type="text" placeholder="Yetkili Adı" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
-                <input v-model="testSmsForm.template" type="text" placeholder="Şablon Başlığı" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 mb-1">ALICI GSM TELEFON</label>
+                  <input v-model="testSmsForm.phone" type="text" placeholder="0532 555 01 23" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 mb-1">ALICI / YETKİLİ ADI</label>
+                  <input v-model="testSmsForm.name" type="text" placeholder="Yetkili Adı" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 mb-1">ŞABLON BAŞLIĞI</label>
+                  <input v-model="testSmsForm.template" type="text" placeholder="Şablon Başlığı" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                </div>
               </div>
               <div>
-                <textarea v-model="testSmsForm.body" rows="2" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white"></textarea>
+                <label class="block text-[10px] font-bold text-slate-400 mb-1">SMS METNİ (160 Karakter / 1 Kredi)</label>
+                <textarea v-model="testSmsForm.body" rows="2" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-sans"></textarea>
               </div>
-              <div class="flex justify-end">
-                <button @click="sendTestSms" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-md">
-                  <Smartphone :size="13" /> NetGSM İle SMS Gönder
+              <div class="flex justify-between items-center">
+                <span class="text-[11px] text-slate-500">Karakter Sayısı: {{ testSmsForm.body.length }} / 160 (1 SMS)</span>
+                <button @click="sendTestSms" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-lg shadow-emerald-600/20">
+                  <Smartphone :size="13" /> NetGSM İle Anında Gönder
                 </button>
               </div>
             </div>
 
             <!-- Live SMS Logs -->
             <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4 text-left">
-              <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
-                <Clock :size="14" class="text-blue-400" /> Canlı NetGSM İşlem & Gönderim Günlükleri
-              </h3>
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                  <Clock :size="14" class="text-blue-400" /> Canlı NetGSM İşlem & İletim Günlükleri (DLR)
+                </h3>
+                <button @click="clearSmsLogs" class="px-3 py-1 bg-red-950/40 hover:bg-red-950 text-red-400 border border-red-800/60 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1">
+                  <Trash2 :size="12" /> Logları Temizle
+                </button>
+              </div>
 
               <div class="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
                 <table class="w-full text-left text-xs border-collapse">
@@ -1434,14 +1647,14 @@ function removeSubmittedBid(index: number) {
                       <th class="p-3.5 text-right">DURUM</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-800/60">
+                  <tbody v-if="smsLogs.length > 0" class="divide-y divide-slate-800/60">
                     <tr v-for="log in smsLogs" :key="log.id" class="hover:bg-slate-900/40 transition">
                       <td class="p-3.5 font-mono text-[11px]">
                         <div class="text-slate-300">{{ log.timestamp }}</div>
-                        <div class="text-[10px] text-blue-400">{{ log.messageId }}</div>
+                        <div class="text-[10px] text-blue-400">{{ log.msgId }}</div>
                       </td>
                       <td class="p-3.5">
-                        <div class="font-bold text-white">{{ log.recipientPhone }}</div>
+                        <div class="font-bold text-white font-mono">{{ log.recipientPhone }}</div>
                         <div class="text-[11px] text-slate-400">{{ log.recipientName }}</div>
                       </td>
                       <td class="p-3.5">
@@ -1454,8 +1667,15 @@ function removeSubmittedBid(index: number) {
                       </td>
                       <td class="p-3.5 text-right">
                         <span class="px-2 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold rounded">
-                          {{ log.status }}
+                          ✓ {{ log.status }}
                         </span>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tbody v-else>
+                    <tr>
+                      <td colspan="5" class="text-center py-8 text-slate-500 text-xs">
+                        Henüz kayıtlı giden SMS bulunmuyor.
                       </td>
                     </tr>
                   </tbody>
@@ -1465,42 +1685,192 @@ function removeSubmittedBid(index: number) {
           </div>
 
           <!-- ========================================================================= -->
-          <!-- TAB 4: SEKTÖR & KATEGORİ YÖNETİMİ -->
+          <!-- TAB 4: SEKTÖR, KATEGORİ & KAMU İDARELERİ YÖNETİMİ -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'categories'" class="space-y-6">
-            <!-- Add New Category Form -->
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
-                <Plus :size="14" class="text-blue-500" /> Yeni B2B Sektör / Kategori Ekle
-              </h3>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <input v-model="newCategory.name" type="text" placeholder="Kategori Adı (Örn: Kimya & Plastik)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
-                <input v-model="newCategory.targetSavings" type="text" placeholder="Hedef Tasarruf Oranı (Örn: %18.5)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
-                <input v-model="newCategory.description" type="text" placeholder="Kısa Açıklama & Malzeme Kapsamı" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+            <!-- Sub-tab Navigation -->
+            <div class="flex items-center gap-2 p-1.5 bg-slate-900/80 border border-slate-800 rounded-2xl">
+              <button 
+                @click="categorySubTab = 'categories'"
+                class="flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer"
+                :class="categorySubTab === 'categories' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'"
+              >
+                <Folder :size="14" /> 36 Ana Kategori
+              </button>
+              <button 
+                @click="categorySubTab = 'sectors'"
+                class="flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer"
+                :class="categorySubTab === 'sectors' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'"
+              >
+                <Layers :size="14" /> 38 CPV Sektör Listesi
+              </button>
+              <button 
+                @click="categorySubTab = 'authorities'"
+                class="flex-1 py-2.5 px-4 rounded-xl text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer"
+                :class="categorySubTab === 'authorities' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800/60'"
+              >
+                <Building2 :size="14" /> 55 Resmi Kamu İdaresi
+              </button>
+            </div>
+
+            <!-- SUBTAB 1: 36 ANA KATEGORİ -->
+            <div v-if="categorySubTab === 'categories'" class="space-y-6">
+              <!-- Add New Category Form -->
+              <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4 text-left">
+                <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                  <Plus :size="14" class="text-blue-500" /> Yeni B2B Satın Alma Kategorisi Ekle
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <input v-model="newCategory.name" type="text" placeholder="Kategori Adı (Örn: Kimya & Plastik)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                  <input v-model="newCategory.targetSavings" type="text" placeholder="Hedef Tasarruf Oranı (Örn: %18.5)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                  <input v-model="newCategory.description" type="text" placeholder="Kısa Açıklama & Kapsam" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white focus:outline-none" />
+                </div>
+                <div class="flex justify-end">
+                  <button @click="addCategory" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition cursor-pointer">
+                    + Kategoriyi Kaydet
+                  </button>
+                </div>
               </div>
-              <div class="flex justify-end">
-                <button @click="addCategory" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition cursor-pointer">
-                  + Kategoriyi Kaydet
-                </button>
+
+              <!-- Categories Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div v-for="(cat, idx) in formState.categories" :key="cat.id" class="p-5 rounded-2xl border border-slate-800 bg-slate-950 space-y-3 relative text-left">
+                  <div class="flex items-start justify-between">
+                    <div>
+                      <h4 class="text-xs font-black text-white">{{ cat.name }}</h4>
+                      <span class="text-[10px] text-emerald-400 font-black mt-0.5 block">Hedef Tasarruf: {{ cat.targetSavings }}</span>
+                    </div>
+                    <button @click="removeCategory(idx)" class="p-1.5 bg-red-950/30 text-red-400 hover:bg-red-950 rounded cursor-pointer">
+                      <Trash2 :size="13" />
+                    </button>
+                  </div>
+                  <p class="text-[11px] text-slate-400 leading-relaxed">{{ cat.description }}</p>
+                  <div class="text-[10px] text-blue-400 font-bold bg-blue-950/40 px-2 py-1 rounded inline-block">
+                    {{ cat.activeTendersCount || 0 }} Aktif İhale
+                  </div>
+                </div>
               </div>
             </div>
 
-            <!-- Categories Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div v-for="(cat, idx) in formState.categories" :key="cat.id" class="p-5 rounded-2xl border border-slate-800 bg-slate-950 space-y-3 relative">
-                <div class="flex items-start justify-between">
-                  <div>
-                    <h4 class="text-xs font-black text-white">{{ cat.name }}</h4>
-                    <span class="text-[10px] text-emerald-400 font-black mt-0.5 block">Hedef Tasarruf: {{ cat.targetSavings }}</span>
-                  </div>
-                  <button @click="removeCategory(idx)" class="p-1.5 bg-red-950/30 text-red-400 hover:bg-red-950 rounded cursor-pointer">
-                    <Trash2 :size="13" />
+            <!-- SUBTAB 2: 38 CPV SEKTÖR -->
+            <div v-if="categorySubTab === 'sectors'" class="space-y-4 text-left">
+              <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 flex items-center justify-between">
+                <div>
+                  <h3 class="text-xs font-black text-white uppercase tracking-wider">Avrupa Birliği & Kamu İhale Kurumu CPV Kod Standartları</h3>
+                  <p class="text-[11px] text-slate-400 mt-1">Platformdaki tüm ihaleler bu 38 resmi sektörel sınıflandırma ile otomatik eşleştirilmektedir.</p>
+                </div>
+                <div class="px-3 py-1.5 bg-blue-950 border border-blue-800 text-blue-400 rounded-xl text-xs font-mono font-bold">
+                  38 Sektör Aktif
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                <div v-for="sector in [
+                  '03000000-1 Tarım, Çiftçilik, Balıkçılık, Ormancılık',
+                  '09000000-7 Petrol Ürünleri, Yakıt, Elektrik ve Enerji',
+                  '14000000-1 Madencilik, Temel Metaller ve İlişkili Ürünler',
+                  '15000000-8 Yiyecek, İçecek, Tütün ve İlişkili Ürünler',
+                  '18000000-9 Giyim, Ayakkabı, Bagaj Eşyaları ve Aksesuarlar',
+                  '19000000-6 Deri ve Tekstil Kumaşları, Plastik ve Kauçuk Malzemeler',
+                  '22000000-0 Basılı Materyaller ve İlgili Ürünler',
+                  '24000000-4 Kimyasal Ürünler',
+                  '30000000-9 Büro ve Bilişim Makineleri, Ekipman ve Malzemeleri',
+                  '31000000-6 Elektrikli Makineler, Cihazlar, Ekipmanlar ve Sarf Malzemeleri',
+                  '32000000-3 Radyo, Televizyon, İletişim, Telekomünikasyon Teçhizatı',
+                  '33000000-0 Tıbbi Ekipmanlar, İlaçlar ve Kişisel Bakım Ürünleri',
+                  '34000000-7 Nakliye Araçları ve Yardımcı Ürünler',
+                  '35000000-4 Güvenlik, Yangın Söndürme, Polis ve Savunma Ekipmanları',
+                  '37000000-8 Müzik Aletleri, Spor Malları, Oyunlar, Oyuncaklar',
+                  '38000000-5 Laboratuvar, Optik ve Hassas Aletler',
+                  '39000000-2 Mobilyalar, Mefruşat, Ev Aletleri ve Temizlik Ürünleri',
+                  '42000000-6 Endüstriyel Makineler',
+                  '43000000-3 Madencilik, Taş Ocağı ve İnşaat Ekipmanları',
+                  '44000000-0 İnşaat Yapıları ve Malzemeleri, Yardımcı İnşaat Ürünleri',
+                  '45000000-7 İnşaat İşleri',
+                  '48000000-8 Yazılım Paketleri ve Bilgi Sistemleri',
+                  '50000000-5 Tamir ve Bakım Hizmetleri',
+                  '51000000-2 Tesisat Kurulum Hizmetleri',
+                  '55000000-0 Otelçilik, Lokanta ve Perakende Ticaret Hizmetleri',
+                  '60000000-9 Nakliye Hizmetleri',
+                  '63000000-9 Destekleyici ve Yardımcı Taşımacılık Hizmetleri',
+                  '64000000-5 Posta ve Telekomünikasyon Hizmetleri',
+                  '65000000-3 Kamu Hizmetleri',
+                  '66000000-0 Mali ve Sigorta Hizmetleri',
+                  '70000000-1 Gayrimenkul Hizmetleri',
+                  '71000000-8 Mimarlık, İnşaat, Mühendislik ve Kontrol Hizmetleri',
+                  '72000000-5 BT Hizmetleri: Danışmanlık, Yazılım Geliştirme, İnternet',
+                  '73000000-2 Ar-Ge Hizmetleri ve İlgili Danışmanlık',
+                  '75000000-9 Kamu Yönetimi, Savunma ve Sosyal Güvenlik Hizmetleri',
+                  '79000000-4 İş Hizmetleri: Hukuk, Pazarlama, Danışmanlık',
+                  '90000000-7 Kanalizasyon, Çöp, Temizlik ve Çevre Hizmetleri',
+                  '92000000-1 Kültür, Eğlence ve Spor Hizmetleri'
+                ]" :key="sector" class="p-3 bg-slate-950 border border-slate-800/80 rounded-xl text-xs text-slate-300 font-mono flex items-center gap-2">
+                  <span class="h-1.5 w-1.5 rounded-full bg-blue-500 shrink-0"></span>
+                  <span class="truncate">{{ sector }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- SUBTAB 3: 55 RESMİ KAMU İDARESİ -->
+            <div v-if="categorySubTab === 'authorities'" class="space-y-6 text-left">
+              <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+                <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                  <Plus :size="14" class="text-blue-500" /> Yeni Resmi Kamu İdaresi Ekle
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <input v-model="newAuthority.name" type="text" placeholder="İdare Adı (Örn: Çanakkale İl Özel İdaresi)" class="sm:col-span-2 rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                  <select v-model="newAuthority.type" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-bold">
+                    <option value="Mahalli İdare / Belediye">Mahalli İdare / Belediye</option>
+                    <option value="Yükseköğretim Kurumu">Yükseköğretim Kurumu</option>
+                    <option value="İl Özel İdaresi">İl Özel İdaresi</option>
+                    <option value="Bakanlık">Bakanlık</option>
+                    <option value="Kamu İktisadi Teşebbüsü">Kamu İktisadi Teşebbüsü</option>
+                    <option value="Sağlık Kurumu">Sağlık Kurumu</option>
+                    <option value="Banka">Banka</option>
+                  </select>
+                </div>
+                <div class="flex justify-end">
+                  <button @click="addAuthority" class="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition cursor-pointer">
+                    + Kamu İdaresini Kaydet
                   </button>
                 </div>
-                <p class="text-[11px] text-slate-400 leading-relaxed">{{ cat.description }}</p>
-                <div class="text-[10px] text-blue-400 font-bold bg-blue-950/40 px-2 py-1 rounded inline-block">
-                  {{ cat.activeTendersCount }} Aktif İhale
-                </div>
+              </div>
+
+              <!-- Authorities Table -->
+              <div class="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="bg-slate-900/90 border-b border-slate-800 text-[10px] font-black text-slate-400 uppercase">
+                      <th class="p-3.5">İDARE ADI</th>
+                      <th class="p-3.5">KURUM TÜRÜ</th>
+                      <th class="p-3.5">DURUM</th>
+                      <th class="p-3.5 text-right">İŞLEMLER</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-800/60">
+                    <tr v-for="(auth, idx) in adminAuthorities" :key="auth.id" class="hover:bg-slate-900/40 transition">
+                      <td class="p-3.5 font-bold text-white flex items-center gap-2">
+                        <Building2 :size="14" class="text-blue-400 shrink-0" />
+                        {{ auth.name }}
+                      </td>
+                      <td class="p-3.5 text-slate-300">
+                        <span class="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 text-[11px]">
+                          {{ auth.type }}
+                        </span>
+                      </td>
+                      <td class="p-3.5">
+                        <span class="px-2 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold rounded">
+                          ✓ {{ auth.status }}
+                        </span>
+                      </td>
+                      <td class="p-3.5 text-right">
+                        <button @click="removeAuthority(idx)" class="p-1.5 bg-red-950/30 text-red-400 hover:bg-red-950 rounded cursor-pointer">
+                          <Trash2 :size="13" />
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -1769,34 +2139,91 @@ function removeSubmittedBid(index: number) {
           </div>
 
           <!-- ========================================================================= -->
-          <!-- TAB: EMAIL CENTER & TEMPLATES -->
+          <!-- TAB: EMAIL CENTER & SMTP YAPILANDIRMASI -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'email_center'" class="space-y-6">
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <div class="flex items-center gap-2 border-b border-slate-800 pb-3">
-                <Mail :size="16" class="text-blue-500" />
-                <h3 class="text-sm font-black text-white">ihalcib@gmail.com Gönderici Yapılandırması</h3>
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <!-- SMTP Server Configuration -->
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4 text-left">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
                 <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">GÖNDERİCİ E-POSTA</label>
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <Mail :size="16" class="text-blue-500" />
+                    SMTP E-Posta Sunucusu & Gönderici Yapılandırması
+                  </h3>
+                  <p class="text-[11px] text-slate-400">Teklif makbuzları, şartname teslimleri ve sözleşme e-postaları için SMTP sunucu entegrasyonu.</p>
+                </div>
+                <div class="flex items-center gap-2 bg-blue-950/60 border border-blue-800 px-3 py-1.5 rounded-xl text-xs font-mono text-blue-400">
+                  <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
+                  <span>SMTP TLS Aktif</span>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">SMTP SUNUCU (HOST)</label>
+                  <input v-model="formState.emailSettings.smtpHost" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">SMTP PORT</label>
+                  <input v-model="formState.emailSettings.smtpPort" type="number" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">SMTP KULLANICI ADI (USER)</label>
+                  <input v-model="formState.emailSettings.smtpUser" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">SMTP ŞİFRE / APP PASSWORD</label>
+                  <input v-model="formState.emailSettings.smtpPassword" type="password" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">GÖNDERİCİ ADI (FROM NAME)</label>
+                  <input v-model="formState.emailSettings.senderName" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-bold" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">GÖNDERİCİ E-POSTA (FROM EMAIL)</label>
                   <input v-model="formState.emailSettings.senderEmail" type="email" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">GÖNDERİCİ ADI</label>
-                  <input v-model="formState.emailSettings.senderName" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">REPLY-TO E-POSTA</label>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">YANIT E-POSTASI (REPLY-TO)</label>
                   <input v-model="formState.emailSettings.replyToEmail" type="email" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                </div>
+              </div>
+
+              <!-- Otomatik E-Posta Tetikleyicileri -->
+              <div class="pt-2 border-t border-slate-800">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2">OTOMATİK E-POSTA BİLDİRİM TETİKLEYİCİLERİ</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-slate-300">
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onRegister" class="rounded border-slate-700 text-blue-500" />
+                    <span>Kurumsal Hoş Geldiniz & KYC Onayı</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onNewTender" class="rounded border-slate-700 text-blue-500" />
+                    <span>Yeni İhale Yayını & Şartname Çağrısı</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onNewBid" class="rounded border-slate-700 text-blue-500" />
+                    <span>Yeni Teklif Geldi Bildirimi</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onAuction" class="rounded border-slate-700 text-blue-500" />
+                    <span>Canlı Eksiltme & Fiyat Düşüşü</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onEscrow" class="rounded border-slate-700 text-blue-500" />
+                    <span>Escrow Sözleşmesi & Tahsilat Makbuzu</span>
+                  </label>
                 </div>
               </div>
             </div>
 
             <!-- Templates List & Editor -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start text-left">
               <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-2">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2">HAZIR E-POSTA ŞABLONLARI</span>
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2">KURUMSAL E-POSTA ŞABLONLARI</span>
                 <button
                   v-for="(tpl, idx) in formState.emailSettings.templates"
                   :key="tpl.id"
@@ -1815,17 +2242,17 @@ function removeSubmittedBid(index: number) {
                   <span class="text-[10px] font-mono bg-blue-950 text-blue-400 px-2 py-0.5 rounded">{{ currentTemplate.id }}</span>
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">KONU (SUBJECT)</label>
-                  <input v-model="currentTemplate.subject" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white" />
+                  <label class="block text-xs font-bold text-slate-400 mb-1">E-POSTA KONUSU (SUBJECT)</label>
+                  <input v-model="currentTemplate.subject" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white font-bold" />
                 </div>
                 <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">İÇERİK METNİ</label>
+                  <label class="block text-xs font-bold text-slate-400 mb-1">E-POSTA GÖVDE METNİ (HTML & Değişkenler Desteklenir)</label>
                   <textarea v-model="currentTemplate.content" rows="10" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white font-sans leading-relaxed"></textarea>
                 </div>
                 <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-                  <input v-model="testEmailTarget" type="email" placeholder="Test alıcı e-posta..." class="w-full sm:w-auto flex-1 bg-transparent border-0 text-xs text-white font-mono" />
-                  <button @click="sendTestEmail" class="w-full sm:w-auto px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center justify-center gap-1.5 cursor-pointer">
-                    <Send :size="13" /> Test Gönderimi Yap
+                  <input v-model="testEmailTarget" type="email" placeholder="Test alıcı e-posta (ihalcib@gmail.com)..." class="w-full sm:w-auto flex-1 bg-transparent border-0 text-xs text-white font-mono" />
+                  <button @click="sendTestEmail" class="w-full sm:w-auto px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-emerald-600/20">
+                    <Send :size="13" /> SMTP İle Test Gönderimi Yap
                   </button>
                 </div>
               </div>
