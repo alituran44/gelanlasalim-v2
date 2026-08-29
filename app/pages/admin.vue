@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { 
   Save, 
   RotateCcw, 
@@ -62,7 +62,10 @@ import {
   RefreshCw,
   Zap,
   Smartphone,
-  Scale
+  Scale,
+  Building2,
+  X,
+  Check
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
@@ -73,6 +76,7 @@ definePageMeta({
 })
 
 const router = useRouter()
+const route = useRoute()
 const { cmsData, saveCmsData, resetCmsData } = useCmsData()
 const { config: netGsmConfig, logs: smsLogs, saveConfig: saveNetGsmConfig, sendSms, clearLogs: clearSmsLogs } = useNetGsm()
 
@@ -315,38 +319,53 @@ onMounted(() => {
       isLoggedIn.value = true
     }
 
+    if (route.query.tab) {
+      activeTab.value = String(route.query.tab)
+    }
+
     try {
       // 1. Load Live Registered User / KYC
       const session = JSON.parse(localStorage.getItem('userSession') || '{}')
       if (session.email || session.companyName || session.company) {
         const compName = session.companyName || session.company || 'Ali Turan Sanayi A.Ş.'
-        const existsInKyc = formState.kycVerifications.some((k: any) => k.email === session.email || k.companyName === compName)
-        if (!existsInKyc) {
-          formState.kycVerifications.unshift({
-            id: 'KYC-2026-01',
-            companyName: compName,
-            legalName: session.legalName || compName,
-            contactPerson: session.name || session.firstName || 'Ali Turan',
-            email: session.email || 'ihalcib@gmail.com',
-            phone: session.phone || '0850 840 86 95',
-            taxNo: session.taxNo || '4700854210',
-            taxOffice: session.taxOffice || 'Çanakkale Vergi Dairesi',
-            mersis: session.mersis || '0470-0854-2100-0001',
-            sicilNo: session.sicilNo || '14520',
-            sectors: session.sectors || 'Ambalaj, İnşaat, Lojistik',
-            authProvider: session.authProvider || 'google',
-            submissionDate: '29.08.2026',
-            status: 'approved',
-            badgeGranted: true,
-            docs: {
-              vergi: true,
-              sicil: true,
-              imza: true,
-              faaliyet: true
-            }
-          })
+        const existingIdx = formState.kycVerifications.findIndex((k: any) => k.email === session.email || k.companyName === compName)
+        const userKycObj = {
+          id: 'KYC-2026-01',
+          companyName: compName,
+          companyType: session.companyType || 'Limited Şirket (LTD)',
+          legalName: session.legalName || compName,
+          authorizedPerson: session.name || session.firstName || 'Ali Turan',
+          email: session.email || 'ihalcib@gmail.com',
+          phone: session.phone || '0850 840 86 95',
+          taxNo: session.taxNo || '4700854210',
+          taxOffice: session.taxOffice || 'Çanakkale Vergi Dairesi',
+          mersis: session.mersis || '0470-0854-2100-0001',
+          sicilNo: session.sicilNo || '14520',
+          sectors: session.sectors || 'Ambalaj, İnşaat, Lojistik',
+          authProvider: session.authProvider || 'google',
+          uploadedDocs: ['2026 Yılı Onaylı Vergi Levhası', 'Noter Tasdikli İmza Sirküleri', 'Ticaret Sicil Gazetesi', 'Oda Faaliyet Belgesi'],
+          status: session.kycStatus || (session.isVerified ? 'approved' : 'pending'),
+          badgeGranted: session.isVerified || false,
+          createdAt: '29.08.2026',
+          rejectionReason: ''
+        }
+
+        if (existingIdx >= 0) {
+          formState.kycVerifications[existingIdx] = { ...formState.kycVerifications[existingIdx], ...userKycObj }
+        } else {
+          formState.kycVerifications.unshift(userKycObj)
         }
       }
+
+      // Ensure every item in kycVerifications has uploadedDocs as array and authorizedPerson
+      formState.kycVerifications.forEach((k: any) => {
+        if (!k.uploadedDocs || !Array.isArray(k.uploadedDocs)) {
+          k.uploadedDocs = ['2026 Yılı Onaylı Vergi Levhası', 'İmza Sirküleri', 'Ticaret Sicil Gazetesi']
+        }
+        if (!k.authorizedPerson && k.contactPerson) {
+          k.authorizedPerson = k.contactPerson
+        }
+      })
 
       // 2. Load Live Created Tenders
       const liveTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
@@ -438,8 +457,14 @@ function exportDataBackup() {
 }
 
 // ----------------------------------------------------
-// KYC Approval Handlers
+// KYC Approval Handlers & Document Inspector
 // ----------------------------------------------------
+const previewingDoc = ref<{ docName: string; kyc: any } | null>(null)
+
+function previewDoc(docName: string, kyc: any) {
+  previewingDoc.value = { docName, kyc }
+}
+
 function approveKyc(kyc: any) {
   kyc.status = 'approved'
   kyc.badgeGranted = true
@@ -1349,13 +1374,26 @@ function removeSubmittedBid(index: number) {
                     </span>
                   </div>
 
-                  <div class="text-[11px] text-slate-300 space-y-1 bg-slate-900/70 p-3 rounded-xl border border-slate-800">
+                  <div class="text-[11px] text-slate-300 space-y-2 bg-slate-900/70 p-3 rounded-xl border border-slate-800">
                     <div><strong>Yetkili:</strong> {{ kyc.authorizedPerson }}</div>
                     <div><strong>İletişim:</strong> {{ kyc.phone }} | {{ kyc.email }}</div>
-                    <div><strong>Yüklenen Evraklar:</strong> 
-                      <span class="text-blue-400 font-mono"> {{ kyc.uploadedDocs.join(', ') }}</span>
+                    <div>
+                      <strong class="block text-[10px] text-slate-400 uppercase tracking-wider mb-1">Yüklenen Resmi Evraklar (İncelemek İçin Tıklayın):</strong> 
+                      <div class="flex flex-wrap gap-1.5">
+                        <button 
+                          v-for="doc in (Array.isArray(kyc.uploadedDocs) ? kyc.uploadedDocs : ['Vergi Levhası (2026)', 'İmza Sirküleri', 'Ticaret Sicil Gazetesi'])"
+                          :key="doc"
+                          type="button"
+                          @click="previewDoc(doc, kyc)"
+                          class="px-2.5 py-1 rounded-lg bg-blue-950/70 hover:bg-blue-900 border border-blue-800/80 text-blue-300 font-mono text-[10px] flex items-center gap-1.5 cursor-pointer transition shadow-xs"
+                        >
+                          <FileText :size="11" class="text-blue-400" />
+                          <span>{{ doc }}</span>
+                          <span class="text-[9px] bg-blue-900/80 px-1 py-0.2 rounded text-blue-200">İncele 👁️</span>
+                        </button>
+                      </div>
                     </div>
-                    <div v-if="kyc.rejectionReason" class="text-red-400">
+                    <div v-if="kyc.rejectionReason" class="text-red-400 font-medium">
                       <strong>Ret Nedeni:</strong> {{ kyc.rejectionReason }}
                     </div>
                   </div>
@@ -2909,6 +2947,61 @@ function removeSubmittedBid(index: number) {
         </div>
 
       </main>
+    </div>
+
+    <!-- KYC DOCUMENT INSPECTION MODAL -->
+    <div v-if="previewingDoc" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+      <div class="bg-slate-900 rounded-3xl border border-slate-800 p-6 max-w-lg w-full shadow-2xl text-left space-y-4">
+        <div class="flex justify-between items-start border-b border-slate-800 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="p-2 rounded-xl bg-blue-950 border border-blue-800 text-blue-400">
+              <FileCheck :size="20" />
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-white">{{ previewingDoc.docName }}</h3>
+              <p class="text-[11px] text-slate-400">{{ previewingDoc.kyc.companyName }} • Vergi No: {{ previewingDoc.kyc.taxNo }}</p>
+            </div>
+          </div>
+          <button @click="previewingDoc = null" class="p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white transition cursor-pointer">
+            <X :size="16" />
+          </button>
+        </div>
+
+        <!-- Simulated Official Document Card -->
+        <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3 font-mono text-xs">
+          <div class="flex justify-between items-center text-[10px] text-slate-500 border-b border-slate-800 pb-2">
+            <span>T.C. RESMİ DİJİTAL DOĞRULAMA</span>
+            <span class="text-emerald-400 font-bold">✓ E-İMZALI / TASDİKLİ</span>
+          </div>
+          <div class="space-y-1.5 text-slate-300">
+            <div><strong class="text-slate-400 font-sans">Kurumsal Ünvan:</strong> {{ previewingDoc.kyc.companyName }}</div>
+            <div><strong class="text-slate-400 font-sans">Yetkili Temsilci:</strong> {{ previewingDoc.kyc.authorizedPerson }}</div>
+            <div><strong class="text-slate-400 font-sans">Vergi Dairesi & No:</strong> {{ previewingDoc.kyc.taxOffice }} / {{ previewingDoc.kyc.taxNo }}</div>
+            <div><strong class="text-slate-400 font-sans">Belge Türü:</strong> {{ previewingDoc.docName }}</div>
+            <div><strong class="text-slate-400 font-sans">Onay Durumu:</strong> 
+              <span class="text-emerald-400 font-bold font-sans" v-if="previewingDoc.kyc.status === 'approved'">✓ ONAYLI (Mavi Rozet Verildi)</span>
+              <span class="text-amber-400 font-bold font-sans" v-else>⏳ Admin Onayı Bekliyor</span>
+            </div>
+          </div>
+          <div class="text-[10px] text-slate-500 pt-2 border-t border-slate-800 flex justify-between">
+            <span>Zaman Damgası: {{ previewingDoc.kyc.createdAt }}</span>
+            <span>Kayıt İzi: TR-{{ previewingDoc.kyc.taxNo }}-2026</span>
+          </div>
+        </div>
+
+        <div class="flex gap-2 justify-end pt-2">
+          <button @click="previewingDoc = null" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl text-xs font-bold transition cursor-pointer">
+            Kapat
+          </button>
+          <button 
+            v-if="previewingDoc.kyc.status !== 'approved'"
+            @click="approveKyc(previewingDoc.kyc); previewingDoc = null" 
+            class="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-md shadow-emerald-600/20"
+          >
+            <CheckCircle2 :size="14" /> Bu Şirketi Onayla & Mavi Rozet Ver
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- GLOBAL TOAST -->
