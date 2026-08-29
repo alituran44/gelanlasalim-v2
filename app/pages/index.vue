@@ -105,7 +105,10 @@ import { useCmsData } from '~/composables/useCmsData'
 
 // ==================== DİNAMİK CMS VERİ BAĞLANTISI ====================
 const { cmsData } = useCmsData()
-const allTenders = computed(() => cmsData.value?.dashboard?.tenders || [])
+const allTenders = computed(() => {
+  const raw = cmsData.value?.dashboard?.tenders || []
+  return raw.filter((t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected')
+})
 
 const todayPublishedCount = computed(() => allTenders.value.filter(t => t.durum !== 'closed').length)
 const todayOngoingCount = computed(() => allTenders.value.filter(t => t.durum === 'active').length)

@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { locale } from '~/composables/useLocale'
-import { AlertCircle, Calendar, UploadCloud, FileText, FileSpreadsheet, X, Camera, Eye, Trash2, Plus } from 'lucide-vue-next'
+import { AlertCircle, Calendar, UploadCloud, FileText, FileSpreadsheet, X, Camera, Eye, Trash2, Plus, ShieldAlert, FileCheck, CheckCircle2, FilePlus2, ArrowLeft } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { usePublicApis } from '~/composables/usePublicApis'
 
@@ -14,6 +14,48 @@ const { fetchTrHolidays, trPublicHolidays } = usePublicApis()
 
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const imageInputRef = ref<HTMLInputElement | null>(null)
+
+// Check if company is verified by Admin KYC desk
+const isCompanyVerified = computed(() => {
+  if (typeof window === 'undefined') return true
+  try {
+    const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    const docs = JSON.parse(localStorage.getItem('companyVerificationDocs') || '{}')
+
+    if (session.isVerified === true || session.kycStatus === 'approved' || docs.status === 'approved' || docs.isVerified === true) {
+      return true
+    }
+
+    const compName = session.companyName || session.company || ''
+    const email = session.email || ''
+    const inCms = (cmsData.value?.kycVerifications || []).find((k: any) => 
+      (email && k.email === email) || (compName && k.companyName === compName)
+    )
+    if (inCms && inCms.status === 'approved') {
+      return true
+    }
+  } catch (e) {}
+  return false
+})
+
+const companyKycStatus = computed<'missing' | 'pending' | 'rejected' | 'approved'>(() => {
+  if (isCompanyVerified.value) return 'approved'
+  if (typeof window === 'undefined') return 'pending'
+  try {
+    const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    const docs = JSON.parse(localStorage.getItem('companyVerificationDocs') || '{}')
+    if (session.kycStatus === 'rejected' || docs.status === 'rejected') return 'rejected'
+    if (session.kycStatus === 'pending' || docs.status === 'pending') return 'pending'
+    
+    const compName = session.companyName || session.company || ''
+    const email = session.email || ''
+    const inCms = (cmsData.value?.kycVerifications || []).find((k: any) => 
+      (email && k.email === email) || (compName && k.companyName === compName)
+    )
+    if (inCms) return inCms.status as any
+  } catch (e) {}
+  return 'pending'
+})
 
 const form = ref({
   baslik: '',
@@ -310,6 +352,11 @@ function removeFile(index: number) {
 }
 
 function handleSubmit() {
+  if (!isCompanyVerified.value) {
+    alert('⛔ İHALE OLUŞTURMA ENGELLENDİ!\n\nŞirketinizin KYC ve kurumsal evrak onay süreci henüz tamamlanmamıştır.\n\nPlatform güvenliği gereği yalnızca Admin Masası tarafından incelenip Mavi Rozet onayı verilmiş onaylı firmalar ihale açabilir.\n\nLütfen "Firma Doğrulama" sayfasından Vergi Levhası, İmza Sirküleri ve Sicil Gazetesi evraklarınızı yükleyiniz veya Admin onayını bekleyiniz.')
+    return
+  }
+
   if (!form.value.baslik) {
     alert(locale.value === 'tr' ? 'Lütfen ihale başlığını giriniz.' : 'Please enter a tender title.')
     return
@@ -354,7 +401,9 @@ function handleSubmit() {
     subCategory: subCat,
     sure: form.value.sure || '7 gün kaldı',
     teklifSayisi: 0,
-    durum: 'active',
+    durum: 'pending_approval',
+    adminApproved: false,
+    statusLabel: 'Yönetici Onayı Bekliyor',
     butce: budgetVal,
     city: form.value.sehir || 'Balıkesir',
     teslimatAdresi: deliveryAddress,
@@ -397,8 +446,8 @@ function handleSubmit() {
       const notifications = JSON.parse(localStorage.getItem('userNotifications') || '[]')
       notifications.unshift({
         id: Date.now(),
-        title: 'Yeni İhale Başarıyla Açıldı',
-        desc: `"${form.value.baslik}" başlıklı satın alma talebiniz ilgili onaylı tedarikçilere iletildi.`,
+        title: 'İhale Admin Onayına İletildi',
+        desc: `"${form.value.baslik}" başlıklı satın alma talebiniz oluşturuldu ve Admin Onay Masası'na gönderildi. Onaylandıktan sonra Pazar Yeri'nde yayınlanacaktır.`,
         date: 'Şimdi',
         read: false,
         type: 'tender'
@@ -457,11 +506,39 @@ function handleSubmit() {
       <p class="text-sm mt-0.5" style="color: #64748B;">Satın alma talebiniz için tedarikçilerden rekabetçi canlı teklifler toplayın</p>
     </div>
 
+    <!-- KURUMSAL KYC & EVRAK ONAYI BLOKAJ KARTI -->
+    <div v-if="!isCompanyVerified" class="mb-6 rounded-2xl border border-amber-400 bg-amber-50/90 p-5 text-left space-y-3 shadow-xs">
+      <div class="flex items-start gap-3">
+        <div class="p-2.5 bg-amber-100 text-amber-800 rounded-xl shrink-0">
+          <ShieldAlert :size="24" />
+        </div>
+        <div class="space-y-1">
+          <div class="flex items-center gap-2">
+            <h3 class="text-sm font-black text-amber-900">Kurumsal Evrak Onayı (KYC) Bekleniyor</h3>
+            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-200 text-amber-900 uppercase">
+              {{ companyKycStatus === 'rejected' ? 'Başvuru Reddedildi' : 'Onay Bekliyor / Evrak Eksik' }}
+            </span>
+          </div>
+          <p class="text-xs text-amber-800 leading-relaxed font-medium">
+            İhaleciBurada platformunda ihale açabilmek ve tedarikçilerden teklif toplayabilmek için şirketinizin <strong>Vergi Levhası, İmza Sirküleri ve Sicil Gazetesi</strong> evraklarının Admin onayından geçmiş (Mavi Rozet) olması zorunludur.
+          </p>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-amber-200">
+        <span class="text-[11px] text-amber-900 font-bold">
+          {{ companyKycStatus === 'rejected' ? '⚠️ Evraklarınız reddedildi. Lütfen güncel evrakları yükleyiniz.' : '⏳ Evraklarınız Admin onay masasında incelenmektedir.' }}
+        </span>
+        <NuxtLink to="/firma-dogrulama" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-black text-xs rounded-xl transition flex items-center gap-1.5 shadow-md">
+          <FileCheck :size="14" /> Firma Evraklarını Yükle / Doğrula →
+        </NuxtLink>
+      </div>
+    </div>
+
     <!-- Başarı Mesajı -->
     <div v-if="showSuccess" class="mb-6 rounded-xl bg-emerald-50 border border-emerald-200 p-5 text-center transition-all animate-bounce">
       <CheckCircle2 class="text-emerald-500 mx-auto mb-2" :size="36" />
-      <h3 class="text-sm font-bold text-emerald-800">İhale Başarıyla Oluşturuldu!</h3>
-      <p class="text-xs text-emerald-600 mt-1">İhale Kodu: <strong>{{ createdId }}</strong>. İhalelerim listesine yönlendiriliyorsunuz...</p>
+      <h3 class="text-sm font-bold text-emerald-800">İhale Oluşturuldu ve Admin Onayına Gönderildi!</h3>
+      <p class="text-xs text-emerald-600 mt-1">İhale Kodu: <strong>{{ createdId }}</strong>. İhale şartnameniz Admin onayının ardından Pazar Yeri'nde yayına alınacaktır...</p>
     </div>
 
     <!-- İhale Formu -->
@@ -792,11 +869,21 @@ function handleSubmit() {
       <!-- Gönder Butonu -->
       <div class="pt-2">
         <button 
+          v-if="isCompanyVerified"
           type="submit" 
           class="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#0F223D] hover:bg-[#003057] text-white font-black text-sm py-4 transition shadow-xl cursor-pointer"
         >
           <FilePlus2 :size="16" class="text-emerald-400" />
-          İhaleyi Başlat ve İlan Et
+          İhaleyi Oluştur ve Admin Onayına Gönder
+        </button>
+        <button 
+          v-else
+          type="button" 
+          @click="handleSubmit"
+          class="w-full flex items-center justify-center gap-2 rounded-2xl bg-amber-700/80 hover:bg-amber-800 text-white font-black text-sm py-4 transition shadow-lg cursor-pointer"
+        >
+          <ShieldAlert :size="16" class="text-amber-300" />
+          Kurumsal Evrak Onayı Bekleniyor (İhale Başlatılamaz)
         </button>
       </div>
 

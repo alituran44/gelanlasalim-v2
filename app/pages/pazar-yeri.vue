@@ -105,7 +105,8 @@ onMounted(() => {
 })
 
 const allTenders = computed(() => {
-  return cmsData.value?.dashboard?.tenders || []
+  const raw = cmsData.value?.dashboard?.tenders || []
+  return raw.filter((t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected')
 })
 
 const categories = [

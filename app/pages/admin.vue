@@ -444,7 +444,31 @@ function approveKyc(kyc: any) {
   kyc.status = 'approved'
   kyc.badgeGranted = true
   kyc.rejectionReason = ''
-  triggerToast(`"${kyc.companyName}" kurumsal hesabı ONAYLANDI ve Mavi Rozet verildi!`, 'success')
+  
+  // Synchronize with client session
+  if (typeof window !== 'undefined') {
+    try {
+      const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+      session.kycStatus = 'approved'
+      session.isVerified = true
+      session.verified = true
+      session.badgeGranted = true
+      if (kyc.companyName) session.companyName = kyc.companyName
+      localStorage.setItem('userSession', JSON.stringify(session))
+
+      localStorage.setItem('companyVerificationDocs', JSON.stringify({
+        status: 'approved',
+        isVerified: true,
+        badgeGranted: true,
+        companyName: kyc.companyName,
+        taxNo: kyc.taxNo,
+        taxOffice: kyc.taxOffice
+      }))
+    } catch (e) {}
+  }
+  
+  saveCmsData(JSON.parse(JSON.stringify(formState)))
+  triggerToast(`"${kyc.companyName}" kurumsal hesabı ONAYLANDI ve Mavi Rozet verildi! Artık ihale açabilir.`, 'success')
 }
 
 function rejectKyc(kyc: any) {
@@ -453,7 +477,99 @@ function rejectKyc(kyc: any) {
     kyc.status = 'rejected'
     kyc.badgeGranted = false
     kyc.rejectionReason = reason
+    
+    if (typeof window !== 'undefined') {
+      try {
+        const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+        session.kycStatus = 'rejected'
+        session.isVerified = false
+        session.verified = false
+        session.badgeGranted = false
+        localStorage.setItem('userSession', JSON.stringify(session))
+
+        localStorage.setItem('companyVerificationDocs', JSON.stringify({
+          status: 'rejected',
+          isVerified: false,
+          badgeGranted: false,
+          rejectionReason: reason
+        }))
+      } catch (e) {}
+    }
+    
+    saveCmsData(JSON.parse(JSON.stringify(formState)))
     triggerToast(`"${kyc.companyName}" başvurusu reddedildi.`, 'info')
+  }
+}
+
+function addSampleKyc() {
+  const sampleId = 'KYC-2026-' + Math.floor(100 + Math.random() * 900)
+  formState.kycVerifications.unshift({
+    id: sampleId,
+    companyName: 'Demirler İnşaat & Taahhüt Ltd. Şti.',
+    companyType: 'Limited Şirket (LTD)',
+    taxNo: '33491820491',
+    taxOffice: 'Balıkesir Karesi V.D.',
+    authorizedPerson: 'Murat Demir (Yönetici)',
+    phone: '0533 444 55 66',
+    email: 'murat@demirlerinsaat.com',
+    uploadedDocs: ['2026 Yılı Onaylı Vergi Levhası', 'Noter Tasdikli İmza Sirküleri', 'Ticaret Sicil Gazetesi'],
+    status: 'pending',
+    badgeGranted: false,
+    createdAt: new Date().toLocaleString('tr-TR'),
+    rejectionReason: ''
+  })
+  saveCmsData(JSON.parse(JSON.stringify(formState)))
+  triggerToast('Test için yeni onay bekleyen kurumsal KYC başvurusu eklendi!', 'success')
+}
+
+// ----------------------------------------------------
+// Tender Approval Handlers
+// ----------------------------------------------------
+const tenderFilterStatus = ref<'pending' | 'active' | 'all'>('pending')
+
+function approveTender(tender: any) {
+  tender.durum = 'active'
+  tender.adminApproved = true
+  tender.rejectionReason = ''
+  
+  if (typeof window !== 'undefined') {
+    try {
+      const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+      const target = myTenders.find((t: any) => t.id === tender.id)
+      if (target) {
+        target.durum = 'active'
+        target.adminApproved = true
+        localStorage.setItem('myTenders', JSON.stringify(myTenders))
+      }
+    } catch (e) {}
+  }
+  
+  saveCmsData(JSON.parse(JSON.stringify(formState)))
+  triggerToast(`"${tender.baslik}" başlıklı ihale ONAYLANDI ve Pazar Yeri'nde anında yayına alındı!`, 'success')
+}
+
+function rejectTender(tender: any) {
+  const reason = prompt('Lütfen ihaleyi ret gerekçesini giriniz:', 'Şartname detayları yetersiz veya bütçe aralığı eksik belirtilmiş.')
+  if (reason) {
+    tender.durum = 'rejected'
+    tender.adminApproved = false
+    tender.rejectionReason = reason
+    
+    if (typeof window !== 'undefined') {
+      try {
+        const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+        const target = myTenders.find((t: any) => t.id === tender.id)
+        if (target) {
+          target.durum = 'rejected'
+          target.adminApproved = false
+          target.rejectionReason = reason
+          localStorage.setItem('myTenders', JSON.stringify(myTenders))
+        }
+      } catch (e) {}
+    }
+    
+    saveCmsData(JSON.parse(JSON.stringify(formState)))
+    triggerToast(`"${tender.baslik}" ihalesi reddedildi.`, 'info')
   }
 }
 
@@ -1040,11 +1156,13 @@ function removeSubmittedBid(index: number) {
 
             <button 
               @click="activeTab = 'db_tenders'" 
-              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'db_tenders' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:bg-slate-800 hover:text-white'"
             >
-              <Folder :size="14" />
-              İhalelerim (Tenders)
+              <span class="flex items-center gap-2.5"><Folder :size="14" /> İhale Masası & Onay</span>
+              <span v-if="(formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'pending_approval' || t.adminApproved === false).length > 0" class="text-[9px] bg-amber-950 text-amber-300 border border-amber-800 px-1.5 py-0.2 rounded font-mono font-bold animate-pulse">
+                {{ (formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'pending_approval' || t.adminApproved === false).length }} Onay Bekleyen
+              </span>
             </button>
 
             <button 
@@ -1192,7 +1310,7 @@ function removeSubmittedBid(index: number) {
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'kyc_desk'" class="space-y-6">
             <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-3 gap-3">
                 <div>
                   <h3 class="text-sm font-black text-white flex items-center gap-2">
                     <ShieldCheck :size="16" class="text-emerald-400" />
@@ -1200,6 +1318,9 @@ function removeSubmittedBid(index: number) {
                   </h3>
                   <p class="text-[11px] text-slate-400">Firmaların yüklediği vergi levhası, imza sirküleri ve ticaret sicil evraklarını inceleyip Mavi Rozet onayını verin.</p>
                 </div>
+                <button @click="addSampleKyc" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-md shrink-0">
+                  <Plus :size="13" /> + Test KYC Başvurusu Ekle
+                </button>
               </div>
 
               <!-- KYC Cards Grid -->
@@ -1876,6 +1997,263 @@ function removeSubmittedBid(index: number) {
           </div>
 
           <!-- ========================================================================= -->
+          <!-- TAB: CRM MÜŞTERİ ADAYLARI -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'crm_leads'" class="space-y-6 text-left">
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <Users :size="16" class="text-blue-400" />
+                    CRM Müşteri ve Firma Aday Havuzu
+                  </h3>
+                  <p class="text-[11px] text-slate-400">Üye olan, 1 ay ücretsiz deneme başlatan ve kurumsal teklif bekleyen potansiyel firmaları takip edin.</p>
+                </div>
+              </div>
+
+              <!-- New Lead Form -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 pt-2">
+                <input v-model="newLeadForm.companyName" type="text" placeholder="Firma Ünvanı *" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                <input v-model="newLeadForm.contactName" type="text" placeholder="Yetkili Kişi" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                <input v-model="newLeadForm.email" type="email" placeholder="E-Posta Adresi *" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                <input v-model="newLeadForm.phone" type="text" placeholder="Telefon (05XX...)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                <button @click="addLead" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
+                  <Plus :size="14" /> + Müşteri Ekle
+                </button>
+              </div>
+
+              <!-- Filter & Search Bar -->
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-800">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <button 
+                    v-for="st in ['ALL', '1 Ay Deneme Aktif', 'Görüşülüyor', 'Kazanıldı', 'Mavi Rozet Verildi']"
+                    :key="st"
+                    @click="crmStatusFilter = st"
+                    class="px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer"
+                    :class="crmStatusFilter === st ? 'bg-blue-600 text-white' : 'bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800'"
+                  >
+                    {{ st === 'ALL' ? 'Tümü' : st }}
+                  </button>
+                </div>
+                <input v-model="crmSearchQuery" type="text" placeholder="Firma, yetkili veya e-posta ile ara..." class="rounded-xl border border-slate-800 bg-slate-950 p-2 text-xs text-white w-full sm:w-64" />
+              </div>
+
+              <!-- Leads Table -->
+              <div class="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="bg-slate-900/90 border-b border-slate-800 text-[10px] font-black text-slate-400 uppercase">
+                      <th class="p-3.5">FİRMA ÜNVANI</th>
+                      <th class="p-3.5">YETKİLİ & İLETİŞİM</th>
+                      <th class="p-3.5">DURUM / AŞAMA</th>
+                      <th class="p-3.5">KAYIT TARİHİ</th>
+                      <th class="p-3.5 text-right">İŞLEM</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-800/60">
+                    <tr v-for="(lead, idx) in filteredLeads" :key="lead.id || idx" class="hover:bg-slate-900/40 transition">
+                      <td class="p-3.5 font-bold text-white">
+                        <div>{{ lead.companyName }}</div>
+                        <div class="text-[11px] text-slate-400 font-normal mt-0.5">{{ lead.notes }}</div>
+                      </td>
+                      <td class="p-3.5">
+                        <div class="text-slate-200 font-medium">{{ lead.contactName }}</div>
+                        <div class="text-slate-400 font-mono text-[11px]">{{ lead.email }} • {{ lead.phone }}</div>
+                      </td>
+                      <td class="p-3.5">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-950 text-blue-300 border border-blue-800">
+                          {{ lead.status }}
+                        </span>
+                      </td>
+                      <td class="p-3.5 text-slate-400 font-mono text-[11px]">{{ lead.createdAt }}</td>
+                      <td class="p-3.5 text-right">
+                        <button @click="removeLead(idx)" class="p-1.5 bg-red-950/30 text-red-400 hover:bg-red-950 rounded cursor-pointer">
+                          <Trash2 :size="13" />
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB: E-POSTA ŞABLONLARI & GÖNDERİM MERKEZİ -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'email_center'" class="space-y-6 text-left">
+            
+            <!-- SMTP Server Configuration -->
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <Mail :size="16" class="text-blue-400" />
+                    Giden E-Posta Sunucusu (SMTP Gateway) Yapılandırması
+                  </h3>
+                  <p class="text-[11px] text-slate-400">Tüm sistem bildirimleri, yeni ihale duyuruları ve teklif onayları bu kurumsal SMTP sunucusu üzerinden iletilir.</p>
+                </div>
+                <span class="px-2.5 py-1 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold flex items-center gap-1.5">
+                  <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
+                  SMTP Aktif
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">SMTP HOST SUNUCU</label>
+                  <input v-model="formState.emailSettings.smtpHost" type="text" placeholder="smtp.gmail.com" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">SMTP PORT</label>
+                  <input v-model="formState.emailSettings.smtpPort" type="number" placeholder="587" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">GÖNDEREN E-POSTA (KULLANICI)</label>
+                  <input v-model="formState.emailSettings.senderEmail" type="email" placeholder="ihalcib@gmail.com" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono font-bold text-blue-400" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">GÖNDEREN ADI / ÜNVAN</label>
+                  <input v-model="formState.emailSettings.senderName" type="text" placeholder="İhaleciBurada.com B2B Satın Alma" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                </div>
+              </div>
+
+              <!-- Automatic Email Notification Triggers -->
+              <div class="pt-2 border-t border-slate-800">
+                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2">OTOMATİK SİSTEM E-POSTA TETİKLEYİCİLERİ</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-slate-300">
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onRegister" class="rounded border-slate-700 text-blue-500" />
+                    <span>Yeni Üyelik & KYC Onay Bildirimi</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onNewTender" class="rounded border-slate-700 text-blue-500" />
+                    <span>Yeni İhale & Şartname Teklif Çağrısı</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onNewBid" class="rounded border-slate-700 text-blue-500" />
+                    <span>İhaleye Yeni Teklif Geldi Uyarısı</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onAuction" class="rounded border-slate-700 text-blue-500" />
+                    <span>Canlı Tersine Eksiltme Başladı Uyarısı</span>
+                  </label>
+                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
+                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onEscrow" class="rounded border-slate-700 text-blue-500" />
+                    <span>Escrow Güvenli Ödeme Makbuzu</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Email Templates Selector & Visual Editor -->
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                  <FileText :size="14" class="text-blue-400" /> Hazır Kurumsal E-Posta Şablonları ({{ (formState.emailSettings.templates || []).length }} Şablon)
+                </h3>
+                <div class="flex items-center gap-2">
+                  <span class="text-xs text-slate-400">Şablon Düzenle:</span>
+                  <select v-model="selectedTemplateIdx" class="p-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white font-bold">
+                    <option v-for="(tpl, idx) in formState.emailSettings.templates" :key="tpl.id" :value="idx">{{ tpl.name }}</option>
+                  </select>
+                </div>
+              </div>
+
+              <div v-if="currentTemplate" class="space-y-3">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 mb-1">E-POSTA KONUSU (SUBJECT)</label>
+                  <input v-model="currentTemplate.subject" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-bold" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 mb-1">E-POSTA METNİ & İÇERİK ŞABLONU</label>
+                  <textarea v-model="currentTemplate.content" rows="6" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-slate-200 leading-relaxed font-sans"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Test Email Dispatcher -->
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
+                  <Send :size="14" class="text-emerald-400" /> Canlı SMTP Test E-Postası Gönderimi
+                </h3>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+                <div class="sm:col-span-2">
+                  <label class="block text-[10px] font-bold text-slate-400 mb-1">TEST ALICI E-POSTA ADRESİ</label>
+                  <input v-model="testEmailTarget" type="email" placeholder="ihalcib@gmail.com" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                </div>
+                <div>
+                  <button @click="sendTestEmail" class="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black transition cursor-pointer flex items-center justify-center gap-1.5 shadow-lg shadow-blue-600/20">
+                    <Send :size="13" /> Test E-Postasını Gönder
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB: BÜLTEN ABONELERİ -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'newsletter_subs'" class="space-y-6 text-left">
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <div>
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <Inbox :size="16" class="text-blue-400" />
+                    E-Bülten ve Sektörel İhale Bildirimi Aboneleri
+                  </h3>
+                  <p class="text-[11px] text-slate-400">Web sitesi alt bilgisinden ve ihale bülteninden abone olan kurumsal firmaların e-posta listesi.</p>
+                </div>
+              </div>
+
+              <!-- Add Subscriber -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <input v-model="newSubscriberEmail" type="email" placeholder="E-Posta Adresi *" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
+                <input v-model="newSubscriberCompany" type="text" placeholder="Firma Adı (Opsiyonel)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                <button @click="addSubscriber" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black transition cursor-pointer flex items-center justify-center gap-1.5">
+                  <Plus :size="14" /> + Abone Ekle
+                </button>
+              </div>
+
+              <!-- Subscribers Table -->
+              <div class="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
+                <table class="w-full text-left text-xs border-collapse font-mono">
+                  <thead>
+                    <tr class="bg-slate-900/90 border-b border-slate-800 text-[10px] font-black text-slate-400 uppercase font-sans">
+                      <th class="p-3.5">E-POSTA</th>
+                      <th class="p-3.5">FİRMA</th>
+                      <th class="p-3.5">KAYIT TARİHİ</th>
+                      <th class="p-3.5">DURUM</th>
+                      <th class="p-3.5 text-right">İŞLEM</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-800/60 text-[11px]">
+                    <tr v-for="(sub, idx) in formState.emailSettings.subscribers" :key="sub.id || idx" class="hover:bg-slate-900/40 transition">
+                      <td class="p-3.5 font-bold text-white">{{ sub.email }}</td>
+                      <td class="p-3.5 text-slate-300 font-sans">{{ sub.companyName }}</td>
+                      <td class="p-3.5 text-slate-400">{{ sub.subscribedAt }}</td>
+                      <td class="p-3.5">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-950 text-emerald-400 border border-emerald-800 font-sans">
+                          ✓ {{ sub.status }}
+                        </span>
+                      </td>
+                      <td class="p-3.5 text-right">
+                        <button @click="removeSubscriber(idx)" class="p-1.5 bg-red-950/30 text-red-400 hover:bg-red-950 rounded cursor-pointer font-sans">
+                          <Trash2 :size="13" />
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ========================================================================= -->
           <!-- TAB 6: KUPON & PROMOSYON KODLARI -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'promo_codes'" class="space-y-6">
@@ -2354,27 +2732,126 @@ function removeSubmittedBid(index: number) {
           </div>
 
           <!-- ========================================================================= -->
-          <!-- TAB: DB TENDERS -->
+          <!-- TAB: İHALE YÖNETİMİ & ONAY MASASI -->
           <!-- ========================================================================= -->
-          <div v-if="activeTab === 'db_tenders'" class="space-y-4">
-            <div class="flex justify-between items-center mb-2">
-              <label class="block text-xs font-bold text-slate-400">YAYINDAKİ İHALELER LİSTESİ</label>
-              <button @click="addDashboardTender" class="flex items-center gap-1 rounded bg-blue-600 px-3 py-1.5 text-xs font-bold text-white transition cursor-pointer">
-                <Plus :size="14" /> Yeni İhale
-              </button>
-            </div>
-            <div class="space-y-4">
-              <div v-for="(tender, index) in formState.dashboard.tenders" :key="tender.id" class="p-4 rounded-xl border border-slate-800 bg-slate-900/30 space-y-3">
-                <div class="flex justify-between items-center">
-                  <span class="text-xs font-mono text-blue-400 font-bold bg-blue-950/30 px-2 py-0.5 rounded">{{ tender.id }}</span>
-                  <button @click="removeDashboardTender(index)" class="p-2 bg-red-950/20 hover:bg-red-950 text-red-400 rounded-lg transition cursor-pointer">
-                    <Trash2 :size="14" />
+          <div v-if="activeTab === 'db_tenders'" class="space-y-6 text-left">
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <Folder :size="16" class="text-blue-400" />
+                    İhale Yönetim & Admin Onay Masası
+                  </h3>
+                  <p class="text-[11px] text-slate-400">Firmalar tarafından açılan ihaleleri inceleyin; şartname ve belgeleri onaylayarak pazar yerinde yayına alın.</p>
+                </div>
+                
+                <div class="flex items-center gap-2">
+                  <button @click="addDashboardTender" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-xs font-black text-white transition flex items-center gap-1.5 cursor-pointer shadow-md">
+                    <Plus :size="14" /> Yeni İhale Tanımla
                   </button>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <input v-model="tender.baslik" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
-                  <input v-model="tender.kategori" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
-                  <input v-model="tender.butce" type="text" class="w-full rounded-lg border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+              </div>
+
+              <!-- Status Filters -->
+              <div class="flex items-center gap-2">
+                <button 
+                  @click="tenderFilterStatus = 'pending'"
+                  class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                  :class="tenderFilterStatus === 'pending' ? 'bg-amber-600 text-white shadow-md' : 'bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800'"
+                >
+                  <Clock :size="13" /> Onay Bekleyenler ({{ (formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'pending_approval' || t.adminApproved === false).length }})
+                </button>
+                <button 
+                  @click="tenderFilterStatus = 'active'"
+                  class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                  :class="tenderFilterStatus === 'active' ? 'bg-emerald-600 text-white shadow-md' : 'bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800'"
+                >
+                  <CheckCircle2 :size="13" /> Yayındaki Aktif İhaleler ({{ (formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'active' && t.adminApproved !== false).length }})
+                </button>
+                <button 
+                  @click="tenderFilterStatus = 'all'"
+                  class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                  :class="tenderFilterStatus === 'all' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800'"
+                >
+                  <Layers :size="13" /> Tümü ({{ (formState.dashboard?.tenders || []).length }})
+                </button>
+              </div>
+
+              <!-- Tenders List -->
+              <div class="space-y-3 pt-2">
+                <div 
+                  v-for="(tender, index) in (formState.dashboard?.tenders || []).filter((t: any) => {
+                    if (tenderFilterStatus === 'pending') return t.durum === 'pending_approval' || t.adminApproved === false
+                    if (tenderFilterStatus === 'active') return t.durum === 'active' && t.adminApproved !== false
+                    return true
+                  })" 
+                  :key="tender.id" 
+                  class="p-5 rounded-2xl border bg-slate-950 space-y-3 transition"
+                  :class="(tender.durum === 'pending_approval' || tender.adminApproved === false) ? 'border-amber-500/50 bg-amber-950/10' : (tender.durum === 'rejected' ? 'border-red-900/40 bg-red-950/10' : 'border-slate-800')"
+                >
+                  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <span class="text-xs font-mono bg-blue-950 text-blue-400 border border-blue-800 px-2 py-0.5 rounded font-bold">{{ tender.id }}</span>
+                        <span class="text-sm font-black text-white">{{ tender.baslik }}</span>
+                        <span 
+                          class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider"
+                          :class="(tender.durum === 'pending_approval' || tender.adminApproved === false) ? 'bg-amber-950 text-amber-400 border border-amber-800 animate-pulse' : (tender.durum === 'rejected' ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-emerald-950 text-emerald-400 border border-emerald-800')"
+                        >
+                          {{ (tender.durum === 'pending_approval' || tender.adminApproved === false) ? '⏳ Onay Bekliyor' : (tender.durum === 'rejected' ? '✕ Reddedildi' : '✓ Yayında (Aktif)') }}
+                        </span>
+                      </div>
+                      <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-3">
+                        <span><strong>Kategori:</strong> {{ tender.kategori }}</span>
+                        <span><strong>Şehir:</strong> {{ tender.city || 'Belirtilmedi' }}</span>
+                        <span><strong>Açan Firma:</strong> <span class="text-blue-400">{{ tender.ownerCompany || 'Kurumsal Üye' }}</span></span>
+                        <span><strong>Bütçe:</strong> <span class="text-emerald-400 font-bold">{{ tender.butce }}</span></span>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                      <button 
+                        v-if="tender.durum === 'pending_approval' || tender.adminApproved === false"
+                        @click="approveTender(tender)"
+                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition flex items-center gap-1 cursor-pointer shadow-md shadow-emerald-600/20"
+                      >
+                        <CheckCircle2 :size="13" /> Onayla ve Yayına Al
+                      </button>
+                      <button 
+                        v-if="tender.durum !== 'rejected'"
+                        @click="rejectTender(tender)"
+                        class="px-3.5 py-2 bg-red-950/40 hover:bg-red-900/60 text-red-400 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-red-800/40"
+                      >
+                        <X :size="13" /> Reddet
+                      </button>
+                      <button 
+                        @click="removeDashboardTender(index)" 
+                        class="p-2 bg-slate-900 hover:bg-red-950/50 text-slate-400 hover:text-red-400 rounded-xl transition cursor-pointer"
+                        title="İhaleyi Tamamen Sil"
+                      >
+                        <Trash2 :size="14" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div v-if="tender.rejectionReason" class="text-xs text-red-400 bg-red-950/30 p-2.5 rounded-xl border border-red-900/40">
+                    <strong>Ret Gerekçesi:</strong> {{ tender.rejectionReason }}
+                  </div>
+
+                  <!-- Quick Inline Details Edit -->
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-800/60">
+                    <input v-model="tender.baslik" type="text" placeholder="İhale Başlığı" class="w-full rounded-xl border border-slate-800 bg-slate-900 p-2.5 text-xs text-white" />
+                    <input v-model="tender.kategori" type="text" placeholder="Kategori" class="w-full rounded-xl border border-slate-800 bg-slate-900 p-2.5 text-xs text-white" />
+                    <input v-model="tender.butce" type="text" placeholder="Bütçe Aralığı" class="w-full rounded-xl border border-slate-800 bg-slate-900 p-2.5 text-xs text-white" />
+                  </div>
+                </div>
+
+                <div v-if="(formState.dashboard?.tenders || []).filter((t: any) => {
+                  if (tenderFilterStatus === 'pending') return t.durum === 'pending_approval' || t.adminApproved === false
+                  if (tenderFilterStatus === 'active') return t.durum === 'active' && t.adminApproved !== false
+                  return true
+                }).length === 0" class="text-center py-12 text-slate-500 text-xs">
+                  Bu filtrede görüntülenecek ihale bulunmuyor.
                 </div>
               </div>
             </div>

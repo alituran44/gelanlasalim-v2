@@ -256,8 +256,22 @@ const statusTabs = computed(() => {
               <h3 class="font-bold text-sm text-slate-800">{{ tender.baslik }}</h3>
               <!-- Durum Rozeti -->
               <span 
-                v-if="tender.durum === 'closed' || tender.sure?.includes('Sonuçlandı') || tender.sure?.includes('Mutabakat')"
-                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1"
+                v-if="tender.durum === 'pending_approval' || tender.adminApproved === false"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1 animate-pulse"
+              >
+                <Clock :size="11" />
+                <span>⏳ Yönetici Onayı Bekliyor</span>
+              </span>
+              <span 
+                v-else-if="tender.durum === 'rejected'"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-red-100 text-red-800 border border-red-300 flex items-center gap-1"
+              >
+                <AlertCircle :size="11" />
+                <span>✕ Reddedildi</span>
+              </span>
+              <span 
+                v-else-if="tender.durum === 'closed' || tender.sure?.includes('Sonuçlandı') || tender.sure?.includes('Mutabakat')"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-purple-100 text-purple-900 border border-purple-300 flex items-center gap-1"
               >
                 <Lock :size="11" />
                 <span>Mutabakat Sağlandı</span>
@@ -274,8 +288,12 @@ const statusTabs = computed(() => {
                 class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1"
               >
                 <CheckCircle2 :size="11" />
-                <span>Yayında (Aktif)</span>
+                <span>🟢 Yayında (Aktif)</span>
               </span>
+            </div>
+
+            <div v-if="tender.rejectionReason" class="mt-1.5 text-xs text-red-700 bg-red-50 p-2 rounded-lg border border-red-200">
+              <strong>Yönetici Ret Gerekçesi:</strong> {{ tender.rejectionReason }}
             </div>
 
             <p class="text-xs text-slate-400 mt-1 font-medium">
