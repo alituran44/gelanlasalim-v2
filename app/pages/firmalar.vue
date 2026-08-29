@@ -29,165 +29,7 @@ const sectors = [
   'Tekstil & İş Güvenliği'
 ]
 
-const verifiedFirms = ref([
-  {
-    id: 1,
-    name: 'Kalyon & Kolin İnşaat Ortak Girişimi',
-    sector: 'İnşaat & Yapı',
-    city: 'Çanakkale',
-    district: 'Merkez',
-    verified: true,
-    rating: 4.9,
-    reviewCount: 54,
-    badge: 'Doğrulanmış Ana Yüklenici',
-    description: 'Büyük ölçekli kamu ve özel sektör otoyol, köprü, tünel, viyadük ve ağır sanayi yapıları inşaatında Türkiye’nin lider mühendislik konsorsiyumu.',
-    capacity: 'Yıllık 4.5 Milyon Ton Agrega & Çelik İşleme',
-    taxOffice: 'Çanakkale V.D.',
-    mersis: '0470-0854-2100-0001',
-    phone: '0850 840 86 95',
-    email: 'ihalcib@gmail.com',
-    completedTenders: 42,
-    totalBids: 184,
-    tradeVolume: '148.5M ₺',
-    onTimeDelivery: '%99.1',
-    specCompliance: '%100',
-    avgResponseTime: '8 dk',
-    reviews: [
-      { author: 'Karayolları 14. Bölge Md.', rating: 5, date: '22.08.2026', comment: '1.500 Ton B420C nervürlü demir sevkiyatını şantiyeye 3 gün erken teslim ettiler. Kalite belgeleri eksiksizdi.' },
-      { author: 'DMO Genel Müdürlüğü', rating: 4.9, date: '15.07.2026', comment: 'Şartnameye ve statik hesaplara harfiyen uyuldu. Escrow ödeme süreci son derece profesyonel yönetildi.' }
-    ]
-  },
-  {
-    id: 2,
-    name: 'Turan Ambalaj ve Oluklu Mukavva San. A.Ş.',
-    sector: 'Ambalaj & Koli',
-    city: 'Çanakkale',
-    district: 'Merkez',
-    verified: true,
-    rating: 4.9,
-    reviewCount: 48,
-    badge: 'Onaylı Üretici',
-    description: '15 yıllık sektör tecrübesiyle kraft koli, flekso baskılı kutu ve endüstriyel ambalaj üretimi.',
-    capacity: 'Yıllık 12.000 Ton Üretim',
-    taxOffice: 'Çanakkale V.D.',
-    mersis: '0470-0854-2100-0001',
-    phone: '0850 840 86 95',
-    email: 'ihalcib@gmail.com',
-    completedTenders: 34,
-    totalBids: 142,
-    tradeVolume: '28.4M ₺',
-    onTimeDelivery: '%98.9',
-    specCompliance: '%100',
-    avgResponseTime: '10 dk',
-    reviews: [
-      { author: 'E-Ticaret Lojistik Masası', rating: 5, date: '18.08.2026', comment: '100.000 adet koli teslimatı onaylandı, hakediş ödemesi sorunsuz aktarıldı.' }
-    ]
-  },
-  {
-    id: 3,
-    name: 'Hepsiburada & Trendyol Lojistik Dağıtım A.Ş.',
-    sector: 'Ambalaj & Koli',
-    city: 'İstanbul',
-    district: 'Sarıyer',
-    verified: true,
-    rating: 4.8,
-    reviewCount: 68,
-    badge: 'Doğrulanmış Kurumsal Alıcı',
-    description: 'E-ticaret sevkiyatları için çift oluklu kraft mukavva koli, ambalaj ve paketleme malzemeleri tedarik zinciri yöneticisi.',
-    capacity: '5.000.000 Paket/Ay Lojistik Hacmi',
-    taxOffice: 'Büyük Mükellefler V.D.',
-    mersis: '0481-0293-8470-0001',
-    phone: '0212 331 00 00',
-    email: 'satinalma@eticaretlojistik.com',
-    completedTenders: 86,
-    totalBids: 312,
-    tradeVolume: '42.1M ₺',
-    onTimeDelivery: '%98.4',
-    specCompliance: '%99.2',
-    avgResponseTime: '12 dk',
-    reviews: [
-      { author: 'Marmara Kağıt Sanayi', rating: 5, date: '18.08.2026', comment: 'Düzenli satın alma yapan ve şartname koşullarına sadık saygın bir alıcı.' }
-    ]
-  },
-  {
-    id: 4,
-    name: 'Turan Enerji & Güneş Sistemleri A.Ş.',
-    sector: 'Enerji & Akaryakıt',
-    city: 'Çanakkale',
-    district: 'Merkez',
-    verified: true,
-    rating: 5.0,
-    reviewCount: 31,
-    badge: 'Onaylı GES Müteahhidi',
-    description: 'Endüstriyel çatı ve arazi Güneş Enerji Santralleri (GES), Tier-1 panel temini ve anahtar teslim EPC mühendislik hizmetleri.',
-    capacity: 'Yıllık 35 MWp Kurulu Güç Kapasitesi',
-    taxOffice: 'Çanakkale V.D.',
-    mersis: '0470-0854-2100-0001',
-    phone: '0850 840 86 95',
-    email: 'ihalcib@gmail.com',
-    completedTenders: 28,
-    totalBids: 94,
-    tradeVolume: '64.8M ₺',
-    onTimeDelivery: '%100',
-    specCompliance: '%100',
-    avgResponseTime: '5 dk',
-    reviews: [
-      { author: 'Çanakkale Onsekiz Mart Ünv.', rating: 5, date: '26.08.2026', comment: '1.2 MW Çatı GES kurulumunu TEDAŞ onaylı olarak 45 günde devreye aldılar.' }
-    ]
-  },
-  {
-    id: 5,
-    name: 'Asyaport Liman İşletmeleri A.Ş.',
-    sector: 'Lojistik & Nakliye',
-    city: 'Tekirdağ',
-    district: 'Süleymanpaşa',
-    verified: true,
-    rating: 4.9,
-    reviewCount: 45,
-    badge: 'Stratejik Lojistik Limanı',
-    description: 'Marmara bölgesinin en büyük konteyner transit limanı ve 250+ tırlık entegre intermodal taşımacılık filosu.',
-    capacity: '2.5 Milyon TEU Yıllık Elleçleme Kapasitesi',
-    taxOffice: 'Süleymanpaşa V.D.',
-    mersis: '0392-0192-8470-0001',
-    phone: '0282 258 00 00',
-    email: 'lojistik@asyaport.com.tr',
-    completedTenders: 63,
-    totalBids: 215,
-    tradeVolume: '52.4M ₺',
-    onTimeDelivery: '%99.0',
-    specCompliance: '%100',
-    avgResponseTime: '15 dk',
-    reviews: [
-      { author: 'Türkiye Kömür İşletmeleri', rating: 5, date: '19.08.2026', comment: '250 seferlik konteyner sevkiyatını hasarsız ve tam zamanında gerçekleştirdiler.' }
-    ]
-  },
-  {
-    id: 6,
-    name: 'Savunma Sanayi Tedarik ve İmalat Grubu',
-    sector: 'Sanayi & Makine',
-    city: 'Ankara',
-    district: 'Ostim',
-    verified: true,
-    rating: 5.0,
-    reviewCount: 59,
-    badge: 'AS9100 Onaylı Üretici',
-    description: 'TUSAŞ, ASELSAN ve ROKETSAN standartlarında 5 eksen mikron hassasiyetli CNC talaşlı imalat ve kompozit işleme.',
-    capacity: 'Aylık 1.200 Adet Havacılık Komponenti',
-    taxOffice: 'Ostim V.D.',
-    mersis: '0819-2039-4850-0001',
-    phone: '0312 590 00 00',
-    email: 'savunma@tusas-tedarik.com.tr',
-    completedTenders: 74,
-    totalBids: 198,
-    tradeVolume: '210.0M ₺',
-    onTimeDelivery: '%100',
-    specCompliance: '%100',
-    avgResponseTime: '10 dk',
-    reviews: [
-      { author: 'TUSAŞ Havacılık A.Ş.', rating: 5, date: '21.08.2026', comment: '5 eksen CNC dik işleme merkezi teslimatı ve kalibrasyonu başarıyla yapıldı.' }
-    ]
-  }
-])
+const verifiedFirms = ref<any[]>([])
 
 const filteredFirms = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
@@ -357,6 +199,28 @@ const selectedFirmForModal = ref<any>(null)
               Profili İncele
             </button>
           </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div v-else class="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-4 shadow-sm">
+        <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
+          <Building2 :size="32" />
+        </div>
+        <div class="space-y-1">
+          <h3 class="font-black text-slate-800 text-base">Henüz Kayıtlı Firma Bulunmuyor</h3>
+          <p class="text-slate-500 text-xs max-w-md mx-auto">
+            Platformda şu anda listelenen kayıtlı firma bulunmamaktadır. Firmanızı ekleyerek B2B tedarikçi ağında yerinizi alabilirsiniz.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <NuxtLink to="/uyelik" class="px-5 py-2.5 rounded-xl bg-[#0052FF] hover:bg-blue-600 text-white font-black text-xs transition flex items-center gap-2 cursor-pointer shadow-md">
+            <Plus :size="14" />
+            <span>Firmanızı Ekleyin</span>
+          </NuxtLink>
+          <button v-if="searchQuery || selectedCity !== 'Tümü' || selectedSector !== 'Tümü'" type="button" @click="searchQuery = ''; selectedCity = 'Tümü'; selectedSector = 'Tümü'" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 cursor-pointer">
+            Filtreleri Sıfırla
+          </button>
         </div>
       </div>
 

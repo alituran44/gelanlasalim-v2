@@ -21,21 +21,24 @@ import {
   ExternalLink,
   ChevronRight
 } from 'lucide-vue-next'
+import { useCmsData } from '~/composables/useCmsData'
 import { locale } from '~/composables/useLocale'
 
 definePageMeta({
   layout: "dashboard"
 })
 
-const companyName = ref('Yılmaz Ambalaj Sanayi A.Ş.')
+const { cmsData } = useCmsData()
+
+const companyName = ref('Kurumsal Üye Hesabı')
 const userRole = ref('company')
 const isVerified = ref(true)
 
 // ==================== EVRAK YÜKLEME DURUMLARI ====================
 const companyDocs = ref([
-  { id: 'vergi', name: 'Güncel Vergi Levhası', required: true, uploaded: true, fileName: 'vergi_levhasi_2026.pdf', date: '25.08.2026' },
-  { id: 'imza', name: 'İmza Sirküleri / Yetki Belgesi', required: true, uploaded: true, fileName: 'imza_sirkuleri_noter.pdf', date: '25.08.2026' },
-  { id: 'sicil', name: 'Ticaret Sicil Gazetesi', required: true, uploaded: true, fileName: 'ticaret_sicil_gazetesi.pdf', date: '26.08.2026' },
+  { id: 'vergi', name: 'Güncel Vergi Levhası', required: true, uploaded: false, fileName: null, date: null },
+  { id: 'imza', name: 'İmza Sirküleri / Yetki Belgesi', required: true, uploaded: false, fileName: null, date: null },
+  { id: 'sicil', name: 'Ticaret Sicil Gazetesi', required: true, uploaded: false, fileName: null, date: null },
   { id: 'faaliyet', name: 'Faaliyet / Oda Kayıt Belgesi', required: false, uploaded: false, fileName: null, date: null }
 ])
 
@@ -63,57 +66,37 @@ function handleFileChange(event: Event) {
   }
 }
 
-// ==================== BASİT İLANLAR & TEKLİFLER LİSTESİ ====================
-const myActiveTenders = ref([
-  {
-    id: 1,
-    no: '2026/14590',
-    title: '100.000 Adet Çift Oluklu Baskılı Koli ve Ambalaj Malzemesi Alımı',
-    bidsCount: 4,
-    bestOffer: '340.000 ₺',
-    date: '02.09.2026',
-    status: 'Yayında & Teklif Alıyor'
-  },
-  {
-    id: 2,
-    no: '2026/14605',
-    title: '50 Ton Streç Film ve Palet Sabitleme Çemberi Temini',
-    bidsCount: 2,
-    bestOffer: '185.000 ₺',
-    date: '08.09.2026',
-    status: 'Yayında & Teklif Alıyor'
-  }
-])
+// ==================== DİNAMİK İLANLAR & TEKLİFLER LİSTESİ ====================
+const myActiveTenders = computed(() => {
+  return (cmsData.value?.dashboard?.tenders || []).map((t: any, index: number) => ({
+    id: t.id || index + 1,
+    no: t.id || `2026/${14600 + index}`,
+    title: t.baslik,
+    bidsCount: t.teklifSayisi || 0,
+    bestOffer: t.butce || 'Teklif Bekleniyor',
+    date: t.sure || 'Aktif',
+    status: t.durum === 'closed' ? 'Tamamlandı' : 'Yayında & Teklif Alıyor'
+  }))
+})
 
-const recentBids = ref([
-  {
-    id: 101,
-    tenderTitle: '100.000 Adet Çift Oluklu Baskılı Koli ve Ambalaj Malzemesi Alımı',
-    bidder: 'Kalyon Ambalaj & Kağıt Sanayi A.Ş.',
-    score: '4.9 ★',
-    amount: '340.000 ₺',
-    date: '10 dk önce',
-    status: 'Yeni Teklif ⚡'
-  },
-  {
-    id: 102,
-    tenderTitle: '100.000 Adet Çift Oluklu Baskılı Koli ve Ambalaj Malzemesi Alımı',
-    bidder: 'Ege Karton Sanayi Ltd. Şti.',
-    score: '4.7 ★',
-    amount: '355.000 ₺',
-    date: '1 saat önce',
-    status: 'İnceleniyor'
-  },
-  {
-    id: 103,
-    tenderTitle: '50 Ton Streç Film ve Palet Sabitleme Çemberi Temini',
-    bidder: 'Marmara Plastik Üretim A.Ş.',
-    score: '5.0 ★',
-    amount: '185.000 ₺',
-    date: '3 saat önce',
-    status: 'Pazarlık Talebi 💬'
-  }
-])
+const recentBids = computed(() => {
+  const list: any[] = []
+  const receivedGroups = cmsData.value?.dashboard?.receivedBids || []
+  receivedGroups.forEach((g: any) => {
+    (g.teklifler || []).forEach((b: any) => {
+      list.push({
+        id: b.id,
+        tenderTitle: g.baslik,
+        bidder: b.firma,
+        score: `${b.puan || 5.0} ★`,
+        amount: b.fiyat,
+        date: 'Güncel',
+        status: b.durum === 'anlasildi' ? 'Onaylandı' : 'İnceleniyor'
+      })
+    })
+  })
+  return list
+})
 
 onMounted(() => {
   if (typeof window !== 'undefined') {
@@ -124,20 +107,6 @@ onMounted(() => {
       }
       if (session.role) {
         userRole.value = session.role
-      }
-
-      const savedMyTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
-      if (savedMyTenders.length > 0) {
-        const mapped = savedMyTenders.map((t: any, index: number) => ({
-          id: t.id || index + 10,
-          no: t.id || `2026/${14600 + index}`,
-          title: t.baslik,
-          bidsCount: t.teklifSayisi || 0,
-          bestOffer: t.butce || 'Teklif Bekleniyor',
-          date: 'Aktif',
-          status: 'Yayında & Teklif Alıyor'
-        }))
-        myActiveTenders.value = [...mapped, ...myActiveTenders.value]
       }
     } catch (e) {
       console.error(e)
@@ -199,8 +168,8 @@ onMounted(() => {
           <FileText :size="18" class="text-blue-600 group-hover:scale-110 transition" />
         </div>
         <div class="text-2xl font-black text-slate-800 font-mono">{{ myActiveTenders.length }} İhale</div>
-        <div class="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-          <span>● Aktif teklif toplanıyor</span>
+        <div class="text-[11px] font-bold flex items-center gap-1" :class="myActiveTenders.length > 0 ? 'text-emerald-600' : 'text-slate-400'">
+          <span>{{ myActiveTenders.length > 0 ? '● Aktif teklif toplanıyor' : 'Henüz ihale açılmadı' }}</span>
         </div>
       </NuxtLink>
 
@@ -210,9 +179,9 @@ onMounted(() => {
           <span class="text-xs font-bold uppercase">Gelen Teklifler</span>
           <Inbox :size="18" class="text-emerald-600 group-hover:scale-110 transition" />
         </div>
-        <div class="text-2xl font-black text-slate-800 font-mono">6 Teklif</div>
-        <div class="text-[11px] text-amber-600 font-bold flex items-center gap-1">
-          <span>⚡ 2 Yeni teklif incelenmeyi bekliyor</span>
+        <div class="text-2xl font-black text-slate-800 font-mono">{{ recentBids.length }} Teklif</div>
+        <div class="text-[11px] font-bold flex items-center gap-1" :class="recentBids.length > 0 ? 'text-amber-600' : 'text-slate-400'">
+          <span>{{ recentBids.length > 0 ? `⚡ ${recentBids.length} Teklif incelenmeyi bekliyor` : 'Henüz gelen teklif yok' }}</span>
         </div>
       </NuxtLink>
 
@@ -222,9 +191,9 @@ onMounted(() => {
           <span class="text-xs font-bold uppercase">Verdiğim Teklifler</span>
           <Send :size="18" class="text-orange-600 group-hover:scale-110 transition" />
         </div>
-        <div class="text-2xl font-black text-slate-800 font-mono">3 İhale</div>
-        <div class="text-[11px] text-blue-600 font-bold flex items-center gap-1">
-          <span>1 Teklifte karşı pazarlık var</span>
+        <div class="text-2xl font-black text-slate-800 font-mono">{{ cmsData?.dashboard?.submittedBids?.length || 0 }} Teklif</div>
+        <div class="text-[11px] font-bold flex items-center gap-1" :class="(cmsData?.dashboard?.submittedBids?.length || 0) > 0 ? 'text-blue-600' : 'text-slate-400'">
+          <span>{{ (cmsData?.dashboard?.submittedBids?.length || 0) > 0 ? 'Aktif ihalelere katılım' : 'Henüz teklif verilmedi' }}</span>
         </div>
       </NuxtLink>
 
@@ -234,16 +203,16 @@ onMounted(() => {
           <span class="text-xs font-bold uppercase">Firma Evrakları</span>
           <ShieldCheck :size="18" class="text-sky-600 group-hover:scale-110 transition" />
         </div>
-        <div class="text-2xl font-black text-emerald-700 font-mono">%100 Tamam</div>
-        <div class="text-[11px] text-emerald-600 font-bold flex items-center gap-1">
-          <span>✓ Vergi & İmza Sirküleri Onaylı</span>
+        <div class="text-2xl font-black text-slate-700 font-mono">Kurumsal Hesap</div>
+        <div class="text-[11px] text-blue-600 font-bold flex items-center gap-1">
+          <span>📁 Evrak yükleme ve doğrulama</span>
         </div>
       </NuxtLink>
 
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 📁 3. FİRMA KAYITLARI & EVRAK YÜKLEME MODÜLÜ (KULLANICI TALEBİ) -->
+    <!-- 📁 3. FİRMA KAYITLARI & EVRAK YÜKLEME MODÜLÜ -->
     <!-- ========================================================================= -->
     <div class="bg-white border border-slate-300 rounded-xl p-5 shadow-xs space-y-4">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
@@ -254,56 +223,60 @@ onMounted(() => {
           </h2>
           <p class="text-xs text-slate-500">İhale açabilmek ve resmi teklif verebilmek için zorunlu şirket evraklarınızı buradan yükleyebilirsiniz.</p>
         </div>
-        <span class="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold self-start sm:self-auto">
-          ✓ Kurumsal Doğrulama Aktif
+        <span class="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold self-start sm:self-auto">
+          Kurumsal Üye Alanı
         </span>
       </div>
 
-      <!-- 4 Temel Evrak Kartı -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
+      <!-- Evrak Yükleme Gizli Input -->
+      <input 
+        ref="fileInput"
+        type="file" 
+        class="hidden" 
+        accept=".pdf,.png,.jpg,.jpeg"
+        @change="handleFileChange"
+      />
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         <div 
           v-for="doc in companyDocs" 
           :key="doc.id"
-          class="p-3.5 rounded-xl border transition flex flex-col justify-between gap-3"
-          :class="doc.uploaded ? 'bg-emerald-50/40 border-emerald-200' : 'bg-slate-50 border-slate-200'"
+          class="p-3.5 rounded-xl border transition flex flex-col justify-between space-y-2.5"
+          :class="doc.uploaded ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-100/50'"
         >
           <div class="space-y-1">
             <div class="flex items-center justify-between">
-              <span class="text-[10px] font-black uppercase text-slate-400">
-                {{ doc.required ? 'ZORUNLU BELGE' : 'İSTEĞE BAĞLI' }}
+              <span class="text-[10px] font-bold uppercase" :class="doc.required ? 'text-rose-600' : 'text-slate-400'">
+                {{ doc.required ? 'Zorunlu Belge *' : 'Opsiyonel Belge' }}
               </span>
-              <span v-if="doc.uploaded" class="text-emerald-700 font-bold text-[10px] flex items-center gap-0.5">
+              <span v-if="doc.uploaded" class="text-emerald-700 text-xs font-bold flex items-center gap-1">
                 <Check :size="12" /> Yüklendi
               </span>
-              <span v-else class="text-amber-600 font-bold text-[10px]">
+              <span v-else class="text-slate-400 text-xs font-bold">
                 Eksik
               </span>
             </div>
-            <h4 class="font-bold text-slate-800 text-xs">{{ doc.name }}</h4>
-            <p v-if="doc.fileName" class="text-[10px] text-slate-500 font-mono truncate">
+            <h4 class="font-bold text-xs text-slate-800">{{ doc.name }}</h4>
+            <p v-if="doc.uploaded" class="text-[10px] text-slate-500 truncate font-mono">
               📄 {{ doc.fileName }}
             </p>
           </div>
 
-          <div>
-            <button 
-              type="button" 
-              @click="triggerUpload(doc.id)" 
-              class="w-full py-1.5 rounded-lg font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
-              :class="doc.uploaded 
-                ? 'bg-white hover:bg-slate-100 text-slate-700 border border-slate-300' 
-                : 'bg-blue-600 hover:bg-blue-700 text-white'"
-            >
-              <UploadCloud :size="13" />
-              <span>{{ doc.uploaded ? 'Evrakı Güncelle' : 'Belge Yükle' }}</span>
-            </button>
-          </div>
+          <button 
+            type="button"
+            @click="triggerUpload(doc.id)"
+            class="w-full py-1.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
+            :class="doc.uploaded ? 'bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-100/50' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'"
+          >
+            <UploadCloud :size="13" />
+            <span>{{ doc.uploaded ? 'Yeniden Yükle' : 'Belge Yükle (PDF)' }}</span>
+          </button>
         </div>
       </div>
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 📋 4. YAYINDAKİ İLANLARIM VE GELEN TEKLİFLER (LETGO SADELİĞİNDE) -->
+    <!-- 📋 4. YAYINDAKİ İLANLARIM VE GELEN TEKLİFLER -->
     <!-- ========================================================================= -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       
@@ -311,14 +284,15 @@ onMounted(() => {
       <div class="bg-white border border-slate-300 rounded-xl p-5 shadow-xs space-y-3">
         <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
           <h3 class="font-black text-sm text-slate-800 flex items-center gap-1.5">
-            <span>📑 Yayındaki İhalelerim</span>
+            <span>📑 Yayındaki İhalelerim ({{ myActiveTenders.length }})</span>
           </h3>
-          <NuxtLink to="/panel/ilanlarim" class="text-blue-600 hover:underline text-xs font-bold">
-            Tümünü Gör ➔
+          <NuxtLink to="/panel/ihale-olustur" class="text-blue-600 hover:underline text-xs font-bold flex items-center gap-1">
+            <Plus :size="12" />
+            <span>İhale Aç</span>
           </NuxtLink>
         </div>
 
-        <div class="space-y-2.5">
+        <div v-if="myActiveTenders.length > 0" class="space-y-2.5">
           <div 
             v-for="item in myActiveTenders" 
             :key="item.id"
@@ -329,7 +303,7 @@ onMounted(() => {
                 {{ item.no }}
               </span>
               <span class="text-xs font-bold text-emerald-700 font-mono">
-                En İyi: {{ item.bestOffer }}
+                Bütçe: {{ item.bestOffer }}
               </span>
             </div>
 
@@ -343,20 +317,30 @@ onMounted(() => {
             </div>
           </div>
         </div>
+
+        <!-- Empty State -->
+        <div v-else class="p-8 text-center space-y-2 bg-slate-50 rounded-xl border border-slate-200">
+          <FileText :size="24" class="mx-auto text-slate-400" />
+          <p class="text-xs text-slate-600 font-bold">Henüz açtığınız bir ihale bulunmuyor.</p>
+          <NuxtLink to="/panel/ihale-olustur" class="inline-flex items-center gap-1 text-xs font-black text-blue-600 hover:underline">
+            <span>İlk İhalenizi Oluşturun</span>
+            <ArrowRight :size="12" />
+          </NuxtLink>
+        </div>
       </div>
 
       <!-- Sağ: Son Gelen Teklifler (Pazarlık & Kabul) -->
       <div class="bg-white border border-slate-300 rounded-xl p-5 shadow-xs space-y-3">
         <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
           <h3 class="font-black text-sm text-slate-800 flex items-center gap-1.5">
-            <span>📥 Son Gelen Teklifler</span>
+            <span>📥 Son Gelen Teklifler ({{ recentBids.length }})</span>
           </h3>
           <NuxtLink to="/panel/gelen-teklifler" class="text-blue-600 hover:underline text-xs font-bold">
             Pazarlık Masası ➔
           </NuxtLink>
         </div>
 
-        <div class="space-y-2.5">
+        <div v-if="recentBids.length > 0" class="space-y-2.5">
           <div 
             v-for="bid in recentBids" 
             :key="bid.id"
@@ -376,6 +360,13 @@ onMounted(() => {
               </NuxtLink>
             </div>
           </div>
+        </div>
+
+        <!-- Empty State -->
+        <div v-else class="p-8 text-center space-y-2 bg-slate-50 rounded-xl border border-slate-200">
+          <Inbox :size="24" class="mx-auto text-slate-400" />
+          <p class="text-xs text-slate-600 font-bold">Henüz gelen bir teklif bulunmuyor.</p>
+          <p class="text-[11px] text-slate-400">İhalelerinize gelen teklifler burada listelenecektir.</p>
         </div>
       </div>
 

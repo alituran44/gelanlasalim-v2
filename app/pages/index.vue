@@ -327,20 +327,7 @@ const sectorsRight = [
 ]
 
 // ==================== 5. YÜKLENİCİLER TABLOSU (GÖRSEL 4: YÜKLENİCİLER) ====================
-const contractorsList = ref([
-  { id: 1, name: 'Rec Uluslararası İnşaat Yatırım Sanayi Ve Ticaret Anonim Şirketi', bidsCount: 33, activeCount: 4, completedCount: 24, totalContracts: '***' },
-  { id: 2, name: 'Kalyon İnşaat Sanayi Ve Ticaret Anonim Şirketi', bidsCount: 60, activeCount: 5, completedCount: 30, totalContracts: '***' },
-  { id: 3, name: 'Fernas İnşaat Anonim Şirketi', bidsCount: 88, activeCount: 5, completedCount: 19, totalContracts: '***' },
-  { id: 4, name: 'Yse Yapı Sanayi Ve Ticaret Anonim Şirketi', bidsCount: 69, activeCount: 3, completedCount: 39, totalContracts: '***' },
-  { id: 5, name: 'Demce Yapı İnşaat Sanayi Ve Ticaret Anonim Şirketi', bidsCount: 90, activeCount: 2, completedCount: 36, totalContracts: '***' },
-  { id: 6, name: 'Yapı Merkezi İnşaat Ve Sanayi Anonim Şirketi', bidsCount: 39, activeCount: 3, completedCount: 31, totalContracts: '***' },
-  { id: 7, name: 'A S L İnşaat Taahhüt Ve Sanayi Ticaret Limited Şirketi', bidsCount: 3, activeCount: 2, completedCount: 9, totalContracts: '***' },
-  { id: 8, name: 'Makyol İnşaat Sanayi Turizm Ve Ticaret Anonim Şirketi', bidsCount: 62, activeCount: 2, completedCount: 32, totalContracts: '***' },
-  { id: 9, name: 'Cengiz İnşaat Sanayi Ve Ticaret Anonim Şirketi', bidsCount: 78, activeCount: 1, completedCount: 30, totalContracts: '***' },
-  { id: 10, name: 'Çelikler Taahhüt İnşaat Ve Sanayi Anonim Şirketi', bidsCount: 71, activeCount: 2, completedCount: 30, totalContracts: '***' },
-  { id: 11, name: 'Kolin İnşaat Turizm Sanayi ve Ticaret A.Ş.', bidsCount: 94, activeCount: 6, completedCount: 45, totalContracts: '***' },
-  { id: 12, name: 'Rönesans Holding & Medikal Taahhüt A.Ş.', bidsCount: 52, activeCount: 3, completedCount: 28, totalContracts: '***' }
-])
+const contractorsList = ref<any[]>([])
 
 const filteredContractors = computed(() => {
   return contractorsList.value.filter(c => {
@@ -353,78 +340,7 @@ const filteredContractors = computed(() => {
 })
 
 // ==================== 6. CANLI İHALE LİSTESİ ====================
-const tenders = ref([
-  {
-    id: 101,
-    no: '2026/14589',
-    title: '1.500 Ton B420C Nervürlü İnşaat Demiri ve Hasır Çelik Temini İşi',
-    authority: 'Karayolları 14. Bölge Müdürlüğü / Çanakkale Köprü Bağlantı Şantiyesi',
-    city: 'Çanakkale',
-    category: 'İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri',
-    type: 'Mal Alımı',
-    method: 'Açık İhale (4734 / 19. Madde)',
-    cost: '14.500.000 ₺',
-    date: '05.09.2026 14:00',
-    specText: 'TSE 708 normlarına uygun nervürlü donatı çeliği temini ve şantiyeye nakli.',
-    bids: 7
-  },
-  {
-    id: 102,
-    no: '2026/14590',
-    title: '100.000 Adet Çift Oluklu Baskılı Koli ve Ambalaj Malzemesi Alımı',
-    authority: 'Devlet Malzeme Ofisi (DMO) Genel Müdürlüğü',
-    city: 'İstanbul',
-    category: 'Matbaa - Toner - Kartuş - Ambalaj - Kırtasiye İhaleleri',
-    type: 'Mal Alımı',
-    method: 'Açık İhale',
-    cost: '350.000 ₺',
-    date: '02.09.2026 11:30',
-    specText: 'E-ticaret ve lojistik sevkiyatlarına uygun dopel kraft koli üretimi.',
-    bids: 12
-  },
-  {
-    id: 103,
-    no: '2026/14591',
-    title: 'Üniversite Hastanesi Binası 1.2 MW Çatı Güneş Enerji Santrali (GES) Yapım İşi',
-    authority: 'Çanakkale Onsekiz Mart Üniversitesi Rektörlüğü',
-    city: 'Çanakkale',
-    category: 'Enerji - Aydınlatma - Sinyalizasyon - Elektrik Tesisatı İhaleleri',
-    type: 'Yapım İşi',
-    method: 'Açık İhale',
-    cost: '18.200.000 ₺',
-    date: '10.09.2026 10:00',
-    specText: 'Anahtar teslim panel, inverter, pano temini ve TEDAŞ onay süreçleri.',
-    bids: 4
-  },
-  {
-    id: 104,
-    no: '2026/14592',
-    title: '250 Seferlik Liman İçi ve Şehirlerarası Konteyner Lojistik Hizmeti',
-    authority: 'Türkiye Kömür İşletmeleri Kurumu',
-    city: 'Tekirdağ',
-    category: 'Nakliye - Taşımacılık Hizmetleri - Servis İhaleleri',
-    type: 'Hizmet Alımı',
-    method: 'Pazarlık Usulü (21/f)',
-    cost: '1.250.000 ₺',
-    date: '01.09.2026 15:00',
-    specText: '40ft konteynerlerin limandan tesis sahasına güvenli nakliyesi.',
-    bids: 9
-  },
-  {
-    id: 105,
-    no: '2026/14593',
-    title: 'Yüksek Hassasiyetli 5 Eksen CNC Freze ve Dik İşleme Merkezi Alımı',
-    authority: 'TUSAŞ Havacılık ve Uzay Sanayii A.Ş.',
-    city: 'Ankara',
-    category: 'Endüstriyel Makine - Motor - Konveyör İhaleleri',
-    type: 'Mal Alımı',
-    method: 'Belli İstekliler Arasında',
-    cost: '6.800.000 ₺',
-    date: '15.09.2026 14:00',
-    specText: 'Havacılık parçaları üretimine tam uyumlu 5 eksen CNC işleme tezgahı.',
-    bids: 3
-  }
-])
+const tenders = ref<any[]>([])
 
 function handleSelectFilter(item: string) {
   navigateTo({
@@ -986,10 +902,10 @@ function handleSelectFilter(item: string) {
       <!-- Toplam Bulunan Sayacı & Sayfalama Üst -->
       <div class="bg-white border border-slate-300 rounded-lg p-3 shadow-xs space-y-3">
         <div class="text-center font-bold text-slate-700 border-b border-slate-200 pb-2">
-          📑 Toplam bulunan: <strong>431.471 Onaylı Firma</strong>
+          📑 Toplam bulunan: <strong>{{ filteredContractors.length }} Onaylı Firma</strong>
         </div>
 
-        <div class="flex items-center justify-center gap-2 text-xs">
+        <div v-if="filteredContractors.length > 0" class="flex items-center justify-center gap-2 text-xs">
           <button class="px-2.5 py-1 rounded border border-slate-300 bg-slate-50 font-bold">⏮ İlk sayfa</button>
           <button class="px-2.5 py-1 rounded border border-slate-300 bg-slate-50 font-bold">‹ Önceki sayfa</button>
           <select v-model="contractorPage" class="p-1 rounded border border-slate-300 bg-white font-bold">
@@ -1014,7 +930,7 @@ function handleSelectFilter(item: string) {
                 <th class="py-2.5 px-3 text-center">Toplam sözleşme ⇅</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-slate-200">
+            <tbody v-if="filteredContractors.length > 0" class="divide-y divide-slate-200">
               <tr v-for="c in filteredContractors" :key="c.id" class="hover:bg-sky-50/50 transition">
                 <td class="py-3 px-3 font-bold text-slate-500">{{ c.id }}</td>
                 <td class="py-3 px-3 font-bold text-slate-800">
@@ -1037,6 +953,13 @@ function handleSelectFilter(item: string) {
                 <td class="py-3 px-3 text-center">
                   <span class="font-bold block text-slate-400">***</span>
                   <NuxtLink to="/panel/istatistikler" class="mt-1 inline-block px-2 py-0.5 rounded border border-indigo-400 bg-indigo-50 text-indigo-800 text-[10px] font-bold">📈 Analiz</NuxtLink>
+                </td>
+              </tr>
+            </tbody>
+            <tbody v-else>
+              <tr>
+                <td colspan="6" class="text-center py-10 text-slate-500 text-xs">
+                  Sistemde henüz listelenen kayıtlı firma bulunmamaktadır.
                 </td>
               </tr>
             </tbody>

@@ -90,15 +90,6 @@ onMounted(() => {
       if (userSession.value.companyName || userSession.value.company) {
         bidForm.value.firmaAdi = userSession.value.companyName || userSession.value.company
       }
-
-      if (!cmsData.value?.dashboard?.tenders || cmsData.value.dashboard.tenders.length === 0) {
-        if (!cmsData.value.dashboard) {
-          cmsData.value.dashboard = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA.dashboard))
-        } else {
-          cmsData.value.dashboard.tenders = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA.dashboard.tenders))
-        }
-        saveCmsData(cmsData.value)
-      }
     } catch (e) {}
   }
 
@@ -114,9 +105,7 @@ onMounted(() => {
 })
 
 const allTenders = computed(() => {
-  const list = cmsData.value?.dashboard?.tenders || []
-  if (list.length > 0) return list
-  return DEFAULT_CMS_DATA.dashboard.tenders || []
+  return cmsData.value?.dashboard?.tenders || []
 })
 
 const categories = [
@@ -248,211 +237,7 @@ function openSpecModal(tender: any) {
   showSpecModal.value = true
 }
 
-const defaultCompaniesData: Record<string, any> = {
-  'kalyon & kolin inşaat ortak girişimi': {
-    name: 'Kalyon & Kolin İnşaat Ortak Girişimi',
-    shortName: 'Kalyon & Kolin O.G.',
-    badge: 'Doğrulanmış Ana Yüklenici',
-    rating: 4.9,
-    reviewCount: 54,
-    city: 'Çanakkale / İstanbul',
-    sector: 'İnşaat, Altyapı, Yapım İşi, Köprü ve Karayolu',
-    completedTenders: 42,
-    totalBids: 184,
-    tradeVolume: '148.5M ₺',
-    onTimeDelivery: '%99.1',
-    specCompliance: '%100',
-    avgResponseTime: '8 dk',
-    taxOffice: 'Çanakkale V.D. 4700854210',
-    mersis: '0470085421000001',
-    phone: '0850 840 86 95',
-    email: 'ihalcib@gmail.com',
-    address: 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale',
-    foundedYear: 2011,
-    description: 'Büyük ölçekli kamu ve özel sektör otoyol, köprü, tünel, viyadük ve ağır sanayi yapıları inşaatında Türkiye’nin lider mühendislik konsorsiyumu.',
-    reviews: [
-      { author: 'Karayolları 14. Bölge Md.', rating: 5, date: '22.08.2026', comment: '1.500 Ton B420C nervürlü demir sevkiyatını şantiyeye 3 gün erken teslim ettiler. Kalite belgeleri ve çekme testleri eksiksizdi.' },
-      { author: 'DMO Genel Müdürlüğü', rating: 4.9, date: '15.07.2026', comment: 'Şartnameye ve statik hesaplara harfiyen uyuldu. Escrow ödeme süreci son derece profesyonel yönetildi.' },
-      { author: 'Çanakkale İl Özel İdaresi', rating: 5, date: '02.06.2026', comment: 'Güvenilir, kurumsal ve zamanında teslimat yapan güçlü bir ortak.' }
-    ]
-  },
-  'hepsiburada & trendyol lojistik dağıtım a.ş.': {
-    name: 'Hepsiburada & Trendyol Lojistik Dağıtım A.Ş.',
-    shortName: 'E-Ticaret Lojistik A.Ş.',
-    badge: 'Doğrulanmış Kurumsal Alıcı',
-    rating: 4.8,
-    reviewCount: 68,
-    city: 'İstanbul',
-    sector: 'Ambalaj, Koli, Kağıt ve E-Ticaret Lojistiği',
-    completedTenders: 86,
-    totalBids: 312,
-    tradeVolume: '42.1M ₺',
-    onTimeDelivery: '%98.4',
-    specCompliance: '%99.2',
-    avgResponseTime: '12 dk',
-    taxOffice: 'Büyük Mükellefler V.D. 4810293847',
-    mersis: '0481029384700001',
-    phone: '0212 331 00 00',
-    email: 'satinalma@eticaretlojistik.com',
-    address: 'Maslak Mah. Büyükdere Cad. No:245 Sarıyer / İstanbul',
-    foundedYear: 2014,
-    description: 'E-ticaret sevkiyatları için çift oluklu kraft mukavva koli, ambalaj ve paketleme malzemeleri tedarik zinciri yöneticisi.',
-    reviews: [
-      { author: 'Marmara Kağıt Sanayi', rating: 5, date: '18.08.2026', comment: '100.000 adet koli teslimatı onaylandı, hakediş ödemesi aynı gün güvenli havuzdan aktarıldı.' },
-      { author: 'Turan Ambalaj A.Ş.', rating: 4.8, date: '28.07.2026', comment: 'Düzenli satın alma yapan ve şartname koşullarına sadık saygın bir alıcı.' }
-    ]
-  },
-  'turan enerji & güneş sistemleri a.ş.': {
-    name: 'Turan Enerji & Güneş Sistemleri A.Ş.',
-    shortName: 'Turan GES A.Ş.',
-    badge: 'Onaylı GES Müteahhidi',
-    rating: 5.0,
-    reviewCount: 31,
-    city: 'Çanakkale',
-    sector: 'Enerji, GES, TEDAŞ Onaylı Elektrik & Trafo',
-    completedTenders: 28,
-    totalBids: 94,
-    tradeVolume: '64.8M ₺',
-    onTimeDelivery: '%100',
-    specCompliance: '%100',
-    avgResponseTime: '5 dk',
-    taxOffice: 'Çanakkale V.D. 4700854210',
-    mersis: '0470085421000001',
-    phone: '0850 840 86 95',
-    email: 'ihalcib@gmail.com',
-    address: 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale',
-    foundedYear: 2016,
-    description: 'Endüstriyel çatı ve arazi Güneş Enerji Santralleri (GES), Tier-1 panel temini ve anahtar teslim EPC mühendislik hizmetleri.',
-    reviews: [
-      { author: 'Çanakkale Onsekiz Mart Ünv.', rating: 5, date: '26.08.2026', comment: '1.2 MW Çatı GES kurulumunu TEDAŞ onaylı olarak 45 günde devreye aldılar. Kusursuz işçilik.' }
-    ]
-  },
-  'asyaport liman işletmeleri a.ş.': {
-    name: 'Asyaport Liman İşletmeleri A.Ş.',
-    shortName: 'Asyaport Liman',
-    badge: 'Stratejik Lojistik Limanı',
-    rating: 4.9,
-    reviewCount: 45,
-    city: 'Tekirdağ',
-    sector: 'Lojistik, Konteyner Taşımacılığı, Liman & Antrepo',
-    completedTenders: 63,
-    totalBids: 215,
-    tradeVolume: '52.4M ₺',
-    onTimeDelivery: '%99.0',
-    specCompliance: '%100',
-    avgResponseTime: '15 dk',
-    taxOffice: 'Süleymanpaşa V.D. 3920192847',
-    mersis: '0392019284700001',
-    phone: '0282 258 00 00',
-    email: 'lojistik@asyaport.com.tr',
-    address: 'Barbaros Mah. Liman Cad. No:1 Süleymanpaşa / Tekirdağ',
-    foundedYear: 2010,
-    description: 'Marmara bölgesinin en büyük konteyner transit limanı ve 250+ tırlık entegre intermodal taşımacılık filosu.',
-    reviews: [
-      { author: 'Türkiye Kömür İşletmeleri', rating: 5, date: '19.08.2026', comment: '250 seferlik konteyner sevkiyatını hasarsız ve tam zamanında gerçekleştirdiler.' }
-    ]
-  },
-  'savunma sanayi tedarik ve imalat grubu': {
-    name: 'Savunma Sanayi Tedarik ve İmalat Grubu',
-    shortName: 'Savunma Sanayi Grubu',
-    badge: 'AS9100 Onaylı Üretici',
-    rating: 5.0,
-    reviewCount: 59,
-    city: 'Ankara',
-    sector: 'Sanayi & Makine, 5 Eksen CNC, Havacılık Parçaları',
-    completedTenders: 74,
-    totalBids: 198,
-    tradeVolume: '210.0M ₺',
-    onTimeDelivery: '%100',
-    specCompliance: '%100',
-    avgResponseTime: '10 dk',
-    taxOffice: 'Ostim V.D. 8192039485',
-    mersis: '0819203948500001',
-    phone: '0312 590 00 00',
-    email: 'savunma@tusas-tedarik.com.tr',
-    address: 'Ostim OSB 1200. Cad. No:45 Yenimahalle / Ankara',
-    foundedYear: 2008,
-    description: 'TUSAŞ, ASELSAN ve ROKETSAN standartlarında 5 eksen mikron hassasiyetli CNC talaşlı imalat ve kompozit işleme.',
-    reviews: [
-      { author: 'TUSAŞ Havacılık A.Ş.', rating: 5, date: '21.08.2026', comment: '5 eksen CNC dik işleme merkezi teslimatı ve kalibrasyonu başarıyla yapıldı.' }
-    ]
-  },
-  'teknopark bilişim sistemleri ltd.': {
-    name: 'Teknopark Bilişim Sistemleri Ltd.',
-    shortName: 'Teknopark Bilişim',
-    badge: 'Tier-3 Veri Merkezi Sağlayıcısı',
-    rating: 4.8,
-    reviewCount: 37,
-    city: 'İzmir',
-    sector: 'Bilişim, Sunucu, Storage, Ağ Donanımı',
-    completedTenders: 35,
-    totalBids: 128,
-    tradeVolume: '18.9M ₺',
-    onTimeDelivery: '%97.8',
-    specCompliance: '%100',
-    avgResponseTime: '7 dk',
-    taxOffice: 'Urla V.D. 7192038475',
-    mersis: '0719203847500001',
-    phone: '0232 765 43 21',
-    email: 'bilisim@teknopark.com.tr',
-    address: 'İYTE Kampüsü Teknopark A3 Blok No:12 Urla / İzmir',
-    foundedYear: 2017,
-    description: 'Kurumsal sunucu altyapıları, yüksek performanslı SAN veri depolama ve siber güvenlik donanımları tedarikçisi.',
-    reviews: [
-      { author: 'İYTE Rektörlüğü', rating: 4.8, date: '14.08.2026', comment: '150 adet kurumsal rack sunucu sorunsuz kuruldu.' }
-    ]
-  },
-  'doğrulanmış sağlık ekipmanları a.ş.': {
-    name: 'Doğrulanmış Sağlık Ekipmanları A.Ş.',
-    shortName: 'Sağlık Ekipmanları A.Ş.',
-    badge: 'CE / FDA Onaylı Medikal',
-    rating: 4.9,
-    reviewCount: 42,
-    city: 'Bursa',
-    sector: 'Medikal, Ventilatör, Hasta Başı Monitör',
-    completedTenders: 49,
-    totalBids: 167,
-    tradeVolume: '38.6M ₺',
-    onTimeDelivery: '%99.4',
-    specCompliance: '%100',
-    avgResponseTime: '11 dk',
-    taxOffice: 'Nilüfer V.D. 6182930485',
-    mersis: '0618293048500001',
-    phone: '0224 443 22 11',
-    email: 'medikal@bursasaglik.com.tr',
-    address: 'Nilüfer Organize Sanayi Bölgesi Pembe Cad. No:8 Bursa',
-    foundedYear: 2013,
-    description: 'Yoğun bakım ventilatörleri, EKG hasta monitörleri ve akredite tıbbi cihaz kalibrasyon ve sarf tedariki.',
-    reviews: [
-      { author: 'Bursa İl Sağlık Müdürlüğü', rating: 5, date: '27.08.2026', comment: '40 adet yoğun bakım ventilatör cihazı montaj ve eğitimiyle teslim edildi.' }
-    ]
-  },
-  'gosb yönetim & sosyal hizmetler a.ş.': {
-    name: 'GOSB Yönetim & Sosyal Hizmetler A.Ş.',
-    shortName: 'GOSB Sosyal Hizmetler',
-    badge: 'ISO 22000 Gıda Güvenliği',
-    rating: 4.7,
-    reviewCount: 51,
-    city: 'Kocaeli',
-    sector: 'Gıda, Yemek, Tabldot, Catering',
-    completedTenders: 58,
-    totalBids: 204,
-    tradeVolume: '27.3M ₺',
-    onTimeDelivery: '%96.9',
-    specCompliance: '%99.0',
-    avgResponseTime: '14 dk',
-    taxOffice: 'Gebze V.D. 5182930485',
-    mersis: '0518293048500001',
-    phone: '0262 677 00 00',
-    email: 'catering@gosb.org.tr',
-    address: 'Gebze Organize Sanayi Bölgesi İhsan Dede Cad. No:114 Gebze / Kocaeli',
-    foundedYear: 2005,
-    description: 'Organize sanayi bölgeleri ve kurumsal fabrikalar için günlük 10.000 kişilik endüstriyel tabldot yemek üretimi.',
-    reviews: [
-      { author: 'GOSB Fabrikalar Birliği', rating: 4.7, date: '25.08.2026', comment: '2.500 kişilik 4 kap tabldot menüsü hijyen ve lezzet standartlarına tam uygundur.' }
-    ]
-  }
-}
+const defaultCompaniesData: Record<string, any> = {}
 
 function getCompanyData(name: string) {
   const key = (name || '').trim().toLowerCase()
@@ -460,30 +245,27 @@ function getCompanyData(name: string) {
     return defaultCompaniesData[key]
   }
   return {
-    name: name || 'Doğrulanmış Kurumsal Firma A.Ş.',
-    shortName: name ? name.split(' ')[0] + ' A.Ş.' : 'Kurumsal Firma',
-    badge: 'Doğrulanmış B2B Üye',
-    rating: 4.9,
-    reviewCount: 38,
-    city: 'Çanakkale / Türkiye',
-    sector: 'İnşaat, Sanayi, Lojistik, Ambalaj & Ticaret',
-    completedTenders: 26,
-    totalBids: 112,
-    tradeVolume: '34.5M ₺',
-    onTimeDelivery: '%98.7',
+    name: name || 'Kurumsal Firma',
+    shortName: name ? name.split(' ')[0] : 'Firma',
+    badge: 'Onaylı B2B Üye',
+    rating: 5.0,
+    reviewCount: 0,
+    city: 'Türkiye Geneli',
+    sector: 'Genel Ticaret & Tedarik',
+    completedTenders: 0,
+    totalBids: 0,
+    tradeVolume: '0 ₺',
+    onTimeDelivery: '%100',
     specCompliance: '%100',
-    avgResponseTime: '10 dk',
-    taxOffice: 'Çanakkale V.D. 4700854210',
-    mersis: '0470085421000001',
+    avgResponseTime: '15 dk',
+    taxOffice: 'Kayıtlı V.D.',
+    mersis: '—',
     phone: '0850 840 86 95',
     email: 'ihalcib@gmail.com',
-    address: 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale',
-    foundedYear: 2015,
-    description: 'İhaleciBurada B2B platformunda doğrulanmış, GİB vergi ve sicil kaydı onaylı kurumsal tedarikçi ve alıcı firma.',
-    reviews: [
-      { author: 'Doğrulanmış Kamu / B2B Alıcı', rating: 5, date: '20.08.2026', comment: 'Şartnameye ve teslimat takvimine tam uyum sağlandı. Escrow güvenceli ödeme sorunsuz tamamlandı.' },
-      { author: 'Marmara Bölge Satın Alma Masası', rating: 4.8, date: '12.07.2026', comment: 'Güvenilir, kaliteli malzeme temini yapan ve iletişimi hızlı bir kurumsal firma.' }
-    ]
+    address: 'Türkiye',
+    foundedYear: new Date().getFullYear(),
+    description: 'İhaleciBurada B2B platformunda doğrulanmış kurumsal firma.',
+    reviews: []
   }
 }
 
@@ -1073,7 +855,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
               <span class="font-bold text-slate-500 shrink-0">Yüklenici adı:</span>
               <button
                 type="button"
-                @click="openCompanyModal(tender.ownerCompany || 'Kalyon & Kolin İnşaat Ortak Girişimi', tender)"
+                @click="openCompanyModal(tender.ownerCompany || 'Doğrulanmış B2B Kurumsal Firma', tender)"
                 class="font-black text-[#0F223D] hover:text-[#0084B4] hover:underline transition-colors cursor-pointer text-left truncate flex items-center gap-1.5"
                 title="Şirket İtibar ve İhale Profilini İncele"
               >
@@ -1216,13 +998,25 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
       </div>
 
       <!-- Empty State -->
-      <div v-else class="bg-white border border-slate-300 rounded-lg p-10 text-center space-y-3">
-        <AlertCircle :size="36" class="mx-auto text-slate-400" />
-        <h3 class="font-black text-slate-800 text-sm">Aramanıza Uygun İhale Bulunamadı</h3>
-        <p class="text-slate-500 text-xs">Filtreleri sıfırlayarak tüm aktif ihaleleri görüntüleyebilirsiniz.</p>
-        <button type="button" @click="resetFilters" class="px-4 py-2 rounded bg-[#0084B4] text-white font-bold text-xs cursor-pointer">
-          Tüm İhaleleri Göster
-        </button>
+      <div v-else class="bg-white border border-slate-300 rounded-2xl p-12 text-center space-y-4 shadow-2xs">
+        <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
+          <FileText :size="32" />
+        </div>
+        <div class="space-y-1">
+          <h3 class="font-black text-slate-800 text-base">Henüz Yayınlanmış İhale İlanı Bulunmuyor</h3>
+          <p class="text-slate-500 text-xs max-w-md mx-auto">
+            Platformda şu anda kayıtlı bir ihale ilanı yer almamaktadır. Satın alma veya tedarik ihalenizi oluşturarak teklif toplamaya başlayabilirsiniz.
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <NuxtLink to="/panel/ihale-olustur" class="px-5 py-2.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition flex items-center gap-2 cursor-pointer shadow-xs">
+            <Plus :size="14" />
+            <span>Yeni İhale İlanı Oluştur</span>
+          </NuxtLink>
+          <button v-if="searchQuery || selectedCategory !== 'Tümü' || selectedCity !== 'Tümü'" type="button" @click="resetFilters" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 cursor-pointer">
+            Filtreleri Sıfırla
+          </button>
+        </div>
       </div>
 
     </div>
