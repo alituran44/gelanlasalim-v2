@@ -1,4 +1,4 @@
-import { defineEventHandler, readBody } from 'h3'
+﻿import { defineEventHandler, readBody } from 'h3'
 
 export interface SmtpSendRequest {
   smtpHost?: string
@@ -25,7 +25,7 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const senderEmail = body.senderEmail || 'ihalcib@gmail.com'
+  const senderEmail = body.senderEmail || 'ihalecib@gmail.com'
   const senderName = body.senderName || 'İhaleciBurada.com Destek & Operasyon'
   const emailId = `MAIL_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`
 
@@ -42,3 +42,4 @@ export default defineEventHandler(async (event) => {
     timestamp: new Date().toISOString()
   }
 })
+

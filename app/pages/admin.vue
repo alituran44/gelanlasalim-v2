@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { 
@@ -213,11 +213,11 @@ if (!formState.crmSettings) {
 if (!formState.emailSettings) {
   formState.emailSettings = {
     senderName: 'İhaleciBurada.com Destek & Operasyon',
-    senderEmail: 'ihalcib@gmail.com',
-    replyToEmail: 'ihalcib@gmail.com',
+    senderEmail: 'ihalecib@gmail.com',
+    replyToEmail: 'ihalecib@gmail.com',
     smtpHost: 'smtp.gmail.com',
     smtpPort: 587,
-    smtpUser: 'ihalcib@gmail.com',
+    smtpUser: 'ihalecib@gmail.com',
     smtpPassword: '••••••••',
     smtpEncryption: 'TLS',
     autoNotifications: {
@@ -307,7 +307,7 @@ if (!formState.siteSettings) {
     announcementTicker: '⚡ LANSMANA ÖZEL: İlk 1 ay boyunca %100 ücretsiz kurumsal deneme paketi (0 ₺)!',
     googleAnalyticsId: 'G-IHALECIBURADA2026',
     supportPhone: '0850 840 86 95',
-    supportEmail: 'ihalcib@gmail.com'
+    supportEmail: 'ihalecib@gmail.com'
   }
 }
 
@@ -356,7 +356,7 @@ onMounted(() => {
           companyType: session.companyType || 'Limited Şirket (LTD)',
           legalName: session.legalName || compName,
           authorizedPerson: session.name || session.firstName || 'Ali Turan',
-          email: session.email || 'ihalcib@gmail.com',
+          email: session.email || 'ihalecib@gmail.com',
           phone: session.phone || '0850 840 86 95',
           taxNo: session.taxNo || '4700854210',
           taxOffice: session.taxOffice || 'Çanakkale Vergi Dairesi',
@@ -409,7 +409,7 @@ function handleLogin() {
   const p = password.value.trim()
 
   if (
-    (e === 'ihalcib@gmail.com' && (p === 'admin123' || p === 'demo-password' || p === 'admin' || p === '123456')) ||
+    (e === 'ihalecib@gmail.com' && (p === 'admin123' || p === 'demo-password' || p === 'admin' || p === '123456')) ||
     (e === 'admin_test@ihaleciburada.com' && p === 'demo-password') ||
     (e === 'admin@ihaleciburada.com' && (p === 'admin123' || p === 'demo-password' || p === 'admin')) ||
     (e === 'admin' && (p === 'admin' || p === 'admin123'))
@@ -838,14 +838,14 @@ function removeLead(index: number) {
 // Email & Template Helpers
 // ----------------------------------------------------
 const selectedTemplateIdx = ref(0)
-const testEmailTarget = ref('ihalcib@gmail.com')
+const testEmailTarget = ref('ihalecib@gmail.com')
 const isSendingEmail = ref(false)
 
 const emailLogs = ref<any[]>([
   {
     id: 1,
     time: 'Bugün 11:42',
-    recipient: 'ihalcib@gmail.com',
+    recipient: 'ihalecib@gmail.com',
     template: 'Kurumsal Hoş Geldiniz & KYC Onayı',
     subject: 'İhaleciBurada.com: 1 Aylık %100 Ücretsiz Lansman Deneme Paketiniz Aktif!',
     status: '250 OK - İletildi'
@@ -2325,7 +2325,7 @@ function removeSubmittedBid(index: number) {
                   <input 
                     v-model="formState.emailSettings.senderEmail" 
                     type="email" 
-                    placeholder="ihalcib@gmail.com" 
+                    placeholder="ihalecib@gmail.com" 
                     class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold text-blue-600"
                     :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 focus:bg-white' : 'bg-slate-950 border-slate-800'" 
                   />
@@ -2480,7 +2480,7 @@ function removeSubmittedBid(index: number) {
                       <input 
                         v-model="testEmailTarget" 
                         type="email" 
-                        placeholder="ihalcib@gmail.com" 
+                        placeholder="ihalecib@gmail.com" 
                         class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold"
                         :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" 
                       />
@@ -2551,7 +2551,7 @@ function removeSubmittedBid(index: number) {
                     <!-- Email Official Footer -->
                     <div class="border-t border-slate-200 pt-3 text-[10px] text-slate-400 text-center space-y-0.5">
                       <div>İhaleciBurada B2B Elektronik Tedarik & Tersine Eksiltme Platformu</div>
-                      <div>0850 840 86 95 • ihalcib@gmail.com • Çanakkale / Türkiye</div>
+                      <div>0850 840 86 95 • ihalecib@gmail.com • Çanakkale / Türkiye</div>
                     </div>
                   </div>
                 </div>
@@ -3038,7 +3038,7 @@ function removeSubmittedBid(index: number) {
                   <textarea v-model="currentTemplate.content" rows="10" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white font-sans leading-relaxed"></textarea>
                 </div>
                 <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-                  <input v-model="testEmailTarget" type="email" placeholder="Test alıcı e-posta (ihalcib@gmail.com)..." class="w-full sm:w-auto flex-1 bg-transparent border-0 text-xs text-white font-mono" />
+                  <input v-model="testEmailTarget" type="email" placeholder="Test alıcı e-posta (ihalecib@gmail.com)..." class="w-full sm:w-auto flex-1 bg-transparent border-0 text-xs text-white font-mono" />
                   <button @click="sendTestEmail" class="w-full sm:w-auto px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-emerald-600/20">
                     <Send :size="13" /> SMTP İle Test Gönderimi Yap
                   </button>
@@ -3667,3 +3667,4 @@ function removeSubmittedBid(index: number) {
 
   </div>
 </template>
+

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
@@ -312,7 +312,7 @@ function fallbackGoogleLogin() {
     isSubmitting.value = false
     if (typeof window !== 'undefined') {
       localStorage.setItem('userSession', JSON.stringify({
-        email: 'ihalcib@gmail.com',
+        email: 'ihalecib@gmail.com',
         firstName: 'Ali',
         lastName: 'Turan',
         name: 'Ali Turan',
@@ -1016,3 +1016,4 @@ function handleGuestEntry() {
   opacity: 0;
 }
 </style>
+

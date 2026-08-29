@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { 
   User, 
@@ -327,7 +327,7 @@ const companyForm = ref({
   description: 'Şirketimiz ambalaj, oluklu mukavva koli, inşaat malzemeleri ve lojistik tedarik alanında kurumsal müşterilere toptan imalat ve tedarik hizmeti sunmaktadır.',
   contactPerson: 'Ali Turan',
   phone: '0850 840 86 95',
-  email: 'ihalcib@gmail.com',
+  email: 'ihalecib@gmail.com',
   tcKimlik: '12345678901',
   taxNo: '4700854210',
   taxOffice: 'Çanakkale Vergi Dairesi',
@@ -2964,3 +2964,4 @@ function saveProfile() {
 
   </div>
 </template>
+

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { ref } from 'vue'
 import { Facebook, Instagram, Linkedin, Mail, CheckCircle2, ArrowRight } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
@@ -188,8 +188,8 @@ const legalLinks = [
               <span class="text-slate-500">KEP: ihaleciburada@hs01.kep.tr</span>
             </p>
             <div class="text-xs font-bold text-slate-700 space-y-1 pt-1">
-              <a href="mailto:ihalcib@gmail.com" class="block hover:text-blue-600 transition-colors">
-                ihalcib@gmail.com
+              <a href="mailto:ihalecib@gmail.com" class="block hover:text-blue-600 transition-colors">
+                ihalecib@gmail.com
               </a>
               <div class="text-[#FF5938] font-bold">
                 📞 0850 840 86 95

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { 
@@ -125,7 +125,7 @@ function printDocument() {
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">Resmi E-Posta</span>
-              <strong class="text-slate-900">ihalcib@gmail.com</strong>
+              <strong class="text-slate-900">ihalecib@gmail.com</strong>
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">KEP Adresi</span>
@@ -339,7 +339,7 @@ function printDocument() {
               <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
                 <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 3 — ŞARTNAME, PATENT VE TELİF SORUMSUZLUK KAYDI</h3>
                 <p>3.1. Alıcı tarafından sisteme yüklenen teknik şartname, formül, patentli tasarım veya CAD çizimlerinin üçüncü tarafların sınai mülkiyet haklarını, patentlerini veya ticari sırlarını ihlal etmesinden kaynaklanan her türlü hukuki, cezai ve idari sorumluluk münhasıran Alıcı\'ya aittir.</p>
-                <p>3.2. Şirket, yüklenen şartnamelerin içeriğini önceden incelemek, patent veri tabanlarında araştırmak veya doğrulamakla yükümlü değildir. Hak ihlali iddiasında bulunan hak sahipleri "Uyar-Kaldır" mekanizması kapsamında <strong>ihalcib@gmail.com</strong> adresine noter onaylı delilleriyle başvurduğunda ilgili içerik derhal incelemeye alınır.</p>
+                <p>3.2. Şirket, yüklenen şartnamelerin içeriğini önceden incelemek, patent veri tabanlarında araştırmak veya doğrulamakla yükümlü değildir. Hak ihlali iddiasında bulunan hak sahipleri "Uyar-Kaldır" mekanizması kapsamında <strong>ihalecib@gmail.com</strong> adresine noter onaylı delilleriyle başvurduğunda ilgili içerik derhal incelemeye alınır.</p>
               </section>
 
               <section class="space-y-2">
@@ -372,7 +372,7 @@ function printDocument() {
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — VERİ SORUMLUSUNUN KİMLİĞİ VE İRTİBAT KANALLARI</h3>
                 <p>1.1. Veri Sorumlusu: İhaleciBurada B2B Elektronik İhale ve Ticaret Platformu İşleticisi.</p>
                 <p>1.2. Adres: İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</p>
-                <p>1.3. E-Posta: <strong>ihalcib@gmail.com</strong> | DPO İletişim: <strong>0850 840 86 95</strong></p>
+                <p>1.3. E-Posta: <strong>ihalecib@gmail.com</strong> | DPO İletişim: <strong>0850 840 86 95</strong></p>
               </section>
 
               <section class="space-y-2">
@@ -474,7 +474,7 @@ function printDocument() {
                   <p><strong>Merkez Adresi:</strong> İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</p>
                   <p><strong>Vergi Dairesi & No:</strong> Çanakkale Vergi Dairesi / VKN: 4700854210</p>
                   <p><strong>MERSİS Numarası:</strong> 0470085421000001 | <strong>Ticaret Sicil No:</strong> 14520</p>
-                  <p><strong>Telefon / Müşteri Destek:</strong> 0850 840 86 95 | <strong>E-Posta:</strong> ihalcib@gmail.com</p>
+                  <p><strong>Telefon / Müşteri Destek:</strong> 0850 840 86 95 | <strong>E-Posta:</strong> ihalecib@gmail.com</p>
                   <p><strong>KEP Adresi:</strong> ihaleciburada@hs01.kep.tr | <strong>Web Sitesi:</strong> https://ihaleciburada.com</p>
                 </div>
               </section>
@@ -508,7 +508,7 @@ function printDocument() {
 
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 5 — ŞİKAYET VE İTİRAZ KANALLARI</h3>
-                <p>5.1. Abone, hizmete ilişkin her türlü talep ve şikayetini <strong>0850 840 86 95</strong> no\'lu destek hattından veya <strong>ihalcib@gmail.com</strong> adresinden kurumsal müşteri temsilcilerimize iletebilir. Başvurular en geç 24 saat içinde yanıtlanır.</p>
+                <p>5.1. Abone, hizmete ilişkin her türlü talep ve şikayetini <strong>0850 840 86 95</strong> no\'lu destek hattından veya <strong>ihalecib@gmail.com</strong> adresinden kurumsal müşteri temsilcilerimize iletebilir. Başvurular en geç 24 saat içinde yanıtlanır.</p>
               </section>
             </div>
           </article>
@@ -672,3 +672,4 @@ function printDocument() {
     </div>
   </div>
 </template>
+

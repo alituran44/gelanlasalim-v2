@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { locale } from '~/composables/useLocale'
@@ -389,7 +389,7 @@ function handleSubmit() {
       session = JSON.parse(localStorage.getItem('userSession') || '{}')
     } catch (e) {}
   }
-  const ownerEmail = session.email || 'ihalcib@gmail.com'
+  const ownerEmail = session.email || 'ihalecib@gmail.com'
   const ownerName = session.name || session.firstName || 'Ali Turan'
   const ownerCompany = session.companyName || session.company || 'Ali Turan Sanayi A.Ş.'
 
@@ -940,3 +940,4 @@ function handleSubmit() {
 
   </div>
 </template>
+

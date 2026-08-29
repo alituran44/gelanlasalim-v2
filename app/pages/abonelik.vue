@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
@@ -221,7 +221,7 @@ onMounted(() => {
         billingTaxOffice.value = userSession.value.taxOffice || 'Çanakkale Vergi Dairesi'
         billingAddress.value = userSession.value.address || 'İsmetpaşa Mah. Büyük Hamam Sok. No:52/1'
         billingPhone.value = userSession.value.phone || '0850 840 86 95'
-        billingEmail.value = userSession.value.email || 'ihalcib@gmail.com'
+        billingEmail.value = userSession.value.email || 'ihalecib@gmail.com'
       }
     } catch (e) {
       console.error('Failed to load user session', e)
@@ -819,3 +819,4 @@ function completeCheckout() {
     </transition>
   </div>
 </template>
+

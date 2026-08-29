@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { ref } from 'vue'
 import { HelpCircle, Search, ChevronDown, Mail, Phone, Play, BookOpen, Sparkles, Zap, TrendingDown, ShieldCheck, Layers } from 'lucide-vue-next'
 import VideoGuideModal from '~/components/common/VideoGuideModal.vue'
@@ -178,7 +178,7 @@ const videoCards = [
         <p class="text-xs text-blue-700 mt-1">Destek ekibimiz 7/24 sorularınızı yanıtlamaktan memnuniyet duyar.</p>
       </div>
       <div class="flex gap-3 shrink-0">
-        <a href="mailto:ihalcib@gmail.com" class="px-5 py-2.5 rounded-xl bg-[#003057] hover:bg-[#1EAE4C] text-white font-bold text-xs transition flex items-center gap-2 shadow-sm">
+        <a href="mailto:ihalecib@gmail.com" class="px-5 py-2.5 rounded-xl bg-[#003057] hover:bg-[#1EAE4C] text-white font-bold text-xs transition flex items-center gap-2 shadow-sm">
           <Mail :size="14" /> E-posta Gönder
         </a>
       </div>
@@ -192,4 +192,5 @@ const videoCards = [
 
   </div>
 </template>
+
 

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { 
   ArrowRight, 
@@ -97,7 +97,7 @@ onMounted(() => {
           <span class="hidden sm:flex items-center gap-1">
             <span class="text-indigo-600">✉</span>
             <strong>E-posta:</strong> 
-            <a href="mailto:ihalcib@gmail.com" class="text-blue-700 hover:underline">ihalcib@gmail.com</a>
+            <a href="mailto:ihalecib@gmail.com" class="text-blue-700 hover:underline">ihalecib@gmail.com</a>
           </span>
         </div>
         <div>
@@ -364,7 +364,7 @@ onMounted(() => {
               </div>
               <div class="text-slate-400">
                 <span>✉</span>
-                <a href="mailto:ihalcib@gmail.com" class="ml-1 text-sky-300 hover:underline">ihalcib@gmail.com</a>
+                <a href="mailto:ihalecib@gmail.com" class="ml-1 text-sky-300 hover:underline">ihalecib@gmail.com</a>
               </div>
               <div class="text-[10px] text-slate-500 pt-1 border-t border-slate-800">
                 Hafta İçi: 09:00 - 18:00 | 7/24 Canlı Destek Masası
@@ -398,3 +398,4 @@ onMounted(() => {
 
   </div>
 </template>
+

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+﻿<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { 
   Search, 
@@ -262,7 +262,7 @@ function getCompanyData(name: string) {
     taxOffice: 'Kayıtlı V.D.',
     mersis: '—',
     phone: '0850 840 86 95',
-    email: 'ihalcib@gmail.com',
+    email: 'ihalecib@gmail.com',
     address: 'Türkiye',
     foundedYear: new Date().getFullYear(),
     description: 'İhaleciBurada B2B platformunda doğrulanmış kurumsal firma.',
@@ -330,7 +330,7 @@ async function submitBid() {
   const myCompanyName = userSession.value.companyName || userSession.value.company || bidForm.value.firmaAdi || 'Yetkili Firma'
   const myContact = userSession.value.name || userSession.value.firstName || 'Ali Turan'
   const myPhone = userSession.value.phone || '0850 840 86 95'
-  const myEmail = userSession.value.email || 'ihalcib@gmail.com'
+  const myEmail = userSession.value.email || 'ihalecib@gmail.com'
   const myTax = userSession.value.taxOffice ? `${userSession.value.taxOffice} / ${userSession.value.taxNo || ''}` : 'Çanakkale V.D. 4700854210'
   const myAddress = userSession.value.faturaAdresi || 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale'
 
@@ -1694,3 +1694,4 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
 
   </div>
 </template>
+

@@ -22,7 +22,13 @@ import {
   Award,
   MessageSquare,
   Lock,
-  X
+  X,
+  CreditCard,
+  Eye,
+  FileCheck,
+  Download,
+  ExternalLink,
+  FileSpreadsheet
 } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
 import { useCmsData } from '~/composables/useCmsData'
@@ -58,6 +64,9 @@ const currentIlan = ref<any>(null)
 const counterOfferPrice = ref('')
 const counterOfferNotes = ref('')
 
+const showDocModal = ref(false)
+const selectedTeklifForDocs = ref<any>(null)
+
 const showDisputeModal = ref(false)
 const selectedIlanForDispute = ref<any>(null)
 const disputeReason = ref('Mücbir Sebep - Tedarik zinciri aksaması ve hammadde yokluğu')
@@ -67,6 +76,12 @@ const reviewCompany = ref<any>(null)
 const reviewRating = ref(5)
 const reviewComment = ref('')
 const reviewTags = ref<string[]>([])
+
+// Open Document Viewer Modal
+function openDocModal(teklif: any) {
+  selectedTeklifForDocs.value = teklif
+  showDocModal.value = true
+}
 
 // Open Negotiation Modal
 function openNegotiation(teklif: any, ilan: any) {
@@ -156,19 +171,66 @@ async function acceptTeklif(teklif: any, ilan: any) {
   }
 
   // 4. Update matching submittedBid for supplier view
+  let userSession: any = {}
+  if (typeof window !== 'undefined') {
+    try {
+      userSession = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+  }
+  const buyerCompanyName = userSession.companyName || userSession.company || 'Ali Turan Sanayi A.Ş.'
+
   const matchingSubmitted = (cmsData.value.dashboard.submittedBids || []).find((b: any) => b.id === teklif.id)
   if (matchingSubmitted) {
     matchingSubmitted.durum = 'onaylandi'
-    matchingSubmitted.yetkili = 'Ahmet Yılmaz (Alıcı Yetkilisi)'
-    matchingSubmitted.telefon = '+90 850 308 00 00'
-    matchingSubmitted.eposta = 'satinlama@ihaleciburada.com'
-    matchingSubmitted.vergiDairesi = 'Karesi V.D. / 4810293847'
-    matchingSubmitted.adres = 'Bahçelievler Mah. Balıkesir'
+    matchingSubmitted.yetkili = userSession.name || 'Ali Turan (Alıcı Yetkilisi)'
+    matchingSubmitted.telefon = userSession.phone || '0850 840 86 95'
+    matchingSubmitted.eposta = userSession.email || 'ihalecib@gmail.com'
+    matchingSubmitted.vergiDairesi = userSession.taxOffice ? `${userSession.taxOffice} / ${userSession.taxNo || ''}` : 'Çanakkale V.D. / 4700854210'
+    matchingSubmitted.adres = userSession.address || 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale'
+  }
+
+  // 5. Automatically create Escrow Order in dashboard.escrowOrders if not existing
+  if (!cmsData.value.dashboard.escrowOrders) {
+    cmsData.value.dashboard.escrowOrders = []
+  }
+  const numAmount = parseInt((teklif.fiyat || '').replace(/[^0-9]/g, '')) || 100000
+  const payoutVal = Math.round(numAmount * 0.97).toLocaleString('tr-TR') + ' ₺'
+  const commVal = Math.round(numAmount * 0.03).toLocaleString('tr-TR') + ' ₺'
+
+  const existingEscrow = cmsData.value.dashboard.escrowOrders.find((o: any) => o.id === ilan.id || o.tenderTitle === ilan.baslik)
+  if (!existingEscrow) {
+    cmsData.value.dashboard.escrowOrders.unshift({
+      id: 'ESC-' + Math.floor(1000 + Math.random() * 9000),
+      orderCode: 'SIP-2026-' + Math.floor(1000 + Math.random() * 9000),
+      tenderId: ilan.id,
+      tenderTitle: ilan.baslik,
+      buyerFirm: buyerCompanyName,
+      supplierFirm: teklif.firma,
+      totalAmount: teklif.fiyat,
+      numericAmount: numAmount,
+      payoutAmount: payoutVal,
+      commissionAmount: commVal,
+      commissionRate: 3,
+      status: 'HAVUZDA_BLOKE',
+      shippingCompany: 'Lojistik / Ambar',
+      trackingCode: '',
+      notes: 'İhale başarıyla sonuçlandı. Güvenli havuz ödemesi bloke edildi.',
+      paymentMethod: 'PayTR / iyzico 3D Güvenli Havuz',
+      createdAt: 'Bugün',
+      updatedAt: 'Şimdi',
+      history: [
+        {
+          title: 'İhale Mutabakatı Sağlandı & Havuz Açıldı',
+          date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
+          by: 'Alıcı Firma Onayı'
+        }
+      ]
+    })
   }
 
   saveCmsData(cmsData.value)
 
-  // 5. Send NetGSM SMS
+  // 6. Send NetGSM SMS
   await sendSms({
     recipientPhone: teklif.telefon || '+90 532 555 01 23',
     recipientName: teklif.firma,
@@ -479,6 +541,15 @@ function submitReview() {
                   <div v-if="!ilan.teklifler.some((t: any) => t.durum === 'onaylandi') && teklif.durum !== 'reddedildi'" class="flex items-center gap-2">
                     <button
                       type="button"
+                      @click="openDocModal(teklif)"
+                      class="rounded-xl px-3 py-2 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition flex items-center gap-1 cursor-pointer shadow-2xs"
+                      title="Firma Evraklarını ve Teklif Dosyalarını Gör"
+                    >
+                      <FileText :size="13" class="text-blue-600" />
+                      <span>Evrakları Gör</span>
+                    </button>
+                    <button
+                      type="button"
                       @click="openNegotiation(teklif, ilan)"
                       class="rounded-xl px-3.5 py-2 text-xs font-black bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition cursor-pointer shadow-2xs"
                     >
@@ -503,6 +574,15 @@ function submitReview() {
 
                   <!-- Anlaşıldıysa Değerlendirme & İptal Butonları -->
                   <div v-else-if="teklif.durum === 'onaylandi'" class="flex items-center gap-2">
+                    <button
+                      type="button"
+                      @click="openDocModal(teklif)"
+                      class="rounded-xl px-3 py-2 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition flex items-center gap-1 cursor-pointer shadow-2xs"
+                      title="Firma Evraklarını Gör"
+                    >
+                      <FileText :size="13" class="text-blue-600" />
+                      <span>Evraklar</span>
+                    </button>
                     <button
                       type="button"
                       @click="openReviewModal(teklif)"
@@ -760,6 +840,140 @@ function submitReview() {
             class="px-5 py-2.5 rounded-xl bg-[#003057] hover:bg-[#1EAE4C] text-white font-black text-xs shadow-md"
           >
             Puanı Kaydet
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 4: FİRMA EVRAKLARI & TEKLİF BELGELERİ GÖRÜNTÜLEYİCİ -->
+    <div v-if="showDocModal && selectedTeklifForDocs" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div class="w-full max-w-2xl rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-6 text-left max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b pb-4 border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 flex items-center justify-center font-black">
+              <FileCheck :size="20" />
+            </div>
+            <div>
+              <span class="text-[10px] font-black text-blue-600 uppercase tracking-wider">KURUMSAL EVRAK KONTROLÜ</span>
+              <h3 class="text-base font-black text-slate-900">{{ selectedTeklifForDocs?.firma }}</h3>
+            </div>
+          </div>
+          <button @click="showDocModal = false" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer">
+            <X :size="18" />
+          </button>
+        </div>
+
+        <!-- Firma Kimlik Kartı -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold block">Vergi No / Daire</span>
+            <strong class="text-slate-800">{{ selectedTeklifForDocs?.vergiDairesi || 'Karesi V.D. 4700854210' }}</strong>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold block">Yetkili</span>
+            <strong class="text-slate-800">{{ selectedTeklifForDocs?.yetkili || 'Mehmet Yılmaz' }}</strong>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold block">Telefon</span>
+            <strong class="text-blue-600 font-mono">{{ selectedTeklifForDocs?.telefon || '0850 840 86 95' }}</strong>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold block">Mavi Rozet</span>
+            <span class="inline-flex items-center gap-1 text-[11px] font-black text-emerald-700">
+              <CheckCircle2 :size="13" class="text-emerald-600" /> Onaylı
+            </span>
+          </div>
+        </div>
+
+        <!-- Yüklenen Resmi Evraklar Listesi -->
+        <div class="space-y-3">
+          <h4 class="text-xs font-black text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+            <FileText :size="14" class="text-blue-600" />
+            <span>Yüklenen Yasal Evraklar ve Teknik Şartnameler</span>
+          </h4>
+
+          <div class="space-y-2">
+            <!-- Evrak 1: Vergi Levhası -->
+            <div class="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-blue-300 transition flex items-center justify-between shadow-2xs">
+              <div class="flex items-center gap-3">
+                <div class="p-2 rounded-lg bg-emerald-50 text-emerald-700">
+                  <FileText :size="18" />
+                </div>
+                <div>
+                  <h5 class="text-xs font-black text-slate-900">2025/2026 Onaylı Vergi Levhası</h5>
+                  <p class="text-[10px] text-slate-400">GİB Barkodlu & Doğrulanmış PDF • 1.4 MB</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">GİB Onaylı</span>
+                <button type="button" @click="alert('📄 Vergi Levhası Görüntüleniyor (GİB Barkodlu Resmi Belge)')" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" title="Görüntüle">
+                  <Eye :size="14" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Evrak 2: İmza Sirküleri & Yetki Belgesi -->
+            <div class="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-blue-300 transition flex items-center justify-between shadow-2xs">
+              <div class="flex items-center gap-3">
+                <div class="p-2 rounded-lg bg-blue-50 text-blue-700">
+                  <FileCheck :size="18" />
+                </div>
+                <div>
+                  <h5 class="text-xs font-black text-slate-900">Noter Onaylı İmza Sirküleri & Temsil Belgesi</h5>
+                  <p class="text-[10px] text-slate-400">Noter Yevmiye No: 14820 • 2.8 MB</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">Noter Tasdikli</span>
+                <button type="button" @click="alert('📄 İmza Sirküleri Görüntüleniyor (Noter Tasdikli)')" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" title="Görüntüle">
+                  <Eye :size="14" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Evrak 3: Ticaret Odası Faaliyet Belgesi -->
+            <div class="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-blue-300 transition flex items-center justify-between shadow-2xs">
+              <div class="flex items-center gap-3">
+                <div class="p-2 rounded-lg bg-purple-50 text-purple-700">
+                  <FileSpreadsheet :size="18" />
+                </div>
+                <div>
+                  <h5 class="text-xs font-black text-slate-900">Ticaret ve Sanayi Odası Faaliyet Belgesi</h5>
+                  <p class="text-[10px] text-slate-400">Son 6 Aylık Güncel Oda Kaydı • 980 KB</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200">Oda Onaylı</span>
+                <button type="button" @click="alert('📄 Faaliyet Belgesi Görüntüleniyor')" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" title="Görüntüle">
+                  <Eye :size="14" />
+                </button>
+              </div>
+            </div>
+
+            <!-- Evrak 4: Teklif Metni & Fiyat Kırılım Tablosu -->
+            <div class="p-3.5 rounded-xl border border-slate-200 bg-white hover:border-blue-300 transition flex items-center justify-between shadow-2xs">
+              <div class="flex items-center gap-3">
+                <div class="p-2 rounded-lg bg-amber-50 text-amber-700">
+                  <FileText :size="18" />
+                </div>
+                <div>
+                  <h5 class="text-xs font-black text-slate-900">Teklif İzahnamesi & Birim Fiyat Tablosu</h5>
+                  <p class="text-[10px] text-slate-400">Teklif Tutarı: {{ selectedTeklifForDocs?.fiyat }} • Teslimat: {{ selectedTeklifForDocs?.sure }}</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200">Teklif Dosyası</span>
+                <button type="button" @click="alert(`📄 Teklif Tutarı: ${selectedTeklifForDocs?.fiyat}\nTeslimat Süresi: ${selectedTeklifForDocs?.sure}\nFirma: ${selectedTeklifForDocs?.firma}`)" class="p-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer" title="Görüntüle">
+                  <Eye :size="14" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end pt-3 border-t border-slate-100">
+          <button @click="showDocModal = false" class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition cursor-pointer shadow-sm">
+            Kapat
           </button>
         </div>
       </div>
