@@ -1,22 +1,29 @@
 <script setup lang="ts">
-const stats = [
+import { computed } from 'vue'
+import { useCmsData } from '~/composables/useCmsData'
+
+const { cmsData } = useCmsData()
+const tenders = computed(() => cmsData.value?.dashboard?.tenders || [])
+const bids = computed(() => cmsData.value?.dashboard?.receivedBids || [])
+
+const stats = computed(() => [
   {
-    value: "12.000+",
-    title: "Firma"
+    value: "0+",
+    title: "Kayıtlı Kurumsal Firma"
   },
   {
-    value: "48.000+",
+    value: `${tenders.value.length}`,
     title: "Aktif İhale"
   },
   {
-    value: "1.250.000+",
-    title: "Teklif"
+    value: `${bids.value.length}`,
+    title: "Teklif Hacmi"
   },
   {
-    value: "97%",
-    title: "Memnuniyet"
+    value: "%100",
+    title: "Escrow Güvencesi"
   }
-]
+])
 </script>
 
 <template>

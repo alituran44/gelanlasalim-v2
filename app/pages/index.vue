@@ -95,184 +95,176 @@ const quickOfferPrice = ref('')
 const quickOfferNotes = ref('')
 const selectedItemName = ref<string | null>(null)
 
+import { useCmsData } from '~/composables/useCmsData'
+
+// ==================== DİNAMİK CMS VERİ BAĞLANTISI ====================
+const { cmsData } = useCmsData()
+const allTenders = computed(() => cmsData.value?.dashboard?.tenders || [])
+
+const todayPublishedCount = computed(() => allTenders.value.filter(t => t.durum !== 'closed').length)
+const todayOngoingCount = computed(() => allTenders.value.filter(t => t.durum === 'active').length)
+const todayFinishedCount = computed(() => allTenders.value.filter(t => t.durum === 'closed').length)
+
+function getCategoryCount(catName: string) {
+  const words = catName.toLowerCase()
+    .replace(/[-–,/()]/g, ' ')
+    .split(/\s+/)
+    .filter(w => w.length > 3 && !['ihaleleri', 'ürünler', 'hizmetleri', 'alım', 'işleri', 'satışı'].includes(w))
+
+  return allTenders.value.filter((t: any) => {
+    const k = (t.kategori || '').toLowerCase()
+    const b = (t.baslik || '').toLowerCase()
+    return words.some(w => k.includes(w) || b.includes(w))
+  }).length
+}
+
+function getCityCount(cityName: string) {
+  return allTenders.value.filter((t: any) => {
+    const city = (t.city || '').toLowerCase()
+    return city.includes(cityName.toLowerCase())
+  }).length
+}
+
+function getFilterCount(filterName: string) {
+  const clean = filterName.toLowerCase().split(' ')[0]
+  return allTenders.value.filter((t: any) => {
+    const tur = (t.tur || t.type || '').toLowerCase()
+    const usul = (t.usul || t.method || '').toLowerCase()
+    const kaynak = (t.kaynak || '').toLowerCase()
+    const kat = (t.kategori || '').toLowerCase()
+    return tur.includes(clean) || usul.includes(clean) || kaynak.includes(clean) || kat.includes(clean)
+  }).length
+}
+
 // ==================== 1. KATEGORİLER LİSTESİ (GÖRSEL 1: 36 KATEGORİ) ====================
-const categoriesLeft = [
-  { id: 1, name: 'İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri', count: 2103 },
-  { id: 2, name: 'Kanalizasyon - Boru - Su - Doğalgaz - Sıhhi Tesisat İhaleleri', count: 618 },
-  { id: 3, name: 'Kent Mobilyaları - Prefabrik Yapılar - Doğrama İhaleleri', count: 442 },
-  { id: 4, name: 'Mühendislik - Mimarlık - Danışmanlık İhaleleri', count: 165 },
-  { id: 5, name: 'Madencilik - Doğal Kaynaklar - Sondaj İhaleleri', count: 33 },
-  { id: 6, name: 'Hırdavat - Nalburiye - Metal ve Plastik Ürünler İhaleleri', count: 838 },
-  { id: 7, name: 'Enerji - Aydınlatma - Sinyalizasyon - Elektrik Tesisatı İhaleleri', count: 737 },
-  { id: 8, name: 'Yangın Algılama - Söndürme - İhbar Sistemleri İhaleleri', count: 75 },
-  { id: 9, name: 'Asansör - Yapı Otomasyon - Mekanik Güvenlik İhaleleri', count: 107 },
-  { id: 10, name: 'Klima - Soğutma - Isıtma - Havalandırma Tesisatı İhaleleri', count: 237 },
-  { id: 11, name: 'Endüstriyel Makine - Motor - Konveyör İhaleleri', count: 756 },
-  { id: 12, name: 'Savunma Sanayi, Silah - Denizcilik - Havacılık İhaleleri', count: 82 },
-  { id: 13, name: 'Taşıt - İş Makinesi - Yedek Parça İhaleleri', count: 987 },
-  { id: 14, name: 'Nakliye - Taşımacılık Hizmetleri - Servis İhaleleri', count: 488 },
-  { id: 15, name: 'Turizm - Ödüllendirme Hizmetleri - Organizasyon İhaleleri', count: 76 },
-  { id: 16, name: 'Reklam - Tabela - Billboard - Tanıtım Materyalleri İhaleleri', count: 88 },
-  { id: 17, name: 'Matbaa - Toner - Kartuş - Ambalaj - Kırtasiye İhaleleri', count: 474 },
-  { id: 18, name: 'Ormancılık, Bahçıvanlık, Bitki, Kozalak - Peyzaj İhaleleri', count: 114 },
-  { id: 19, name: 'Hayvancılık - Veterinerlik - Hayvan Yemi İhaleleri', count: 70 },
-  { id: 20, name: 'Sanat Eserleri - Müzik Aletleri - Heykel - Maket İhaleleri', count: 11 }
+const rawCategoriesLeft = [
+  { id: 1, name: 'İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri' },
+  { id: 2, name: 'Kanalizasyon - Boru - Su - Doğalgaz - Sıhhi Tesisat İhaleleri' },
+  { id: 3, name: 'Kent Mobilyaları - Prefabrik Yapılar - Doğrama İhaleleri' },
+  { id: 4, name: 'Mühendislik - Mimarlık - Danışmanlık İhaleleri' },
+  { id: 5, name: 'Madencilik - Doğal Kaynaklar - Sondaj İhaleleri' },
+  { id: 6, name: 'Hırdavat - Nalburiye - Metal ve Plastik Ürünler İhaleleri' },
+  { id: 7, name: 'Enerji - Aydınlatma - Sinyalizasyon - Elektrik Tesisatı İhaleleri' },
+  { id: 8, name: 'Yangın Algılama - Söndürme - İhbar Sistemleri İhaleleri' },
+  { id: 9, name: 'Asansör - Yapı Otomasyon - Mekanik Güvenlik İhaleleri' },
+  { id: 10, name: 'Klima - Soğutma - Isıtma - Havalandırma Tesisatı İhaleleri' },
+  { id: 11, name: 'Endüstriyel Makine - Motor - Konveyör İhaleleri' },
+  { id: 12, name: 'Savunma Sanayi, Silah - Denizcilik - Havacılık İhaleleri' },
+  { id: 13, name: 'Taşıt - İş Makinesi - Yedek Parça İhaleleri' },
+  { id: 14, name: 'Nakliye - Taşımacılık Hizmetleri - Servis İhaleleri' },
+  { id: 15, name: 'Turizm - Ödüllendirme Hizmetleri - Organizasyon İhaleleri' },
+  { id: 16, name: 'Reklam - Tabela - Billboard - Tanıtım Materyalleri İhaleleri' },
+  { id: 17, name: 'Matbaa - Toner - Kartuş - Ambalaj - Kırtasiye İhaleleri' },
+  { id: 18, name: 'Ormancılık, Bahçıvanlık, Bitki, Kozalak - Peyzaj İhaleleri' },
+  { id: 19, name: 'Hayvancılık - Veterinerlik - Hayvan Yemi İhaleleri' },
+  { id: 20, name: 'Sanat Eserleri - Müzik Aletleri - Heykel - Maket İhaleleri' }
 ]
 
-const categoriesRight = [
-  { id: 21, name: 'Sağlık - İlaç - Kozmetik - Medikal İhaleleri', count: 2615 },
-  { id: 22, name: 'Tıbbi Cihaz - Laboratuvar - Hastane Ekipmanları İhaleleri', count: 1399 },
-  { id: 23, name: 'Akaryakıt - Gazyağı - Madeni Yağ İhaleleri', count: 143 },
-  { id: 24, name: 'Odun - Kömür - Katıyakıt İhaleleri', count: 66 },
-  { id: 25, name: 'Gıda - Tarım Ürünleri - Yiyecek - İçecek İhaleleri', count: 582 },
-  { id: 26, name: 'Hazır Yemek - Lokantacılık İhaleleri', count: 89 },
-  { id: 27, name: 'Elektronik - Ölçü Aletleri - İletişim - Bilgisayar İhaleleri', count: 859 },
-  { id: 28, name: 'Yazılım - Bilgi Yönetim Hizmetleri - Bilişim İhaleleri', count: 243 },
-  { id: 29, name: 'Uydu Takip - Kamera - Scada - Haberleşme Sistemleri İhaleleri', count: 151 },
-  { id: 30, name: 'Temizlik - İlaçlama - Geri Dönüşüm İhaleleri', count: 317 },
-  { id: 31, name: 'Kimyasal Maddeler - Dezenfektan - Gübre İhaleleri', count: 260 },
-  { id: 32, name: 'Tekstil - Giyim - Spor Ekipmanları İhaleleri', count: 381 },
-  { id: 33, name: 'İş Sağlığı - İş Güvenliği ve Ekipmanları İhaleleri', count: 143 },
-  { id: 34, name: 'Mobilya - Beyaz Eşya - Mutfak - Züccaciye İhaleleri', count: 291 },
-  { id: 35, name: 'Özel Güvenlik - Koruma - Bekçilik İhaleleri', count: 136 },
-  { id: 36, name: 'Eğitim - Araştırma - Anket - Tercümanlık İhaleleri', count: 89 },
-  { id: 37, name: 'İşletmecilik - İşçilik - Sosyal Hizmetler İhaleleri', count: 148 },
-  { id: 38, name: 'Sigortacılık - Mali ve Hukuki Hizmetler İhaleleri', count: 18 },
-  { id: 39, name: 'Menkul Mallar - Araç Satışı ve Hurda İhaleleri', count: 76 },
-  { id: 40, name: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri', count: 714 }
+const rawCategoriesRight = [
+  { id: 21, name: 'Sağlık - İlaç - Kozmetik - Medikal İhaleleri' },
+  { id: 22, name: 'Tıbbi Cihaz - Laboratuvar - Hastane Ekipmanları İhaleleri' },
+  { id: 23, name: 'Akaryakıt - Gazyağı - Madeni Yağ İhaleleri' },
+  { id: 24, name: 'Odun - Kömür - Katıyakıt İhaleleri' },
+  { id: 25, name: 'Gıda - Tarım Ürünleri - Yiyecek - İçecek İhaleleri' },
+  { id: 26, name: 'Hazır Yemek - Lokantacılık İhaleleri' },
+  { id: 27, name: 'Elektronik - Ölçü Aletleri - İletişim - Bilgisayar İhaleleri' },
+  { id: 28, name: 'Yazılım - Bilgi Yönetim Hizmetleri - Bilişim İhaleleri' },
+  { id: 29, name: 'Uydu Takip - Kamera - Scada - Haberleşme Sistemleri İhaleleri' },
+  { id: 30, name: 'Temizlik - İlaçlama - Geri Dönüşüm İhaleleri' },
+  { id: 31, name: 'Kimyasal Maddeler - Dezenfektan - Gübre İhaleleri' },
+  { id: 32, name: 'Tekstil - Giyim - Spor Ekipmanları İhaleleri' },
+  { id: 33, name: 'İş Sağlığı - İş Güvenliği ve Ekipmanları İhaleleri' },
+  { id: 34, name: 'Mobilya - Beyaz Eşya - Mutfak - Züccaciye İhaleleri' },
+  { id: 35, name: 'Özel Güvenlik - Koruma - Bekçilik İhaleleri' },
+  { id: 36, name: 'Eğitim - Araştırma - Anket - Tercümanlık İhaleleri' },
+  { id: 37, name: 'İşletmecilik - İşçilik - Sosyal Hizmetler İhaleleri' },
+  { id: 38, name: 'Sigortacılık - Mali ve Hukuki Hizmetler İhaleleri' },
+  { id: 39, name: 'Menkul Mallar - Araç Satışı ve Hurda İhaleleri' },
+  { id: 40, name: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri' }
 ]
+
+const categoriesLeft = computed(() => {
+  return rawCategoriesLeft.map(c => ({
+    ...c,
+    count: getCategoryCount(c.name)
+  }))
+})
+
+const categoriesRight = computed(() => {
+  return rawCategoriesRight.map(c => ({
+    ...c,
+    count: getCategoryCount(c.name)
+  }))
+})
 
 // ==================== 2. EK FİLTRE BLOKLARI (GÖRSEL 1 ALT KISIM) ====================
-const ihaleKaynaklari = [
-  { name: 'Ekap İhaleleri', count: 8764 },
-  { name: 'Gazete İhaleleri', count: 1026 },
-  { name: 'İstihbarat İhaleleri', count: 7640 }
+const rawIhaleKaynaklari = [
+  { name: 'Ekap İhaleleri' },
+  { name: 'Gazete İhaleleri' },
+  { name: 'İstihbarat İhaleleri' }
 ]
 
-const ihaleTurleri = [
-  { name: 'Yapım İşi İhaleleri', count: 1687 },
-  { name: 'Mal Alımı İhaleleri', count: 7486 },
-  { name: 'Hizmet Alımı İhaleleri', count: 7280 },
-  { name: 'Satış İhaleleri', count: 547 },
-  { name: 'Kiralama İhaleleri', count: 1006 }
+const rawIhaleTurleri = [
+  { name: 'Yapım İşi İhaleleri' },
+  { name: 'Mal Alımı İhaleleri' },
+  { name: 'Hizmet Alımı İhaleleri' },
+  { name: 'Satış İhaleleri' },
+  { name: 'Kiralama İhaleleri' }
 ]
 
-const ihaleUsulleri = [
-  { name: 'Açık İhale Usulü İhaleleri', count: 5779 },
-  { name: 'Doğrudan Temin İhaleleri', count: 6007 },
-  { name: 'Fiyat Araştırması İhaleleri', count: 42 },
-  { name: 'Belli İstekliler İhaleleri', count: 21 },
-  { name: 'Pazarlık Usulü İhaleleri', count: 791 },
-  { name: 'İstisna İhaleleri', count: 198 }
+const rawIhaleUsulleri = [
+  { name: 'Açık İhale Usulü İhaleleri' },
+  { name: 'Doğrudan Temin İhaleleri' },
+  { name: 'Fiyat Araştırması İhaleleri' },
+  { name: 'Belli İstekliler İhaleleri' },
+  { name: 'Pazarlık Usulü İhaleleri' },
+  { name: 'İstisna İhaleleri' }
 ]
 
-const teklifTurleri = [
-  { name: 'E-İhale İhaleleri', count: 5081 },
-  { name: 'E-İhale İhaleleri', count: 98 },
-  { name: 'Kısmi Teklif Verilebilir İhaleleri', count: 1082 },
-  { name: 'Kısmi Teklif Verilemez İhaleleri', count: 7874 },
-  { name: 'Birim Fiyat Usulü İhaleleri', count: 5706 },
-  { name: 'Götürü Bedel Usulü İhaleleri', count: 170 },
-  { name: 'Sadece Yerli İstekliler İhaleleri', count: 7672 },
-  { name: 'Yerli ve Yabancı İstekliler İhaleleri', count: 1749 }
+const rawTeklifTurleri = [
+  { name: 'E-İhale İhaleleri' },
+  { name: 'Kısmi Teklif Verilebilir İhaleleri' },
+  { name: 'Kısmi Teklif Verilemez İhaleleri' },
+  { name: 'Birim Fiyat Usulü İhaleleri' },
+  { name: 'Götürü Bedel Usulü İhaleleri' },
+  { name: 'Sadece Yerli İstekliler İhaleleri' },
+  { name: 'Yerli ve Yabancı İstekliler İhaleleri' }
 ]
 
-const icerikTurleri = [
-  { name: 'Düzeltme İlanı', count: 181 },
-  { name: 'İptal İlanı', count: 33 },
-  { name: 'Zeyilname', count: 442 }
+const rawIcerikTurleri = [
+  { name: 'Düzeltme İlanı' },
+  { name: 'İptal İlanı' },
+  { name: 'Zeyilname' }
 ]
+
+const ihaleKaynaklari = computed(() => rawIhaleKaynaklari.map(item => ({ name: item.name, count: getFilterCount(item.name) })))
+const ihaleTurleri = computed(() => rawIhaleTurleri.map(item => ({ name: item.name, count: getFilterCount(item.name) })))
+const ihaleUsulleri = computed(() => rawIhaleUsulleri.map(item => ({ name: item.name, count: getFilterCount(item.name) })))
+const teklifTurleri = computed(() => rawTeklifTurleri.map(item => ({ name: item.name, count: getFilterCount(item.name) })))
+const icerikTurleri = computed(() => rawIcerikTurleri.map(item => ({ name: item.name, count: getFilterCount(item.name) })))
 
 // ==================== 3. ŞEHİRLER LİSTESİ (GÖRSEL 2: 81 İL) ====================
-const cityListCol1 = [
-  { name: 'Adana', count: 338 },
-  { name: 'Adıyaman', count: 97 },
-  { name: 'Afyonkarahisar', count: 168 },
-  { name: 'Ağrı', count: 99 },
-  { name: 'Aksaray', count: 87 },
-  { name: 'Amasya', count: 63 },
-  { name: 'Ankara', count: 1392 },
-  { name: 'Antalya', count: 857 },
-  { name: 'Ardahan', count: 24 },
-  { name: 'Artvin', count: 36 },
-  { name: 'Aydın', count: 196 },
-  { name: 'Balıkesir', count: 293 },
-  { name: 'Bartın', count: 42 },
-  { name: 'Batman', count: 90 },
-  { name: 'Bayburt', count: 17 },
-  { name: 'Bilecik', count: 61 },
-  { name: 'Bingöl', count: 48 },
-  { name: 'Bitlis', count: 37 },
-  { name: 'Bolu', count: 99 },
-  { name: 'Burdur', count: 57 },
-  { name: 'Bursa', count: 573 },
-  { name: 'Çanakkale', count: 180 },
-  { name: 'Çankırı', count: 39 },
-  { name: 'Çorum', count: 80 },
-  { name: 'Denizli', count: 139 },
-  { name: 'Diyarbakır', count: 337 },
-  { name: 'Düzce', count: 83 }
+const rawCityNamesCol1 = [
+  'Adana', 'Adıyaman', 'Afyonkarahisar', 'Ağrı', 'Aksaray', 'Amasya', 'Ankara', 'Antalya', 'Ardahan', 'Artvin',
+  'Aydın', 'Balıkesir', 'Bartın', 'Batman', 'Bayburt', 'Bilecik', 'Bingöl', 'Bitlis', 'Bolu', 'Burdur',
+  'Bursa', 'Çanakkale', 'Çankırı', 'Çorum', 'Denizli', 'Diyarbakır', 'Düzce'
 ]
 
-const cityListCol2 = [
-  { name: 'Edirne', count: 117 },
-  { name: 'Elazığ', count: 148 },
-  { name: 'Erzincan', count: 80 },
-  { name: 'Erzurum', count: 239 },
-  { name: 'Eskişehir', count: 258 },
-  { name: 'Gaziantep', count: 390 },
-  { name: 'Giresun', count: 80 },
-  { name: 'Gümüşhane', count: 22 },
-  { name: 'Hakkari', count: 52 },
-  { name: 'Hatay', count: 119 },
-  { name: 'Iğdır', count: 33 },
-  { name: 'Isparta', count: 79 },
-  { name: 'İstanbul', count: 3243 },
-  { name: 'İzmir', count: 787 },
-  { name: 'Kahramanmaraş', count: 208 },
-  { name: 'Karabük', count: 34 },
-  { name: 'Karaman', count: 39 },
-  { name: 'Kars', count: 78 },
-  { name: 'Kastamonu', count: 67 },
-  { name: 'Kayseri', count: 338 },
-  { name: 'Kırıkkale', count: 60 },
-  { name: 'Kırklareli', count: 76 },
-  { name: 'Kırşehir', count: 108 },
-  { name: 'Kilis', count: 47 },
-  { name: 'Kocaeli', count: 340 },
-  { name: 'Konya', count: 388 },
-  { name: 'Kütahya', count: 147 }
+const rawCityNamesCol2 = [
+  'Edirne', 'Elazığ', 'Erzincan', 'Erzurum', 'Eskişehir', 'Gaziantep', 'Giresun', 'Gümüşhane', 'Hakkari', 'Hatay',
+  'Iğdır', 'Isparta', 'İstanbul', 'İzmir', 'Kahramanmaraş', 'Karabük', 'Karaman', 'Kars', 'Kastamonu', 'Kayseri',
+  'Kırıkkale', 'Kırklareli', 'Kırşehir', 'Kilis', 'Kocaeli', 'Konya', 'Kütahya'
 ]
 
-const cityListCol3 = [
-  { name: 'Malatya', count: 117 },
-  { name: 'Manisa', count: 246 },
-  { name: 'Mardin', count: 89 },
-  { name: 'Mersin', count: 287 },
-  { name: 'Muğla', count: 213 },
-  { name: 'Muş', count: 70 },
-  { name: 'Nevşehir', count: 67 },
-  { name: 'Niğde', count: 56 },
-  { name: 'Ordu', count: 97 },
-  { name: 'Osmaniye', count: 83 },
-  { name: 'Rize', count: 77 },
-  { name: 'Sakarya', count: 166 },
-  { name: 'Samsun', count: 197 },
-  { name: 'Siirt', count: 43 },
-  { name: 'Sinop', count: 46 },
-  { name: 'Sivas', count: 176 },
-  { name: 'Şanlıurfa', count: 299 },
-  { name: 'Şırnak', count: 97 },
-  { name: 'Tekirdağ', count: 149 },
-  { name: 'Tokat', count: 147 },
-  { name: 'Trabzon', count: 153 },
-  { name: 'Tunceli', count: 173 },
-  { name: 'Uşak', count: 39 },
-  { name: 'Van', count: 193 },
-  { name: 'Yalova', count: 93 },
-  { name: 'Yozgat', count: 103 },
-  { name: 'Zonguldak', count: 171 }
+const rawCityNamesCol3 = [
+  'Malatya', 'Manisa', 'Mardin', 'Mersin', 'Muğla', 'Muş', 'Nevşehir', 'Niğde', 'Ordu', 'Osmaniye',
+  'Rize', 'Sakarya', 'Samsun', 'Siirt', 'Sinop', 'Sivas', 'Şanlıurfa', 'Şırnak', 'Tekirdağ', 'Tokat',
+  'Trabzon', 'Tunceli', 'Uşak', 'Van', 'Yalova', 'Yozgat', 'Zonguldak'
 ]
+
+const cityListCol1 = computed(() => rawCityNamesCol1.map(name => ({ name, count: getCityCount(name) })))
+const cityListCol2 = computed(() => rawCityNamesCol2.map(name => ({ name, count: getCityCount(name) })))
+const cityListCol3 = computed(() => rawCityNamesCol3.map(name => ({ name, count: getCityCount(name) })))
 
 // ==================== 4. SEKTÖRLER LİSTESİ (GÖRSEL 3: 38 CPV SEKTÖR) ====================
 const sectorsLeft = [
@@ -552,7 +544,7 @@ function handleSelectFilter(item: string) {
               <span>Bugün yayınlananlar</span>
             </span>
             <span class="px-2.5 py-0.5 rounded-full bg-white border border-sky-300 text-sky-800 font-black text-xs font-mono">
-              2.215 İhale
+              {{ todayPublishedCount }} İhale
             </span>
           </div>
           <div class="p-2.5 rounded border border-blue-300 bg-blue-50 flex items-center justify-between hover:bg-blue-100 transition cursor-pointer">
@@ -561,7 +553,7 @@ function handleSelectFilter(item: string) {
               <span>Bugün yapılacaklar</span>
             </span>
             <span class="px-2.5 py-0.5 rounded-full bg-white border border-blue-300 text-blue-800 font-black text-xs font-mono">
-              2.627 İhale
+              {{ todayOngoingCount }} İhale
             </span>
           </div>
           <div class="p-2.5 rounded border border-emerald-300 bg-emerald-50 flex items-center justify-between hover:bg-emerald-100 transition cursor-pointer">
@@ -570,7 +562,7 @@ function handleSelectFilter(item: string) {
               <span>Bugün sonuçlananlar</span>
             </span>
             <span class="px-2.5 py-0.5 rounded-full bg-white border border-emerald-300 text-emerald-800 font-black text-xs font-mono">
-              1.681 İhale
+              {{ todayFinishedCount }} İhale
             </span>
           </div>
         </div>

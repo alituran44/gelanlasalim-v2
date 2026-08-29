@@ -1,14 +1,27 @@
 <script setup lang="ts">
-const categories = [
-  { name: "İnşaat", icon: "🏗️", count: 1248 },
-  { name: "Yazılım", icon: "💻", count: 865 },
-  { name: "Elektrik", icon: "⚡", count: 532 },
-  { name: "Makine", icon: "⚙️", count: 478 },
-  { name: "Sağlık", icon: "🏥", count: 302 },
-  { name: "Lojistik", icon: "🚛", count: 290 },
-  { name: "Eğitim", icon: "🎓", count: 187 },
-  { name: "Güvenlik", icon: "🛡️", count: 156 }
+import { computed } from 'vue'
+import { useCmsData } from '~/composables/useCmsData'
+
+const { cmsData } = useCmsData()
+const tenders = computed(() => cmsData.value?.dashboard?.tenders || [])
+
+const rawCategories = [
+  { name: "İnşaat", icon: "🏗️" },
+  { name: "Yazılım", icon: "💻" },
+  { name: "Elektrik", icon: "⚡" },
+  { name: "Makine", icon: "⚙️" },
+  { name: "Sağlık", icon: "🏥" },
+  { name: "Lojistik", icon: "🚛" },
+  { name: "Eğitim", icon: "🎓" },
+  { name: "Güvenlik", icon: "🛡️" }
 ]
+
+const categories = computed(() => {
+  return rawCategories.map(cat => ({
+    ...cat,
+    count: tenders.value.filter(t => (t.kategori || '').toLowerCase().includes(cat.name.toLowerCase()) || (t.baslik || '').toLowerCase().includes(cat.name.toLowerCase())).length
+  }))
+})
 </script>
 
 <template>
