@@ -1,4 +1,4 @@
-﻿import { ref } from 'vue'
+import { ref } from 'vue'
 
 // Default contents in Turkish for authentic local B2B portal experience
 export const DEFAULT_CMS_DATA = {
@@ -113,30 +113,7 @@ export const DEFAULT_CMS_DATA = {
     workHoursWeekdays: 'Pazartesi - Cuma: 09:00 - 18:00',
     workHoursSaturday: 'Cumartesi: 10:00 - 14:00'
   },
-  payments: [
-    {
-      id: 'ORD-894210',
-      referenceCode: 'GA-9B432',
-      userName: 'Ahmet Yılmaz',
-      companyName: 'Ekspres Lojistik A.Ş.',
-      packageName: 'Profesyonel Üyelik Planı',
-      amount: '960 ₺',
-      paymentMethod: 'Banka Havalesi / EFT',
-      status: 'pending',
-      date: '17 Temmuz 2026'
-    },
-    {
-      id: 'ORD-761234',
-      referenceCode: '-',
-      userName: 'Elif Kaya',
-      companyName: 'Kaya Mimarlık Ltd.',
-      packageName: 'Kurumsal Enterprise Plan',
-      amount: '1.800 ₺',
-      paymentMethod: 'PayTR / Kredi Kartı',
-      status: 'approved',
-      date: '16 Temmuz 2026'
-    }
-  ],
+  payments: [],
   supportSettings: {
     whatsappEnabled: true,
     whatsappNumber: '908508408695',
@@ -147,11 +124,7 @@ export const DEFAULT_CMS_DATA = {
     aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın. Kullanıcılara 1 ay ücretsiz deneme, ihale açma, teklif verme, ihale ve satın alma konularında yardımcı ol.'
   },
   crmSettings: {
-    leads: [
-      { id: 1, companyName: 'Kalyon Tedarik Ltd.', contactName: 'Ahmet Kalyoncu', email: 'ahmet@kalyon.com', phone: '0532 111 22 33', status: '1 Ay Deneme Aktif', stage: 'active', notes: 'İnşaat malzemesi ihalesi açacak.', createdAt: '2026-08-20' },
-      { id: 2, companyName: 'Anadolu Lojistik A.Ş.', contactName: 'Mehmet Yılmaz', email: 'mehmet@anadolulojistik.com', phone: '0544 555 66 77', status: 'Teklif Veren', stage: 'qualified', notes: 'Akaryakıt ihalesine teklif verdi.', createdAt: '2026-08-21' },
-      { id: 3, companyName: 'Mega Ambalaj Sanayi', contactName: 'Selin Erdem', email: 'selin@megaambalaj.com', phone: '0555 888 99 00', status: 'Görüşülüyor', stage: 'contacted', notes: 'Kurumsal SAP entegrasyonu talebi var.', createdAt: '2026-08-22' }
-    ]
+    leads: []
   },
   emailSettings: {
     senderName: 'İhaleciBurada B2B Operasyon',
@@ -160,11 +133,7 @@ export const DEFAULT_CMS_DATA = {
     smtpHost: 'smtp.gmail.com',
     smtpPort: 587,
     smtpUser: 'ihalecib@gmail.com',
-    subscribers: [
-      { id: 1, email: 'info@kalyon.com', companyName: 'Kalyon Tedarik Ltd.', source: 'Kayıt Formu', subscribedAt: '2026-08-20', status: 'Aktif' },
-      { id: 2, email: 'satinalma@anadolu.com', companyName: 'Anadolu Lojistik A.Ş.', source: 'Bülten Aboneliği', subscribedAt: '2026-08-21', status: 'Aktif' },
-      { id: 3, email: 'kurumsal@megaambalaj.com', companyName: 'Mega Ambalaj Sanayi', source: 'İhale Katılımı', subscribedAt: '2026-08-22', status: 'Aktif' }
-    ],
+    subscribers: [],
     templates: [
       {
         id: 'trial-welcome',
@@ -198,141 +167,9 @@ export const DEFAULT_CMS_DATA = {
       }
     ]
   },
-  kycVerifications: [
-    {
-      id: 'KYC-8921',
-      companyName: 'Turan Bilişim & Tedarik Ltd.',
-      companyType: 'Limited Şirket (LTD)',
-      taxNo: '43624665040',
-      taxOffice: 'Çanakkale Vergi Dairesi',
-      authorizedPerson: 'Ali Turan (Yönetici)',
-      phone: '0850 840 86 95',
-      email: 'ali@turanbilisim.com',
-      uploadedDocs: ['Vergi Levhası (2025/2026)', 'İmza Sirküleri', 'Ticaret Sicil Gazetesi'],
-      status: 'pending',
-      badgeGranted: false,
-      createdAt: '2026-08-22 14:30',
-      rejectionReason: ''
-    },
-    {
-      id: 'KYC-7412',
-      companyName: 'Kalyon İnşaat & Yapı Malzemeleri A.Ş.',
-      companyType: 'Anonim Şirket (A.Ş.)',
-      taxNo: '58402918231',
-      taxOffice: 'Büyük Mükellefler V.D.',
-      authorizedPerson: 'Ahmet Kalyoncu (Genel Müdür)',
-      phone: '0532 111 22 33',
-      email: 'ahmet@kalyon.com',
-      uploadedDocs: ['Vergi Levhası', 'Faaliyet Belgesi', 'İmza Sirküleri'],
-      status: 'approved',
-      badgeGranted: true,
-      createdAt: '2026-08-20 11:15',
-      rejectionReason: ''
-    },
-    {
-      id: 'KYC-6320',
-      companyName: 'Anadolu Akaryakıt & Lojistik A.Ş.',
-      companyType: 'Anonim Şirket (A.Ş.)',
-      taxNo: '10928374652',
-      taxOffice: 'Ankara Kızılbey V.D.',
-      authorizedPerson: 'Mehmet Yılmaz (Satın Alma Direktörü)',
-      phone: '0544 555 66 77',
-      email: 'mehmet@anadolulojistik.com',
-      uploadedDocs: ['Vergi Levhası', 'EPDK Lisans Belgesi'],
-      status: 'approved',
-      badgeGranted: true,
-      createdAt: '2026-08-19 16:45',
-      rejectionReason: ''
-    },
-    {
-      id: 'KYC-5109',
-      companyName: 'Hızlı Kargo & Paketleme Şahıs İşletmesi',
-      companyType: 'Şahıs İşletmesi',
-      taxNo: '99283746102',
-      taxOffice: 'İzmir Kordon V.D.',
-      authorizedPerson: 'Caner Demir',
-      phone: '0555 333 44 55',
-      email: 'caner@hizlikargo.com',
-      uploadedDocs: ['Kimlik Fotokopisi'],
-      status: 'rejected',
-      badgeGranted: false,
-      createdAt: '2026-08-18 09:20',
-      rejectionReason: 'Vergi levhası ve imza beyannamesi eksik yüklenmiştir.'
-    }
-  ],
-  liveAuctionRooms: [
-    {
-      id: 'ROOM-101',
-      tenderTitle: 'CNC Fason Üretim İş Emri Serisi (5.000 Adet Parça)',
-      category: 'Makine & Metal Sanayi',
-      ceilingPrice: 420000,
-      currentBestBid: 396800,
-      minStep: 1000,
-      participantsCount: 6,
-      remainingSeconds: 340,
-      status: 'live',
-      leaderSupplier: 'Tedarikçi #A47 (Ege Hassas Talaşlı Üretim)'
-    },
-    {
-      id: 'ROOM-102',
-      tenderTitle: '10.000 Litre Euro Dizel Motorin Yakıt Alımı',
-      category: 'Akaryakıt & Enerji',
-      ceilingPrice: 480000,
-      currentBestBid: 435000,
-      minStep: 500,
-      participantsCount: 4,
-      remainingSeconds: 720,
-      status: 'live',
-      leaderSupplier: 'Tedarikçi #K12 (Petrol Dağıtım A.Ş.)'
-    },
-    {
-      id: 'ROOM-103',
-      tenderTitle: '50.000 Adet Özel Baskılı Çift Dalga Koli Alımı',
-      category: 'Ambalaj & Koli',
-      ceilingPrice: 185000,
-      currentBestBid: 162000,
-      minStep: 250,
-      participantsCount: 5,
-      remainingSeconds: 0,
-      status: 'ended',
-      leaderSupplier: 'Mega Ambalaj Sanayi Ltd.'
-    }
-  ],
-  escrowOrders: [
-    {
-      id: 'ESC-9041',
-      orderCode: 'SIP-2026-8812',
-      tenderTitle: '120 Ton Hazır Beton C30/37 Alımı',
-      buyerCompany: 'Özgür İnşaat A.Ş.',
-      supplierCompany: 'Çanakkale Çimento & Beton Sanayi',
-      totalAmount: '450.000 ₺',
-      escrowStatus: 'sevkiyat_bekliyor',
-      deliveryDate: '28 Ağustos 2026',
-      trackingNumber: 'TRK-9812401'
-    },
-    {
-      id: 'ESC-8930',
-      orderCode: 'SIP-2026-7645',
-      tenderTitle: 'Kurumsal Ofis Ergonomik Çalışma Koltukları (40 Adet)',
-      buyerCompany: 'Metro Teknoloji A.Ş.',
-      supplierCompany: 'Büroline Mobilya Ltd.',
-      totalAmount: '128.000 ₺',
-      escrowStatus: 'teslim_onaylandi',
-      deliveryDate: '21 Ağustos 2026',
-      trackingNumber: 'TRK-6641209'
-    },
-    {
-      id: 'ESC-7721',
-      orderCode: 'SIP-2026-6102',
-      tenderTitle: '5.000 Metre Su Geçirmez Brandalı Kumaş',
-      buyerCompany: 'Tekstil Sanayi Ltd.',
-      supplierCompany: 'Dokuma İplik A.Ş.',
-      totalAmount: '89.500 ₺',
-      escrowStatus: 'odeme_cozuldu',
-      deliveryDate: '15 Ağustos 2026',
-      trackingNumber: 'TRK-5519800'
-    }
-  ],
+  kycVerifications: [],
+  liveAuctionRooms: [],
+  escrowOrders: [],
   categories: [
     { id: 'kat-1', name: 'İnşaat, Yapı & Şantiye', icon: 'Building2', targetSavings: '%16.5', activeTendersCount: 0, description: 'Demir, çimento, hazır beton, yalıtım ve kaba inşaat malzemeleri.' },
     { id: 'kat-2', name: 'Makine, Yedek Parça & Metal', icon: 'Wrench', targetSavings: '%14.2', activeTendersCount: 0, description: 'CNC fason talaşlı imalat, torna, sac işleme ve hidrolik aksam.' },
@@ -341,19 +178,8 @@ export const DEFAULT_CMS_DATA = {
     { id: 'kat-5', name: 'Lojistik, Nakliye & Depolama', icon: 'Truck', targetSavings: '%15.4', activeTendersCount: 0, description: 'Yurt içi komple tır, parsiyel sevkiyat, antrepo ve soğuk hava depolama.' },
     { id: 'kat-6', name: 'Kırtasiye, Ofis & Teknoloji', icon: 'Laptop', targetSavings: '%21.0', activeTendersCount: 0, description: 'Fotokopi kağıdı, toner, bilgisayar donanımı ve ofis mobilyası.' }
   ],
-  promoCodes: [
-    { code: 'LANSMAN1AY', discountType: 'free_trial_months', value: '1 Ay Bedelsiz', usageLimit: 1000, usedCount: 142, expiryDate: '25 Eylül 2026', status: 'active' },
-    { code: 'LANSMAN20', discountType: 'percent_discount', value: '%20 İndirim', usageLimit: 500, usedCount: 45, expiryDate: '31 Aralık 2026', status: 'active' },
-    { code: 'VIP2026', discountType: 'percent_discount', value: '%100 İndirim', usageLimit: 250, usedCount: 38, expiryDate: '31 Aralık 2026', status: 'active' },
-    { code: 'B2BTASARRUF', discountType: 'fixed_amount', value: '1.000 ₺ Kredi', usageLimit: 500, usedCount: 89, expiryDate: '01 Ocak 2027', status: 'active' }
-  ],
-  auditLogs: [
-    { id: 'LOG-9912', timestamp: '2026-08-23 02:10:14', userEmail: 'admin@ihaleciburada.com', action: 'Yönetici Girişi Yapıldı', ipAddress: '176.240.12.84', status: 'success', details: 'TLS 1.3 şifreli oturum başlatıldı.' },
-    { id: 'LOG-9911', timestamp: '2026-08-22 23:05:42', userEmail: 'admin@ihaleciburada.com', action: 'WhatsApp & AI Ayarları Güncellendi', ipAddress: '176.240.12.84', status: 'success', details: 'Numara: 908508408695 olarak kaydedildi.' },
-    { id: 'LOG-9910', timestamp: '2026-08-22 22:58:19', userEmail: 'admin@ihaleciburada.com', action: '1 Ay Lansman Planı Yayına Alındı', ipAddress: '176.240.12.84', status: 'success', details: '0 TL bedelsiz deneme paketi aktif edildi.' },
-    { id: 'LOG-9909', timestamp: '2026-08-22 21:40:05', userEmail: 'sistem@ihaleciburada.com', action: 'Otomatik Veritabanı Yedeği Alındı', ipAddress: '127.0.0.1', status: 'success', details: 'JSON veri yedeği disk alanına arşivlendi.' },
-    { id: 'LOG-9908', timestamp: '2026-08-22 19:15:33', userEmail: 'ahmet@kalyon.com', action: 'KYC Belgesi Yüklendi', ipAddress: '88.241.90.11', status: 'warning', details: 'Vergi levhası inceleme kuyruğuna alındı.' }
-  ],
+  promoCodes: [],
+  auditLogs: [],
   siteSettings: {
     maintenanceMode: false,
     maintenanceNotice: 'Platformumuzda planlı altyapı güçlendirme çalışması yapılmaktadır. Sistem en kısa sürede tekrar aktif olacaktır.',
@@ -379,37 +205,59 @@ export function useCmsData() {
     const saved = localStorage.getItem('cmsData')
     if (saved) {
       try {
-        const str = saved.toLowerCase()
-        // If saved data contains old seeded mock tenders or legacy demo content, purge completely
-        if (
-          str.includes('2026/14589') ||
-          str.includes('kalyon & kolin') ||
-          str.includes('nervürlü inşaat demiri') ||
-          str.includes('dopel kraft') ||
-          str.includes('ihc-2026-101') || 
-          str.includes('ihc-2024-001') || 
-          str.includes('mıcır') || 
-          str.includes('micir') || 
-          str.includes('harita ölçüm') || 
-          str.includes('harita olcum')
-        ) {
-          const fresh = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
-          cmsDataRef.value = fresh
-          localStorage.setItem('cmsData', JSON.stringify(fresh))
-        } else {
-          cmsDataRef.value = JSON.parse(saved)
-          if (!cmsDataRef.value.dashboard) {
-            cmsDataRef.value.dashboard = { ...DEFAULT_CMS_DATA.dashboard }
-          }
-          if (!Array.isArray(cmsDataRef.value.dashboard.tenders)) {
-            cmsDataRef.value.dashboard.tenders = []
-          }
+        const parsed = JSON.parse(saved)
+        if (!parsed.dashboard) {
+          parsed.dashboard = { ...DEFAULT_CMS_DATA.dashboard }
         }
+        if (!Array.isArray(parsed.dashboard.tenders)) {
+          parsed.dashboard.tenders = []
+        }
+
+        // Clean out legacy mock dummy data if present
+        if (Array.isArray(parsed.payments)) {
+          parsed.payments = parsed.payments.filter((p: any) => !['ORD-894210', 'ORD-761234'].includes(p.id))
+        }
+        if (parsed.crmSettings && Array.isArray(parsed.crmSettings.leads)) {
+          parsed.crmSettings.leads = parsed.crmSettings.leads.filter((l: any) => !['Kalyon Tedarik Ltd.', 'Anadolu Lojistik A.Ş.', 'Mega Ambalaj Sanayi'].includes(l.companyName))
+        }
+        if (parsed.emailSettings && Array.isArray(parsed.emailSettings.subscribers)) {
+          parsed.emailSettings.subscribers = parsed.emailSettings.subscribers.filter((s: any) => !['info@kalyon.com', 'satinalma@anadolu.com', 'kurumsal@megaambalaj.com'].includes(s.email))
+        }
+        if (Array.isArray(parsed.kycVerifications)) {
+          parsed.kycVerifications = parsed.kycVerifications.filter((k: any) => !['KYC-8921', 'KYC-7412', 'KYC-6320', 'KYC-5109'].includes(k.id))
+        }
+        if (Array.isArray(parsed.liveAuctionRooms)) {
+          parsed.liveAuctionRooms = parsed.liveAuctionRooms.filter((r: any) => !['ROOM-101', 'ROOM-102', 'ROOM-103'].includes(r.id))
+        }
+        if (Array.isArray(parsed.escrowOrders)) {
+          parsed.escrowOrders = parsed.escrowOrders.filter((e: any) => !['ESC-9041', 'ESC-8930', 'ESC-7721'].includes(e.id))
+        }
+        if (Array.isArray(parsed.auditLogs)) {
+          parsed.auditLogs = parsed.auditLogs.filter((a: any) => !['LOG-9912', 'LOG-9911', 'LOG-9910', 'LOG-9909', 'LOG-9908'].includes(a.id))
+        }
+
+        // Synchronize any created user tenders from 'myTenders'
+        try {
+          const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+          if (Array.isArray(myTenders)) {
+            myTenders.forEach((mt: any) => {
+              const exists = parsed.dashboard.tenders.some((t: any) => t.id === mt.id)
+              if (!exists) {
+                parsed.dashboard.tenders.unshift(mt)
+              }
+            })
+          }
+        } catch (e) {}
+
+        cmsDataRef.value = parsed
+        localStorage.setItem('cmsData', JSON.stringify(parsed))
       } catch (e) {
         cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
         localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
       }
     } else {
+      // First run: save clean DEFAULT_CMS_DATA
+      cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
       localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
     }
   }

@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { 
@@ -202,11 +202,7 @@ if (!formState.supportSettings) {
 
 if (!formState.crmSettings) {
   formState.crmSettings = {
-    leads: [
-      { id: 1, companyName: 'Kalyon Tedarik Ltd.', contactName: 'Ahmet Kalyoncu', email: 'ahmet@kalyon.com', phone: '0532 111 22 33', status: '1 Ay Deneme Aktif', stage: 'active', notes: 'İnşaat malzemesi ihalesi açacak.', createdAt: '2026-08-20' },
-      { id: 2, companyName: 'Anadolu Lojistik A.Ş.', contactName: 'Mehmet Yılmaz', email: 'mehmet@anadolulojistik.com', phone: '0544 555 66 77', status: 'Teklif Veren', stage: 'qualified', notes: 'Akaryakıt ihalesine teklif verdi.', createdAt: '2026-08-21' },
-      { id: 3, companyName: 'Mega Ambalaj Sanayi', contactName: 'Selin Erdem', email: 'selin@megaambalaj.com', phone: '0555 888 99 00', status: 'Görüşülüyor', stage: 'contacted', notes: 'Kurumsal SAP entegrasyonu talebi var.', createdAt: '2026-08-22' }
-    ]
+    leads: []
   }
 }
 
@@ -326,6 +322,92 @@ const showToast = ref(false)
 const toastMessage = ref('')
 const toastType = ref<'success' | 'info' | 'error'>('success')
 
+// Computed counts
+const pendingTendersCount = computed(() => {
+  return (formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'pending_approval' || t.adminApproved === false).length
+})
+
+const activeTendersCount = computed(() => {
+  return (formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'active' && t.adminApproved !== false).length
+})
+
+const pendingKycCount = computed(() => {
+  return (formState.kycVerifications || []).filter((k: any) => k.status === 'pending').length
+})
+
+function syncLiveState() {
+  if (typeof window === 'undefined') return
+  try {
+    const rawCms = localStorage.getItem('cmsData')
+    if (rawCms) {
+      const parsed = JSON.parse(rawCms)
+      if (parsed && typeof parsed === 'object') {
+        Object.keys(parsed).forEach(k => {
+          formState[k] = parsed[k]
+        })
+      }
+    }
+
+    if (!formState.dashboard) {
+      formState.dashboard = { tenders: [], receivedBids: [], submittedBids: [], disputes: [], companyReviews: [], sectorAlerts: [], escrowOrders: [] }
+    }
+    if (!Array.isArray(formState.dashboard.tenders)) {
+      formState.dashboard.tenders = []
+    }
+    if (!Array.isArray(formState.kycVerifications)) {
+      formState.kycVerifications = []
+    }
+
+    // 1. Sync all user created tenders from localStorage 'myTenders'
+    const liveTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+    if (Array.isArray(liveTenders) && liveTenders.length > 0) {
+      liveTenders.forEach((lt: any) => {
+        const existingIdx = formState.dashboard.tenders.findIndex((t: any) => t.id === lt.id)
+        if (existingIdx === -1) {
+          formState.dashboard.tenders.unshift(lt)
+        } else {
+          formState.dashboard.tenders[existingIdx] = { ...formState.dashboard.tenders[existingIdx], ...lt }
+        }
+      })
+    }
+
+    // 2. Sync KYC from genuine verification submission
+    const verificationDocs = JSON.parse(localStorage.getItem('companyVerificationDocs') || 'null')
+    const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    if (verificationDocs || session.uploadedDocs || session.isVerified || session.kycSubmitted) {
+      const compName = session.companyName || session.company || verificationDocs?.companyName || 'Ali Turan Sanayi A.Ş.'
+      const userKycObj = {
+        id: 'KYC-' + (session.taxNo || '4700854210'),
+        companyName: compName,
+        companyType: session.companyType || 'Limited Şirket (LTD)',
+        legalName: session.legalName || compName,
+        authorizedPerson: session.name || session.firstName || 'Ali Turan',
+        email: session.email || 'ihalecib@gmail.com',
+        phone: session.phone || '0850 840 86 95',
+        taxNo: session.taxNo || '4700854210',
+        taxOffice: session.taxOffice || 'Çanakkale Vergi Dairesi',
+        mersis: session.mersis || '0470-0854-2100-0001',
+        sicilNo: session.sicilNo || '14520',
+        sectors: session.sectors || 'Ambalaj, İnşaat, Lojistik',
+        authProvider: session.authProvider || 'google',
+        uploadedDocs: verificationDocs?.files?.map((f: any) => f.name) || ['2026 Yılı Onaylı Vergi Levhası', 'Noter Tasdikli İmza Sirküleri', 'Ticaret Sicil Gazetesi', 'Oda Faaliyet Belgesi'],
+        status: session.kycStatus || (session.isVerified ? 'approved' : 'pending'),
+        badgeGranted: session.isVerified || false,
+        createdAt: session.kycDate || 'Bugün',
+        rejectionReason: session.rejectionReason || ''
+      }
+      const existingIdx = formState.kycVerifications.findIndex((k: any) => k.email === userKycObj.email || k.companyName === userKycObj.companyName)
+      if (existingIdx >= 0) {
+        formState.kycVerifications[existingIdx] = { ...formState.kycVerifications[existingIdx], ...userKycObj }
+      } else {
+        formState.kycVerifications.unshift(userKycObj)
+      }
+    }
+  } catch (e) {
+    console.warn('Admin live data sync warning', e)
+  }
+}
+
 onMounted(() => {
   if (typeof window !== 'undefined') {
     const savedTheme = localStorage.getItem('adminTheme')
@@ -344,63 +426,7 @@ onMounted(() => {
       activeTab.value = String(route.query.tab)
     }
 
-    try {
-      // 1. Load Live Registered User / KYC
-      const session = JSON.parse(localStorage.getItem('userSession') || '{}')
-      if (session.email || session.companyName || session.company) {
-        const compName = session.companyName || session.company || 'Ali Turan Sanayi A.Ş.'
-        const existingIdx = formState.kycVerifications.findIndex((k: any) => k.email === session.email || k.companyName === compName)
-        const userKycObj = {
-          id: 'KYC-2026-01',
-          companyName: compName,
-          companyType: session.companyType || 'Limited Şirket (LTD)',
-          legalName: session.legalName || compName,
-          authorizedPerson: session.name || session.firstName || 'Ali Turan',
-          email: session.email || 'ihalecib@gmail.com',
-          phone: session.phone || '0850 840 86 95',
-          taxNo: session.taxNo || '4700854210',
-          taxOffice: session.taxOffice || 'Çanakkale Vergi Dairesi',
-          mersis: session.mersis || '0470-0854-2100-0001',
-          sicilNo: session.sicilNo || '14520',
-          sectors: session.sectors || 'Ambalaj, İnşaat, Lojistik',
-          authProvider: session.authProvider || 'google',
-          uploadedDocs: ['2026 Yılı Onaylı Vergi Levhası', 'Noter Tasdikli İmza Sirküleri', 'Ticaret Sicil Gazetesi', 'Oda Faaliyet Belgesi'],
-          status: session.kycStatus || (session.isVerified ? 'approved' : 'pending'),
-          badgeGranted: session.isVerified || false,
-          createdAt: '29.08.2026',
-          rejectionReason: ''
-        }
-
-        if (existingIdx >= 0) {
-          formState.kycVerifications[existingIdx] = { ...formState.kycVerifications[existingIdx], ...userKycObj }
-        } else {
-          formState.kycVerifications.unshift(userKycObj)
-        }
-      }
-
-      // Ensure every item in kycVerifications has uploadedDocs as array and authorizedPerson
-      formState.kycVerifications.forEach((k: any) => {
-        if (!k.uploadedDocs || !Array.isArray(k.uploadedDocs)) {
-          k.uploadedDocs = ['2026 Yılı Onaylı Vergi Levhası', 'İmza Sirküleri', 'Ticaret Sicil Gazetesi']
-        }
-        if (!k.authorizedPerson && k.contactPerson) {
-          k.authorizedPerson = k.contactPerson
-        }
-      })
-
-      // 2. Load Live Created Tenders
-      const liveTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
-      if (liveTenders.length > 0 && formState.dashboard?.tenders) {
-        liveTenders.forEach((lt: any) => {
-          const exists = formState.dashboard.tenders.some((t: any) => t.id === lt.id)
-          if (!exists) {
-            formState.dashboard.tenders.unshift(lt)
-          }
-        })
-      }
-    } catch (e) {
-      console.warn('Admin live data sync warning', e)
-    }
+    syncLiveState()
   }
 })
 
@@ -559,27 +585,6 @@ function rejectKyc(kyc: any) {
   }
 }
 
-function addSampleKyc() {
-  const sampleId = 'KYC-2026-' + Math.floor(100 + Math.random() * 900)
-  formState.kycVerifications.unshift({
-    id: sampleId,
-    companyName: 'Demirler İnşaat & Taahhüt Ltd. Şti.',
-    companyType: 'Limited Şirket (LTD)',
-    taxNo: '33491820491',
-    taxOffice: 'Balıkesir Karesi V.D.',
-    authorizedPerson: 'Murat Demir (Yönetici)',
-    phone: '0533 444 55 66',
-    email: 'murat@demirlerinsaat.com',
-    uploadedDocs: ['2026 Yılı Onaylı Vergi Levhası', 'Noter Tasdikli İmza Sirküleri', 'Ticaret Sicil Gazetesi'],
-    status: 'pending',
-    badgeGranted: false,
-    createdAt: new Date().toLocaleString('tr-TR'),
-    rejectionReason: ''
-  })
-  saveCmsData(JSON.parse(JSON.stringify(formState)))
-  triggerToast('Test için yeni onay bekleyen kurumsal KYC başvurusu eklendi!', 'success')
-}
-
 // ----------------------------------------------------
 // Tender Approval Handlers
 // ----------------------------------------------------
@@ -588,6 +593,7 @@ const tenderFilterStatus = ref<'pending' | 'active' | 'all'>('pending')
 function approveTender(tender: any) {
   tender.durum = 'active'
   tender.adminApproved = true
+  tender.statusLabel = 'Yayında (Aktif)'
   tender.rejectionReason = ''
   
   if (typeof window !== 'undefined') {
@@ -597,8 +603,22 @@ function approveTender(tender: any) {
       if (target) {
         target.durum = 'active'
         target.adminApproved = true
+        target.statusLabel = 'Yayında (Aktif)'
+        target.rejectionReason = ''
         localStorage.setItem('myTenders', JSON.stringify(myTenders))
       }
+
+      // Add user notification
+      const userNotifications = JSON.parse(localStorage.getItem('userNotifications') || '[]')
+      userNotifications.unshift({
+        id: Date.now(),
+        title: '🎉 İhaleniz Yayına Alındı',
+        desc: `"${tender.baslik}" başlıklı satın alma talebiniz Admin Masası tarafından onaylanmış ve Pazar Yeri'nde yayına alınmıştır.`,
+        date: 'Şimdi',
+        read: false,
+        type: 'success'
+      })
+      localStorage.setItem('userNotifications', JSON.stringify(userNotifications))
     } catch (e) {}
   }
   
@@ -611,6 +631,7 @@ function rejectTender(tender: any) {
   if (reason) {
     tender.durum = 'rejected'
     tender.adminApproved = false
+    tender.statusLabel = 'Reddedildi'
     tender.rejectionReason = reason
     
     if (typeof window !== 'undefined') {
@@ -620,9 +641,22 @@ function rejectTender(tender: any) {
         if (target) {
           target.durum = 'rejected'
           target.adminApproved = false
+          target.statusLabel = 'Reddedildi'
           target.rejectionReason = reason
           localStorage.setItem('myTenders', JSON.stringify(myTenders))
         }
+
+        // Add user notification
+        const userNotifications = JSON.parse(localStorage.getItem('userNotifications') || '[]')
+        userNotifications.unshift({
+          id: Date.now(),
+          title: '❌ İhale Talebiniz Onaylanmadı',
+          desc: `"${tender.baslik}" başlıklı talebiniz Admin tarafından reddedildi. Gerekçe: ${reason}`,
+          date: 'Şimdi',
+          read: false,
+          type: 'warning'
+        })
+        localStorage.setItem('userNotifications', JSON.stringify(userNotifications))
       } catch (e) {}
     }
     
@@ -1140,13 +1174,27 @@ function removeSubmittedBid(index: number) {
             </div>
 
             <button 
+              @click="activeTab = 'db_tenders'; tenderFilterStatus = 'pending'" 
+              class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'db_tenders' ? 'bg-amber-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
+            >
+              <span class="flex items-center gap-2.5"><Folder :size="14" /> İhale Onay Masası</span>
+              <span v-if="pendingTendersCount > 0" class="text-[9px] bg-amber-100 text-amber-900 border border-amber-300 px-1.5 py-0.2 rounded font-mono font-bold animate-pulse">
+                {{ pendingTendersCount }} Bekleyen
+              </span>
+              <span v-else class="text-[9px] text-slate-400 font-mono">
+                {{ activeTendersCount }} Aktif
+              </span>
+            </button>
+
+            <button 
               @click="activeTab = 'kyc_desk'" 
               class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'kyc_desk' ? 'bg-emerald-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <span class="flex items-center gap-2.5"><FileCheck :size="14" /> KYC & Mavi Rozet</span>
-              <span class="text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-1.5 py-0.2 rounded font-mono font-bold">
-                {{ formState.kycVerifications.filter((k: any) => k.status === 'pending').length }} Bekleyen
+              <span v-if="pendingKycCount > 0" class="text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-1.5 py-0.2 rounded font-mono font-bold animate-pulse">
+                {{ pendingKycCount }} Bekleyen
               </span>
             </button>
 
@@ -1302,17 +1350,6 @@ function removeSubmittedBid(index: number) {
             <div class="text-[9px] font-black text-slate-400 uppercase tracking-widest px-4 pt-3 mb-1.5">B2B VERİTABANI</div>
 
             <button 
-              @click="activeTab = 'db_tenders'" 
-              class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'db_tenders' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
-            >
-              <span class="flex items-center gap-2.5"><Folder :size="14" /> İhale Masası & Onay</span>
-              <span v-if="(formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'pending_approval' || t.adminApproved === false).length > 0" class="text-[9px] bg-amber-100 text-amber-900 border border-amber-300 px-1.5 py-0.2 rounded font-mono font-bold animate-pulse">
-                {{ (formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'pending_approval' || t.adminApproved === false).length }} Onay Bekleyen
-              </span>
-            </button>
-
-            <button 
               @click="activeTab = 'db_received'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'db_received' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
@@ -1422,6 +1459,23 @@ function removeSubmittedBid(index: number) {
           </div>
         </div>
 
+        <!-- TOP PENDING APPROVAL ALERT BANNER -->
+        <div v-if="pendingTendersCount > 0" class="mb-6 p-4 rounded-2xl bg-amber-500/15 border border-amber-500/40 text-amber-900 dark:text-amber-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+          <div class="flex items-center gap-3">
+            <span class="p-2 rounded-xl bg-amber-500/25 text-amber-600 dark:text-amber-400 font-black text-xs animate-pulse shrink-0">⏳ ONAY BEKLEYEN İHALELER</span>
+            <div>
+              <div class="text-xs font-black text-amber-950 dark:text-amber-200">Sistemde onay bekleyen {{ pendingTendersCount }} adet B2B satın alma ihalesi bulunuyor!</div>
+              <div class="text-[11px] text-amber-800 dark:text-amber-400/90 mt-0.5">Yeni açılan ihaleler Admin tarafından onaylanana kadar Pazar Yeri'nde yayınlanmaz.</div>
+            </div>
+          </div>
+          <button 
+            @click="activeTab = 'db_tenders'; tenderFilterStatus = 'pending'" 
+            class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-black transition cursor-pointer shadow-md shadow-amber-600/20 shrink-0"
+          >
+            İhaleleri İncele & Onayla ({{ pendingTendersCount }}) →
+          </button>
+        </div>
+
         <!-- TAB VIEWS -->
         <div class="space-y-6">
 
@@ -1431,30 +1485,60 @@ function removeSubmittedBid(index: number) {
           <div v-if="activeTab === 'overview'" class="space-y-6">
             <!-- Metric Cards -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              
+              <!-- Card 1: Toplam Hacim -->
               <div class="p-5 rounded-2xl border border-slate-800 bg-slate-900/80">
                 <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">TOPLAM TİCARET HACMİ</span>
                 <div class="text-2xl font-black text-white mt-1.5">12.4M ₺+</div>
                 <span class="text-[11px] text-emerald-400 font-bold mt-1 block">↗ %14.2 Ortalama Tasarruf</span>
               </div>
-              <div class="p-5 rounded-2xl border border-emerald-900/50 bg-emerald-950/20">
-                <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider">1 AY DENEME AKTİF FİRMALAR</span>
-                <div class="text-2xl font-black text-emerald-400 mt-1.5">142 Firma</div>
-                <span class="text-[11px] text-emerald-300 font-bold mt-1 block">0 ₺ Bedelsiz Lansman Üyeliği</span>
-              </div>
-              <div class="p-5 rounded-2xl border border-blue-900/50 bg-blue-950/20">
-                <span class="text-[10px] font-black text-blue-400 uppercase tracking-wider">AKTİF İHALE SAYISI</span>
-                <div class="text-2xl font-black text-blue-400 mt-1.5">{{ formState.dashboard?.tenders?.length || 48 }}+</div>
-                <span class="text-[11px] text-blue-300 font-bold mt-1 block">İhale ve Satın Alma Yayında</span>
-              </div>
-              <div class="p-5 rounded-2xl border border-amber-900/50 bg-amber-950/20">
-                <span class="text-[10px] font-black text-amber-400 uppercase tracking-wider">ONAY BEKLEYEN KYC EVRAKLARI</span>
+
+              <!-- Card 2: Onay Bekleyen İhaleler -->
+              <div 
+                class="p-5 rounded-2xl border transition"
+                :class="pendingTendersCount > 0 ? 'border-amber-500/60 bg-amber-950/20 shadow-md shadow-amber-500/10' : 'border-slate-800 bg-slate-900/80'"
+              >
+                <span class="text-[10px] font-black text-amber-400 uppercase tracking-wider flex items-center justify-between">
+                  <span>ONAY BEKLEYEN İHALELER</span>
+                  <span v-if="pendingTendersCount > 0" class="h-2 w-2 rounded-full bg-amber-500 animate-ping"></span>
+                </span>
                 <div class="text-2xl font-black text-amber-400 mt-1.5">
-                  {{ formState.kycVerifications.filter((k: any) => k.status === 'pending').length }} Başvuru
+                  {{ pendingTendersCount }} İhale
                 </div>
-                <button @click="activeTab = 'kyc_desk'" class="text-[11px] text-amber-300 hover:underline font-bold mt-1 block cursor-pointer">
+                <button 
+                  @click="activeTab = 'db_tenders'; tenderFilterStatus = 'pending'" 
+                  class="text-[11px] text-amber-300 hover:underline font-bold mt-1 block cursor-pointer"
+                >
                   Hemen İncele & Onayla →
                 </button>
               </div>
+
+              <!-- Card 3: Yayındaki Aktif İhaleler -->
+              <div class="p-5 rounded-2xl border border-emerald-900/50 bg-emerald-950/20">
+                <span class="text-[10px] font-black text-emerald-400 uppercase tracking-wider">YAYINDAKİ AKTİF İHALELER</span>
+                <div class="text-2xl font-black text-emerald-400 mt-1.5">{{ activeTendersCount }} İhale</div>
+                <button 
+                  @click="activeTab = 'db_tenders'; tenderFilterStatus = 'active'" 
+                  class="text-[11px] text-emerald-300 hover:underline font-bold mt-1 block cursor-pointer"
+                >
+                  Yayındaki İlanları Gör →
+                </button>
+              </div>
+
+              <!-- Card 4: Onay Bekleyen KYC -->
+              <div 
+                class="p-5 rounded-2xl border transition"
+                :class="pendingKycCount > 0 ? 'border-blue-500/60 bg-blue-950/20' : 'border-slate-800 bg-slate-900/80'"
+              >
+                <span class="text-[10px] font-black text-blue-400 uppercase tracking-wider">ONAY BEKLEYEN KYC EVRAKI</span>
+                <div class="text-2xl font-black text-blue-400 mt-1.5">
+                  {{ pendingKycCount }} Başvuru
+                </div>
+                <button @click="activeTab = 'kyc_desk'" class="text-[11px] text-blue-300 hover:underline font-bold mt-1 block cursor-pointer">
+                  Mavi Rozet İncele →
+                </button>
+              </div>
+
             </div>
 
             <!-- Quick Operational Actions -->
@@ -1463,25 +1547,41 @@ function removeSubmittedBid(index: number) {
                 <Zap :size="14" class="text-amber-400" /> Hızlı Operasyon Kısayolları
               </h3>
               <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <button 
+                  @click="activeTab = 'db_tenders'; tenderFilterStatus = 'pending'" 
+                  class="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500/50 transition text-left cursor-pointer"
+                >
+                  <Folder :size="18" class="text-amber-400 mb-2" />
+                  <div class="text-xs font-bold text-white flex items-center justify-between">
+                    <span>İhale Onay Masası</span>
+                    <span v-if="pendingTendersCount > 0" class="text-[9px] bg-amber-500 text-slate-950 font-black px-1.5 py-0.2 rounded font-mono">
+                      {{ pendingTendersCount }}
+                    </span>
+                  </div>
+                  <div class="text-[10px] text-slate-400 mt-0.5">İlanları onayla ve yayına al</div>
+                </button>
+
                 <button @click="activeTab = 'kyc_desk'" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-emerald-500/50 transition text-left cursor-pointer">
                   <FileCheck :size="18" class="text-emerald-400 mb-2" />
-                  <div class="text-xs font-bold text-white">KYC Evraklarını İncele</div>
+                  <div class="text-xs font-bold text-white flex items-center justify-between">
+                    <span>KYC Evraklarını İncele</span>
+                    <span v-if="pendingKycCount > 0" class="text-[9px] bg-emerald-500 text-slate-950 font-black px-1.5 py-0.2 rounded font-mono">
+                      {{ pendingKycCount }}
+                    </span>
+                  </div>
                   <div class="text-[10px] text-slate-400 mt-0.5">Firmalara Mavi Rozet ver</div>
                 </button>
+
                 <button @click="activeTab = 'live_rooms'" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-rose-500/50 transition text-left cursor-pointer">
                   <Activity :size="18" class="text-rose-400 mb-2" />
                   <div class="text-xs font-bold text-white">İhale ve Satın Alma Yönet</div>
                   <div class="text-[10px] text-slate-400 mt-0.5">Odalara +5 dk ekle / sonuçlandır</div>
                 </button>
+
                 <button @click="activeTab = 'email_center'" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-blue-500/50 transition text-left cursor-pointer">
                   <Mail :size="18" class="text-blue-400 mb-2" />
                   <div class="text-xs font-bold text-white">Toplu Mail & Şablonlar</div>
                   <div class="text-[10px] text-slate-400 mt-0.5">info@ üzerinden bildirim gönder</div>
-                </button>
-                <button @click="activeTab = 'support_ai'" class="p-4 rounded-xl bg-slate-950 border border-slate-800 hover:border-teal-500/50 transition text-left cursor-pointer">
-                  <Bot :size="18" class="text-teal-400 mb-2" />
-                  <div class="text-xs font-bold text-white">WhatsApp & AI Ayarları</div>
-                  <div class="text-[10px] text-slate-400 mt-0.5">Canlı asistan promptunu güncelle</div>
                 </button>
               </div>
             </div>
@@ -1500,9 +1600,6 @@ function removeSubmittedBid(index: number) {
                   </h3>
                   <p class="text-[11px] text-slate-400">Firmaların yüklediği vergi levhası, imza sirküleri ve ticaret sicil evraklarını inceleyip Mavi Rozet onayını verin.</p>
                 </div>
-                <button @click="addSampleKyc" class="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-md shrink-0">
-                  <Plus :size="13" /> + Test KYC Başvurusu Ekle
-                </button>
               </div>
 
               <!-- KYC Cards Grid -->
@@ -3248,8 +3345,37 @@ function removeSubmittedBid(index: number) {
                     <strong>Ret Gerekçesi:</strong> {{ tender.rejectionReason }}
                   </div>
 
+                  <!-- Tender Summary & Documents -->
+                  <div class="bg-slate-900/80 p-3.5 rounded-xl border border-slate-800 space-y-2 text-xs">
+                    <div v-if="tender.aciklama" class="text-slate-300 leading-relaxed">
+                      <strong class="text-slate-400 text-[11px] block uppercase">İhale Açıklaması & Şartname Özeti:</strong>
+                      <div class="mt-0.5 whitespace-pre-line">{{ tender.aciklama }}</div>
+                    </div>
+
+                    <div v-if="(tender.files && tender.files.length > 0) || (tender.documents && tender.documents.length > 0)" class="pt-2 border-t border-slate-800/80">
+                      <strong class="text-slate-400 text-[10px] uppercase block mb-1">Ekli Teknik Şartname & Belgeler:</strong>
+                      <div class="flex flex-wrap gap-2">
+                        <div 
+                          v-for="file in (tender.files || tender.documents || [])" 
+                          :key="file.name || file"
+                          class="px-2.5 py-1 rounded-lg bg-blue-950/60 border border-blue-800/60 text-blue-300 text-[11px] flex items-center gap-1.5"
+                        >
+                          <FileText :size="12" class="text-blue-400" />
+                          <span>{{ typeof file === 'string' ? file : file.name }}</span>
+                          <span v-if="file.size" class="text-[9px] text-blue-400/70">({{ (file.size / 1024).toFixed(0) }} KB)</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="pt-1.5 flex flex-wrap items-center gap-4 text-[11px] text-slate-400 border-t border-slate-800/60">
+                      <span><strong>İletişim:</strong> {{ tender.ownerEmail || 'ihalecib@gmail.com' }}</span>
+                      <span><strong>Teslimat:</strong> {{ tender.teslimatAdresi || tender.city || 'Merkez' }}</span>
+                      <span><strong>Ödeme:</strong> {{ tender.odemeYontemi || 'Escrow Güvenceli / Banka' }}</span>
+                    </div>
+                  </div>
+
                   <!-- Quick Inline Details Edit -->
-                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-800/60">
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1 border-t border-slate-800/60">
                     <input v-model="tender.baslik" type="text" placeholder="İhale Başlığı" class="w-full rounded-xl border border-slate-800 bg-slate-900 p-2.5 text-xs text-white" />
                     <input v-model="tender.kategori" type="text" placeholder="Kategori" class="w-full rounded-xl border border-slate-800 bg-slate-900 p-2.5 text-xs text-white" />
                     <input v-model="tender.butce" type="text" placeholder="Bütçe Aralığı" class="w-full rounded-xl border border-slate-800 bg-slate-900 p-2.5 text-xs text-white" />
