@@ -951,55 +951,6 @@ onMounted(() => {
   <div class="min-h-screen bg-[#F4F6F9] text-slate-800 font-sans text-xs flex flex-col">
 
     <!-- ========================================================================= -->
-    <!-- 🔵 1. ÜST 5'Lİ KURUMSAL MENÜ ŞERİDİ (SOL PANEL SEÇİCİSİ İLE SENKRONİZE) -->
-    <!-- ========================================================================= -->
-    <div class="bg-[#0F223D] border-b border-slate-800 text-white font-bold text-xs sticky top-[108px] z-40 shadow-sm">
-      <div class="max-w-[1440px] mx-auto flex flex-wrap items-center">
-        
-        <button 
-          @click="activeLeftTab = 'kategoriler'; currentPage = 1" 
-          :class="activeLeftTab === 'kategoriler' ? 'bg-white text-[#0F223D] border-t-2 border-amber-500 font-black shadow-inner' : 'hover:bg-[#1E3A8A] text-slate-200'"
-          class="px-5 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-slate-800"
-        >
-          <span>📁 Tüm İhaleler / Kategoriler (40)</span>
-        </button>
-
-        <button 
-          @click="activeLeftTab = 'sehirler'; currentPage = 1" 
-          :class="activeLeftTab === 'sehirler' ? 'bg-white text-[#0F223D] border-t-2 border-amber-500 font-black shadow-inner' : 'hover:bg-[#1E3A8A] text-slate-200'"
-          class="px-5 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-slate-800"
-        >
-          <span>🏙️ Şehirler (81 İl)</span>
-        </button>
-
-        <button 
-          @click="activeLeftTab = 'sektorler'; currentPage = 1" 
-          :class="activeLeftTab === 'sektorler' ? 'bg-white text-[#0F223D] border-t-2 border-amber-500 font-black shadow-inner' : 'hover:bg-[#1E3A8A] text-slate-200'"
-          class="px-5 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-slate-800"
-        >
-          <span>🏭 Sektörler</span>
-        </button>
-
-        <button 
-          @click="activeLeftTab = 'idareler'; currentPage = 1" 
-          :class="activeLeftTab === 'idareler' ? 'bg-white text-[#0F223D] border-t-2 border-amber-500 font-black shadow-inner' : 'hover:bg-[#1E3A8A] text-slate-200'"
-          class="px-5 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-slate-800"
-        >
-          <span>🏛️ İdareler & Kurumlar (Bütün İdareler)</span>
-        </button>
-
-        <button 
-          @click="activeLeftTab = 'firmalar'; currentPage = 1" 
-          :class="activeLeftTab === 'firmalar' ? 'bg-white text-[#0F223D] border-t-2 border-amber-500 font-black shadow-inner' : 'hover:bg-[#1E3A8A] text-slate-200'"
-          class="px-5 py-2.5 transition flex items-center gap-1.5 cursor-pointer border-r border-slate-800"
-        >
-          <span>🏢 Doğrulanmış Firmalar</span>
-        </button>
-
-      </div>
-    </div>
-
-    <!-- ========================================================================= -->
     <!-- 🎛️ 2. ÜST HIZLI ARAMA & GÜNLÜK SAYAÇ ŞERİDİ -->
     <!-- ========================================================================= -->
     <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-6 pt-3">
