@@ -558,6 +558,14 @@ const filteredTendersList = computed(() => {
   return list
 })
 
+// ==================== SAYFALAMA HESABI ====================
+const itemsPerPage = ref(10)
+const totalPages = computed(() => Math.ceil(filteredTendersList.value.length / itemsPerPage.value) || 1)
+const paginatedTenders = computed(() => {
+  const start = (currentPage.value - 1) * itemsPerPage.value
+  return filteredTendersList.value.slice(start, start + itemsPerPage.value)
+})
+
 function resetAllFilters() {
   selectedCategory.value = 'Tümü'
   categorySearchQuery.value = ''
@@ -570,6 +578,7 @@ function resetAllFilters() {
   maxPriceFilter.value = ''
   activeTimeTab.value = 'guncel'
   selectedSort.value = 'otomatik'
+  currentPage.value = 1
 }
 
 // ==================== 6. MODAL VE HIZLI TEKLİF İŞLEMLERİ ====================
@@ -1022,9 +1031,9 @@ onMounted(() => {
           <!-- ========================================================= -->
           <!-- 📋 LİSTE GÖRÜNÜMÜ (SAHİBİNDEN.COM KLASİK RESİMLİ İLAN LİSTESİ) -->
           <!-- ========================================================= -->
-          <div v-if="viewLayout === 'list' && filteredTendersList.length > 0" class="space-y-3">
+          <div v-if="viewLayout === 'list' && paginatedTenders.length > 0" class="space-y-3">
             <div 
-              v-for="tender in filteredTendersList" 
+              v-for="tender in paginatedTenders" 
               :key="tender.id"
               class="bg-white border border-slate-300 hover:border-[#0084B4] hover:shadow-md rounded-2xl p-3 sm:p-4 transition-all flex flex-col sm:flex-row gap-4 items-start relative group"
             >
@@ -1141,9 +1150,9 @@ onMounted(() => {
           <!-- ========================================================= -->
           <!-- 🖼️ VİTRİN / GALERİ GÖRÜNÜMÜ (SAHİBİNDEN VİTRİN KARTLARI) -->
           <!-- ========================================================= -->
-          <div v-else-if="viewLayout === 'grid' && filteredTendersList.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div v-else-if="viewLayout === 'grid' && paginatedTenders.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             <div 
-              v-for="tender in filteredTendersList" 
+              v-for="tender in paginatedTenders" 
               :key="tender.id"
               class="bg-white border border-slate-300 hover:border-[#0084B4] hover:shadow-md rounded-2xl overflow-hidden transition-all flex flex-col group"
             >
@@ -1208,6 +1217,63 @@ onMounted(() => {
             >
               Filtreleri Sıfırla
             </button>
+          </div>
+
+          <!-- SAYFALAMA (SAHİBİNDEN / EKAP TARZI PAGINATION) -->
+          <div v-if="filteredTendersList.length > itemsPerPage" class="bg-white border border-slate-300 rounded-xl p-3 shadow-2xs flex flex-wrap items-center justify-between gap-3 text-xs">
+            <span class="text-slate-500 font-bold">
+              Sayfa {{ currentPage }} / {{ totalPages }} (Toplam {{ filteredTendersList.length }} İlan)
+            </span>
+            <div class="flex items-center gap-1.5 font-bold">
+              <button 
+                type="button" 
+                @click="currentPage = 1" 
+                :disabled="currentPage === 1" 
+                class="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+                title="İlk Sayfa"
+              >
+                <ChevronsLeft :size="14" />
+              </button>
+              <button 
+                type="button" 
+                @click="currentPage > 1 ? currentPage-- : null" 
+                :disabled="currentPage === 1" 
+                class="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+                title="Önceki Sayfa"
+              >
+                <ChevronLeft :size="14" />
+              </button>
+
+              <button 
+                v-for="p in totalPages" 
+                :key="p" 
+                type="button" 
+                @click="currentPage = p"
+                class="w-8 h-8 rounded-lg text-xs font-black transition cursor-pointer flex items-center justify-center"
+                :class="currentPage === p ? 'bg-[#0084B4] text-white shadow-xs' : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'"
+              >
+                {{ p }}
+              </button>
+
+              <button 
+                type="button" 
+                @click="currentPage < totalPages ? currentPage++ : null" 
+                :disabled="currentPage === totalPages" 
+                class="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+                title="Sonraki Sayfa"
+              >
+                <ChevronRight :size="14" />
+              </button>
+              <button 
+                type="button" 
+                @click="currentPage = totalPages" 
+                :disabled="currentPage === totalPages" 
+                class="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+                title="Son Sayfa"
+              >
+                <ChevronsRight :size="14" />
+              </button>
+            </div>
           </div>
 
         </main>
