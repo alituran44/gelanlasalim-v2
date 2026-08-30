@@ -7,7 +7,7 @@ definePageMeta({ layout: 'dashboard' })
 const chats = ref([
   {
     id: 'chat-1',
-    tender: 'Ofis Malzemeleri Alımı (IHC-2024-001)',
+    tender: 'Ofis Malzemeleri Alımı (IHC-DEMO)',
     company: 'ABC Ofis Malzemeleri A.Ş.',
     initial: 'A',
     status: 'online',
@@ -24,7 +24,7 @@ const chats = ref([
   },
   {
     id: 'chat-2',
-    tender: 'Güvenlik Kamera Sistemi (IHC-2024-002)',
+    tender: 'Güvenlik Kamera Sistemi (IHC-DEMO)',
     company: 'SecureTech Sistemleri',
     initial: 'S',
     status: 'offline',
@@ -39,7 +39,7 @@ const chats = ref([
   },
   {
     id: 'chat-3',
-    tender: 'Lojistik Hizmet Alımı (IHC-2024-004)',
+    tender: 'Lojistik Hizmet Alımı (IHC-DEMO)',
     company: 'HızlıNakliye Ltd.',
     initial: 'H',
     status: 'online',

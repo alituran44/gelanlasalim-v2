@@ -9,7 +9,7 @@ const notifications = ref([
     id: 'notif-1',
     type: 'success',
     title: 'Yeni Teklif Alındı',
-    desc: 'Ofis Malzemeleri Alımı (IHC-2024-001) ihalesine ABC Ofis Malzemeleri A.Ş. tarafından 38.500 ₺ tutarında yeni bir teklif sunuldu.',
+    desc: 'Ofis Malzemeleri Alımı (IHC-DEMO) ihalesine ABC Ofis Malzemeleri A.Ş. tarafından 38.500 ₺ tutarında yeni bir teklif sunuldu.',
     time: '5 dakika önce',
     read: false
   },
@@ -17,7 +17,7 @@ const notifications = ref([
     id: 'notif-2',
     type: 'info',
     title: 'Yeni Mesajınız Var',
-    desc: 'SecureTech Sistemleri firmasından "Güvenlik Kamera Sistemi (IHC-2024-002)" ihalesi kapsamında yeni bir mesaj aldınız.',
+    desc: 'SecureTech Sistemleri firmasından "Güvenlik Kamera Sistemi (IHC-DEMO)" ihalesi kapsamında yeni bir mesaj aldınız.',
     time: '2 saat önce',
     read: false
   },
@@ -33,7 +33,7 @@ const notifications = ref([
     id: 'notif-4',
     type: 'warning',
     title: 'İhale Süresi Yaklaşıyor',
-    desc: 'Tarımsal Sulama Ekipmanı (IHC-2024-003) ihalesinin teklif toplama süresi son 24 saate girdi.',
+    desc: 'Tarımsal Sulama Ekipmanı (IHC-DEMO) ihalesinin teklif toplama süresi son 24 saate girdi.',
     time: '2 gün önce',
     read: true
   },
