@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { ref, computed } from 'vue'
 import { 
   User, 
@@ -785,33 +785,7 @@ function saveProfile() {
       </div>
     </div>
 
-    <!-- Top Global Banner for Unverified State -->
-    <div 
-      v-if="!companyVerified"
-      class="rounded-xl border p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-bold animate-pulse"
-      :class="docsCount === 6 ? 'bg-blue-50/50 text-blue-800 border-blue-200' : 'bg-emerald-50/50 text-emerald-800 border-[#A7F3D0]'"
-    >
-      <div class="flex items-center gap-2 font-medium">
-        <span class="relative flex h-2 w-2">
-          <span class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" :class="docsCount === 6 ? 'bg-blue-400' : 'bg-emerald-400'"></span>
-          <span class="relative inline-flex rounded-full h-2 w-2" :class="docsCount === 6 ? 'bg-blue-500' : 'bg-emerald-500'"></span>
-        </span>
-        <span v-if="docsCount === 6">
-          {{ '🍀 Tüm belgeleriniz yüklendi. Doğrulama süreci tamamlanmak üzere inceleniyor.' }}
-        </span>
-        <span v-else>
-          {{ `🏢 Şirket kimliği ve fatura bilgileriniz hazır. Tam hesap aktivasyonu için kalan eksik belgeleri (${6 - docsCount} adet) yükleyin.` }}
-        </span>
-      </div>
-      <button 
-        type="button"
-        @click="activeSubTab = 'sirket'"
-        class="rounded-lg text-white px-3 py-1.5 transition self-start sm:self-auto font-bold"
-        :class="docsCount === 6 ? 'bg-blue-800 hover:bg-blue-900' : 'bg-emerald-800 hover:bg-emerald-900'"
-      >
-        {{ docsCount === 6 ? ('Belgeleri İncele') : ('Kalan Belgeleri Yükle') }}
-      </button>
-    </div>
+
 
     <!-- Title and Breadcrumbs -->
     <div class="flex flex-col md:flex-row md:items-center justify-between border-b pb-4 gap-4" style="border-color: #F1F5F9;">

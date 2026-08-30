@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
@@ -247,7 +247,7 @@ function handleRegister() {
       mailBildirimi: mailBildirimi.value,
       isPremium: false
     }
-    pendingTargetRoute.value = '/firma-dogrulama'
+    pendingTargetRoute.value = '/panel'
     showOtpModal.value = true
   }, 800)
 }

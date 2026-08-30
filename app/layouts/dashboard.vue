@@ -44,7 +44,6 @@ const sidebarMenus = computed(() => {
       { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
-      { title: "Firma & Evrak Yükleme", icon: Building2, to: "/panel/ayarlar?tab=sirket" },
       { title: "Üye Firmalar", icon: Building2, to: "/panel/firmalar" },
       { title: "Bildirimler", icon: ClipboardList, to: "/panel/bildirimler" },
       { title: "Profil & Hesap", icon: Settings, to: "/panel/ayarlar?tab=kisisel" }
@@ -55,7 +54,6 @@ const sidebarMenus = computed(() => {
       { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" },
-      { title: "Company & Documents", icon: Building2, to: "/panel/ayarlar?tab=sirket" },
       { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
       { title: "Notifications", icon: ClipboardList, to: "/panel/bildirimler" },
       { title: "Account & Profile", icon: Settings, to: "/panel/ayarlar?tab=kisisel" }

@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { locale } from '~/composables/useLocale'
@@ -352,11 +352,6 @@ function removeFile(index: number) {
 }
 
 function handleSubmit() {
-  if (!isCompanyVerified.value) {
-    alert('⛔ İHALE OLUŞTURMA ENGELLENDİ!\n\nŞirketinizin KYC ve kurumsal evrak onay süreci henüz tamamlanmamıştır.\n\nPlatform güvenliği gereği yalnızca Admin Masası tarafından incelenip Mavi Rozet onayı verilmiş onaylı firmalar ihale açabilir.\n\nLütfen "Firma Doğrulama" sayfasından Vergi Levhası, İmza Sirküleri ve Sicil Gazetesi evraklarınızı yükleyiniz veya Admin onayını bekleyiniz.')
-    return
-  }
-
   if (!form.value.baslik) {
     alert(locale.value === 'tr' ? 'Lütfen ihale başlığını giriniz.' : 'Please enter a tender title.')
     return
@@ -506,33 +501,7 @@ function handleSubmit() {
       <p class="text-sm mt-0.5" style="color: #64748B;">Satın alma talebiniz için tedarikçilerden rekabetçi canlı teklifler toplayın</p>
     </div>
 
-    <!-- KURUMSAL KYC & EVRAK ONAYI BLOKAJ KARTI -->
-    <div v-if="!isCompanyVerified" class="mb-6 rounded-2xl border border-amber-400 bg-amber-50/90 p-5 text-left space-y-3 shadow-xs">
-      <div class="flex items-start gap-3">
-        <div class="p-2.5 bg-amber-100 text-amber-800 rounded-xl shrink-0">
-          <ShieldAlert :size="24" />
-        </div>
-        <div class="space-y-1">
-          <div class="flex items-center gap-2">
-            <h3 class="text-sm font-black text-amber-900">Kurumsal Evrak Onayı (KYC) Bekleniyor</h3>
-            <span class="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-200 text-amber-900 uppercase">
-              {{ companyKycStatus === 'rejected' ? 'Başvuru Reddedildi' : 'Onay Bekliyor / Evrak Eksik' }}
-            </span>
-          </div>
-          <p class="text-xs text-amber-800 leading-relaxed font-medium">
-            İhaleciBurada platformunda ihale açabilmek ve tedarikçilerden teklif toplayabilmek için şirketinizin <strong>Vergi Levhası, İmza Sirküleri ve Sicil Gazetesi</strong> evraklarının Admin onayından geçmiş (Mavi Rozet) olması zorunludur.
-          </p>
-        </div>
-      </div>
-      <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-amber-200">
-        <span class="text-[11px] text-amber-900 font-bold">
-          {{ companyKycStatus === 'rejected' ? '⚠️ Evraklarınız reddedildi. Lütfen güncel evrakları yükleyiniz.' : '⏳ Evraklarınız Admin onay masasında incelenmektedir.' }}
-        </span>
-        <NuxtLink to="/firma-dogrulama" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-black text-xs rounded-xl transition flex items-center gap-1.5 shadow-md">
-          <FileCheck :size="14" /> Firma Evraklarını Yükle / Doğrula →
-        </NuxtLink>
-      </div>
-    </div>
+
 
     <!-- Başarı Mesajı -->
     <div v-if="showSuccess" class="mb-6 rounded-xl bg-emerald-50 border border-emerald-200 p-5 text-center transition-all animate-bounce">
