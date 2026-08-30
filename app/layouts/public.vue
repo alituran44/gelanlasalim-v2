@@ -238,9 +238,13 @@ onMounted(() => {
             <span>🔄 Üyelik uzat</span>
           </NuxtLink>
 
-          <!-- 5. İhale Aç -->
-          <NuxtLink to="/panel/ihale-olustur" class="px-4 py-1.5 rounded-lg bg-[#EA580C] hover:bg-[#C2410C] text-white font-black text-xs shadow-xs flex items-center gap-1 border border-orange-700/30 transition">
-            <span>+ İhale Aç</span>
+          <!-- 4. İhale Aç (Büyük, Yatayda Geniş ve Yanıp Sönen Dikkat Çekici Buton) -->
+          <NuxtLink 
+            to="/panel/ihale-olustur" 
+            class="px-6 py-2 rounded-xl bg-gradient-to-r from-orange-600 via-amber-500 to-orange-600 bg-[length:200%_auto] hover:bg-right text-white font-black text-sm shadow-md shadow-orange-600/30 flex items-center gap-1.5 border border-orange-400 transition-all duration-300 animate-pulse hover:scale-105 cursor-pointer tracking-wide"
+          >
+            <span class="text-base leading-none">✨</span>
+            <span>+ İHALE AÇ</span>
           </NuxtLink>
         </div>
 

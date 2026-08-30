@@ -146,13 +146,13 @@ const pageTitle = computed(() => {
         <span>Ana Sayfa</span>
       </NuxtLink>
 
-      <!-- New Tender Button -->
+      <!-- New Tender Button (Büyük ve Yanıp Sönen) -->
       <NuxtLink
         to="/panel/ihale-olustur"
-        class="hidden sm:flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black text-white bg-[#1EAE4C] hover:bg-[#188c3d] shadow-md shadow-[#1EAE4C]/20 transition"
+        class="hidden sm:flex items-center gap-1.5 rounded-xl px-5 py-2 text-xs font-black text-white bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 shadow-md shadow-orange-500/20 transition-all duration-300 animate-pulse hover:scale-105"
       >
-        <Plus :size="15" />
-        <span>+ İhale Aç</span>
+        <span class="text-sm">✨</span>
+        <span>+ İHALE AÇ</span>
       </NuxtLink>
 
       <!-- Notifications Dropdown Trigger -->

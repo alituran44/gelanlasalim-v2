@@ -284,6 +284,7 @@ function clearDraft() {
 
 const showSuccess = ref(false)
 const createdId = ref('')
+const submittedTenderSummary = ref<any>(null)
 
 function triggerFileSelect() {
   fileInputRef.value?.click()
@@ -451,13 +452,40 @@ function handleSubmit() {
     } catch (e) {}
   }
 
+  // Summary object for persistent success view
+  submittedTenderSummary.value = {
+    id: newId,
+    baslik: form.value.baslik,
+    kategori: combinedCategory,
+    butce: budgetVal,
+    city: form.value.sehir || 'Balıkesir',
+    filesCount: form.value.files.length,
+    imagesCount: form.value.images.length,
+    files: [...form.value.files]
+  }
+
   // Clear draft
   clearDraft()
 
   showSuccess.value = true
-  setTimeout(() => {
-    router.push('/panel/ilanlarim')
-  }, 1600)
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+function resetFormAndCreateNew() {
+  form.value = {
+    baslik: '',
+    kategori: 'İnşaat ve Yapı',
+    sure: '7 gün',
+    butce: '',
+    aciklama: '',
+    sehir: 'Balıkesir',
+    teslimatAdresi: '',
+    odemeYontemi: 'Vadeli 30 Gün',
+    images: [],
+    files: []
+  }
+  showSuccess.value = false
+  submittedTenderSummary.value = null
 }
 </script>
 
@@ -503,11 +531,69 @@ function handleSubmit() {
 
 
 
-    <!-- Başarı Mesajı -->
-    <div v-if="showSuccess" class="mb-6 rounded-xl bg-emerald-50 border border-emerald-200 p-5 text-center transition-all animate-bounce">
-      <CheckCircle2 class="text-emerald-500 mx-auto mb-2" :size="36" />
-      <h3 class="text-sm font-bold text-emerald-800">İhale Oluşturuldu ve Admin Onayına Gönderildi!</h3>
-      <p class="text-xs text-emerald-600 mt-1">İhale Kodu: <strong>{{ createdId }}</strong>. İhale şartnameniz Admin onayının ardından Pazar Yeri'nde yayına alınacaktır...</p>
+    <!-- ZENGİN İHALE ONAY VE GÖNDERİLDİ EKRANI -->
+    <div v-if="showSuccess" class="mb-8 rounded-3xl bg-white border border-emerald-300 p-6 sm:p-8 text-center space-y-5 shadow-xl animate-fadeIn">
+      <div class="w-16 h-16 rounded-3xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-inner">
+        <CheckCircle2 :size="36" />
+      </div>
+      
+      <div class="space-y-1">
+        <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black uppercase tracking-wider inline-block">
+          ✓ İhale İlanınız Başarıyla Oluşturuldu ve Gönderildi
+        </span>
+        <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-2">{{ submittedTenderSummary?.baslik }}</h2>
+        <p class="text-xs text-slate-500">İhale Referans No: <strong class="font-mono text-blue-700 font-black">{{ createdId }}</strong></p>
+      </div>
+
+      <!-- Özet Detay Kartı -->
+      <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs text-left">
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Kategori</span>
+          <span class="font-bold text-slate-800">{{ submittedTenderSummary?.kategori }}</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Hedef Bütçe</span>
+          <span class="font-mono font-black text-emerald-700">{{ submittedTenderSummary?.butce }}</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Konum / Şehir</span>
+          <span class="font-bold text-slate-800">{{ submittedTenderSummary?.city }}</span>
+        </div>
+        <div>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Eklenen Belgeler</span>
+          <span class="font-bold text-blue-700">{{ submittedTenderSummary?.filesCount }} Dosya · {{ submittedTenderSummary?.imagesCount }} Görsel</span>
+        </div>
+      </div>
+
+      <!-- Eklenen Dosyaların Listesi -->
+      <div v-if="submittedTenderSummary?.files?.length > 0" class="text-left space-y-1.5 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs">
+        <span class="font-bold text-slate-700 block text-[11px] flex items-center gap-1.5">
+          <FileSpreadsheet :size="14" class="text-emerald-600" />
+          <span>İlana Eklenen Teknik Şartname & Fiyat Cetveli Belgeleri ({{ submittedTenderSummary.files.length }} Adet):</span>
+        </span>
+        <div class="space-y-1">
+          <div v-for="(f, i) in submittedTenderSummary.files" :key="i" class="text-slate-600 flex items-center justify-between p-2 rounded-lg bg-white border border-slate-200 font-mono text-[11px]">
+            <div class="flex items-center gap-1.5 truncate">
+              <FileCheck :size="13" class="text-emerald-600 shrink-0" />
+              <span class="truncate font-bold text-slate-800">{{ f.name }}</span>
+            </div>
+            <span class="text-slate-400 shrink-0 text-[10px]">✓ Yüklendi ({{ f.size }})</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Aksiyon Butonları -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3 pt-3">
+        <NuxtLink to="/panel/ilanlarim" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-blue-900 hover:bg-blue-950 text-white font-black text-xs transition shadow-md flex items-center justify-center gap-1.5">
+          <span>📋 İlanlarım Sayfasına Git</span>
+        </NuxtLink>
+        <NuxtLink to="/" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition shadow-md flex items-center justify-center gap-1.5">
+          <span>🏠 Ana Sayfada Görüntüle</span>
+        </NuxtLink>
+        <button type="button" @click="resetFormAndCreateNew" class="w-full sm:w-auto px-5 py-3 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs transition cursor-pointer">
+          + Yeni İhale Daha Aç
+        </button>
+      </div>
     </div>
 
     <!-- İhale Formu -->

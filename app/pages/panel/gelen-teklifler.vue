@@ -551,24 +551,24 @@ function submitReview() {
                     <button
                       type="button"
                       @click="openNegotiation(teklif, ilan)"
-                      class="rounded-xl px-3.5 py-2 text-xs font-black bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition cursor-pointer shadow-2xs"
+                      class="rounded-xl px-3.5 py-2 text-xs font-black bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition cursor-pointer shadow-2xs flex items-center gap-1"
                     >
-                      💬 Pazarlık
+                      <span>💬 Karşı Teklif</span>
                     </button>
                     <button
                       type="button"
                       @click="acceptTeklif(teklif, ilan)"
-                      class="rounded-xl px-4 py-2 text-xs font-black text-white transition cursor-pointer hover:bg-[#188c3d] bg-[#1EAE4C] shadow-md shadow-[#1EAE4C]/20"
+                      class="rounded-xl px-4 py-2 text-xs font-black text-white transition cursor-pointer hover:bg-[#188c3d] bg-[#1EAE4C] shadow-md shadow-[#1EAE4C]/20 flex items-center gap-1"
                     >
-                      Kabul Et & Bitir
+                      <span>✓ Onayla</span>
                     </button>
                     <button
                       type="button"
                       @click="rejectTeklif(teklif)"
-                      class="rounded-xl p-2 text-xs font-bold text-red-500 hover:bg-red-50 transition border border-red-200"
+                      class="rounded-xl px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition border border-red-200 cursor-pointer flex items-center gap-1"
                       title="Teklifi Reddet"
                     >
-                      ✕
+                      <span>✕ Reddet</span>
                     </button>
                   </div>
 
