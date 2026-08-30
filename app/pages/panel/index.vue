@@ -34,38 +34,6 @@ const companyName = ref('Kurumsal Üye Hesabı')
 const userRole = ref('company')
 const isVerified = ref(true)
 
-// ==================== EVRAK YÜKLEME DURUMLARI ====================
-const companyDocs = ref([
-  { id: 'vergi', name: 'Güncel Vergi Levhası', required: true, uploaded: false, fileName: null, date: null },
-  { id: 'imza', name: 'İmza Sirküleri / Yetki Belgesi', required: true, uploaded: false, fileName: null, date: null },
-  { id: 'sicil', name: 'Ticaret Sicil Gazetesi', required: true, uploaded: false, fileName: null, date: null },
-  { id: 'faaliyet', name: 'Faaliyet / Oda Kayıt Belgesi', required: false, uploaded: false, fileName: null, date: null }
-])
-
-const fileInput = ref<HTMLInputElement | null>(null)
-const activeDocId = ref<string | null>(null)
-
-function triggerUpload(docId: string) {
-  activeDocId.value = docId
-  if (fileInput.value) {
-    fileInput.value.click()
-  }
-}
-
-function handleFileChange(event: Event) {
-  const target = event.target as HTMLInputElement
-  if (target.files && target.files[0] && activeDocId.value) {
-    const file = target.files[0]
-    const doc = companyDocs.value.find(d => d.id === activeDocId.value)
-    if (doc) {
-      doc.uploaded = true
-      doc.fileName = file.name
-      doc.date = new Date().toLocaleDateString('tr-TR')
-      alert(`✓ "${doc.name}" başarıyla yüklendi ve sisteme kaydedildi!`)
-    }
-  }
-}
-
 // ==================== DİNAMİK İLANLAR & TEKLİFLER LİSTESİ ====================
 const myActiveTenders = computed(() => {
   return (cmsData.value?.dashboard?.tenders || []).map((t: any, index: number) => ({
@@ -117,10 +85,6 @@ onMounted(() => {
 
 <template>
   <div class="p-4 sm:p-6 max-w-7xl mx-auto space-y-6 text-left">
-    
-    <!-- Hidden File Input -->
-    <input ref="fileInput" type="file" class="hidden" accept=".pdf,.png,.jpg,.jpeg" @change="handleFileChange" />
-
     <!-- ========================================================================= -->
     <!-- 🏢 1. ÜST HOŞ GELDİNİZ VE KURUMSAL AKSİYON KARTI -->
     <!-- ========================================================================= -->
@@ -135,7 +99,7 @@ onMounted(() => {
           <span class="text-xs text-slate-300">1 Ay Ücretsiz Kurumsal Deneme</span>
         </div>
         <h1 class="text-xl sm:text-2xl font-black tracking-tight">{{ companyName }}</h1>
-        <p class="text-xs text-slate-300">İhalelerinizi yönetebilir, gelen teklifleri inceleyebilir ve kurumsal evraklarınızı güncelleyebilirsiniz.</p>
+        <p class="text-xs text-slate-300">İhalelerinizi yönetebilir, gelen teklifleri inceleyebilir ve satın alma süreçlerinizi takip edebilirsiniz.</p>
       </div>
 
       <div class="flex flex-wrap items-center gap-2.5">
@@ -147,11 +111,11 @@ onMounted(() => {
           <span>+ Yeni İhale / İlan Aç</span>
         </NuxtLink>
         <NuxtLink 
-          to="/panel/ayarlar?tab=sirket" 
+          to="/panel/ayarlar" 
           class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition border border-white/20 flex items-center gap-1.5 cursor-pointer"
         >
-          <UploadCloud :size="15" class="text-sky-300" />
-          <span>📁 Evrakları Düzenle</span>
+          <Building2 :size="15" class="text-sky-300" />
+          <span>🏢 Kurumsal Ayarlar</span>
         </NuxtLink>
       </div>
     </div>
@@ -197,82 +161,18 @@ onMounted(() => {
         </div>
       </NuxtLink>
 
-      <!-- Kart 4: Evrak ve Doğrulama Durumu -->
-      <NuxtLink to="/panel/ayarlar?tab=sirket" class="p-4 rounded-xl bg-white border border-slate-200 hover:border-sky-500 transition shadow-xs space-y-2 group">
+      <!-- Kart 4: Pazar Yeri & İhale Keşfet -->
+      <NuxtLink to="/" class="p-4 rounded-xl bg-white border border-slate-200 hover:border-sky-500 transition shadow-xs space-y-2 group">
         <div class="flex items-center justify-between text-slate-500">
-          <span class="text-xs font-bold uppercase">Firma Evrakları</span>
-          <ShieldCheck :size="18" class="text-sky-600 group-hover:scale-110 transition" />
+          <span class="text-xs font-bold uppercase">Canlı İhale Havuzu</span>
+          <Building2 :size="18" class="text-sky-600 group-hover:scale-110 transition" />
         </div>
-        <div class="text-2xl font-black text-slate-700 font-mono">Kurumsal Hesap</div>
+        <div class="text-2xl font-black text-slate-700 font-mono">İhaleci Burada</div>
         <div class="text-[11px] text-blue-600 font-bold flex items-center gap-1">
-          <span>📁 Evrak yükleme ve doğrulama</span>
+          <span>🔍 Tüm canlı ihaleleri incele</span>
         </div>
       </NuxtLink>
 
-    </div>
-
-    <!-- ========================================================================= -->
-    <!-- 📁 3. FİRMA KAYITLARI & EVRAK YÜKLEME MODÜLÜ -->
-    <!-- ========================================================================= -->
-    <div class="bg-white border border-slate-300 rounded-xl p-5 shadow-xs space-y-4">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-3">
-        <div class="space-y-0.5">
-          <h2 class="text-base font-black text-slate-800 flex items-center gap-2">
-            <FileCheck :size="18" class="text-blue-600" />
-            <span>Firma Kayıt Evrakları & Kurumsal Doğrulama</span>
-          </h2>
-          <p class="text-xs text-slate-500">İhale açabilmek ve resmi teklif verebilmek için zorunlu şirket evraklarınızı buradan yükleyebilirsiniz.</p>
-        </div>
-        <span class="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold self-start sm:self-auto">
-          Kurumsal Üye Alanı
-        </span>
-      </div>
-
-      <!-- Evrak Yükleme Gizli Input -->
-      <input 
-        ref="fileInput"
-        type="file" 
-        class="hidden" 
-        accept=".pdf,.png,.jpg,.jpeg"
-        @change="handleFileChange"
-      />
-
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <div 
-          v-for="doc in companyDocs" 
-          :key="doc.id"
-          class="p-3.5 rounded-xl border transition flex flex-col justify-between space-y-2.5"
-          :class="doc.uploaded ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-slate-50/50 hover:bg-slate-100/50'"
-        >
-          <div class="space-y-1">
-            <div class="flex items-center justify-between">
-              <span class="text-[10px] font-bold uppercase" :class="doc.required ? 'text-rose-600' : 'text-slate-400'">
-                {{ doc.required ? 'Zorunlu Belge *' : 'Opsiyonel Belge' }}
-              </span>
-              <span v-if="doc.uploaded" class="text-emerald-700 text-xs font-bold flex items-center gap-1">
-                <Check :size="12" /> Yüklendi
-              </span>
-              <span v-else class="text-slate-400 text-xs font-bold">
-                Eksik
-              </span>
-            </div>
-            <h4 class="font-bold text-xs text-slate-800">{{ doc.name }}</h4>
-            <p v-if="doc.uploaded" class="text-[10px] text-slate-500 truncate font-mono">
-              📄 {{ doc.fileName }}
-            </p>
-          </div>
-
-          <button 
-            type="button"
-            @click="triggerUpload(doc.id)"
-            class="w-full py-1.5 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer"
-            :class="doc.uploaded ? 'bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-100/50' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'"
-          >
-            <UploadCloud :size="13" />
-            <span>{{ doc.uploaded ? 'Yeniden Yükle' : 'Belge Yükle (PDF)' }}</span>
-          </button>
-        </div>
-      </div>
     </div>
 
     <!-- ========================================================================= -->
