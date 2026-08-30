@@ -1,6 +1,8 @@
 import { ref } from 'vue'
 
-// Default empty & clean state for platform
+const SCHEMA_VERSION = 'v2026_08_30_clean_slate_final_1'
+
+// Clean state for platform - zero dummy / mock data
 export const DEFAULT_CMS_DATA = {
   hero: {
     tagline: "ÖZEL SEKTÖRÜN CANLI TERS İHALE VE PAZARLIK ARENASI",
@@ -168,6 +170,22 @@ let isInitialized = false
 export function useCmsData() {
   if (typeof window !== 'undefined' && !isInitialized) {
     isInitialized = true
+
+    // Check version migration - force clean slate if old version detected
+    const savedVersion = localStorage.getItem('cms_schema_version')
+    if (savedVersion !== SCHEMA_VERSION) {
+      localStorage.removeItem('cmsData')
+      localStorage.removeItem('myTenders')
+      localStorage.setItem('cms_schema_version', SCHEMA_VERSION)
+      cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
+      localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
+      return {
+        cmsData: cmsDataRef,
+        saveCmsData,
+        resetCmsData
+      }
+    }
+
     const saved = localStorage.getItem('cmsData')
     if (saved) {
       try {
@@ -185,16 +203,13 @@ export function useCmsData() {
           parsed.registeredCompanies = []
         }
 
-        // Clean out legacy mock dummy items if any exist
+        // Clean out any legacy mock dummy items
         parsed.dashboard.tenders = (parsed.dashboard.tenders || []).filter(
-          (t: any) => !t.id?.startsWith('IHC-2024-') && !t.id?.startsWith('IHC-DEMO-')
+          (t: any) => !t.id?.startsWith('IHC-2024-') && !t.id?.startsWith('IHC-DEMO')
         )
         parsed.kycVerifications = (parsed.kycVerifications || []).filter(
           (k: any) => !['KYC-8921', 'KYC-7412', 'KYC-6320', 'KYC-5109'].includes(k.id)
         )
-        if (Array.isArray(parsed.payments)) {
-          parsed.payments = parsed.payments.filter((p: any) => !['ORD-894210', 'ORD-761234'].includes(p.id))
-        }
 
         cmsDataRef.value = parsed
         localStorage.setItem('cmsData', JSON.stringify(parsed))

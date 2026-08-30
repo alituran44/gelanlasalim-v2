@@ -6,6 +6,14 @@ import { detectLocale } from '~/composables/useLocale'
 const { initTheme } = useAppTheme()
 
 onMounted(() => {
+  if (typeof window !== 'undefined') {
+    const SCHEMA_VERSION = 'v2026_08_30_clean_slate_final_1'
+    if (localStorage.getItem('cms_schema_version') !== SCHEMA_VERSION) {
+      localStorage.removeItem('cmsData')
+      localStorage.removeItem('myTenders')
+      localStorage.setItem('cms_schema_version', SCHEMA_VERSION)
+    }
+  }
   initTheme()
   detectLocale()
 })
