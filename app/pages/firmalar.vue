@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useCmsData } from '~/composables/useCmsData'
 import { ref, computed } from 'vue'
 import { Plus, Search, MapPin, Building2, User, Star, X, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-vue-next'
 
@@ -29,7 +30,23 @@ const sectors = [
   'Tekstil & İş Güvenliği'
 ]
 
-const verifiedFirms = ref<any[]>([])
+const { cmsData } = useCmsData()
+const verifiedFirms = computed(() => {
+  return (cmsData.value.kycVerifications || []).filter((k: any) => k.status === 'approved' || k.badgeGranted === true).map((k: any) => ({
+    id: k.id,
+    name: k.companyName,
+    sector: 'Kurumsal Tedarik',
+    city: k.city || 'Çanakkale',
+    district: 'Merkez',
+    rating: 5.0,
+    reviewCount: 1,
+    completedTenders: 0,
+    totalBids: 0,
+    tradeVolume: '0 ₺',
+    badge: 'Doğrulanmış Üretici',
+    description: k.companyName + ' kurumsal B2B tedarikçi profili. Tüm resmi evrakları onaylanmıştır.'
+  }))
+})
 
 const filteredFirms = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()
@@ -131,7 +148,26 @@ const selectedFirmForModal = ref<any>(null)
       </div>
 
       <!-- Companies Grid -->
-      <div v-if="filteredFirms.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div v-if="filteredFirms.length === 0" class="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-4 shadow-sm">
+        <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
+          <Building2 :size="32" />
+        </div>
+        <div class="space-y-1">
+          <h3 class="font-black text-slate-800 text-base">Henüz Onaylanmış Firma Bulunmuyor</h3>
+          <p class="text-slate-500 text-xs max-w-md mx-auto leading-relaxed">
+            Firmanızı platforma ekleyin, vergi levhası ve evrak onayınız tamamlandığında onaylı mavi rozetinizle burada yerinizi alın.
+          </p>
+        </div>
+        <NuxtLink 
+          to="/uyelik" 
+          class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-600/20 transition cursor-pointer"
+        >
+          <Plus :size="14" />
+          <span>Firmanızı Ücretsiz Ekleyin</span>
+        </NuxtLink>
+      </div>
+
+      <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
           v-for="firm in filteredFirms"
           :key="firm.id"
@@ -199,28 +235,6 @@ const selectedFirmForModal = ref<any>(null)
               Profili İncele
             </button>
           </div>
-        </div>
-      </div>
-
-      <!-- Empty State -->
-      <div v-else class="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-4 shadow-sm">
-        <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto">
-          <Building2 :size="32" />
-        </div>
-        <div class="space-y-1">
-          <h3 class="font-black text-slate-800 text-base">Henüz Kayıtlı Firma Bulunmuyor</h3>
-          <p class="text-slate-500 text-xs max-w-md mx-auto">
-            Platformda şu anda listelenen kayıtlı firma bulunmamaktadır. Firmanızı ekleyerek B2B tedarikçi ağında yerinizi alabilirsiniz.
-          </p>
-        </div>
-        <div class="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <NuxtLink to="/uyelik" class="px-5 py-2.5 rounded-xl bg-[#0052FF] hover:bg-blue-600 text-white font-black text-xs transition flex items-center gap-2 cursor-pointer shadow-md">
-            <Plus :size="14" />
-            <span>Firmanızı Ekleyin</span>
-          </NuxtLink>
-          <button v-if="searchQuery || selectedCity !== 'Tümü' || selectedSector !== 'Tümü'" type="button" @click="searchQuery = ''; selectedCity = 'Tümü'; selectedSector = 'Tümü'" class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 cursor-pointer">
-            Filtreleri Sıfırla
-          </button>
         </div>
       </div>
 

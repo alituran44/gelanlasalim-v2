@@ -465,19 +465,9 @@ const allSectorsList = [
 ]
 
 // ==================== 5. DOĞRULANMIŞ FİRMALAR DİZİNİ ====================
-const allCompaniesList = [
-  { name: 'Çanakkale Mimarlık & Altyapı A.Ş.', city: 'Çanakkale', sector: 'İnşaat & Yapı', verified: true, score: 9.8, vkn: '4700854210', completedTenders: 28, contactProtection: true },
-  { name: 'Ege Tıbbi Sistemler ve Medikal Ltd.', city: 'İzmir', sector: 'Sağlık & Medikal', verified: true, score: 9.9, vkn: '3210984567', completedTenders: 42, contactProtection: true },
-  { name: 'Bursa Tarım & Sera Üretim A.Ş.', city: 'Bursa', sector: 'Gıda & Tarım', verified: true, score: 9.9, vkn: '1987654320', completedTenders: 34, contactProtection: true },
-  { name: 'Anadolu Endüstriyel Boru ve Vana San.', city: 'Bursa', sector: 'Tesisat & Altyapı', verified: true, score: 9.7, vkn: '5647382910', completedTenders: 19, contactProtection: true },
-  { name: 'Marmara Bilişim ve Siber Güvenlik A.Ş.', city: 'İstanbul', sector: 'Yazılım & Bilişim', verified: true, score: 9.9, vkn: '8901234567', completedTenders: 31, contactProtection: true },
-  { name: 'Mega Filo Lojistik ve Taşımacılık', city: 'Kocaeli', sector: 'Nakliye & Lojistik', verified: true, score: 9.6, vkn: '2345678901', completedTenders: 56, contactProtection: true },
-  { name: 'Başkent Enerji ve Trafo Sistemleri', city: 'Ankara', sector: 'Elektrik & Enerji', verified: true, score: 9.8, vkn: '7890123456', completedTenders: 22, contactProtection: true },
-  { name: 'Akdeniz Gıda ve Soğuk Zincir Dağıtım', city: 'Antalya', sector: 'Gıda & Tarım', verified: true, score: 9.7, vkn: '4567890123', completedTenders: 38, contactProtection: true },
-  { name: 'Eskişehir Gezer Vinç ve Makine İmalatı', city: 'Eskişehir', sector: 'Makine & İmalat', verified: true, score: 9.8, vkn: '6789012345', completedTenders: 15, contactProtection: true }
-]
+const allCompaniesList: any[] = []
 
-// ==================== 6. SEED / CANLI İHALE VERİLERİ (DOMATES & ÇİMENTO VB. KELİME TESTLERİ DAHİL) ====================
+// ==================== 6. SEED / CANLI İHALE VERİLERİ ====================
 const seedTenders = [
   {
     id: 'IHC-2024-001',
@@ -775,14 +765,14 @@ function getTenderImage(tender: any): string {
 // ==================== 7. CANLI VERİLERİ BİRLEŞTİRME ====================
 const allTenders = computed(() => {
   const cmsTenders = (cmsData.value?.dashboard?.tenders || []).filter(
-    (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected'
+    (t: any) => t.adminApproved === true && t.durum !== 'pending_approval' && t.durum !== 'rejected'
   )
   
   let localTenders: any[] = []
   if (typeof window !== 'undefined') {
     try {
       localTenders = JSON.parse(localStorage.getItem('myTenders') || '[]').filter(
-        (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected'
+        (t: any) => t.adminApproved === true && t.durum !== 'pending_approval' && t.durum !== 'rejected'
       )
     } catch (e) {}
   }

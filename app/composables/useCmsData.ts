@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-// Default contents in Turkish for authentic local B2B portal experience
+// Default empty & clean state for platform
 export const DEFAULT_CMS_DATA = {
   hero: {
     tagline: "ÖZEL SEKTÖRÜN CANLI TERS İHALE VE PAZARLIK ARENASI",
@@ -17,15 +17,12 @@ export const DEFAULT_CMS_DATA = {
     heroVideoUrl: 'https://assets.mixkit.co/videos/preview/mixkit-corporate-team-working-together-in-an-office-42790-large.mp4'
   },
   liveTender: {
-    title: 'CNC Fason Üretim İş Emri Serisi',
-    remainingTime: '02:21',
-    bestBid: 396800,
-    openingPrice: 412000,
-    savingsText: 'TASARRUF %3.7',
-    competitors: [
-      { name: 'Tedarikçi #A47', price: 396800, leader: true },
-      { name: 'Tedarikçi #D08', price: 404500, leader: false }
-    ]
+    title: 'Canlı İhale Bekleniyor',
+    remainingTime: '00:00',
+    bestBid: 0,
+    openingPrice: 0,
+    savingsText: 'TASARRUF %0',
+    competitors: []
   },
   pricing: {
     vatNotice: 'Fiyatlara %20 KDV dahildir.',
@@ -87,9 +84,9 @@ export const DEFAULT_CMS_DATA = {
     { title: "TR · EN", subtitle: "ÇOKLU DİL", desc: "Türkçe ve İngilizce çift dil arayüz desteği." }
   ],
   stats: [
-    { value: '12.4M ₺+', label: 'Toplam Ticaret Hacmi' },
-    { value: '150+', label: 'Doğrulanmış B2B Üretici' },
-    { value: '%14.2', label: 'Ortalama Tedarik Tasarrufu' },
+    { value: '0 ₺', label: 'Toplam Ticaret Hacmi' },
+    { value: '0', label: 'Doğrulanmış B2B Üretici' },
+    { value: '%0', label: 'Ortalama Tedarik Tasarrufu' },
     { value: '0 ₺', label: 'Alıcı Üyelik Komisyonu' }
   ],
   videoGuides: [
@@ -107,6 +104,7 @@ export const DEFAULT_CMS_DATA = {
     sectorAlerts: [],
     escrowOrders: []
   },
+  registeredCompanies: [],
   contact: {
     address: 'İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye',
     email: 'ihalecib@gmail.com',
@@ -120,8 +118,8 @@ export const DEFAULT_CMS_DATA = {
     whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale süreçleri ve 1 ay ücretsiz deneme paketi hakkında bilgi almak istiyorum.',
     aiEnabled: true,
     aiBotName: 'İhaleciBurada AI Asistanı',
-    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel 1 Ay %100 Ücretsiz Deneme süreciniz hakkında size nasıl yardımcı olabilirim?',
-    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın. Kullanıcılara 1 ay ücretsiz deneme, ihale açma, teklif verme, ihale ve satın alma konularında yardımcı ol.'
+    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme veya üyelik süreciniz hakkında size nasıl yardımcı olabilirim?',
+    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın.'
   },
   crmSettings: {
     leads: []
@@ -134,38 +132,7 @@ export const DEFAULT_CMS_DATA = {
     smtpPort: 587,
     smtpUser: 'ihalecib@gmail.com',
     subscribers: [],
-    templates: [
-      {
-        id: 'trial-welcome',
-        name: '🎉 1 Ay Ücretsiz Lansman Hoş Geldin & Aktivasyon',
-        subject: 'İhaleciBurada.com: 1 Aylık %100 Ücretsiz Lansman Deneme Paketiniz Aktif!',
-        content: `Sayın Yetkili,\n\nİhaleciBurada B2B İhale ve Satın Alma ve Satın Alma Platformu'na hoş geldiniz!\n\nLansmanımıza özel olarak tanımlanan 1 Aylık %100 Ücretsiz Kurumsal Deneme Paketiniz başarıyla aktifleştirildi.\n\n✓ 1 Ay Boyunca 0 ₺ Ücret (Kredi Kartı Gerekmez)\n✓ Sınırsız İhale Açma & Canlı Tersine Eksiltme\n✓ Doğrulanmış Kurumsal Firmalardan Belgeli Teklif Toplama\n✓ Geçerlilik Bitiş Tarihi: 25 Eylül 2026\n\nPanele gitmek ve ilk ihalenizi oluşturmak için: https://gelanlasalim-v2.vercel.app/panel\n\nSaygılarımızla,\nİhaleciBurada Müşteri Başarı Ekibi\nihalecib@gmail.com | 0850 840 86 95`
-      },
-      {
-        id: 'new-tender',
-        name: '📢 Yeni İhale Yayınlandı Bildirimi',
-        subject: 'Yeni İhale Yayında: Sektörünüze Uygun Yeni Bir Satın Alma İlanı Açıldı',
-        content: `Sayın Tedarikçimiz,\n\nFaaliyet alanınıza uygun yeni bir B2B satın alma ihalesi yayına alınmıştır.\n\nİhale Başlığı: [İhale Başlığı]\nKategori: [Sektör / Kategori]\nKalan Süre: [Kalan Süre]\n\nŞartnameyi incelemek ve teklifinizi iletmek için hemen tıklayın:\nhttps://gelanlasalim-v2.vercel.app/panel/gelen-teklifler\n\nİhaleciBurada B2B Operasyon Merkezi\nihalecib@gmail.com`
-      },
-      {
-        id: 'live-auction',
-        name: '⚡ Canlı Tersine Eksiltme Başladı & Teklif Uyarısı',
-        subject: 'İhale ve Satın Alma Başladı: İhalede Fiyatlar Düşüyor!',
-        content: `Sayın İhale Katılımcısı,\n\nKayıt olduğunuz ihalenin CANLI TERSİNE EKSİLTME (Canlı Pazarlık) seansı başlamıştır.\n\nAnlık Lider Teklif: [Lider Fiyat]\nKalan Süre: [Süre]\n\nCanlı odaya bağlanmak ve yeni teklifinizi vermek için:\nhttps://gelanlasalim-v2.vercel.app/panel/canli-etkinlikler\n\nBol kazançlı ihaleler dileriz,\nİhaleciBurada.com`
-      },
-      {
-        id: 'kyc-approved',
-        name: '🛡️ Kurumsal Firma Doğrulama & KYC Onayı',
-        subject: 'Firma Belgeleriniz Doğrulandı — Mavi Rozetiniz Aktif!',
-        content: `Tebrikler!\n\nYüklemiş olduğunuz vergi levhası ve ticaret sicil belgeleri uzmanlarımız tarafından incelenmiş ve onaylanmıştır.\n\nProfilinize 'DOĞRULANMIŞ KURUMSAL ÜRETİCİ / ALICI' mavi rozeti eklenmiştir.\n\nİhaleciBurada Güvenlik ve Uyumluluk Departmanı\nihalecib@gmail.com`
-      },
-      {
-        id: 'weekly-digest',
-        name: '📊 Haftalık B2B İhale ve Tasarruf Bülteni',
-        subject: 'Haftalık B2B Tedarik Özeti: 12.4M ₺ Hacim ve Öne Çıkan İhaleler',
-        content: `Bu hafta İhaleciBurada'da gerçekleşen öne çıkan ihaleler ve ortalama %14.2 tasarruf fırsatları bülteninizde!\n\nAktif İhale Sayısı: 48+\nTamamlanan İşlem Hacmi: 12.4M ₺+\n\nTüm güncel fırsatları listelemek için: https://gelanlasalim-v2.vercel.app/pazar-yeri\n\nİhaleciBurada B2B Bülten\nihalecib@gmail.com`
-      }
-    ]
+    templates: []
   },
   kycVerifications: [],
   liveAuctionRooms: [],
@@ -182,10 +149,10 @@ export const DEFAULT_CMS_DATA = {
   auditLogs: [],
   siteSettings: {
     maintenanceMode: false,
-    maintenanceNotice: 'Platformumuzda planlı altyapı güçlendirme çalışması yapılmaktadır. Sistem en kısa sürede tekrar aktif olacaktır.',
-    metaTitle: 'İhaleciBurada.com | Türkiye’nin Öncü B2B İhale ve Satın Alma & Satın Alma Platformu',
-    metaDescription: 'B2B satın alma ihaleleri açın, canlı tersine eksiltme ile rekabetçi teklifler toplayın, kurumsal tedarik maliyetlerinizi %14.2 düşürün.',
-    announcementTicker: '⚡ LANSMANA ÖZEL: Tüm alıcı ve tedarikçi firmalarımıza ilk 1 ay boyunca %100 ücretsiz kurumsal deneme paketi! Kredi kartı gerekmez, 0 ₺ bedelsiz anında aktivasyon.',
+    maintenanceNotice: 'Platformumuzda planlı altyapı güçlendirme çalışması yapılmaktadır.',
+    metaTitle: 'İhaleciBurada.com | B2B İhale ve Satın Alma Platformu',
+    metaDescription: 'B2B satın alma ihaleleri açın, onaylı tedarikçilerden rekabetçi teklifler toplayın.',
+    announcementTicker: '⚡ Tüm alıcı ve tedarikçi firmalarımıza ilk 1 ay boyunca %100 ücretsiz kurumsal deneme paketi!',
     googleAnalyticsId: 'G-IHALECIBURADA2026',
     supportPhone: '0850 840 86 95',
     supportEmail: 'ihalecib@gmail.com',
@@ -199,7 +166,6 @@ const cmsDataRef = ref({ ...DEFAULT_CMS_DATA })
 let isInitialized = false
 
 export function useCmsData() {
-  // Initialize and load data on client side once
   if (typeof window !== 'undefined' && !isInitialized) {
     isInitialized = true
     const saved = localStorage.getItem('cmsData')
@@ -212,42 +178,23 @@ export function useCmsData() {
         if (!Array.isArray(parsed.dashboard.tenders)) {
           parsed.dashboard.tenders = []
         }
+        if (!Array.isArray(parsed.kycVerifications)) {
+          parsed.kycVerifications = []
+        }
+        if (!Array.isArray(parsed.registeredCompanies)) {
+          parsed.registeredCompanies = []
+        }
 
-        // Clean out legacy mock dummy data if present
+        // Clean out legacy mock dummy items if any exist
+        parsed.dashboard.tenders = (parsed.dashboard.tenders || []).filter(
+          (t: any) => !t.id?.startsWith('IHC-2024-') && !t.id?.startsWith('IHC-DEMO-')
+        )
+        parsed.kycVerifications = (parsed.kycVerifications || []).filter(
+          (k: any) => !['KYC-8921', 'KYC-7412', 'KYC-6320', 'KYC-5109'].includes(k.id)
+        )
         if (Array.isArray(parsed.payments)) {
           parsed.payments = parsed.payments.filter((p: any) => !['ORD-894210', 'ORD-761234'].includes(p.id))
         }
-        if (parsed.crmSettings && Array.isArray(parsed.crmSettings.leads)) {
-          parsed.crmSettings.leads = parsed.crmSettings.leads.filter((l: any) => !['Kalyon Tedarik Ltd.', 'Anadolu Lojistik A.Ş.', 'Mega Ambalaj Sanayi'].includes(l.companyName))
-        }
-        if (parsed.emailSettings && Array.isArray(parsed.emailSettings.subscribers)) {
-          parsed.emailSettings.subscribers = parsed.emailSettings.subscribers.filter((s: any) => !['info@kalyon.com', 'satinalma@anadolu.com', 'kurumsal@megaambalaj.com'].includes(s.email))
-        }
-        if (Array.isArray(parsed.kycVerifications)) {
-          parsed.kycVerifications = parsed.kycVerifications.filter((k: any) => !['KYC-8921', 'KYC-7412', 'KYC-6320', 'KYC-5109'].includes(k.id))
-        }
-        if (Array.isArray(parsed.liveAuctionRooms)) {
-          parsed.liveAuctionRooms = parsed.liveAuctionRooms.filter((r: any) => !['ROOM-101', 'ROOM-102', 'ROOM-103'].includes(r.id))
-        }
-        if (Array.isArray(parsed.escrowOrders)) {
-          parsed.escrowOrders = parsed.escrowOrders.filter((e: any) => !['ESC-9041', 'ESC-8930', 'ESC-7721'].includes(e.id))
-        }
-        if (Array.isArray(parsed.auditLogs)) {
-          parsed.auditLogs = parsed.auditLogs.filter((a: any) => !['LOG-9912', 'LOG-9911', 'LOG-9910', 'LOG-9909', 'LOG-9908'].includes(a.id))
-        }
-
-        // Synchronize any created user tenders from 'myTenders'
-        try {
-          const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
-          if (Array.isArray(myTenders)) {
-            myTenders.forEach((mt: any) => {
-              const exists = parsed.dashboard.tenders.some((t: any) => t.id === mt.id)
-              if (!exists) {
-                parsed.dashboard.tenders.unshift(mt)
-              }
-            })
-          }
-        } catch (e) {}
 
         cmsDataRef.value = parsed
         localStorage.setItem('cmsData', JSON.stringify(parsed))
@@ -256,7 +203,6 @@ export function useCmsData() {
         localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
       }
     } else {
-      // First run: save clean DEFAULT_CMS_DATA
       cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
       localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
     }
@@ -273,6 +219,7 @@ export function useCmsData() {
     cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
     if (typeof window !== 'undefined') {
       localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
+      localStorage.removeItem('myTenders')
     }
   }
 
@@ -282,4 +229,3 @@ export function useCmsData() {
     resetCmsData
   }
 }
-

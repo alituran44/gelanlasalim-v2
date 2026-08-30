@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useCmsData } from '~/composables/useCmsData'
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
@@ -153,13 +154,47 @@ const otpInput = ref('849201')
 const pendingUserSession = ref<any>(null)
 const pendingTargetRoute = ref('/panel')
 
+const { cmsData, saveCmsData } = useCmsData()
+
 function verifyOtp() {
   if (!otpInput.value || otpInput.value.length < 6) {
     alert(locale.value === 'tr' ? 'Lütfen 6 haneli onay kodunu giriniz.' : 'Please enter 6-digit verification code.')
     return
   }
+  
   if (typeof window !== 'undefined' && pendingUserSession.value) {
-    localStorage.setItem('userSession', JSON.stringify(pendingUserSession.value))
+    const sessionData = {
+      ...pendingUserSession.value,
+      verified: false,
+      approvalStatus: 'pending'
+    }
+    localStorage.setItem('userSession', JSON.stringify(sessionData))
+
+    // If company, register into Admin KYC verification queue
+    if (sessionData.role === 'company' || sessionData.company) {
+      if (!Array.isArray(cmsData.value.kycVerifications)) {
+        cmsData.value.kycVerifications = []
+      }
+      const existingKyc = cmsData.value.kycVerifications.find((k: any) => k.email === sessionData.email)
+      if (!existingKyc) {
+        cmsData.value.kycVerifications.unshift({
+          id: 'KYC-' + Math.floor(1000 + Math.random() * 9000),
+          companyName: sessionData.company || sessionData.name,
+          companyType: 'Kurumsal Şirket (A.Ş. / Ltd. Şti.)',
+          taxOffice: 'Çanakkale V.D.',
+          taxNo: '4700854210',
+          authorizedPerson: sessionData.name || sessionData.firstName,
+          phone: phone.value || '0850 840 86 95',
+          email: sessionData.email,
+          city: 'Çanakkale',
+          status: 'pending',
+          badgeGranted: false,
+          createdAt: new Date().toLocaleDateString('tr-TR'),
+          uploadedDocs: ['Vergi Levhası (2026)', 'İmza Sirküleri', 'Ticaret Sicil Gazetesi']
+        })
+        saveCmsData(cmsData.value)
+      }
+    }
   }
   showOtpModal.value = false
   router.push(pendingTargetRoute.value)
