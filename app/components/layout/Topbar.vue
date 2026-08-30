@@ -137,25 +137,6 @@ const pageTitle = computed(() => {
     <!-- Right: Actions & Links -->
     <div class="flex items-center gap-2">
 
-      <!-- Pazar Yeri Link -->
-      <NuxtLink
-        to="/panel/pazar-yeri"
-        class="hidden sm:flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-black text-slate-700 hover:text-[#1EAE4C] hover:border-[#1EAE4C] transition shadow-xs"
-        title="İhale Pazar Yeri"
-      >
-        <ShoppingBag :size="14" class="text-[#1EAE4C]" />
-        <span>Pazar Yeri</span>
-      </NuxtLink>
-
-      <!-- Video Guides Button -->
-      <NuxtLink
-        to="/videolar"
-        class="hidden md:flex items-center gap-1.5 rounded-xl border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-bold text-blue-700 hover:bg-blue-100 transition"
-      >
-        <Play :size="12" class="fill-blue-700 text-blue-700" />
-        <span>Rehberler</span>
-      </NuxtLink>
-
       <!-- Home Page Button -->
       <NuxtLink
         to="/"

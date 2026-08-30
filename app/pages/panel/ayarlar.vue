@@ -1730,23 +1730,23 @@ function saveProfile() {
               </div>
             </div>
 
-            <!-- Upload files list -->
+            <!-- Upload files list (İsteğe Bağlı / Opsiyonel) -->
             <div class="space-y-4 pt-4 border-t" style="border-color: #F1F5F9;">
               <div class="flex items-center justify-between">
                 <h4 class="text-xs font-bold text-slate-800">Doğrulama Belgeleri</h4>
-                <span class="text-[10px] text-slate-400 font-bold">Zorunlu belgeler: {{ docsCount }}/6</span>
+                <span class="text-[10px] text-slate-400 font-bold">Yüklenen belgeler: {{ docsCount }}/6 (İsteğe Bağlı)</span>
               </div>
 
               <div class="divide-y divide-slate-100">
                 <!-- Doc 1: Vergi Levhası -->
                 <div class="flex items-center justify-between py-3">
                   <span class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-                    Vergi Levhası <span class="text-[8px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded font-black">ZORUNLU</span>
+                    Vergi Levhası
                   </span>
                   <button 
                     type="button" 
                     @click="triggerDocUpload('vergi')" 
-                    class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition"
+                    class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition cursor-pointer"
                     :class="uploadedDocs.vergi ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white hover:bg-slate-50 text-slate-700'"
                     style="border-color: #E2E8F0;"
                   >
@@ -1757,12 +1757,12 @@ function saveProfile() {
                 <!-- Doc 2: Ticaret Sicil Gazetesi -->
                 <div class="flex items-center justify-between py-3">
                   <span class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-                    Ticaret Sicil Gazetesi <span class="text-[8px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded font-black">ZORUNLU</span>
+                    Ticaret Sicil Gazetesi
                   </span>
                   <button 
                     type="button" 
                     @click="triggerDocUpload('sicil')" 
-                    class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition"
+                    class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition cursor-pointer"
                     :class="uploadedDocs.sicil ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white hover:bg-slate-50 text-slate-700'"
                     style="border-color: #E2E8F0;"
                   >
@@ -1773,12 +1773,12 @@ function saveProfile() {
                 <!-- Doc 3: İmza Sirküleri -->
                 <div class="flex items-center justify-between py-3">
                   <span class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-                    İmza Sirküleri <span class="text-[8px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded font-black">ZORUNLU</span>
+                    İmza Sirküleri
                   </span>
                   <button 
                     type="button" 
                     @click="triggerDocUpload('imza')" 
-                    class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition"
+                    class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition cursor-pointer"
                     :class="uploadedDocs.imza ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white hover:bg-slate-50 text-slate-700'"
                     style="border-color: #E2E8F0;"
                   >
@@ -1789,12 +1789,12 @@ function saveProfile() {
                 <!-- Doc 4: Faaliyet Belgesi -->
                 <div class="flex items-center justify-between py-3">
                   <span class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-                    Faaliyet Belgesi <span class="text-[8px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded font-black">ZORUNLU</span>
+                    Faaliyet Belgesi
                   </span>
                   <button 
                     type="button" 
                     @click="triggerDocUpload('faaliyet')" 
-                    class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition"
+                    class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition cursor-pointer"
                     :class="uploadedDocs.faaliyet ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white hover:bg-slate-50 text-slate-700'"
                     style="border-color: #E2E8F0;"
                   >
@@ -1805,12 +1805,12 @@ function saveProfile() {
                 <!-- Doc 5: Yetkili Kimlik Belgesi - Ön Yüz -->
                 <div class="flex items-center justify-between py-3">
                   <span class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-                    Yetkili Kimlik Belgesi - Ön Yüz <span class="text-[8px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded font-black">ZORUNLU</span>
+                    Yetkili Kimlik Belgesi - Ön Yüz
                   </span>
                   <button 
                     type="button" 
                     @click="triggerDocUpload('kimlikOn')" 
-                    class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition"
+                    class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition cursor-pointer"
                     :class="uploadedDocs.kimlikOn ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white hover:bg-slate-50 text-slate-700'"
                     style="border-color: #E2E8F0;"
                   >
@@ -1821,12 +1821,12 @@ function saveProfile() {
                 <!-- Doc 6: Yetkili Kimlik Belgesi - Arka Yüz -->
                 <div class="flex items-center justify-between py-3">
                   <span class="text-[11px] font-bold text-slate-700 flex items-center gap-1.5">
-                    Yetkili Kimlik Belgesi - Arka Yüz <span class="text-[8px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded font-black">ZORUNLU</span>
+                    Yetkili Kimlik Belgesi - Arka Yüz
                   </span>
                   <button 
                     type="button" 
                     @click="triggerDocUpload('kimlikArka')" 
-                    class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition"
+                    class="rounded-lg border px-4 py-1.5 text-[10px] font-bold transition cursor-pointer"
                     :class="uploadedDocs.kimlikArka ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-white hover:bg-slate-50 text-slate-700'"
                     style="border-color: #E2E8F0;"
                   >
