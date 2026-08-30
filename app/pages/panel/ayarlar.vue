@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { 
+import {
+  Sun,
+  Moon,
   User, 
   Building2, 
   MapPin, 
@@ -46,7 +48,8 @@ import {
   ChevronDown
 } from 'lucide-vue-next'
 import { useRoute, useRouter } from 'vue-router'
-import { locale, detectLocale } from '~/composables/useLocale'
+import { locale, detectLocale, setLocale } from '~/composables/useLocale'
+import { useAppTheme } from '~/composables/useAppTheme'
 
 definePageMeta({ 
   layout: 'dashboard' 
@@ -56,6 +59,16 @@ const userSession = ref<any>({})
 
 onMounted(() => {
   detectLocale()
+  activeTheme.value = globalTheme.value || 'sistem'
+  if (typeof window !== 'undefined') {
+    try {
+      const prefs = JSON.parse(localStorage.getItem('userPreferences') || '{}')
+      if (prefs.theme) activeTheme.value = prefs.theme
+      if (prefs.language) selectedLanguage.value = prefs.language
+      if (prefs.timeFormat) timeFormat.value = prefs.timeFormat
+      if (prefs.timezone) timezone.value = prefs.timezone
+    } catch (e) {}
+  }
   if (typeof window !== 'undefined') {
     try {
       const session = JSON.parse(localStorage.getItem('userSession') || '{}')
@@ -3016,44 +3029,44 @@ function saveProfile() {
             <div class="flex items-center gap-2.5 pb-2 border-b" style="border-color: #F1F5F9;">
               <Sliders :size="15" class="text-blue-600" />
               <div>
-                <span class="text-[8px] font-black text-slate-300 block">UYGULAMA TERCİHLERİ</span>
-                <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Tercihler</h3>
+                <span class="text-[8px] font-black text-slate-400 block">UYGULAMA TERCİHLERİ</span>
+                <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Tercihler & Görünüm</h3>
               </div>
             </div>
-            <p class="text-[10px] text-slate-400 leading-normal">Görünüm, dil ve saat biçimi tercihlerinizi kişiselleştirin.</p>
+            <p class="text-[10px] text-slate-500 leading-normal">Karanlık / Açık tema görünümü, dil ve saat biçimi tercihlerinizi anlık olarak kişiselleştirin.</p>
             
-            <!-- Theme grids -->
+            <!-- Active Theme Selection -->
             <div class="space-y-3">
-              <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">Tema değişikliği yalnızca görünümü sembolize eder</span>
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">TEMA MODU SEÇİMİ (CANLI UYGULANIR)</span>
               <div class="grid grid-cols-3 gap-4">
                 <button 
                   type="button" 
-                  @click="activeTheme = 'sistem'; showToast('Sistem teması aktif edildi.')"
-                  class="rounded-xl border p-4 text-center space-y-2 transition shadow-sm"
-                  :style="activeTheme === 'sistem' ? 'border-color: #2563EB; background: rgba(37,99,235,0.05); color: #2563EB;' : 'border-color: #E2E8F0;'"
+                  @click="activeTheme = 'sistem'; applyTheme('sistem'); showToast('Sistem teması aktif edildi.')"
+                  class="rounded-xl border p-4 text-center space-y-2 transition shadow-sm cursor-pointer"
+                  :class="activeTheme === 'sistem' ? 'border-blue-600 bg-blue-50/50 text-blue-600 ring-2 ring-blue-500/20 font-black' : 'border-slate-200 hover:bg-slate-50 text-slate-700 font-bold'"
                 >
-                  <Laptop :size="16" class="mx-auto" />
-                  <span class="text-xs font-bold block">Sistem</span>
+                  <Laptop :size="18" class="mx-auto text-blue-600" />
+                  <span class="text-xs block">💻 Sistem</span>
                 </button>
 
                 <button 
                   type="button" 
-                  @click="activeTheme = 'acik'; showToast('Açık renk şeması yüklendi.')"
-                  class="rounded-xl border p-4 text-center space-y-2 transition shadow-sm"
-                  :style="activeTheme === 'acik' ? 'border-color: #2563EB; background: rgba(37,99,235,0.05); color: #2563EB;' : 'border-color: #E2E8F0;'"
+                  @click="activeTheme = 'acik'; applyTheme('acik'); showToast('Açık renk teması uygulandı.')"
+                  class="rounded-xl border p-4 text-center space-y-2 transition shadow-sm cursor-pointer"
+                  :class="activeTheme === 'acik' ? 'border-blue-600 bg-blue-50/50 text-blue-600 ring-2 ring-blue-500/20 font-black' : 'border-slate-200 hover:bg-slate-50 text-slate-700 font-bold'"
                 >
-                  <Camera :size="16" class="mx-auto" />
-                  <span class="text-xs font-bold block">Açık</span>
+                  <Sun :size="18" class="mx-auto text-amber-500" />
+                  <span class="text-xs block">☀️ Açık</span>
                 </button>
 
                 <button 
                   type="button" 
-                  @click="activeTheme = 'koyu'; showToast('Koyu (Karanlık) tema seçildi.')"
-                  class="rounded-xl border p-4 text-center space-y-2 transition shadow-sm"
-                  :style="activeTheme === 'koyu' ? 'border-color: #2563EB; background: rgba(37,99,235,0.05); color: #2563EB;' : 'border-color: #E2E8F0;'"
+                  @click="activeTheme = 'koyu'; applyTheme('koyu'); showToast('Koyu (Karanlık) tema uygulandı.')"
+                  class="rounded-xl border p-4 text-center space-y-2 transition shadow-sm cursor-pointer"
+                  :class="activeTheme === 'koyu' ? 'border-blue-600 bg-blue-50/50 text-blue-600 ring-2 ring-blue-500/20 font-black' : 'border-slate-200 hover:bg-slate-50 text-slate-700 font-bold'"
                 >
-                  <Video :size="16" class="mx-auto" />
-                  <span class="text-xs font-bold block">Koyu</span>
+                  <Moon :size="18" class="mx-auto text-indigo-500" />
+                  <span class="text-xs block">🌙 Koyu</span>
                 </button>
               </div>
             </div>
@@ -3061,33 +3074,39 @@ function saveProfile() {
             <!-- Form dropdowns -->
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5">Dil</label>
-                <select v-model="selectedLanguage" class="w-full rounded-xl border px-3 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;">
-                  <option value="Türkçe">🇹🇷 Türkçe</option>
-                  <option value="English">🇺🇸 English</option>
+                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5">Dil / Language</label>
+                <select 
+                  v-model="selectedLanguage" 
+                  @change="setLocale(selectedLanguage === 'English' ? 'en' : 'tr')"
+                  class="w-full rounded-xl border px-3 py-2.5 text-xs bg-white outline-none cursor-pointer" 
+                  style="border-color: #E2E8F0;"
+                >
+                  <option value="Türkçe">🇹🇷 TR Türkçe</option>
+                  <option value="English">🇺🇸 EN English</option>
                 </select>
               </div>
 
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5">Saat Formatı</label>
-                <select v-model="timeFormat" class="w-full rounded-xl border px-3 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;">
-                  <option value="24 saat">24 saat</option>
-                  <option value="12 saat">12 saat</option>
+                <select v-model="timeFormat" class="w-full rounded-xl border px-3 py-2.5 text-xs bg-white outline-none cursor-pointer" style="border-color: #E2E8F0;">
+                  <option value="24 saat">24 saat (14:30)</option>
+                  <option value="12 saat">12 saat (02:30 PM)</option>
                 </select>
               </div>
 
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1.5">Saat Dilimi</label>
-                <select v-model="timezone" class="w-full rounded-xl border px-3 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;">
+                <select v-model="timezone" class="w-full rounded-xl border px-3 py-2.5 text-xs bg-white outline-none cursor-pointer" style="border-color: #E2E8F0;">
                   <option value="Europe/Istanbul (GMT+3)">Europe/Istanbul (GMT+3)</option>
                   <option value="Europe/London (GMT)">Europe/London (GMT)</option>
+                  <option value="America/New_York (EST)">America/New_York (EST)</option>
                 </select>
               </div>
             </div>
 
             <div class="flex gap-2 justify-end pt-2">
-              <button type="button" @click="resetPreferences" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-500 bg-white hover:bg-slate-50 transition" style="border-color: #E2E8F0;">Varsayılanlara Sıfırla</button>
-              <button type="button" @click="savePreferences" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-5 py-2 transition shadow">Tercihleri kaydet</button>
+              <button type="button" @click="resetPreferences" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-500 bg-white hover:bg-slate-50 transition cursor-pointer" style="border-color: #E2E8F0;">Varsayılanlara Sıfırla</button>
+              <button type="button" @click="savePreferences" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-black text-xs px-5 py-2 transition shadow cursor-pointer">Tercihleri kaydet</button>
             </div>
           </div>
 
