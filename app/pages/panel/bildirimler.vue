@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { Bell, CheckCircle2, AlertCircle, Info, Trash2, ShieldAlert } from 'lucide-vue-next'
+import { Bell, CheckCircle2, AlertCircle, Info, Trash2, ShieldAlert, Settings } from 'lucide-vue-next'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -69,12 +69,22 @@ function deleteNotification(id: string) {
         <p class="text-sm mt-0.5" style="color: #64748B;">İhaleciBurada platformundaki ihale ve teklif bildirimlerini izleyin</p>
       </div>
 
-      <button 
-        @click="markAllRead"
-        class="text-xs font-bold text-blue-600 hover:text-blue-800 transition bg-blue-50 hover:bg-blue-100/80 px-3.5 py-2 rounded-lg"
-      >
-        Tümünü Okundu İşaretle
-      </button>
+      <div class="flex items-center gap-2.5">
+        <NuxtLink 
+          to="/panel/ayarlar?tab=bildirimler"
+          class="text-xs font-bold text-slate-700 hover:text-blue-600 transition bg-white border border-slate-200 hover:border-slate-300 px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-2xs cursor-pointer"
+        >
+          <Settings :size="13" class="text-slate-500" />
+          <span>Bildirim Ayarları</span>
+        </NuxtLink>
+
+        <button 
+          @click="markAllRead"
+          class="text-xs font-bold text-blue-600 hover:text-blue-800 transition bg-blue-50 hover:bg-blue-100/80 px-3.5 py-2 rounded-xl cursor-pointer"
+        >
+          Tümünü Okundu İşaretle
+        </button>
+      </div>
     </div>
 
     <!-- Bildirim Listesi -->

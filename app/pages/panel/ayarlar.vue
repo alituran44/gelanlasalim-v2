@@ -88,6 +88,7 @@ onMounted(() => {
       if (session.tcKimlik) companyForm.value.tcKimlik = session.tcKimlik
       if (session.iban) companyForm.value.iban = session.iban
       if (session.faturaAdresi) companyForm.value.faturaAdresi = session.faturaAdresi
+      loadNotificationSettings()
     } catch (e) {
       console.error(e)
     }
@@ -640,13 +641,96 @@ function scrollToSection(id: string) {
   }
 }
 
-// Notification toggles
-const notifyMail = ref(true)
-const notifySms = ref(false)
-const notifyBrowser = ref(true)
+// Comprehensive Notification Preferences State
+const notifSettings = ref({
+  // Kanallar (Channels)
+  emailEnabled: true,
+  smsEnabled: true,
+  whatsappEnabled: true,
+  browserPush: true,
+  soundAlerts: true,
+  
+  // Olaylar (Events)
+  newBid: true,
+  counterOffer: true,
+  tenderAwarded: true,
+  deadlineWarning: true,
+  sectorNewTenders: true,
+  escrowUpdates: true,
+  messages: true,
+  weeklyDigest: false,
+  
+  // Tercihler & Saatler
+  frequency: 'instant', // 'instant' | 'daily' | 'weekly'
+  quietHours: true,
+  quietStart: '22:00',
+  quietEnd: '08:00'
+})
+
+// Legacy reactive variables synced
+const notifyMail = computed({
+  get: () => notifSettings.value.emailEnabled,
+  set: (val) => { notifSettings.value.emailEnabled = val }
+})
+const notifySms = computed({
+  get: () => notifSettings.value.smsEnabled,
+  set: (val) => { notifSettings.value.smsEnabled = val }
+})
+const notifyBrowser = computed({
+  get: () => notifSettings.value.browserPush,
+  set: (val) => { notifSettings.value.browserPush = val }
+})
+
+// Load saved notification preferences on mount
+function loadNotificationSettings() {
+  if (typeof window !== 'undefined') {
+    try {
+      const saved = localStorage.getItem('userNotificationPreferences')
+      if (saved) {
+        notifSettings.value = { ...notifSettings.value, ...JSON.parse(saved) }
+      }
+    } catch (e) {}
+  }
+}
+
+function saveNotificationPreferences() {
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('userNotificationPreferences', JSON.stringify(notifSettings.value))
+    const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    session.notificationPreferences = notifSettings.value
+    localStorage.setItem('userSession', JSON.stringify(session))
+  }
+  showToast("Bildirim ve anlık uyarı tercihleriniz başarıyla kaydedildi.", "success")
+}
+
+function enableAllNotifications() {
+  notifSettings.value.emailEnabled = true
+  notifSettings.value.smsEnabled = true
+  notifSettings.value.whatsappEnabled = true
+  notifSettings.value.browserPush = true
+  notifSettings.value.soundAlerts = true
+  notifSettings.value.newBid = true
+  notifSettings.value.counterOffer = true
+  notifSettings.value.tenderAwarded = true
+  notifSettings.value.deadlineWarning = true
+  notifSettings.value.sectorNewTenders = true
+  notifSettings.value.escrowUpdates = true
+  notifSettings.value.messages = true
+  notifSettings.value.weeklyDigest = true
+  saveNotificationPreferences()
+}
+
+function muteAllNotifications() {
+  notifSettings.value.emailEnabled = false
+  notifSettings.value.smsEnabled = false
+  notifSettings.value.whatsappEnabled = false
+  notifSettings.value.browserPush = false
+  notifSettings.value.soundAlerts = false
+  saveNotificationPreferences()
+}
 
 function saveNotifications() {
-  showToast("Bildirim tercihleri güncellendi.")
+  saveNotificationPreferences()
 }
 
 // Sözleşmeler modal & consent checkboxes
@@ -790,25 +874,27 @@ function saveProfile() {
     <!-- Title and Breadcrumbs -->
     <div class="flex flex-col md:flex-row md:items-center justify-between border-b pb-4 gap-4" style="border-color: #F1F5F9;">
       <div>
-        <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">ACCOUNT CENTER</span>
+        <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">HESAP VE PROFİL MERKEZİ</span>
         <h1 class="text-2xl font-black text-slate-800 mt-1" style="color: #0F172A;">
           {{ 
-            activeSubTab === 'kisisel' ? 'Personal Account Center' :
-            activeSubTab === 'sirket' ? 'Company & Verification' :
-            activeSubTab === 'adresler' ? 'Saved Addresses' :
-            activeSubTab === 'takip' ? 'Favorites & Follows' : 
-            activeSubTab === 'uyelik' ? 'Membership Plan' :
-            activeSubTab === 'ayarlar' ? 'Settings' : 'Settings'
+            activeSubTab === 'kisisel' ? 'Kişisel Profil & Hesap Bilgileri' :
+            activeSubTab === 'sirket' ? 'Şirket Bilgileri & Kurumsal Kimlik' :
+            activeSubTab === 'bildirimler' ? 'Bildirim & Anlık Uyarı Tercihleri' :
+            activeSubTab === 'adresler' ? 'Kayıtlı Teslimat & Fatura Adresleri' :
+            activeSubTab === 'takip' ? 'Favoriler & Takip Edilenler' : 
+            activeSubTab === 'uyelik' ? 'Abonelik & Üyelik Planı' :
+            activeSubTab === 'ayarlar' ? 'Güvenlik & Uygulama Tercihleri' : 'Hesap Ayarları'
           }}
         </h1>
         <p class="text-xs text-slate-500 mt-1">
           {{ 
-            activeSubTab === 'kisisel' ? 'Manage your personal profile, media assets, and contact preferences.' :
-            activeSubTab === 'sirket' ? 'Manage your organization details and company verification status.' :
-            activeSubTab === 'adresler' ? 'Manage delivery and billing addresses for fast tender creation.' :
-            activeSubTab === 'takip' ? 'View saved companies and track their latest tender updates.' :
-            activeSubTab === 'uyelik' ? 'Manage your B2B membership packages and active tender quotas.' :
-            'Manage security, appearance, notification, and legal preferences in one place.'
+            activeSubTab === 'kisisel' ? 'Kişisel profilinizi, iletişim bilgilerinizi ve hesap detaylarınızı yönetin.' :
+            activeSubTab === 'sirket' ? 'Firma unvanı, vergi bilgileri, faaliyet sektörleri ve kurumsal belgelerinizi düzenleyin.' :
+            activeSubTab === 'bildirimler' ? 'E-posta, SMS, WhatsApp ve anlık tarayıcı bildirim kanallarını ve ihale uyarılarını kişiselleştirin.' :
+            activeSubTab === 'adresler' ? 'İhale açarken ve teklif verirken kullanılacak fatura ve teslimat adreslerinizi yönetin.' :
+            activeSubTab === 'takip' ? 'Takip ettiğiniz firmaları ve favori ilanlarınızı görüntüleyin.' :
+            activeSubTab === 'uyelik' ? 'B2B ihale paketlerinizi, kalan kullanım haklarınızı ve fatura geçmişinizi inceleyin.' :
+            'Şifre, iki aşamalı doğrulama (2FA), oturumlar, görünüm ve yasal onaylarınızı yönetin.'
           }}
         </p>
       </div>
@@ -820,6 +906,9 @@ function saveProfile() {
         </button>
         <button v-if="activeSubTab === 'sirket'" type="button" @click="showToast('Firma profiliniz önizleniyor...')" class="rounded-lg border px-4 py-2 text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 transition" style="border-color: #E2E8F0;">
           Profili önizle
+        </button>
+        <button v-if="activeSubTab === 'bildirimler'" type="button" @click="saveNotificationPreferences" class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 transition shadow-sm cursor-pointer">
+          <Save :size="14" /> Tercihleri Kaydet
         </button>
 
         <!-- Üyelik summary pill matching design -->
@@ -844,6 +933,30 @@ function saveProfile() {
           </div>
         </div>
       </div>
+    </div>
+
+    <!-- Horizontal Sub-Navigation Tab Bar -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-slate-200">
+      <NuxtLink
+        v-for="tab in [
+          { key: 'kisisel', label: 'Kişisel Profil', icon: User, to: '/panel/ayarlar?tab=kisisel' },
+          { key: 'sirket', label: 'Şirket & Firma', icon: Building2, to: '/panel/ayarlar?tab=sirket' },
+          { key: 'bildirimler', label: 'Bildirim Ayarları', icon: Bell, to: '/panel/ayarlar?tab=bildirimler' },
+          { key: 'adresler', label: 'Kayıtlı Adresler', icon: MapPin, to: '/panel/ayarlar?tab=adresler' },
+          { key: 'takip', label: 'Favoriler & Takip', icon: Heart, to: '/panel/ayarlar?tab=takip' },
+          { key: 'uyelik', label: 'Abonelik & Plan', icon: Award, to: '/panel/ayarlar?tab=uyelik' },
+          { key: 'ayarlar', label: 'Güvenlik & Tercihler', icon: Settings, to: '/panel/ayarlar?tab=ayarlar' }
+        ]"
+        :key="tab.key"
+        :to="tab.to"
+        class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer border"
+        :class="activeSubTab === tab.key 
+          ? 'bg-[#0F223D] text-white border-[#0F223D] shadow-sm' 
+          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'"
+      >
+        <component :is="tab.icon" :size="14" :class="activeSubTab === tab.key ? 'text-[#1EAE4C]' : 'text-slate-400'" />
+        <span>{{ tab.label }}</span>
+      </NuxtLink>
     </div>
 
     <!-- Main Content Area -->
@@ -1841,63 +1954,408 @@ function saveProfile() {
           </div>
         </div>
 
-        <!-- BİLDİRİMLER TAB -->
-        <div v-if="activeSubTab === 'bildirimler'" class="space-y-6">
-          <div class="border-b pb-3" style="border-color: #F1F5F9;">
-            <h2 class="text-lg font-black text-slate-800">Bildirim Tercihleri</h2>
-            <p class="text-xs text-slate-400">Hangi güncellemeleri hangi kanallar üzerinden almak istediğinizi belirtin.</p>
+        <!-- BİLDİRİMLER TAB (NOTIFICATION PREFERENCES CENTER) -->
+        <div v-if="activeSubTab === 'bildirimler'" class="space-y-6 text-left">
+          
+          <!-- Header Banner & Quick Actions -->
+          <div class="rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-50/80 to-slate-50 p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-xs">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <div class="p-2 rounded-xl bg-blue-600 text-white shadow-xs">
+                  <Bell :size="18" />
+                </div>
+                <h2 class="text-base font-black text-slate-900">Bildirim ve Anlık Uyarı Tercihleri</h2>
+              </div>
+              <p class="text-xs text-slate-500 leading-relaxed max-w-2xl">
+                Açtığınız ihaleler, gelen teklifler, canlı eksiltme odaları ve sistem güncellemelerinin hangi iletişim kanalları üzerinden ne sıklıkla iletileceğini buradan özelleştirin.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 shrink-0">
+              <button 
+                type="button" 
+                @click="enableAllNotifications" 
+                class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:border-emerald-500 hover:text-emerald-700 text-slate-700 text-xs font-bold transition cursor-pointer shadow-2xs flex items-center gap-1.5"
+              >
+                <Check :size="13" class="text-emerald-600" /> Tümünü Aç
+              </button>
+              <button 
+                type="button" 
+                @click="muteAllNotifications" 
+                class="px-3.5 py-2 rounded-xl bg-white border border-slate-200 hover:border-rose-400 hover:text-rose-600 text-slate-700 text-xs font-bold transition cursor-pointer shadow-2xs flex items-center gap-1.5"
+              >
+                <X :size="13" class="text-rose-500" /> Tümünü Sessize Al
+              </button>
+              <button 
+                type="button" 
+                @click="saveNotificationPreferences" 
+                class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black transition cursor-pointer shadow-md shadow-blue-600/20 flex items-center gap-1.5"
+              >
+                <Save :size="13" /> Değişiklikleri Kaydet
+              </button>
+            </div>
           </div>
 
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+          <!-- KART 1: İLETİŞİM VE DAĞITIM KANALLARI -->
+          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-5 border-slate-200/80">
             <div class="flex items-center justify-between pb-3 border-b border-slate-100">
               <div>
-                <h4 class="text-xs font-bold text-slate-800">E-posta bildirimleri</h4>
-                <p class="text-[10px] text-slate-400">Yeni teklif geldiğinde, ihale sonuçlandığında e-posta gönderilsin.</p>
+                <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider block">1. İLETİŞİM KANALLARI</span>
+                <h3 class="text-sm font-black text-slate-800 mt-0.5">Bildirim Dağıtım Kanalları</h3>
               </div>
-              <button 
-                type="button" 
-                @click="notifyMail = !notifyMail; showToast(notifyMail ? 'E-posta bildirimleri açıldı.' : 'E-posta bildirimleri sessize alındı.', 'warning')"
-                class="relative h-5 w-9 rounded-full transition-all"
-                :style="notifyMail ? 'background: #003057;' : 'background: #CBD5E1;'"
-              >
-                <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifyMail ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
-              </button>
+              <span class="text-[11px] text-slate-400 font-bold">5 Kanal Aktif</span>
             </div>
 
-            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
-              <div>
-                <h4 class="text-xs font-bold text-slate-800">SMS bildirimleri</h4>
-                <p class="text-[10px] text-slate-400">Önemli sözleşme ve kargo sevkiyat durumları telefona iletilsin.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              <!-- E-Posta -->
+              <div class="p-4 rounded-xl border border-slate-200/90 bg-slate-50/50 flex items-center justify-between gap-4 transition hover:border-slate-300">
+                <div class="space-y-0.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-black text-slate-800">E-Posta Bildirimleri</span>
+                    <span class="text-[9px] bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.2 rounded font-bold">Önerilen</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500">{{ profileForm.email || 'alituran88@gmail.com' }} adresine resmi ihale özetleri ve teklif detayları iletilir.</p>
+                </div>
+                <button 
+                  type="button" 
+                  @click="notifSettings.emailEnabled = !notifSettings.emailEnabled"
+                  class="relative h-6 w-11 rounded-full transition-all shrink-0 cursor-pointer"
+                  :style="notifSettings.emailEnabled ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                >
+                  <span class="absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.emailEnabled ? 'left: 1.5rem;' : 'left: 0.25rem;'"></span>
+                </button>
               </div>
-              <button 
-                type="button" 
-                @click="notifySms = !notifySms; showToast(notifySms ? 'SMS bildirimleri açıldı.' : 'SMS bildirimleri sessize alındı.', 'warning')"
-                class="relative h-5 w-9 rounded-full transition-all"
-                :style="notifySms ? 'background: #003057;' : 'background: #CBD5E1;'"
-              >
-                <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifySms ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
-              </button>
-            </div>
 
-            <div class="flex items-center justify-between">
-              <div>
-                <h4 class="text-xs font-bold text-slate-800">Tarayıcı anlık bildirimleri</h4>
-                <p class="text-[10px] text-slate-400">Yeni mesaj veya canlı etkinlik başladığında tarayıcıda bildirim göster.</p>
+              <!-- SMS -->
+              <div class="p-4 rounded-xl border border-slate-200/90 bg-slate-50/50 flex items-center justify-between gap-4 transition hover:border-slate-300">
+                <div class="space-y-0.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-black text-slate-800">SMS Anlık Mesajları</span>
+                    <span class="text-[9px] bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.2 rounded font-bold">Hızlı Uyarı</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500">+90 {{ profileForm.phone || '543 734 08 60' }} numarasına acil ihale sonuçları ve güvenlik kodları SMS ile iletilir.</p>
+                </div>
+                <button 
+                  type="button" 
+                  @click="notifSettings.smsEnabled = !notifSettings.smsEnabled"
+                  class="relative h-6 w-11 rounded-full transition-all shrink-0 cursor-pointer"
+                  :style="notifSettings.smsEnabled ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                >
+                  <span class="absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.smsEnabled ? 'left: 1.5rem;' : 'left: 0.25rem;'"></span>
+                </button>
               </div>
-              <button 
-                type="button" 
-                @click="notifyBrowser = !notifyBrowser; showToast(notifyBrowser ? 'Tarayıcı bildirimleri açıldı.' : 'Tarayıcı bildirimleri kapatıldı.', 'warning')"
-                class="relative h-5 w-9 rounded-full transition-all"
-                :style="notifyBrowser ? 'background: #003057;' : 'background: #CBD5E1;'"
-              >
-                <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifyBrowser ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
-              </button>
-            </div>
 
-            <div class="flex justify-end pt-2">
-              <button type="button" @click="saveNotifications" class="rounded-xl bg-blue-600 text-white font-bold text-xs px-6 py-2.5 hover:bg-blue-700 transition">Bildirimleri Kaydet</button>
+              <!-- WhatsApp -->
+              <div class="p-4 rounded-xl border border-slate-200/90 bg-slate-50/50 flex items-center justify-between gap-4 transition hover:border-slate-300">
+                <div class="space-y-0.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-black text-slate-800">WhatsApp Kurumsal Bildirimleri</span>
+                    <span class="text-[9px] bg-emerald-50 text-emerald-700 border border-emerald-200 px-1.5 py-0.2 rounded font-bold">Yeni</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500">İhale davet linkleri ve teklif durum özetleri WhatsApp üzerinden anlık mesaj olarak gönderilir.</p>
+                </div>
+                <button 
+                  type="button" 
+                  @click="notifSettings.whatsappEnabled = !notifSettings.whatsappEnabled"
+                  class="relative h-6 w-11 rounded-full transition-all shrink-0 cursor-pointer"
+                  :style="notifSettings.whatsappEnabled ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                >
+                  <span class="absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.whatsappEnabled ? 'left: 1.5rem;' : 'left: 0.25rem;'"></span>
+                </button>
+              </div>
+
+              <!-- Web Push -->
+              <div class="p-4 rounded-xl border border-slate-200/90 bg-slate-50/50 flex items-center justify-between gap-4 transition hover:border-slate-300">
+                <div class="space-y-0.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-black text-slate-800">Tarayıcı & Web Push</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500">Masaüstü ve mobil tarayıcınızda sağ altta canlı bildirim kartları gösterilir.</p>
+                </div>
+                <button 
+                  type="button" 
+                  @click="notifSettings.browserPush = !notifSettings.browserPush"
+                  class="relative h-6 w-11 rounded-full transition-all shrink-0 cursor-pointer"
+                  :style="notifSettings.browserPush ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                >
+                  <span class="absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.browserPush ? 'left: 1.5rem;' : 'left: 0.25rem;'"></span>
+                </button>
+              </div>
+
+              <!-- Sesli Teklif Zili -->
+              <div class="p-4 rounded-xl border border-slate-200/90 bg-slate-50/50 flex items-center justify-between gap-4 transition hover:border-slate-300 md:col-span-2">
+                <div class="space-y-0.5">
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-black text-slate-800">Sesli Teklif Zili & Canlı Eksiltme Uyarısı</span>
+                    <span class="text-[9px] bg-purple-50 text-purple-700 border border-purple-200 px-1.5 py-0.2 rounded font-bold">Canlı Oda</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500">Paneliniz açıkken veya canlı eksiltme odasında yeni bir teklif verildiğinde sesli bildirim tonu çalar.</p>
+                </div>
+                <button 
+                  type="button" 
+                  @click="notifSettings.soundAlerts = !notifSettings.soundAlerts"
+                  class="relative h-6 w-11 rounded-full transition-all shrink-0 cursor-pointer"
+                  :style="notifSettings.soundAlerts ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                >
+                  <span class="absolute top-1 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.soundAlerts ? 'left: 1.5rem;' : 'left: 0.25rem;'"></span>
+                </button>
+              </div>
+
             </div>
           </div>
+
+          <!-- KART 2: İHALE VE SATIN ALMA OLAYLARI -->
+          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-5 border-slate-200/80">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider block">2. İHALE & TİCARİ OLAYLAR</span>
+                <h3 class="text-sm font-black text-slate-800 mt-0.5">Hangi Durumlarda Bildirim Almak İstiyorsunuz?</h3>
+              </div>
+            </div>
+
+            <div class="divide-y divide-slate-100">
+              
+              <!-- Olay 1: Yeni Teklif -->
+              <div class="py-3.5 flex items-center justify-between gap-4">
+                <div class="space-y-0.5">
+                  <div class="text-xs font-bold text-slate-800">Yeni Teklif Geldiğinde</div>
+                  <div class="text-[11px] text-slate-500">Açtığınız bir ihaleye tedarikçiler yeni bir fiyat teklifi sunduğunda.</div>
+                </div>
+                <button 
+                  type="button" 
+                  @click="notifSettings.newBid = !notifSettings.newBid"
+                  class="relative h-5 w-9 rounded-full transition-all shrink-0 cursor-pointer"
+                  :style="notifSettings.newBid ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                >
+                  <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.newBid ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
+                </button>
+              </div>
+
+              <!-- Olay 2: Karşı Teklif / İndirim -->
+              <div class="py-3.5 flex items-center justify-between gap-4">
+                <div class="space-y-0.5">
+                  <div class="text-xs font-bold text-slate-800">Karşı Teklif & Fiyat İndirimi Yapıldığında</div>
+                  <div class="text-[11px] text-slate-500">Canlı eksiltme odasında lider teklif değiştiğinde veya karşı teklif iletildiğinde.</div>
+                </div>
+                <button 
+                  type="button" 
+                  @click="notifSettings.counterOffer = !notifSettings.counterOffer"
+                  class="relative h-5 w-9 rounded-full transition-all shrink-0 cursor-pointer"
+                  :style="notifSettings.counterOffer ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                >
+                  <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.counterOffer ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
+                </button>
+              </div>
+
+              <!-- Olay 3: İhale Sonuçlanması -->
+              <div class="py-3.5 flex items-center justify-between gap-4">
+                <div class="space-y-0.5">
+                  <div class="text-xs font-bold text-slate-800">İhale Sonuçlanması & Kazanan İlanı</div>
+                  <div class="text-[11px] text-slate-500">Teklif verdiğiniz veya açtığınız ihale tamamlandığında ve kazanan firma onaylandığında.</div>
+                </div>
+                <button 
+                  type="button" 
+                  @click="notifSettings.tenderAwarded = !notifSettings.tenderAwarded"
+                  class="relative h-5 w-9 rounded-full transition-all shrink-0 cursor-pointer"
+                  :style="notifSettings.tenderAwarded ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                >
+                  <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.tenderAwarded ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
+                </button>
+              </div>
+
+              <!-- Olay 4: Süre Uyarısı -->
+              <div class="py-3.5 flex items-center justify-between gap-4">
+                <div class="space-y-0.5">
+                  <div class="text-xs font-bold text-slate-800">İhale Süresi Bitiş Hatırlatması</div>
+                  <div class="text-[11px] text-slate-500">Takip ettiğiniz veya teklif verdiğiniz ihalelerin bitmesine son 24 saat ve 1 saat kala.</div>
+                </div>
+                <button 
+                  type="button" 
+                  @click="notifSettings.deadlineWarning = !notifSettings.deadlineWarning"
+                  class="relative h-5 w-9 rounded-full transition-all shrink-0 cursor-pointer"
+                  :style="notifSettings.deadlineWarning ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                >
+                  <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.deadlineWarning ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
+                </button>
+              </div>
+
+              <!-- Olay 5: Sektörel İhaleler -->
+              <div class="py-3.5 flex items-center justify-between gap-4">
+                <div class="space-y-0.5">
+                  <div class="text-xs font-bold text-slate-800">Sektörünüze Özel Yeni İhale Duyuruları</div>
+                  <div class="text-[11px] text-slate-500">Profilinizde seçtiğiniz faaliyet sektörlerine uygun yeni bir satın alma talebi açıldığında.</div>
+                </div>
+                <button 
+                  type="button" 
+                  @click="notifSettings.sectorNewTenders = !notifSettings.sectorNewTenders"
+                  class="relative h-5 w-9 rounded-full transition-all shrink-0 cursor-pointer"
+                  :style="notifSettings.sectorNewTenders ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                >
+                  <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.sectorNewTenders ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
+                </button>
+              </div>
+
+              <!-- Olay 6: Escrow & Ödeme / Kargo -->
+              <div class="py-3.5 flex items-center justify-between gap-4">
+                <div class="space-y-0.5">
+                  <div class="text-xs font-bold text-slate-800">Escrow & Güvenli Havuz / Kargo Teslimat Onayları</div>
+                  <div class="text-[11px] text-slate-500">Sipariş ödemesi havuza alındığında, kargo takip no girildiğinde veya mal kabulü yapıldığında.</div>
+                </div>
+                <button 
+                  type="button" 
+                  @click="notifSettings.escrowUpdates = !notifSettings.escrowUpdates"
+                  class="relative h-5 w-9 rounded-full transition-all shrink-0 cursor-pointer"
+                  :style="notifSettings.escrowUpdates ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                >
+                  <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.escrowUpdates ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
+                </button>
+              </div>
+
+              <!-- Olay 7: Mesajlaşma -->
+              <div class="py-3.5 flex items-center justify-between gap-4">
+                <div class="space-y-0.5">
+                  <div class="text-xs font-bold text-slate-800">Doğrudan Mesajlar & İhale Soru-Cevapları</div>
+                  <div class="text-[11px] text-slate-500">Alıcı veya tedarikçi firmalar ihale kapsamında size yeni bir mesaj gönderdiğinde.</div>
+                </div>
+                <button 
+                  type="button" 
+                  @click="notifSettings.messages = !notifSettings.messages"
+                  class="relative h-5 w-9 rounded-full transition-all shrink-0 cursor-pointer"
+                  :style="notifSettings.messages ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                >
+                  <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.messages ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
+                </button>
+              </div>
+
+              <!-- Olay 8: Haftalık Bülten -->
+              <div class="py-3.5 flex items-center justify-between gap-4">
+                <div class="space-y-0.5">
+                  <div class="text-xs font-bold text-slate-800">Haftalık Pazar Yeri & Tasarruf Analiz Bülteni</div>
+                  <div class="text-[11px] text-slate-500">Her Pazartesi sektörel fiyat değişimleri ve popüler ihaleleri içeren e-posta özeti.</div>
+                </div>
+                <button 
+                  type="button" 
+                  @click="notifSettings.weeklyDigest = !notifSettings.weeklyDigest"
+                  class="relative h-5 w-9 rounded-full transition-all shrink-0 cursor-pointer"
+                  :style="notifSettings.weeklyDigest ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                >
+                  <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.weeklyDigest ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
+                </button>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- KART 3: SIKLIK & SESSİZ SAATLER -->
+          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-5 border-slate-200/80">
+            <div class="pb-3 border-b border-slate-100">
+              <span class="text-[9px] font-black text-blue-600 uppercase tracking-wider block">3. ZAMANLAMA VE SIKLIK</span>
+              <h3 class="text-sm font-black text-slate-800 mt-0.5">Bildirim Gönderim Sıklığı ve Rahatsız Etmeme Modu</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              
+              <!-- Gönderim Sıklığı -->
+              <div class="space-y-3">
+                <label class="block text-xs font-bold text-slate-700">Bildirim İletim Sıklığı</label>
+                <div class="space-y-2">
+                  <label 
+                    class="flex items-center gap-3 p-3 rounded-xl border text-xs font-medium cursor-pointer transition"
+                    :class="notifSettings.frequency === 'instant' ? 'border-blue-500 bg-blue-50/50 text-blue-950 font-bold' : 'border-slate-200 text-slate-700 hover:bg-slate-50'"
+                  >
+                    <input type="radio" v-model="notifSettings.frequency" value="instant" class="text-blue-600" />
+                    <div>
+                      <div>⚡ Anında İletim (Önerilen)</div>
+                      <div class="text-[10px] text-slate-400 font-normal">Her yeni teklifte ve olayda anında bildirim gönderilir.</div>
+                    </div>
+                  </label>
+
+                  <label 
+                    class="flex items-center gap-3 p-3 rounded-xl border text-xs font-medium cursor-pointer transition"
+                    :class="notifSettings.frequency === 'daily' ? 'border-blue-500 bg-blue-50/50 text-blue-950 font-bold' : 'border-slate-200 text-slate-700 hover:bg-slate-50'"
+                  >
+                    <input type="radio" v-model="notifSettings.frequency" value="daily" class="text-blue-600" />
+                    <div>
+                      <div>🕒 Günlük Özet</div>
+                      <div class="text-[10px] text-slate-400 font-normal">Günde 1 kez saat 18:00'de toplu bildirim özeti gönderilir.</div>
+                    </div>
+                  </label>
+
+                  <label 
+                    class="flex items-center gap-3 p-3 rounded-xl border text-xs font-medium cursor-pointer transition"
+                    :class="notifSettings.frequency === 'weekly' ? 'border-blue-500 bg-blue-50/50 text-blue-950 font-bold' : 'border-slate-200 text-slate-700 hover:bg-slate-50'"
+                  >
+                    <input type="radio" v-model="notifSettings.frequency" value="weekly" class="text-blue-600" />
+                    <div>
+                      <div>📅 Haftalık Özet</div>
+                      <div class="text-[10px] text-slate-400 font-normal">Haftada bir kez Pazartesi sabahı haftalık bülten iletilir.</div>
+                    </div>
+                  </label>
+                </div>
+              </div>
+
+              <!-- Sessiz Saatler -->
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <label class="block text-xs font-bold text-slate-700">Gece Sessiz Saatler (DND)</label>
+                  <button 
+                    type="button" 
+                    @click="notifSettings.quietHours = !notifSettings.quietHours"
+                    class="relative h-5 w-9 rounded-full transition-all shrink-0 cursor-pointer"
+                    :style="notifSettings.quietHours ? 'background: #1EAE4C;' : 'background: #CBD5E1;'"
+                  >
+                    <span class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all" :style="notifSettings.quietHours ? 'left: 1.25rem;' : 'left: 0.125rem;'"></span>
+                  </button>
+                </div>
+
+                <div class="p-4 rounded-xl border border-slate-200/90 bg-slate-50/60 space-y-3">
+                  <p class="text-[11px] text-slate-500 leading-relaxed">
+                    Belirlenen saat aralığında cep telefonunuza SMS ve sesli çağrı/alarm iletilmez; bildirimler sessizce e-posta kutunuza ve panelinize kaydedilir.
+                  </p>
+                  
+                  <div class="grid grid-cols-2 gap-3 pt-1">
+                    <div>
+                      <span class="text-[10px] font-bold text-slate-400 block mb-1">Başlangıç Saati</span>
+                      <input 
+                        v-model="notifSettings.quietStart" 
+                        type="time" 
+                        :disabled="!notifSettings.quietHours"
+                        class="w-full rounded-lg border p-2 text-xs bg-white border-slate-200 outline-none font-mono"
+                      />
+                    </div>
+                    <div>
+                      <span class="text-[10px] font-bold text-slate-400 block mb-1">Bitiş Saati</span>
+                      <input 
+                        v-model="notifSettings.quietEnd" 
+                        type="time" 
+                        :disabled="!notifSettings.quietHours"
+                        class="w-full rounded-lg border p-2 text-xs bg-white border-slate-200 outline-none font-mono"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Bottom Save Actions -->
+          <div class="flex items-center justify-between p-4 rounded-2xl bg-white border border-slate-200 shadow-sm">
+            <div class="flex items-center gap-2 text-xs text-slate-500">
+              <CheckCircle2 :size="15" class="text-emerald-500" />
+              <span>Bildirim ayarlarınız anında hesabınızla eşitlenir.</span>
+            </div>
+            <button 
+              type="button" 
+              @click="saveNotificationPreferences" 
+              class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black transition cursor-pointer shadow-md shadow-blue-600/20 flex items-center gap-2"
+            >
+              <Save :size="14" />
+              Bildirim Tercihlerini Kaydet
+            </button>
+          </div>
+
         </div>
 
         <!-- ÜYELİK TAB (Photo 2 Design: 4 Packages + Switcher + Security Strip + Standard Features) -->
@@ -2640,18 +3098,30 @@ function saveProfile() {
                 <Bell :size="15" class="text-blue-600" />
                 <div>
                   <span class="text-[8px] font-black text-slate-300 block">BİLDİRİM TERCİHLERİ</span>
-                  <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Bildirim Tercihleri</h3>
+                  <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Bildirim & Uyarı Ayarları</h3>
                 </div>
               </div>
-              <button type="button" @click="notifyMail = true; notifySms = true; notifyBrowser = true; showToast('Tüm alıcı bildirimleri açıldı.')" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold text-slate-700 bg-white hover:bg-slate-100" style="border-color: #E2E8F0;">
-                Alıcı Bildirimlerini Al
-              </button>
+              <NuxtLink 
+                to="/panel/ayarlar?tab=bildirimler"
+                class="rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 px-3 py-1.5 text-[11px] font-bold transition flex items-center gap-1"
+              >
+                Tam Ekran Yönet →
+              </NuxtLink>
             </div>
-            <p class="text-[10px] text-slate-400 leading-normal">
-              E-posta, uygulama içi ve anlık bildirim tercihlerinizi yönetin.
+            <p class="text-xs text-slate-500 leading-normal">
+              E-posta, SMS, WhatsApp, Web Push ve sesli uyarı kanallarınızı detaylı olarak yapılandırın.
             </p>
-            <div class="p-4 rounded-xl bg-slate-50 border text-[10px] text-slate-400 text-center" style="border-color: #E2E8F0;">
-              Bildirim kanalları, sessiz saatler ve kategori tercihleri için bir ekrandan yönetilir.
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+              <div class="space-y-0.5 text-slate-600 font-medium">
+                <div>E-Posta: <strong class="text-slate-800">{{ notifSettings.emailEnabled ? 'Açık' : 'Kapalı' }}</strong> · SMS: <strong class="text-slate-800">{{ notifSettings.smsEnabled ? 'Açık' : 'Kapalı' }}</strong> · WhatsApp: <strong class="text-slate-800">{{ notifSettings.whatsappEnabled ? 'Açık' : 'Kapalı' }}</strong></div>
+                <div class="text-[11px] text-slate-400">Sıklık: {{ notifSettings.frequency === 'instant' ? 'Anında İletim' : (notifSettings.frequency === 'daily' ? 'Günlük Özet' : 'Haftalık Özet') }}</div>
+              </div>
+              <NuxtLink 
+                to="/panel/ayarlar?tab=bildirimler" 
+                class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs transition shadow-sm shrink-0"
+              >
+                Bildirim Ayarlarını Düzenle →
+              </NuxtLink>
             </div>
           </div>
 
