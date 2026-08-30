@@ -218,7 +218,7 @@ onMounted(() => {
 
       </div>
 
-      <!-- ALT İKİNCİ ŞERİT: YENİ ÜYELİK, GİRİŞ YAP, MİSAFİR GİRİŞİ, ÜYELİK UZAT & İHALE AÇ -->
+      <!-- ALT İKİNCİ ŞERİT: YENİ ÜYELİK, GİRİŞ YAP, ÜYELİK UZAT & İHALE AÇ -->
       <div class="max-w-[1400px] mx-auto mt-2 pt-2 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-3">
         
         <!-- Sol: Kurumsal Butonlar Grubu -->
@@ -233,12 +233,7 @@ onMounted(() => {
             <span>🔑 Giriş Yap</span>
           </NuxtLink>
 
-          <!-- 3. Misafir Girişi -->
-          <NuxtLink to="/uyelik?tab=guest" class="px-3.5 py-1.5 rounded-lg bg-[#B45309] hover:bg-[#92400E] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-amber-700/30 transition">
-            <span>👁️ Misafir Girişi</span>
-          </NuxtLink>
-
-          <!-- 4. Üyelik Uzat -->
+          <!-- 3. Üyelik Uzat -->
           <NuxtLink to="/abonelik" class="px-3.5 py-1.5 rounded-lg bg-[#0284C7] hover:bg-[#0369A1] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-sky-700/30 transition">
             <span>🔄 Üyelik uzat</span>
           </NuxtLink>
