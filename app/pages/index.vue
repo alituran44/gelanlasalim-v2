@@ -183,7 +183,7 @@ const all81Cities = [
 
 // ==================== 3. BÜTÜN İDARELER LİSTESİ (TAM VE EKSİKSİZ) ====================
 const allAuthoritiesList = [
-  // --- BAKANLIKLAR & MERKEZİ İDARELER ---
+  // ==================== 🏛️ 1. BAKANLIKLAR & MERKEZİ BAŞKANLIKLAR ====================
   { name: 'T.C. Sağlık Bakanlığı', type: 'Bakanlık', city: 'Ankara', icon: '🏛️' },
   { name: 'T.C. Milli Eğitim Bakanlığı', type: 'Bakanlık', city: 'Ankara', icon: '🏛️' },
   { name: 'T.C. Ulaştırma ve Altyapı Bakanlığı', type: 'Bakanlık', city: 'Ankara', icon: '🏛️' },
@@ -203,44 +203,67 @@ const allAuthoritiesList = [
   { name: 'Savunma Sanayii Başkanlığı (SSB)', type: 'Bakanlık', city: 'Ankara', icon: '🛡️' },
   { name: 'AFAD Afet ve Acil Durum Yönetimi Başkanlığı', type: 'Bakanlık', city: 'Ankara', icon: '🚨' },
   { name: 'Kamu İhale Kurumu (KİK)', type: 'Bakanlık', city: 'Ankara', icon: '📜' },
-  
-  // --- GENEL MÜDÜRLÜKLER, KİT & KAMU KURULUŞLARI ---
-  { name: 'Devlet Su İşleri (DSİ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '💧' },
-  { name: 'Karayolları Genel Müdürlüğü (KGM)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🛣️' },
-  { name: 'Toplu Konut İdaresi Başkanlığı (TOKİ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🏗️' },
-  { name: 'Emlak Konut GYO A.Ş.', type: 'Genel Müdürlük & KİT', city: 'İstanbul', icon: '🏢' },
-  { name: 'İller Bankası A.Ş. (İLBANK)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🏦' },
-  { name: 'Orman Genel Müdürlüğü (OGM)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🌲' },
-  { name: 'T.C. Devlet Demiryolları (TCDD)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🚆' },
-  { name: 'TCDD Taşımacılık A.Ş.', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🚂' },
-  { name: 'Türkiye Elektrik İletim A.Ş. (TEİAŞ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⚡' },
-  { name: 'Türkiye Elektrik Dağıtım A.Ş. (TEDAŞ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⚡' },
-  { name: 'Elektrik Üretim A.Ş. (EÜAŞ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⚡' },
-  { name: 'Boru Hatları ile Petrol Taşıma A.Ş. (BOTAŞ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⛽' },
-  { name: 'Türkiye Petrolleri Anonim Ortaklığı (TPAO)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🛢️' },
-  { name: 'Eti Maden İşletmeleri Genel Müdürlüğü', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⛏️' },
-  { name: 'Türkiye Kömür İşletmeleri Kurumu (TKİ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⛏️' },
-  { name: 'Türkiye Taşkömürü Kurumu (TTK)', type: 'Genel Müdürlük & KİT', city: 'Zonguldak', icon: '⛏️' },
-  { name: 'Makina ve Kimya Endüstrisi A.Ş. (MKE)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⚙️' },
-  { name: 'ASELSAN Elektronik Sanayi', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🛰️' },
-  { name: 'HAVELSAN Hava Elektronik Sanayi', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '💻' },
-  { name: 'ROKETSAN Roket Sanayii', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🚀' },
-  { name: 'TUSAŞ Türk Havacılık ve Uzay Sanayii', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '✈️' },
-  { name: 'STM Savunma Teknolojileri', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🛡️' },
-  { name: 'TÜRASAŞ Türkiye Raylı Sistem Araçları', type: 'Genel Müdürlük & KİT', city: 'Sakarya', icon: '🚆' },
-  { name: 'Devlet Hava Meydanları İşletmesi (DHMİ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🛫' },
-  { name: 'Kıyı Emniyeti Genel Müdürlüğü (KEGM)', type: 'Genel Müdürlük & KİT', city: 'İstanbul', icon: '⚓' },
-  { name: 'Vakıflar Genel Müdürlüğü', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🕌' },
-  { name: 'Türk Kızılayı Genel Müdürlüğü', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🩸' },
-  { name: 'Posta ve Telgraf Teşkilatı A.Ş. (PTT)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '📮' },
-  { name: 'Tarım İşletmeleri Genel Müdürlüğü (TİGEM)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🌾' },
-  { name: 'Toprak Mahsulleri Ofisi (TMO)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🌽' },
-  { name: 'Çay İşletmeleri Genel Müdürlüğü (ÇAYKUR)', type: 'Genel Müdürlük & KİT', city: 'Rize', icon: '🌱' },
-  { name: 'Türkiye Şeker Fabrikaları (TÜRKŞEKER)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🏭' },
-  { name: 'Et ve Süt Kurumu Genel Müdürlüğü (ESK)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🥩' },
-  { name: 'Maden Tetkik ve Arama (MTA)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🗺️' },
+  { name: 'Gelir İdaresi Başkanlığı (GİB)', type: 'Bakanlık', city: 'Ankara', icon: '📑' },
+  { name: 'TÜBİTAK Başkanlığı', type: 'Bakanlık', city: 'Ankara', icon: '🔬' },
+  { name: 'Diyanet İşleri Başkanlığı', type: 'Bakanlık', city: 'Ankara', icon: '🕌' },
 
-  // --- BÜYÜKŞEHİR VE İL BELEDİYELERİ ---
+  // ==================== 🌾 2. İL ÖZEL İDARELERİ (81 İL ÖZEL İDARESİ) ====================
+  { name: 'Çanakkale İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Çanakkale', icon: '🌾' },
+  { name: 'Balıkesir İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Balıkesir', icon: '🌾' },
+  { name: 'Edirne İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Edirne', icon: '🌾' },
+  { name: 'Kırklareli İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Kırklareli', icon: '🌾' },
+  { name: 'Tekirdağ İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Tekirdağ', icon: '🌾' },
+  { name: 'Bolu İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Bolu', icon: '🌾' },
+  { name: 'Sivas İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Sivas', icon: '🌾' },
+  { name: 'Afyonkarahisar İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Afyonkarahisar', icon: '🌾' },
+  { name: 'Kastamonu İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Kastamonu', icon: '🌾' },
+  { name: 'Kütahya İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Kütahya', icon: '🌾' },
+  { name: 'Zonguldak İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Zonguldak', icon: '🌾' },
+  { name: 'Rize İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Rize', icon: '🌾' },
+  { name: 'Trabzon İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Trabzon', icon: '🌾' },
+  { name: 'Erzurum İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Erzurum', icon: '🌾' },
+  { name: 'Van İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Van', icon: '🌾' },
+  { name: 'Elazığ İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Elazığ', icon: '🌾' },
+  { name: 'Isparta İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Isparta', icon: '🌾' },
+  { name: 'Çorum İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Çorum', icon: '🌾' },
+  { name: 'Yozgat İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Yozgat', icon: '🌾' },
+  { name: 'Tokat İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Tokat', icon: '🌾' },
+  { name: 'Nevşehir İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Nevşehir', icon: '🌾' },
+  { name: 'Amasya İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Amasya', icon: '🌾' },
+  { name: 'Giresun İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Giresun', icon: '🌾' },
+  { name: 'Sinop İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Sinop', icon: '🌾' },
+  { name: 'Artvin İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Artvin', icon: '🌾' },
+  { name: 'Uşak İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Uşak', icon: '🌾' },
+  { name: 'Bilecik İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Bilecik', icon: '🌾' },
+  { name: 'Düzce İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Düzce', icon: '🌾' },
+  { name: 'Yalova İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Yalova', icon: '🌾' },
+  { name: 'Karabük İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Karabük', icon: '🌾' },
+  { name: 'Bartın İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Bartın', icon: '🌾' },
+  { name: 'Çankırı İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Çankırı', icon: '🌾' },
+  { name: 'Kırşehir İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Kırşehir', icon: '🌾' },
+  { name: 'Kırıkkale İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Kırıkkale', icon: '🌾' },
+  { name: 'Niğde İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Niğde', icon: '🌾' },
+  { name: 'Aksaray İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Aksaray', icon: '🌾' },
+  { name: 'Karaman İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Karaman', icon: '🌾' },
+  { name: 'Burdur İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Burdur', icon: '🌾' },
+  { name: 'Gümüşhane İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Gümüşhane', icon: '🌾' },
+  { name: 'Bayburt İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Bayburt', icon: '🌾' },
+  { name: 'Kars İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Kars', icon: '🌾' },
+  { name: 'Iğdır İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Iğdır', icon: '🌾' },
+  { name: 'Ardahan İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Ardahan', icon: '🌾' },
+  { name: 'Ağrı İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Ağrı', icon: '🌾' },
+  { name: 'Muş İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Muş', icon: '🌾' },
+  { name: 'Bitlis İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Bitlis', icon: '🌾' },
+  { name: 'Bingöl İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Bingöl', icon: '🌾' },
+  { name: 'Tunceli İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Tunceli', icon: '🌾' },
+  { name: 'Hakkari İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Hakkari', icon: '🌾' },
+  { name: 'Şırnak İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Şırnak', icon: '🌾' },
+  { name: 'Batman İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Batman', icon: '🌾' },
+  { name: 'Siirt İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Siirt', icon: '🌾' },
+  { name: 'Adıyaman İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Adıyaman', icon: '🌾' },
+  { name: 'Kilis İl Özel İdaresi', type: 'İl Özel İdaresi', city: 'Kilis', icon: '🌾' },
+
+  // ==================== 🏙️ 3. BÜYÜKŞEHİR, İL VE İLÇE BELEDİYELERİ ====================
   { name: 'Çanakkale Belediyesi', type: 'Belediye', city: 'Çanakkale', icon: '🏛️' },
   { name: 'İstanbul Büyükşehir Belediyesi (İBB)', type: 'Belediye', city: 'İstanbul', icon: '🏛️' },
   { name: 'Ankara Büyükşehir Belediyesi (ABB)', type: 'Belediye', city: 'Ankara', icon: '🏛️' },
@@ -282,8 +305,72 @@ const allAuthoritiesList = [
   { name: 'Batman Belediyesi', type: 'Belediye', city: 'Batman', icon: '🏛️' },
   { name: 'Yalova Belediyesi', type: 'Belediye', city: 'Yalova', icon: '🏛️' },
   { name: 'Düzce Belediyesi', type: 'Belediye', city: 'Düzce', icon: '🏛️' },
+  { name: 'Çanakkale Biga Belediyesi', type: 'Belediye', city: 'Çanakkale', icon: '🏛️' },
+  { name: 'Çanakkale Gelibolu Belediyesi', type: 'Belediye', city: 'Çanakkale', icon: '🏛️' },
+  { name: 'Çanakkale Çan Belediyesi', type: 'Belediye', city: 'Çanakkale', icon: '🏛️' },
+  { name: 'Balıkesir Bandırma Belediyesi', type: 'Belediye', city: 'Balıkesir', icon: '🏛️' },
+  { name: 'Balıkesir Edremit Belediyesi', type: 'Belediye', city: 'Balıkesir', icon: '🏛️' },
+  { name: 'Bursa Nilüfer Belediyesi', type: 'Belediye', city: 'Bursa', icon: '🏛️' },
+  { name: 'Bursa Osmangazi Belediyesi', type: 'Belediye', city: 'Bursa', icon: '🏛️' },
+  { name: 'İstanbul Kadıköy Belediyesi', type: 'Belediye', city: 'İstanbul', icon: '🏛️' },
+  { name: 'İstanbul Üsküdar Belediyesi', type: 'Belediye', city: 'İstanbul', icon: '🏛️' },
+  { name: 'İstanbul Başakşehir Belediyesi', type: 'Belediye', city: 'İstanbul', icon: '🏛️' },
+  { name: 'Ankara Çankaya Belediyesi', type: 'Belediye', city: 'Ankara', icon: '🏛️' },
+  { name: 'Ankara Yenimahalle Belediyesi', type: 'Belediye', city: 'Ankara', icon: '🏛️' },
+  { name: 'İzmir Konak Belediyesi', type: 'Belediye', city: 'İzmir', icon: '🏛️' },
+  { name: 'İzmir Karşıyaka Belediyesi', type: 'Belediye', city: 'İzmir', icon: '🏛️' },
 
-  // --- ÜNİVERSİTELER & TEKNOPARKLAR ---
+  // ==================== ⚙️ 4. GENEL MÜDÜRLÜKLER & KİT KAMU KURULUŞLARI ====================
+  { name: 'Devlet Su İşleri (DSİ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '💧' },
+  { name: 'Karayolları Genel Müdürlüğü (KGM)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🛣️' },
+  { name: 'Toplu Konut İdaresi Başkanlığı (TOKİ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🏗️' },
+  { name: 'Emlak Konut GYO A.Ş.', type: 'Genel Müdürlük & KİT', city: 'İstanbul', icon: '🏢' },
+  { name: 'İller Bankası A.Ş. (İLBANK)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🏦' },
+  { name: 'Orman Genel Müdürlüğü (OGM)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🌲' },
+  { name: 'T.C. Devlet Demiryolları (TCDD)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🚆' },
+  { name: 'TCDD Taşımacılık A.Ş.', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🚂' },
+  { name: 'Türkiye Elektrik İletim A.Ş. (TEİAŞ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⚡' },
+  { name: 'Türkiye Elektrik Dağıtım A.Ş. (TEDAŞ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⚡' },
+  { name: 'Elektrik Üretim A.Ş. (EÜAŞ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⚡' },
+  { name: 'Boru Hatları ile Petrol Taşıma A.Ş. (BOTAŞ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⛽' },
+  { name: 'Türkiye Petrolleri Anonim Ortaklığı (TPAO)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🛢️' },
+  { name: 'Eti Maden İşletmeleri Genel Müdürlüğü', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⛏️' },
+  { name: 'Türkiye Kömür İşletmeleri Kurumu (TKİ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⛏️' },
+  { name: 'Türkiye Taşkömürü Kurumu (TTK)', type: 'Genel Müdürlük & KİT', city: 'Zonguldak', icon: '⛏️' },
+  { name: 'Makina ve Kimya Endüstrisi A.Ş. (MKE)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '⚙️' },
+  { name: 'ASELSAN Elektronik Sanayi', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🛰️' },
+  { name: 'HAVELSAN Hava Elektronik Sanayi', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '💻' },
+  { name: 'ROKETSAN Roket Sanayii', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🚀' },
+  { name: 'TUSAŞ Türk Havacılık ve Uzay Sanayii', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '✈️' },
+  { name: 'STM Savunma Teknolojileri', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🛡️' },
+  { name: 'TÜRASAŞ Türkiye Raylı Sistem Araçları', type: 'Genel Müdürlük & KİT', city: 'Sakarya', icon: '🚆' },
+  { name: 'Devlet Hava Meydanları İşletmesi (DHMİ)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🛫' },
+  { name: 'Kıyı Emniyeti Genel Müdürlüğü (KEGM)', type: 'Genel Müdürlük & KİT', city: 'İstanbul', icon: '⚓' },
+  { name: 'Vakıflar Genel Müdürlüğü', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🕌' },
+  { name: 'Türk Kızılayı Genel Müdürlüğü', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🩸' },
+  { name: 'Posta ve Telgraf Teşkilatı A.Ş. (PTT)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '📮' },
+  { name: 'Tarım İşletmeleri Genel Müdürlüğü (TİGEM)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🌾' },
+  { name: 'Toprak Mahsulleri Ofisi (TMO)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🌽' },
+  { name: 'Çay İşletmeleri Genel Müdürlüğü (ÇAYKUR)', type: 'Genel Müdürlük & KİT', city: 'Rize', icon: '🌱' },
+  { name: 'Türkiye Şeker Fabrikaları (TÜRKŞEKER)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🏭' },
+  { name: 'Et ve Süt Kurumu Genel Müdürlüğü (ESK)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🥩' },
+  { name: 'Maden Tetkik ve Arama (MTA)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🗺️' },
+  { name: 'Tapu ve Kadastro Genel Müdürlüğü (TKGM)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '📑' },
+  { name: 'Meteoroloji Genel Müdürlüğü (MGM)', type: 'Genel Müdürlük & KİT', city: 'Ankara', icon: '🌤️' },
+
+  // ==================== 🏛️ 5. VALİLİKLER & KAYMAKAMLIKLAR (YİKOB) ====================
+  { name: 'Çanakkale Valiliği (YİKOB)', type: 'Valilik & YİKOB', city: 'Çanakkale', icon: '🏛️' },
+  { name: 'Balıkesir Valiliği (YİKOB)', type: 'Valilik & YİKOB', city: 'Balıkesir', icon: '🏛️' },
+  { name: 'İstanbul Valiliği (YİKOB)', type: 'Valilik & YİKOB', city: 'İstanbul', icon: '🏛️' },
+  { name: 'Ankara Valiliği (YİKOB)', type: 'Valilik & YİKOB', city: 'Ankara', icon: '🏛️' },
+  { name: 'İzmir Valiliği (YİKOB)', type: 'Valilik & YİKOB', city: 'İzmir', icon: '🏛️' },
+  { name: 'Bursa Valiliği (YİKOB)', type: 'Valilik & YİKOB', city: 'Bursa', icon: '🏛️' },
+  { name: 'Edirne Valiliği (YİKOB)', type: 'Valilik & YİKOB', city: 'Edirne', icon: '🏛️' },
+  { name: 'Tekirdağ Valiliği (YİKOB)', type: 'Valilik & YİKOB', city: 'Tekirdağ', icon: '🏛️' },
+  { name: 'Antalya Valiliği (YİKOB)', type: 'Valilik & YİKOB', city: 'Antalya', icon: '🏛️' },
+  { name: 'Diyarbakır Valiliği (YİKOB)', type: 'Valilik & YİKOB', city: 'Diyarbakır', icon: '🏛️' },
+
+  // ==================== 🎓 6. ÜNİVERSİTELER & TEKNOPARKLAR ====================
   { name: 'Çanakkale Onsekiz Mart Üniversitesi (ÇOMÜ)', type: 'Üniversite & Teknokent', city: 'Çanakkale', icon: '🎓' },
   { name: 'İstanbul Teknik Üniversitesi (İTÜ)', type: 'Üniversite & Teknokent', city: 'İstanbul', icon: '🎓' },
   { name: 'Orta Doğu Teknik Üniversitesi (ODTÜ)', type: 'Üniversite & Teknokent', city: 'Ankara', icon: '🎓' },
@@ -300,12 +387,27 @@ const allAuthoritiesList = [
   { name: 'Bursa Uludağ Üniversitesi', type: 'Üniversite & Teknokent', city: 'Bursa', icon: '🎓' },
   { name: 'Kocaeli Üniversitesi', type: 'Üniversite & Teknokent', city: 'Kocaeli', icon: '🎓' },
   { name: 'Akdeniz Üniversitesi', type: 'Üniversite & Teknokent', city: 'Antalya', icon: '🎓' },
+  { name: 'Selçuk Üniversitesi', type: 'Üniversite & Teknokent', city: 'Konya', icon: '🎓' },
+  { name: 'Anadolu Üniversitesi', type: 'Üniversite & Teknokent', city: 'Eskişehir', icon: '🎓' },
   { name: 'Bilişim Vadisi Teknopark', type: 'Üniversite & Teknokent', city: 'Kocaeli', icon: '🚀' },
   { name: 'İTÜ ARI Teknokent', type: 'Üniversite & Teknokent', city: 'İstanbul', icon: '🚀' },
   { name: 'ODTÜ Teknokent', type: 'Üniversite & Teknokent', city: 'Ankara', icon: '🚀' },
 
-  // --- ORGANİZE SANAYİ BÖLGELERİ & ODALAR ---
+  // ==================== 🏥 7. İL SAĞLIK MÜDÜRLÜKLERİ & ŞEHİR HASTANELERİ ====================
+  { name: 'Çanakkale İl Sağlık Müdürlüğü', type: 'Sağlık & Hastane', city: 'Çanakkale', icon: '🏥' },
+  { name: 'Çanakkale Mehmet Akif Ersoy Devlet Hastanesi', type: 'Sağlık & Hastane', city: 'Çanakkale', icon: '🏥' },
+  { name: 'Balıkesir İl Sağlık Müdürlüğü', type: 'Sağlık & Hastane', city: 'Balıkesir', icon: '🏥' },
+  { name: 'İstanbul İl Sağlık Müdürlüğü', type: 'Sağlık & Hastane', city: 'İstanbul', icon: '🏥' },
+  { name: 'Ankara Bilkent Şehir Hastanesi', type: 'Sağlık & Hastane', city: 'Ankara', icon: '🏥' },
+  { name: 'İstanbul Başakşehir Çam ve Sakura Şehir Hastanesi', type: 'Sağlık & Hastane', city: 'İstanbul', icon: '🏥' },
+  { name: 'İzmir Bayraklı Şehir Hastanesi', type: 'Sağlık & Hastane', city: 'İzmir', icon: '🏥' },
+  { name: 'Bursa Şehir Hastanesi', type: 'Sağlık & Hastane', city: 'Bursa', icon: '🏥' },
+  { name: 'Kocaeli Şehir Hastanesi', type: 'Sağlık & Hastane', city: 'Kocaeli', icon: '🏥' },
+  { name: 'Gaziantep Şehir Hastanesi', type: 'Sağlık & Hastane', city: 'Gaziantep', icon: '🏥' },
+
+  // ==================== 🏭 8. ORGANİZE SANAYİ BÖLGELERİ & TİCARET ODALARI ====================
   { name: 'Çanakkale OSB & Sanayi Odası', type: 'OSB & Sanayi Odası', city: 'Çanakkale', icon: '🏭' },
+  { name: 'Balıkesir OSB Müdürlüğü', type: 'OSB & Sanayi Odası', city: 'Balıkesir', icon: '🏭' },
   { name: 'İstanbul İkitelli OSB', type: 'OSB & Sanayi Odası', city: 'İstanbul', icon: '🏭' },
   { name: 'İstanbul Dudullu OSB', type: 'OSB & Sanayi Odası', city: 'İstanbul', icon: '🏭' },
   { name: 'Ankara Sanayi Odası 1. OSB', type: 'OSB & Sanayi Odası', city: 'Ankara', icon: '🏭' },
@@ -322,9 +424,17 @@ const allAuthoritiesList = [
   { name: 'Manisa Organize Sanayi Bölgesi', type: 'OSB & Sanayi Odası', city: 'Manisa', icon: '🏭' },
   { name: 'Tekirdağ Çorlu 1. OSB', type: 'OSB & Sanayi Odası', city: 'Tekirdağ', icon: '🏭' },
   { name: 'Tekirdağ Çerkezköy OSB (ÇOSB)', type: 'OSB & Sanayi Odası', city: 'Tekirdağ', icon: '🏭' },
-  { name: 'Balıkesir Organize Sanayi Bölgesi', type: 'OSB & Sanayi Odası', city: 'Balıkesir', icon: '🏭' },
 
-  // --- ÖZEL SEKTÖR B2B SATIN ALMA MASALARI ---
+  // ==================== 🌱 9. KALKINMA AJANSLARI & BİRLİKLER ====================
+  { name: 'Güney Marmara Kalkınma Ajansı (GMKA)', type: 'Kalkınma Ajansı & Birlik', city: 'Balıkesir', icon: '🌱' },
+  { name: 'İstanbul Kalkınma Ajansı (İSTKA)', type: 'Kalkınma Ajansı & Birlik', city: 'İstanbul', icon: '🌱' },
+  { name: 'Ankara Kalkınma Ajansı (ANKARAKA)', type: 'Kalkınma Ajansı & Birlik', city: 'Ankara', icon: '🌱' },
+  { name: 'İzmir Kalkınma Ajansı (İZKA)', type: 'Kalkınma Ajansı & Birlik', city: 'İzmir', icon: '🌱' },
+  { name: 'Bursa Eskişehir Bilecik Kalkınma Ajansı (BEBKA)', type: 'Kalkınma Ajansı & Birlik', city: 'Bursa', icon: '🌱' },
+  { name: 'Trakya Kalkınma Ajansı (TRAKYAKA)', type: 'Kalkınma Ajansı & Birlik', city: 'Tekirdağ', icon: '🌱' },
+  { name: 'Çanakkale Sulama Birliği Başkanlığı', type: 'Kalkınma Ajansı & Birlik', city: 'Çanakkale', icon: '💧' },
+
+  // ==================== 🏢 10. ÖZEL SEKTÖR B2B SATIN ALMA MASALARI ====================
   { name: 'Mega Lojistik ve Dağıtım A.Ş.', type: 'Özel Sektör Masası', city: 'Kocaeli', icon: '🏢' },
   { name: 'Ege Ambalaj ve İhracat Sanayi A.Ş.', type: 'Özel Sektör Masası', city: 'İzmir', icon: '🏢' },
   { name: 'Anadolu Çelik ve Metal Sanayi A.Ş.', type: 'Özel Sektör Masası', city: 'Bursa', icon: '🏢' },
@@ -589,6 +699,40 @@ const seedTenders = [
     teklifSayisi: 6,
     yayinTarihi: '22.08.2026',
     aciklama: '800 Konutluk yerleşim alanı için 4 adet 1600 kVA modüler hücreli trafo merkezi, OG/AG yer altı kablolama ve sokak aydınlatma yapımıdır.'
+  },
+  {
+    id: 'IHC-2024-014',
+    baslik: 'Köyler ve Kırsal Yerleşimler İçin 15 Adet İçme Suyu Deposu ve 25 Km İsale Hattı Yapım İşi',
+    kategori: 'Kanalizasyon - Boru - Su - Doğalgaz - Sıhhi Tesisat İhaleleri',
+    ownerCompany: 'Çanakkale İl Özel İdaresi Su ve Kanal Hizmetleri Md.',
+    authority: 'Çanakkale İl Özel İdaresi',
+    city: 'Çanakkale',
+    butce: '7.850.000 ₺',
+    sure: '6 gün kaldı',
+    tur: 'Yapım İşi',
+    usul: 'Açık İhale',
+    kaynak: 'Ekap İhaleleri',
+    durum: 'active',
+    teklifSayisi: 5,
+    yayinTarihi: '29.08.2026',
+    aciklama: 'Biga, Çan ve Yenice ilçelerine bağlı 15 köyün içme suyu depolarının betonarme yapımı, terfi merkezleri ve PE100 boru isale hatları anahtar teslim yapım ihalesidir.'
+  },
+  {
+    id: 'IHC-2024-015',
+    baslik: 'Hükümet Konağı ve Kamu Hizmet Binaları Yangın Algılama ve Güvenlik Otomasyonu Yenileme İşi',
+    kategori: 'Yangın Algılama - Söndürme - İhbar Sistemleri İhaleleri',
+    ownerCompany: 'Balıkesir Valiliği (YİKOB)',
+    authority: 'Balıkesir Valiliği (YİKOB)',
+    city: 'Balıkesir',
+    butce: '1.450.000 ₺',
+    sure: '5 gün kaldı',
+    tur: 'Mal Alımı',
+    usul: 'Pazarlık Usulü',
+    kaynak: 'Ekap İhaleleri',
+    durum: 'active',
+    teklifSayisi: 3,
+    yayinTarihi: '28.08.2026',
+    aciklama: 'Yatırım İzleme ve Koordinasyon Başkanlığı bünyesindeki hizmet binaları için adresli yangın algılama panelleri, duman dedektörleri ve acil anons sistemleri tedariği ve montajıdır.'
   }
 ]
 
@@ -1190,7 +1334,7 @@ onMounted(() => {
                 title="Bütün İdare ve Kurumlar"
               >
                 <Landmark :size="13" />
-                <span class="leading-none">İdareler</span>
+                <span class="leading-none">Resmi Kurum</span>
               </button>
 
               <!-- 4. Sektörler -->
@@ -1224,7 +1368,7 @@ onMounted(() => {
               <span class="font-black text-slate-800 text-xs flex items-center gap-1.5">
                 <span v-if="activeLeftTab === 'kategoriler'">📁 İhale Kategorileri (40)</span>
                 <span v-else-if="activeLeftTab === 'sehirler'">🏙️ Türkiye Geneli (81 İl)</span>
-                <span v-else-if="activeLeftTab === 'idareler'">🏛️ Bütün İdareler & Kurumlar</span>
+                <span v-else-if="activeLeftTab === 'idareler'">🏛️ Bütün Resmi Kurumlar & İdareler</span>
                 <span v-else-if="activeLeftTab === 'sektorler'">🏭 Sektörel Gruplar (CPV)</span>
                 <span v-else-if="activeLeftTab === 'firmalar'">🏢 Doğrulanmış Firmalar</span>
               </span>
@@ -1253,15 +1397,19 @@ onMounted(() => {
             <div v-if="activeLeftTab === 'idareler'" class="space-y-1">
               <select 
                 v-model="authorityCategoryFilter"
-                class="w-full p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold text-slate-700 outline-none"
+                class="w-full p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold text-slate-700 outline-none cursor-pointer"
               >
-                <option value="Tümü">Tüm Kurum Tipleri (Bakanlık, KİT, Belediye, Üniversite)</option>
-                <option value="Bakanlık">Bakanlıklar & Başkanlıklar</option>
-                <option value="Genel Müdürlük & KİT">Genel Müdürlükler & KİT'ler (DSİ, KGM, TOKİ...)</option>
-                <option value="Belediye">Büyükşehir & İl Belediyeleri</option>
-                <option value="Üniversite & Teknokent">Üniversiteler & Teknoparklar</option>
-                <option value="OSB & Sanayi Odası">Organize Sanayi Bölgeleri (OSB)</option>
-                <option value="Özel Sektör Masası">Özel Sektör B2B Masaları</option>
+                <option value="Tümü">Tüm Resmi Kurumlar (Bakanlık, Belediye, Özel İdare...)</option>
+                <option value="Bakanlık">🏛️ Bakanlıklar & Başkanlıklar (17 Bakanlık + SSB, AFAD)</option>
+                <option value="İl Özel İdaresi">🌾 İl Özel İdareleri (81 İl Özel İdaresi)</option>
+                <option value="Belediye">🏙️ Belediyeler (Büyükşehir, İl & İlçe)</option>
+                <option value="Genel Müdürlük & KİT">⚙️ Genel Müdürlükler & KİT'ler (DSİ, KGM, TOKİ...)</option>
+                <option value="Valilik & YİKOB">🏛️ Valilikler & YİKOB (Yatırım İzleme)</option>
+                <option value="Üniversite & Teknokent">🎓 Üniversiteler & Teknoparklar</option>
+                <option value="Sağlık & Hastane">🏥 İl Sağlık Müdürlükleri & Şehir Hastaneleri</option>
+                <option value="OSB & Sanayi Odası">🏭 Organize Sanayi Bölgeleri (OSB)</option>
+                <option value="Kalkınma Ajansı & Birlik">🌱 Kalkınma Ajansları & Sulama Birlikleri</option>
+                <option value="Özel Sektör Masası">🏢 Özel Sektör B2B Satın Alma Masaları</option>
               </select>
             </div>
 
@@ -1360,7 +1508,7 @@ onMounted(() => {
                 >
                   <div class="flex items-center gap-2 truncate">
                     <span>🏛️</span>
-                    <span>Tüm İdare ve Kurumlar</span>
+                    <span>Tüm Resmi Kurumlar (Bakanlık, Belediye, Özel İdare...)</span>
                   </div>
                   <span 
                     class="px-1.5 py-0.2 rounded text-[10px] font-mono shrink-0"
