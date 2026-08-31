@@ -920,10 +920,11 @@ function resetFormAndCreateNew() {
 
       <!-- Gönder Butonu -->
       <div class="pt-2">
-        <button 
-          type="submit" 
-          class="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#0F223D] hover:bg-[#003057] text-white font-black text-sm py-4 transition shadow-xl cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
-        >
+        <button
+          type="button"
+          @click="handleSubmit"
+          :disabled="isSubmittingTender"
+          class="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#0F223D] hover:bg-[#003057] active:bg-[#0a182b] text-white font-black text-sm py-4 transition-all shadow-xl cursor-pointer hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50">
           <FilePlus2 :size="16" class="text-emerald-400" />
           <span>İhaleyi Oluştur ve Admin Onayına Gönder</span>
         </button>
