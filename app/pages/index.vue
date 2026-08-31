@@ -1106,12 +1106,60 @@ function submitQuickOffer() {
     status: 'Değerlendirmede'
   }
 
+  // Save to localStorage
   if (typeof window !== 'undefined') {
     try {
       const myBids = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]')
       myBids.unshift(bidObj)
       localStorage.setItem('mySubmittedBids', JSON.stringify(myBids))
+
+      const myBidsGeneral = JSON.parse(localStorage.getItem('myBids') || '[]')
+      myBidsGeneral.unshift({
+        id: bidObj.id,
+        tenderId: tender.id,
+        ilanBaslik: tender.baslik,
+        teklifFiyatim: bidObj.price,
+        tarih: bidObj.submittedAt,
+        status: 'Değerlendirmede',
+        bidderName: bidObj.bidderName
+      })
+      localStorage.setItem('myBids', JSON.stringify(myBidsGeneral))
     } catch (e) {}
+  }
+
+  // Sync directly into cmsData receivedBids
+  if (cmsData.value) {
+    if (!cmsData.value.dashboard) cmsData.value.dashboard = {}
+    if (!cmsData.value.dashboard.receivedBids) cmsData.value.dashboard.receivedBids = []
+
+    let targetGroup = cmsData.value.dashboard.receivedBids.find((g: any) => g.id === tender.id || g.baslik === tender.baslik)
+    if (!targetGroup) {
+      targetGroup = {
+        id: tender.id,
+        baslik: tender.baslik,
+        teklifler: []
+      }
+      cmsData.value.dashboard.receivedBids.unshift(targetGroup)
+    }
+
+    targetGroup.teklifler.unshift({
+      id: bidObj.id,
+      firma: bidObj.bidderName,
+      fiyat: bidObj.price,
+      sure: bidObj.validityDuration || '7 gün',
+      durum: 'degerlendirmede',
+      tarih: bidObj.submittedAt,
+      adres: (userSession.value?.city || tender.city || 'Balıkesir') + ' / Türkiye',
+      aciklama: bidObj.notes,
+      files: bidObj.files
+    })
+
+    // Increment tender bid count
+    if (tender.teklifSayisi !== undefined) {
+      tender.teklifSayisi = (tender.teklifSayisi || 0) + 1
+    }
+
+    saveCmsData(cmsData.value)
   }
 
   const fileMsg = quickOfferFiles.value.length > 0 ? ('\n📁 Eklenen Belge: ' + quickOfferFiles.value.length + ' adet Birim Fiyat Cetveli/Şartname Belgesi') : ''

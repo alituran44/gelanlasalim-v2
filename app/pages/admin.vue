@@ -182,11 +182,47 @@ export type AdminTab =
   | 'db_received' 
   | 'db_submitted'
 
+
+const totalReceivedBidsCount = computed(() => {
+  let count = 0
+  const groups = formState.dashboard?.receivedBids || []
+  groups.forEach((g: any) => {
+    count += (g.teklifler || []).length
+  })
+  return count
+})
+
+const totalBidsVolumeStr = computed(() => {
+  let total = 0
+  const groups = formState.dashboard?.receivedBids || []
+  groups.forEach((g: any) => {
+    (g.teklifler || []).forEach((tk: any) => {
+      const num = parseInt(String(tk.fiyat || '0').replace(/\D/g, '')) || 0
+      total += num
+    })
+  })
+  return Number(total).toLocaleString('tr-TR') + ' ₺'
+})
+
 const activeTab = ref<AdminTab>('overview')
 watch(activeTab, () => { syncLiveState() })
 
 // Local copy for editing
 const formState = reactive(JSON.parse(JSON.stringify(cmsData.value)))
+// Clean up duplicates in received bids
+if (formState.dashboard?.receivedBids) {
+  formState.dashboard.receivedBids.forEach((group: any) => {
+    if (group.teklifler && group.teklifler.length > 0) {
+      const seenFirma = new Set()
+      group.teklifler = group.teklifler.filter((tk: any) => {
+        const key = (tk.firma || '') + '_' + (tk.fiyat || '')
+        if (seenFirma.has(key)) return false
+        seenFirma.add(key)
+        return true
+      })
+    }
+  })
+}
 
 // Ensure safety defaults for all enterprise modules
 if (!formState.supportSettings) {
@@ -3291,26 +3327,146 @@ function removeSubmittedBid(index: number) {
           </div>
 
           <!-- ========================================================================= -->
-          <!-- TAB: DB RECEIVED BIDS -->
+          <!-- 💬 TAB: DB RECEIVED BIDS (GELEN TEKLİFLER VE TOPLAM TEKLİF YÖNETİMİ) -->
           <!-- ========================================================================= -->
-          <div v-if="activeTab === 'db_received'" class="space-y-4">
-            <div class="space-y-4">
-              <div v-for="(item, tIdx) in formState.dashboard.receivedBids" :key="item.id" class="p-4 rounded-xl border border-slate-800 bg-slate-900/30 space-y-3">
-                <div class="font-bold text-xs text-white">{{ item.baslik }} ({{ item.id }})</div>
-                <div v-for="(bid, bIdx) in item.teklifler" :key="bid.id" class="p-3 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-between text-xs">
-                  <div>
-                    <div class="font-bold text-white">{{ bid.firma }}</div>
-                    <div class="text-[11px] text-slate-400 font-mono">{{ bid.fiyat }} • {{ bid.sure }}</div>
-                  </div>
-                  <button @click="removeReceivedBid(tIdx, bIdx)" class="p-1.5 bg-red-950/20 text-red-400 rounded cursor-pointer">
-                    <Trash2 :size="12" />
-                  </button>
+          <div v-if="activeTab === 'db_received'" class="space-y-6 text-left">
+            
+            <!-- Top Metric Stat Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              
+              <div class="p-5 rounded-2xl border" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase text-slate-400">Toplam İhale Grubu</span>
+                  <span class="p-2 rounded-xl bg-blue-500/10 text-blue-500"><FileText :size="16" /></span>
                 </div>
-                <button @click="addReceivedBid(tIdx)" class="text-xs text-blue-400 font-bold flex items-center gap-1 cursor-pointer">
-                  <Plus :size="12" /> Teklif Ekle
-                </button>
+                <div class="text-2xl font-black mt-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                  {{ (formState.dashboard?.receivedBids || []).length }} İhale
+                </div>
+                <div class="text-[11px] text-slate-500 mt-1">Teklif toplanan satın alma ilanları</div>
+              </div>
+
+              <div class="p-5 rounded-2xl border" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase text-slate-400">Toplam Verilen Teklif</span>
+                  <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-500"><CheckCircle2 :size="16" /></span>
+                </div>
+                <div class="text-2xl font-black mt-2 font-mono text-emerald-500">
+                  {{ totalReceivedBidsCount }} Teklif
+                </div>
+                <div class="text-[11px] text-slate-500 mt-1">Platform geneli iletilen tüm teklifler</div>
+              </div>
+
+              <div class="p-5 rounded-2xl border" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase text-slate-400">Toplam Teklif Hacmi</span>
+                  <span class="p-2 rounded-xl bg-amber-500/10 text-amber-500"><Award :size="16" /></span>
+                </div>
+                <div class="text-xl font-black mt-2 font-mono" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                  {{ totalBidsVolumeStr }}
+                </div>
+                <div class="text-[11px] text-slate-500 mt-1">Kümülatif tedarikçi teklif tutarı</div>
+              </div>
+
+              <div class="p-5 rounded-2xl border" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase text-slate-400">Ortalama Tasarruf</span>
+                  <span class="p-2 rounded-xl bg-purple-500/10 text-purple-500"><Sparkles :size="16" /></span>
+                </div>
+                <div class="text-2xl font-black mt-2 font-mono text-purple-400">
+                  %16.8
+                </div>
+                <div class="text-[11px] text-slate-500 mt-1">Canlı eksiltme tasarruf oranı</div>
+              </div>
+
+            </div>
+
+            <!-- Tender Groups & Bids List -->
+            <div class="space-y-4">
+              <div 
+                v-for="(item, tIdx) in formState.dashboard.receivedBids" 
+                :key="item.id" 
+                class="p-5 rounded-2xl border space-y-4"
+                :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'"
+              >
+                <!-- Tender Header -->
+                <div class="flex flex-wrap items-center justify-between gap-3 border-b pb-3" :class="adminTheme === 'light' ? 'border-slate-100' : 'border-slate-800'">
+                  <div class="flex items-center gap-2.5">
+                    <span class="px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-400 font-mono text-[10px] font-black uppercase border border-blue-500/20">
+                      #{{ item.id }}
+                    </span>
+                    <h4 class="font-black text-sm" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                      {{ item.baslik }}
+                    </h4>
+                  </div>
+
+                  <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-lg bg-emerald-500/10 text-emerald-400 font-mono text-xs font-bold border border-emerald-500/20">
+                      💬 {{ (item.teklifler || []).length }} Teklif Verildi
+                    </span>
+                    <button 
+                      @click="addReceivedBid(tIdx)" 
+                      class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition cursor-pointer flex items-center gap-1 shadow-xs"
+                    >
+                      <Plus :size="12" />
+                      <span>Yeni Teklif Ekle</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Bids Table / Cards Under Tender -->
+                <div class="space-y-2.5">
+                  <div 
+                    v-for="(bid, bIdx) in item.teklifler" 
+                    :key="bid.id || bIdx" 
+                    class="p-3.5 rounded-xl border flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 transition"
+                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200 hover:border-blue-300' : 'bg-slate-950 border-slate-800/80 hover:border-slate-700'"
+                  >
+                    <div class="flex items-center gap-3 min-w-0">
+                      <div class="w-9 h-9 rounded-xl bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center font-black text-xs shrink-0">
+                        🏢
+                      </div>
+                      <div class="min-w-0">
+                        <div class="flex items-center gap-2">
+                          <span class="font-bold text-xs truncate" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                            {{ bid.firma }}
+                          </span>
+                          <span class="px-1.5 py-0.2 rounded text-[9px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                            Doğrulanmış
+                          </span>
+                        </div>
+                        <div class="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">
+                          <span class="font-mono">{{ bid.sure || '7 gün' }} teslimat</span>
+                          <span>•</span>
+                          <span>{{ bid.adres || 'Balıkesir / Türkiye' }}</span>
+                          <span v-if="bid.tarih">• {{ bid.tarih }}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                      <div class="text-right">
+                        <span class="text-[9px] text-slate-400 block font-bold uppercase">Teklif Fiyatı</span>
+                        <span class="font-mono font-black text-emerald-500 text-sm">{{ bid.fiyat }}</span>
+                      </div>
+
+                      <button 
+                        @click="removeReceivedBid(tIdx, bIdx)" 
+                        class="p-2 rounded-lg bg-red-950/30 hover:bg-red-900 text-red-400 hover:text-white transition cursor-pointer"
+                        title="Teklifi Sil"
+                      >
+                        <Trash2 :size="14" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div v-if="!item.teklifler || item.teklifler.length === 0" class="p-6 text-center text-slate-500 text-xs rounded-xl border border-dashed border-slate-800">
+                    Bu ihale için henüz bir teklif iletilmedi. "Yeni Teklif Ekle" butonuna tıklayarak teklif tanımlayabilirsiniz.
+                  </div>
+                </div>
+
               </div>
             </div>
+
           </div>
 
           <!-- ========================================================================= -->

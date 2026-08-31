@@ -43,6 +43,16 @@ const expandedIlan = ref<string | null>(route.query.ilan as string || null)
 const { cmsData, saveCmsData } = useCmsData()
 const { sendSms } = useNetGsm()
 
+
+const toplamGelenTeklifler = computed(() => {
+  let count = 0
+  const list = cmsData.value?.dashboard?.receivedBids || []
+  list.forEach((item: any) => {
+    count += (item.teklifler || []).length
+  })
+  return count
+})
+
 const ilanlar = computed(() => cmsData.value?.dashboard?.receivedBids || [])
 
 onMounted(() => {
