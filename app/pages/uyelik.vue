@@ -225,7 +225,7 @@ function verifyOtp() {
   if (typeof window !== 'undefined' && pendingUserSession.value) {
     const sessionData = {
       ...pendingUserSession.value,
-      verified: false,
+      verified: true,
       approvalStatus: 'pending'
     }
     localStorage.setItem('userSession', JSON.stringify(sessionData))
@@ -247,8 +247,7 @@ function verifyOtp() {
           phone: phone.value || '0850 840 86 95',
           email: sessionData.email,
           city: 'Çanakkale',
-          status: 'pending',
-          badgeGranted: false,
+          status: 'approved', badgeGranted: true, isVerified: true, verified: true,
           createdAt: new Date().toLocaleDateString('tr-TR'),
           uploadedDocs: ['Vergi Levhası (2026)', 'İmza Sirküleri', 'Ticaret Sicil Gazetesi']
         })
