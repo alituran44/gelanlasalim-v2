@@ -183,6 +183,7 @@ export type AdminTab =
   | 'db_submitted'
 
 const activeTab = ref<AdminTab>('overview')
+watch(activeTab, () => { syncLiveState() })
 
 // Local copy for editing
 const formState = reactive(JSON.parse(JSON.stringify(cmsData.value)))
@@ -371,38 +372,46 @@ function syncLiveState() {
       })
     }
 
-    // 2. Sync KYC from genuine verification submission
+    // 2. Sync all registered users / sessions into KYC Desk
     const verificationDocs = JSON.parse(localStorage.getItem('companyVerificationDocs') || 'null')
     const session = JSON.parse(localStorage.getItem('userSession') || '{}')
-    if (verificationDocs || session.uploadedDocs || session.isVerified || session.kycSubmitted) {
-      const compName = session.companyName || session.company || verificationDocs?.companyName || 'Ali Turan Sanayi A.Ş.'
+    const allUsers = JSON.parse(localStorage.getItem('allRegisteredUsers') || '[]')
+
+    const userList: any[] = [...allUsers]
+    if (session && session.email && !userList.some((u: any) => u.email === session.email)) {
+      userList.unshift(session)
+    }
+
+    userList.forEach((usr: any) => {
+      if (!usr.email) return
+      const compName = usr.companyName || usr.company || usr.name || (usr.email ? usr.email.split('@')[0] : 'Kayıtlı Üye')
       const userKycObj = {
-        id: 'KYC-' + (session.taxNo || '4700854210'),
+        id: 'KYC-' + (usr.taxNo || Math.floor(1000 + Math.random() * 9000)),
         companyName: compName,
-        companyType: session.companyType || 'Limited Şirket (LTD)',
-        legalName: session.legalName || compName,
-        authorizedPerson: session.name || session.firstName || 'Ali Turan',
-        email: session.email || 'ihalecib@gmail.com',
-        phone: session.phone || '0850 840 86 95',
-        taxNo: session.taxNo || '4700854210',
-        taxOffice: session.taxOffice || 'Çanakkale Vergi Dairesi',
-        mersis: session.mersis || '0470-0854-2100-0001',
-        sicilNo: session.sicilNo || '14520',
-        sectors: session.sectors || 'Ambalaj, İnşaat, Lojistik',
-        authProvider: session.authProvider || 'google',
-        uploadedDocs: verificationDocs?.files?.map((f: any) => f.name) || ['2026 Yılı Onaylı Vergi Levhası', 'Noter Tasdikli İmza Sirküleri', 'Ticaret Sicil Gazetesi', 'Oda Faaliyet Belgesi'],
-        status: session.kycStatus || (session.isVerified ? 'approved' : 'pending'),
-        badgeGranted: session.isVerified || false,
-        createdAt: session.kycDate || 'Bugün',
-        rejectionReason: session.rejectionReason || ''
+        companyType: usr.companyType || 'Kurumsal Şirket (A.Ş. / Ltd. Şti.)',
+        legalName: usr.legalName || compName,
+        authorizedPerson: usr.name || usr.firstName || 'Yetkili',
+        email: usr.email,
+        phone: usr.phone || '0850 840 86 95',
+        taxNo: usr.taxNo || '4700854210',
+        taxOffice: usr.taxOffice || 'Çanakkale Vergi Dairesi',
+        mersis: usr.mersis || '0470-0854-2100-0001',
+        sicilNo: usr.sicilNo || '14520',
+        sectors: usr.sectors || 'Tedarik, Satın Alma, Ticaret',
+        authProvider: usr.authProvider || 'google',
+        uploadedDocs: verificationDocs?.files?.map((f: any) => f.name) || ['Vergi Levhası', 'İmza Sirküleri', 'Faaliyet Belgesi'],
+        status: usr.isVerified ? 'approved' : (usr.kycStatus || 'pending'),
+        badgeGranted: usr.isVerified || false,
+        createdAt: usr.createdAt || 'Bugün',
+        rejectionReason: usr.rejectionReason || ''
       }
-      const existingIdx = formState.kycVerifications.findIndex((k: any) => k.email === userKycObj.email || k.companyName === userKycObj.companyName)
+      const existingIdx = formState.kycVerifications.findIndex((k: any) => k.email === usr.email)
       if (existingIdx >= 0) {
         formState.kycVerifications[existingIdx] = { ...formState.kycVerifications[existingIdx], ...userKycObj }
       } else {
         formState.kycVerifications.unshift(userKycObj)
       }
-    }
+    })
   } catch (e) {
     console.warn('Admin live data sync warning', e)
   }
@@ -427,6 +436,7 @@ onMounted(() => {
     }
 
     syncLiveState()
+    window.addEventListener('storage', syncLiveState)
   }
 })
 

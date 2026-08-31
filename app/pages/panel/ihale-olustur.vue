@@ -440,6 +440,7 @@ function handleSubmit() {
 
   // Persist to localStorage
   saveCmsData(cmsData.value)
+  if (typeof window !== 'undefined') window.dispatchEvent(new Event('storage'))
 
   if (typeof window !== 'undefined') {
     try {

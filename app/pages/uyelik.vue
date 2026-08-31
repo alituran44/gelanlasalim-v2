@@ -63,7 +63,7 @@ onMounted(() => {
               if (response.credential) {
                 const user = parseJwt(response.credential)
                 if (user) {
-                  localStorage.setItem('userSession', JSON.stringify({
+                  const sessionObj = {
                     email: user.email,
                     firstName: user.given_name || user.name,
                     lastName: user.family_name || '',
@@ -78,7 +78,9 @@ onMounted(() => {
                     authProvider: 'google',
                     isPremium: true,
                     subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
-                  }))
+                  }
+                  localStorage.setItem('userSession', JSON.stringify(sessionObj))
+                  registerToAdminKycQueue(sessionObj)
                   router.push('/panel')
                 }
               }
@@ -156,6 +158,52 @@ const pendingUserSession = ref<any>(null)
 const pendingTargetRoute = ref('/panel')
 
 const { cmsData, saveCmsData } = useCmsData()
+
+function registerToAdminKycQueue(sessionData: any) {
+  if (typeof window === 'undefined') return
+  try {
+    if (!Array.isArray(cmsData.value.kycVerifications)) {
+      cmsData.value.kycVerifications = []
+    }
+    const compName = sessionData.companyName || sessionData.company || sessionData.name || 'Yeni Kayıtlı Firma'
+    const existingIdx = cmsData.value.kycVerifications.findIndex((k: any) => k.email === sessionData.email)
+    const kycItem = {
+      id: existingIdx >= 0 ? cmsData.value.kycVerifications[existingIdx].id : ('KYC-' + Math.floor(1000 + Math.random() * 9000)),
+      companyName: compName,
+      companyType: sessionData.companyType || 'Kurumsal Şirket (A.Ş. / Ltd. Şti.)',
+      legalName: sessionData.legalName || compName,
+      taxOffice: sessionData.taxOffice || 'Çanakkale V.D.',
+      taxNo: sessionData.taxNo || '4700854210',
+      authorizedPerson: sessionData.name || sessionData.firstName || 'Yetkili',
+      phone: sessionData.phone || '0850 840 86 95',
+      email: sessionData.email,
+      city: sessionData.city || 'Çanakkale',
+      authProvider: sessionData.authProvider || 'web',
+      uploadedDocs: ['2026 Yılı Vergi Levhası', 'Noter Onaylı İmza Sirküleri', 'Ticaret Sicil Gazetesi'],
+      status: sessionData.isVerified ? 'approved' : 'pending',
+      badgeGranted: sessionData.isVerified || false,
+      createdAt: 'Bugün',
+      rejectionReason: ''
+    }
+    if (existingIdx >= 0) {
+      cmsData.value.kycVerifications[existingIdx] = { ...cmsData.value.kycVerifications[existingIdx], ...kycItem }
+    } else {
+      cmsData.value.kycVerifications.unshift(kycItem)
+    }
+    saveCmsData(cmsData.value)
+
+    const allUsers = JSON.parse(localStorage.getItem('allRegisteredUsers') || '[]')
+    const userIdx = allUsers.findIndex((u: any) => u.email === sessionData.email)
+    if (userIdx >= 0) allUsers[userIdx] = sessionData
+    else allUsers.unshift(sessionData)
+    localStorage.setItem('allRegisteredUsers', JSON.stringify(allUsers))
+
+    window.dispatchEvent(new Event('storage'))
+  } catch (e) {
+    console.warn('KYC queue registration warning', e)
+  }
+}
+
 
 function verifyOtp() {
   if (!otpInput.value || otpInput.value.length < 6) {
