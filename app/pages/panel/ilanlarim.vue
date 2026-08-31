@@ -20,8 +20,37 @@ onMounted(() => {
   }, 400)
 })
 
+const route = useRoute()
+const recentCreatedId = computed(() => (route.query.created as string) || '')
+const justCreatedNotice = ref(false)
+
+onMounted(() => {
+  if (route.query.created) {
+    justCreatedNotice.value = true
+  }
+  if (typeof window !== 'undefined') {
+    const rec = localStorage.getItem('recentTenderCreated')
+    if (rec) {
+      justCreatedNotice.value = true
+    }
+  }
+})
+
 const tendersList = computed(() => {
-  return cmsData.value?.dashboard?.tenders || []
+  const cmsList = cmsData.value?.dashboard?.tenders || []
+  let localList: any[] = []
+  if (typeof window !== 'undefined') {
+    try {
+      localList = JSON.parse(localStorage.getItem('myTenders') || '[]')
+    } catch (e) {}
+  }
+  
+  // Merge and deduplicate by id
+  const map = new Map<string, any>()
+  localList.forEach(item => map.set(item.id, item))
+  cmsList.forEach(item => map.set(item.id, item))
+  
+  return Array.from(map.values())
 })
 
 const filteredTenders = computed(() => {

@@ -317,16 +317,17 @@ const titleInputRef = ref<HTMLInputElement | null>(null)
 const isSubmittingTender = ref(false)
 
 function handleSubmit() {
+  if (isSubmittingTender.value) return
   isSubmittingTender.value = true
 
   try {
-    // If title is completely empty, auto-assign a sensible corporate procurement title
+    // 1. Default Title if empty
     if (!form.value.baslik || !form.value.baslik.trim()) {
       const subCat = selectedSubcategory.value || 'Malzeme & Hizmet'
       form.value.baslik = `${form.value.kategori || 'Kurumsal Satın Alma'} - ${subCat} Tedarik Talebi`
     }
 
-    // Format budget with min-max range or open auction
+    // 2. Format Budget
     let budgetVal = ''
     const min = form.value.minButce ? String(form.value.minButce).replace(/[^\d.,]/g, '').trim() : ''
     const max = form.value.maxButce ? String(form.value.maxButce).replace(/[^\d.,]/g, '').trim() : ''
@@ -346,13 +347,13 @@ function handleSubmit() {
     const deliveryCity = form.value.sehir || 'Balıkesir'
     const deliveryAddress = form.value.teslimatAdresi || `${deliveryCity} Merkez / Saha Depo Teslimat`
 
-    // Generate unique B2B procurement ID
+    // 3. Unique ID
     const newId = 'IHC-2026-' + Math.floor(100 + Math.random() * 900)
     createdId.value = newId
 
     const subCat = selectedSubcategory.value || 'Genel Satın Alma'
     const combinedCategory = `${form.value.kategori || 'İnşaat ve Yapı'} / ${subCat}`
-    const primaryImg = form.value.images[0]?.url || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'
+    const primaryImg = form.value.images?.[0]?.url || 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'
     const imgList = (form.value.images || []).map(img => img.url)
 
     let session: any = {}
@@ -392,16 +393,13 @@ function handleSubmit() {
       olusturma: 'Bugün'
     }
 
-    // Ensure CMS Data structures exist safely
+    // 4. Save to CMS Data
     if (!cmsData.value) cmsData.value = {} as any
     if (!cmsData.value.dashboard) cmsData.value.dashboard = {} as any
     if (!Array.isArray(cmsData.value.dashboard.tenders)) cmsData.value.dashboard.tenders = []
     if (!Array.isArray(cmsData.value.dashboard.receivedBids)) cmsData.value.dashboard.receivedBids = []
 
-    // Add to active tenders list in CMS
     cmsData.value.dashboard.tenders.unshift(tenderObject)
-
-    // Create matching empty received bids slot
     cmsData.value.dashboard.receivedBids.unshift({
       id: newId,
       baslik: form.value.baslik,
@@ -411,16 +409,16 @@ function handleSubmit() {
       teklifler: []
     })
 
-    // Persist to localStorage
     saveCmsData(cmsData.value)
 
+    // 5. Save to LocalStorage
     if (typeof window !== 'undefined') {
       try {
         const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
         myTenders.unshift(tenderObject)
         localStorage.setItem('myTenders', JSON.stringify(myTenders))
+        localStorage.setItem('recentTenderCreated', JSON.stringify(tenderObject))
 
-        // Trigger automatic category notification
         const notifications = JSON.parse(localStorage.getItem('userNotifications') || '[]')
         notifications.unshift({
           id: Date.now(),
@@ -431,11 +429,12 @@ function handleSubmit() {
           type: 'tender'
         })
         localStorage.setItem('userNotifications', JSON.stringify(notifications))
+        localStorage.removeItem('tenderDraft')
       } catch (e) {}
+
       window.dispatchEvent(new Event('storage'))
     }
 
-    // Summary object for persistent success view
     submittedTenderSummary.value = {
       id: newId,
       baslik: form.value.baslik,
@@ -447,16 +446,16 @@ function handleSubmit() {
       files: [...(form.value.files || [])]
     }
 
-    // Clear draft
-    clearDraft()
-
-    // Switch to success view immediately and scroll to top
     showSuccess.value = true
-    if (typeof window !== 'undefined') {
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    }
-  } catch (err) {
-    console.error('Error creating tender:', err)
+
+    // Direct redirect to confirmation / my tenders approval page
+    setTimeout(() => {
+      router.push('/panel/ilanlarim?created=' + encodeURIComponent(newId))
+    }, 600)
+
+  } catch (err: any) {
+    console.error('Tender creation error:', err)
+    alert('İhale oluşturulurken bir hata oluştu: ' + (err?.message || 'Bilinmeyen hata'))
   } finally {
     isSubmittingTender.value = false
   }
