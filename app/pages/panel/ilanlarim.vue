@@ -14,29 +14,9 @@ const activeTab = ref<'aktif' | 'tamamlanan' | 'suresi_dolan' | 'tum'>('tum')
 const activePeriod = ref<'7gun' | '30gun' | '90gun' | '1yil'>('30gun')
 const searchQuery = ref('')
 
-onMounted(() => {
-  setTimeout(() => {
-    isLoading.value = false
-  }, 400)
-})
+const localTendersState = ref<any[]>([])
 
-const route = useRoute()
-const recentCreatedId = computed(() => (route.query.created as string) || '')
-const justCreatedNotice = ref(false)
-
-onMounted(() => {
-  if (route.query.created) {
-    justCreatedNotice.value = true
-  }
-  if (typeof window !== 'undefined') {
-    const rec = localStorage.getItem('recentTenderCreated')
-    if (rec) {
-      justCreatedNotice.value = true
-    }
-  }
-})
-
-const tendersList = computed(() => {
+function reloadTenders() {
   const cmsList = cmsData.value?.dashboard?.tenders || []
   let localList: any[] = []
   if (typeof window !== 'undefined') {
@@ -45,11 +25,41 @@ const tendersList = computed(() => {
     } catch (e) {}
   }
   
-  // Merge and deduplicate by id
   const map = new Map<string, any>()
   localList.forEach(item => map.set(item.id, item))
   cmsList.forEach(item => map.set(item.id, item))
   
+  localTendersState.value = Array.from(map.values())
+}
+
+onMounted(() => {
+  reloadTenders()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', reloadTenders)
+  }
+  setTimeout(() => {
+    isLoading.value = false
+  }, 300)
+})
+
+watch(() => cmsData.value?.dashboard?.tenders, () => {
+  reloadTenders()
+}, { deep: true })
+
+const tendersList = computed(() => {
+  if (localTendersState.value.length > 0) {
+    return localTendersState.value
+  }
+  const cmsList = cmsData.value?.dashboard?.tenders || []
+  let localList: any[] = []
+  if (typeof window !== 'undefined') {
+    try {
+      localList = JSON.parse(localStorage.getItem('myTenders') || '[]')
+    } catch (e) {}
+  }
+  const map = new Map<string, any>()
+  localList.forEach(item => map.set(item.id, item))
+  cmsList.forEach(item => map.set(item.id, item))
   return Array.from(map.values())
 })
 

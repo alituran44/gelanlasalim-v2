@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-const SCHEMA_VERSION = 'v2026_08_31_quota_safe_final_v2'
+const SCHEMA_VERSION = 'v2026_08_31_quota_safe_final_v3'
 
 // Clean state for platform - zero dummy / mock data
 export const DEFAULT_CMS_DATA = {
@@ -98,22 +98,22 @@ export const DEFAULT_CMS_DATA = {
     { title: 'Yönetim Paneli Rehberi', desc: 'Kontrol panelini ve raporlamaları etkin kullanma', videoUrl: '' }
   ],
   dashboard: {
-    tenders: [],
-    receivedBids: [],
-    submittedBids: [],
-    disputes: [],
-    companyReviews: [],
-    sectorAlerts: [],
-    escrowOrders: []
+    tenders: [] as any[],
+    receivedBids: [] as any[],
+    submittedBids: [] as any[],
+    disputes: [] as any[],
+    companyReviews: [] as any[],
+    sectorAlerts: [] as any[],
+    escrowOrders: [] as any[]
   },
-  registeredCompanies: [],
+  registeredCompanies: [] as any[],
   contact: {
     address: 'İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye',
     email: 'ihalecib@gmail.com',
     workHoursWeekdays: 'Pazartesi - Cuma: 09:00 - 18:00',
     workHoursSaturday: 'Cumartesi: 10:00 - 14:00'
   },
-  payments: [],
+  payments: [] as any[],
   supportSettings: {
     whatsappEnabled: true,
     whatsappNumber: '908508408695',
@@ -124,7 +124,7 @@ export const DEFAULT_CMS_DATA = {
     aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın.'
   },
   crmSettings: {
-    leads: []
+    leads: [] as any[]
   },
   emailSettings: {
     senderName: 'İhaleciBurada B2B Operasyon',
@@ -133,12 +133,12 @@ export const DEFAULT_CMS_DATA = {
     smtpHost: 'smtp.gmail.com',
     smtpPort: 587,
     smtpUser: 'ihalecib@gmail.com',
-    subscribers: [],
-    templates: []
+    subscribers: [] as any[],
+    templates: [] as any[]
   },
-  kycVerifications: [],
-  liveAuctionRooms: [],
-  escrowOrders: [],
+  kycVerifications: [] as any[],
+  liveAuctionRooms: [] as any[],
+  escrowOrders: [] as any[],
   categories: [
     { id: 'kat-1', name: 'İnşaat, Yapı & Şantiye', icon: 'Building2', targetSavings: '%16.5', activeTendersCount: 0, description: 'Demir, çimento, hazır beton, yalıtım ve kaba inşaat malzemeleri.' },
     { id: 'kat-2', name: 'Makine, Yedek Parça & Metal', icon: 'Wrench', targetSavings: '%14.2', activeTendersCount: 0, description: 'CNC fason talaşlı imalat, torna, sac işleme ve hidrolik aksam.' },
@@ -147,8 +147,8 @@ export const DEFAULT_CMS_DATA = {
     { id: 'kat-5', name: 'Lojistik, Nakliye & Depolama', icon: 'Truck', targetSavings: '%15.4', activeTendersCount: 0, description: 'Yurt içi komple tır, parsiyel sevkiyat, antrepo ve soğuk hava depolama.' },
     { id: 'kat-6', name: 'Kırtasiye, Ofis & Teknoloji', icon: 'Laptop', targetSavings: '%21.0', activeTendersCount: 0, description: 'Fotokopi kağıdı, toner, bilgisayar donanımı ve ofis mobilyası.' }
   ],
-  promoCodes: [],
-  auditLogs: [],
+  promoCodes: [] as any[],
+  auditLogs: [] as any[],
   siteSettings: {
     maintenanceMode: false,
     maintenanceNotice: 'Platformumuzda planlı altyapı güçlendirme çalışması yapılmaktadır.',
@@ -166,7 +166,6 @@ export const DEFAULT_CMS_DATA = {
 
 const cmsDataRef = ref({ ...DEFAULT_CMS_DATA })
 let isInitialized = false
-
 
 function stripHeavyDataUrls(obj: any, depth = 0): any {
   if (!obj || typeof obj !== 'object' || depth > 8) return obj
@@ -207,7 +206,6 @@ function safeLocalStorageSet(key: string, value: any) {
     try {
       localStorage.removeItem('tenderDraft')
       localStorage.removeItem('userNotifications')
-      localStorage.removeItem('allRegisteredUsers')
       const sanitized = sanitizeForStorage(value)
       localStorage.setItem(key, JSON.stringify(sanitized))
     } catch (e2) {
@@ -220,90 +218,42 @@ export function useCmsData() {
   if (typeof window !== 'undefined' && !isInitialized) {
     isInitialized = true
 
-    // Check version migration - force clean slate if old version detected
-    const savedVersion = localStorage.getItem('cms_schema_version')
-    if (savedVersion !== SCHEMA_VERSION) {
-      localStorage.removeItem('cmsData')
-      localStorage.removeItem('myTenders')
-      localStorage.setItem('cms_schema_version', SCHEMA_VERSION)
-      cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
-      localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
-      return {
-        cmsData: cmsDataRef,
-        saveCmsData,
-        resetCmsData
-      }
-    }
+    let existingTenders: any[] = []
+    let existingReceivedBids: any[] = []
+    let existingKyc: any[] = []
 
+    // Read previous data from localStorage
     const saved = localStorage.getItem('cmsData')
     if (saved) {
       try {
         const parsed = JSON.parse(saved)
-        if (!parsed.dashboard) {
-          parsed.dashboard = { ...DEFAULT_CMS_DATA.dashboard }
-        }
-        if (!Array.isArray(parsed.dashboard.tenders)) {
-          parsed.dashboard.tenders = []
-        }
-        if (!Array.isArray(parsed.kycVerifications)) {
-          parsed.kycVerifications = []
-        }
-        if (!Array.isArray(parsed.registeredCompanies)) {
-          parsed.registeredCompanies = []
-        }
-
-        // Clean out any legacy mock dummy items
-        parsed.dashboard.tenders = (parsed.dashboard.tenders || []).filter(
-          (t: any) => !t.id?.startsWith('IHC-2024-') && !t.id?.startsWith('IHC-DEMO')
-        )
-        parsed.kycVerifications = (parsed.kycVerifications || []).filter(
-          (k: any) => !['KYC-8921', 'KYC-7412', 'KYC-6320', 'KYC-5109'].includes(k.id)
-        )
-
-        cmsDataRef.value = parsed
-        localStorage.setItem('cmsData', JSON.stringify(parsed))
-      } catch (e) {
-        cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
-        localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
-      }
-    } else {
-      cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
-      localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
+        if (Array.isArray(parsed?.dashboard?.tenders)) existingTenders = parsed.dashboard.tenders
+        if (Array.isArray(parsed?.dashboard?.receivedBids)) existingReceivedBids = parsed.dashboard.receivedBids
+        if (Array.isArray(parsed?.kycVerifications)) existingKyc = parsed.kycVerifications
+      } catch (e) {}
     }
-  }
 
-  function sanitizeForStorage(data: any): any {
     try {
-      const copy = JSON.parse(JSON.stringify(data))
-      if (copy?.dashboard?.tenders && Array.isArray(copy.dashboard.tenders)) {
-        copy.dashboard.tenders = copy.dashboard.tenders.map((t: any) => {
-          const tCopy = { ...t }
-          if (Array.isArray(tCopy.images)) {
-            tCopy.images = tCopy.images.map((img: any) => ({
-              name: img.name || 'Görsel',
-              url: (typeof img.url === 'string' && img.url.length > 50000)
-                ? 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'
-                : img.url
-            }))
+      const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+      if (Array.isArray(myTenders)) {
+        myTenders.forEach(mt => {
+          if (!existingTenders.some(et => et.id === mt.id)) {
+            existingTenders.unshift(mt)
           }
-          if (typeof tCopy.image === 'string' && tCopy.image.length > 50000) {
-            tCopy.image = 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'
-          }
-          if (Array.isArray(tCopy.files)) {
-            tCopy.files = tCopy.files.map((f: any) => ({
-              name: f.name,
-              size: f.size,
-              type: f.type,
-              progress: 100
-            }))
-          }
-          return tCopy
         })
       }
-      return copy
-    } catch (e) {
-      return data
-    }
+    } catch (e) {}
+
+    // Initialize with default structure merged with preserved live data
+    const initialData = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
+    if (!initialData.dashboard) initialData.dashboard = { tenders: [], receivedBids: [], submittedBids: [], disputes: [] }
+    
+    initialData.dashboard.tenders = existingTenders.filter((t: any) => !t.id?.startsWith('IHC-2024-') && !t.id?.startsWith('IHC-DEMO'))
+    initialData.dashboard.receivedBids = existingReceivedBids
+    if (existingKyc.length > 0) initialData.kycVerifications = existingKyc
+
+    cmsDataRef.value = initialData
+    safeLocalStorageSet('cmsData', initialData)
   }
 
   function saveCmsData(newData: typeof DEFAULT_CMS_DATA) {
