@@ -31,6 +31,34 @@ definePageMeta({ layout: 'dashboard' })
 const { cmsData, saveCmsData } = useCmsData()
 const { sendSms } = useNetGsm()
 
+function getBidRankStatus(bid: any) {
+  const tenderId = bid.tenderId || bid.id
+  const matchingGroup = (cmsData.value?.dashboard?.receivedBids || []).find((g: any) => g.id === tenderId || g.baslik === bid.ilanBaslik)
+  if (!matchingGroup || !matchingGroup.teklifler || matchingGroup.teklifler.length === 0) {
+    return { isLeader: true, leaderPrice: bid.teklifFiyatim, rank: 1, totalBids: 1 }
+  }
+
+  const sorted = [...matchingGroup.teklifler].sort((a, b) => {
+    const pA = parseInt(String(a.fiyat || '0').replace(/\D/g, '')) || 0
+    const pB = parseInt(String(b.fiyat || '0').replace(/\D/g, '')) || 0
+    return pA - pB
+  })
+
+  const lowest = sorted[0]
+  const myPriceNum = parseInt(String(bid.teklifFiyatim || '0').replace(/\D/g, '')) || 0
+  const lowestNum = parseInt(String(lowest.fiyat || '0').replace(/\D/g, '')) || 0
+
+  const isLeader = myPriceNum <= lowestNum
+  const rank = sorted.findIndex(t => t.id === bid.id || t.firma === bid.bidderName) + 1 || (isLeader ? 1 : 2)
+
+  return {
+    isLeader,
+    leaderPrice: lowest.fiyat,
+    rank,
+    totalBids: sorted.length
+  }
+}
+
 const teklifler = computed(() => cmsData.value?.dashboard?.submittedBids || [])
 
 // Modal States
