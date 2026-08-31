@@ -100,6 +100,25 @@ function getTenderImage(tender: any): string {
 
   return 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80'
 }
+function formatTenderBudget(raw: any): string {
+  if (!raw) return 'Açık Eksiltme'
+  const str = String(raw).trim()
+  if (str.includes('-')) {
+    // If range like 50000 ₺ - 150000 ₺, extract the clean single target budget
+    const parts = str.split('-')
+    const maxPart = parts[parts.length - 1]
+    const cleanNum = parseInt(maxPart.replace(/\D/g, '')) || 0
+    if (cleanNum > 0) {
+      return Number(cleanNum).toLocaleString('tr-TR') + ' ₺'
+    }
+  }
+  const cleanNum = parseInt(str.replace(/\D/g, '')) || 0
+  if (cleanNum > 0) {
+    return Number(cleanNum).toLocaleString('tr-TR') + ' ₺'
+  }
+  return str.includes('₺') ? str : (str || 'Açık Eksiltme')
+}
+
 const searchQuery = ref('')
 const selectedCategory = ref<string>('Tümü')
 const selectedMethod = ref<string>('Tümü')

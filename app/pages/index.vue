@@ -519,6 +519,25 @@ function getTenderImage(tender: any): string {
 
 // ==================== 7. CANLI VERİLERİ BİRLEŞTİRME ====================
 
+function formatTenderBudget(raw: any): string {
+  if (!raw) return 'Açık Eksiltme'
+  const str = String(raw).trim()
+  if (str.includes('-')) {
+    // If range like 50000 ₺ - 150000 ₺, extract the clean single target budget
+    const parts = str.split('-')
+    const maxPart = parts[parts.length - 1]
+    const cleanNum = parseInt(maxPart.replace(/\D/g, '')) || 0
+    if (cleanNum > 0) {
+      return Number(cleanNum).toLocaleString('tr-TR') + ' ₺'
+    }
+  }
+  const cleanNum = parseInt(str.replace(/\D/g, '')) || 0
+  if (cleanNum > 0) {
+    return Number(cleanNum).toLocaleString('tr-TR') + ' ₺'
+  }
+  return str.includes('₺') ? str : (str || 'Açık Eksiltme')
+}
+
 function maskBidderName(bid: any, idx?: number): string {
   if (bid.isMine) return '👤 Sizin Teklifiniz'
   const code = (bid.id || String(idx || 1)).replace(/\D/g, '').slice(-3) || ((idx || 0) + 105)
@@ -1588,7 +1607,7 @@ onMounted(() => {
               </div>
               <div>
                 <span class="text-[10px] font-black text-slate-400 uppercase block">Hedef / Yaklaşık Bütçe</span>
-                <span class="font-mono font-black text-emerald-700">{{ pdfTenderTarget.butce || 'Açık Teklif' }}</span>
+                <span class="font-mono font-black text-emerald-700">{{ formatTenderBudget(pdfTenderTarget.butce) }}</span>
               </div>
               <div>
                 <span class="text-[10px] font-black text-slate-400 uppercase block">Teslimat / Uygulama İli</span>
@@ -2116,7 +2135,7 @@ onMounted(() => {
                 <div>
                   <span class="text-[9px] font-bold text-slate-400 uppercase block">Sözleşme / Hedef Bütçe</span>
                   <span class="font-mono font-black text-base sm:text-lg text-emerald-700 block">
-                    {{ tender.butce || 'Açık Teklif' }}
+                    {{ formatTenderBudget(tender.butce) }}
                   </span>
                 </div>
 
@@ -2555,7 +2574,7 @@ onMounted(() => {
                 </div>
                 <div>
                   <span class="text-[10px] font-black text-slate-400 uppercase block">Sözleşme / Hedef Bütçe</span>
-                  <span class="font-mono font-black text-emerald-700">{{ selectedTenderModal.butce || 'Açık Teklif' }}</span>
+                  <span class="font-mono font-black text-emerald-700">{{ formatTenderBudget(selectedTenderModal.butce) }}</span>
                 </div>
                 <div>
                   <span class="text-[10px] font-black text-slate-400 uppercase block">Teslimat İli / Konum</span>

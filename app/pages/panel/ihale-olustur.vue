@@ -363,21 +363,14 @@ function handleSubmit() {
       form.value.baslik = `${form.value.kategori || 'Kurumsal Satın Alma'} - ${subCat} Tedarik Talebi`
     }
 
-    // 2. Format Budget
-    let budgetVal = ''
-    const min = form.value.minButce ? String(form.value.minButce).replace(/[^\d.,]/g, '').trim() : ''
-    const max = form.value.maxButce ? String(form.value.maxButce).replace(/[^\d.,]/g, '').trim() : ''
-
-    if (min && max) {
-      budgetVal = `${min} ₺ - ${max} ₺`
-    } else if (min && !max) {
-      budgetVal = `Min. ${min} ₺`
-    } else if (!min && max) {
-      budgetVal = `Maks. ${max} ₺`
-    } else if (form.value.butce) {
-      budgetVal = String(form.value.butce).includes('₺') ? form.value.butce : `${form.value.butce} ₺`
-    } else {
-      budgetVal = 'Teklif Usulü (Açık İhale)'
+    // 2. Format Budget as single clean amount (no ranges)
+    let budgetVal = 'Teklif Usulü (Açık İhale)'
+    const rawAmt = form.value.butce || form.value.maxButce || form.value.minButce
+    if (rawAmt) {
+      const cleanNum = parseInt(String(rawAmt).replace(/\D/g, '')) || 0
+      if (cleanNum > 0) {
+        budgetVal = Number(cleanNum).toLocaleString('tr-TR') + ' ₺'
+      }
     }
 
     const deliveryCity = form.value.sehir || 'Balıkesir'
