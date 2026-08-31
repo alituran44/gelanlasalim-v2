@@ -108,6 +108,9 @@ const selectedTenderModal = ref<any>(null)
 const detailActiveTab = ref<'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'firmalar' | 'sonuc'>('ilan')
 
 // Hızlı Teklif Modalı & Çok Kalemli Belge Yükleme
+const showOfferSuccessToast = ref(false)
+const offerSuccessToastMsg = ref('')
+
 const showQuickBidModal = ref(false)
 const quickBidTender = ref<any>(null)
 const quickOfferPrice = ref('')
@@ -1227,106 +1230,144 @@ function removeQuoteFile(index: number) {
 }
 
 function submitQuickOffer() {
-  if (isMyOwnTender(quickBidTender.value)) {
-    alert('🚫 Kendi açtığınız bir ihaleye teklif veremezsiniz!')
-    showQuickBidModal.value = false
-    return
-  }
-  if (!quickOfferPrice.value || !quickOfferPrice.value.trim()) {
-    alert('Lütfen geçerli bir teklif tutarı giriniz.')
-    return
-  }
-
-  const numericPrice = parseFloat(quickOfferPrice.value.replace(/[^0-9.]/g, ''))
-  if (isNaN(numericPrice) || numericPrice <= 0) {
-    alert('Lütfen geçerli bir teklif tutarı giriniz.')
+  if (!quickBidTender.value) {
+    alert('Lütfen bir ihale seçiniz.')
     return
   }
 
   const tender = quickBidTender.value
-  if (!tender) return
 
+  if (isMyOwnTender(tender)) {
+    alert('🚫 Kendi açtığınız bir ihaleye teklif veremezsiniz!')
+    showQuickBidModal.value = false
+    return
+  }
+
+  if (!quickOfferPrice.value || !String(quickOfferPrice.value).trim()) {
+    alert('Lütfen teklif tutarınızı giriniz.')
+    return
+  }
+
+  const rawClean = String(quickOfferPrice.value).replace(/[^0-9]/g, '')
+  const numericPrice = parseInt(rawClean, 10)
+  if (isNaN(numericPrice) || numericPrice <= 0) {
+    alert('Lütfen geçerli bir teklif tutarı giriniz (Örn: 75000).')
+    return
+  }
+
+  // Current session resolution
+  let session: any = {}
+  if (typeof window !== 'undefined') {
+    try {
+      session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+  }
+
+  const bidderCompany = session.companyName || session.company || session.name || session.username || 'Onaylı Tedarikçi Firma'
   const vatLabel = quickOfferVatType.value === 'vat_excluded' ? '+ KDV Hariç' : 'KDV Dahil'
+  const formattedPrice = Number(numericPrice).toLocaleString('tr-TR') + ' ₺'
+  const fullPriceLabel = formattedPrice + ' (' + vatLabel + ')'
+  const now = new Date().toLocaleDateString('tr-TR') + ' ' + new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
 
   const bidObj = {
     id: 'BID-' + Math.floor(100000 + Math.random() * 900000),
     tenderId: tender.id,
     tenderTitle: tender.baslik,
     tenderCategory: tender.kategori,
-    tenderCity: tender.city,
-    buyerCompany: tender.ownerCompany || tender.authority,
-    price: Number(numericPrice).toLocaleString('tr-TR') + ' ₺ (' + vatLabel + ')',
+    tenderCity: tender.city || 'Balıkesir',
+    buyerCompany: tender.ownerCompany || tender.authority || 'Kurumsal Masası',
+    price: fullPriceLabel,
     priceNum: numericPrice,
+    rawPrice: formattedPrice,
     vatType: quickOfferVatType.value,
-    validityDuration: quickOfferDuration.value,
-    notes: quickOfferNotes.value || 'Şartname koşulları ve birim fiyat cetveli uyarınca teklif sunulmuştur.',
-    bidderName: userSession.value?.companyName || userSession.value?.username || 'Doğrulanmış Tedarikçi Firma',
-    files: quickOfferFiles.value,
+    validityDuration: quickOfferDuration.value || '7 gün',
+    notes: quickOfferNotes.value || 'Şartname ve teknik kriterler uyarınca teklifimizdir.',
+    bidderName: bidderCompany,
+    bidderEmail: session.email || '',
+    files: [...quickOfferFiles.value],
     filesCount: quickOfferFiles.value.length,
-    submittedAt: new Date().toLocaleDateString('tr-TR') + ' ' + new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-    status: 'Değerlendirmede'
+    submittedAt: now,
+    time: 'Az önce',
+    tarih: now,
+    status: 'Değerlendirmede',
+    isMine: true
   }
 
-  // Save to localStorage
+  // 1. LocalStorage update
   if (typeof window !== 'undefined') {
     try {
       const myBids = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]')
       myBids.unshift(bidObj)
       localStorage.setItem('mySubmittedBids', JSON.stringify(myBids))
 
-      const myBidsGeneral = JSON.parse(localStorage.getItem('myBids') || '[]')
-      myBidsGeneral.unshift({
+      const myBidsGen = JSON.parse(localStorage.getItem('myBids') || '[]')
+      myBidsGen.unshift({
         id: bidObj.id,
         tenderId: tender.id,
         ilanBaslik: tender.baslik,
-        teklifFiyatim: bidObj.price,
-        tarih: bidObj.submittedAt,
+        teklifFiyatim: fullPriceLabel,
+        tarih: now,
         status: 'Değerlendirmede',
-        bidderName: bidObj.bidderName
+        bidderName: bidderCompany
       })
-      localStorage.setItem('myBids', JSON.stringify(myBidsGeneral))
-    } catch (e) {}
+      localStorage.setItem('myBids', JSON.stringify(myBidsGen))
+    } catch (e) {
+      console.warn('localStorage bid sync error', e)
+    }
   }
 
-  // Sync directly into cmsData receivedBids
+  // 2. Sync to CMS Data
   if (cmsData.value) {
-    if (!cmsData.value.dashboard) cmsData.value.dashboard = {}
-    if (!cmsData.value.dashboard.receivedBids) cmsData.value.dashboard.receivedBids = []
+    if (!cmsData.value.dashboard) cmsData.value.dashboard = {} as any
+    if (!Array.isArray(cmsData.value.dashboard.receivedBids)) cmsData.value.dashboard.receivedBids = []
 
     let targetGroup = cmsData.value.dashboard.receivedBids.find((g: any) => g.id === tender.id || g.baslik === tender.baslik)
     if (!targetGroup) {
       targetGroup = {
         id: tender.id,
         baslik: tender.baslik,
+        kategori: tender.kategori,
         teklifler: []
       }
       cmsData.value.dashboard.receivedBids.unshift(targetGroup)
     }
 
+    if (!Array.isArray(targetGroup.teklifler)) targetGroup.teklifler = []
     targetGroup.teklifler.unshift({
       id: bidObj.id,
-      firma: bidObj.bidderName,
-      fiyat: bidObj.price,
-      sure: bidObj.validityDuration || '7 gün',
+      firma: bidderCompany,
+      fiyat: formattedPrice,
+      sure: quickOfferDuration.value || '7 gün',
       durum: 'degerlendirmede',
-      tarih: bidObj.submittedAt,
-      adres: (userSession.value?.city || tender.city || 'Balıkesir') + ' / Türkiye',
-      aciklama: bidObj.notes,
-      files: bidObj.files
+      tarih: 'Az önce',
+      adres: (session.city || tender.city || 'Balıkesir') + ' / Türkiye',
+      aciklama: quickOfferNotes.value || '',
+      files: [...quickOfferFiles.value]
     })
 
-    // Increment tender bid count
     if (tender.teklifSayisi !== undefined) {
       tender.teklifSayisi = (tender.teklifSayisi || 0) + 1
     }
 
-    saveCmsData(cmsData.value)
+    try {
+      saveCmsData(cmsData.value)
+    } catch (err) {
+      console.warn('saveCmsData warning', err)
+    }
   }
 
-  const fileMsg = quickOfferFiles.value.length > 0 ? ('\n📁 Eklenen Belge: ' + quickOfferFiles.value.length + ' adet Birim Fiyat Cetveli/Şartname Belgesi') : ''
+  // Dispatch storage event for other components
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('storage'))
+  }
 
-  alert('✓ TEKLİFİNİZ BAŞARIYLA İLETİLDİ!\n\nİhale: ' + tender.baslik + '\nAlıcı Kurum/Firma: ' + bidObj.buyerCompany + '\nTeklif Tutarı: ' + bidObj.price + fileMsg + '\n\nTeklifiniz alıcı firmanın kontrol paneline ve onay havuzuna güvenle aktarıldı.')
   showQuickBidModal.value = false
+  offerSuccessToastMsg.value = `"${tender.baslik}" ihalesine ${fullPriceLabel} tutarındaki teklifiniz başarıyla iletildi!`
+  showOfferSuccessToast.value = true
+
+  setTimeout(() => {
+    showOfferSuccessToast.value = false
+  }, 5000)
 }
 
 onMounted(() => {
@@ -3070,10 +3111,11 @@ onMounted(() => {
               İptal
             </button>
             <button 
-              type="submit" 
-              class="flex-1 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition cursor-pointer shadow-md shadow-emerald-600/20 flex items-center justify-center gap-1.5"
+              type="button" 
+              @click.prevent="submitQuickOffer" 
+              class="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition cursor-pointer shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2"
             >
-              <Send :size="13" />
+              <Send :size="14" />
               <span>Teklifi Gönder</span>
             </button>
           </div>
