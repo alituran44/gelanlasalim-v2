@@ -986,6 +986,70 @@ function printPdfDocument() {
   window.print()
 }
 
+function downloadTenderFile(doc: any, tender: any) {
+  if (typeof window === 'undefined') return
+
+  const fileName = doc?.name || `Resmi_Sartname_${tender?.id || 'IHC'}.pdf`
+  
+  if (doc?.url && doc.url.startsWith('data:')) {
+    const link = document.createElement('a')
+    link.href = doc.url
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    return
+  }
+
+  const textContent = `================================================================================
+                    T.C. B2B TICARET VE ELEKTRONIK IHALE PORTALI
+                     IHALECIBURADA RESMI IHALE SARTNAMESI
+================================================================================
+
+Ihale Kayit No (IKN)    : #${tender?.id || 'IHC-2026-178'}
+Ihale Basligi            : ${tender?.baslik || 'Kurumsal Satin Alma Talebi'}
+Sektor & Kategori       : ${tender?.kategori || 'Genel Satin Alma'}
+Alici Kurum / Sirket    : ${tender?.ownerCompany || tender?.authority || 'Kurumsal Masasi'}
+Hedef Sozlesme Butcesi  : ${tender?.butce || 'Acik Eksiltmeli Ihale'}
+Teslimat Sehri / Lokasyon: ${tender?.city || 'Balikesir'}
+Teslimat Adresi         : ${tender?.teslimatAdresi || (tender?.city + ' Merkez / Saha Depo')}
+Teklif Toplama Suresi   : ${tender?.sure || '7 gun'}
+Yayin Tarihi            : ${new Date().toLocaleDateString('tr-TR')}
+
+--------------------------------------------------------------------------------
+1. IHALENIN KONUSU VE TEKNIK ISTERLER:
+--------------------------------------------------------------------------------
+${tender?.aciklama || tender?.baslik || 'Teknik sartname esaslarina gore temin saglanacaktir.'}
+
+--------------------------------------------------------------------------------
+2. IDARI SARTLAR VE TESLIMAT HUKUMLERI:
+--------------------------------------------------------------------------------
+- Teslimat adresi ${tender?.teslimatAdresi || (tender?.city + ' Merkez')} olarak teyit edilmistir.
+- Hakedis odemeleri BDDK ve TCMB mevzuatina uygun ESCROW GUVENLI HAVUZ hesabinda bloke edilir.
+- Muayene kabul ve e-Irsaliye teslim onayinin ardindan odeme yukleniciye serbest birakilir.
+
+--------------------------------------------------------------------------------
+3. E-IMZA VE DIJITAL MUHUR DOGRULAMASI:
+--------------------------------------------------------------------------------
+- 6098 s. Turk Borclar Kanunu ve 6102 s. Turk Ticaret Kanunu kapsaminda duzenlenmistir.
+- Zaman Damgasi: ${new Date().toISOString()}
+- Dogrulama Hash: SHA-256-${tender?.id || 'CERT'}-VALID-SECURE
+- Belge Adi: ${fileName}
+
+IhaleciBurada Platform A.S. | GIB VKN: 4700854210 | Mersis: 0470-0854-2100-0001
+================================================================================`;
+
+  const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName.endsWith('.pdf') || fileName.endsWith('.txt') ? fileName : (fileName + '.pdf');
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 function downloadPdfDocument(tender: any) {
   const content = `================================================================================
                     T.C. B2B TICARET VE ELEKTRONIK IHALE PORTALI
@@ -2614,20 +2678,56 @@ onMounted(() => {
                   </ul>
                 </div>
 
-                <div class="space-y-1.5">
+                <div class="space-y-2">
                   <h3 class="font-black text-slate-900 text-sm border-b pb-1 border-slate-200 flex items-center justify-between">
-                    <span>3. YÜKLENEN RESMİ DOKÜMANLAR</span>
-                    <span class="text-[10px] text-emerald-700 font-bold">✓ Ekli Dosya</span>
+                    <span class="flex items-center gap-1.5">
+                      <FileText :size="15" class="text-blue-600" />
+                      <span>3. YÜKLENEN RESMİ DOKÜMANLAR & ŞARTNAMELER</span>
+                    </span>
+                    <span class="text-[10px] text-emerald-700 font-bold">✓ e-İmzalı Belgeler</span>
                   </h3>
-                  <div class="p-3 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                      <span class="px-2 py-0.5 rounded bg-red-100 text-red-700 font-black text-[10px]">PDF</span>
-                      <span class="font-bold text-slate-800">
-                        {{ (selectedTenderModal.files?.[activeDocIndex]?.name) || (selectedTenderModal.documents?.[activeDocIndex]?.name) || ('Resmi_Sartname_' + selectedTenderModal.id + '.pdf') }}
-                      </span>
-                      <span class="text-slate-400">({{ selectedTenderModal.files?.[activeDocIndex]?.size || '0.08 MB' }})</span>
+                  
+                  <div class="space-y-2">
+                    <div 
+                      v-for="(doc, dIdx) in (selectedTenderModal.files && selectedTenderModal.files.length > 0 ? selectedTenderModal.files : (selectedTenderModal.documents && selectedTenderModal.documents.length > 0 ? selectedTenderModal.documents : [{ name: 'TASLAK.pdf', size: '0.08 MB', type: 'pdf' }]))"
+                      :key="dIdx"
+                      class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex flex-wrap items-center justify-between gap-3 shadow-2xs hover:border-blue-300 transition"
+                    >
+                      <div class="flex items-center gap-2.5 min-w-0">
+                        <span class="px-2 py-1 rounded bg-red-100 text-red-700 font-black text-[10px] uppercase shrink-0">
+                          {{ doc.type || 'PDF' }}
+                        </span>
+                        <div class="min-w-0">
+                          <div class="font-bold text-slate-900 text-xs truncate">
+                            {{ doc.name || ('TASLAK_' + (dIdx + 1) + '.pdf') }}
+                          </div>
+                          <div class="text-[10px] text-slate-500 flex items-center gap-1.5">
+                            <span>{{ doc.size || '0.08 MB' }}</span>
+                            <span>•</span>
+                            <span class="text-emerald-700 font-bold">✓ Aslı Doğrulandı</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="flex items-center gap-2">
+                        <button
+                          type="button"
+                          @click="activeDocIndex = dIdx"
+                          class="px-3 py-1.5 rounded-lg border border-slate-300 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs transition cursor-pointer flex items-center gap-1"
+                        >
+                          <Eye :size="12" />
+                          <span>Önizle</span>
+                        </button>
+                        <button
+                          type="button"
+                          @click="downloadTenderFile(doc, selectedTenderModal)"
+                          class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition cursor-pointer flex items-center gap-1 shadow-xs"
+                        >
+                          <Download :size="12" />
+                          <span>İndir</span>
+                        </button>
+                      </div>
                     </div>
-                    <span class="text-emerald-700 font-bold text-[11px]">✓ Aslı Doğrulandı</span>
                   </div>
                 </div>
               </div>

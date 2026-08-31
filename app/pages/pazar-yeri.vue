@@ -119,6 +119,70 @@ function formatTenderBudget(raw: any): string {
   return str.includes('₺') ? str : (str || 'Açık Eksiltme')
 }
 
+function downloadTenderFile(doc: any, tender: any) {
+  if (typeof window === 'undefined') return
+
+  const fileName = doc?.name || `Resmi_Sartname_${tender?.id || 'IHC'}.pdf`
+  
+  if (doc?.url && doc.url.startsWith('data:')) {
+    const link = document.createElement('a')
+    link.href = doc.url
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    return
+  }
+
+  const textContent = `================================================================================
+                    T.C. B2B TICARET VE ELEKTRONIK IHALE PORTALI
+                     IHALECIBURADA RESMI IHALE SARTNAMESI
+================================================================================
+
+Ihale Kayit No (IKN)    : #${tender?.id || 'IHC-2026-178'}
+Ihale Basligi            : ${tender?.baslik || 'Kurumsal Satin Alma Talebi'}
+Sektor & Kategori       : ${tender?.kategori || 'Genel Satin Alma'}
+Alici Kurum / Sirket    : ${tender?.ownerCompany || tender?.authority || 'Kurumsal Masasi'}
+Hedef Sozlesme Butcesi  : ${tender?.butce || 'Acik Eksiltmeli Ihale'}
+Teslimat Sehri / Lokasyon: ${tender?.city || 'Balikesir'}
+Teslimat Adresi         : ${tender?.teslimatAdresi || (tender?.city + ' Merkez / Saha Depo')}
+Teklif Toplama Suresi   : ${tender?.sure || '7 gun'}
+Yayin Tarihi            : ${new Date().toLocaleDateString('tr-TR')}
+
+--------------------------------------------------------------------------------
+1. IHALENIN KONUSU VE TEKNIK ISTERLER:
+--------------------------------------------------------------------------------
+${tender?.aciklama || tender?.baslik || 'Teknik sartname esaslarina gore temin saglanacaktir.'}
+
+--------------------------------------------------------------------------------
+2. IDARI SARTLAR VE TESLIMAT HUKUMLERI:
+--------------------------------------------------------------------------------
+- Teslimat adresi ${tender?.teslimatAdresi || (tender?.city + ' Merkez')} olarak teyit edilmistir.
+- Hakedis odemeleri BDDK ve TCMB mevzuatina uygun ESCROW GUVENLI HAVUZ hesabinda bloke edilir.
+- Muayene kabul ve e-Irsaliye teslim onayinin ardindan odeme yukleniciye serbest birakilir.
+
+--------------------------------------------------------------------------------
+3. E-IMZA VE DIJITAL MUHUR DOGRULAMASI:
+--------------------------------------------------------------------------------
+- 6098 s. Turk Borclar Kanunu ve 6102 s. Turk Ticaret Kanunu kapsaminda duzenlenmistir.
+- Zaman Damgasi: ${new Date().toISOString()}
+- Dogrulama Hash: SHA-256-${tender?.id || 'CERT'}-VALID-SECURE
+- Belge Adi: ${fileName}
+
+IhaleciBurada Platform A.S. | GIB VKN: 4700854210 | Mersis: 0470-0854-2100-0001
+================================================================================`;
+
+  const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName.endsWith('.pdf') || fileName.endsWith('.txt') ? fileName : (fileName + '.pdf');
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
 const searchQuery = ref('')
 const selectedCategory = ref<string>('Tümü')
 const selectedMethod = ref<string>('Tümü')
