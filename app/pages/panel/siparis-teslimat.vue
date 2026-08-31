@@ -39,7 +39,65 @@ const searchQuery = ref('')
 const activeTab = ref<'all' | 'HAVUZDA_BLOKE' | 'SEVKIYATTA' | 'MAL_KABUL_BEKLIYOR' | 'TAMAMLANDI' | 'UYUSMAZLIK'>('all')
 
 const orders = computed(() => {
-  return cmsData.value?.dashboard?.escrowOrders || []
+  const list: any[] = []
+  const seenIds = new Set()
+
+  // 1. Check cmsData.value.dashboard.escrowOrders
+  const dOrders = cmsData.value?.dashboard?.escrowOrders || []
+  dOrders.forEach((o: any) => {
+    if (!seenIds.has(o.id || o.tenderId)) {
+      seenIds.add(o.id || o.tenderId)
+      list.push(o)
+    }
+  })
+
+  // 2. Check cmsData.value.escrowOrders
+  const rootOrders = cmsData.value?.escrowOrders || []
+  rootOrders.forEach((o: any) => {
+    if (!seenIds.has(o.id || o.tenderId)) {
+      seenIds.add(o.id || o.tenderId)
+      list.push(o)
+    }
+  })
+
+  // 3. Check receivedBids for any approved offers
+  const receivedGroups = cmsData.value?.dashboard?.receivedBids || []
+  receivedGroups.forEach((group: any) => {
+    if (group.teklifler) {
+      const approved = group.teklifler.find((t: any) => t.durum === 'onaylandi' || t.durum === 'anlasildi')
+      if (approved && !seenIds.has(group.id)) {
+        seenIds.add(group.id)
+        const numVal = parseInt(String(approved.fiyat || '75000').replace(/\D/g, '')) || 75000
+        list.unshift({
+          id: 'ORD-2026-' + (group.id ? group.id.replace(/\D/g, '') : Math.floor(100 + Math.random() * 900)),
+          orderCode: 'SIP-2026-' + Math.floor(1000 + Math.random() * 9000),
+          tenderId: group.id,
+          tenderTitle: group.baslik,
+          buyerFirm: group.ownerCompany || 'Ali Turan San. Tic. A.Ş.',
+          buyerCompany: group.ownerCompany || 'Ali Turan San. Tic. A.Ş.',
+          supplierFirm: approved.firma,
+          supplierCompany: approved.firma,
+          totalAmount: approved.fiyat,
+          amount: approved.fiyat,
+          numericAmount: numVal,
+          payoutAmount: Math.round(numVal * 0.97).toLocaleString('tr-TR') + ' ₺',
+          commissionAmount: Math.round(numVal * 0.03).toLocaleString('tr-TR') + ' ₺',
+          commissionRate: 3,
+          status: 'HAVUZDA_BLOKE',
+          statusLabel: 'Güvenli Havuzda Bloke Edildi',
+          trackingCode: 'YK-8829104',
+          trackingNumber: 'YK-8829104',
+          shippingCompany: 'Yurtiçi Kargo & Borusan Lojistik',
+          carrier: 'Yurtiçi Kargo & Borusan Lojistik',
+          notes: 'İhale başarıyla sonuçlandı. Güvenli havuz ödemesi bloke edildi.',
+          createdAt: 'Bugün',
+          updatedAt: 'Şimdi'
+        })
+      }
+    }
+  })
+
+  return list
 })
 
 const filteredOrders = computed(() => {

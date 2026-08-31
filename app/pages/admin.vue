@@ -378,7 +378,61 @@ const pendingKycCount = computed(() => {
   return (formState.kycVerifications || []).filter((k: any) => k.status === 'pending').length
 })
 
+function syncLiveEscrowOrders() {
+  if (!formState.escrowOrders || formState.escrowOrders.length === 0) {
+    if (formState.dashboard?.escrowOrders && formState.dashboard.escrowOrders.length > 0) {
+      formState.escrowOrders = JSON.parse(JSON.stringify(formState.dashboard.escrowOrders))
+    } else if (cmsData.value?.escrowOrders && cmsData.value.escrowOrders.length > 0) {
+      formState.escrowOrders = JSON.parse(JSON.stringify(cmsData.value.escrowOrders))
+    }
+  }
+
+  // Also auto-generate escrow orders from any approved bids in receivedBids if not yet present
+  if (formState.dashboard?.receivedBids) {
+    formState.dashboard.receivedBids.forEach((group: any) => {
+      if (group.teklifler) {
+        const approvedBid = group.teklifler.find((t: any) => t.durum === 'onaylandi' || t.durum === 'anlasildi')
+        if (approvedBid) {
+          const exists = (formState.escrowOrders || []).some((o: any) => o.tenderId === group.id || o.tenderTitle === group.baslik)
+          if (!exists) {
+            if (!formState.escrowOrders) formState.escrowOrders = []
+            const numericVal = parseInt(String(approvedBid.fiyat || '75000').replace(/\D/g, '')) || 75000
+            formState.escrowOrders.unshift({
+              id: 'ORD-2026-' + (group.id ? group.id.replace(/\D/g, '') : Math.floor(100 + Math.random() * 900)),
+              orderCode: 'SIP-2026-' + Math.floor(1000 + Math.random() * 9000),
+              tenderId: group.id,
+              tenderTitle: group.baslik,
+              buyerCompany: group.ownerCompany || 'Ali Turan San. Tic. A.Ş.',
+              buyerFirm: group.ownerCompany || 'Ali Turan San. Tic. A.Ş.',
+              supplierCompany: approvedBid.firma,
+              supplierFirm: approvedBid.firma,
+              totalAmount: approvedBid.fiyat,
+              amount: approvedBid.fiyat,
+              numericAmount: numericVal,
+              payoutAmount: Math.round(numericVal * 0.97).toLocaleString('tr-TR') + ' ₺',
+              commissionAmount: Math.round(numericVal * 0.03).toLocaleString('tr-TR') + ' ₺',
+              status: 'HAVUZDA_BLOKE',
+              escrowStatus: 'havuzda_bloke',
+              trackingNumber: 'YK-' + Math.floor(1000000 + Math.random() * 9000000),
+              trackingCode: 'YK-' + Math.floor(1000000 + Math.random() * 9000000),
+              carrier: 'Yurtiçi Kargo / Borusan Lojistik',
+              deliveryDate: '3 iş günü',
+              createdAt: new Date().toLocaleDateString('tr-TR'),
+              updatedAt: 'Şimdi'
+            })
+          }
+        }
+      }
+    })
+  }
+
+  if (formState.dashboard) {
+    formState.dashboard.escrowOrders = formState.escrowOrders
+  }
+}
+
 function syncLiveState() {
+  syncLiveEscrowOrders()
   if (typeof window === 'undefined') return
   try {
     const rawCms = localStorage.getItem('cmsData')
@@ -1832,22 +1886,30 @@ function removeSubmittedBid(index: number) {
           <!-- TAB 3: SİPARİŞ & GÜVENLİ HAVUZ (ESCROW) -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'escrow_delivery'" class="space-y-6">
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div 
+              class="p-6 rounded-2xl border space-y-4"
+              :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'"
+            >
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 gap-2" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
                 <div>
-                  <h3 class="text-sm font-black text-white flex items-center gap-2">
-                    <Package :size="16" class="text-blue-400" />
+                  <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                    <Package :size="16" class="text-blue-500" />
                     Sipariş & Güvenli Havuz (Escrow) Teslimat Denetim Masası
                   </h3>
-                  <p class="text-[11px] text-slate-400">Sonuçlanan ihalelerin bloke ödemelerini, sevkiyat takip kodlarını ve teslimat onaylarını yönetin.</p>
+                  <p class="text-[11px]" :class="adminTheme === 'light' ? 'text-slate-500' : 'text-slate-400'">Sonuçlanan ve mutabakat sağlanan ihalelerin bloke ödemelerini, sevkiyat takip kodlarını ve teslimat onaylarını yönetin.</p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="px-2.5 py-1 rounded-full text-xs font-bold font-mono" :class="adminTheme === 'light' ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-blue-950 text-blue-400 border border-blue-800'">
+                    {{ (formState.escrowOrders || []).length }} Onaylı Sipariş
+                  </span>
                 </div>
               </div>
 
               <!-- Escrow Table -->
-              <div class="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
+              <div class="rounded-2xl border overflow-hidden" :class="adminTheme === 'light' ? 'border-slate-200 bg-white' : 'border-slate-800 bg-slate-950'">
                 <table class="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr class="bg-slate-900/90 border-b border-slate-800 text-[10px] font-black text-slate-400 uppercase">
+                    <tr class="border-b text-[10px] font-black uppercase" :class="adminTheme === 'light' ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-slate-900/90 border-slate-800 text-slate-400'">
                       <th class="p-3.5">SİPARİŞ & İHALE</th>
                       <th class="p-3.5">ALICI & TEDARİKÇİ</th>
                       <th class="p-3.5">TUTAR</th>
@@ -1856,40 +1918,55 @@ function removeSubmittedBid(index: number) {
                       <th class="p-3.5 text-right">İŞLEMLER</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-800/60">
-                    <tr v-for="order in formState.escrowOrders" :key="order.id" class="hover:bg-slate-900/40 transition">
+                  <tbody v-if="(formState.escrowOrders || []).length > 0" class="divide-y" :class="adminTheme === 'light' ? 'divide-slate-200 text-slate-800' : 'divide-slate-800/60 text-slate-300'">
+                    <tr v-for="order in formState.escrowOrders" :key="order.id" class="hover:bg-slate-500/10 transition">
                       <td class="p-3.5">
-                        <div class="font-bold text-white">{{ order.tenderTitle }}</div>
-                        <div class="text-[10px] text-blue-400 font-mono">{{ order.orderCode }}</div>
+                        <div class="font-bold" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">{{ order.tenderTitle }}</div>
+                        <div class="text-[10px] text-blue-500 font-mono font-bold">{{ order.orderCode || order.id }}</div>
                       </td>
-                      <td class="p-3.5 text-slate-300">
-                        <div><strong>Alıcı:</strong> {{ order.buyerCompany }}</div>
-                        <div class="text-slate-400"><strong>Tedarikçi:</strong> {{ order.supplierCompany }}</div>
+                      <td class="p-3.5">
+                        <div><strong>Alıcı:</strong> {{ order.buyerCompany || order.buyerFirm || 'Ali Turan San. Tic. A.Ş.' }}</div>
+                        <div class="text-slate-500"><strong>Tedarikçi:</strong> {{ order.supplierCompany || order.supplierFirm || 'Ata Akademi San. Tic. A.Ş.' }}</div>
                       </td>
-                      <td class="p-3.5 font-mono font-bold text-emerald-400 text-sm">
-                        {{ order.totalAmount }}
+                      <td class="p-3.5 font-mono font-black text-emerald-600 text-sm">
+                        {{ order.totalAmount || order.amount }}
                       </td>
                       <td class="p-3.5">
                         <span 
-                          class="px-2.5 py-0.5 rounded text-[10px] font-black uppercase"
-                          :class="order.escrowStatus === 'odeme_cozuldu' ? 'bg-emerald-950 text-emerald-400 border border-emerald-800' : (order.escrowStatus === 'teslim_onaylandi' ? 'bg-blue-950 text-blue-400 border border-blue-800' : 'bg-amber-950 text-amber-400 border border-amber-800')"
+                          class="px-2.5 py-0.5 rounded text-[10px] font-black uppercase inline-flex items-center gap-1"
+                          :class="order.escrowStatus === 'odeme_cozuldu' || order.status === 'TAMAMLANDI' ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : (order.escrowStatus === 'sevkiyatta' || order.status === 'SEVKIYATTA' ? 'bg-blue-100 text-blue-800 border border-blue-300' : 'bg-amber-100 text-amber-800 border border-amber-300')"
                         >
-                          {{ order.escrowStatus.replace('_', ' ') }}
+                          <Lock v-if="order.status === 'HAVUZDA_BLOKE' || order.escrowStatus === 'havuzda_bloke'" :size="11" />
+                          <Truck v-else-if="order.status === 'SEVKIYATTA' || order.escrowStatus === 'sevkiyatta'" :size="11" />
+                          <CheckCircle2 v-else :size="11" />
+                          <span>{{ (order.statusLabel || order.status || order.escrowStatus || 'HAVUZDA BLOKE').replace('_', ' ') }}</span>
                         </span>
                       </td>
-                      <td class="p-3.5 text-[11px] text-slate-400 font-mono">
-                        <div>{{ order.trackingNumber }}</div>
-                        <div class="text-[10px] text-slate-500">{{ order.deliveryDate }}</div>
+                      <td class="p-3.5 text-[11px] font-mono text-slate-500">
+                        <div class="font-bold text-slate-700">{{ order.trackingNumber || order.trackingCode || 'YK-8829104' }}</div>
+                        <div class="text-[10px] text-slate-400">{{ order.carrier || order.shippingCompany || 'Lojistik / Ambar' }} · {{ order.deliveryDate || '3 gün' }}</div>
                       </td>
                       <td class="p-3.5 text-right">
                         <div class="flex items-center justify-end gap-1.5">
                           <button 
+                            v-if="order.status !== 'TAMAMLANDI' && order.escrowStatus !== 'odeme_cozuldu'"
                             @click="updateEscrowStatus(order, 'odeme_cozuldu')"
-                            class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-black cursor-pointer"
+                            class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-[10px] font-black cursor-pointer shadow-xs"
                           >
                             Ödemeyi Çöz
                           </button>
+                          <span v-else class="text-[10px] font-black text-emerald-600 font-mono">
+                            ✓ Ödendi
+                          </span>
                         </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tbody v-else>
+                    <tr>
+                      <td colspan="6" class="text-center py-12 text-slate-400 text-xs">
+                        <Package :size="24" class="mx-auto mb-2 opacity-50" />
+                        Henüz onaylanan bir ihale veya güvenli havuz siparişi bulunmuyor.
                       </td>
                     </tr>
                   </tbody>
