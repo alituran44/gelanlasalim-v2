@@ -389,7 +389,15 @@ function handleSubmit() {
 
     const subCat = selectedSubcategory.value || 'Genel Satın Alma'
     const combinedCategory = `${form.value.kategori || 'İnşaat ve Yapı'} / ${subCat}`
-    const primaryImg = 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'
+    let primaryImg = form.value.images?.[0]?.url || 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
+    const catLow = (form.value.kategori || '').toLowerCase()
+    if (!form.value.images?.length) {
+      if (catLow.includes('lojistik') || catLow.includes('nakliye') || catLow.includes('havayolu')) primaryImg = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
+      else if (catLow.includes('inşaat') || catLow.includes('yapı')) primaryImg = 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80'
+      else if (catLow.includes('makine') || catLow.includes('metal')) primaryImg = 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&auto=format&fit=crop&q=80'
+      else if (catLow.includes('ambalaj') || catLow.includes('koli')) primaryImg = 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80'
+      else if (catLow.includes('bilişim') || catLow.includes('ofis')) primaryImg = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80'
+    }
 
     let session: any = {}
     if (typeof window !== 'undefined') {

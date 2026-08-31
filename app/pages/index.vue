@@ -472,37 +472,48 @@ const allCompaniesList: any[] = []
 const seedTenders: any[] = []
 
 function getTenderImage(tender: any): string {
-  if (tender.images && tender.images.length > 0) {
-    return tender.images[0].url || tender.images[0]
+  if (!tender) return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
+
+  if (tender.image && typeof tender.image === 'string' && (tender.image.startsWith('http') || tender.image.startsWith('data:image'))) {
+    return tender.image
   }
-  const text = (tender.baslik || '' + ' ' + tender.kategori || '').toLowerCase()
-  if (text.includes('domates') || text.includes('tarım') || text.includes('gıda') || text.includes('sebze')) {
-    return 'https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&auto=format&fit=crop&q=80'
+
+  if (Array.isArray(tender.images) && tender.images.length > 0) {
+    const first = tender.images[0]
+    if (typeof first === 'string' && (first.startsWith('http') || first.startsWith('data:image'))) {
+      return first
+    }
+    if (first && typeof first === 'object' && typeof first.url === 'string' && (first.url.startsWith('http') || first.url.startsWith('data:image'))) {
+      return first.url
+    }
   }
-  if (text.includes('mobilya') || text.includes('koltuk') || text.includes('masa')) {
-    return 'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=600&auto=format&fit=crop&q=80'
+
+  const text = ((tender.baslik || '') + ' ' + (tender.kategori || '') + ' ' + (tender.mainCategory || '')).toLowerCase()
+  if (text.includes('lojistik') || text.includes('nakliye') || text.includes('taşımacılık') || text.includes('havayolu') || text.includes('kargo') || text.includes('uçak')) {
+    return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
   }
-  if (text.includes('tıbbi') || text.includes('hastane') || text.includes('sağlık') || text.includes('röntgen')) {
-    return 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=600&auto=format&fit=crop&q=80'
+  if (text.includes('inşaat') || text.includes('yapı') || text.includes('şantiye') || text.includes('çimento') || text.includes('demir') || text.includes('bina')) {
+    return 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80'
   }
-  if (text.includes('inşaat') || text.includes('restorasyon') || text.includes('bina') || text.includes('konut') || text.includes('asfalt')) {
-    return 'https://images.unsplash.com/photo-1541888946425-d0fbb180c5f5?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('enerji') || text.includes('güneş') || text.includes('ges') || text.includes('trafo') || text.includes('elektrik')) {
-    return 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('bilişim') || text.includes('sunucu') || text.includes('yazılım') || text.includes('donanım')) {
-    return 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('lojistik') || text.includes('tır') || text.includes('nakliye') || text.includes('taşımacılık') || text.includes('servis')) {
-    return 'https://images.unsplash.com/photo-1519003722824-194d4455a60c?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('vinç') || text.includes('makine') || text.includes('motor') || text.includes('konveyör')) {
+  if (text.includes('makine') || text.includes('yedek parça') || text.includes('metal') || text.includes('sanayi') || text.includes('torna')) {
     return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&auto=format&fit=crop&q=80'
   }
-  if (text.includes('boru') || text.includes('kanalizasyon') || text.includes('tesisat') || text.includes('su') || text.includes('doğalgaz')) {
-    return 'https://images.unsplash.com/photo-1542013936693-884638332954?w=600&auto=format&fit=crop&q=80'
+  if (text.includes('ambalaj') || text.includes('koli') || text.includes('plastik') || text.includes('kağıt') || text.includes('kutu')) {
+    return 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80'
   }
+  if (text.includes('akaryakıt') || text.includes('enerji') || text.includes('petrol') || text.includes('madeni yağ') || text.includes('motorin')) {
+    return 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('kırtasiye') || text.includes('ofis') || text.includes('bilişim') || text.includes('teknoloji') || text.includes('yazılım') || text.includes('bilgisayar')) {
+    return 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('gıda') || text.includes('tarım') || text.includes('yemek') || text.includes('sebze') || text.includes('meyve')) {
+    return 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('sağlık') || text.includes('medikal') || text.includes('ilaç') || text.includes('hastane')) {
+    return 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=600&auto=format&fit=crop&q=80'
+  }
+
   return 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80'
 }
 
@@ -1776,7 +1787,7 @@ onMounted(() => {
               <!-- 🖼️ 1. İhale Fotoğrafı / Thumbnail -->
               <div class="relative w-full sm:w-44 sm:h-32 h-44 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
                 <img 
-                  :src="getTenderImage(tender)" 
+                  :src="getTenderImage(tender)" @error="($event.target as any).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'" 
                   :alt="tender.baslik"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
@@ -1900,7 +1911,7 @@ onMounted(() => {
               <!-- Fotoğraf -->
               <div class="relative h-44 w-full bg-slate-100 overflow-hidden">
                 <img 
-                  :src="getTenderImage(tender)" 
+                  :src="getTenderImage(tender)" @error="($event.target as any).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'" 
                   :alt="tender.baslik"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
