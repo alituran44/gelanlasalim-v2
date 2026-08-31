@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-const SCHEMA_VERSION = 'v2026_09_01_clean_slate_production_v1'
+const SCHEMA_VERSION = 'v2026_09_01_clean_slate_final_v5'
 
 // Clean state for platform - zero dummy / mock data
 export const DEFAULT_CMS_DATA = {
@@ -552,6 +552,20 @@ function safeLocalStorageSet(key: string, value: any) {
 export function useCmsData() {
   if (typeof window !== 'undefined' && !isInitialized) {
     isInitialized = true
+// Strict clean slate: Wipe any old test tenders like IHC-2026-178 from localStorage
+    try {
+      const rawMyTenders = localStorage.getItem('myTenders')
+      if (rawMyTenders && (rawMyTenders.includes('IHC-2026-178') || rawMyTenders.includes('aesredtruıo85urıy'))) {
+        localStorage.removeItem('myTenders')
+        localStorage.removeItem('myBids')
+        localStorage.removeItem('mySubmittedBids')
+        localStorage.removeItem('b2b_messages_chats')
+      }
+      const rawCms = localStorage.getItem('cmsData')
+      if (rawCms && (rawCms.includes('IHC-2026-178') || rawCms.includes('aesredtruıo85urıy'))) {
+        localStorage.removeItem('cmsData')
+      }
+    } catch (e) {}
 
     // Read previous data from localStorage
     const saved = localStorage.getItem('cmsData')

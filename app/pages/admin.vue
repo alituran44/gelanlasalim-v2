@@ -813,7 +813,7 @@ function syncLiveState() {
     }
 
     // 1. Sync all user created tenders from localStorage 'myTenders'
-    const liveTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+    const liveTenders = JSON.parse(localStorage.getItem('myTenders') || '[]').filter((t: any) => t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy')
     if (Array.isArray(liveTenders) && liveTenders.length > 0) {
       liveTenders.forEach((lt: any) => {
         const existingIdx = formState.dashboard.tenders.findIndex((t: any) => t.id === lt.id)

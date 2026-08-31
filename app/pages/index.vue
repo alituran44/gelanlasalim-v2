@@ -125,6 +125,19 @@ const selectedCompanyProfileModal = ref<any>(null)
 const userSession = ref<any>({})
 
 const { cmsData, saveCmsData } = useCmsData()
+// Clean onMounted in index.vue
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('myTenders')
+      if (raw && (raw.includes('IHC-2026-178') || raw.includes('aesredtruıo85urıy'))) {
+        localStorage.removeItem('myTenders')
+        localStorage.removeItem('myBids')
+        localStorage.removeItem('mySubmittedBids')
+      }
+    } catch (e) {}
+  }
+})
 const { sendSms } = useNetGsm()
 
 // ==================== 1. KATEGORİLER LİSTESİ (İNŞAAT, SAĞLIK, TARIM İLK 3 SIRADA) ====================
@@ -565,25 +578,10 @@ function getTenderBidsList(tender: any): any[] {
   let rawBids: any[] = []
   if (group && group.teklifler) {
     rawBids = [...group.teklifler]
-  } else if (tender.id === 'IHC-2026-178') {
-    rawBids = [
-      { id: 'TKF-892', firma: 'Ekol Global Lojistik A.Ş.', fiyat: '72.500 ₺', sure: '2 gün', tarih: '2 dk önce' },
-      { id: 'TKF-891', firma: 'Netlog Lojistik Hizmetleri', fiyat: '78.000 ₺', sure: '3 gün', tarih: '5 dk önce' }
-    ]
-  } else if (tender.id === 'IHC-2026-104') {
-    rawBids = [
-      { id: 'TKF-870', firma: 'Çimsa Çimento Sanayi T.A.Ş.', fiyat: '142.000 ₺', sure: '1 gün', tarih: '12 dk önce' },
-      { id: 'TKF-865', firma: 'Batıçim Batı Anadolu Çimento', fiyat: '149.500 ₺', sure: '2 gün', tarih: '18 dk önce' }
-    ]
-  } else if (tender.id === 'IHC-2026-112') {
-    rawBids = [
-      { id: 'TKF-854', firma: 'Mopak Kağıt Karton Sanayi', fiyat: '38.400 ₺', sure: '4 gün', tarih: '25 dk önce' }
-    ]
   }
 
   const isArtirma = (tender.ihaleYonu === 'artirma') || (tender.tur || '').toLowerCase().includes('artırma')
 
-  // Sort bids based on auction direction
   rawBids.sort((a, b) => {
     const pA = parseInt(String(a.fiyat || '0').replace(/\D/g, '')) || 0
     const pB = parseInt(String(b.fiyat || '0').replace(/\D/g, '')) || 0
@@ -611,15 +609,7 @@ const currentActiveTenderForSidebar = computed(() => {
   if (selectedTenderForLiveBids.value) return selectedTenderForLiveBids.value
   if (filteredTendersList.value.length > 0) return filteredTendersList.value[0]
   if (allTenders.value.length > 0) return allTenders.value[0]
-  return {
-    id: 'IHC-2026-178',
-    baslik: 'Lojistik & Taşımacılık Hizmeti Alımı',
-    kategori: 'Lojistik ve Taşımacılık',
-    ownerCompany: 'Ekol Global Tedarik Masası',
-    city: 'Balıkesir',
-    butce: '150.000 ₺',
-    sure: '7 gün kaldı'
-  }
+  return null
 })
 
 const activeTenderLiveBids = computed(() => {
@@ -633,14 +623,13 @@ function selectTenderForLiveBids(tender: any) {
 const liveBidsStream = computed(() => {
   const list: any[] = []
   
-  // 1. User submitted bids from localStorage
   if (typeof window !== 'undefined') {
     try {
       const myBids = JSON.parse(localStorage.getItem('myBids') || '[]')
       myBids.forEach((mb: any) => {
         list.push({
           id: mb.id || 'TKF-' + Math.floor(100 + Math.random() * 900),
-          tenderId: mb.tenderId || 'IHC-2026-178',
+          tenderId: mb.tenderId,
           tenderTitle: mb.ilanBaslik || mb.tenderTitle || 'Kurumsal Satın Alma İhalesi',
           bidderRealName: mb.bidderName || userSession.value?.companyName || 'Kendi Şirketiniz',
           bidder: '👤 Sizin Teklifiniz',
@@ -655,7 +644,6 @@ const liveBidsStream = computed(() => {
     } catch (e) {}
   }
 
-  // 2. CMS received bids
   const receivedGroups = cmsData.value?.dashboard?.receivedBids || []
   receivedGroups.forEach((rg: any) => {
     (rg.teklifler || []).forEach((tkf: any, idx: number) => {
@@ -677,29 +665,7 @@ const liveBidsStream = computed(() => {
     })
   })
 
-  // 3. Platform live active market bids seed
-  const platformSeeds = [
-    { id: 'TKF-892', tenderId: 'IHC-2026-178', tenderTitle: 'Lojistik & Taşımacılık İhalesi', bidderRealName: 'Ekol Global Lojistik A.Ş.', price: '72.500 ₺', priceNum: 72500, time: '2 dk önce', status: 'En İyi Teklif', city: 'İstanbul' },
-    { id: 'TKF-891', tenderId: 'IHC-2026-178', tenderTitle: 'Lojistik & Taşımacılık İhalesi', bidderRealName: 'Netlog Lojistik Hizmetleri', price: '78.000 ₺', priceNum: 78000, time: '5 dk önce', status: 'Canlı Eksiltme', city: 'Kocaeli' },
-    { id: 'TKF-870', tenderId: 'IHC-2026-104', tenderTitle: 'Hazır Beton & Çimento Tedariği', bidderRealName: 'Çimsa Çimento Sanayi T.A.Ş.', price: '142.000 ₺', priceNum: 142000, time: '12 dk önce', status: 'En İyi Teklif', city: 'İzmir' },
-    { id: 'TKF-865', tenderId: 'IHC-2026-104', tenderTitle: 'Hazır Beton & Çimento Tedariği', bidderRealName: 'Batıçim Batı Anadolu Çimento', price: '149.500 ₺', priceNum: 149500, time: '18 dk önce', status: 'Canlı Eksiltme', city: 'Manisa' },
-    { id: 'TKF-854', tenderId: 'IHC-2026-112', tenderTitle: 'Oluklu Mukavva Koli & Ambalaj', bidderRealName: 'Mopak Kağıt Karton Sanayi', price: '38.400 ₺', priceNum: 38400, time: '25 dk önce', status: 'En İyi Teklif', city: 'Bursa' },
-    { id: 'TKF-840', tenderId: 'IHC-2026-120', tenderTitle: 'CNC Fason Talaşlı İmalat Parça', bidderRealName: 'Kaya Pres Metal Sanayi Ltd.', price: '89.000 ₺', priceNum: 89000, time: '34 dk önce', status: 'En İyi Teklif', city: 'Ankara' }
-  ]
-
-  platformSeeds.forEach((ps, idx) => {
-    if (!list.some(item => item.id === ps.id)) {
-      list.push({
-        ...ps,
-        bidder: maskBidderName(ps, idx),
-        isMine: false
-      })
-    }
-  })
-
-  // Sort: Lowest price first (Canlı Eksiltme Sıralaması / Reverse Auction Ranking)
   list.sort((a, b) => (a.priceNum || 0) - (b.priceNum || 0))
-
   return list
 })
 

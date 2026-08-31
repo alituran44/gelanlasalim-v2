@@ -215,6 +215,15 @@ const bidForm = ref({
 onMounted(() => {
   if (typeof window !== 'undefined') {
     try {
+      const raw = localStorage.getItem('myTenders')
+      if (raw && (raw.includes('IHC-2026-178') || raw.includes('aesredtruıo85urıy'))) {
+        localStorage.removeItem('myTenders')
+        localStorage.removeItem('myBids')
+      }
+    } catch (e) {}
+  }
+  if (typeof window !== 'undefined') {
+    try {
       userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
       if (userSession.value.companyName || userSession.value.company) {
         bidForm.value.firmaAdi = userSession.value.companyName || userSession.value.company
