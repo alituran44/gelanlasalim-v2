@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-const SCHEMA_VERSION = 'v2026_08_30_clean_slate_final_1'
+const SCHEMA_VERSION = 'v2026_08_31_quota_safe_final_v2'
 
 // Clean state for platform - zero dummy / mock data
 export const DEFAULT_CMS_DATA = {
@@ -167,6 +167,55 @@ export const DEFAULT_CMS_DATA = {
 const cmsDataRef = ref({ ...DEFAULT_CMS_DATA })
 let isInitialized = false
 
+
+function stripHeavyDataUrls(obj: any, depth = 0): any {
+  if (!obj || typeof obj !== 'object' || depth > 8) return obj
+  try {
+    for (const key of Object.keys(obj)) {
+      const val = obj[key]
+      if (typeof val === 'string' && (val.startsWith('data:') || val.length > 25000)) {
+        if (key.includes('img') || key.includes('image') || key === 'url') {
+          obj[key] = 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'
+        } else {
+          obj[key] = ''
+        }
+      } else if (typeof val === 'object') {
+        stripHeavyDataUrls(val, depth + 1)
+      }
+    }
+  } catch (e) {}
+  return obj
+}
+
+function sanitizeForStorage(data: any): any {
+  try {
+    const copy = JSON.parse(JSON.stringify(data))
+    stripHeavyDataUrls(copy)
+    return copy
+  } catch (e) {
+    return data
+  }
+}
+
+function safeLocalStorageSet(key: string, value: any) {
+  if (typeof window === 'undefined') return
+  try {
+    const jsonStr = typeof value === 'string' ? value : JSON.stringify(value)
+    localStorage.setItem(key, jsonStr)
+  } catch (err) {
+    console.warn(`localStorage quota reached on key "${key}", cleaning...`, err)
+    try {
+      localStorage.removeItem('tenderDraft')
+      localStorage.removeItem('userNotifications')
+      localStorage.removeItem('allRegisteredUsers')
+      const sanitized = sanitizeForStorage(value)
+      localStorage.setItem(key, JSON.stringify(sanitized))
+    } catch (e2) {
+      console.warn('Could not save to localStorage (relying on memory state):', e2)
+    }
+  }
+}
+
 export function useCmsData() {
   if (typeof window !== 'undefined' && !isInitialized) {
     isInitialized = true
@@ -260,35 +309,15 @@ export function useCmsData() {
   function saveCmsData(newData: typeof DEFAULT_CMS_DATA) {
     cmsDataRef.value = { ...newData }
     if (typeof window !== 'undefined') {
-      try {
-        const sanitized = sanitizeForStorage(newData)
-        localStorage.setItem('cmsData', JSON.stringify(sanitized))
-      } catch (err) {
-        console.warn('localStorage save quota limit reached (auto-cleaning):', err)
-        try {
-          localStorage.removeItem('tenderDraft')
-          localStorage.removeItem('userNotifications')
-          const minimal = {
-            hero: DEFAULT_CMS_DATA.hero,
-            dashboard: {
-              tenders: (newData as any)?.dashboard?.tenders?.slice(0, 15) || [],
-              receivedBids: (newData as any)?.dashboard?.receivedBids?.slice(0, 15) || []
-            },
-            kycVerifications: (newData as any)?.kycVerifications || [],
-            siteSettings: DEFAULT_CMS_DATA.siteSettings
-          }
-          localStorage.setItem('cmsData', JSON.stringify(minimal))
-        } catch (e2) {
-          console.warn('Could not save to localStorage (keeping in reactive memory):', e2)
-        }
-      }
+      const sanitized = sanitizeForStorage(newData)
+      safeLocalStorageSet('cmsData', sanitized)
     }
   }
 
   function resetCmsData() {
     cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
     if (typeof window !== 'undefined') {
-      localStorage.setItem('cmsData', JSON.stringify(DEFAULT_CMS_DATA))
+      safeLocalStorageSet('cmsData', DEFAULT_CMS_DATA)
       localStorage.removeItem('myTenders')
     }
   }
