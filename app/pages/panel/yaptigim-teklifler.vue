@@ -160,6 +160,108 @@ function openReviseModal(bid: any) {
   showReviseModal.value = true
 }
 
+async function acceptCounterOffer(teklif: any) {
+  // Extract latest counter offer price if available
+  let latestPrice = teklif.teklifFiyatim
+  if (teklif.pazarlikGecmisi && teklif.pazarlikGecmisi.length > 0) {
+    const lastEntry = teklif.pazarlikGecmisi[0]
+    if (lastEntry.fiyat) {
+      latestPrice = lastEntry.fiyat
+    }
+  }
+
+  const confirmAccept = confirm(`🎉 Alıcı firmanın ${latestPrice} tutarındaki karşı teklifini kabul edip sözleşmeyi onaylamak istiyor musunuz?\n\nBu işlemle birlikte ihale mutabakatla sonuçlanacak ve sevkiyat süreci başlayacaktır.`)
+  if (!confirmAccept) return
+
+  const now = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+
+  // 1. Mark supplier bid as 'onaylandi'
+  teklif.durum = 'onaylandi'
+  teklif.teklifFiyatim = latestPrice
+  if (!teklif.pazarlikGecmisi) teklif.pazarlikGecmisi = []
+  teklif.pazarlikGecmisi.unshift({
+    kim: 'Tedarikçi (Siz)',
+    mesaj: `✓ Karşı teklif kabul edildi (${latestPrice}). Mutabakat sağlandı.`,
+    tarih: now,
+    fiyat: latestPrice
+  })
+
+  // 2. Sync to matching receivedBid slot in cmsData
+  const receivedGroups = cmsData.value?.dashboard?.receivedBids || []
+  let matchingGroup = receivedGroups.find((g: any) => g.id === teklif.tenderId || g.baslik === teklif.ilanBaslik)
+  if (matchingGroup && matchingGroup.teklifler) {
+    matchingGroup.teklifler.forEach((b: any) => {
+      if (b.id === teklif.id || b.firma === teklif.bidderName) {
+        b.durum = 'onaylandi'
+        b.fiyat = latestPrice
+        if (!b.pazarlikGecmisi) b.pazarlikGecmisi = []
+        b.pazarlikGecmisi.unshift({
+          kim: 'Tedarikçi Firma',
+          mesaj: `✓ Karşı teklif kabul edildi (${latestPrice}). Mutabakat sağlandı.`,
+          tarih: now,
+          fiyat: latestPrice
+        })
+      } else {
+        b.durum = 'elendi'
+      }
+    })
+  }
+
+  // 3. Mark the tender as closed
+  const tendersList = cmsData.value?.dashboard?.tenders || []
+  const tenderObj = tendersList.find((t: any) => t.id === teklif.tenderId || t.baslik === teklif.ilanBaslik)
+  if (tenderObj) {
+    tenderObj.durum = 'closed'
+    tenderObj.sure = 'Sonuçlandı (Mutabakat Sağlandı)'
+  }
+
+  // 4. Update localStorage
+  if (typeof window !== 'undefined') {
+    try {
+      const myBids = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]')
+      myBids.forEach((mb: any) => {
+        if (mb.id === teklif.id || mb.tenderId === teklif.tenderId) {
+          mb.status = 'Onaylandı'
+          mb.durum = 'onaylandi'
+          mb.price = latestPrice
+        }
+      })
+      localStorage.setItem('mySubmittedBids', JSON.stringify(myBids))
+      window.dispatchEvent(new Event('storage'))
+    } catch (e) {}
+  }
+
+  saveCmsData(cmsData.value)
+
+  // Send NetGSM SMS to buyer
+  await sendSms({
+    recipientPhone: '+90 532 000 11 22',
+    recipientName: teklif.aliciFirma,
+    templateName: 'Karşı Teklif Kabulü Bildirimi',
+    messageBody: `Sayın Yetkili, "${teklif.ilanBaslik}" ihalesinde ilettiğiniz ${latestPrice} karşı teklif tedarikçi tarafından KABUL EDİLMİŞTİR. İhale mutabakatla sonuçlanmıştır.`
+  })
+
+  alert(`✓ MUTABAKAT SAĞLANDI!\n\n"${teklif.ilanBaslik}" ihalesinde ${latestPrice} tutarında anlaşma onaylandı. Sevkiyat ve faturalandırma aşamasına geçebilirsiniz.`)
+}
+
+async function rejectCounterOffer(teklif: any) {
+  const confirmReject = confirm(`Alıcı firmanın karşı teklifini reddetmek istediğinize emin misiniz?`)
+  if (!confirmReject) return
+
+  teklif.durum = 'reddedildi'
+  const now = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+
+  if (!teklif.pazarlikGecmisi) teklif.pazarlikGecmisi = []
+  teklif.pazarlikGecmisi.unshift({
+    kim: 'Tedarikçi (Siz)',
+    mesaj: '✕ Karşı teklif reddedildi.',
+    tarih: now
+  })
+
+  saveCmsData(cmsData.value)
+  alert('Karşı teklif reddedildi.')
+}
+
 async function submitRevise() {
   if (!revisedPrice.value) {
     alert('Lütfen revize teklif tutarınızı giriniz.')
@@ -368,21 +470,55 @@ function submitReview() {
               }}
             </span>
 
-            <!-- Eylem Butonları -->
-            <div class="flex items-center gap-2">
-              <!-- Revize Teklif Butonu (Pazarlıkta veya Reddedildiyse) -->
-              <button
-                v-if="teklif.durum === 'pazarlik' || teklif.durum === 'reddedildi'"
-                type="button"
-                @click="openReviseModal(teklif)"
-                class="rounded-xl px-4 py-2 text-xs font-black bg-amber-400 hover:bg-amber-500 text-slate-950 transition shadow-sm flex items-center gap-1.5 cursor-pointer border border-amber-300"
-              >
-                <RotateCw :size="13" />
-                <span>Revize Teklif Ver</span>
-              </button>
+            <!-- Eylem Butonları (Karşı Teklif Geldiğinde Onayla veya Pazarlık Yap) -->
+            <div class="flex items-center gap-2 flex-wrap justify-end">
+              
+              <!-- ⚡ KARŞI TEKLİF GELDİĞİNDE: 1. ONAYLA (KABUL ET) | 2. PAZARLIK YAP (REVİZE TEKLİF) | 3. REDDET -->
+              <template v-if="teklif.durum === 'pazarlik'">
+                <button
+                  type="button"
+                  @click="acceptCounterOffer(teklif)"
+                  class="rounded-xl px-3.5 py-2 text-xs font-black bg-emerald-600 hover:bg-emerald-700 text-white transition shadow-sm flex items-center gap-1.5 cursor-pointer"
+                  title="Alıcının önerdiği karşı teklifi kabul et ve ihaleyi kazan"
+                >
+                  <CheckCircle2 :size="13" />
+                  <span>Karşı Teklifi Kabul Et (Onayla)</span>
+                </button>
 
-              <!-- Onaylandıysa Değerlendirme & Mücbir Sebep -->
-              <template v-if="teklif.durum === 'onaylandi'">
+                <button
+                  type="button"
+                  @click="openReviseModal(teklif)"
+                  class="rounded-xl px-3 py-2 text-xs font-black bg-amber-400 hover:bg-amber-500 text-slate-950 transition shadow-sm flex items-center gap-1.5 cursor-pointer border border-amber-300"
+                  title="Farklı bir indirimli teklif sun"
+                >
+                  <RotateCw :size="13" />
+                  <span>Pazarlık Yap (Revize Ver)</span>
+                </button>
+
+                <button
+                  type="button"
+                  @click="rejectCounterOffer(teklif)"
+                  class="rounded-xl px-2.5 py-2 text-xs font-bold text-red-600 hover:bg-red-50 border border-red-200 cursor-pointer"
+                  title="Karşı teklifi reddet"
+                >
+                  <X :size="13" />
+                </button>
+              </template>
+
+              <!-- REDDEDİLDİYSE VEYA BEKLİYORSA YENİDEN REVİZE VER -->
+              <template v-else-if="teklif.durum === 'reddedildi' || teklif.durum === 'bekliyor'">
+                <button
+                  type="button"
+                  @click="openReviseModal(teklif)"
+                  class="rounded-xl px-3 py-2 text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-800 transition flex items-center gap-1.5 cursor-pointer border border-slate-200"
+                >
+                  <RotateCw :size="12" />
+                  <span>Teklifi Güncelle / Revize Et</span>
+                </button>
+              </template>
+
+              <!-- ONAYLANDIYSA DEĞERLENDİRME & MÜCBİR SEBEP -->
+              <template v-else-if="teklif.durum === 'onaylandi'">
                 <button
                   type="button"
                   @click="openReviewModal(teklif)"
@@ -400,8 +536,8 @@ function submitReview() {
                   <Scale :size="13" />
                 </button>
               </template>
-            </div>
 
+            </div>
           </div>
         </div>
 
