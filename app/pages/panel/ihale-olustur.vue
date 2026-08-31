@@ -15,48 +15,6 @@ const { fetchTrHolidays, trPublicHolidays } = usePublicApis()
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const imageInputRef = ref<HTMLInputElement | null>(null)
 
-// Check if company is verified by Admin KYC desk
-const isCompanyVerified = computed(() => {
-  if (typeof window === 'undefined') return true
-  try {
-    const session = JSON.parse(localStorage.getItem('userSession') || '{}')
-    const docs = JSON.parse(localStorage.getItem('companyVerificationDocs') || '{}')
-
-    if (session.isVerified === true || session.kycStatus === 'approved' || docs.status === 'approved' || docs.isVerified === true) {
-      return true
-    }
-
-    const compName = session.companyName || session.company || ''
-    const email = session.email || ''
-    const inCms = (cmsData.value?.kycVerifications || []).find((k: any) => 
-      (email && k.email === email) || (compName && k.companyName === compName)
-    )
-    if (inCms && inCms.status === 'approved') {
-      return true
-    }
-  } catch (e) {}
-  return false
-})
-
-const companyKycStatus = computed<'missing' | 'pending' | 'rejected' | 'approved'>(() => {
-  if (isCompanyVerified.value) return 'approved'
-  if (typeof window === 'undefined') return 'pending'
-  try {
-    const session = JSON.parse(localStorage.getItem('userSession') || '{}')
-    const docs = JSON.parse(localStorage.getItem('companyVerificationDocs') || '{}')
-    if (session.kycStatus === 'rejected' || docs.status === 'rejected') return 'rejected'
-    if (session.kycStatus === 'pending' || docs.status === 'pending') return 'pending'
-    
-    const compName = session.companyName || session.company || ''
-    const email = session.email || ''
-    const inCms = (cmsData.value?.kycVerifications || []).find((k: any) => 
-      (email && k.email === email) || (compName && k.companyName === compName)
-    )
-    if (inCms) return inCms.status as any
-  } catch (e) {}
-  return 'pending'
-})
-
 const form = ref({
   baslik: '',
   kategori: 'İnşaat ve Yapı',
