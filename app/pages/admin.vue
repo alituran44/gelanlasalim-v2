@@ -700,12 +700,32 @@ const toastMessage = ref('')
 const toastType = ref<'success' | 'info' | 'error'>('success')
 
 // Computed counts
+function isTenderClosedOrInEscrow(tender: any): boolean {
+  if (!tender) return false
+  if (tender.durum === 'closed' || tender.durum === 'sonuclandi') return true
+  // check if in escrow orders
+  const inEscrow = (formState.escrowOrders || []).some((o: any) => o.tenderId === tender.id || (tender.baslik && o.tenderTitle && o.tenderTitle.includes(tender.baslik)))
+  if (inEscrow) return true
+  // check if has approved bid in receivedBids
+  const hasApprovedBid = (formState.dashboard?.receivedBids || []).some((g: any) => {
+    if (g.id === tender.id || (tender.baslik && g.baslik && g.baslik.includes(tender.baslik))) {
+      return (g.teklifler || []).some((tk: any) => tk.durum === 'onaylandi' || tk.durum === 'anlasildi')
+    }
+    return false
+  })
+  return hasApprovedBid
+}
+
 const pendingTendersCount = computed(() => {
   return (formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'pending_approval' || t.adminApproved === false).length
 })
 
 const activeTendersCount = computed(() => {
-  return (formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'active' && t.adminApproved !== false).length
+  return (formState.dashboard?.tenders || []).filter((t: any) => !isTenderClosedOrInEscrow(t) && t.durum === 'active' && t.adminApproved !== false).length
+})
+
+const closedTendersCount = computed(() => {
+  return (formState.dashboard?.tenders || []).filter((t: any) => isTenderClosedOrInEscrow(t)).length
 })
 
 const pendingKycCount = computed(() => {
@@ -779,6 +799,30 @@ function syncLiveEscrowOrders() {
 
   if (formState.dashboard) {
     formState.dashboard.escrowOrders = formState.escrowOrders
+  }
+  // Auto-mark closed and sync with escrow
+  if (formState.dashboard?.tenders) {
+    formState.dashboard.tenders.forEach((t: any) => {
+      if (isTenderClosedOrInEscrow(t)) {
+        t.durum = 'closed'
+        t.statusLabel = 'Sonuçlandı (Mutabakat Sağlandı)'
+      }
+    })
+  }
+
+  if (typeof window !== 'undefined') {
+    try {
+      const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+      if (Array.isArray(myTenders)) {
+        myTenders.forEach((mt: any) => {
+          if (isTenderClosedOrInEscrow(mt)) {
+            mt.durum = 'closed'
+            mt.statusLabel = 'Sonuçlandı (Mutabakat Sağlandı)'
+          }
+        })
+        localStorage.setItem('myTenders', JSON.stringify(myTenders))
+      }
+    } catch (e) {}
   }
 }
 
@@ -3630,25 +3674,32 @@ function removeSubmittedBid(index: number) {
               </div>
 
               <!-- Status Filters -->
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2 flex-wrap">
                 <button 
                   @click="tenderFilterStatus = 'pending'"
                   class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
                   :class="tenderFilterStatus === 'pending' ? 'bg-amber-600 text-white shadow-md' : 'bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800'"
                 >
-                  <Clock :size="13" /> Onay Bekleyenler ({{ (formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'pending_approval' || t.adminApproved === false).length }})
+                  <Clock :size="13" /> Onay Bekleyenler ({{ (formState.dashboard?.tenders || []).filter((t: any) => !isTenderClosedOrInEscrow(t) && (t.durum === 'pending_approval' || t.adminApproved === false)).length }})
                 </button>
                 <button 
                   @click="tenderFilterStatus = 'active'"
                   class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
                   :class="tenderFilterStatus === 'active' ? 'bg-emerald-600 text-white shadow-md' : 'bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800'"
                 >
-                  <CheckCircle2 :size="13" /> Yayındaki Aktif İhaleler ({{ (formState.dashboard?.tenders || []).filter((t: any) => t.durum === 'active' && t.adminApproved !== false).length }})
+                  <CheckCircle2 :size="13" /> Yayındaki Aktif İhaleler ({{ (formState.dashboard?.tenders || []).filter((t: any) => !isTenderClosedOrInEscrow(t) && (t.durum === 'active' || !t.durum) && t.durum !== 'rejected' && t.adminApproved !== false).length }})
+                </button>
+                <button 
+                  @click="tenderFilterStatus = 'closed'"
+                  class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
+                  :class="tenderFilterStatus === 'closed' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800'"
+                >
+                  <Package :size="13" /> Sonuçlanan / Escrow Havuzundaki İhaleler ({{ (formState.dashboard?.tenders || []).filter((t: any) => isTenderClosedOrInEscrow(t)).length }})
                 </button>
                 <button 
                   @click="tenderFilterStatus = 'all'"
                   class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 cursor-pointer"
-                  :class="tenderFilterStatus === 'all' ? 'bg-blue-600 text-white shadow-md' : 'bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800'"
+                  :class="tenderFilterStatus === 'all' ? 'bg-slate-700 text-white shadow-md' : 'bg-slate-950 text-slate-400 border border-slate-800 hover:bg-slate-800'"
                 >
                   <Layers :size="13" /> Tümü ({{ (formState.dashboard?.tenders || []).length }})
                 </button>
@@ -3658,28 +3709,29 @@ function removeSubmittedBid(index: number) {
               <div class="space-y-3 pt-2">
                 <div 
                   v-for="(tender, index) in (formState.dashboard?.tenders || []).filter((t: any) => {
-                    if (tenderFilterStatus === 'pending') return t.durum === 'pending_approval' || t.adminApproved === false
-                    if (tenderFilterStatus === 'active') return (t.durum === 'active' || !t.durum) && t.durum !== 'closed' && t.durum !== 'rejected' && t.adminApproved !== false
-                    if (tenderFilterStatus === 'closed') return t.durum === 'closed'
+                    const isClosed = isTenderClosedOrInEscrow(t)
+                    if (tenderFilterStatus === 'pending') return !isClosed && (t.durum === 'pending_approval' || t.adminApproved === false)
+                    if (tenderFilterStatus === 'active') return !isClosed && (t.durum === 'active' || !t.durum) && t.durum !== 'rejected' && t.adminApproved !== false
+                    if (tenderFilterStatus === 'closed') return isClosed
                     return true
                   })" 
                   :key="tender.id" 
                   class="p-5 rounded-2xl border bg-slate-950 space-y-3 transition"
-                  :class="(tender.durum === 'pending_approval' || tender.adminApproved === false) ? 'border-amber-500/50 bg-amber-950/10' : (tender.durum === 'rejected' ? 'border-red-900/40 bg-red-950/10' : 'border-slate-800')"
+                  :class="isTenderClosedOrInEscrow(tender) ? 'border-blue-500/40 bg-blue-950/10' : ((tender.durum === 'pending_approval' || tender.adminApproved === false) ? 'border-amber-500/50 bg-amber-950/10' : (tender.durum === 'rejected' ? 'border-red-900/40 bg-red-950/10' : 'border-slate-800'))"
                 >
                   <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
-                      <div class="flex items-center gap-2">
+                      <div class="flex items-center gap-2 flex-wrap">
                         <span class="text-xs font-mono bg-blue-950 text-blue-400 border border-blue-800 px-2 py-0.5 rounded font-bold">{{ tender.id }}</span>
                         <span class="text-sm font-black text-white">{{ tender.baslik }}</span>
                         <span 
                           class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider"
-                          :class="(tender.durum === 'pending_approval' || tender.adminApproved === false) ? 'bg-amber-950 text-amber-400 border border-amber-800 animate-pulse' : (tender.durum === 'rejected' ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-emerald-950 text-emerald-400 border border-emerald-800')"
+                          :class="isTenderClosedOrInEscrow(tender) ? 'bg-blue-950 text-blue-400 border border-blue-800' : ((tender.durum === 'pending_approval' || tender.adminApproved === false) ? 'bg-amber-950 text-amber-400 border border-amber-800 animate-pulse' : (tender.durum === 'rejected' ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-emerald-950 text-emerald-400 border border-emerald-800'))"
                         >
-                          {{ (tender.durum === 'pending_approval' || tender.adminApproved === false) ? '⏳ Onay Bekliyor' : (tender.durum === 'rejected' ? '✕ Reddedildi' : (tender.durum === 'closed' ? '🏆 Sonuçlandı & Escrow Havuzunda' : '✓ Yayında (Aktif)')) }}
+                          {{ isTenderClosedOrInEscrow(tender) ? '🏆 Sonuçlandı & Escrow Havuzunda' : ((tender.durum === 'pending_approval' || tender.adminApproved === false) ? '⏳ Onay Bekliyor' : (tender.durum === 'rejected' ? '✕ Reddedildi' : '✓ Yayında (Aktif)')) }}
                         </span>
                       </div>
-                      <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-3">
+                      <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-3 flex-wrap">
                         <span><strong>Kategori:</strong> {{ tender.kategori }}</span>
                         <span><strong>Şehir:</strong> {{ tender.city || 'Belirtilmedi' }}</span>
                         <span><strong>Açan Firma:</strong> <span class="text-blue-400">{{ tender.ownerCompany || 'Kurumsal Üye' }}</span></span>
@@ -3689,14 +3741,21 @@ function removeSubmittedBid(index: number) {
 
                     <div class="flex items-center gap-2">
                       <button 
-                        v-if="tender.durum === 'pending_approval' || tender.adminApproved === false"
+                        v-if="isTenderClosedOrInEscrow(tender)"
+                        @click="activeTab = 'escrow_delivery'"
+                        class="px-3.5 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-md"
+                      >
+                        <Package :size="13" /> 📦 Sipariş & Escrow'da Gör →
+                      </button>
+                      <button 
+                        v-else-if="tender.durum === 'pending_approval' || tender.adminApproved === false"
                         @click="approveTender(tender)"
                         class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition flex items-center gap-1 cursor-pointer shadow-md shadow-emerald-600/20"
                       >
                         <CheckCircle2 :size="13" /> Onayla ve Yayına Al
                       </button>
                       <button 
-                        v-if="tender.durum !== 'rejected'"
+                        v-if="!isTenderClosedOrInEscrow(tender) && tender.durum !== 'rejected'"
                         @click="rejectTender(tender)"
                         class="px-3.5 py-2 bg-red-950/40 hover:bg-red-900/60 text-red-400 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-red-800/40"
                       >
