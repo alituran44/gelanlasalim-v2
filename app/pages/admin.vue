@@ -577,68 +577,30 @@ if (!formState.crmSettings) {
   }
 }
 
-if (!formState.emailSettings) {
-  formState.emailSettings = {
-    senderName: 'İhaleciBurada.com Destek & Operasyon',
-    senderEmail: 'ihalecib@gmail.com',
-    replyToEmail: 'ihalecib@gmail.com',
-    smtpHost: 'smtp.gmail.com',
-    smtpPort: 587,
-    smtpUser: 'ihalecib@gmail.com',
-    smtpPassword: '••••••••',
-    smtpEncryption: 'TLS',
-    autoNotifications: {
-      onRegister: true,
-      onNewTender: true,
-      onNewBid: true,
-      onAuction: true,
-      onEscrow: true
-    },
-    subscribers: [],
-    templates: []
-  }
-}
-
-if (!formState.emailSettings.templates || formState.emailSettings.templates.length === 0) {
-  formState.emailSettings.templates = [
-    {
-      id: 'TPL_WELCOME',
-      name: 'Kurumsal Hoş Geldiniz & KYC Mavi Rozet Onayı',
-      subject: 'İhaleciBurada.com Kurumsal Üyeliğiniz ve Mavi Rozetiniz Onaylandı!',
-      content: 'Sayın Yetkili,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket evraklarınız (Vergi Levhası, Ticaret Sicil Gazetesi, İmza Sirküleri) hukuk birimimizce doğrulanmış ve hesabınıza Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: https://ihalciburada.com/panel\n\nSaygılarımızla,\nİhaleciBurada Platform A.Ş.\nİletişim: 0850 840 86 95 | ihalecib@gmail.com'
-    },
-    {
-      id: 'TPL_NEW_TENDER',
-      name: 'Yeni İhale Yayını & Şartname Teklif Çağrısı',
-      subject: 'Yeni İhale İlanı: [İhale Başlığı] için Teklif Süreci Başladı',
-      content: 'Sayın Tedarikçimiz,\n\nFaaliyet gösterdiğiniz sektörde yeni bir satın alma ihalesi onaylanarak yayına alınmıştır.\n\n• İhale Başlığı: [İhale Başlığı]\n• Başlangıç Bütçesi: [Lider Fiyat]\n• Son Teklif Tarihi: [Kalan Süre]\n\nTeknik şartnameyi indirmek ve doğrudan fiyat teklifinizi iletmek için bağlantıyı ziyaret ediniz:\nhttps://ihalciburada.com/pazar-yeri\n\nİhaleciBurada.com Satın Alma Masası'
-    },
-    {
-      id: 'TPL_NEW_BID',
-      name: 'İhaleye Yeni Teklif Geldi Bildirimi',
-      subject: 'İhalenize Yeni Teklif Geldi: [İhale Başlığı]',
-      content: 'Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz "[İhale Başlığı]" başlıklı satın alma ilanı için onaylı bir tedarikçi firma tarafından yeni bir fiyat teklifi sunuldu.\n\n• Sunulan Teklif: [Lider Fiyat] TL\n• Teklif Veren: [Firma Adı]\n\nTeklifi incelemek ve karşı pazarlık teklifinizi iletmek için kurumsal panelinize giriş yapınız:\nhttps://ihalciburada.com/panel/gelen-teklifler\n\nİhaleciBurada B2B Operasyon'
-    },
-    {
-      id: 'TPL_AUCTION_ALERT',
-      name: 'Canlı Tersine Eksiltme & Fiyat Revizyonu Çağrısı',
-      subject: '⚡ Canlı Tersine Eksiltme Başladı! Fiyatınızı Güncelleyin',
-      content: 'Sayın Tedarikçi Yetkilisi,\n\nTeklif vermiş olduğunuz "[İhale Başlığı]" ihalesinde alıcı firma Canlı Tersine Eksiltme oturumunu başlatmıştır.\n\n• Lider En İyi Fiyat: [Lider Fiyat] TL\n• Kalan Süre: [Kalan Süre]\n\nİhale süresi dolmadan en avantajlı teklifinizi sunmak için canlı eksiltme odasına katılın:\nhttps://ihalciburada.com/panel\n\nİhaleciBurada Canlı İhale Odası'
-    },
-    {
-      id: 'TPL_DISPUTE_DECISION',
-      name: 'Mücbir Sebep & Hukuki Fesih Kararı',
-      subject: '⚖️ Hakem Heyeti Kararı: Mücbir Sebep Fesih Talebi Sonuçlandı',
-      content: 'Sayın Yetkili,\n\n"[İhale Başlığı]" sözleşmesine istinaden iletmiş olduğunuz mücbir sebep fesih başvurusu İhaleciBurada Hukuk ve Hakem Heyeti tarafından incelenmiştir.\n\nKarar: Talebiniz haklı bulunarak sözleşme cezai şartsız feshedilmiş ve güvence bedeli serbest bırakılmıştır.\n\nDetaylı Hakem Kararı: https://ihalciburada.com/panel/mucbir-sebep\n\nİhaleciBurada Hukuk ve Hakem Heyeti'
-    },
-    {
-      id: 'TPL_ESCROW_RECEIPT',
-      name: 'Escrow Güvenli Ödeme Sözleşmesi & Tahsilat Makbuzu',
-      subject: 'Escrow Güvenli Ödeme Blokesi Alındı — Teslimat Başlatılabilir',
-      content: 'Sayın Tedarikçi ve Alıcı Yetkilileri,\n\n"[İhale Başlığı]" ihalesine ait sözleşme bedeli alıcı tarafından İhaleciBurada Escrow Güvence Havuzuna aktarılmış ve bloke edilmiştir.\n\nTedarikçi firma, şartnameye uygun teslimat sürecini başlatabilir. Mal/hizmet eksiksiz teslim alınıp onaylandığında ödeme derhal tedarikçinin IBAN hesabına aktarılacaktır.\n\nSipariş & Teslimat Takibi: https://ihalciburada.com/panel/siparis-teslimat\n\nİhaleciBurada Finans & Hukuk Birimi'
+// Ensure email templates are never empty
+  if (!formState.emailSettings) {
+    formState.emailSettings = {
+      senderName: 'İhaleciBurada.com Destek & Operasyon',
+      senderEmail: 'ihalecib@gmail.com',
+      replyToEmail: 'ihalecib@gmail.com',
+      smtpHost: 'smtp.gmail.com',
+      smtpPort: 587,
+      smtpUser: 'ihalecib@gmail.com',
+      smtpPassword: '••••••••',
+      smtpEncryption: 'TLS',
+      autoNotifications: {
+        onRegister: true,
+        onNewTender: true,
+        onNewBid: true,
+        onAuction: true,
+        onEscrow: true
+      },
+      subscribers: [],
+      templates: [{"id":"TPL_WELCOME","name":"Kurumsal Hoş Geldiniz & KYC Onayı","subject":"İhaleciBurada.com Kurumsal Üyeliğiniz ve 1 Ay Ücretsiz Deneme Paketiniz Onaylandı!","content":"Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza 1 Ay %100 Ücretsiz Lansman Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nİhaleciBurada Platform A.Ş.\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"},{"id":"TPL_NEW_TENDER","name":"Yeni İhale Yayını & Şartname Teklif Çağrısı","subject":"Yeni İhale İlanı: [İhale Başlığı] için Teklif Süreci Başladı","content":"Sayın Tedarikçimiz,\n\nFaaliyet gösterdiğiniz sektörde yeni bir satın alma ihalesi onaylanarak yayına alınmıştır.\n\n• İhale Başlığı: [İhale Başlığı]\n• Başlangıç Bütçesi: [Lider Fiyat]\n• Kalan Süre: [Kalan Süre]\n\nTeknik şartnameyi indirmek ve doğrudan fiyat teklifinizi iletmek için bağlantıyı ziyaret ediniz:\n[Panel Linki]\n\nİhaleciBurada.com Satın Alma Masası"},{"id":"TPL_NEW_BID","name":"İhaleye Yeni Teklif Geldi Bildirimi","subject":"İhalenize Yeni Teklif Geldi: [İhale Başlığı]","content":"Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz \"[İhale Başlığı]\" başlıklı satın alma ilanı için onaylı bir tedarikçi firma tarafından yeni bir fiyat teklifi sunuldu.\n\n• Sunulan Teklif: [Lider Fiyat] TL\n• Teklif Veren: [Firma Adı]\n\nTeklifi incelemek ve karşı pazarlık teklifinizi iletmek için kurumsal panelinize giriş yapınız:\n[Panel Linki]\n\nİhaleciBurada B2B Operasyon"},{"id":"TPL_AUCTION_START","name":"Canlı Tersine Eksiltme Başladı Uyarısı","subject":"Canlı İhale Başladı: [İhale Başlığı] İhalesinde Fiyatlar Eksiliyor!","content":"Sayın Yetkili,\n\nTakip ettiğiniz \"[İhale Başlığı]\" ihalesi için canlı tersine eksiltme odası açılmıştır.\n\nTedarikçiler anlık olarak en iyi fiyatı sunmak için yarışmaktadır. Canlı odaya katılarak teklifinizi güncelleyebilir veya süreci izleyebilirsiniz:\n[Panel Linki]\n\nİhaleciBurada Canlı İhale Odası"},{"id":"TPL_ESCROW_RELEASE","name":"Escrow Güvenli Tahsilat & Mal Kabul Makbuzu","subject":"Güvenli Havuz Ödemesi Serbest Bırakıldı: [İhale Başlığı]","content":"Sayın [Firma Adı],\n\n[İhale Başlığı] kapsamındaki siparişin mal kabulü ve irsaliye denetimi alıcı firma tarafından başarıyla onaylanmıştır.\n\nGüvenli havuzda (Escrow) bloke edilen hakediş tutarınız banka hesabınıza transfer edilmek üzere serbest bırakılmıştır.\n\nDetaylı hakediş ve fatura dökümünüzü görüntülemek için:\n[Panel Linki]\n\nİhaleciBurada Güvenli Ticaret Masası"}]
     }
-  ]
-}
+  } else if (!Array.isArray(formState.emailSettings.templates) || formState.emailSettings.templates.length === 0) {
+    formState.emailSettings.templates = [{"id":"TPL_WELCOME","name":"Kurumsal Hoş Geldiniz & KYC Onayı","subject":"İhaleciBurada.com Kurumsal Üyeliğiniz ve 1 Ay Ücretsiz Deneme Paketiniz Onaylandı!","content":"Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza 1 Ay %100 Ücretsiz Lansman Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nİhaleciBurada Platform A.Ş.\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"},{"id":"TPL_NEW_TENDER","name":"Yeni İhale Yayını & Şartname Teklif Çağrısı","subject":"Yeni İhale İlanı: [İhale Başlığı] için Teklif Süreci Başladı","content":"Sayın Tedarikçimiz,\n\nFaaliyet gösterdiğiniz sektörde yeni bir satın alma ihalesi onaylanarak yayına alınmıştır.\n\n• İhale Başlığı: [İhale Başlığı]\n• Başlangıç Bütçesi: [Lider Fiyat]\n• Kalan Süre: [Kalan Süre]\n\nTeknik şartnameyi indirmek ve doğrudan fiyat teklifinizi iletmek için bağlantıyı ziyaret ediniz:\n[Panel Linki]\n\nİhaleciBurada.com Satın Alma Masası"},{"id":"TPL_NEW_BID","name":"İhaleye Yeni Teklif Geldi Bildirimi","subject":"İhalenize Yeni Teklif Geldi: [İhale Başlığı]","content":"Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz \"[İhale Başlığı]\" başlıklı satın alma ilanı için onaylı bir tedarikçi firma tarafından yeni bir fiyat teklifi sunuldu.\n\n• Sunulan Teklif: [Lider Fiyat] TL\n• Teklif Veren: [Firma Adı]\n\nTeklifi incelemek ve karşı pazarlık teklifinizi iletmek için kurumsal panelinize giriş yapınız:\n[Panel Linki]\n\nİhaleciBurada B2B Operasyon"},{"id":"TPL_AUCTION_START","name":"Canlı Tersine Eksiltme Başladı Uyarısı","subject":"Canlı İhale Başladı: [İhale Başlığı] İhalesinde Fiyatlar Eksiliyor!","content":"Sayın Yetkili,\n\nTakip ettiğiniz \"[İhale Başlığı]\" ihalesi için canlı tersine eksiltme odası açılmıştır.\n\nTedarikçiler anlık olarak en iyi fiyatı sunmak için yarışmaktadır. Canlı odaya katılarak teklifinizi güncelleyebilir veya süreci izleyebilirsiniz:\n[Panel Linki]\n\nİhaleciBurada Canlı İhale Odası"},{"id":"TPL_ESCROW_RELEASE","name":"Escrow Güvenli Tahsilat & Mal Kabul Makbuzu","subject":"Güvenli Havuz Ödemesi Serbest Bırakıldı: [İhale Başlığı]","content":"Sayın [Firma Adı],\n\n[İhale Başlığı] kapsamındaki siparişin mal kabulü ve irsaliye denetimi alıcı firma tarafından başarıyla onaylanmıştır.\n\nGüvenli havuzda (Escrow) bloke edilen hakediş tutarınız banka hesabınıza transfer edilmek üzere serbest bırakılmıştır.\n\nDetaylı hakediş ve fatura dökümünüzü görüntülemek için:\n[Panel Linki]\n\nİhaleciBurada Güvenli Ticaret Masası"}]
+  }
 
 if (!formState.categories || formState.categories.length === 0) {
   formState.categories = [
@@ -1478,6 +1440,25 @@ const emailLogs = ref<any[]>([
 const currentTemplate = computed(() => {
   return formState.emailSettings?.templates?.[selectedTemplateIdx.value] || null
 })
+
+function addNewTemplate() {
+  if (!formState.emailSettings.templates) formState.emailSettings.templates = []
+  const newTpl = {
+    id: 'TPL_' + Date.now(),
+    name: 'Yeni Özel Bildirim Şablonu',
+    subject: 'İhaleciBurada.com: [İhale Başlığı] Hakkında Bilgilendirme',
+    content: 'Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com üzerinden gerçekleştirdiğiniz işlemlerle ilgili bilgilendirme:\n\n• İşlem Detayı: [İhale Başlığı]\n• Tutar: [Lider Fiyat] TL\n\nDetayları incelemek için: [Panel Linki]\n\nSaygılarımızla,\nİhaleciBurada B2B Operasyon'
+  }
+  formState.emailSettings.templates.push(newTpl)
+  selectedTemplateIdx.value = formState.emailSettings.templates.length - 1
+  triggerToast('Yeni e-posta şablonu oluşturuldu!', 'success')
+}
+
+function resetDefaultTemplates() {
+  formState.emailSettings.templates = [{"id":"TPL_WELCOME","name":"Kurumsal Hoş Geldiniz & KYC Onayı","subject":"İhaleciBurada.com Kurumsal Üyeliğiniz ve 1 Ay Ücretsiz Deneme Paketiniz Onaylandı!","content":"Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza 1 Ay %100 Ücretsiz Lansman Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nİhaleciBurada Platform A.Ş.\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"},{"id":"TPL_NEW_TENDER","name":"Yeni İhale Yayını & Şartname Teklif Çağrısı","subject":"Yeni İhale İlanı: [İhale Başlığı] için Teklif Süreci Başladı","content":"Sayın Tedarikçimiz,\n\nFaaliyet gösterdiğiniz sektörde yeni bir satın alma ihalesi onaylanarak yayına alınmıştır.\n\n• İhale Başlığı: [İhale Başlığı]\n• Başlangıç Bütçesi: [Lider Fiyat]\n• Kalan Süre: [Kalan Süre]\n\nTeknik şartnameyi indirmek ve doğrudan fiyat teklifinizi iletmek için bağlantıyı ziyaret ediniz:\n[Panel Linki]\n\nİhaleciBurada.com Satın Alma Masası"},{"id":"TPL_NEW_BID","name":"İhaleye Yeni Teklif Geldi Bildirimi","subject":"İhalenize Yeni Teklif Geldi: [İhale Başlığı]","content":"Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz \"[İhale Başlığı]\" başlıklı satın alma ilanı için onaylı bir tedarikçi firma tarafından yeni bir fiyat teklifi sunuldu.\n\n• Sunulan Teklif: [Lider Fiyat] TL\n• Teklif Veren: [Firma Adı]\n\nTeklifi incelemek ve karşı pazarlık teklifinizi iletmek için kurumsal panelinize giriş yapınız:\n[Panel Linki]\n\nİhaleciBurada B2B Operasyon"},{"id":"TPL_AUCTION_START","name":"Canlı Tersine Eksiltme Başladı Uyarısı","subject":"Canlı İhale Başladı: [İhale Başlığı] İhalesinde Fiyatlar Eksiliyor!","content":"Sayın Yetkili,\n\nTakip ettiğiniz \"[İhale Başlığı]\" ihalesi için canlı tersine eksiltme odası açılmıştır.\n\nTedarikçiler anlık olarak en iyi fiyatı sunmak için yarışmaktadır. Canlı odaya katılarak teklifinizi güncelleyebilir veya süreci izleyebilirsiniz:\n[Panel Linki]\n\nİhaleciBurada Canlı İhale Odası"},{"id":"TPL_ESCROW_RELEASE","name":"Escrow Güvenli Tahsilat & Mal Kabul Makbuzu","subject":"Güvenli Havuz Ödemesi Serbest Bırakıldı: [İhale Başlığı]","content":"Sayın [Firma Adı],\n\n[İhale Başlığı] kapsamındaki siparişin mal kabulü ve irsaliye denetimi alıcı firma tarafından başarıyla onaylanmıştır.\n\nGüvenli havuzda (Escrow) bloke edilen hakediş tutarınız banka hesabınıza transfer edilmek üzere serbest bırakılmıştır.\n\nDetaylı hakediş ve fatura dökümünüzü görüntülemek için:\n[Panel Linki]\n\nİhaleciBurada Güvenli Ticaret Masası"}]
+  selectedTemplateIdx.value = 0
+  triggerToast('5 kurumsal varsayılan şablon başarıyla yüklendi!', 'success')
+}
 
 function selectTemplate(idx: number) {
   selectedTemplateIdx.value = idx
@@ -3012,105 +2993,31 @@ function removeSubmittedBid(index: number) {
               :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'"
             >
               <div class="flex items-center justify-between border-b pb-3" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
-                <div>
-                  <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
-                    <Mail :size="16" class="text-blue-500" />
-                    Giden E-Posta Sunucusu (SMTP Gateway) Yapılandırması
-                  </h3>
-                  <p class="text-[11px]" :class="adminTheme === 'light' ? 'text-slate-500' : 'text-slate-400'">
-                    Tüm kurumsal bildirimler, yeni ihale duyuruları ve teklif onayları bu kurumsal SMTP gateway üzerinden iletilir.
-                  </p>
+                  <div>
+                    <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                      <FileText :size="16" class="text-blue-500" />
+                      Hazır Kurumsal E-Posta Şablonları ({{ (formState.emailSettings.templates || []).length }} Şablon)
+                    </h3>
+                    <p class="text-[11px]" :class="adminTheme === 'light' ? 'text-slate-500' : 'text-slate-400'">
+                      Düzenlemek ve canlı önizlemek istediğiniz şablon kartına tıklayın.
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button 
+                      @click="addNewTemplate" 
+                      class="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-xs"
+                    >
+                      <Plus :size="13" /> Yeni Şablon
+                    </button>
+                    <button 
+                      @click="resetDefaultTemplates" 
+                      class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-700"
+                      title="Varsayılan 5 Şablonu Geri Yükle"
+                    >
+                      <RotateCcw :size="13" /> Varsayılanları Yükle
+                    </button>
+                  </div>
                 </div>
-                <span class="px-2.5 py-1 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold flex items-center gap-1.5 font-mono">
-                  <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
-                  SMTP Aktif
-                </span>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-3">
-                <div>
-                  <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-500'">SMTP HOST SUNUCU</label>
-                  <input 
-                    v-model="formState.emailSettings.smtpHost" 
-                    type="text" 
-                    placeholder="smtp.gmail.com" 
-                    class="w-full rounded-xl border p-2.5 text-xs font-mono"
-                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900 focus:bg-white' : 'bg-slate-950 border-slate-800 text-white'" 
-                  />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-500'">SMTP PORT</label>
-                  <input 
-                    v-model="formState.emailSettings.smtpPort" 
-                    type="number" 
-                    placeholder="587" 
-                    class="w-full rounded-xl border p-2.5 text-xs font-mono"
-                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900 focus:bg-white' : 'bg-slate-950 border-slate-800 text-white'" 
-                  />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-500'">GÖNDEREN E-POSTA (USER)</label>
-                  <input 
-                    v-model="formState.emailSettings.senderEmail" 
-                    type="email" 
-                    placeholder="ihalecib@gmail.com" 
-                    class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold text-blue-600"
-                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 focus:bg-white' : 'bg-slate-950 border-slate-800'" 
-                  />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-500'">GÖNDEREN ADI / ÜNVAN</label>
-                  <input 
-                    v-model="formState.emailSettings.senderName" 
-                    type="text" 
-                    placeholder="İhaleciBurada.com B2B Satın Alma" 
-                    class="w-full rounded-xl border p-2.5 text-xs font-bold"
-                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900 focus:bg-white' : 'bg-slate-950 border-slate-800 text-white'" 
-                  />
-                </div>
-              </div>
-
-              <!-- Automatic Email Notification Triggers -->
-              <div class="pt-3 border-t" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
-                <span class="text-[10px] font-black uppercase tracking-wider block mb-2" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-400'">
-                  OTOMATİK SİSTEM E-POSTA TETİKLEYİCİLERİ
-                </span>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs">
-                  <label 
-                    v-for="(label, key) in {
-                      onRegister: 'Yeni Üyelik & KYC Onay Bildirimi',
-                      onNewTender: 'Yeni İhale & Şartname Teklif Çağrısı',
-                      onNewBid: 'İhaleye Yeni Teklif Geldi Uyarısı',
-                      onAuction: 'Canlı Tersine Eksiltme Başladı Uyarısı',
-                      onEscrow: 'Escrow Güvenli Ödeme & Tahsilat Makbuzu'
-                    }" 
-                    :key="key"
-                    class="flex items-center gap-2 p-2.5 rounded-xl border cursor-pointer transition"
-                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200 hover:bg-slate-100 text-slate-800' : 'bg-slate-950/60 border-slate-800 hover:bg-slate-900 text-slate-300'"
-                  >
-                    <input type="checkbox" v-model="(formState.emailSettings.autoNotifications as any)[key]" class="rounded text-blue-600 focus:ring-blue-500 h-4 w-4" />
-                    <span class="font-medium">{{ label }}</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <!-- 2. Visual Template Cards Selector (5 Core Templates) -->
-            <div 
-              class="p-6 rounded-2xl border space-y-4"
-              :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'"
-            >
-              <div class="flex items-center justify-between border-b pb-3" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
-                <div>
-                  <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
-                    <FileText :size="16" class="text-blue-500" />
-                    Hazır Kurumsal E-Posta Şablonları ({{ (formState.emailSettings.templates || []).length }} Şablon)
-                  </h3>
-                  <p class="text-[11px]" :class="adminTheme === 'light' ? 'text-slate-500' : 'text-slate-400'">
-                    Düzenlemek ve canlı önizlemek istediğiniz şablon kartına tıklayın.
-                  </p>
-                </div>
-              </div>
 
               <!-- Template Cards Grid -->
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
