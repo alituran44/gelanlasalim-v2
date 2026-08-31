@@ -69,7 +69,9 @@ import {
   Printer,
   Maximize2,
   Sun,
-  Moon
+  Moon,
+  Percent,
+  Calculator
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
@@ -86,6 +88,7 @@ const { config: netGsmConfig, logs: smsLogs, saveConfig: saveNetGsmConfig, sendS
 
 // Auth State
 const isLoggedIn = ref(false)
+const formState = reactive(JSON.parse(JSON.stringify(cmsData.value)))
 const email = ref('')
 const password = ref('')
 const authError = ref('')
@@ -163,6 +166,7 @@ export type AdminTab =
   | 'kyc_desk'
   | 'live_rooms'
   | 'escrow_delivery'
+  | 'commission_rates'
   | 'disputes_desk'
   | 'categories'
   | 'promo_codes'
@@ -181,6 +185,8 @@ export type AdminTab =
   | 'db_tenders' 
   | 'db_received' 
   | 'db_submitted'
+
+
 
 
 const totalReceivedBidsCount = computed(() => {
@@ -204,11 +210,66 @@ const totalBidsVolumeStr = computed(() => {
   return Number(total).toLocaleString('tr-TR') + ' ₺'
 })
 
+if (!formState.commissionSettings) {
+  formState.commissionSettings = {
+    defaultRate: 3.0,
+    minTransactionFee: 50,
+    vatRate: 20,
+    sectorRates: [
+      { id: 'sec-1', name: 'İnşaat, Yapı & Altyapı', rate: 2.5, icon: '🏗️', description: 'Kaba inşaat, hazır beton, çimento ve şantiye tedariği' },
+      { id: 'sec-2', name: 'Sağlık, İlaç & Medikal', rate: 3.0, icon: '💊', description: 'Tıbbi sarf, medikal cihaz ve laboratuvar donanımları' },
+      { id: 'sec-3', name: 'Gıda, Tarım & Hayvancılık', rate: 2.0, icon: '🌾', description: 'Toptan bakliyat, un, yağ, et ve yaş sebze/meyve' },
+      { id: 'sec-4', name: 'Endüstriyel Makine & Metal', rate: 3.5, icon: '⚙️', description: 'CNC fason imalat, torna, sac işleme ve hidrolik aksam' },
+      { id: 'sec-5', name: 'Lojistik, Nakliye & Depolama', rate: 4.0, icon: '🚚', description: 'Komple tır, parsiyel sevkiyat ve antrepo depolama' },
+      { id: 'sec-6', name: 'Akaryakıt, Enerji & Madeni Yağ', rate: 1.5, icon: '⛽', description: 'Toptan motorin, sanayi elektriği ve endüstriyel yağlar' },
+      { id: 'sec-7', name: 'Yazılım, Bilişim & Donanım', rate: 5.0, icon: '💻', description: 'ERP, CRM, sunucu, yazılım lisansları ve IT altyapısı' },
+      { id: 'sec-8', name: 'Ambalaj, Koli & Plastik', rate: 3.0, icon: '📦', description: 'Oluklu mukavva koli, streç film ve palet tedariği' }
+    ],
+    planDiscountRates: [
+      { planName: 'Ücretsiz / Standart Üyelik', commissionRate: 3.0, badge: 'Standart' },
+      { planName: '1 Ay Lansman Deneme', commissionRate: 0.0, badge: '%100 Komisyonsuz' },
+      { planName: '3 Aylık Kurumsal', commissionRate: 2.5, badge: '%0.5 İndirimli' },
+      { planName: '6 Aylık Kurumsal Pro', commissionRate: 2.0, badge: '%1.0 İndirimli' },
+      { planName: '12 Aylık Enterprise Plus', commissionRate: 1.0, badge: '%2.0 İndirimli' }
+    ]
+  }
+}
+
+const simAmount = ref(100000)
+const simSectorRate = ref(3.0)
+const simPlatformEarning = computed(() => Math.round((simAmount.value * simSectorRate.value) / 100))
+const simSupplierNet = computed(() => simAmount.value - simPlatformEarning.value)
+
+const newSectorRate = ref({
+  name: '',
+  rate: 3.0,
+  icon: '🏢',
+  description: ''
+})
+
+function addSectorRate() {
+  if (!newSectorRate.value.name) return
+  if (!formState.commissionSettings.sectorRates) formState.commissionSettings.sectorRates = []
+  formState.commissionSettings.sectorRates.push({
+    id: 'sec-' + Date.now(),
+    name: newSectorRate.value.name,
+    rate: Number(newSectorRate.value.rate) || 3.0,
+    icon: newSectorRate.value.icon || '🏢',
+    description: newSectorRate.value.description || 'Sektörel satın alma komisyonu'
+  })
+  newSectorRate.value = { name: '', rate: 3.0, icon: '🏢', description: '' }
+  triggerToast('Yeni sektörel komisyon oranı eklendi!', 'success')
+}
+
+function removeSectorRate(index: number) {
+  formState.commissionSettings.sectorRates.splice(index, 1)
+  triggerToast('Sektörel komisyon oranı silindi.', 'info')
+}
+
 const activeTab = ref<AdminTab>('overview')
 watch(activeTab, () => { syncLiveState() })
 
 // Local copy for editing
-const formState = reactive(JSON.parse(JSON.stringify(cmsData.value)))
 // Clean up duplicates in received bids
 if (formState.dashboard?.receivedBids) {
   formState.dashboard.receivedBids.forEach((group: any) => {
@@ -379,6 +440,23 @@ const pendingKycCount = computed(() => {
 })
 
 function syncLiveEscrowOrders() {
+
+    // Check received bids and auto-close approved tenders
+    if (formState.dashboard?.receivedBids && formState.dashboard?.tenders) {
+      formState.dashboard.receivedBids.forEach((group: any) => {
+        if (group.teklifler) {
+          const hasApproved = group.teklifler.some((t: any) => t.durum === 'onaylandi' || t.durum === 'anlasildi')
+          if (hasApproved) {
+            const targetTender = formState.dashboard.tenders.find((t: any) => t.id === group.id || t.baslik === group.baslik)
+            if (targetTender) {
+              targetTender.durum = 'closed'
+              targetTender.statusLabel = 'Sonuçlandı (Mutabakat Sağlandı)'
+            }
+          }
+        }
+      })
+    }
+
   if (!formState.escrowOrders || formState.escrowOrders.length === 0) {
     if (formState.dashboard?.escrowOrders && formState.dashboard.escrowOrders.length > 0) {
       formState.escrowOrders = JSON.parse(JSON.stringify(formState.dashboard.escrowOrders))
@@ -1328,7 +1406,15 @@ function removeSubmittedBid(index: number) {
             </button>
 
             <button 
-              @click="activeTab = 'escrow_delivery'" 
+              @click="activeTab = 'commission_rates'" 
+              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'commission_rates' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
+            >
+              <Percent :size="14" />
+              Komisyon & Gelir Modeli
+            </button>
+
+            <button @click="activeTab = 'escrow_delivery'" 
               class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'escrow_delivery' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
@@ -1519,6 +1605,7 @@ function removeSubmittedBid(index: number) {
               <span v-else-if="activeTab === 'kyc_desk'">🛡️ Kurumsal Firma Doğrulama & KYC Masası (Mavi Rozet)</span>
               <span v-else-if="activeTab === 'live_rooms'">🔴 Canlı Tersine Eksiltme Odası Operatörü</span>
               <span v-else-if="activeTab === 'escrow_delivery'">📦 Sipariş, Güvenli Havuz (Escrow) & Teslimat</span>
+              <span v-else-if="activeTab === 'commission_rates'">💰 Komisyon Oranları, Gelir Modeli & Split Payment Yönetimi</span>
               <span v-else-if="activeTab === 'categories'">🏷️ B2B Sektör & Kategori Yönetimi</span>
               <span v-else-if="activeTab === 'promo_codes'">🎟️ Kupon & Lansman Promosyon Kodları</span>
               <span v-else-if="activeTab === 'audit_logs'">🔒 Sistem Denetim İzi & Güvenlik Günlüğü</span>
@@ -3299,7 +3386,8 @@ function removeSubmittedBid(index: number) {
                 <div 
                   v-for="(tender, index) in (formState.dashboard?.tenders || []).filter((t: any) => {
                     if (tenderFilterStatus === 'pending') return t.durum === 'pending_approval' || t.adminApproved === false
-                    if (tenderFilterStatus === 'active') return t.durum === 'active' && t.adminApproved !== false
+                    if (tenderFilterStatus === 'active') return (t.durum === 'active' || !t.durum) && t.durum !== 'closed' && t.durum !== 'rejected' && t.adminApproved !== false
+                    if (tenderFilterStatus === 'closed') return t.durum === 'closed'
                     return true
                   })" 
                   :key="tender.id" 
@@ -3315,7 +3403,7 @@ function removeSubmittedBid(index: number) {
                           class="px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider"
                           :class="(tender.durum === 'pending_approval' || tender.adminApproved === false) ? 'bg-amber-950 text-amber-400 border border-amber-800 animate-pulse' : (tender.durum === 'rejected' ? 'bg-red-950 text-red-400 border border-red-800' : 'bg-emerald-950 text-emerald-400 border border-emerald-800')"
                         >
-                          {{ (tender.durum === 'pending_approval' || tender.adminApproved === false) ? '⏳ Onay Bekliyor' : (tender.durum === 'rejected' ? '✕ Reddedildi' : '✓ Yayında (Aktif)') }}
+                          {{ (tender.durum === 'pending_approval' || tender.adminApproved === false) ? '⏳ Onay Bekliyor' : (tender.durum === 'rejected' ? '✕ Reddedildi' : (tender.durum === 'closed' ? '🏆 Sonuçlandı & Escrow Havuzunda' : '✓ Yayında (Aktif)')) }}
                         </span>
                       </div>
                       <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-3">
@@ -3401,6 +3489,193 @@ function removeSubmittedBid(index: number) {
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- 💰 TAB: KOMİSYON ORANLARI & GELİR MODELİ YÖNETİMİ -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'commission_rates'" class="space-y-6 text-left">
+            
+            <!-- Top KPI Banner -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="p-5 rounded-2xl border" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase text-slate-400">Standart B2B Komisyonu</span>
+                  <span class="p-2 rounded-xl bg-blue-500/10 text-blue-500"><Percent :size="16" /></span>
+                </div>
+                <div class="text-2xl font-black mt-2 font-mono" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                  %{{ formState.commissionSettings?.defaultRate || 3.0 }}
+                </div>
+                <div class="text-[11px] text-slate-500 mt-1">Sonuçlanan ihalelerden kesilen oran</div>
+              </div>
+
+              <div class="p-5 rounded-2xl border" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase text-slate-400">Tahsil Edilen Komisyon Geliri</span>
+                  <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-500"><DollarSign :size="16" /></span>
+                </div>
+                <div class="text-2xl font-black mt-2 font-mono text-emerald-500">
+                  {{ (formState.escrowOrders || []).reduce((acc: number, o: any) => acc + ((o.numericAmount || 75000) * ((o.commissionRate || 3) / 100)), 0).toLocaleString('tr-TR') }} ₺
+                </div>
+                <div class="text-[11px] text-slate-500 mt-1">Güvenli havuz hakediş kesintisi</div>
+              </div>
+
+              <div class="p-5 rounded-2xl border" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase text-slate-400">Minimum İşlem Bedeli</span>
+                  <span class="p-2 rounded-xl bg-amber-500/10 text-amber-500"><Lock :size="16" /></span>
+                </div>
+                <div class="text-2xl font-black mt-2 font-mono text-amber-500">
+                  {{ formState.commissionSettings?.minTransactionFee || 50 }} ₺
+                </div>
+                <div class="text-[11px] text-slate-500 mt-1">İhale başı minimum alt limit</div>
+              </div>
+
+              <div class="p-5 rounded-2xl border" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black uppercase text-slate-400">Komisyon KDV Oranı</span>
+                  <span class="p-2 rounded-xl bg-purple-500/10 text-purple-500"><FileText :size="16" /></span>
+                </div>
+                <div class="text-2xl font-black mt-2 font-mono text-purple-400">
+                  %{{ formState.commissionSettings?.vatRate || 20 }}
+                </div>
+                <div class="text-[11px] text-slate-500 mt-1">Resmi e-Arşiv / e-Fatura kesintisi</div>
+              </div>
+            </div>
+
+            <!-- Genel Komisyon & Split Payment Parametreleri -->
+            <div class="p-6 rounded-2xl border space-y-4" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+              <div class="flex items-center justify-between border-b pb-3" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                  <Percent :size="16" class="text-blue-500" />
+                  Platform Genel Komisyon Yapılandırması
+                </h3>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label class="block text-xs font-bold text-slate-400 mb-1">VARSAYILAN BAŞARI KOMİSYONU (%)</label>
+                  <div class="relative">
+                    <input v-model.number="formState.commissionSettings.defaultRate" type="number" step="0.1" class="w-full rounded-xl border p-2.5 text-xs font-bold font-mono" :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" />
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 font-black text-slate-400">%</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-400 mb-1">MİNİMUM İŞLEM ÜCRETİ (₺)</label>
+                  <div class="relative">
+                    <input v-model.number="formState.commissionSettings.minTransactionFee" type="number" class="w-full rounded-xl border p-2.5 text-xs font-bold font-mono" :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" />
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 font-black text-slate-400">₺</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-bold text-slate-400 mb-1">KOMİSYON KDV ORANI (%)</label>
+                  <div class="relative">
+                    <input v-model.number="formState.commissionSettings.vatRate" type="number" class="w-full rounded-xl border p-2.5 text-xs font-bold font-mono" :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" />
+                    <span class="absolute right-3 top-1/2 -translate-y-1/2 font-black text-slate-400">%</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Sektörel Özel Komisyon Oranları -->
+            <div class="p-6 rounded-2xl border space-y-4" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 gap-2" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                <div>
+                  <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                    <Layers :size="16" class="text-emerald-500" />
+                    Sektör Bazlı Özel Komisyon Oranları
+                  </h3>
+                  <p class="text-[11px] text-slate-400">Farklı sektörlerdeki kar marjlarına göre özelleştirilmiş komisyon oranları tanımlayın.</p>
+                </div>
+              </div>
+
+              <!-- Add New Sector Rate -->
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 p-4 rounded-xl border" :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-slate-950 border-slate-800'">
+                <input v-model="newSectorRate.name" type="text" placeholder="Sektör Adı (Örn: Kimya & Plastik)" class="rounded-xl border p-2.5 text-xs" :class="adminTheme === 'light' ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800 text-white'" />
+                <div class="relative">
+                  <input v-model.number="newSectorRate.rate" type="number" step="0.1" placeholder="Komisyon Oranı (Örn: 2.5)" class="w-full rounded-xl border p-2.5 text-xs font-mono" :class="adminTheme === 'light' ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800 text-white'" />
+                  <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">%</span>
+                </div>
+                <input v-model="newSectorRate.description" type="text" placeholder="Açıklama / Kapsam" class="rounded-xl border p-2.5 text-xs" :class="adminTheme === 'light' ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800 text-white'" />
+                <button @click="addSectorRate" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
+                  <Plus :size="14" /> + Sektör Oranı Ekle
+                </button>
+              </div>
+
+              <!-- Sector Rates List -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                <div 
+                  v-for="(sec, idx) in formState.commissionSettings?.sectorRates" 
+                  :key="sec.id || idx"
+                  class="p-4 rounded-xl border space-y-2 flex flex-col justify-between transition"
+                  :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200 hover:border-blue-300' : 'bg-slate-950 border-slate-800 hover:border-slate-700'"
+                >
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between">
+                      <span class="text-xs font-black flex items-center gap-1.5" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                        <span>{{ sec.icon || '🏢' }}</span>
+                        <span>{{ sec.name }}</span>
+                      </span>
+                      <button @click="removeSectorRate(idx)" class="text-red-400 hover:text-red-600 p-1 cursor-pointer" title="Sil">
+                        <Trash2 :size="13" />
+                      </button>
+                    </div>
+                    <p class="text-[10px] text-slate-400 line-clamp-1">{{ sec.description }}</p>
+                  </div>
+
+                  <div class="pt-2 border-t flex items-center justify-between" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                    <span class="text-[10px] font-bold text-slate-400">Komisyon:</span>
+                    <div class="flex items-center gap-1">
+                      <span class="text-xs font-black text-slate-400">%</span>
+                      <input v-model.number="sec.rate" type="number" step="0.1" class="w-16 p-1 rounded-lg border text-xs font-mono font-black text-right outline-none" :class="adminTheme === 'light' ? 'bg-white border-slate-300 text-blue-700' : 'bg-slate-900 border-slate-800 text-emerald-400'" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Canlı Gelir & Split Payment Hesaplama Simülatörü -->
+            <div class="p-6 rounded-2xl border space-y-4" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+              <div class="flex items-center justify-between border-b pb-3" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                  <Calculator :size="16" class="text-amber-500" />
+                  Canlı İhale Hakediş & Platform Gelir Simülatörü
+                </h3>
+              </div>
+
+              <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 items-center">
+                <div class="space-y-3">
+                  <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">ÖRNEK İHALE TUTARI (₺)</label>
+                    <input v-model.number="simAmount" type="number" step="1000" class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold" :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" />
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-400 mb-1">UYGULANACAK KOMİSYON ORANI (%)</label>
+                    <input v-model.number="simSectorRate" type="number" step="0.1" class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold" :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" />
+                  </div>
+                </div>
+
+                <!-- Simulation Output -->
+                <div class="lg:col-span-2 p-5 rounded-2xl border space-y-3" :class="adminTheme === 'light' ? 'bg-blue-50/50 border-blue-200' : 'bg-slate-950 border-slate-800'">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+                    <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                      <span class="text-[10px] text-slate-400 font-bold block">Tedarikçiye Aktarılacak Net Tutar:</span>
+                      <span class="text-lg font-black font-mono text-emerald-600">{{ simSupplierNet.toLocaleString('tr-TR') }} ₺</span>
+                    </div>
+                    <div class="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                      <span class="text-[10px] text-slate-400 font-bold block">Platform Net Komisyon Kazancı:</span>
+                      <span class="text-lg font-black font-mono text-blue-600">{{ simPlatformEarning.toLocaleString('tr-TR') }} ₺</span>
+                    </div>
+                  </div>
+                  <p class="text-[10px] text-slate-500">
+                    * Otomatik TCMB lisanslı ödeme kuruluşu (İyzico / PayTR) split payment protokolü ile teslimat onaylandığı anda komisyon platform havuzuna, kalan hakediş ise tedarikçi IBAN hesabına aktarılır.
+                  </p>
+                </div>
+              </div>
+            </div>
+
           </div>
 
           <!-- ========================================================================= -->

@@ -239,6 +239,28 @@ export const DEFAULT_CMS_DATA = {
       ]
     }
   ],
+  commissionSettings: {
+    defaultRate: 3.0,
+    minTransactionFee: 50,
+    vatRate: 20,
+    sectorRates: [
+      { id: 'sec-1', name: 'İnşaat, Yapı & Altyapı', rate: 2.5, icon: '🏗️', description: 'Kaba inşaat, hazır beton, çimento ve şantiye tedariği' },
+      { id: 'sec-2', name: 'Sağlık, İlaç & Medikal', rate: 3.0, icon: '💊', description: 'Tıbbi sarf, medikal cihaz ve laboratuvar donanımları' },
+      { id: 'sec-3', name: 'Gıda, Tarım & Hayvancılık', rate: 2.0, icon: '🌾', description: 'Toptan bakliyat, un, yağ, et ve yaş sebze/meyve' },
+      { id: 'sec-4', name: 'Endüstriyel Makine & Metal', rate: 3.5, icon: '⚙️', description: 'CNC fason imalat, torna, sac işleme ve hidrolik aksam' },
+      { id: 'sec-5', name: 'Lojistik, Nakliye & Depolama', rate: 4.0, icon: '🚚', description: 'Komple tır, parsiyel sevkiyat ve antrepo depolama' },
+      { id: 'sec-6', name: 'Akaryakıt, Enerji & Madeni Yağ', rate: 1.5, icon: '⛽', description: 'Toptan motorin, sanayi elektriği ve endüstriyel yağlar' },
+      { id: 'sec-7', name: 'Yazılım, Bilişim & Donanım', rate: 5.0, icon: '💻', description: 'ERP, CRM, sunucu, yazılım lisansları ve IT altyapısı' },
+      { id: 'sec-8', name: 'Ambalaj, Koli & Plastik', rate: 3.0, icon: '📦', description: 'Oluklu mukavva koli, streç film ve palet tedariği' }
+    ],
+    planDiscountRates: [
+      { planName: 'Ücretsiz / Standart Üyelik', commissionRate: 3.0, badge: 'Standart' },
+      { planName: '1 Ay Lansman Deneme', commissionRate: 0.0, badge: '%100 Komisyonsuz' },
+      { planName: '3 Aylık Kurumsal', commissionRate: 2.5, badge: '%0.5 İndirimli' },
+      { planName: '6 Aylık Kurumsal Pro', commissionRate: 2.0, badge: '%1.0 İndirimli' },
+      { planName: '12 Aylık Enterprise Plus', commissionRate: 1.0, badge: '%2.0 İndirimli' }
+    ]
+  },
   categories: [
     { id: 'kat-1', name: 'İnşaat, Yapı & Şantiye', icon: 'Building2', targetSavings: '%16.5', activeTendersCount: 0, description: 'Demir, çimento, hazır beton, yalıtım ve kaba inşaat malzemeleri.' },
     { id: 'kat-2', name: 'Makine, Yedek Parça & Metal', icon: 'Wrench', targetSavings: '%14.2', activeTendersCount: 0, description: 'CNC fason talaşlı imalat, torna, sac işleme ve hidrolik aksam.' },
