@@ -216,15 +216,287 @@ if (!formState.commissionSettings) {
     minTransactionFee: 50,
     vatRate: 20,
     sectorRates: [
-      { id: 'sec-1', name: 'İnşaat, Yapı & Altyapı', rate: 2.5, icon: '🏗️', description: 'Kaba inşaat, hazır beton, çimento ve şantiye tedariği' },
-      { id: 'sec-2', name: 'Sağlık, İlaç & Medikal', rate: 3.0, icon: '💊', description: 'Tıbbi sarf, medikal cihaz ve laboratuvar donanımları' },
-      { id: 'sec-3', name: 'Gıda, Tarım & Hayvancılık', rate: 2.0, icon: '🌾', description: 'Toptan bakliyat, un, yağ, et ve yaş sebze/meyve' },
-      { id: 'sec-4', name: 'Endüstriyel Makine & Metal', rate: 3.5, icon: '⚙️', description: 'CNC fason imalat, torna, sac işleme ve hidrolik aksam' },
-      { id: 'sec-5', name: 'Lojistik, Nakliye & Depolama', rate: 4.0, icon: '🚚', description: 'Komple tır, parsiyel sevkiyat ve antrepo depolama' },
-      { id: 'sec-6', name: 'Akaryakıt, Enerji & Madeni Yağ', rate: 1.5, icon: '⛽', description: 'Toptan motorin, sanayi elektriği ve endüstriyel yağlar' },
-      { id: 'sec-7', name: 'Yazılım, Bilişim & Donanım', rate: 5.0, icon: '💻', description: 'ERP, CRM, sunucu, yazılım lisansları ve IT altyapısı' },
-      { id: 'sec-8', name: 'Ambalaj, Koli & Plastik', rate: 3.0, icon: '📦', description: 'Oluklu mukavva koli, streç film ve palet tedariği' }
-    ],
+      {
+            "id": "sec-1",
+            "name": "İnşaat, Altyapı & Yapım İşi",
+            "rate": 2.5,
+            "icon": "🏗️",
+            "description": "Kaba inşaat, hazır beton, çimento, hafriyat ve şantiye yapım ihaleleri"
+      },
+      {
+            "id": "sec-2",
+            "name": "Sağlık, İlaç & Kozmetik",
+            "rate": 3,
+            "icon": "💊",
+            "description": "İlaç, serum, sarf malzeme, aşı ve kozmetik tedariği"
+      },
+      {
+            "id": "sec-3",
+            "name": "Gıda, Tarım Ürünleri & İçecek",
+            "rate": 2,
+            "icon": "🌾",
+            "description": "Toptan un, bakliyat, yağ, et, süt, yaş sebze/meyve ve içecek"
+      },
+      {
+            "id": "sec-4",
+            "name": "Tıbbi Cihaz, Laboratuvar & Hastane",
+            "rate": 3,
+            "icon": "🩺",
+            "description": "Görüntüleme sistemleri, ameliyathane donanımı ve laboratuvar kitleri"
+      },
+      {
+            "id": "sec-5",
+            "name": "Kanalizasyon, Boru, Su & Tesisat",
+            "rate": 2.5,
+            "icon": "🚰",
+            "description": "Altyapı boruları, vana, pompa, su arıtma ve sıhhi tesisat"
+      },
+      {
+            "id": "sec-6",
+            "name": "Enerji, Aydınlatma & Elektrik",
+            "rate": 2.5,
+            "icon": "⚡",
+            "description": "Trafo, jeneratör, kablo, aydınlatma armatürleri ve güneş panelleri"
+      },
+      {
+            "id": "sec-7",
+            "name": "Akaryakıt, Gazyağı & Madeni Yağ",
+            "rate": 1.5,
+            "icon": "⛽",
+            "description": "Toptan motorin, benzin, sanayi yakıtı ve madeni yağlar"
+      },
+      {
+            "id": "sec-8",
+            "name": "Endüstriyel Makine & Motor",
+            "rate": 3.5,
+            "icon": "⚙️",
+            "description": "CNC tezgahları, sanayi presleri, elektrik motorları ve konveyörler"
+      },
+      {
+            "id": "sec-9",
+            "name": "Yazılım, Bilişim & IT Hizmetleri",
+            "rate": 5,
+            "icon": "💻",
+            "description": "ERP, CRM, özel yazılım, sunucu, bulut lisansları ve IT altyapısı"
+      },
+      {
+            "id": "sec-10",
+            "name": "Nakliye, Taşımacılık & Lojistik",
+            "rate": 4,
+            "icon": "🚚",
+            "description": "Komple tır, parsiyel kargo, antrepo, filo kiralama ve personel servisi"
+      },
+      {
+            "id": "sec-11",
+            "name": "Mobilya, Beyaz Eşya & Ofis",
+            "rate": 3.5,
+            "icon": "🪑",
+            "description": "Büro mobilyası, dayanıklı tüketim malları ve mutfak ekipmanları"
+      },
+      {
+            "id": "sec-12",
+            "name": "Hırdavat, Nalburiye, Metal & Plastik",
+            "rate": 3,
+            "icon": "🔩",
+            "description": "Bağlantı elemanları, el aletleri, profil sac ve endüstriyel plastik"
+      },
+      {
+            "id": "sec-13",
+            "name": "Yangın Algılama, Söndürme & Güvenlik",
+            "rate": 3,
+            "icon": "🧯",
+            "description": "Yangın dolapları, sprinkler, duman dedektörleri ve alarm panoları"
+      },
+      {
+            "id": "sec-14",
+            "name": "Kimyasal Maddeler, Dezenfektan & Gübre",
+            "rate": 2.5,
+            "icon": "🧪",
+            "description": "Sanayi kimyasalları, tarımsal gübre, ziraat ilaçları ve dezenfektan"
+      },
+      {
+            "id": "sec-15",
+            "name": "Matbaa, Toner, Ambalaj & Kırtasiye",
+            "rate": 3,
+            "icon": "📦",
+            "description": "Oluklu mukavva koli, ambalaj streci, fotokopi kağıdı ve toner"
+      },
+      {
+            "id": "sec-16",
+            "name": "Kent Mobilyaları, Prefabrik & Çelik",
+            "rate": 3,
+            "icon": "🏙️",
+            "description": "Park ekipmanları, konteyner, prefabrik binalar ve çelik konstrüksiyon"
+      },
+      {
+            "id": "sec-17",
+            "name": "Mühendislik, Mimarlık & Müşavirlik",
+            "rate": 4,
+            "icon": "📐",
+            "description": "Statik proje, zemin etüdü, harita mühendisliği ve müşavirlik"
+      },
+      {
+            "id": "sec-18",
+            "name": "Madencilik, Doğal Kaynak & Sondaj",
+            "rate": 2.5,
+            "icon": "⛏️",
+            "description": "Mermer, kireçtaşı, agrega, maden cevheri ve sondaj ekipmanları"
+      },
+      {
+            "id": "sec-19",
+            "name": "Asansör, Yürüyen Merdiven & Otomasyon",
+            "rate": 3.5,
+            "icon": "🛗",
+            "description": "Yolcu/yük asansörleri, yürüyen bantlar ve bina otomasyonu"
+      },
+      {
+            "id": "sec-20",
+            "name": "Klima, Havalandırma & Soğutma",
+            "rate": 3,
+            "icon": "❄️",
+            "description": "VRF sistemleri, soğuk hava depoları, kazanlar ve havalandırma kanalları"
+      },
+      {
+            "id": "sec-21",
+            "name": "Savunma Sanayii, Denizcilik & Havacılık",
+            "rate": 3,
+            "icon": "🛡️",
+            "description": "Taktik ekipman, bot donanımı, aviyonik aksam ve kompozit malzemeler"
+      },
+      {
+            "id": "sec-22",
+            "name": "Taşıt, İş Makinesi & Yedek Parça",
+            "rate": 2.5,
+            "icon": "🚜",
+            "description": "Ekskavatör, loder, forklift, kamyon ve orijinal yedek parçalar"
+      },
+      {
+            "id": "sec-23",
+            "name": "Turizm, Konaklama & Organizasyon",
+            "rate": 4,
+            "icon": "🎪",
+            "description": "Kongre, fuar organizasyonu, otel konaklama ve catering"
+      },
+      {
+            "id": "sec-24",
+            "name": "Reklam, Tabela & Tanıtım Materyalleri",
+            "rate": 4.5,
+            "icon": "📢",
+            "description": "Işıklı tabela, led ekran, totem, açık hava reklamcılığı ve promosyon"
+      },
+      {
+            "id": "sec-25",
+            "name": "Ormancılık, Fidan, Bitki & Peyzaj",
+            "rate": 3,
+            "icon": "🌲",
+            "description": "Fidan üretimi, çimleme, ağaçlandırma ve çevre düzenleme"
+      },
+      {
+            "id": "sec-26",
+            "name": "Hayvancılık, Veterinerlik & Yem",
+            "rate": 2,
+            "icon": "🐄",
+            "description": "Büyükbaş/küçükbaş hayvan, karma yem, premiks ve veteriner ilaçları"
+      },
+      {
+            "id": "sec-27",
+            "name": "Sanat Eserleri, Enstrüman & Heykel",
+            "rate": 5,
+            "icon": "🎨",
+            "description": "Sanatsal anıt, kent heykelleri, enstrüman ve müze sergileme"
+      },
+      {
+            "id": "sec-28",
+            "name": "Odun, Kömür & Katı Yakıtlar",
+            "rate": 2,
+            "icon": "🪵",
+            "description": "Toptan linyit kömürü, odun, pelet ve briket yakıt"
+      },
+      {
+            "id": "sec-29",
+            "name": "Hazır Yemek, Tabldot & Lokantacılık",
+            "rate": 2.5,
+            "icon": "🍽️",
+            "description": "Toplu yemek üretimi, şantiye/hastane yemekhanesi ve kumanya"
+      },
+      {
+            "id": "sec-30",
+            "name": "Elektronik, Bilgisayar & Ölçü Aletleri",
+            "rate": 3.5,
+            "icon": "🖥️",
+            "description": "PC, tablet, endüstriyel switch, multimetre ve kalibrasyon aletleri"
+      },
+      {
+            "id": "sec-31",
+            "name": "Kamera, CCTV & Haberleşme",
+            "rate": 3.5,
+            "icon": "📹",
+            "description": "IP kamera sistemleri, NVR, telsiz, fiber optik ve telsiz kuleleri"
+      },
+      {
+            "id": "sec-32",
+            "name": "Temizlik, İlaçlama & Atık Yönetimi",
+            "rate": 3,
+            "icon": "🧹",
+            "description": "Tesis temizliği, vektör ilaçlama, geri dönüşüm ve tıbbi atık bertarafı"
+      },
+      {
+            "id": "sec-33",
+            "name": "Tekstil, İş Elbiseleri & Giyim",
+            "rate": 3,
+            "icon": "👕",
+            "description": "Reflektörlü iş kıyafetleri, üniforma, ayakkabı ve kurumsal tekstil"
+      },
+      {
+            "id": "sec-34",
+            "name": "İş Sağlığı & Güvenliği (İSG)",
+            "rate": 3.5,
+            "icon": "⛑️",
+            "description": "Baret, emniyet kemeri, gaz maskesi, iş gözlüğü ve İSG donanımları"
+      },
+      {
+            "id": "sec-35",
+            "name": "Özel Güvenlik & Koruma Hizmetleri",
+            "rate": 3.5,
+            "icon": "👮",
+            "description": "Fiziki güvenlik, koruma personeli, x-ray ve güvenlik bariyerleri"
+      },
+      {
+            "id": "sec-36",
+            "name": "Eğitim, Tercümanlık & Danışmanlık",
+            "rate": 4.5,
+            "icon": "📚",
+            "description": "Kurumsal eğitimler, yeminli tercüme, anket ve pazar araştırması"
+      },
+      {
+            "id": "sec-37",
+            "name": "İşletmecilik & Tesis Yönetimi",
+            "rate": 3.5,
+            "icon": "🤝",
+            "description": "Bina yönetimi, resepsiyon, kurye ve veri giriş personeli"
+      },
+      {
+            "id": "sec-38",
+            "name": "Sigortacılık, Finans & Hukuk",
+            "rate": 4,
+            "icon": "⚖️",
+            "description": "Kurumsal kasko, all-risk sigorta, bağımsız denetim ve danışmanlık"
+      },
+      {
+            "id": "sec-39",
+            "name": "Araç Satışı & Hurda İhaleleri",
+            "rate": 2,
+            "icon": "🚗",
+            "description": "Filo araç satışları, demir/bakır hurda ve atık malzeme ihaleleri"
+      },
+      {
+            "id": "sec-40",
+            "name": "Gayrimenkul, Arsa & Kiralama",
+            "rate": 2,
+            "icon": "🏢",
+            "description": "Ticari bina, fabrika, arsa satışı, depo ve büfe/kantin kiralama"
+      }
+],
     planDiscountRates: [
       { planName: 'Ücretsiz / Standart Üyelik', commissionRate: 3.0, badge: 'Standart' },
       { planName: '1 Ay Lansman Deneme', commissionRate: 0.0, badge: '%100 Komisyonsuz' },
@@ -240,6 +512,7 @@ const simSectorRate = ref(3.0)
 const simPlatformEarning = computed(() => Math.round((simAmount.value * simSectorRate.value) / 100))
 const simSupplierNet = computed(() => simAmount.value - simPlatformEarning.value)
 
+const sectorSearchQuery = ref('')
 const newSectorRate = ref({
   name: '',
   rate: 3.0,
@@ -3579,21 +3852,44 @@ function removeSubmittedBid(index: number) {
               </div>
             </div>
 
-            <!-- Sektörel Özel Komisyon Oranları -->
+            <!-- Sektörel Özel Komisyon Oranları (40 Kategori & CPV Sektör) -->
             <div class="p-6 rounded-2xl border space-y-4" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
-              <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 gap-2" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b pb-3 gap-3" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
                 <div>
-                  <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
-                    <Layers :size="16" class="text-emerald-500" />
-                    Sektör Bazlı Özel Komisyon Oranları
-                  </h3>
-                  <p class="text-[11px] text-slate-400">Farklı sektörlerdeki kar marjlarına göre özelleştirilmiş komisyon oranları tanımlayın.</p>
+                  <div class="flex items-center gap-2">
+                    <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                      <Layers :size="16" class="text-emerald-500" />
+                      Sektör Bazlı Özel Komisyon Oranları
+                    </h3>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-mono">
+                      {{ (formState.commissionSettings?.sectorRates || []).length }} Sektör Aktif
+                    </span>
+                  </div>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Platformdaki 40 ana sektörün kar marjlarına göre özelleştirilmiş komisyon oranları ve açıklamaları.</p>
+                </div>
+
+                <!-- Search Input for Sectors -->
+                <div class="w-full sm:w-72 relative">
+                  <input 
+                    v-model="sectorSearchQuery" 
+                    type="text" 
+                    placeholder="🔍 40 Sektör İçinde Ara..." 
+                    class="w-full rounded-xl border p-2 text-xs transition outline-none"
+                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900 focus:border-blue-500 focus:bg-white' : 'bg-slate-950 border-slate-800 text-white focus:border-blue-500'"
+                  />
+                  <button 
+                    v-if="sectorSearchQuery" 
+                    @click="sectorSearchQuery = ''" 
+                    class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
+                  >
+                    ✕
+                  </button>
                 </div>
               </div>
 
               <!-- Add New Sector Rate -->
               <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 p-4 rounded-xl border" :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-slate-950 border-slate-800'">
-                <input v-model="newSectorRate.name" type="text" placeholder="Sektör Adı (Örn: Kimya & Plastik)" class="rounded-xl border p-2.5 text-xs" :class="adminTheme === 'light' ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800 text-white'" />
+                <input v-model="newSectorRate.name" type="text" placeholder="Yeni Sektör Adı (Örn: Kimya & Plastik)" class="rounded-xl border p-2.5 text-xs" :class="adminTheme === 'light' ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800 text-white'" />
                 <div class="relative">
                   <input v-model.number="newSectorRate.rate" type="number" step="0.1" placeholder="Komisyon Oranı (Örn: 2.5)" class="w-full rounded-xl border p-2.5 text-xs font-mono" :class="adminTheme === 'light' ? 'bg-white border-slate-300 text-slate-900' : 'bg-slate-900 border-slate-800 text-white'" />
                   <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">%</span>
@@ -3604,35 +3900,45 @@ function removeSubmittedBid(index: number) {
                 </button>
               </div>
 
-              <!-- Sector Rates List -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <!-- 40 Sector Rates Grid List -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 max-h-[640px] overflow-y-auto p-1 pr-2">
                 <div 
-                  v-for="(sec, idx) in formState.commissionSettings?.sectorRates" 
+                  v-for="(sec, idx) in (formState.commissionSettings?.sectorRates || []).filter((s: any) => !sectorSearchQuery || s.name.toLowerCase().includes(sectorSearchQuery.toLowerCase()) || (s.description && s.description.toLowerCase().includes(sectorSearchQuery.toLowerCase())))" 
                   :key="sec.id || idx"
-                  class="p-4 rounded-xl border space-y-2 flex flex-col justify-between transition"
-                  :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200 hover:border-blue-300' : 'bg-slate-950 border-slate-800 hover:border-slate-700'"
+                  class="p-4 rounded-xl border space-y-2 flex flex-col justify-between transition group shadow-2xs"
+                  :class="adminTheme === 'light' ? 'bg-slate-50/80 border-slate-200 hover:border-blue-400 hover:bg-white' : 'bg-slate-950 border-slate-800/80 hover:border-slate-700 hover:bg-slate-900/60'"
                 >
-                  <div class="space-y-1">
-                    <div class="flex items-center justify-between">
-                      <span class="text-xs font-black flex items-center gap-1.5" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
-                        <span>{{ sec.icon || '🏢' }}</span>
+                  <div class="space-y-1.5">
+                    <div class="flex items-start justify-between gap-1.5">
+                      <span class="text-xs font-black flex items-center gap-1.5 leading-snug" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                        <span class="text-base shrink-0">{{ sec.icon || '🏢' }}</span>
                         <span>{{ sec.name }}</span>
                       </span>
-                      <button @click="removeSectorRate(idx)" class="text-red-400 hover:text-red-600 p-1 cursor-pointer" title="Sil">
+                      <button @click="removeSectorRate(idx)" class="text-slate-400 hover:text-red-500 p-1 transition cursor-pointer shrink-0" title="Sektörü Sil">
                         <Trash2 :size="13" />
                       </button>
                     </div>
-                    <p class="text-[10px] text-slate-400 line-clamp-1">{{ sec.description }}</p>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-2 leading-relaxed">{{ sec.description }}</p>
                   </div>
 
                   <div class="pt-2 border-t flex items-center justify-between" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
-                    <span class="text-[10px] font-bold text-slate-400">Komisyon:</span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Komisyon:</span>
                     <div class="flex items-center gap-1">
                       <span class="text-xs font-black text-slate-400">%</span>
-                      <input v-model.number="sec.rate" type="number" step="0.1" class="w-16 p-1 rounded-lg border text-xs font-mono font-black text-right outline-none" :class="adminTheme === 'light' ? 'bg-white border-slate-300 text-blue-700' : 'bg-slate-900 border-slate-800 text-emerald-400'" />
+                      <input 
+                        v-model.number="sec.rate" 
+                        type="number" 
+                        step="0.1" 
+                        class="w-16 p-1 rounded-lg border text-xs font-mono font-black text-right outline-none transition focus:ring-1 focus:ring-blue-500" 
+                        :class="adminTheme === 'light' ? 'bg-white border-slate-300 text-blue-700' : 'bg-slate-900 border-slate-800 text-emerald-400'" 
+                      />
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <div v-if="(formState.commissionSettings?.sectorRates || []).filter((s: any) => !sectorSearchQuery || s.name.toLowerCase().includes(sectorSearchQuery.toLowerCase()) || (s.description && s.description.toLowerCase().includes(sectorSearchQuery.toLowerCase()))).length === 0" class="text-center py-8 text-slate-400 text-xs rounded-xl border border-dashed border-slate-300 dark:border-slate-800">
+                Arama kriterinize uygun sektör bulunamadı.
               </div>
             </div>
 
