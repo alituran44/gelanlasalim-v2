@@ -2301,7 +2301,7 @@ onMounted(() => {
                   <button 
                     v-else
                     type="button" 
-                    @click="openLiveBidsDrawer(tender)"
+                    @click="openQuickBidModal(tender)"
                     class="flex-1 sm:w-full px-3.5 py-1.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition cursor-pointer shadow-xs flex items-center justify-center gap-1"
                   >
                     <Send :size="12" />
@@ -2374,7 +2374,7 @@ onMounted(() => {
                   </div>
                   <button 
                     type="button" 
-                    @click="openLiveBidsDrawer(tender)"
+                    @click="openQuickBidModal(tender)"
                     class="px-3 py-1.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-bold text-xs transition cursor-pointer"
                   >
                     Teklif Ver
