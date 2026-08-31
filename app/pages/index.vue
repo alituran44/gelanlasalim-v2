@@ -518,6 +518,86 @@ function getTenderImage(tender: any): string {
 }
 
 // ==================== 7. CANLI VERİLERİ BİRLEŞTİRME ====================
+
+const liveBidsStream = computed(() => {
+  const list: any[] = []
+  
+  // 1. User submitted bids from localStorage
+  if (typeof window !== 'undefined') {
+    try {
+      const myBids = JSON.parse(localStorage.getItem('myBids') || '[]')
+      myBids.forEach((mb: any) => {
+        list.push({
+          id: mb.id || 'TKF-' + Math.floor(100 + Math.random() * 900),
+          tenderId: mb.tenderId || 'IHC-2026-178',
+          tenderTitle: mb.ilanBaslik || mb.tenderTitle || 'Kurumsal Satın Alma İhalesi',
+          bidder: mb.bidderName || userSession.value?.companyName || userSession.value?.company || 'Kendi Şirketiniz',
+          price: mb.teklifFiyatim || mb.price || 'Teklif Verildi',
+          time: mb.tarih || 'Az önce',
+          isMine: true,
+          status: 'Değerlendirmede',
+          city: 'Balıkesir'
+        })
+      })
+    } catch (e) {}
+  }
+
+  // 2. CMS received bids
+  const receivedGroups = cmsData.value?.dashboard?.receivedBids || []
+  receivedGroups.forEach((rg: any) => {
+    (rg.teklifler || []).forEach((tkf: any) => {
+      list.push({
+        id: tkf.id || 'TKF-' + Math.floor(100 + Math.random() * 900),
+        tenderId: rg.id,
+        tenderTitle: rg.baslik,
+        bidder: tkf.firma,
+        price: tkf.fiyat,
+        time: tkf.sure ? `${tkf.sure} teslimat` : 'Bugün',
+        isMine: false,
+        status: tkf.durum === 'mutabakat' ? 'Mutabakat Sağlandı' : 'Canlı Eksiltme',
+        city: tkf.adres?.split(' ')[0] || 'İstanbul'
+      })
+    })
+  })
+
+  // 3. Platform live active market bids seed
+  const platformSeeds = [
+    { id: 'TKF-892', tenderId: 'IHC-2026-178', tenderTitle: 'Lojistik & Taşımacılık İhalesi', bidder: 'Ekol Global Lojistik A.Ş.', price: '72.500 ₺', time: '2 dk önce', status: 'En İyi Teklif', city: 'İstanbul' },
+    { id: 'TKF-891', tenderId: 'IHC-2026-178', tenderTitle: 'Lojistik & Taşımacılık İhalesi', bidder: 'Netlog Lojistik Hizmetleri', price: '78.000 ₺', time: '5 dk önce', status: 'Canlı Eksiltme', city: 'Kocaeli' },
+    { id: 'TKF-870', tenderId: 'IHC-2026-104', tenderTitle: 'Hazır Beton & Çimento Tedariği', bidder: 'Çimsa Çimento Sanayi T.A.Ş.', price: '142.000 ₺', time: '12 dk önce', status: 'En İyi Teklif', city: 'İzmir' },
+    { id: 'TKF-865', tenderId: 'IHC-2026-104', tenderTitle: 'Hazır Beton & Çimento Tedariği', bidder: 'Batıçim Batı Anadolu Çimento', price: '149.500 ₺', time: '18 dk önce', status: 'Canlı Eksiltme', city: 'Manisa' },
+    { id: 'TKF-854', tenderId: 'IHC-2026-112', tenderTitle: 'Oluklu Mukavva Koli & Ambalaj', bidder: 'Mopak Kağıt Karton Sanayi', price: '38.400 ₺', time: '25 dk önce', status: 'En İyi Teklif', city: 'Bursa' },
+    { id: 'TKF-840', tenderId: 'IHC-2026-120', tenderTitle: 'CNC Fason Talaşlı İmalat Parça', bidder: 'Kaya Pres Metal Sanayi Ltd.', price: '89.000 ₺', time: '34 dk önce', status: 'En İyi Teklif', city: 'Ankara' }
+  ]
+
+  platformSeeds.forEach(ps => {
+    if (!list.some(item => item.id === ps.id)) {
+      list.push(ps)
+    }
+  })
+
+  return list
+})
+
+function openTenderByIdOrBid(bid: any) {
+  const target = allTenders.value.find((t: any) => t.id === bid.tenderId || t.baslik === bid.tenderTitle)
+  if (target) {
+    openTenderDetailModal(target)
+  } else {
+    // Open modal with synthetic tender info
+    openTenderDetailModal({
+      id: bid.tenderId,
+      baslik: bid.tenderTitle,
+      kategori: 'Kurumsal Satın Alma & Tedarik',
+      ownerCompany: 'Doğrulanmış B2B Kurumsal Alıcı',
+      city: bid.city || 'Balıkesir',
+      butce: 'Açık Teklif Usulü',
+      sure: '7 gün kaldı',
+      aciklama: `"${bid.tenderTitle}" için canlı eksiltme ve teklif süreci devam etmektedir. Şartname detaylarını inceleyebilir ve teklifinizi sunabilirsiniz.`
+    })
+  }
+}
+
 const allTenders = computed(() => {
   const cmsTenders = (cmsData.value?.dashboard?.tenders || []).filter(
     (t: any) => t.adminApproved === true && t.durum !== 'pending_approval' && t.durum !== 'rejected'
@@ -1686,7 +1766,7 @@ onMounted(() => {
         <!-- ========================================================= -->
         <!-- ➡️ SAĞ / ORTA SÜTUN: RESİMLİ İHALE LİSTESİ (SAHİBİNDEN FEED) -->
         <!-- ========================================================= -->
-        <main class="lg:col-span-8 xl:col-span-9 space-y-4">
+        <main class="lg:col-span-6 xl:col-span-6 space-y-4">
           
           <!-- ÜST KONTROL ŞERİDİ: SONUÇ SAYACI, AKTİF ROZETLER & SIRALAMA -->
           <div class="bg-white border border-slate-300 rounded-2xl p-3.5 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -2036,8 +2116,98 @@ onMounted(() => {
 
         </main>
 
-      </div>
-    </div>
+        <!-- ========================================================= -->
+        <!-- ⚡ SAĞ SÜTUN: CANLI TEKLİF VE EKSİLTME AKIŞI FEED'İ -->
+        <!-- ========================================================= -->
+        <aside class="lg:col-span-3 xl:col-span-3 space-y-4">
+          
+          <!-- Canlı Teklif Akışı Kartı -->
+          <div class="bg-white border border-slate-300 rounded-2xl p-4 shadow-2xs space-y-3.5 sticky top-20 text-left">
+            
+            <!-- Header -->
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div class="flex items-center gap-2">
+                <span class="relative flex h-2.5 w-2.5">
+                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                </span>
+                <h3 class="font-black text-xs text-slate-900 tracking-tight">CANLI TEKLİF AKIŞI</h3>
+              </div>
+              <span class="text-[10px] font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                Anlık Eksiltme
+              </span>
+            </div>
+
+            <!-- Mini Stats Banner -->
+            <div class="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
+              <div>
+                <div class="text-[9px] font-black text-slate-400 uppercase">Bugün Verilen</div>
+                <div class="font-mono font-black text-slate-900 text-sm">{{ liveBidsStream.length + 14 }} Teklif</div>
+              </div>
+              <div>
+                <div class="text-[9px] font-black text-slate-400 uppercase">Ort. Tasarruf</div>
+                <div class="font-mono font-black text-emerald-600 text-sm">%16.8</div>
+              </div>
+            </div>
+
+            <!-- Bids Feed List -->
+            <div class="space-y-2.5 max-h-[580px] overflow-y-auto pr-1 custom-scrollbar">
+              <div 
+                v-for="(bid, bIdx) in liveBidsStream" 
+                :key="bIdx"
+                class="p-3 rounded-xl border transition-all hover:border-[#0084B4] hover:shadow-xs space-y-2 group"
+                :class="bid.isMine ? 'bg-amber-50/70 border-amber-300' : 'bg-white border-slate-200'"
+              >
+                <!-- Top Row: Bidder & Time -->
+                <div class="flex items-center justify-between gap-1 text-[11px]">
+                  <div class="flex items-center gap-1.5 min-w-0 font-black" :class="bid.isMine ? 'text-amber-950' : 'text-slate-800'">
+                    <Building2 :size="12" :class="bid.isMine ? 'text-amber-700' : 'text-blue-600'" class="shrink-0" />
+                    <span class="truncate">{{ bid.bidder }}</span>
+                  </div>
+                  <span class="text-[10px] text-slate-400 shrink-0 font-medium">{{ bid.time }}</span>
+                </div>
+
+                <!-- Target Tender Title -->
+                <div class="text-[11px] text-slate-600 truncate font-semibold">
+                  <span class="font-mono text-[10px] text-blue-700 font-bold">#{{ bid.tenderId }}</span> · {{ bid.tenderTitle }}
+                </div>
+
+                <!-- Bottom Row: Price & Action -->
+                <div class="flex items-center justify-between pt-1.5 border-t border-slate-100">
+                  <div>
+                    <span class="text-[9px] text-slate-400 font-bold block uppercase">Teklif Tutarı</span>
+                    <span class="font-mono font-black text-emerald-600 text-xs">{{ bid.price }}</span>
+                  </div>
+
+                  <button
+                    type="button"
+                    @click="openTenderByIdOrBid(bid)"
+                    class="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-600 text-blue-700 hover:text-white font-bold text-[10px] transition cursor-pointer flex items-center gap-1"
+                  >
+                    <span>İhaleyi Gör</span>
+                    <ArrowRight :size="10" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Escrow Protection Badge -->
+            <div class="p-3 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-1 text-left">
+              <div class="flex items-center gap-1.5 text-emerald-950 font-black text-xs">
+                <ShieldCheck :size="14" class="text-emerald-600" />
+                <span>Escrow Güvenli Havuz</span>
+              </div>
+              <p class="text-[10px] text-emerald-800 leading-snug">
+                Tüm teklif ve ödemeler BDDK/TCMB onaylı korumalı havuzda bloke edilerek güvenle korunur.
+              </p>
+            </div>
+
+          </div>
+
+        </aside>
+
+</div>
+</div>
 
     <!-- ========================================================================= -->
     <!-- 📄 1. İHALE DETAY MODALI -->
