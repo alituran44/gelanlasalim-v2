@@ -903,6 +903,32 @@ function syncLiveState() {
         formState.kycVerifications.unshift(userKycObj)
       }
     })
+// 3. Sync all registered users into CRM Leads
+    if (!formState.crmSettings) formState.crmSettings = { leads: [] }
+    if (!Array.isArray(formState.crmSettings.leads)) formState.crmSettings.leads = []
+
+    userList.forEach((usr: any) => {
+      if (!usr.email) return
+      const compName = usr.companyName || usr.company || usr.name || (usr.email ? usr.email.split('@')[0] : 'Kayıtlı Üye')
+      const crmLeadObj = {
+        id: 'LEAD-' + (usr.taxNo || Math.floor(1000 + Math.random() * 9000)),
+        companyName: compName,
+        contactName: usr.name || usr.firstName || 'Yetkili',
+        email: usr.email,
+        phone: usr.phone || '0850 840 86 95',
+        status: usr.badgeGranted ? 'Mavi Rozet Verildi' : '1 Ay Deneme Aktif',
+        source: usr.authProvider === 'google' ? 'Google OAuth Kayıt' : (usr.isEDevletVerified ? 'e-Devlet Kayıt' : 'Web Portalı'),
+        notes: usr.notes || `Kurumsal üye kaydı tamamlandı. 1 Ay %100 Ücretsiz B2B Paketi aktif. Sektörler: ${usr.sectors || 'Genel Tedarik'}`,
+        createdAt: usr.createdAt || 'Bugün'
+      }
+
+      const existingLeadIdx = formState.crmSettings.leads.findIndex((l: any) => l.email === usr.email)
+      if (existingLeadIdx >= 0) {
+        formState.crmSettings.leads[existingLeadIdx] = { ...formState.crmSettings.leads[existingLeadIdx], ...crmLeadObj }
+      } else {
+        formState.crmSettings.leads.unshift(crmLeadObj)
+      }
+    })
   } catch (e) {
     console.warn('Admin live data sync warning', e)
   }
@@ -2878,23 +2904,49 @@ function removeSubmittedBid(index: number) {
                   <tbody class="divide-y divide-slate-800/60">
                     <tr v-for="(lead, idx) in filteredLeads" :key="lead.id || idx" class="hover:bg-slate-900/40 transition">
                       <td class="p-3.5 font-bold text-white">
-                        <div>{{ lead.companyName }}</div>
+                        <div class="flex items-center gap-2">
+                          <span class="text-white">{{ lead.companyName }}</span>
+                          <span v-if="lead.source" class="text-[9px] px-1.5 py-0.2 rounded bg-blue-950 text-blue-400 border border-blue-800 font-mono">
+                            {{ lead.source }}
+                          </span>
+                        </div>
                         <div class="text-[11px] text-slate-400 font-normal mt-0.5">{{ lead.notes }}</div>
                       </td>
                       <td class="p-3.5">
                         <div class="text-slate-200 font-medium">{{ lead.contactName }}</div>
-                        <div class="text-slate-400 font-mono text-[11px]">{{ lead.email }} • {{ lead.phone }}</div>
+                        <div class="text-slate-400 font-mono text-[11px] flex items-center gap-2 mt-0.5">
+                          <a :href="`mailto:${lead.email}`" class="text-blue-400 hover:underline">{{ lead.email }}</a>
+                          <span>•</span>
+                          <a :href="`tel:${lead.phone}`" class="text-emerald-400 hover:underline">{{ lead.phone }}</a>
+                        </div>
                       </td>
                       <td class="p-3.5">
-                        <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-950 text-blue-300 border border-blue-800">
-                          {{ lead.status }}
-                        </span>
+                        <select 
+                          v-model="lead.status" 
+                          class="rounded-lg border border-slate-800 bg-slate-900 px-2 py-1 text-xs font-bold text-emerald-400 outline-none"
+                        >
+                          <option value="1 Ay Deneme Aktif">🟢 1 Ay Deneme Aktif</option>
+                          <option value="Mavi Rozet Verildi">✓ Mavi Rozet Verildi</option>
+                          <option value="Görüşülüyor">📞 Görüşülüyor</option>
+                          <option value="Kazanıldı">🏆 Kazanıldı (Abone)</option>
+                          <option value="Takipte">⏳ Takipte</option>
+                        </select>
                       </td>
                       <td class="p-3.5 text-slate-400 font-mono text-[11px]">{{ lead.createdAt }}</td>
                       <td class="p-3.5 text-right">
-                        <button @click="removeLead(idx)" class="p-1.5 bg-red-950/30 text-red-400 hover:bg-red-950 rounded cursor-pointer">
-                          <Trash2 :size="13" />
-                        </button>
+                        <div class="flex items-center justify-end gap-1.5">
+                          <a 
+                            :href="`https://wa.me/${(lead.phone || '').replace(/\D/g, '')}?text=Merhaba%20${encodeURIComponent(lead.contactName || '')},%20İhaleciBurada.com%20üyeliğiniz%20hakkında%20bilgilendirme%20yapmak%20istiyoruz.`"
+                            target="_blank"
+                            class="p-1.5 bg-emerald-950/40 text-emerald-400 hover:bg-emerald-900 border border-emerald-800/40 rounded-lg cursor-pointer transition text-[10px] flex items-center gap-1 font-bold"
+                            title="WhatsApp ile İletişime Geç"
+                          >
+                            <MessageSquare :size="12" /> WhatsApp
+                          </a>
+                          <button @click="removeLead(idx)" class="p-1.5 bg-red-950/30 text-red-400 hover:bg-red-950 rounded-lg cursor-pointer transition" title="Adayı Sil">
+                            <Trash2 :size="13" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   </tbody>

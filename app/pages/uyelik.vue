@@ -201,6 +201,31 @@ function registerToAdminKycQueue(sessionData: any) {
     } else {
       cmsData.value.kycVerifications.unshift(kycItem)
     }
+    // Also auto-register into CRM Leads
+    if (!cmsData.value.crmSettings) {
+      cmsData.value.crmSettings = { leads: [] }
+    }
+    if (!Array.isArray(cmsData.value.crmSettings.leads)) {
+      cmsData.value.crmSettings.leads = []
+    }
+    const leadItem = {
+      id: 'LEAD-' + (sessionData.taxNo || Math.floor(1000 + Math.random() * 9000)),
+      companyName: sessionData.company || sessionData.companyName || sessionData.name || 'Yeni Kayıtlı Firma',
+      contactName: sessionData.name || sessionData.firstName || 'Yetkili',
+      email: sessionData.email,
+      phone: sessionData.phone || phone.value || '0850 840 86 95',
+      status: '1 Ay Deneme Aktif',
+      source: sessionData.authProvider === 'google' ? 'Google OAuth Hızlı Kayıt' : (sessionData.isEDevletVerified ? 'e-Devlet Onaylı Kayıt' : 'Web Kurumsal Kayıt'),
+      notes: `Lansmana özel 1 Ay %100 Ücretsiz Kurumsal Deneme Paketi tanımlandı. Sektörler: ${(sessionData.sektorler || []).join(', ') || 'Genel Tedarik & İhale'}`,
+      createdAt: new Date().toLocaleDateString('tr-TR')
+    }
+    const existingLeadIdx = cmsData.value.crmSettings.leads.findIndex((l: any) => l.email === sessionData.email)
+    if (existingLeadIdx >= 0) {
+      cmsData.value.crmSettings.leads[existingLeadIdx] = { ...cmsData.value.crmSettings.leads[existingLeadIdx], ...leadItem }
+    } else {
+      cmsData.value.crmSettings.leads.unshift(leadItem)
+    }
+
     saveCmsData(cmsData.value)
 
     const allUsers = JSON.parse(localStorage.getItem('allRegisteredUsers') || '[]')
