@@ -262,15 +262,57 @@ function handleImageChange(event: Event) {
     const file = target.files[i]
     const reader = new FileReader()
     reader.onload = (e) => {
-      if (e.target?.result) {
+      const rawDataUrl = e.target?.result as string
+      if (!rawDataUrl) return
+
+      try {
+        const img = new Image()
+        img.onload = () => {
+          const canvas = document.createElement('canvas')
+          const maxDimension = 500
+          let width = img.width
+          let height = img.height
+
+          if (width > height) {
+            if (width > maxDimension) {
+              height = Math.round((height * maxDimension) / width)
+              width = maxDimension
+            }
+          } else {
+            if (height > maxDimension) {
+              width = Math.round((width * maxDimension) / height)
+              height = maxDimension
+            }
+          }
+
+          canvas.width = width
+          canvas.height = height
+          const ctx = canvas.getContext('2d')
+          if (ctx) {
+            ctx.drawImage(img, 0, 0, width, height)
+            const compressed = canvas.toDataURL('image/jpeg', 0.6)
+            form.value.images.push({
+              url: compressed,
+              name: file.name
+            })
+          } else {
+            form.value.images.push({
+              url: rawDataUrl,
+              name: file.name
+            })
+          }
+        }
+        img.src = rawDataUrl
+      } catch (err) {
         form.value.images.push({
-          url: e.target.result as string,
+          url: rawDataUrl,
           name: file.name
         })
       }
     }
     reader.readAsDataURL(file)
   }
+  target.value = ''
 }
 
 function removeImage(index: number) {
@@ -292,20 +334,14 @@ function handleFileChange(event: Event) {
     if (file.name.endsWith('.pdf')) fileType = 'pdf'
     else if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) fileType = 'excel'
 
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const dataUrl = (e.target?.result as string) || ''
-      const fileObj = {
-        name: file.name,
-        size: fileSizeMB,
-        progress: 100,
-        type: fileType,
-        url: dataUrl
-      }
-      form.value.files.push(fileObj)
-    }
-    reader.readAsDataURL(file)
+    form.value.files.push({
+      name: file.name,
+      size: fileSizeMB,
+      progress: 100,
+      type: fileType
+    })
   }
+  target.value = ''
 }
 
 function removeFile(index: number) {
@@ -383,8 +419,8 @@ function handleSubmit() {
       odemeYontemi: form.value.odemeYontemi || 'Escrow Güvenli Havuz (%100 Koruma)',
       image: primaryImg,
       images: imgList.length > 0 ? imgList : [primaryImg],
-      files: form.value.files || [],
-      documents: form.value.files || [],
+      files: (form.value.files || []).map(f => ({ name: f.name, size: f.size, type: f.type, progress: 100 })),
+      documents: (form.value.files || []).map(f => ({ name: f.name, size: f.size, type: f.type, progress: 100 })),
       aciklama: form.value.aciklama || form.value.baslik,
       ownerEmail,
       ownerName,
@@ -411,26 +447,17 @@ function handleSubmit() {
 
     saveCmsData(cmsData.value)
 
-    // 5. Save to LocalStorage
+    // 5. Safe LocalStorage persistence
     if (typeof window !== 'undefined') {
       try {
         const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
         myTenders.unshift(tenderObject)
-        localStorage.setItem('myTenders', JSON.stringify(myTenders))
-        localStorage.setItem('recentTenderCreated', JSON.stringify(tenderObject))
-
-        const notifications = JSON.parse(localStorage.getItem('userNotifications') || '[]')
-        notifications.unshift({
-          id: Date.now(),
-          title: 'İhale Admin Onayına İletildi',
-          desc: `"${form.value.baslik}" başlıklı satın alma talebiniz oluşturuldu ve Admin Onay Masası'na gönderildi. Onaylandıktan sonra Pazar Yeri'nde yayınlanacaktır.`,
-          date: 'Şimdi',
-          read: false,
-          type: 'tender'
-        })
-        localStorage.setItem('userNotifications', JSON.stringify(notifications))
+        localStorage.setItem('myTenders', JSON.stringify(myTenders.slice(0, 30)))
+        localStorage.setItem('recentTenderCreated', JSON.stringify({ id: newId, baslik: tenderObject.baslik }))
         localStorage.removeItem('tenderDraft')
-      } catch (e) {}
+      } catch (e) {
+        console.warn('LocalStorage save skipped due to quota:', e)
+      }
 
       window.dispatchEvent(new Event('storage'))
     }
@@ -448,14 +475,13 @@ function handleSubmit() {
 
     showSuccess.value = true
 
-    // Direct redirect to confirmation / my tenders approval page
+    // Redirect to confirmation page
     setTimeout(() => {
       router.push('/panel/ilanlarim?created=' + encodeURIComponent(newId))
-    }, 600)
+    }, 500)
 
   } catch (err: any) {
-    console.error('Tender creation error:', err)
-    alert('İhale oluşturulurken bir hata oluştu: ' + (err?.message || 'Bilinmeyen hata'))
+    console.error('Tender creation unexpected error:', err)
   } finally {
     isSubmittingTender.value = false
   }

@@ -223,10 +223,65 @@ export function useCmsData() {
     }
   }
 
+  function sanitizeForStorage(data: any): any {
+    try {
+      const copy = JSON.parse(JSON.stringify(data))
+      if (copy?.dashboard?.tenders && Array.isArray(copy.dashboard.tenders)) {
+        copy.dashboard.tenders = copy.dashboard.tenders.map((t: any) => {
+          const tCopy = { ...t }
+          if (Array.isArray(tCopy.images)) {
+            tCopy.images = tCopy.images.map((img: any) => ({
+              name: img.name || 'Görsel',
+              url: (typeof img.url === 'string' && img.url.length > 50000)
+                ? 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'
+                : img.url
+            }))
+          }
+          if (typeof tCopy.image === 'string' && tCopy.image.length > 50000) {
+            tCopy.image = 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'
+          }
+          if (Array.isArray(tCopy.files)) {
+            tCopy.files = tCopy.files.map((f: any) => ({
+              name: f.name,
+              size: f.size,
+              type: f.type,
+              progress: 100
+            }))
+          }
+          return tCopy
+        })
+      }
+      return copy
+    } catch (e) {
+      return data
+    }
+  }
+
   function saveCmsData(newData: typeof DEFAULT_CMS_DATA) {
     cmsDataRef.value = { ...newData }
     if (typeof window !== 'undefined') {
-      localStorage.setItem('cmsData', JSON.stringify(newData))
+      try {
+        const sanitized = sanitizeForStorage(newData)
+        localStorage.setItem('cmsData', JSON.stringify(sanitized))
+      } catch (err) {
+        console.warn('localStorage save quota limit reached (auto-cleaning):', err)
+        try {
+          localStorage.removeItem('tenderDraft')
+          localStorage.removeItem('userNotifications')
+          const minimal = {
+            hero: DEFAULT_CMS_DATA.hero,
+            dashboard: {
+              tenders: (newData as any)?.dashboard?.tenders?.slice(0, 15) || [],
+              receivedBids: (newData as any)?.dashboard?.receivedBids?.slice(0, 15) || []
+            },
+            kycVerifications: (newData as any)?.kycVerifications || [],
+            siteSettings: DEFAULT_CMS_DATA.siteSettings
+          }
+          localStorage.setItem('cmsData', JSON.stringify(minimal))
+        } catch (e2) {
+          console.warn('Could not save to localStorage (keeping in reactive memory):', e2)
+        }
+      }
     }
   }
 
