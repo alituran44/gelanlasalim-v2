@@ -77,7 +77,7 @@ const router = useRouter()
 // ==================== MENÜ VE GÖRÜNÜM SEÇİMİ ====================
 const activeLeftTab = ref<'kategoriler' | 'sehirler' | 'sektorler' | 'idareler' | 'firmalar'>('kategoriler')
 const activeTimeTab = ref<'guncel' | 'gecmis' | 'sonuc' | 'detayli'>('guncel')
-const viewLayout = ref<'list' | 'grid'>('list') // 'list' = Sahibinden Liste Görünümü, 'grid' = Vitrin Görünümü
+const viewLayout = ref<'list' | 'grid'>('grid') // 'list' = Sahibinden Liste Görünümü, 'grid' = Vitrin Görünümü
 const viewMode = ref<'gelismis' | 'basit'>('gelismis')
 const readMode = ref<'goster' | 'gizle'>('goster')
 
@@ -2179,227 +2179,156 @@ onMounted(() => {
           </div>
 
           <!-- ========================================================= -->
-          <!-- 📋 LİSTE GÖRÜNÜMÜ (SAHİBİNDEN.COM KLASİK RESİMLİ İLAN LİSTESİ) -->
+          <!-- 🖼️ 4'LÜ KART DÜZENİ (VİTRİN / 4 SÜTUNLU RESPONSIVE GRID) -->
           <!-- ========================================================= -->
-          <div v-if="viewLayout === 'list' && paginatedTenders.length > 0" class="space-y-3">
+          <div v-if="paginatedTenders.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             <div 
               v-for="tender in paginatedTenders" 
               :key="tender.id"
-              class="bg-white border border-slate-300 hover:border-[#0084B4] hover:shadow-md rounded-2xl p-3 sm:p-4 transition-all flex flex-col sm:flex-row gap-4 items-start relative group"
+              class="bg-white border border-slate-300 hover:border-[#0084B4] hover:shadow-xl rounded-2xl overflow-hidden transition-all duration-300 flex flex-col justify-between group shadow-2xs text-left"
             >
-              
-              <!-- 🖼️ 1. İhale Fotoğrafı / Thumbnail -->
-              <div class="relative w-full sm:w-44 sm:h-32 h-44 rounded-xl overflow-hidden bg-slate-100 shrink-0 border border-slate-200">
+              <!-- 🖼️ Üst Görsel ve Rozetler -->
+              <div 
+                @click="openTenderDetailModal(tender); selectTenderForLiveBids(tender)" 
+                class="relative h-40 w-full bg-slate-100 overflow-hidden cursor-pointer"
+                title="Şartname ve İhale Detayını İncele"
+              >
                 <img 
-                  :src="getTenderImage(tender)" @error="($event.target as any).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'" 
+                  :src="getTenderImage(tender)" 
                   :alt="tender.baslik"
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  @error="($event.target as any).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'"
                 />
-                
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+
                 <!-- Durum Rozeti -->
                 <div class="absolute top-2 left-2 flex flex-col gap-1">
                   <span 
-                    class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider text-white shadow-xs"
+                    class="px-2 py-0.5 rounded text-[9px] font-black uppercase text-white shadow-xs backdrop-blur-xs"
                     :class="tender.durum === 'closed' ? 'bg-amber-600' : 'bg-emerald-600'"
                   >
                     {{ tender.durum === 'closed' ? '🏆 Sonuçlandı' : '🟢 Canlı İhale' }}
                   </span>
                 </div>
 
-                <!-- Fotoğraf Rozeti -->
-                <div class="absolute bottom-1.5 right-1.5 px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-xs text-white text-[9px] font-bold flex items-center gap-1">
-                  <span>📷 Fotoğraflı</span>
+                <!-- İhale No Rozeti -->
+                <span class="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white text-[9px] font-mono font-black uppercase border border-white/20">
+                  {{ tender.id }}
+                </span>
+
+                <!-- Alt Lokasyon & Kalan Süre -->
+                <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white text-[11px] font-bold">
+                  <span class="flex items-center gap-1 truncate max-w-[120px]">
+                    <MapPin :size="12" class="text-sky-400 shrink-0" />
+                    <span class="truncate">{{ tender.city || 'Balıkesir' }}</span>
+                  </span>
+                  <span class="flex items-center gap-1 bg-black/50 px-1.5 py-0.5 rounded backdrop-blur-xs text-[10px] shrink-0">
+                    <Clock :size="11" class="text-amber-400" />
+                    <span>{{ tender.sure || '7 gün' }}</span>
+                  </span>
                 </div>
               </div>
 
-              <!-- 📝 2. Orta Detay Bilgileri -->
-              <div class="flex-1 space-y-2 min-w-0">
-                
-                <!-- İhale No ve Başlık -->
-                <div>
-                  <div class="flex items-center gap-2 mb-1">
-                    <span class="font-mono font-black text-sky-700 bg-sky-50 px-2 py-0.2 rounded text-[10px] border border-sky-200">
-                      {{ tender.id }}
-                    </span>
-                    <span class="px-2 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px] font-bold truncate max-w-[280px]">
+              <!-- 📝 Kart Gövdesi -->
+              <div class="p-3.5 flex-1 flex flex-col justify-between space-y-3">
+                <div class="space-y-1.5">
+                  
+                  <!-- Kategori ve İhale Yönü Rozeti -->
+                  <div class="flex items-center gap-1.5 flex-wrap">
+                    <span class="text-[10px] font-bold text-slate-500 truncate max-w-[140px]">
                       {{ tender.kategori }}
                     </span>
                     <span 
-                      class="px-2 py-0.2 rounded text-[10px] font-bold border truncate"
+                      class="text-[9px] font-bold px-1.5 py-0.5 rounded border truncate"
                       :class="getTenderDirectionBadge(tender).class"
                     >
                       {{ getTenderDirectionBadge(tender).label }}
                     </span>
                   </div>
 
-                  <h3 
+                  <!-- İhale Başlığı -->
+                  <h4 
                     @click="openTenderDetailModal(tender); selectTenderForLiveBids(tender)" 
-                    class="text-sm sm:text-base font-black text-[#0F223D] hover:text-[#0084B4] cursor-pointer transition leading-snug line-clamp-2"
+                    class="font-black text-xs sm:text-sm text-slate-900 hover:text-[#0084B4] cursor-pointer line-clamp-2 leading-snug transition-colors"
+                    title="İhale Detayını İncele"
                   >
-                    {{ tender.baslik }}
-                  </h3>
-                </div>
-
-                <!-- Alıcı / Kurum & Şehir (Tıklanabilir Firma Profili İle) -->
-                <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-600">
-                  <button 
-                    type="button"
-                    @click="openCompanyProfileModal(tender.ownerCompany || tender.authority, tender.city)"
-                    class="flex items-center gap-1 font-bold text-blue-700 hover:text-blue-900 hover:underline cursor-pointer transition group/comp"
-                    title="Firma Profilini İncele"
-                  >
-                    <Building2 :size="13" class="text-blue-600 shrink-0 group-hover/comp:scale-110 transition-transform" />
-                    <span class="truncate max-w-[220px]">{{ tender.ownerCompany || tender.authority || 'Kurumsal Satın Alma Masası' }}</span>
-                    <span class="text-[9px] bg-blue-50 text-blue-700 px-1.5 py-0.2 rounded font-black border border-blue-200">Profil ↗</span>
-                  </button>
-
-                  <span class="flex items-center gap-1 font-medium text-slate-500">
-                    <MapPin :size="13" class="text-slate-400 shrink-0" />
-                    <span>{{ tender.city || 'Türkiye Geneli' }}</span>
-                  </span>
-
-                  <span class="flex items-center gap-1 font-medium text-slate-500">
-                    <Clock :size="13" class="text-amber-500 shrink-0" />
-                    <span class="font-bold text-slate-700">{{ tender.sure || '3 gün kaldı' }}</span>
-                  </span>
-                </div>
-
-                <!-- Şartname & Malzeme Özeti -->
-                <p class="text-[11px] text-slate-500 line-clamp-2 leading-relaxed">
-                  {{ tender.aciklama || 'Şartname ve malzeme listesi uyarınca mal/hizmet temini yapılacaktır. Teklifler kapalı havuzda toplanmaktadır.' }}
-                </p>
-
-<!-- ⚡ Canlı Eksiltme & Önceki Teklifler Şeridi -->
-                <div v-if="getTenderBidsList(tender).length > 0" class="p-2 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-[10px]">
-                  <div class="flex items-center gap-2">
-                    <span class="font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
-                      🥇 Lider Teklif: {{ getTenderBidsList(tender)[0].fiyat }}
-                    </span>
-                    <span v-if="getTenderBidsList(tender).length > 1" class="text-slate-500 font-medium hidden sm:inline">
-                      Önceki: {{ getTenderBidsList(tender)[1].fiyat }}
-                    </span>
-                  </div>
-                  <span class="text-blue-600 font-bold cursor-pointer hover:underline" @click="openLiveBidsDrawer(tender)">
-                    ⚡ Daha Düşük Teklif Ver ↗
-                  </span>
-                </div>
-
-              </div>
-
-              <!-- 💰 3. Sağ Fiyat & Aksiyon Butonları -->
-              <div class="w-full sm:w-44 shrink-0 flex sm:flex-col justify-between sm:justify-start items-end sm:items-end gap-2 border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100 text-right">
-                
-                <div>
-                  <span class="text-[9px] font-bold text-slate-400 uppercase block">Sözleşme / Hedef Bütçe</span>
-                  <span class="font-mono font-black text-base sm:text-lg text-emerald-700 block">
-                    {{ formatTenderBudget(tender.butce) }}
-                  </span>
-                </div>
-
-                <div class="text-[11px] font-bold text-slate-500">
-                  💬 {{ tender.teklifSayisi || (Math.floor(Math.random() * 6) + 2) }} Teklif Verildi
-                </div>
-
-                <div class="flex sm:flex-col gap-1.5 w-full sm:w-auto pt-1">
-                  <button 
-                    type="button" 
-                    @click="openTenderDetailModal(tender)"
-                    class="flex-1 sm:w-full px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs transition cursor-pointer"
-                  >
-                    Şartname İncele
-                  </button>
-
-                  <NuxtLink 
-                    v-if="isMyOwnTender(tender)"
-                    to="/panel/gelen-teklifler"
-                    class="flex-1 sm:w-full px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
-                    title="Bu sizin kendi açtığınız ihale ilanıdır"
-                  >
-                    <Building2 :size="12" class="text-amber-700" />
-                    <span>👤 Kendi İlanınız</span>
-                  </NuxtLink>
-                  <button 
-                    v-else
-                    type="button" 
-                    @click="openQuickBidModal(tender)"
-                    class="flex-1 sm:w-full px-3.5 py-1.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition cursor-pointer shadow-xs flex items-center justify-center gap-1"
-                  >
-                    <Send :size="12" />
-                    <span>Teklif Ver</span>
-                  </button>
-
-                  <!-- ⚡ Canlı Teklifler Çekmecesi Açıcı Buton -->
-                  <button
-                    type="button"
-                    @click="openLiveBidsDrawer(tender)"
-                    class="flex-1 sm:w-full px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-black text-xs transition cursor-pointer flex items-center justify-center gap-1"
-                  >
-                    <Sparkles :size="12" class="text-emerald-600" />
-                    <span>⚡ Canlı Teklifler ({{ getTenderBidsList(tender).length }})</span>
-                  </button>
-                </div>
-
-              </div>
-
-            </div>
-          </div>
-
-          <!-- ========================================================= -->
-          <!-- 🖼️ VİTRİN / GALERİ GÖRÜNÜMÜ (SAHİBİNDEN VİTRİN KARTLARI) -->
-          <!-- ========================================================= -->
-          <div v-else-if="viewLayout === 'grid' && paginatedTenders.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div 
-              v-for="tender in paginatedTenders" 
-              :key="tender.id"
-              class="bg-white border border-slate-300 hover:border-[#0084B4] hover:shadow-md rounded-2xl overflow-hidden transition-all flex flex-col group"
-            >
-              <!-- Fotoğraf -->
-              <div class="relative h-44 w-full bg-slate-100 overflow-hidden">
-                <img 
-                  :src="getTenderImage(tender)" @error="($event.target as any).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'" 
-                  :alt="tender.baslik"
-                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-                <span 
-                  class="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-black uppercase text-white shadow-xs"
-                  :class="tender.durum === 'closed' ? 'bg-amber-600' : 'bg-emerald-600'"
-                >
-                  {{ tender.durum === 'closed' ? 'Sonuçlandı' : '🟢 Canlı' }}
-                </span>
-                <span class="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/60 text-white text-[10px] font-mono font-bold">
-                  {{ tender.city }}
-                </span>
-              </div>
-
-              <!-- İçerik -->
-              <div class="p-4 flex-1 flex flex-col justify-between space-y-3">
-                <div class="space-y-1.5">
-                  <div class="text-[10px] font-mono text-sky-700 font-bold">{{ tender.id }} · {{ tender.kategori }}</div>
-                  <h4 @click="openTenderDetailModal(tender); selectTenderForLiveBids(tender)" class="font-black text-xs text-slate-900 hover:text-[#0084B4] cursor-pointer line-clamp-2 leading-snug">
                     {{ tender.baslik }}
                   </h4>
+
+                  <!-- Alıcı Kurum / Firma -->
                   <button 
                     type="button"
                     @click="openCompanyProfileModal(tender.ownerCompany || tender.authority, tender.city)"
-                    class="text-[11px] font-bold text-blue-700 hover:underline text-left block truncate"
+                    class="text-[11px] font-bold text-blue-700 hover:text-blue-900 hover:underline flex items-center gap-1 text-left truncate w-full cursor-pointer"
                   >
-                    🏢 {{ tender.ownerCompany || tender.authority }}
+                    <Building2 :size="12" class="text-blue-600 shrink-0" />
+                    <span class="truncate">{{ tender.ownerCompany || tender.authority || 'Kurumsal Satın Alma Masası' }}</span>
                   </button>
+
+                  <!-- ⚡ Canlı Lider Teklif Şeridi -->
+                  <div 
+                    v-if="getTenderBidsList(tender).length > 0"
+                    @click="openLiveBidsDrawer(tender)"
+                    class="p-2 bg-emerald-50/80 rounded-xl border border-emerald-200 flex items-center justify-between text-[10px] cursor-pointer hover:bg-emerald-100 transition"
+                  >
+                    <span class="font-bold text-emerald-800 flex items-center gap-1">
+                      <span>🥇 Lider:</span>
+                      <strong class="font-mono font-black text-emerald-900">{{ getTenderBidsList(tender)[0].fiyat }}</strong>
+                    </span>
+                    <span class="text-blue-600 font-bold hover:underline">
+                      Teklif Ver ↗
+                    </span>
+                  </div>
+
                 </div>
 
-                <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-                  <div>
-                    <span class="text-[8px] font-bold text-slate-400 uppercase block">Hedef Bütçe</span>
-                    <span class="font-mono font-black text-emerald-700 text-sm">{{ tender.butce }}</span>
+                <!-- 🔘 Butonlar Grubu -->
+                <div class="pt-2 border-t border-slate-100 space-y-1.5">
+                  
+                  <div class="grid grid-cols-2 gap-1.5">
+                    <!-- 1. Şartname İncele -->
+                    <button 
+                      type="button" 
+                      @click.stop="openTenderDetailModal(tender)"
+                      class="py-2 px-2 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-[11px] transition cursor-pointer text-center flex items-center justify-center gap-1"
+                    >
+                      <FileText :size="12" />
+                      <span>Şartname</span>
+                    </button>
+
+                    <!-- 2. Teklif Ver -->
+                    <NuxtLink 
+                      v-if="isMyOwnTender(tender)"
+                      to="/panel/gelen-teklifler"
+                      class="py-2 px-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[11px] transition cursor-pointer text-center flex items-center justify-center gap-1"
+                      title="Kendi İlanınız"
+                    >
+                      <Building2 :size="12" class="text-amber-700" />
+                      <span>İlanınız</span>
+                    </NuxtLink>
+                    <button 
+                      v-else
+                      type="button" 
+                      @click.stop="openQuickBidModal(tender)"
+                      class="py-2 px-2 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-[11px] transition cursor-pointer shadow-xs flex items-center justify-center gap-1"
+                    >
+                      <Send :size="12" />
+                      <span>Teklif Ver</span>
+                    </button>
                   </div>
-                  <button 
-                    type="button" 
-                    @click="openQuickBidModal(tender)"
-                    class="px-3 py-1.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-bold text-xs transition cursor-pointer"
+
+                  <!-- 3. Canlı Teklifler (Drawer Açıcı) -->
+                  <button
+                    type="button"
+                    @click.stop="openLiveBidsDrawer(tender)"
+                    class="w-full py-1.5 px-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-black text-[10px] transition cursor-pointer flex items-center justify-center gap-1"
                   >
-                    Teklif Ver
+                    <Sparkles :size="11" class="text-emerald-600" />
+                    <span>⚡ Canlı Teklifler ({{ getTenderBidsList(tender).length }})</span>
                   </button>
+
                 </div>
+
               </div>
             </div>
           </div>
