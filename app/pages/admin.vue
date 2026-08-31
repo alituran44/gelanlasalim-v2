@@ -1011,6 +1011,52 @@ function handleSave() {
   triggerToast('Tüm değişiklikler başarıyla kaydedildi ve anında yayına alındı!', 'success')
 }
 
+function handleFullSystemWipe() {
+  const confirmWipe = confirm('⚠️ TÜM SİSTEMİ VE TEST VERİLERİNİ TEMİZLEME ONAYI\n\nTüm kullanıcılar, açılan ihaleler, teklifler, emanet siparişleri, mesajlaşmalar ve KYC kayıtları tamamen sıfırlanacak; sistem tertemiz sıfır noktasına getirilecektir.\n\nBu işlemi onaylıyor musunuz?')
+  if (!confirmWipe) return
+
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.removeItem('cmsData')
+      localStorage.removeItem('myTenders')
+      localStorage.removeItem('mySubmittedBids')
+      localStorage.removeItem('allRegisteredUsers')
+      localStorage.removeItem('user_accounts_registry')
+      localStorage.removeItem('companyVerificationDocs')
+      localStorage.removeItem('b2b_messages_chats')
+      localStorage.removeItem('tenderDraft')
+      localStorage.removeItem('userNotifications')
+      localStorage.setItem('cmsData_version', 'v2026_09_01_clean_slate_production_v1')
+    } catch (e) {}
+  }
+
+  resetCmsData()
+  Object.keys(formState).forEach(k => {
+    delete formState[k]
+  })
+  Object.assign(formState, JSON.parse(JSON.stringify(cmsData.value)))
+  
+  if (formState.dashboard) {
+    formState.dashboard.tenders = []
+    formState.dashboard.receivedBids = []
+    formState.dashboard.submittedBids = []
+    formState.dashboard.escrowOrders = []
+    formState.dashboard.disputes = []
+  }
+  formState.escrowOrders = []
+  formState.kycVerifications = []
+  formState.liveAuctionRooms = []
+  if (formState.crmSettings) formState.crmSettings.leads = []
+  if (formState.emailSettings) formState.emailSettings.subscribers = []
+  formState.auditLogs = []
+
+  saveCmsData(JSON.parse(JSON.stringify(formState)))
+  triggerToast('Tüm test verileri, ihaleler ve kullanıcılar temizlendi. Sistem tertemiz duruma getirildi!', 'success')
+  setTimeout(() => {
+    if (typeof window !== 'undefined') window.location.reload()
+  }, 1000)
+}
+
 function handleReset() {
   if (confirm('Tüm içerikleri fabrika varsayılan ayarlarına döndürmek istediğinize emin misiniz?')) {
     resetCmsData()

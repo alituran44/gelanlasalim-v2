@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-const SCHEMA_VERSION = 'v2026_08_31_quota_safe_final_v3'
+const SCHEMA_VERSION = 'v2026_09_01_clean_slate_production_v1'
 
 // Clean state for platform - zero dummy / mock data
 export const DEFAULT_CMS_DATA = {
@@ -138,107 +138,7 @@ export const DEFAULT_CMS_DATA = {
   },
   kycVerifications: [] as any[],
   liveAuctionRooms: [] as any[],
-  escrowOrders: [
-    {
-      id: 'ORD-2026-178',
-      orderCode: 'SIP-2026-8819',
-      tenderId: 'IHC-2026-178',
-      tenderTitle: 'aesredtruıo85urıy (Lojistik ve Havayolu Taşımacılığı)',
-      buyerCompany: 'Ali Turan San. Tic. A.Ş.',
-      buyerFirm: 'Ali Turan San. Tic. A.Ş.',
-      buyerEmail: 'alituran44@gmail.com',
-      supplierCompany: 'Ata Akademi San. Tic. A.Ş.',
-      supplierFirm: 'Ata Akademi San. Tic. A.Ş.',
-      supplierEmail: 'ataakademi@gmail.com',
-      totalAmount: '75.000 ₺',
-      amount: '75.000 ₺',
-      numericAmount: 75000,
-      payoutAmount: '72.750 ₺',
-      commissionAmount: '2.250 ₺',
-      commissionRate: 3,
-      status: 'HAVUZDA_BLOKE',
-      statusLabel: 'Güvenli Havuzda Bloke Edildi',
-      escrowStatus: 'havuzda_bloke',
-      trackingNumber: 'YK-8829104',
-      trackingCode: 'YK-8829104',
-      carrier: 'Yurtiçi Kargo / Borusan Lojistik',
-      shippingCompany: 'Yurtiçi Kargo & Borusan Lojistik',
-      deliveryDate: '3 iş günü',
-      notes: 'İhale mutabakatı tamamlandı. Havuz ödemesi bloke edildi.',
-      createdAt: '2026-08-31',
-      updatedAt: 'Az önce',
-      paymentMethod: 'PayTR / iyzico 3D Güvenli Havuz',
-      history: [
-        { title: 'İhale Onaylandı & Havuz Açıldı', date: '31.08.2026 22:30', by: 'Sistem' }
-      ]
-    },
-    {
-      id: 'ORD-2026-101',
-      orderCode: 'SIP-2026-7734',
-      tenderId: 'IHC-2026-101',
-      tenderTitle: 'Endüstriyel Koli ve Ambalaj Malzemesi Alımı',
-      buyerCompany: 'Çanakkale Seramik A.Ş.',
-      buyerFirm: 'Çanakkale Seramik A.Ş.',
-      buyerEmail: 'satinlama@canakkaleseramik.com',
-      supplierCompany: 'Marmara Ambalaj San. Tic. Ltd. Şti.',
-      supplierFirm: 'Marmara Ambalaj San. Tic. Ltd. Şti.',
-      supplierEmail: 'satis@marmaraambalaj.com',
-      totalAmount: '142.000 ₺',
-      amount: '142.000 ₺',
-      numericAmount: 142000,
-      payoutAmount: '137.740 ₺',
-      commissionAmount: '4.260 ₺',
-      commissionRate: 3,
-      status: 'SEVKIYATTA',
-      statusLabel: 'Sevkiyatta (İrsaliye Kesildi)',
-      escrowStatus: 'sevkiyatta',
-      trackingNumber: 'MNG-991204',
-      trackingCode: 'MNG-991204',
-      carrier: 'MNG Kargo & Ambar',
-      shippingCompany: 'MNG Kargo & Ambar',
-      deliveryDate: '2 gün',
-      notes: 'Ürünler depodan sevk edildi.',
-      createdAt: '2026-08-30',
-      updatedAt: 'Dün',
-      paymentMethod: 'PayTR / iyzico 3D Güvenli Havuz',
-      history: [
-        { title: 'Sevkiyat Başlatıldı', date: '30.08.2026 14:00', by: 'Tedarikçi' }
-      ]
-    },
-    {
-      id: 'ORD-2026-089',
-      orderCode: 'SIP-2026-6621',
-      tenderId: 'IHC-2026-089',
-      tenderTitle: 'Toptan Motorin ve Madeni Yağ Temini',
-      buyerCompany: 'Ege İnşaat Madencilik A.Ş.',
-      buyerFirm: 'Ege İnşaat Madencilik A.Ş.',
-      buyerEmail: 'lojistik@egeinsaat.com',
-      supplierCompany: 'Petrol Taşımacılık Sanayi A.Ş.',
-      supplierFirm: 'Petrol Taşımacılık Sanayi A.Ş.',
-      supplierEmail: 'akaryakit@petrolsan.com',
-      totalAmount: '450.000 ₺',
-      amount: '450.000 ₺',
-      numericAmount: 450000,
-      payoutAmount: '436.500 ₺',
-      commissionAmount: '13.500 ₺',
-      commissionRate: 3,
-      status: 'TAMAMLANDI',
-      statusLabel: 'Mal Kabul Onaylandı & Hakediş Aktarıldı',
-      escrowStatus: 'odeme_cozuldu',
-      trackingNumber: 'IRS-2026-4401',
-      trackingCode: 'IRS-2026-4401',
-      carrier: 'Özel Tanker Filosu',
-      shippingCompany: 'Özel Tanker Filosu',
-      deliveryDate: 'Tamamlandı',
-      notes: 'Mal kabul tamamlandı, bakiye aktarıldı.',
-      createdAt: '2026-08-28',
-      updatedAt: '28.08.2026',
-      paymentMethod: 'PayTR / iyzico 3D Güvenli Havuz',
-      history: [
-        { title: 'Hakediş Aktarıldı', date: '28.08.2026 18:00', by: 'Alıcı Onayı' }
-      ]
-    }
-  ],
+  escrowOrders: [] as any[],
   commissionSettings: {
     defaultRate: 3.0,
     minTransactionFee: 50,
@@ -591,19 +491,20 @@ function sanitizeForStorage(data: any): any {
 }
 
 function safeLocalStorageSet(key: string, value: any) {
-  if (typeof window === 'undefined') return
-  try {
-    const jsonStr = typeof value === 'string' ? value : JSON.stringify(value)
-    localStorage.setItem(key, jsonStr)
-  } catch (err) {
-    console.warn(`localStorage quota reached on key "${key}", cleaning...`, err)
+  if (typeof window !== 'undefined') {
     try {
-      localStorage.removeItem('tenderDraft')
-      localStorage.removeItem('userNotifications')
-      const sanitized = sanitizeForStorage(value)
-      localStorage.setItem(key, JSON.stringify(sanitized))
-    } catch (e2) {
-      console.warn('Could not save to localStorage (relying on memory state):', e2)
+      const jsonStr = typeof value === 'string' ? value : JSON.stringify(value)
+      localStorage.setItem(key, jsonStr)
+    } catch (err) {
+      console.warn(`localStorage quota reached on key "${key}", cleaning...`, err)
+      try {
+        localStorage.removeItem('tenderDraft')
+        localStorage.removeItem('userNotifications')
+        const sanitized = sanitizeForStorage(value)
+        localStorage.setItem(key, JSON.stringify(sanitized))
+      } catch (e2) {
+        console.warn('Could not save to localStorage (relying on memory state):', e2)
+      }
     }
   }
 }
@@ -612,58 +513,49 @@ export function useCmsData() {
   if (typeof window !== 'undefined' && !isInitialized) {
     isInitialized = true
 
-    let existingTenders: any[] = []
-    let existingReceivedBids: any[] = []
-    let existingKyc: any[] = []
-
     // Read previous data from localStorage
     const saved = localStorage.getItem('cmsData')
-    if (saved) {
+    const savedVer = localStorage.getItem('cmsData_version')
+
+    if (savedVer !== SCHEMA_VERSION) {
+      // Force clean slate for production
+      localStorage.removeItem('cmsData')
+      localStorage.removeItem('myTenders')
+      localStorage.removeItem('mySubmittedBids')
+      localStorage.removeItem('allRegisteredUsers')
+      localStorage.removeItem('user_accounts_registry')
+      localStorage.removeItem('companyVerificationDocs')
+      localStorage.removeItem('b2b_messages_chats')
+      localStorage.removeItem('tenderDraft')
+      localStorage.removeItem('userNotifications')
+      localStorage.setItem('cmsData_version', SCHEMA_VERSION)
+      cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
+      safeLocalStorageSet('cmsData', cmsDataRef.value)
+    } else if (saved) {
       try {
         const parsed = JSON.parse(saved)
-        if (Array.isArray(parsed?.dashboard?.tenders)) existingTenders = parsed.dashboard.tenders
-        if (Array.isArray(parsed?.dashboard?.receivedBids)) existingReceivedBids = parsed.dashboard.receivedBids
-        if (Array.isArray(parsed?.kycVerifications)) existingKyc = parsed.kycVerifications
-      } catch (e) {}
-    }
-
-    try {
-      const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
-      if (Array.isArray(myTenders)) {
-        myTenders.forEach(mt => {
-          if (!existingTenders.some(et => et.id === mt.id)) {
-            existingTenders.unshift(mt)
+        if (parsed && typeof parsed === 'object') {
+          cmsDataRef.value = {
+            ...DEFAULT_CMS_DATA,
+            ...parsed,
+            commissionSettings: parsed.commissionSettings || DEFAULT_CMS_DATA.commissionSettings
           }
-        })
+        }
+      } catch (e) {
+        console.warn('Failed to parse cmsData from localStorage, using clean defaults', e)
+        cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
       }
-    } catch (e) {}
-
-    // Initialize with default structure merged with preserved live data
-    const initialData = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
-    if (!initialData.dashboard) initialData.dashboard = { tenders: [], receivedBids: [], submittedBids: [], disputes: [] }
-    
-    initialData.dashboard.tenders = existingTenders.filter((t: any) => !t.id?.startsWith('IHC-2024-') && !t.id?.startsWith('IHC-DEMO'))
-    initialData.dashboard.receivedBids = existingReceivedBids
-    if (existingKyc.length > 0) initialData.kycVerifications = existingKyc
-
-    cmsDataRef.value = initialData
-    safeLocalStorageSet('cmsData', initialData)
+    }
   }
 
-  function saveCmsData(newData: typeof DEFAULT_CMS_DATA) {
-    cmsDataRef.value = { ...newData }
-    if (typeof window !== 'undefined') {
-      const sanitized = sanitizeForStorage(newData)
-      safeLocalStorageSet('cmsData', sanitized)
-    }
+  function saveCmsData(newData: any) {
+    cmsDataRef.value = JSON.parse(JSON.stringify(newData))
+    safeLocalStorageSet('cmsData', cmsDataRef.value)
   }
 
   function resetCmsData() {
     cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
-    if (typeof window !== 'undefined') {
-      safeLocalStorageSet('cmsData', DEFAULT_CMS_DATA)
-      localStorage.removeItem('myTenders')
-    }
+    safeLocalStorageSet('cmsData', cmsDataRef.value)
   }
 
   return {
