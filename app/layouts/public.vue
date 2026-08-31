@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { 
   ArrowRight, 
   Home, 
@@ -20,14 +21,13 @@ import FloatingSupportWidget from '~/components/common/FloatingSupportWidget.vue
 import PaymentBadges from '~/components/common/PaymentBadges.vue'
 import Footer from '~/components/landing/Footer.vue'
 
+const route = useRoute()
 const userSession = ref<any>(null)
-const loginUsername = ref('')
-const loginPassword = ref('')
 const activeNavTab = ref('anasayfa')
 
 const isLoggedIn = computed(() => {
   if (!userSession.value) return false
-  return !!(userSession.value.email || userSession.value.id || userSession.value.companyName || userSession.value.username)
+  return !!(userSession.value.email || userSession.value.id || userSession.value.companyName || userSession.value.company || userSession.value.username || userSession.value.name)
 })
 
 function checkSession() {
@@ -35,51 +35,42 @@ function checkSession() {
     try {
       const raw = localStorage.getItem('userSession')
       if (raw && raw !== 'null' && raw !== 'undefined' && raw !== '{}') {
-        userSession.value = JSON.parse(raw)
-      } else {
-        userSession.value = null
+        const parsed = JSON.parse(raw)
+        if (parsed && typeof parsed === 'object' && (parsed.email || parsed.name || parsed.username || parsed.company || parsed.companyName)) {
+          userSession.value = parsed
+          return
+        }
       }
+      userSession.value = null
     } catch {
       userSession.value = null
     }
   }
 }
 
-function handleLogin() {
-  if (!loginUsername.value || !loginPassword.value) {
-    alert('Lütfen kullanıcı adı ve şifrenizi giriniz.')
-    return
-  }
-  const displayName = loginUsername.value.includes('@') ? loginUsername.value.split('@')[0] : loginUsername.value
-  const session = {
-    username: displayName,
-    name: displayName,
-    firstName: displayName,
-    companyName: '',
-    role: 'member'
-  }
-  userSession.value = session
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('userSession', JSON.stringify(session))
-  }
-  alert(`✓ Hoş geldiniz, ${session.companyName}!`)
-}
-
 function handleLogout() {
   if (typeof window !== 'undefined') {
-    localStorage.removeItem('userSession')
-    localStorage.removeItem('guestSession')
+    try {
+      localStorage.removeItem('userSession')
+      localStorage.removeItem('guestSession')
+    } catch (e) {}
   }
   userSession.value = null
   if (typeof window !== 'undefined') {
+    window.dispatchEvent(new Event('storage'))
     window.location.reload()
   }
 }
+
+watch(() => route.fullPath, () => {
+  checkSession()
+})
 
 onMounted(() => {
   checkSession()
   if (typeof window !== 'undefined') {
     window.addEventListener('storage', checkSession)
+    window.addEventListener('focus', checkSession)
   }
 })
 </script>
@@ -226,18 +217,26 @@ onMounted(() => {
         
         <!-- Sol: Kurumsal Butonlar Grubu -->
         <div class="flex flex-wrap items-center gap-2.5">
-          <!-- 1. Yeni Üyelik -->
-          <NuxtLink to="/uyelik?tab=register" class="px-3.5 py-1.5 rounded-lg bg-[#059669] hover:bg-[#047857] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-emerald-700/30 transition">
+          <!-- 1. Yeni Üyelik (Giriş yapılmamışsa görünür) -->
+          <NuxtLink 
+            v-if="!isLoggedIn" 
+            to="/uyelik?tab=register" 
+            class="px-3.5 py-1.5 rounded-lg bg-[#059669] hover:bg-[#047857] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-emerald-700/30 transition cursor-pointer"
+          >
             <span>👤+ Yeni üyelik</span>
           </NuxtLink>
 
-          <!-- 2. Giriş Yap -->
-          <NuxtLink to="/uyelik?tab=login" class="px-3.5 py-1.5 rounded-lg bg-[#0F223D] hover:bg-[#1E293B] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-slate-700/40 transition">
+          <!-- 2. Giriş Yap (Giriş yapılmamışsa görünür, giriş yapılınca otomatik gizlenir) -->
+          <NuxtLink 
+            v-if="!isLoggedIn" 
+            to="/uyelik?tab=login" 
+            class="px-3.5 py-1.5 rounded-lg bg-[#0F223D] hover:bg-[#1E293B] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-slate-700/40 transition cursor-pointer"
+          >
             <span>🔑 Giriş Yap</span>
           </NuxtLink>
 
           <!-- 3. Üyelik Uzat -->
-          <NuxtLink to="/abonelik" class="px-3.5 py-1.5 rounded-lg bg-[#0284C7] hover:bg-[#0369A1] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-sky-700/30 transition">
+          <NuxtLink to="/abonelik" class="px-3.5 py-1.5 rounded-lg bg-[#0284C7] hover:bg-[#0369A1] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-sky-700/30 transition cursor-pointer">
             <span>🔄 Üyelik uzat</span>
           </NuxtLink>
 
@@ -251,11 +250,31 @@ onMounted(() => {
           </NuxtLink>
         </div>
 
-        <!-- Sağ: Giriş Yapılmışsa Kullanıcı Profili ve Çıkış -->
-        <div v-if="isLoggedIn" class="flex items-center gap-3 text-xs">
-          <span class="font-bold text-slate-700">👤 {{ userSession?.name || userSession?.firstName || userSession?.username || 'Hesabım' }}</span>
-          <NuxtLink to="/panel" class="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold">Yönetim Paneli</NuxtLink>
-          <button @click="handleLogout" class="px-2.5 py-1 rounded bg-red-100 hover:bg-red-200 text-red-700 font-bold border border-red-300 cursor-pointer">Çıkış</button>
+        <!-- Sağ: Giriş Yapılmışsa Kullanıcı Profili ve Çıkış Butonu -->
+        <div v-if="isLoggedIn" class="flex items-center gap-2.5 text-xs">
+          <NuxtLink 
+            to="/panel/ayarlar"
+            class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold border border-slate-300 flex items-center gap-1.5 transition"
+          >
+            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+            <span class="truncate max-w-[180px]">{{ userSession?.company || userSession?.companyName || userSession?.name || userSession?.firstName || 'Kurumsal Hesabım' }}</span>
+          </NuxtLink>
+
+          <NuxtLink 
+            to="/panel" 
+            class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center gap-1 shadow-xs"
+          >
+            <span>🎛️ Panelime Git</span>
+          </NuxtLink>
+
+          <button 
+            @click="handleLogout" 
+            class="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 font-bold border border-red-200 transition flex items-center gap-1 cursor-pointer"
+            title="Güvenli Çıkış Yap"
+          >
+            <LogOut :size="13" />
+            <span>Çıkış Yap</span>
+          </button>
         </div>
 
       </div>
