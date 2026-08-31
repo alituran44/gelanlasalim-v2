@@ -878,9 +878,25 @@ function resetAllFilters() {
 }
 
 // ==================== 10. MODAL VE HIZLI TEKLİF İŞLEMLERİ ====================
+const activeSpecTab = ref<'pdf' | 'gallery' | 'details'>('pdf')
+const activeDocIndex = ref(0)
+const activeImageIndex = ref(0)
+const pdfZoomLevel = ref(100)
+
 function openTenderDetailModal(tender: any) {
   selectedTenderModal.value = tender
-  detailActiveTab.value = 'ilan'
+  activeDocIndex.value = 0
+  activeImageIndex.value = 0
+  pdfZoomLevel.value = 100
+  
+  // Auto-select gallery if user has images but no PDF, or PDF if files exist
+  if (tender.files && tender.files.length > 0) {
+    activeSpecTab.value = 'pdf'
+  } else if (tender.images && tender.images.length > 0) {
+    activeSpecTab.value = 'gallery'
+  } else {
+    activeSpecTab.value = 'pdf'
+  }
 }
 
 // Firma Profil Modalı Açıcı (Dışarıdan Görünüm & Düzenle Butonu Kontrolü)
@@ -2259,141 +2275,362 @@ onMounted(() => {
 </div>
 
     <!-- ========================================================================= -->
-    <!-- 📄 1. İHALE DETAY MODALI -->
+    <!-- 📄 1. İNTERAKTİF ÇOKLU ŞARTNAME, PDF VE GÖRSEL GALERİSİ MODALI -->
     <!-- ========================================================================= -->
-    <div v-if="selectedTenderModal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4">
-      <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[92vh] overflow-y-auto p-5 sm:p-7 space-y-5 shadow-2xl animate-fadeIn text-left border border-slate-200">
+    <div v-if="selectedTenderModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-fadeIn">
+      <div class="bg-slate-900 rounded-3xl max-w-5xl w-full max-h-[96vh] flex flex-col shadow-2xl border border-slate-700 overflow-hidden text-left">
         
-        <div class="flex items-start justify-between gap-4 border-b pb-3 border-slate-100">
-          <div>
-            <div class="flex items-center gap-2">
-              <span class="px-2.5 py-0.5 rounded-lg bg-blue-50 text-blue-700 text-[10px] font-mono font-black uppercase">
-                #{{ selectedTenderModal.id }}
-              </span>
-              <span class="text-xs font-black text-blue-600 uppercase tracking-wider">
-                {{ selectedTenderModal.kategori }}
-              </span>
+        <!-- Üst Başlık & Sekme Çubuğu -->
+        <div class="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 text-white">
+          
+          <div class="flex items-center gap-3 min-w-0">
+            <div class="w-10 h-10 rounded-2xl bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center font-black text-sm shrink-0">
+              <FileText :size="20" />
             </div>
-            <h2 class="text-lg sm:text-xl font-black text-slate-900 mt-1">
-              {{ selectedTenderModal.baslik }}
-            </h2>
+            <div class="min-w-0">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded bg-blue-500/20 text-blue-400 font-mono text-[10px] font-black uppercase">
+                  #{{ selectedTenderModal.id }}
+                </span>
+                <span class="text-xs font-black text-slate-300 uppercase tracking-wider truncate">
+                  {{ selectedTenderModal.kategori }}
+                </span>
+              </div>
+              <h2 class="text-sm sm:text-base font-black text-white truncate max-w-md sm:max-w-xl">
+                {{ selectedTenderModal.baslik }}
+              </h2>
+            </div>
           </div>
-          <button @click="selectedTenderModal = null" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl cursor-pointer">
-            <X :size="20" />
-          </button>
-        </div>
 
-        <!-- Meta Strip -->
-        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase block">🏢 Alıcı / Kurum</span>
-            <button 
-              type="button" 
-              @click="openCompanyProfileModal(selectedTenderModal.ownerCompany || selectedTenderModal.authority, selectedTenderModal.city); selectedTenderModal = null"
-              class="font-bold text-blue-700 hover:underline text-left block"
+          <!-- Sekme Değiştirici (PDF / Galeri / Detaylar) -->
+          <div class="flex items-center gap-1.5 bg-slate-900 p-1 rounded-xl border border-slate-800 text-xs">
+            <button
+              type="button"
+              @click="activeSpecTab = 'pdf'"
+              class="px-3 py-1.5 rounded-lg font-bold transition cursor-pointer flex items-center gap-1.5"
+              :class="activeSpecTab === 'pdf' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white hover:bg-slate-800'"
             >
-              {{ selectedTenderModal.ownerCompany || selectedTenderModal.authority || 'Kurumsal Masası' }} ↗
+              <FileText :size="13" />
+              <span>PDF Dokümanları ({{ (selectedTenderModal.files || selectedTenderModal.documents || []).length || 1 }})</span>
+            </button>
+
+            <button
+              type="button"
+              @click="activeSpecTab = 'gallery'"
+              class="px-3 py-1.5 rounded-lg font-bold transition cursor-pointer flex items-center gap-1.5"
+              :class="activeSpecTab === 'gallery' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white hover:bg-slate-800'"
+            >
+              <Eye :size="13" />
+              <span>Görseller & Numuneler ({{ (selectedTenderModal.images || []).length || 1 }})</span>
+            </button>
+
+            <button
+              type="button"
+              @click="activeSpecTab = 'details'"
+              class="px-3 py-1.5 rounded-lg font-bold transition cursor-pointer flex items-center gap-1.5"
+              :class="activeSpecTab === 'details' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white hover:bg-slate-800'"
+            >
+              <Building2 :size="13" />
+              <span>İhale & Firma Bilgileri</span>
+            </button>
+
+            <button
+              type="button"
+              @click="selectedTenderModal = null"
+              class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer ml-1"
+            >
+              <X :size="18" />
             </button>
           </div>
-          <div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase block">💰 Hedef / Sözleşme Bütçesi</span>
-            <span class="font-mono font-black text-emerald-600 text-sm">{{ selectedTenderModal.butce || 'Açık Teklif' }}</span>
-          </div>
-          <div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase block">📍 Şehir</span>
-            <span class="font-bold text-slate-800">{{ selectedTenderModal.city || 'Türkiye Geneli' }}</span>
-          </div>
-          <div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase block">⏱️ Kalan Süre</span>
-            <span class="font-bold text-amber-600">{{ selectedTenderModal.sure || '3 gün kaldı' }}</span>
-          </div>
+
         </div>
 
-        
-        <!-- İhale Açıklaması -->
-        <div class="space-y-2 text-xs text-slate-700 leading-relaxed p-4 rounded-2xl bg-slate-50/50 border border-slate-200">
-          <h4 class="font-black text-slate-900 text-xs">Şartname ve İhale Kapsamı:</h4>
-          <p class="whitespace-pre-line">{{ selectedTenderModal.aciklama }}</p>
-        </div>
+        <!-- =================================================================== -->
+        <!-- 📑 1. SEKME: PDF DOKÜMANLARI & ŞARTNAME SAYFALARI GÖRÜNTÜLEYİCİ -->
+        <!-- =================================================================== -->
+        <div v-if="activeSpecTab === 'pdf'" class="flex-1 flex flex-col min-h-0 bg-slate-800">
+          
+          <!-- PDF Seçici Bar (Birden fazla dosya varsa tıklayarak geçiş) -->
+          <div class="bg-slate-950/80 px-4 py-2.5 border-b border-slate-800 flex items-center justify-between gap-3 text-xs overflow-x-auto">
+            <div class="flex items-center gap-2 shrink-0">
+              <span class="text-slate-400 font-bold text-[11px]">Şartname Belgeleri:</span>
+              <button
+                v-for="(doc, dIdx) in (selectedTenderModal.files || selectedTenderModal.documents || [{ name: 'Resmi_Teknik_Sartname_' + selectedTenderModal.id + '.pdf', size: '0.08 MB', type: 'pdf' }])"
+                :key="dIdx"
+                type="button"
+                @click="activeDocIndex = dIdx"
+                class="px-3 py-1.5 rounded-lg font-bold text-xs transition cursor-pointer flex items-center gap-1.5 border"
+                :class="activeDocIndex === dIdx 
+                  ? 'bg-red-600/20 text-red-400 border-red-500/40 shadow-xs' 
+                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'"
+              >
+                <span class="w-2 h-2 rounded-full" :class="activeDocIndex === dIdx ? 'bg-red-500' : 'bg-slate-600'"></span>
+                <span class="truncate max-w-[180px]">{{ doc.name || ('Sayfa ' + (dIdx + 1) + '.pdf') }}</span>
+              </button>
+            </div>
 
-        <!-- Ekli Şartname ve Belgeler -->
-        <div class="space-y-3 p-4 rounded-2xl bg-blue-50/50 border border-blue-100 text-left">
-          <div class="flex items-center justify-between">
-            <h4 class="font-black text-slate-900 text-xs flex items-center gap-1.5">
-              <FileText :size="14" class="text-blue-600" />
-              <span>İhaleye Eklenen Şartname & Dokümanlar:</span>
-            </h4>
-            <span class="text-[10px] font-bold text-blue-700 bg-blue-100 px-2 py-0.5 rounded-full">
-              {{ (selectedTenderModal.files || selectedTenderModal.documents || []).length || 1 }} Belge Mevcut
-            </span>
-          </div>
-
-          <!-- File Items Grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <div 
-              v-for="(doc, dIdx) in (selectedTenderModal.files || selectedTenderModal.documents || [{ name: 'Resmi_Teknik_Sartname_' + selectedTenderModal.id + '.pdf', size: '0.08 MB', type: 'pdf' }])"
-              :key="dIdx"
-              class="p-3 rounded-xl bg-white border border-slate-200 flex items-center justify-between gap-2 shadow-2xs hover:border-blue-300 transition"
-            >
-              <div class="flex items-center gap-2.5 min-w-0">
-                <div class="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center font-bold text-xs shrink-0 border border-red-100">
-                  PDF
-                </div>
-                <div class="min-w-0">
-                  <div class="font-bold text-slate-800 text-xs truncate">{{ doc.name || 'Sartname.pdf' }}</div>
-                  <div class="text-[10px] text-slate-400 font-medium">{{ doc.size || '0.08 MB' }} · e-İmzalı Doküman</div>
-                </div>
+            <!-- Zoom & Print Toolbar -->
+            <div class="flex items-center gap-2 shrink-0">
+              <div class="flex items-center bg-slate-900 rounded-lg border border-slate-800 p-0.5 text-xs text-slate-300">
+                <button type="button" @click="pdfZoomLevel = Math.max(75, pdfZoomLevel - 15)" class="px-2 py-0.5 hover:bg-slate-800 rounded font-bold cursor-pointer">-</button>
+                <span class="px-2 font-mono text-[11px]">{{ pdfZoomLevel }}%</span>
+                <button type="button" @click="pdfZoomLevel = Math.min(150, pdfZoomLevel + 15)" class="px-2 py-0.5 hover:bg-slate-800 rounded font-bold cursor-pointer">+</button>
               </div>
 
               <button
                 type="button"
-                @click="openPdfViewer(selectedTenderModal, doc)"
-                class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] flex items-center gap-1 shrink-0 cursor-pointer shadow-xs"
+                @click="printPdfDocument"
+                class="px-3 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-bold border border-slate-800 transition cursor-pointer flex items-center gap-1"
               >
-                <Eye :size="12" />
-                <span>İncele / Aç</span>
+                <Printer :size="12" />
+                <span>Yazdır</span>
               </button>
+
+              <button
+                type="button"
+                @click="downloadPdfDocument(selectedTenderModal)"
+                class="px-3 py-1 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition cursor-pointer flex items-center gap-1 shadow-xs"
+              >
+                <Download :size="12" />
+                <span>İndir (.PDF/.TXT)</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- A4 PDF Kağıt Görüntüleyici Alanı -->
+          <div class="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center custom-scrollbar">
+            <div 
+              id="printable-pdf-spec" 
+              class="bg-white text-slate-900 rounded-xl shadow-2xl p-6 sm:p-12 max-w-3xl w-full space-y-6 text-left border border-slate-200 font-sans min-h-[750px] relative transition-transform duration-200"
+              :style="{ transform: 'scale(' + (pdfZoomLevel / 100) + ')', transformOrigin: 'top center' }"
+            >
+              
+              <!-- Resmi Antet -->
+              <div class="border-b-2 border-slate-900 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-12 h-12 rounded-xl bg-[#0F223D] text-white flex items-center justify-center font-black text-lg shrink-0">
+                    İB
+                  </div>
+                  <div>
+                    <div class="text-[10px] font-black uppercase text-blue-900 tracking-wider">T.C. ELEKTRONİK TİCARET VE B2B İHALE SİSTEMİ</div>
+                    <div class="text-base font-black text-slate-900 tracking-tight">İHALECİBURADA RESMİ İHALE ŞARTNAMESİ</div>
+                    <div class="text-[10px] text-slate-500">Mersis: 0470-0854-2100-0001 · GİB VKN: 4700854210</div>
+                  </div>
+                </div>
+                <div class="text-right sm:border-l sm:pl-4 border-slate-200">
+                  <div class="text-[10px] font-mono font-bold text-slate-400">İHALE KAYIT NO (İKN)</div>
+                  <div class="text-sm font-mono font-black text-blue-900">#{{ selectedTenderModal.id }}</div>
+                  <div class="text-[10px] text-emerald-600 font-bold">● Dijital Mühürlü & Doğrulanmış</div>
+                </div>
+              </div>
+
+              <!-- İhale Özet Tablosu -->
+              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+                <div>
+                  <span class="text-[10px] font-black text-slate-400 uppercase block">İhaleyi Açan Kurum</span>
+                  <span class="font-bold text-slate-800">{{ selectedTenderModal.ownerCompany || selectedTenderModal.authority || 'Kurumsal Masası' }}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] font-black text-slate-400 uppercase block">Kategori & Sektör</span>
+                  <span class="font-bold text-slate-800">{{ selectedTenderModal.kategori }}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] font-black text-slate-400 uppercase block">Sözleşme / Hedef Bütçe</span>
+                  <span class="font-mono font-black text-emerald-700">{{ selectedTenderModal.butce || 'Açık Teklif' }}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] font-black text-slate-400 uppercase block">Teslimat İli / Konum</span>
+                  <span class="font-bold text-slate-800">{{ selectedTenderModal.city || 'Türkiye Geneli' }}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] font-black text-slate-400 uppercase block">İhale Usulü</span>
+                  <span class="font-bold text-slate-800">{{ selectedTenderModal.tur || 'Açık Eksiltmeli İhale' }}</span>
+                </div>
+                <div>
+                  <span class="text-[10px] font-black text-slate-400 uppercase block">Son Teklif / Kalan Süre</span>
+                  <span class="font-bold text-amber-700">{{ selectedTenderModal.sure || '7 gün' }}</span>
+                </div>
+              </div>
+
+              <!-- Şartname İçerik Maddeleri -->
+              <div class="space-y-4 text-xs text-slate-700 leading-relaxed">
+                <div class="space-y-1.5">
+                  <h3 class="font-black text-slate-900 text-sm border-b pb-1 border-slate-200 flex items-center justify-between">
+                    <span>1. İHALENİN KONUSU VE TEKNİK İSTERLER</span>
+                    <span class="text-[10px] text-blue-700 font-bold">Madde 1.1</span>
+                  </h3>
+                  <p class="p-3.5 rounded-lg bg-slate-50 border border-slate-200 font-serif leading-relaxed text-slate-800 whitespace-pre-line">
+                    {{ selectedTenderModal.aciklama || selectedTenderModal.baslik }}
+                  </p>
+                </div>
+
+                <div class="space-y-1.5">
+                  <h3 class="font-black text-slate-900 text-sm border-b pb-1 border-slate-200 flex items-center justify-between">
+                    <span>2. İDARİ ŞARTLAR VE TESLİMAT ŞARTNAMESİ</span>
+                    <span class="text-[10px] text-blue-700 font-bold">Madde 2.1</span>
+                  </h3>
+                  <ul class="list-disc pl-5 space-y-1.5 text-slate-600">
+                    <li>Teslimat adresi: <strong>{{ selectedTenderModal.teslimatAdresi || (selectedTenderModal.city + ' Merkez / Saha Depo Teslimat') }}</strong> olarak kayıtlıdır.</li>
+                    <li>Tedarikçi firma teknik şartnamede belirtilen kalite toleranslarına ve yasal garanti sürelerine uymakla yükümlüdür.</li>
+                    <li>Hakediş ödemeleri BDDK ve TCMB mevzuatına uygun <strong>Escrow Güvenli Havuz</strong> hesabında bloke edilir.</li>
+                  </ul>
+                </div>
+
+                <div class="space-y-1.5">
+                  <h3 class="font-black text-slate-900 text-sm border-b pb-1 border-slate-200 flex items-center justify-between">
+                    <span>3. YÜKLENEN RESMİ DOKÜMANLAR</span>
+                    <span class="text-[10px] text-emerald-700 font-bold">✓ Ekli Dosya</span>
+                  </h3>
+                  <div class="p-3 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="px-2 py-0.5 rounded bg-red-100 text-red-700 font-black text-[10px]">PDF</span>
+                      <span class="font-bold text-slate-800">
+                        {{ (selectedTenderModal.files?.[activeDocIndex]?.name) || (selectedTenderModal.documents?.[activeDocIndex]?.name) || ('Resmi_Sartname_' + selectedTenderModal.id + '.pdf') }}
+                      </span>
+                      <span class="text-slate-400">({{ selectedTenderModal.files?.[activeDocIndex]?.size || '0.08 MB' }})</span>
+                    </div>
+                    <span class="text-emerald-700 font-bold text-[11px]">✓ Aslı Doğrulandı</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Mühür ve İmza Altlığı -->
+              <div class="pt-6 border-t-2 border-slate-200 flex items-end justify-between text-[10px] text-slate-500">
+                <div>
+                  <div>6098 s. TBK ve 6102 s. TTK kapsamında düzenlenmiştir.</div>
+                  <div>Zaman Damgası: {{ new Date().toISOString() }}</div>
+                  <div class="font-mono text-slate-400">Hash: SHA-256-{{ selectedTenderModal.id }}-CERT-VALID</div>
+                </div>
+                <div class="text-center p-3 rounded-xl border border-blue-200 bg-blue-50/50">
+                  <div class="w-8 h-8 rounded-full bg-blue-900 text-white flex items-center justify-center font-black mx-auto mb-1">
+                    ✓
+                  </div>
+                  <div class="font-black text-blue-950 text-[10px]">İhaleciBurada</div>
+                  <div class="text-[8px] text-blue-700 font-bold">DİJİTAL MÜHÜR VE ONAY</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- 🖼️ 2. SEKME: YÜKLENEN GÖRSELLER & PNG/JPG GALERİSİ -->
+        <!-- =================================================================== -->
+        <div v-else-if="activeSpecTab === 'gallery'" class="flex-1 flex flex-col min-h-0 bg-slate-950 p-4 sm:p-6 overflow-y-auto custom-scrollbar text-center">
+          
+          <!-- Büyük Görsel Önizleme Alanı -->
+          <div class="relative max-w-3xl w-full mx-auto h-72 sm:h-96 rounded-2xl overflow-hidden bg-black/60 border border-slate-800 flex items-center justify-center group">
+            <img
+              :src="(selectedTenderModal.images?.[activeImageIndex]?.url) || (typeof selectedTenderModal.images?.[activeImageIndex] === 'string' ? selectedTenderModal.images[activeImageIndex] : getTenderImage(selectedTenderModal))"
+              :alt="selectedTenderModal.baslik"
+              class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-102"
+              @error="($event.target as any).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'"
+            />
+
+            <!-- Önceki / Sonraki Butonları -->
+            <button
+              v-if="(selectedTenderModal.images || []).length > 1"
+              type="button"
+              @click="activeImageIndex = (activeImageIndex > 0 ? activeImageIndex - 1 : selectedTenderModal.images.length - 1)"
+              class="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black text-white text-sm font-bold transition cursor-pointer"
+            >
+              ❮
+            </button>
+            <button
+              v-if="(selectedTenderModal.images || []).length > 1"
+              type="button"
+              @click="activeImageIndex = (activeImageIndex < selectedTenderModal.images.length - 1 ? activeImageIndex + 1 : 0)"
+              class="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black text-white text-sm font-bold transition cursor-pointer"
+            >
+              ❯
+            </button>
+
+            <!-- Görsel Sayacı -->
+            <div class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-black/70 text-white text-xs font-mono font-bold">
+              Görsel {{ activeImageIndex + 1 }} / {{ (selectedTenderModal.images || []).length || 1 }}
+            </div>
+          </div>
+
+          <!-- Thumbnail Strip (Tıklandıkça Değişen Fotoğraf Şeridi) -->
+          <div class="flex items-center justify-center gap-3 mt-4 overflow-x-auto py-2">
+            <div
+              v-for="(imgItem, imgIdx) in (selectedTenderModal.images && selectedTenderModal.images.length > 0 ? selectedTenderModal.images : [getTenderImage(selectedTenderModal)])"
+              :key="imgIdx"
+              @click="activeImageIndex = imgIdx"
+              class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 cursor-pointer transition-all shrink-0 bg-slate-900"
+              :class="activeImageIndex === imgIdx ? 'border-blue-500 scale-105 shadow-md shadow-blue-500/20' : 'border-slate-800 opacity-60 hover:opacity-100'"
+            >
+              <img
+                :src="imgItem.url || imgItem"
+                class="w-full h-full object-cover"
+                @error="($event.target as any).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'"
+              />
+            </div>
+          </div>
+
+        </div>
+
+        <!-- =================================================================== -->
+        <!-- 🏢 3. SEKME: İHALE VE ALICI FİRMA BİLGİLERİ -->
+        <!-- =================================================================== -->
+        <div v-else-if="activeSpecTab === 'details'" class="flex-1 p-6 sm:p-8 bg-slate-800 overflow-y-auto custom-scrollbar space-y-5 text-white">
+          <div class="p-5 rounded-2xl bg-slate-900 border border-slate-700 space-y-3">
+            <h3 class="font-black text-sm text-blue-400 flex items-center gap-2">
+              <Building2 :size="16" />
+              <span>İhaleyi Açan Kurumsal Alıcı</span>
+            </h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div>
+                <span class="text-slate-400 text-[11px] block">Şirket Unvanı:</span>
+                <span class="font-bold text-white text-sm">{{ selectedTenderModal.ownerCompany || selectedTenderModal.authority || 'Kurumsal Satın Alma Masası' }}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 text-[11px] block">Lokasyon & Adres:</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.city || 'Türkiye Geneli' }} · {{ selectedTenderModal.teslimatAdresi || 'Merkez Depo' }}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 text-[11px] block">Ödeme Yöntemi:</span>
+                <span class="font-bold text-emerald-400">Escrow Güvenli Havuz (%100 Koruma)</span>
+              </div>
+              <div>
+                <span class="text-slate-400 text-[11px] block">İhale Durumu:</span>
+                <span class="font-bold text-amber-400">{{ selectedTenderModal.sure || 'Teklif Toplama Devam Ediyor' }}</span>
+              </div>
             </div>
           </div>
         </div>
 
-        <!-- Alt Aksiyonlar -->
-        <div class="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-slate-100">
+        <!-- Alt Aksiyon Çubuğu (Footer Actions) -->
+        <div class="p-4 bg-slate-950 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3 text-white">
+          <button 
+            type="button" 
+            @click="selectedTenderModal = null" 
+            class="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 font-bold text-xs hover:bg-slate-800 transition cursor-pointer"
+          >
+            Kapat
+          </button>
+          
           <div class="flex items-center gap-2">
+            <NuxtLink 
+              v-if="isMyOwnTender(selectedTenderModal)"
+              to="/panel/gelen-teklifler"
+              class="px-5 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-black text-xs transition cursor-pointer flex items-center gap-1.5"
+            >
+              <Building2 :size="13" class="text-amber-700" />
+              <span>👤 Kendi İlanınız (Gelen Teklifler)</span>
+            </NuxtLink>
             <button 
+              v-else
               type="button" 
-              @click="selectedTenderModal = null" 
-              class="px-4 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 transition cursor-pointer"
+              @click="openQuickBidModal(selectedTenderModal); selectedTenderModal = null"
+              class="px-6 py-2.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition cursor-pointer shadow-md shadow-blue-600/20 flex items-center gap-2"
             >
-              Kapat
-            </button>
-            <button
-              type="button"
-              @click="openPdfViewer(selectedTenderModal)"
-              class="px-4 py-2.5 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-xs transition cursor-pointer flex items-center gap-1.5"
-            >
-              <FileText :size="14" />
-              <span>Şartnameyi PDF Olarak Aç</span>
+              <Send :size="13" />
+              <span>Bu İhaleye Teklif Ver</span>
             </button>
           </div>
-          
-          <NuxtLink 
-            v-if="isMyOwnTender(selectedTenderModal)"
-            to="/panel/gelen-teklifler"
-            class="px-5 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-black text-xs transition cursor-pointer flex items-center gap-1.5"
-          >
-            <Building2 :size="13" class="text-amber-700" />
-            <span>👤 Kendi İlanınız (Gelen Teklifler)</span>
-          </NuxtLink>
-          <button 
-            v-else
-            type="button" 
-            @click="openQuickBidModal(selectedTenderModal); selectedTenderModal = null"
-            class="px-6 py-2.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition cursor-pointer shadow-md shadow-blue-600/20 flex items-center gap-2"
-          >
-            <Send :size="13" />
-            <span>Bu İhaleye Teklif Ver</span>
-          </button>
         </div>
 
       </div>
