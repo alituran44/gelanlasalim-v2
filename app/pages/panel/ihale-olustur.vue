@@ -398,7 +398,7 @@ function handleSubmit() {
         session = JSON.parse(localStorage.getItem('userSession') || '{}')
       } catch (e) {}
     }
-    const ownerEmail = session.email || 'ihalecib@gmail.com'
+    const ownerEmail = (session.email || 'ihalecib@gmail.com').trim().toLowerCase()
     const ownerName = session.name || session.firstName || 'Ali Turan'
     const ownerCompany = session.companyName || session.company || 'Ali Turan Sanayi A.Ş.'
 
@@ -425,7 +425,7 @@ function handleSubmit() {
       ownerEmail,
       ownerName,
       ownerCompany,
-      isMine: true,
+      isMine: false,
       olusturma: 'Bugün'
     }
 

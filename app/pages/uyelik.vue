@@ -63,25 +63,36 @@ onMounted(() => {
               if (response.credential) {
                 const user = parseJwt(response.credential)
                 if (user) {
-                  const sessionObj = {
-                    email: user.email,
-                    firstName: user.given_name || user.name,
-                    lastName: user.family_name || '',
-                    name: user.name,
-                    picture: user.picture,
-                    company: '',
-                    companyName: '',
-                    username: user.name || (user.email ? user.email.split('@')[0] : 'Kullanıcı'),
-                    role: userRole.value || 'company',
-                    verified: true,
-                    isGoogleAuth: true,
-                    authProvider: 'google',
-                    isPremium: true,
-                    subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
-                  }
-                  localStorage.setItem('userSession', JSON.stringify(sessionObj))
-                  registerToAdminKycQueue(sessionObj)
-                  router.push('/panel')
+                  const cleanEmail = (user.email || '').trim().toLowerCase()
+                    const accounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
+                    
+                    let userAccount = accounts[cleanEmail]
+                    if (!userAccount) {
+                      const derivedName = user.name || (user.given_name ? `${user.given_name} ${user.family_name || ''}` : cleanEmail.split('@')[0])
+                      userAccount = {
+                        email: cleanEmail,
+                        firstName: user.given_name || user.name || cleanEmail.split('@')[0],
+                        lastName: user.family_name || '',
+                        name: derivedName,
+                        picture: user.picture,
+                        company: derivedName + ' Tedarik Ticaret',
+                        companyName: derivedName + ' Tedarik Ticaret',
+                        username: derivedName,
+                        role: 'company',
+                        verified: true,
+                        isGoogleAuth: true,
+                        authProvider: 'google',
+                        isPremium: true,
+                        subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
+                      }
+                      accounts[cleanEmail] = userAccount
+                      localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
+                    }
+
+                    localStorage.setItem('userSession', JSON.stringify(userAccount))
+                    registerToAdminKycQueue(userAccount)
+                    window.dispatchEvent(new Event('storage'))
+                    router.push('/panel')
                 }
               }
             },
@@ -344,22 +355,35 @@ function handleOAuth(provider = 'google') {
                 headers: { Authorization: `Bearer ${response.access_token}` }
               })
               const user = await res.json()
-              localStorage.setItem('userSession', JSON.stringify({
-                email: user.email,
-                firstName: user.given_name || user.name,
-                lastName: user.family_name || '',
-                name: user.name,
-                picture: user.picture,
-                company: '',
-                    companyName: '',
-                    username: user.name || (user.email ? user.email.split('@')[0] : 'Kullanıcı'),
-                role: userRole.value || 'company',
-                verified: true,
-                isGoogleAuth: true,
-                authProvider: 'google',
-                isPremium: true,
-                subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
-              }))
+              const cleanEmail = (user.email || '').trim().toLowerCase()
+              const accounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
+              
+              let userAccount = accounts[cleanEmail]
+              if (!userAccount) {
+                const derivedName = user.name || (user.given_name ? `${user.given_name} ${user.family_name || ''}` : cleanEmail.split('@')[0])
+                userAccount = {
+                  email: cleanEmail,
+                  firstName: user.given_name || user.name || cleanEmail.split('@')[0],
+                  lastName: user.family_name || '',
+                  name: derivedName,
+                  picture: user.picture,
+                  company: derivedName + ' San. Tic. A.Ş.',
+                  companyName: derivedName + ' San. Tic. A.Ş.',
+                  username: derivedName,
+                  role: userRole.value || 'company',
+                  verified: true,
+                  isGoogleAuth: true,
+                  authProvider: 'google',
+                  isPremium: true,
+                  subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
+                }
+                accounts[cleanEmail] = userAccount
+                localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
+              }
+
+              localStorage.setItem('userSession', JSON.stringify(userAccount))
+              registerToAdminKycQueue(userAccount)
+              window.dispatchEvent(new Event('storage'))
               isSubmitting.value = false
               router.push('/panel')
               return
@@ -373,7 +397,7 @@ function handleOAuth(provider = 'google') {
           fallbackGoogleLogin()
         }
       })
-      client.requestAccessToken({ prompt: '' })
+      client.requestAccessToken({ prompt: 'select_account' })
       return
     } catch (e) {
       console.warn('Google GIS init error', e)
@@ -384,27 +408,45 @@ function handleOAuth(provider = 'google') {
 }
 
 function fallbackGoogleLogin() {
+  const customGmail = prompt('Lütfen giriş yapmak istediğiniz Gmail / E-posta adresini giriniz:', 'tedarikci@gmail.com')
+  if (!customGmail) {
+    isSubmitting.value = false
+    return
+  }
+
   setTimeout(() => {
     isSubmitting.value = false
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('userSession', JSON.stringify({
-        email: 'ihalecib@gmail.com',
-        firstName: 'Ali',
-        lastName: 'Turan',
-        name: 'Ali Turan',
-        company: '',
-        companyName: '',
-        username: 'Ali Turan',
+    const cleanEmail = customGmail.trim().toLowerCase()
+    const rawUsername = cleanEmail.split('@')[0]
+    const formattedName = rawUsername.charAt(0).toUpperCase() + rawUsername.slice(1)
+    const accounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
+
+    let userAccount = accounts[cleanEmail]
+    if (!userAccount) {
+      userAccount = {
+        email: cleanEmail,
+        firstName: formattedName,
+        lastName: '',
+        name: formattedName + ' Tedarik',
+        company: formattedName + ' San. Tic. Ltd. Şti.',
+        companyName: formattedName + ' San. Tic. Ltd. Şti.',
+        username: formattedName,
         role: userRole.value || 'company',
         verified: true,
         isGoogleAuth: true,
         authProvider: 'google',
         isPremium: true,
         subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
-      }))
+      }
+      accounts[cleanEmail] = userAccount
+      localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
     }
+
+    localStorage.setItem('userSession', JSON.stringify(userAccount))
+    registerToAdminKycQueue(userAccount)
+    window.dispatchEvent(new Event('storage'))
     router.push('/panel')
-  }, 700)
+  }, 500)
 }
 
 function handleEDevletAuth() {

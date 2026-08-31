@@ -1159,33 +1159,23 @@ const isMyOwnCompany = computed(() => {
 
 function isMyOwnTender(tender: any): boolean {
   if (!tender) return false
-  if (tender.isMine === true) return true
-
+  
   let session: any = {}
-  let myTenders: any[] = []
   if (typeof window !== 'undefined') {
     try {
       session = JSON.parse(localStorage.getItem('userSession') || '{}')
-      myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
     } catch (e) {}
   }
 
-  if (myTenders.some((mt: any) => mt.id === tender.id || (mt.baslik && mt.baslik.trim().toLowerCase() === (tender.baslik || '').trim().toLowerCase()))) {
-    return true
-  }
-
-  const currentEmail = (session.email || userSession.value?.email || '').trim().toLowerCase()
+  const currentEmail = (session.email || '').trim().toLowerCase()
   const tenderEmail = (tender.ownerEmail || '').trim().toLowerCase()
+
+  // Sadece aynı e-posta ile giriş yapılmışsa kullanıcının kendi ilanı sayılır
   if (currentEmail && tenderEmail && currentEmail === tenderEmail) {
     return true
   }
 
-  const currentComp = (session.companyName || session.company || userSession.value?.companyName || userSession.value?.company || userSession.value?.username || '').trim().toLowerCase()
-  const tenderComp = (tender.ownerCompany || tender.authority || '').trim().toLowerCase()
-  if (currentComp && currentComp.length > 2 && tenderComp && (tenderComp.includes(currentComp) || currentComp.includes(tenderComp))) {
-    return true
-  }
-
+  // Eğer ilanın sahibi belirtilmemişse ve session ile uyuşmuyorsa başkasına aittir
   return false
 }
 
