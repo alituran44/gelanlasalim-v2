@@ -79,7 +79,11 @@ onMounted(() => {
       }
       if (session.firstName || session.name) {
         profileForm.value.name = session.firstName || session.name
+        profileForm.value.username = session.username || session.name || session.firstName
         companyForm.value.contactPerson = session.name || session.firstName
+      }
+      if (session.username) {
+        profileForm.value.username = session.username
       }
       if (session.lastName) profileForm.value.surname = session.lastName
       if (session.phone) {
@@ -220,6 +224,7 @@ const membershipPricingGlobalUSD = [
 const profileForm = ref({
   name: 'Ali',
   surname: 'Turan',
+  username: 'Ali Turan',
   email: 'alituran88@gmail.com',
   phone: '5437340860',
   title: 'Yönetici'
@@ -400,6 +405,7 @@ function saveCompanyInfo() {
     session.verified = true
     localStorage.setItem('userSession', JSON.stringify(session))
     userSession.value = session
+    window.dispatchEvent(new Event('storage'))
   }
   showToast("Kurumsal firma, sektör ve açıklama bilgileriniz başarıyla kaydedildi.", "success")
 }
@@ -816,7 +822,8 @@ const isSaved = ref(false)
 function saveProfile() {
   if (typeof window !== 'undefined') {
     const session = JSON.parse(localStorage.getItem('userSession') || '{}')
-    session.name = profileForm.value.name
+    session.username = profileForm.value.username || profileForm.value.name
+    session.name = profileForm.value.username || (profileForm.value.name + (profileForm.value.surname ? ' ' + profileForm.value.surname : '')).trim()
     session.firstName = profileForm.value.name
     session.lastName = profileForm.value.surname
     session.surname = profileForm.value.surname
@@ -843,6 +850,7 @@ function saveProfile() {
 
     localStorage.setItem('userSession', JSON.stringify(session))
     userSession.value = session
+    window.dispatchEvent(new Event('storage'))
   }
   isSaved.value = true
   showToast("Profil, şirket tanıtım açıklaması ve sektör bilgileriniz başarıyla güncellendi.", "success")
@@ -1099,7 +1107,11 @@ function saveProfile() {
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
             <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2"><User :size="14" class="text-blue-600" /> Kişisel Yetkili Bilgileri</h3>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label class="block text-[10px] font-black text-blue-600 uppercase mb-1">Giriş / Görünen Kullanıcı Adı</label>
+                <input v-model="profileForm.username" type="text" placeholder="Örn: Ali Turan" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-bold text-slate-900 focus:border-blue-500" style="border-color: #CBD5E1;" />
+              </div>
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Yetkili İsim</label>
                 <input v-model="profileForm.name" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />

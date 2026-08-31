@@ -50,9 +50,12 @@ function handleLogin() {
     alert('Lütfen kullanıcı adı ve şifrenizi giriniz.')
     return
   }
+  const displayName = loginUsername.value.includes('@') ? loginUsername.value.split('@')[0] : loginUsername.value
   const session = {
-    username: loginUsername.value,
-    companyName: loginUsername.value.includes('@') ? loginUsername.value.split('@')[0] : loginUsername.value,
+    username: displayName,
+    name: displayName,
+    firstName: displayName,
+    companyName: '',
     role: 'member'
   }
   userSession.value = session
@@ -250,7 +253,7 @@ onMounted(() => {
 
         <!-- Sağ: Giriş Yapılmışsa Kullanıcı Profili ve Çıkış -->
         <div v-if="isLoggedIn" class="flex items-center gap-3 text-xs">
-          <span class="font-bold text-slate-700">👤 {{ userSession?.companyName || userSession?.name || userSession?.username }}</span>
+          <span class="font-bold text-slate-700">👤 {{ userSession?.name || userSession?.firstName || userSession?.username || 'Hesabım' }}</span>
           <NuxtLink to="/panel" class="px-3 py-1 rounded bg-blue-600 hover:bg-blue-700 text-white font-bold">Yönetim Paneli</NuxtLink>
           <button @click="handleLogout" class="px-2.5 py-1 rounded bg-red-100 hover:bg-red-200 text-red-700 font-bold border border-red-300 cursor-pointer">Çıkış</button>
         </div>

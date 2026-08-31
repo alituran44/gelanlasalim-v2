@@ -81,7 +81,7 @@ onMounted(() => {
 })
 
 const userName = computed(() => {
-  return userSession.value?.firstName || userSession.value?.company || 'Kurumsal Üye'
+  return userSession.value?.name || userSession.value?.firstName || userSession.value?.username || 'Hesabım'
 })
 const userInitial = computed(() => userName.value.charAt(0).toUpperCase())
 
