@@ -29,7 +29,8 @@ import {
   Sliders,
   Building,
   Globe,
-  ShieldCheck
+  ShieldCheck,
+  Scale
 } from "lucide-vue-next"
 import { locale, detectLocale, setLocale } from '~/composables/useLocale'
 
@@ -85,6 +86,7 @@ const sidebarMenus = computed(() => {
       { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
       { title: "Üye Firmalar", icon: Building2, to: "/panel/firmalar" },
+      { title: "Mücbir Sebep & Fesih", icon: Scale, to: "/panel/mucbir-sebep" },
       { title: "Bildirimler", icon: Bell, to: "/panel/bildirimler" },
       { title: "Profil & Hesap", icon: Settings, to: "/panel/ayarlar?tab=kisisel" }
     ]
@@ -95,6 +97,7 @@ const sidebarMenus = computed(() => {
       { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" },
       { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
+      { title: "Force Majeure & Disputes", icon: Scale, to: "/panel/mucbir-sebep" },
       { title: "Notifications", icon: Bell, to: "/panel/bildirimler" },
       { title: "Account & Profile", icon: Settings, to: "/panel/ayarlar?tab=kisisel" }
     ]

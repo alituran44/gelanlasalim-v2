@@ -98,6 +98,7 @@ const pageTitle = computed(() => {
       '/panel/canli-etkinlikler': 'İhale ve Satın Alma Arenası',
       '/panel/istatistikler': 'Analitik & Raporlar',
       '/panel/doviz-kurlari': 'Döviz & Emtia Kurları',
+      '/panel/mucbir-sebep': 'Mücbir Sebep & Sözleşme Feshi',
       '/panel/firmalar': 'Onaylı Kurumsal Firmalar',
       '/panel/ekip-yetki': 'Ekip & Yetkilendirme',
       '/panel/mesajlar': 'Mesajlar',
