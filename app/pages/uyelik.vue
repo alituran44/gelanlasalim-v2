@@ -1,4 +1,8 @@
 <script setup lang="ts">
+function sanitizeText(str: string): string {
+  if (!str) return ''
+  return String(str).replace(/[<>]/g, '').trim()
+}
 import { useCmsData } from '~/composables/useCmsData'
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'

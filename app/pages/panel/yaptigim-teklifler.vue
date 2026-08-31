@@ -129,10 +129,7 @@ const teklifler = computed(() => {
     })
   })
 
-  // 3. Fallback demo data if list is still empty for demo accounts
-  if (list.length === 0 && (!currentEmail || currentEmail.includes('alituran') || currentEmail.includes('ihalecib'))) {
-    list.push(...(cmsData.value?.dashboard?.submittedBids || []))
-  }
+  // 3. Clean production state - zero mock fallback injection
 
   return list
 })

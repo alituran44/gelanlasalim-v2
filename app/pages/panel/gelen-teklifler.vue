@@ -144,8 +144,14 @@ async function submitCounterOffer() {
     return
   }
 
+  const rawNum = parseInt(String(counterOfferPrice.value).replace(/\D/g, '')) || 0
+  if (rawNum <= 0) {
+    alert('Lütfen geçerli pozitif bir teklif tutarı giriniz.')
+    return
+  }
+
   const teklif = selectedTeklifForNegotiation.value
-  const formattedPrice = Number(counterOfferPrice.value).toLocaleString('tr-TR') + ' ₺'
+  const formattedPrice = Number(rawNum).toLocaleString('tr-TR') + ' ₺'
   const now = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 
   teklif.durum = 'pazarlik'
@@ -171,71 +177,20 @@ async function submitCounterOffer() {
     })
   }
 
-  // Also sync top-level escrowOrders
-  if (!cmsData.value.escrowOrders) {
-    cmsData.value.escrowOrders = []
-  }
-  const inRootEscrow = cmsData.value.escrowOrders.find((o: any) => o.id === ilan.id || o.tenderTitle === ilan.baslik || o.tenderId === ilan.id)
-  if (!inRootEscrow) {
-    cmsData.value.escrowOrders.unshift({
-      id: 'ORD-2026-' + (ilan.id ? ilan.id.replace(/\D/g, '') : Math.floor(100 + Math.random() * 900)),
-      orderCode: 'SIP-2026-' + Math.floor(1000 + Math.random() * 9000),
-      tenderId: ilan.id,
-      tenderTitle: ilan.baslik,
-      buyerCompany: buyerCompanyName,
-      buyerFirm: buyerCompanyName,
-      buyerEmail: userSession.email || 'alituran44@gmail.com',
-      supplierCompany: teklif.firma,
-      supplierFirm: teklif.firma,
-      supplierEmail: teklif.eposta || 'tedarikci@gmail.com',
-      totalAmount: teklif.fiyat,
-      amount: teklif.fiyat,
-      numericAmount: numAmount,
-      payoutAmount: payoutVal,
-      commissionAmount: commVal,
-      commissionRate: 3,
-      status: 'HAVUZDA_BLOKE',
-      statusLabel: 'Güvenli Havuzda Bloke Edildi',
-      escrowStatus: 'havuzda_bloke',
-      trackingNumber: 'YK-' + Math.floor(1000000 + Math.random() * 9000000),
-      trackingCode: 'YK-' + Math.floor(1000000 + Math.random() * 9000000),
-      carrier: 'Yurtiçi Kargo / Borusan Lojistik',
-      shippingCompany: 'Yurtiçi Kargo & Borusan Lojistik',
-      deliveryDate: '3 iş günü',
-      notes: 'İhale başarıyla sonuçlandı. Güvenli havuz ödemesi bloke edildi.',
-      paymentMethod: 'PayTR / iyzico 3D Güvenli Havuz',
-      createdAt: new Date().toLocaleDateString('tr-TR'),
-      updatedAt: 'Şimdi'
-    })
-  }
-
-  // Update localStorage myTenders
-  if (typeof window !== 'undefined') {
-    try {
-      const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
-      const target = myTenders.find((t: any) => t.id === ilan.id || t.baslik === ilan.baslik)
-      if (target) {
-        target.durum = 'closed'
-        target.sure = 'Sonuçlandı (Mutabakat Sağlandı)'
-        target.statusLabel = 'Sonuçlandı (Mutabakat Sağlandı)'
-        localStorage.setItem('myTenders', JSON.stringify(myTenders))
-      }
-      window.dispatchEvent(new Event('storage'))
-    } catch (e) {}
-  }
-
   saveCmsData(cmsData.value)
 
   // Send NetGSM SMS to supplier
-  await sendSms({
-    recipientPhone: teklif.telefon || '+90 532 555 01 23',
-    recipientName: teklif.firma,
-    templateName: 'Karşı Teklif Pazarlık Bildirimi',
-    messageBody: `Sayın ${teklif.yetkili || teklif.firma}, "${currentIlan.value?.baslik}" ihalesinde alıcı firma ${formattedPrice} karşı teklif iletmiştir. Panelinizi inceleyiniz.`
-  })
+  try {
+    await sendSms({
+      recipientPhone: teklif.telefon || '+90 532 555 01 23',
+      recipientName: teklif.firma,
+      templateName: 'Karşı Teklif Pazarlık Bildirimi',
+      messageBody: `Sayın ${teklif.yetkili || teklif.firma}, "${currentIlan.value?.baslik || 'İhale'}" ihalesinde alıcı firma ${formattedPrice} karşı teklif iletmiştir. Panelinizi inceleyiniz.`
+    })
+  } catch (e) {}
 
   showNegotiationModal.value = false
-  alert(`💬 PAZARLIK TEKLİFİNİZ İLETİLDİ!\n\n${teklif.firma} firmasına ${formattedPrice} tutarındaki karşı teklifiniz başarıyla gönderilmiştir. NetGSM SMS bildirimi yapıldı.`)
+  alert(`💬 PAZARLIK TEKLİFİNİZ İLETİLDİ!\n\n${teklif.firma} firmasına ${formattedPrice} tutarındaki karşı teklifiniz başarıyla gönderilmiştir.`)
 }
 
 // Accept Offer & Close Tender (Single Award Rule)
