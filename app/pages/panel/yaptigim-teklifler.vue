@@ -59,7 +59,83 @@ function getBidRankStatus(bid: any) {
   }
 }
 
-const teklifler = computed(() => cmsData.value?.dashboard?.submittedBids || [])
+const userSession = ref<any>({})
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    try {
+      userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+    window.addEventListener('storage', () => {
+      try {
+        userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
+      } catch (e) {}
+    })
+  }
+})
+
+const teklifler = computed(() => {
+  const currentEmail = (userSession.value?.email || '').trim().toLowerCase()
+  const currentComp = (userSession.value?.companyName || userSession.value?.company || userSession.value?.name || userSession.value?.username || '').trim().toLowerCase()
+  
+  const list: any[] = []
+  
+  // 1. Check localStorage 'mySubmittedBids'
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]')
+      stored.forEach((s: any) => {
+        list.push({
+          id: s.id,
+          tenderId: s.tenderId,
+          kategori: s.tenderCategory || 'Genel Satın Alma',
+          ilanBaslik: s.tenderTitle || 'Satın Alma İhalesi',
+          aliciFirma: s.buyerCompany || 'Kurumsal Alıcı',
+          teklifFiyatim: s.price || s.teklifFiyatim,
+          sure: s.validityDuration || s.sure || '7 gün',
+          durum: s.status === 'Onaylandı' ? 'onaylandi' : (s.durum || 'bekliyor'),
+          pazarlikGecmisi: s.pazarlikGecmisi || [],
+          bidderName: s.bidderName
+        })
+      })
+    } catch (e) {}
+  }
+
+  // 2. Check cmsData.value.dashboard.receivedBids for this company/user bids
+  const receivedGroups = cmsData.value?.dashboard?.receivedBids || []
+  receivedGroups.forEach((g: any) => {
+    (g.teklifler || []).forEach((b: any) => {
+      const bFirma = (b.firma || '').trim().toLowerCase()
+      const bEmail = (b.bidderEmail || '').trim().toLowerCase()
+      const isMine = (currentEmail && bEmail && currentEmail === bEmail) || (currentComp && bFirma && (bFirma.includes(currentComp) || currentComp.includes(bFirma)))
+      
+      if (isMine) {
+        const alreadyInList = list.find(item => item.id === b.id || (item.tenderId === g.id && item.teklifFiyatim === b.fiyat))
+        if (!alreadyInList) {
+          list.push({
+            id: b.id,
+            tenderId: g.id,
+            kategori: g.kategori || 'Genel Satın Alma',
+            ilanBaslik: g.baslik,
+            aliciFirma: g.ownerCompany || 'Kurumsal Satın Alma Masası',
+            teklifFiyatim: b.fiyat,
+            sure: b.sure || '7 gün',
+            durum: b.durum === 'anlasildi' || b.durum === 'onaylandi' ? 'onaylandi' : 'bekliyor',
+            pazarlikGecmisi: b.pazarlikGecmisi || [],
+            bidderName: b.firma
+          })
+        }
+      }
+    })
+  })
+
+  // 3. Fallback demo data if list is still empty for demo accounts
+  if (list.length === 0 && (!currentEmail || currentEmail.includes('alituran') || currentEmail.includes('ihalecib'))) {
+    list.push(...(cmsData.value?.dashboard?.submittedBids || []))
+  }
+
+  return list
+})
 
 // Modal States
 const showReviseModal = ref(false)

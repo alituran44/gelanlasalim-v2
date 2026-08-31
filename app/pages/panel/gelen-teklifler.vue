@@ -56,8 +56,21 @@ const myTendersList = computed(() => {
 const myTenderIds = computed(() => myTendersList.value.map((t: any) => t.id))
 
 const filteredReceivedBids = computed(() => {
+  const currentEmail = (userSession.value?.email || '').trim().toLowerCase()
   const allReceived = cmsData.value?.dashboard?.receivedBids || []
-  return allReceived.filter((g: any) => myTenderIds.value.includes(g.id))
+  const allTenders = cmsData.value?.dashboard?.tenders || []
+
+  // Check user's own tenders
+  if (currentEmail) {
+    const myTenders = allTenders.filter((t: any) => (t.ownerEmail || '').trim().toLowerCase() === currentEmail)
+    const myTenderIds = myTenders.map((t: any) => t.id)
+    if (myTenderIds.length > 0) {
+      return allReceived.filter((g: any) => myTenderIds.includes(g.id) || myTenders.some((mt: any) => mt.baslik === g.baslik))
+    }
+  }
+
+  // Fallback: If user has created tenders in storage
+  return allReceived
 })
 
 const toplamGelenTeklifler = computed(() => {
