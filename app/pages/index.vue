@@ -519,6 +519,44 @@ function getTenderImage(tender: any): string {
 
 // ==================== 7. CANLI VERİLERİ BİRLEŞTİRME ====================
 
+function maskBidderName(bid: any, idx?: number): string {
+  if (bid.isMine) return '👤 Sizin Teklifiniz'
+  const code = (bid.id || String(idx || 1)).replace(/\D/g, '').slice(-3) || ((idx || 0) + 105)
+  return `Onaylı Tedarikçi #${code}`
+}
+
+function getTenderBidsList(tender: any): any[] {
+  if (!tender) return []
+  const group = (cmsData.value?.dashboard?.receivedBids || []).find((g: any) => g.id === tender.id || g.baslik === tender.baslik)
+  let rawBids: any[] = []
+  if (group && group.teklifler) {
+    rawBids = [...group.teklifler]
+  } else if (tender.id === 'IHC-2026-178') {
+    rawBids = [
+      { id: 'TKF-892', firma: 'Ekol Global Lojistik A.Ş.', fiyat: '72.500 ₺', sure: '2 gün', tarih: '2 dk önce' },
+      { id: 'TKF-891', firma: 'Netlog Lojistik Hizmetleri', fiyat: '78.000 ₺', sure: '3 gün', tarih: '5 dk önce' }
+    ]
+  } else if (tender.id === 'IHC-2026-104') {
+    rawBids = [
+      { id: 'TKF-870', firma: 'Çimsa Çimento Sanayi T.A.Ş.', fiyat: '142.000 ₺', sure: '1 gün', tarih: '12 dk önce' },
+      { id: 'TKF-865', firma: 'Batıçim Batı Anadolu Çimento', fiyat: '149.500 ₺', sure: '2 gün', tarih: '18 dk önce' }
+    ]
+  } else if (tender.id === 'IHC-2026-112') {
+    rawBids = [
+      { id: 'TKF-854', firma: 'Mopak Kağıt Karton Sanayi', fiyat: '38.400 ₺', sure: '4 gün', tarih: '25 dk önce' }
+    ]
+  }
+
+  // Sort by price ascending (Lowest price first)
+  rawBids.sort((a, b) => {
+    const pA = parseInt(String(a.fiyat || '0').replace(/\D/g, '')) || 0
+    const pB = parseInt(String(b.fiyat || '0').replace(/\D/g, '')) || 0
+    return pA - pB
+  })
+
+  return rawBids
+}
+
 const liveBidsStream = computed(() => {
   const list: any[] = []
   
@@ -531,8 +569,10 @@ const liveBidsStream = computed(() => {
           id: mb.id || 'TKF-' + Math.floor(100 + Math.random() * 900),
           tenderId: mb.tenderId || 'IHC-2026-178',
           tenderTitle: mb.ilanBaslik || mb.tenderTitle || 'Kurumsal Satın Alma İhalesi',
-          bidder: mb.bidderName || userSession.value?.companyName || userSession.value?.company || 'Kendi Şirketiniz',
+          bidderRealName: mb.bidderName || userSession.value?.companyName || 'Kendi Şirketiniz',
+          bidder: '👤 Sizin Teklifiniz',
           price: mb.teklifFiyatim || mb.price || 'Teklif Verildi',
+          priceNum: parseInt(String(mb.teklifFiyatim || mb.price || '0').replace(/\D/g, '')) || 0,
           time: mb.tarih || 'Az önce',
           isMine: true,
           status: 'Değerlendirmede',
@@ -545,15 +585,19 @@ const liveBidsStream = computed(() => {
   // 2. CMS received bids
   const receivedGroups = cmsData.value?.dashboard?.receivedBids || []
   receivedGroups.forEach((rg: any) => {
-    (rg.teklifler || []).forEach((tkf: any) => {
+    (rg.teklifler || []).forEach((tkf: any, idx: number) => {
+      const num = parseInt(String(tkf.fiyat || '0').replace(/\D/g, '')) || 0
+      const isMine = tkf.firma === userSession.value?.companyName || tkf.firma === userSession.value?.username
       list.push({
         id: tkf.id || 'TKF-' + Math.floor(100 + Math.random() * 900),
         tenderId: rg.id,
         tenderTitle: rg.baslik,
-        bidder: tkf.firma,
+        bidderRealName: tkf.firma,
+        bidder: isMine ? '👤 Sizin Teklifiniz' : maskBidderName(tkf, idx),
         price: tkf.fiyat,
-        time: tkf.sure ? `${tkf.sure} teslimat` : 'Bugün',
-        isMine: false,
+        priceNum: num,
+        time: tkf.sure ? `${tkf.sure} teslimat` : (tkf.tarih || 'Bugün'),
+        isMine: isMine,
         status: tkf.durum === 'mutabakat' ? 'Mutabakat Sağlandı' : 'Canlı Eksiltme',
         city: tkf.adres?.split(' ')[0] || 'İstanbul'
       })
@@ -562,19 +606,26 @@ const liveBidsStream = computed(() => {
 
   // 3. Platform live active market bids seed
   const platformSeeds = [
-    { id: 'TKF-892', tenderId: 'IHC-2026-178', tenderTitle: 'Lojistik & Taşımacılık İhalesi', bidder: 'Ekol Global Lojistik A.Ş.', price: '72.500 ₺', time: '2 dk önce', status: 'En İyi Teklif', city: 'İstanbul' },
-    { id: 'TKF-891', tenderId: 'IHC-2026-178', tenderTitle: 'Lojistik & Taşımacılık İhalesi', bidder: 'Netlog Lojistik Hizmetleri', price: '78.000 ₺', time: '5 dk önce', status: 'Canlı Eksiltme', city: 'Kocaeli' },
-    { id: 'TKF-870', tenderId: 'IHC-2026-104', tenderTitle: 'Hazır Beton & Çimento Tedariği', bidder: 'Çimsa Çimento Sanayi T.A.Ş.', price: '142.000 ₺', time: '12 dk önce', status: 'En İyi Teklif', city: 'İzmir' },
-    { id: 'TKF-865', tenderId: 'IHC-2026-104', tenderTitle: 'Hazır Beton & Çimento Tedariği', bidder: 'Batıçim Batı Anadolu Çimento', price: '149.500 ₺', time: '18 dk önce', status: 'Canlı Eksiltme', city: 'Manisa' },
-    { id: 'TKF-854', tenderId: 'IHC-2026-112', tenderTitle: 'Oluklu Mukavva Koli & Ambalaj', bidder: 'Mopak Kağıt Karton Sanayi', price: '38.400 ₺', time: '25 dk önce', status: 'En İyi Teklif', city: 'Bursa' },
-    { id: 'TKF-840', tenderId: 'IHC-2026-120', tenderTitle: 'CNC Fason Talaşlı İmalat Parça', bidder: 'Kaya Pres Metal Sanayi Ltd.', price: '89.000 ₺', time: '34 dk önce', status: 'En İyi Teklif', city: 'Ankara' }
+    { id: 'TKF-892', tenderId: 'IHC-2026-178', tenderTitle: 'Lojistik & Taşımacılık İhalesi', bidderRealName: 'Ekol Global Lojistik A.Ş.', price: '72.500 ₺', priceNum: 72500, time: '2 dk önce', status: 'En İyi Teklif', city: 'İstanbul' },
+    { id: 'TKF-891', tenderId: 'IHC-2026-178', tenderTitle: 'Lojistik & Taşımacılık İhalesi', bidderRealName: 'Netlog Lojistik Hizmetleri', price: '78.000 ₺', priceNum: 78000, time: '5 dk önce', status: 'Canlı Eksiltme', city: 'Kocaeli' },
+    { id: 'TKF-870', tenderId: 'IHC-2026-104', tenderTitle: 'Hazır Beton & Çimento Tedariği', bidderRealName: 'Çimsa Çimento Sanayi T.A.Ş.', price: '142.000 ₺', priceNum: 142000, time: '12 dk önce', status: 'En İyi Teklif', city: 'İzmir' },
+    { id: 'TKF-865', tenderId: 'IHC-2026-104', tenderTitle: 'Hazır Beton & Çimento Tedariği', bidderRealName: 'Batıçim Batı Anadolu Çimento', price: '149.500 ₺', priceNum: 149500, time: '18 dk önce', status: 'Canlı Eksiltme', city: 'Manisa' },
+    { id: 'TKF-854', tenderId: 'IHC-2026-112', tenderTitle: 'Oluklu Mukavva Koli & Ambalaj', bidderRealName: 'Mopak Kağıt Karton Sanayi', price: '38.400 ₺', priceNum: 38400, time: '25 dk önce', status: 'En İyi Teklif', city: 'Bursa' },
+    { id: 'TKF-840', tenderId: 'IHC-2026-120', tenderTitle: 'CNC Fason Talaşlı İmalat Parça', bidderRealName: 'Kaya Pres Metal Sanayi Ltd.', price: '89.000 ₺', priceNum: 89000, time: '34 dk önce', status: 'En İyi Teklif', city: 'Ankara' }
   ]
 
-  platformSeeds.forEach(ps => {
+  platformSeeds.forEach((ps, idx) => {
     if (!list.some(item => item.id === ps.id)) {
-      list.push(ps)
+      list.push({
+        ...ps,
+        bidder: maskBidderName(ps, idx),
+        isMine: false
+      })
     }
   })
+
+  // Sort: Lowest price first (Canlı Eksiltme Sıralaması / Reverse Auction Ranking)
+  list.sort((a, b) => (a.priceNum || 0) - (b.priceNum || 0))
 
   return list
 })
@@ -2042,6 +2093,21 @@ onMounted(() => {
                   {{ tender.aciklama || 'Şartname ve malzeme listesi uyarınca mal/hizmet temini yapılacaktır. Teklifler kapalı havuzda toplanmaktadır.' }}
                 </p>
 
+<!-- ⚡ Canlı Eksiltme & Önceki Teklifler Şeridi -->
+                <div v-if="getTenderBidsList(tender).length > 0" class="p-2 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-wrap items-center justify-between gap-2 text-[10px]">
+                  <div class="flex items-center gap-2">
+                    <span class="font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">
+                      🥇 Lider Teklif: {{ getTenderBidsList(tender)[0].fiyat }}
+                    </span>
+                    <span v-if="getTenderBidsList(tender).length > 1" class="text-slate-500 font-medium hidden sm:inline">
+                      Önceki: {{ getTenderBidsList(tender)[1].fiyat }}
+                    </span>
+                  </div>
+                  <span class="text-blue-600 font-bold cursor-pointer hover:underline" @click="openQuickBidModal(tender)">
+                    ⚡ Daha Düşük Teklif Ver ↗
+                  </span>
+                </div>
+
               </div>
 
               <!-- 💰 3. Sağ Fiyat & Aksiyon Butonları -->
@@ -2263,7 +2329,7 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- Bids Feed List -->
+            <!-- Bids Feed List (Sorted by Best / Lowest Price) -->
             <div class="space-y-2.5 max-h-[580px] overflow-y-auto pr-1 custom-scrollbar">
               <div 
                 v-for="(bid, bIdx) in liveBidsStream" 
@@ -2271,10 +2337,15 @@ onMounted(() => {
                 class="p-3 rounded-xl border transition-all hover:border-[#0084B4] hover:shadow-xs space-y-2 group"
                 :class="bid.isMine ? 'bg-amber-50/70 border-amber-300' : 'bg-white border-slate-200'"
               >
-                <!-- Top Row: Bidder & Time -->
+                <!-- Top Row: Anonymous Bidder & Rank Badge & Time -->
                 <div class="flex items-center justify-between gap-1 text-[11px]">
-                  <div class="flex items-center gap-1.5 min-w-0 font-black" :class="bid.isMine ? 'text-amber-950' : 'text-slate-800'">
-                    <Building2 :size="12" :class="bid.isMine ? 'text-amber-700' : 'text-blue-600'" class="shrink-0" />
+                  <div class="flex items-center gap-1.5 min-w-0 font-bold" :class="bid.isMine ? 'text-amber-950 font-black' : 'text-slate-800'">
+                    <span 
+                      class="px-1.5 py-0.2 rounded text-[9px] font-black shrink-0 font-mono"
+                      :class="bIdx === 0 ? 'bg-emerald-600 text-white' : (bIdx === 1 ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600')"
+                    >
+                      {{ bIdx === 0 ? '🥇 Lider' : (bIdx === 1 ? '🥈 2. Sıra' : ('#' + (bIdx + 1))) }}
+                    </span>
                     <span class="truncate">{{ bid.bidder }}</span>
                   </div>
                   <span class="text-[10px] text-slate-400 shrink-0 font-medium">{{ bid.time }}</span>
