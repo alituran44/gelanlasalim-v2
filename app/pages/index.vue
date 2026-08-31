@@ -558,12 +558,24 @@ function getTenderDirectionBadge(tender: any) {
   const tur = (tender.tur || '').toLowerCase()
   const yonu = (tender.ihaleYonu || '').toLowerCase()
   if (yonu === 'artirma' || tur.includes('artırma') || tur.includes('artırımlı')) {
-    return { label: '📈 Açık Artırma (Fiyat Artırımlı)', class: 'bg-blue-100 text-blue-800 border-blue-200' }
+    return { 
+      label: '📈 Açık Artırma (Fiyat Artırımlı)', 
+      fullLabel: '📈 Açık Artırma (Fiyat Artırımlı / Satış İhalesi)',
+      class: 'bg-blue-100 text-blue-950 border-blue-400 font-black' 
+    }
   }
   if (yonu === 'kapali_zarf' || tur.includes('kapalı')) {
-    return { label: '📑 Kapalı Zarf Usulü', class: 'bg-purple-100 text-purple-800 border-purple-200' }
+    return { 
+      label: '📑 Kapalı Zarf Usulü', 
+      fullLabel: '📑 Kapalı Zarf Teklif Usulü',
+      class: 'bg-purple-100 text-purple-950 border-purple-400 font-black' 
+    }
   }
-  return { label: '📉 Açık Eksiltme (Fiyat Azaltımlı)', class: 'bg-emerald-100 text-emerald-800 border-emerald-200' }
+  return { 
+    label: '📉 Açık Eksiltme (Fiyat Azaltımlı)', 
+    fullLabel: '📉 Açık Eksiltme (Fiyat Azaltımlı / Alım İhalesi)',
+    class: 'bg-emerald-100 text-emerald-950 border-emerald-400 font-black' 
+  }
 }
 
 function maskBidderName(bid: any, idx?: number): string {

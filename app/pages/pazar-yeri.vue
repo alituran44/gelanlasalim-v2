@@ -55,6 +55,27 @@ const activeTab = ref<'guncel' | 'gecmis' | 'sonuc' | 'detayli'>('guncel')
 const viewMode = ref<'gelismis' | 'basit'>('gelismis')
 const hideRead = ref(false)
 
+function getTenderDirectionBadge(tender: any) {
+  const tur = (tender.tur || '').toLowerCase()
+  const yonu = (tender.ihaleYonu || '').toLowerCase()
+  if (yonu === 'artirma' || tur.includes('artırma') || tur.includes('artırımlı')) {
+    return { 
+      label: '📈 Açık Artırma (Fiyat Artırımlı)', 
+      class: 'bg-blue-100 text-blue-950 border-blue-400 font-black' 
+    }
+  }
+  if (yonu === 'kapali_zarf' || tur.includes('kapalı')) {
+    return { 
+      label: '📑 Kapalı Zarf Usulü', 
+      class: 'bg-purple-100 text-purple-950 border-purple-400 font-black' 
+    }
+  }
+  return { 
+    label: '📉 Açık Eksiltme (Fiyat Azaltımlı)', 
+    class: 'bg-emerald-100 text-emerald-950 border-emerald-400 font-black' 
+  }
+}
+
 function getTenderImage(tender: any): string {
   if (!tender) return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
 
@@ -1023,7 +1044,13 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
               </h3>
             </div>
 
-            <div class="shrink-0 flex items-center gap-1.5">
+            <div class="shrink-0 flex items-center gap-1.5 flex-wrap">
+              <span 
+                class="px-2.5 py-0.8 rounded-lg text-[10px] font-black border shadow-2xs"
+                :class="getTenderDirectionBadge(tender).class"
+              >
+                {{ getTenderDirectionBadge(tender).label }}
+              </span>
               <span class="px-2 py-0.5 rounded text-[10px] font-bold" :class="tender.durum === 'closed' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'">
                 {{ tender.durum === 'closed' ? 'Tamamlandı' : '🟢 Canlı / Açık' }}
               </span>
