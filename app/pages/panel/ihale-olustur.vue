@@ -16,6 +16,7 @@ const fileInputRef = ref<HTMLInputElement | null>(null)
 const imageInputRef = ref<HTMLInputElement | null>(null)
 
 const form = ref({
+  ihaleYonu: 'eksiltme', // 'eksiltme' (Azaltımlı / Alım) | 'artirma' (Artırımlı / Satış) | 'kapali_zarf' (Kapalı Zarf)
   baslik: '',
   kategori: 'İnşaat ve Yapı',
   sure: '7 gün',
@@ -377,6 +378,11 @@ function handleSubmit() {
     const deliveryAddress = form.value.teslimatAdresi || `${deliveryCity} Merkez / Saha Depo Teslimat`
 
     // 3. Unique ID
+    const ihaleYonuVal = form.value.ihaleYonu || 'eksiltme'
+    const turLabel = ihaleYonuVal === 'artirma' 
+      ? 'Açık Artırma (Fiyat Artırımlı)' 
+      : (ihaleYonuVal === 'kapali_zarf' ? 'Kapalı Zarf Usulü' : 'Açık Eksiltme (Fiyat Azaltımlı)')
+
     const newId = 'IHC-2026-' + Math.floor(100 + Math.random() * 900)
     createdId.value = newId
 
@@ -626,6 +632,77 @@ function resetFormAndCreateNew() {
       <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
         <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">1. İhale Genel Bilgileri</h2>
         
+        <!-- 🎯 İHALE USULÜ VE TEKLİF YÖNÜ SEÇİMİ (ARTIRIMLI / AZALTIMLI / KAPALI ZARF) -->
+        <div class="space-y-2 p-4 bg-slate-50/90 rounded-2xl border-2 border-slate-200">
+          <div class="flex items-center justify-between">
+            <label class="block text-[11px] font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
+              <span>🎯 İHALE REKABET USULÜ VE TEKLİF YÖNÜ *</span>
+            </label>
+            <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+              İhale Sahibi Belirler
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+            <!-- 1. Açık Eksiltme / Azaltımlı -->
+            <div 
+              @click="form.ihaleYonu = 'eksiltme'"
+              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
+              :class="form.ihaleYonu === 'eksiltme' ? 'border-emerald-600 bg-emerald-50/50 shadow-xs ring-2 ring-emerald-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-black text-xs flex items-center gap-1.5" :class="form.ihaleYonu === 'eksiltme' ? 'text-emerald-900' : 'text-slate-800'">
+                  <span>📉 Açık Eksiltme</span>
+                </span>
+                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.ihaleYonu === 'eksiltme' ? 'border-emerald-600 bg-emerald-600 text-white text-[10px]' : 'border-slate-300'">
+                  <span v-if="form.ihaleYonu === 'eksiltme'">✓</span>
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-snug">
+                <strong>(Fiyat Azaltımlı - Satın Alma):</strong> Alıcı sizsiniz. Tedarikçiler en düşük fiyatı vermek için aşağı yönlü yarışır.
+              </p>
+            </div>
+
+            <!-- 2. Açık Artırma / Artırımlı -->
+            <div 
+              @click="form.ihaleYonu = 'artirma'"
+              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
+              :class="form.ihaleYonu === 'artirma' ? 'border-blue-600 bg-blue-50/50 shadow-xs ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-black text-xs flex items-center gap-1.5" :class="form.ihaleYonu === 'artirma' ? 'text-blue-900' : 'text-slate-800'">
+                  <span>📈 Açık Artırma</span>
+                </span>
+                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.ihaleYonu === 'artirma' ? 'border-blue-600 bg-blue-600 text-white text-[10px]' : 'border-slate-300'">
+                  <span v-if="form.ihaleYonu === 'artirma'">✓</span>
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-snug">
+                <strong>(Fiyat Artırımlı - Satış):</strong> Satıcı sizsiniz. Teklif verenler en yüksek fiyatı sunmak için yukarı yönlü yarışır.
+              </p>
+            </div>
+
+            <!-- 3. Kapalı Zarf Usulü -->
+            <div 
+              @click="form.ihaleYonu = 'kapali_zarf'"
+              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
+              :class="form.ihaleYonu === 'kapali_zarf' ? 'border-purple-600 bg-purple-50/50 shadow-xs ring-2 ring-purple-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-black text-xs flex items-center gap-1.5" :class="form.ihaleYonu === 'kapali_zarf' ? 'text-purple-900' : 'text-slate-800'">
+                  <span>📑 Kapalı Zarf Usulü</span>
+                </span>
+                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.ihaleYonu === 'kapali_zarf' ? 'border-purple-600 bg-purple-600 text-white text-[10px]' : 'border-slate-300'">
+                  <span v-if="form.ihaleYonu === 'kapali_zarf'">✓</span>
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-snug">
+                <strong>(Gizli Teklif Toplama):</strong> Teklifler son ana kadar gizli tutulur, süre bitiminde topluca değerlendirilir.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <!-- İhale Başlığı -->
         <div>
           <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">İHALE BAŞLIĞI *</label>

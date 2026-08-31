@@ -541,6 +541,18 @@ function formatTenderBudget(raw: any): string {
   return str.includes('₺') ? str : (str || 'Açık Eksiltme')
 }
 
+function getTenderDirectionBadge(tender: any) {
+  const tur = (tender.tur || '').toLowerCase()
+  const yonu = (tender.ihaleYonu || '').toLowerCase()
+  if (yonu === 'artirma' || tur.includes('artırma') || tur.includes('artırımlı')) {
+    return { label: '📈 Açık Artırma (Fiyat Artırımlı)', class: 'bg-blue-100 text-blue-800 border-blue-200' }
+  }
+  if (yonu === 'kapali_zarf' || tur.includes('kapalı')) {
+    return { label: '📑 Kapalı Zarf Usulü', class: 'bg-purple-100 text-purple-800 border-purple-200' }
+  }
+  return { label: '📉 Açık Eksiltme (Fiyat Azaltımlı)', class: 'bg-emerald-100 text-emerald-800 border-emerald-200' }
+}
+
 function maskBidderName(bid: any, idx?: number): string {
   if (bid.isMine) return '👤 Sizin Teklifiniz'
   const code = (bid.id || String(idx || 1)).replace(/\D/g, '').slice(-3) || ((idx || 0) + 105)
@@ -569,11 +581,13 @@ function getTenderBidsList(tender: any): any[] {
     ]
   }
 
-  // Sort by price ascending (Lowest price first)
+  const isArtirma = (tender.ihaleYonu === 'artirma') || (tender.tur || '').toLowerCase().includes('artırma')
+
+  // Sort bids based on auction direction
   rawBids.sort((a, b) => {
     const pA = parseInt(String(a.fiyat || '0').replace(/\D/g, '')) || 0
     const pB = parseInt(String(b.fiyat || '0').replace(/\D/g, '')) || 0
-    return pA - pB
+    return isArtirma ? (pB - pA) : (pA - pB)
   })
 
   return rawBids
@@ -2210,6 +2224,12 @@ onMounted(() => {
                     <span class="px-2 py-0.2 rounded bg-slate-100 text-slate-600 text-[10px] font-bold truncate max-w-[280px]">
                       {{ tender.kategori }}
                     </span>
+                    <span 
+                      class="px-2 py-0.2 rounded text-[10px] font-bold border truncate"
+                      :class="getTenderDirectionBadge(tender).class"
+                    >
+                      {{ getTenderDirectionBadge(tender).label }}
+                    </span>
                   </div>
 
                   <h3 
@@ -3001,6 +3021,18 @@ onMounted(() => {
 
         <form @submit.prevent="submitQuickOffer" class="space-y-4">
           
+          <div 
+            class="p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between"
+            :class="getTenderDirectionBadge(quickBidTender).class"
+          >
+            <span class="flex items-center gap-1.5">
+              <span>{{ getTenderDirectionBadge(quickBidTender).label }}</span>
+            </span>
+            <span class="text-[10px] opacity-80">
+              {{ (quickBidTender.ihaleYonu === 'artirma' || (quickBidTender.tur || '').includes('Artırma')) ? 'En Yüksek Teklif Kazanır' : 'En Düşük Teklif Kazanır' }}
+            </span>
+          </div>
+
           <!-- Teklif Tutarı ve KDV Seçimi -->
           <div class="space-y-1.5">
             <label class="block text-xs font-bold text-slate-700">Teklif Ettiğiniz Tutar (₺): *</label>

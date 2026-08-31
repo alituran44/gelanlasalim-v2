@@ -32,6 +32,18 @@ definePageMeta({
 const { cmsData, saveCmsData } = useCmsData()
 const { sendSms } = useNetGsm()
 
+function getTenderDirectionBadge(tender: any) {
+  const tur = (tender.tur || '').toLowerCase()
+  const yonu = (tender.ihaleYonu || '').toLowerCase()
+  if (yonu === 'artirma' || tur.includes('artırma') || tur.includes('artırımlı')) {
+    return { label: '📈 Açık Artırma (Fiyat Artırımlı)', class: 'bg-blue-100 text-blue-800 border-blue-200' }
+  }
+  if (yonu === 'kapali_zarf' || tur.includes('kapalı')) {
+    return { label: '📑 Kapalı Zarf Usulü', class: 'bg-purple-100 text-purple-800 border-purple-200' }
+  }
+  return { label: '📉 Açık Eksiltme (Fiyat Azaltımlı)', class: 'bg-emerald-100 text-emerald-800 border-emerald-200' }
+}
+
 const searchQuery = ref('')
 const selectedCategory = ref<string>('Tümü')
 const selectedMethod = ref<string>('Tümü')
@@ -456,8 +468,8 @@ function downloadAllSpecs(tender: any) {
               <span class="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">
                 {{ tender.kategori }}
               </span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
-                {{ tender.tur || 'Açık İhale' }}
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border" :class="getTenderDirectionBadge(tender).class">
+                {{ getTenderDirectionBadge(tender).label }}
               </span>
             </div>
 
