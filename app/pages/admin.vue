@@ -235,31 +235,37 @@ if (!formState.emailSettings.templates || formState.emailSettings.templates.leng
       id: 'TPL_WELCOME',
       name: 'Kurumsal Hoş Geldiniz & KYC Mavi Rozet Onayı',
       subject: 'İhaleciBurada.com Kurumsal Üyeliğiniz ve Mavi Rozetiniz Onaylandı!',
-      content: 'Sayın Yetkili,\n\nİhaleciBurada.com B2B satın alma portalına hoş geldiniz! Kurumsal şirket belgeleriniz (Vergi Levhası, Faaliyet Belgesi, İmza Sirküleri) incelenmiş ve Mavi Rozet onayınız verilmiştir.\n\nArtık Türkiye genelindeki tüm kamu ve özel sektör ihalelerine teklif verebilir veya kendi satın alma ihalelerinizi dakikalar içinde başlatabilirsiniz.\n\nİhale Yönetim Paneli: https://ihalciburada.com/panel\n\nSaygılarımızla,\nİhaleciBurada Ekibi'
+      content: 'Sayın Yetkili,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket evraklarınız (Vergi Levhası, Ticaret Sicil Gazetesi, İmza Sirküleri) hukuk birimimizce doğrulanmış ve hesabınıza Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: https://ihalciburada.com/panel\n\nSaygılarımızla,\nİhaleciBurada Platform A.Ş.\nİletişim: 0850 840 86 95 | ihalecib@gmail.com'
     },
     {
       id: 'TPL_NEW_TENDER',
       name: 'Yeni İhale Yayını & Şartname Teklif Çağrısı',
       subject: 'Yeni İhale İlanı: [İhale Başlığı] için Teklif Süreci Başladı',
-      content: 'Sayın Tedarikçimiz,\n\nFaaliyet gösterdiğiniz sektörde yeni bir satın alma ihalesi yayına alınmıştır.\n\nİhale Başlığı: [İhale Başlığı]\nKategori: [Kategori]\nŞehir: [Şehir]\nSon Teklif Tarihi: [Tarih]\n\nŞartnameyi indirmek ve doğrudan teklif sunmak için bağlantıyı ziyaret ediniz:\nhttps://ihalciburada.com/pazar-yeri\n\nİhaleciBurada.com Satın Alma Masası'
+      content: 'Sayın Tedarikçimiz,\n\nFaaliyet gösterdiğiniz sektörde yeni bir satın alma ihalesi onaylanarak yayına alınmıştır.\n\n• İhale Başlığı: [İhale Başlığı]\n• Başlangıç Bütçesi: [Lider Fiyat]\n• Son Teklif Tarihi: [Kalan Süre]\n\nTeknik şartnameyi indirmek ve doğrudan fiyat teklifinizi iletmek için bağlantıyı ziyaret ediniz:\nhttps://ihalciburada.com/pazar-yeri\n\nİhaleciBurada.com Satın Alma Masası'
     },
     {
       id: 'TPL_NEW_BID',
       name: 'İhaleye Yeni Teklif Geldi Bildirimi',
-      subject: 'İhalenize Doğrulanmış Yeni Bir Teklif İletildi',
-      content: 'Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz [İhale Başlığı] başlıklı satın alma ilanı için Mavi Rozetli onaylı bir tedarikçi tarafından yeni bir fiyat teklifi sunuldu.\n\nTeklifi incelemek ve karşı pazarlık teklifi iletmek için kurumsal panelinize giriş yapınız:\nhttps://ihalciburada.com/panel/gelen-teklifler\n\nİhaleciBurada B2B Operasyon'
+      subject: 'İhalenize Yeni Teklif Geldi: [İhale Başlığı]',
+      content: 'Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz "[İhale Başlığı]" başlıklı satın alma ilanı için onaylı bir tedarikçi firma tarafından yeni bir fiyat teklifi sunuldu.\n\n• Sunulan Teklif: [Lider Fiyat] TL\n• Teklif Veren: [Firma Adı]\n\nTeklifi incelemek ve karşı pazarlık teklifinizi iletmek için kurumsal panelinize giriş yapınız:\nhttps://ihalciburada.com/panel/gelen-teklifler\n\nİhaleciBurada B2B Operasyon'
     },
     {
       id: 'TPL_AUCTION_ALERT',
-      name: 'Canlı Eksiltme & Fiyat Revizyonu Çağrısı',
+      name: 'Canlı Tersine Eksiltme & Fiyat Revizyonu Çağrısı',
       subject: '⚡ Canlı Tersine Eksiltme Başladı! Fiyatınızı Güncelleyin',
-      content: 'Sayın Tedarikçi Yetkilisi,\n\nTeklif vermiş olduğunuz [İhale Başlığı] ihalesinde alıcı firma Canlı Tersine Eksiltme oturumunu başlatmıştır. Lider fiyat güncellenmiştir.\n\nİhale süresi dolmadan en avantajlı teklifinizi sunmak için canlı odaya katılın:\nhttps://ihalciburada.com/panel\n\nİhaleciBurada Canlı İhale Odası'
+      content: 'Sayın Tedarikçi Yetkilisi,\n\nTeklif vermiş olduğunuz "[İhale Başlığı]" ihalesinde alıcı firma Canlı Tersine Eksiltme oturumunu başlatmıştır.\n\n• Lider En İyi Fiyat: [Lider Fiyat] TL\n• Kalan Süre: [Kalan Süre]\n\nİhale süresi dolmadan en avantajlı teklifinizi sunmak için canlı eksiltme odasına katılın:\nhttps://ihalciburada.com/panel\n\nİhaleciBurada Canlı İhale Odası'
+    },
+    {
+      id: 'TPL_DISPUTE_DECISION',
+      name: 'Mücbir Sebep & Hukuki Fesih Kararı',
+      subject: '⚖️ Hakem Heyeti Kararı: Mücbir Sebep Fesih Talebi Sonuçlandı',
+      content: 'Sayın Yetkili,\n\n"[İhale Başlığı]" sözleşmesine istinaden iletmiş olduğunuz mücbir sebep fesih başvurusu İhaleciBurada Hukuk ve Hakem Heyeti tarafından incelenmiştir.\n\nKarar: Talebiniz haklı bulunarak sözleşme cezai şartsız feshedilmiş ve güvence bedeli serbest bırakılmıştır.\n\nDetaylı Hakem Kararı: https://ihalciburada.com/panel/mucbir-sebep\n\nİhaleciBurada Hukuk ve Hakem Heyeti'
     },
     {
       id: 'TPL_ESCROW_RECEIPT',
-      name: 'Escrow Sözleşmesi & Tahsilat Güvence Makbuzu',
+      name: 'Escrow Güvenli Ödeme Sözleşmesi & Tahsilat Makbuzu',
       subject: 'Escrow Güvenli Ödeme Blokesi Alındı — Teslimat Başlatılabilir',
-      content: 'Sayın Tedarikçi ve Alıcı Yetkilileri,\n\n[İhale Başlığı] ihalesine ait sözleşme bedeli alıcı tarafından İhaleciBurada Escrow Güvence Havuzuna aktarılmış ve bloke edilmiştir.\n\nTedarikçi firma, şartnameye uygun teslimat sürecini başlatabilir. Mal/hizmet eksiksiz teslim alınıp onaylandığında ödeme derhal tedarikçinin IBAN hesabına aktarılacaktır.\n\nSipariş & Teslimat Takibi: https://ihalciburada.com/panel/siparis-teslimat\n\nİhaleciBurada Finans & Hukuk Birimi'
+      content: 'Sayın Tedarikçi ve Alıcı Yetkilileri,\n\n"[İhale Başlığı]" ihalesine ait sözleşme bedeli alıcı tarafından İhaleciBurada Escrow Güvence Havuzuna aktarılmış ve bloke edilmiştir.\n\nTedarikçi firma, şartnameye uygun teslimat sürecini başlatabilir. Mal/hizmet eksiksiz teslim alınıp onaylandığında ödeme derhal tedarikçinin IBAN hesabına aktarılacaktır.\n\nSipariş & Teslimat Takibi: https://ihalciburada.com/panel/siparis-teslimat\n\nİhaleciBurada Finans & Hukuk Birimi'
     }
   ]
 }
@@ -3033,126 +3039,7 @@ function removeSubmittedBid(index: number) {
             </div>
           </div>
 
-          <!-- ========================================================================= -->
-          <!-- TAB: EMAIL CENTER & SMTP YAPILANDIRMASI -->
-          <!-- ========================================================================= -->
-          <div v-if="activeTab === 'email_center'" class="space-y-6">
-            <!-- SMTP Server Configuration -->
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4 text-left">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div>
-                  <h3 class="text-sm font-black text-white flex items-center gap-2">
-                    <Mail :size="16" class="text-blue-500" />
-                    SMTP E-Posta Sunucusu & Gönderici Yapılandırması
-                  </h3>
-                  <p class="text-[11px] text-slate-400">Teklif makbuzları, şartname teslimleri ve sözleşme e-postaları için SMTP sunucu entegrasyonu.</p>
-                </div>
-                <div class="flex items-center gap-2 bg-blue-950/60 border border-blue-800 px-3 py-1.5 rounded-xl text-xs font-mono text-blue-400">
-                  <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
-                  <span>SMTP TLS Aktif</span>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">SMTP SUNUCU (HOST)</label>
-                  <input v-model="formState.emailSettings.smtpHost" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">SMTP PORT</label>
-                  <input v-model="formState.emailSettings.smtpPort" type="number" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">SMTP KULLANICI ADI (USER)</label>
-                  <input v-model="formState.emailSettings.smtpUser" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">SMTP ŞİFRE / APP PASSWORD</label>
-                  <input v-model="formState.emailSettings.smtpPassword" type="password" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
-                <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">GÖNDERİCİ ADI (FROM NAME)</label>
-                  <input v-model="formState.emailSettings.senderName" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-bold" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">GÖNDERİCİ E-POSTA (FROM EMAIL)</label>
-                  <input v-model="formState.emailSettings.senderEmail" type="email" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">YANIT E-POSTASI (REPLY-TO)</label>
-                  <input v-model="formState.emailSettings.replyToEmail" type="email" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
-                </div>
-              </div>
-
-              <!-- Otomatik E-Posta Tetikleyicileri -->
-              <div class="pt-2 border-t border-slate-800">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2">OTOMATİK E-POSTA BİLDİRİM TETİKLEYİCİLERİ</span>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-slate-300">
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onRegister" class="rounded border-slate-700 text-blue-500" />
-                    <span>Kurumsal Hoş Geldiniz & KYC Onayı</span>
-                  </label>
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onNewTender" class="rounded border-slate-700 text-blue-500" />
-                    <span>Yeni İhale Yayını & Şartname Çağrısı</span>
-                  </label>
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onNewBid" class="rounded border-slate-700 text-blue-500" />
-                    <span>Yeni Teklif Geldi Bildirimi</span>
-                  </label>
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onAuction" class="rounded border-slate-700 text-blue-500" />
-                    <span>Canlı Eksiltme & Fiyat Düşüşü</span>
-                  </label>
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" v-model="formState.emailSettings.autoNotifications.onEscrow" class="rounded border-slate-700 text-blue-500" />
-                    <span>Escrow Sözleşmesi & Tahsilat Makbuzu</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <!-- Templates List & Editor -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start text-left">
-              <div class="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 space-y-2">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2">KURUMSAL E-POSTA ŞABLONLARI</span>
-                <button
-                  v-for="(tpl, idx) in formState.emailSettings.templates"
-                  :key="tpl.id"
-                  @click="selectedTemplateIdx = idx"
-                  class="w-full text-left p-3 rounded-xl text-xs font-bold transition flex items-center justify-between cursor-pointer"
-                  :class="selectedTemplateIdx === idx ? 'bg-blue-600 text-white shadow-md' : 'text-slate-300 hover:bg-slate-800'"
-                >
-                  <span class="truncate pr-2">{{ tpl.name }}</span>
-                  <span class="text-[10px] opacity-75 shrink-0">Düzenle</span>
-                </button>
-              </div>
-
-              <div v-if="currentTemplate" class="lg:col-span-2 rounded-2xl border border-slate-800 bg-slate-900/60 p-6 space-y-4">
-                <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                  <h4 class="text-sm font-black text-white">{{ currentTemplate.name }}</h4>
-                  <span class="text-[10px] font-mono bg-blue-950 text-blue-400 px-2 py-0.5 rounded">{{ currentTemplate.id }}</span>
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">E-POSTA KONUSU (SUBJECT)</label>
-                  <input v-model="currentTemplate.subject" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white font-bold" />
-                </div>
-                <div>
-                  <label class="block text-xs font-bold text-slate-400 mb-1">E-POSTA GÖVDE METNİ (HTML & Değişkenler Desteklenir)</label>
-                  <textarea v-model="currentTemplate.content" rows="10" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-3 text-xs text-white font-sans leading-relaxed"></textarea>
-                </div>
-                <div class="p-4 rounded-xl bg-slate-950 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
-                  <input v-model="testEmailTarget" type="email" placeholder="Test alıcı e-posta (ihalecib@gmail.com)..." class="w-full sm:w-auto flex-1 bg-transparent border-0 text-xs text-white font-mono" />
-                  <button @click="sendTestEmail" class="w-full sm:w-auto px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-lg shadow-emerald-600/20">
-                    <Send :size="13" /> SMTP İle Test Gönderimi Yap
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
+          
 
           <!-- ========================================================================= -->
           <!-- TAB: NEWSLETTER SUBSCRIBERS -->
