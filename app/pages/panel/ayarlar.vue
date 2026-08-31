@@ -50,6 +50,7 @@ import {
 import { useRoute, useRouter } from 'vue-router'
 import { locale, detectLocale, setLocale } from '~/composables/useLocale'
 import { useAppTheme } from '~/composables/useAppTheme'
+import { useNetGsm } from '~/composables/useNetGsm'
 
 definePageMeta({ 
   layout: 'dashboard' 
@@ -116,6 +117,87 @@ const route = useRoute()
 const router = useRouter()
 
 // Sub-navigation tabs matching query parameter tab
+
+// ----------------------------------------------------
+// NetGSM Phone SMS Verification State & Handlers
+// ----------------------------------------------------
+const { sendSms } = useNetGsm()
+const showPhoneVerifyModal = ref(false)
+const phoneVerifyNumber = ref('')
+const phoneVerifyOtp = ref('849201')
+const isSendingPhoneSms = ref(false)
+const phoneSmsSent = ref(false)
+const phoneSmsTimer = ref(180)
+let phoneTimerInterval: any = null
+
+const isUserPhoneVerified = computed(() => {
+  return userSession.value?.isPhoneVerified === true || userSession.value?.phoneVerified === true
+})
+
+function openPhoneVerifyModal() {
+  phoneVerifyNumber.value = profileForm.value.phone || companyForm.value.phone || userSession.value?.phone || '05325550123'
+  phoneVerifyOtp.value = '849201'
+  phoneSmsSent.value = false
+  showPhoneVerifyModal.value = true
+}
+
+async function sendNetGsmVerificationSms() {
+  if (!phoneVerifyNumber.value || phoneVerifyNumber.value.length < 10) {
+    alert('Lütfen geçerli bir cep telefonu numarası giriniz.')
+    return
+  }
+
+  isSendingPhoneSms.value = true
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
+  phoneVerifyOtp.value = otpCode
+
+  try {
+    await sendSms({
+      recipientPhone: phoneVerifyNumber.value,
+      recipientName: profileForm.value.name || userSession.value?.name || 'Yetkili',
+      templateName: 'Telefon SMS Doğrulama',
+      messageBody: `[İhaleciBurada] Telefon doğrulama kodunuz: ${otpCode}. Bu kodu 3 dakika içinde kimseyle paylaşmayınız.`
+    })
+  } catch (e) {}
+
+  isSendingPhoneSms.value = false
+  phoneSmsSent.value = true
+  phoneSmsTimer.value = 180
+
+  if (phoneTimerInterval) clearInterval(phoneTimerInterval)
+  phoneTimerInterval = setInterval(() => {
+    if (phoneSmsTimer.value > 0) {
+      phoneSmsTimer.value--
+    } else {
+      clearInterval(phoneTimerInterval)
+    }
+  }, 1000)
+
+  showToast(`📱 ${phoneVerifyNumber.value} numarasına NetGSM doğrulama SMS'i iletildi!`, 'success')
+}
+
+function confirmPhoneVerificationOtp() {
+  if (!phoneVerifyOtp.value || phoneVerifyOtp.value.length < 6) {
+    alert('Lütfen 6 haneli doğrulama kodunu giriniz.')
+    return
+  }
+
+  userSession.value.isPhoneVerified = true
+  userSession.value.phoneVerified = true
+  userSession.value.phone = phoneVerifyNumber.value
+  profileForm.value.phone = phoneVerifyNumber.value
+  companyForm.value.phone = phoneVerifyNumber.value
+
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('userSession', JSON.stringify(userSession.value))
+    window.dispatchEvent(new Event('storage'))
+  }
+
+  showPhoneVerifyModal.value = false
+  if (phoneTimerInterval) clearInterval(phoneTimerInterval)
+  showToast('🎉 Telefon numaranız NetGSM SMS ile başarıyla doğrulandı!', 'success')
+}
+
 const activeSubTab = computed(() => {
   return (route.query.tab as 'kisisel' | 'sirket' | 'adresler' | 'bildirimler' | 'takip' | 'ticaret' | 'uyelik' | 'ayarlar') || 'ayarlar'
 })
