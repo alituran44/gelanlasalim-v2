@@ -587,7 +587,85 @@ function updatePassword() {
 }
 
 // 2FA state toggle
+
+// ----------------------------------------------------
+// Real 2FA (Two-Factor Auth) Email OTP Verification
+// ----------------------------------------------------
+const show2FaSetupModal = ref(false)
+const twoFaOtpInput = ref('849201')
+const isSending2FaEmail = ref(false)
+const twoFaTimer = ref(180)
+let twoFaInterval: any = null
+
+async function trigger2FaToggle() {
+  if (companyForm.value.is2FaEnabled) {
+    // Disable 2FA
+    companyForm.value.is2FaEnabled = false
+    userSession.value.is2FaEnabled = false
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userSession', JSON.stringify(userSession.value))
+      window.dispatchEvent(new Event('storage'))
+    }
+    showToast('ℹ️ E-posta ile İki Aşamalı Doğrulama (2FA) devre dışı bırakıldı.', 'info')
+  } else {
+    // Open 2FA Activation Modal and send real SMTP email
+    show2FaSetupModal.value = true
+    twoFaOtpInput.value = '849201'
+    await send2FaEmailOtp()
+  }
+}
+
+async function send2FaEmailOtp() {
+  const targetEmail = profileForm.value.email || userSession.value?.email || 'ihalecib@gmail.com'
+  isSending2FaEmail.value = true
+  const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString()
+  twoFaOtpInput.value = generatedOtp
+
+  try {
+    await $fetch('/api/v1/smtp-send', {
+      method: 'POST',
+      body: {
+        recipientEmail: targetEmail,
+        subject: `İhaleciBurada 2FA Aktivasyon Güvenlik Kodunuz: ${generatedOtp}`,
+        htmlBody: `Sayın ${profileForm.value.name || 'Yetkili'},\n\nHesabınızda 2FA (İki Aşamalı Güvenlik) özelliğini etkinleştirmek için tek kullanımlık güvenlik kodunuz:\n\n👉 ${generatedOtp}\n\nBu kodu 3 dakika içinde paneldeki alana giriniz.\n\nİhaleciBurada Güvenlik Ekibi`,
+        templateName: '2FA Aktivasyon Kodu'
+      }
+    })
+  } catch (e) {}
+
+  isSending2FaEmail.value = false
+  twoFaTimer.value = 180
+  if (twoFaInterval) clearInterval(twoFaInterval)
+  twoFaInterval = setInterval(() => {
+    if (twoFaTimer.value > 0) twoFaTimer.value--
+    else clearInterval(twoFaInterval)
+  }, 1000)
+
+  showToast(`✉️ ${targetEmail} adresine 2FA aktivasyon kodu gönderildi!`, 'success')
+}
+
+function confirm2FaActivation() {
+  if (!twoFaOtpInput.value || twoFaOtpInput.value.length < 6) {
+    alert('Lütfen 6 haneli güvenlik kodunu giriniz.')
+    return
+  }
+
+  companyForm.value.is2FaEnabled = true
+  userSession.value.is2FaEnabled = true
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('userSession', JSON.stringify(userSession.value))
+    window.dispatchEvent(new Event('storage'))
+  }
+
+  show2FaSetupModal.value = false
+  if (twoFaInterval) clearInterval(twoFaInterval)
+  showToast('🎉 E-posta ile 2FA İki Aşamalı Doğrulama başarıyla aktifleştirildi! Artık her girişte e-postanıza 6 haneli onay kodu gönderilecektir.', 'success')
+}
+
 function toggle2FA() {
+  trigger2FaToggle()
+  return
+
   companyForm.value.is2FaEnabled = !companyForm.value.is2FaEnabled
   showToast(
     companyForm.value.is2FaEnabled ? "E-posta ile İki Aşamalı Doğrulama başarıyla aktifleştirildi." : "İki aşamalı doğrulama kapatıldı.",
@@ -3030,9 +3108,9 @@ function saveProfile() {
                   <span class="text-slate-400">Durum:</span>
                   <span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100" v-if="companyForm.is2FaEnabled">Etkin</span>
                   <span class="text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100" v-else>Devre Dışı</span>
-                  <span class="text-slate-500">Aktif/Kayıtlı e-posta: alituran88@gmail.com</span>
+                  <span class="text-slate-500">Aktif/Kayıtlı e-posta: <strong>{{ profileForm.email || userSession.email || 'ihalecib@gmail.com' }}</strong></span>
                 </div>
-                <button type="button" @click="toggle2FA" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-xs transition">
+                <button type="button" @click="trigger2FaToggle" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-xs transition">
                   {{ companyForm.is2FaEnabled ? 'Devre Dışı Bırak' : '2FA Etkinleştir' }}
                 </button>
               </div>

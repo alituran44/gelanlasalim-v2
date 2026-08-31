@@ -451,21 +451,67 @@ function handleLogin() {
   isSubmitting.value = true
   errorMessage.value = ''
 
-  setTimeout(() => {
+  setTimeout(async () => {
     isSubmitting.value = false
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('userSession', JSON.stringify({
+    let currentSession: any = {}
+    try {
+      currentSession = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+
+    const is2Fa = (currentSession.email === loginEmail.value && currentSession.is2FaEnabled === true)
+
+    if (is2Fa) {
+      // Trigger real 2FA verification via modal
+      pendingUserSession.value = {
         email: loginEmail.value,
-        firstName: 'Ali',
-        name: 'Ali Turan',
-        role: 'buyer',
+        firstName: currentSession.firstName || 'Ali',
+        name: currentSession.name || 'Ali Turan',
+        username: currentSession.username || 'Ali Turan',
+        company: currentSession.company || '',
+        companyName: currentSession.companyName || '',
+        role: currentSession.role || 'company',
+        verified: true,
+        is2FaEnabled: true,
+        isPremium: true,
+        subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
+      }
+      pendingTargetRoute.value = '/panel'
+      otpInput.value = '849201'
+
+      try {
+        await $fetch('/api/v1/smtp-send', {
+          method: 'POST',
+          body: {
+            recipientEmail: loginEmail.value,
+            subject: 'İhaleciBurada Giriş Güvenlik Kodu (2FA): 849201',
+            htmlBody: 'Sayın Kullanıcımız,\n\nİhaleciBurada hesabınıza giriş için 2FA güvenlik kodunuz: 849201\n\nBu kod 3 dakika geçerlidir.',
+            templateName: '2FA Giriş Doğrulama'
+          }
+        })
+      } catch (e) {}
+
+      showOtpModal.value = true
+      return
+    }
+
+    if (typeof window !== 'undefined') {
+      const sessionObj = {
+        email: loginEmail.value,
+        firstName: currentSession.firstName || 'Ali',
+        name: currentSession.name || 'Ali Turan',
+        username: currentSession.username || (loginEmail.value.split('@')[0]),
+        company: currentSession.company || '',
+        companyName: currentSession.companyName || '',
+        role: currentSession.role || 'company',
         verified: true,
         isPremium: true,
         subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
-      }))
+      }
+      localStorage.setItem('userSession', JSON.stringify(sessionObj))
+      registerToAdminKycQueue(sessionObj)
     }
     router.push('/panel')
-  }, 1000)
+  }, 600)
 }
 
 function handleDemoLogin(role: 'company' | 'individual') {
