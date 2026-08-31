@@ -61,6 +61,8 @@ const form = ref({
   baslik: '',
   kategori: 'İnşaat ve Yapı',
   sure: '7 gün',
+  minButce: '',
+  maxButce: '',
   butce: '',
   aciklama: '',
   sehir: 'Balıkesir',
@@ -358,12 +360,19 @@ function handleSubmit() {
     return
   }
 
-  // Format budget or mark as Open Reverse Auction
-  let budgetVal = form.value.butce ? form.value.butce.trim() : ''
-  if (budgetVal) {
-    if (!budgetVal.startsWith('₺') && !budgetVal.includes('₺') && !budgetVal.includes('$') && !budgetVal.includes('€')) {
-      budgetVal = '₺' + budgetVal
-    }
+  // Format budget with min-max range or open auction
+  let budgetVal = ''
+  const min = form.value.minButce ? form.value.minButce.replace(/[^\d.,]/g, '').trim() : ''
+  const max = form.value.maxButce ? form.value.maxButce.replace(/[^\d.,]/g, '').trim() : ''
+
+  if (min && max) {
+    budgetVal = `${min} ₺ - ${max} ₺`
+  } else if (min && !max) {
+    budgetVal = `Min. ${min} ₺`
+  } else if (!min && max) {
+    budgetVal = `Maks. ${max} ₺`
+  } else if (form.value.butce) {
+    budgetVal = form.value.butce.includes('₺') ? form.value.butce : `${form.value.butce} ₺`
   } else {
     budgetVal = 'Teklif Usulü (Açık İhale)'
   }
@@ -552,7 +561,7 @@ function resetFormAndCreateNew() {
           <span class="font-bold text-slate-800">{{ submittedTenderSummary?.kategori }}</span>
         </div>
         <div>
-          <span class="text-[10px] font-bold text-slate-400 uppercase block">Hedef Bütçe</span>
+          <span class="text-[10px] font-bold text-slate-400 uppercase block">Pazarlık / Bütçe</span>
           <span class="font-mono font-black text-emerald-700">{{ submittedTenderSummary?.butce }}</span>
         </div>
         <div>
@@ -641,19 +650,48 @@ function resetFormAndCreateNew() {
             </select>
           </div>
 
-          <!-- Hedef Bütçe (İsteğe Bağlı) -->
-          <div>
-            <div class="flex items-center justify-between mb-1.5">
-              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider">HEDEF BÜTÇE (₺)</label>
-              <span class="text-[9px] font-bold text-slate-400 lowercase">(isteğe bağlı)</span>
+          <!-- Pazarlık & Bütçe Aralığı (Min Taban - Maks Tavan) -->
+          <div class="col-span-1 md:col-span-2 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80 space-y-3">
+            <div class="flex items-center justify-between">
+              <label class="block text-[10px] font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                <span>💰 PAZARLIK VE BÜTÇE ARALIĞI</span>
+              </label>
+              <span class="text-[10px] font-bold text-slate-400 lowercase">(isteğe bağlı / boş bırakılabilir)</span>
             </div>
-            <input 
-              v-model="form.butce" 
-              type="text" 
-              placeholder="Örn: 150.000 (Boş bırakabilirsiniz)" 
-              class="w-full rounded-lg border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-              style="border-color: #CBD5E1; color: #0F172A;"
-            />
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <!-- Minimum Alt Değer / Taban Fiyat -->
+              <div>
+                <label class="block text-[10px] font-bold text-slate-600 mb-1">
+                  MİNİMUM ALT DEĞER (TABAN ₺)
+                </label>
+                <input 
+                  v-model="form.minButce" 
+                  type="text" 
+                  placeholder="Örn: 50.000 (Pazarlık alt sınırı)" 
+                  class="w-full rounded-xl border p-2.5 text-xs outline-none bg-white transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-medium"
+                  style="border-color: #CBD5E1; color: #0F172A;"
+                />
+              </div>
+
+              <!-- Maksimum Tavan Bütçe -->
+              <div>
+                <label class="block text-[10px] font-bold text-slate-600 mb-1">
+                  MAKSİMUM TAVAN BÜTÇE (₺)
+                </label>
+                <input 
+                  v-model="form.maxButce" 
+                  type="text" 
+                  placeholder="Örn: 150.000 (Hedef üst sınır)" 
+                  class="w-full rounded-xl border p-2.5 text-xs outline-none bg-white transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-medium"
+                  style="border-color: #CBD5E1; color: #0F172A;"
+                />
+              </div>
+            </div>
+
+            <p class="text-[10px] text-slate-500 leading-relaxed">
+              💡 Tedarikçilerin teklif verirken baz alacağı minimum başlangıç tabanını ve maksimum hedef bütçeyi belirleyebilirsiniz. Boş bırakırsanız <strong>"Teklif Usulü (Açık İhale)"</strong> olarak yayınlanır.
+            </p>
           </div>
         </div>
 
