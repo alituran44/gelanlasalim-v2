@@ -231,6 +231,64 @@ async function acceptCounterOffer(teklif: any) {
     } catch (e) {}
   }
 
+  // 5. Create or sync Escrow Orders
+  if (!cmsData.value.escrowOrders) cmsData.value.escrowOrders = []
+  if (!cmsData.value.dashboard.escrowOrders) cmsData.value.dashboard.escrowOrders = []
+
+  const numVal = parseInt(String(latestPrice || '75000').replace(/\D/g, '')) || 75000
+  const payoutStr = Math.round(numVal * 0.97).toLocaleString('tr-TR') + ' ₺'
+  const commStr = Math.round(numVal * 0.03).toLocaleString('tr-TR') + ' ₺'
+
+  const orderItem = {
+    id: 'ORD-2026-' + (teklif.tenderId ? String(teklif.tenderId).replace(/\D/g, '') : Math.floor(100 + Math.random() * 900)),
+    orderCode: 'SIP-2026-' + Math.floor(1000 + Math.random() * 9000),
+    tenderId: teklif.tenderId || 'IHC-2026-178',
+    tenderTitle: teklif.ilanBaslik,
+    buyerCompany: teklif.aliciFirma || 'Ali Turan San. Tic. A.Ş.',
+    buyerFirm: teklif.aliciFirma || 'Ali Turan San. Tic. A.Ş.',
+    buyerEmail: 'alituran44@gmail.com',
+    supplierCompany: teklif.firma || 'Ata Akademi San. Tic. A.Ş.',
+    supplierFirm: teklif.firma || 'Ata Akademi San. Tic. A.Ş.',
+    supplierEmail: 'tedarikci@gmail.com',
+    totalAmount: latestPrice,
+    amount: latestPrice,
+    numericAmount: numVal,
+    payoutAmount: payoutStr,
+    commissionAmount: commStr,
+    commissionRate: 3,
+    status: 'HAVUZDA_BLOKE',
+    statusLabel: 'Güvenli Havuzda Bloke Edildi',
+    escrowStatus: 'havuzda_bloke',
+    trackingNumber: 'YK-' + Math.floor(1000000 + Math.random() * 9000000),
+    trackingCode: 'YK-' + Math.floor(1000000 + Math.random() * 9000000),
+    carrier: 'Yurtiçi Kargo / Borusan Lojistik',
+    shippingCompany: 'Yurtiçi Kargo & Borusan Lojistik',
+    deliveryDate: '3 iş günü',
+    notes: 'İhale mutabakatı tamamlandı. Havuz ödemesi bloke edildi.',
+    paymentMethod: 'PayTR / iyzico 3D Güvenli Havuz',
+    createdAt: new Date().toLocaleDateString('tr-TR'),
+    updatedAt: 'Şimdi'
+  }
+
+  const existingRoot = cmsData.value.escrowOrders.find((o: any) => o.tenderId === teklif.tenderId || o.tenderTitle === teklif.ilanBaslik)
+  if (!existingRoot) cmsData.value.escrowOrders.unshift(orderItem)
+
+  const existingDash = cmsData.value.dashboard.escrowOrders.find((o: any) => o.tenderId === teklif.tenderId || o.tenderTitle === teklif.ilanBaslik)
+  if (!existingDash) cmsData.value.dashboard.escrowOrders.unshift(orderItem)
+
+  if (typeof window !== 'undefined') {
+    try {
+      const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+      myTenders.forEach((mt: any) => {
+        if (mt.id === teklif.tenderId || mt.baslik === teklif.ilanBaslik) {
+          mt.durum = 'closed'
+          mt.statusLabel = 'Sonuçlandı (Mutabakat Sağlandı)'
+        }
+      })
+      localStorage.setItem('myTenders', JSON.stringify(myTenders))
+    } catch (e) {}
+  }
+
   saveCmsData(cmsData.value)
 
   // Send NetGSM SMS to buyer
