@@ -121,7 +121,7 @@ const quoteFileInputRef = ref<HTMLInputElement | null>(null)
 const selectedCompanyProfileModal = ref<any>(null)
 const userSession = ref<any>({})
 
-const { cmsData } = useCmsData()
+const { cmsData, saveCmsData } = useCmsData()
 const { sendSms } = useNetGsm()
 
 // ==================== 1. KATEGORİLER LİSTESİ (İNŞAAT, SAĞLIK, TARIM İLK 3 SIRADA) ====================
@@ -1334,6 +1334,11 @@ onMounted(() => {
     try {
       userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
     } catch (e) {}
+    window.addEventListener('storage', () => {
+      try {
+        userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
+      } catch (e) {}
+    })
   }
 })
 </script>

@@ -35,34 +35,51 @@ const userRole = ref('company')
 const isVerified = ref(true)
 
 // ==================== DİNAMİK İLANLAR & TEKLİFLER LİSTESİ ====================
+const userSession = ref<any>({})
+
 const myActiveTenders = computed(() => {
-  return (cmsData.value?.dashboard?.tenders || []).map((t: any, index: number) => ({
-    id: t.id || index + 1,
-    no: t.id || `2026/${14600 + index}`,
-    title: t.baslik,
-    bidsCount: t.teklifSayisi || 0,
-    bestOffer: t.butce || 'Teklif Bekleniyor',
-    date: t.sure || 'Aktif',
-    status: t.durum === 'closed' ? 'Tamamlandı' : 'Yayında & Teklif Alıyor'
-  }))
+  const currentEmail = (userSession.value?.email || '').trim().toLowerCase()
+  const allTenders = cmsData.value?.dashboard?.tenders || []
+  
+  if (!currentEmail) return []
+
+  return allTenders
+    .filter((t: any) => {
+      const ownerEmail = (t.ownerEmail || '').trim().toLowerCase()
+      return ownerEmail && ownerEmail === currentEmail
+    })
+    .map((t: any, index: number) => ({
+      id: t.id || index + 1,
+      no: t.id || `2026/${14600 + index}`,
+      title: t.baslik,
+      bidsCount: t.teklifSayisi || 0,
+      bestOffer: t.butce || 'Teklif Bekleniyor',
+      date: t.sure || 'Aktif',
+      status: t.durum === 'closed' ? 'Tamamlandı' : 'Yayında & Teklif Alıyor'
+    }))
 })
 
 const recentBids = computed(() => {
   const list: any[] = []
+  const currentEmail = (userSession.value?.email || '').trim().toLowerCase()
+  const myTenderIds = myActiveTenders.value.map((t: any) => t.id)
+  
   const receivedGroups = cmsData.value?.dashboard?.receivedBids || []
-  receivedGroups.forEach((g: any) => {
-    (g.teklifler || []).forEach((b: any) => {
-      list.push({
-        id: b.id,
-        tenderTitle: g.baslik,
-        bidder: b.firma,
-        score: `${b.puan || 5.0} ★`,
-        amount: b.fiyat,
-        date: 'Güncel',
-        status: b.durum === 'anlasildi' ? 'Onaylandı' : 'İnceleniyor'
+  receivedGroups
+    .filter((g: any) => myTenderIds.includes(g.id))
+    .forEach((g: any) => {
+      (g.teklifler || []).forEach((b: any) => {
+        list.push({
+          id: b.id,
+          tenderTitle: g.baslik,
+          bidder: b.firma,
+          score: `${b.puan || 5.0} ★`,
+          amount: b.fiyat,
+          date: 'Güncel',
+          status: b.durum === 'anlasildi' ? 'Onaylandı' : 'İnceleniyor'
+        })
       })
     })
-  })
   return list
 })
 
@@ -70,6 +87,7 @@ onMounted(() => {
   if (typeof window !== 'undefined') {
     try {
       const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+      userSession.value = session
       if (session.companyName || session.company) {
         companyName.value = session.companyName || session.company
       }

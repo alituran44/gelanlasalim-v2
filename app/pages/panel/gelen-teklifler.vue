@@ -44,6 +44,22 @@ const { cmsData, saveCmsData } = useCmsData()
 const { sendSms } = useNetGsm()
 
 
+const userSession = ref<any>({})
+
+const myTendersList = computed(() => {
+  const currentEmail = (userSession.value?.email || '').trim().toLowerCase()
+  const allTenders = cmsData.value?.dashboard?.tenders || []
+  if (!currentEmail) return []
+  return allTenders.filter((t: any) => (t.ownerEmail || '').trim().toLowerCase() === currentEmail)
+})
+
+const myTenderIds = computed(() => myTendersList.value.map((t: any) => t.id))
+
+const filteredReceivedBids = computed(() => {
+  const allReceived = cmsData.value?.dashboard?.receivedBids || []
+  return allReceived.filter((g: any) => myTenderIds.value.includes(g.id))
+})
+
 const toplamGelenTeklifler = computed(() => {
   let count = 0
   const list = cmsData.value?.dashboard?.receivedBids || []
@@ -56,6 +72,11 @@ const toplamGelenTeklifler = computed(() => {
 const ilanlar = computed(() => cmsData.value?.dashboard?.receivedBids || [])
 
 onMounted(() => {
+  if (typeof window !== 'undefined') {
+    try {
+      userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+  }
   if (typeof window !== 'undefined') {
     if (!expandedIlan.value && ilanlar.value.length > 0) {
       expandedIlan.value = ilanlar.value[0].id

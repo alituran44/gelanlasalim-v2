@@ -33,10 +33,17 @@ function reloadTenders() {
 }
 
 onMounted(() => {
-  reloadTenders()
   if (typeof window !== 'undefined') {
-    window.addEventListener('storage', reloadTenders)
+    try {
+      userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+    window.addEventListener('storage', () => {
+      try {
+        userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
+      } catch (e) {}
+    })
   }
+  reloadTenders()
   setTimeout(() => {
     isLoading.value = false
   }, 300)
@@ -46,21 +53,18 @@ watch(() => cmsData.value?.dashboard?.tenders, () => {
   reloadTenders()
 }, { deep: true })
 
+const userSession = ref<any>({})
+
 const tendersList = computed(() => {
-  if (localTendersState.value.length > 0) {
-    return localTendersState.value
-  }
+  const currentEmail = (userSession.value?.email || '').trim().toLowerCase()
   const cmsList = cmsData.value?.dashboard?.tenders || []
-  let localList: any[] = []
-  if (typeof window !== 'undefined') {
-    try {
-      localList = JSON.parse(localStorage.getItem('myTenders') || '[]')
-    } catch (e) {}
-  }
-  const map = new Map<string, any>()
-  localList.forEach(item => map.set(item.id, item))
-  cmsList.forEach(item => map.set(item.id, item))
-  return Array.from(map.values())
+  
+  if (!currentEmail) return []
+
+  return cmsList.filter((t: any) => {
+    const ownerEmail = (t.ownerEmail || '').trim().toLowerCase()
+    return ownerEmail && ownerEmail === currentEmail
+  })
 })
 
 const filteredTenders = computed(() => {
