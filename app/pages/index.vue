@@ -969,9 +969,43 @@ const isMyOwnCompany = computed(() => {
   return userComp.length > 2 && (modalComp.includes(userComp) || userComp.includes(modalComp))
 })
 
+
+function isMyOwnTender(tender: any): boolean {
+  if (!tender) return false
+  if (tender.isMine === true) return true
+
+  let session: any = {}
+  let myTenders: any[] = []
+  if (typeof window !== 'undefined') {
+    try {
+      session = JSON.parse(localStorage.getItem('userSession') || '{}')
+      myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+    } catch (e) {}
+  }
+
+  if (myTenders.some((mt: any) => mt.id === tender.id || (mt.baslik && mt.baslik.trim().toLowerCase() === (tender.baslik || '').trim().toLowerCase()))) {
+    return true
+  }
+
+  const currentEmail = (session.email || userSession.value?.email || '').trim().toLowerCase()
+  const tenderEmail = (tender.ownerEmail || '').trim().toLowerCase()
+  if (currentEmail && tenderEmail && currentEmail === tenderEmail) {
+    return true
+  }
+
+  const currentComp = (session.companyName || session.company || userSession.value?.companyName || userSession.value?.company || userSession.value?.username || '').trim().toLowerCase()
+  const tenderComp = (tender.ownerCompany || tender.authority || '').trim().toLowerCase()
+  if (currentComp && currentComp.length > 2 && tenderComp && (tenderComp.includes(currentComp) || currentComp.includes(tenderComp))) {
+    return true
+  }
+
+  return false
+}
+
+
 function openQuickBidModal(tender: any) {
-  if (userSession.value && userSession.value.username && (tender.ownerCompany === userSession.value.username || tender.ownerCompany === userSession.value.companyName)) {
-    alert('Kendi açtığınız bir ihaleye teklif veremezsiniz!')
+  if (isMyOwnTender(tender)) {
+    alert(`🚫 KENDİ İLANINIZA TEKLİF VEREMEZSİNİZ!\n\n"${tender.baslik}" ihalesi sizin tarafınızdan açılmıştır.\n\nSistem kuralları ve B2B ihale mevzuatı gereği kendi açtığınız ihalelere teklif sunamazsınız.\n\nİhaleniz için gelen teklifleri incelemek ve pazarlık yürütmek için lütfen "Gelen Teklifler" sayfasına gidiniz.`)
     return
   }
   quickBidTender.value = tender
@@ -1016,6 +1050,11 @@ function removeQuoteFile(index: number) {
 }
 
 function submitQuickOffer() {
+  if (isMyOwnTender(quickBidTender.value)) {
+    alert('🚫 Kendi açtığınız bir ihaleye teklif veremezsiniz!')
+    showQuickBidModal.value = false
+    return
+  }
   if (!quickOfferPrice.value || !quickOfferPrice.value.trim()) {
     alert('Lütfen geçerli bir teklif tutarı giriniz.')
     return
@@ -1964,7 +2003,17 @@ onMounted(() => {
                     Şartname İncele
                   </button>
 
+                  <NuxtLink 
+                    v-if="isMyOwnTender(tender)"
+                    to="/panel/gelen-teklifler"
+                    class="flex-1 sm:w-full px-3 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs transition cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
+                    title="Bu sizin kendi açtığınız ihale ilanıdır"
+                  >
+                    <Building2 :size="12" class="text-amber-700" />
+                    <span>👤 Kendi İlanınız</span>
+                  </NuxtLink>
                   <button 
+                    v-else
                     type="button" 
                     @click="openQuickBidModal(tender)"
                     class="flex-1 sm:w-full px-3.5 py-1.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition cursor-pointer shadow-xs flex items-center justify-center gap-1"
