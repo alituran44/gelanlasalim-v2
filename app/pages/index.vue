@@ -2990,8 +2990,12 @@ onMounted(() => {
             <span class="font-mono font-bold text-slate-700">{{ quickBidTender.id }}</span>
           </div>
           <div class="flex justify-between items-center">
-            <span class="text-slate-500 font-bold">Hedef / Yaklaşık Maliyet:</span>
-            <span class="font-mono font-black text-emerald-700">{{ quickBidTender.butce || 'Açık Teklif' }}</span>
+            <span class="text-slate-500 font-bold">Kategori & İhale Türü:</span>
+            <span class="font-bold text-slate-800">{{ quickBidTender.kategori || 'Açık Eksiltmeli İhale' }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500 font-bold">Teslimat Lokasyonu:</span>
+            <span class="font-bold text-slate-800">{{ quickBidTender.city || 'Balıkesir' }} (Saha Depo Teslim)</span>
           </div>
         </div>
 
