@@ -220,9 +220,7 @@ onMounted(() => {
               <span class="px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-mono font-bold text-[10px]">
                 {{ item.no }}
               </span>
-              <span class="text-xs font-bold text-emerald-700 font-mono">
-                Bütçe: {{ item.bestOffer }}
-              </span>
+              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">🟢 Canlı İhale</span>
             </div>
 
             <h4 class="font-bold text-xs text-slate-800 line-clamp-1">{{ item.title }}</h4>

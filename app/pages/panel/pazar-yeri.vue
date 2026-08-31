@@ -477,15 +477,14 @@ function downloadAllSpecs(tender: any) {
           <!-- Price, Spec Preview & Actions Footer -->
           <div class="pt-4 border-t border-slate-100 space-y-3">
             <div class="flex items-center justify-between">
-              <div>
-                <span class="text-[10px] font-bold text-slate-400 uppercase block">Tahmini Hacim:</span>
-                <span class="text-sm font-black font-mono text-slate-900">{{ tender.butce || 'Açık İhale' }}</span>
-              </div>
+              <span class="px-2.5 py-1 rounded-lg bg-slate-100 text-slate-700 font-bold text-[11px]">
+                🛡️ Escrow Korumalı
+              </span>
               
               <button
                 type="button"
                 @click="openSpecModal(tender)"
-                class="flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2.5 py-1.5 rounded-lg border border-blue-200 transition cursor-pointer"
+                class="flex items-center gap-1 text-[11px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-xl border border-blue-200 transition cursor-pointer"
               >
                 <FileText :size="13" />
                 <span>Şartname İncele</span>
