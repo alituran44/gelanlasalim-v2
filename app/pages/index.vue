@@ -576,6 +576,18 @@ function getTenderBidsList(tender: any): any[] {
   return rawBids
 }
 
+const showLiveBidsDrawer = ref(false)
+const drawerTender = ref<any>(null)
+
+function openLiveBidsDrawer(tender: any) {
+  drawerTender.value = tender
+  showLiveBidsDrawer.value = true
+}
+
+const drawerTenderLiveBids = computed(() => {
+  return getTenderBidsList(drawerTender.value)
+})
+
 const selectedTenderForLiveBids = ref<any>(null)
 
 const currentActiveTenderForSidebar = computed(() => {
@@ -2028,7 +2040,7 @@ onMounted(() => {
         <!-- ========================================================= -->
         <!-- ➡️ SAĞ / ORTA SÜTUN: RESİMLİ İHALE LİSTESİ (SAHİBİNDEN FEED) -->
         <!-- ========================================================= -->
-        <main class="lg:col-span-6 xl:col-span-6 space-y-4">
+        <main class="lg:col-span-8 xl:col-span-9 space-y-4">
           
           <!-- ÜST KONTROL ŞERİDİ: SONUÇ SAYACI, AKTİF ROZETLER & SIRALAMA -->
           <div class="bg-white border border-slate-300 rounded-2xl p-3.5 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -2211,7 +2223,7 @@ onMounted(() => {
                       Önceki: {{ getTenderBidsList(tender)[1].fiyat }}
                     </span>
                   </div>
-                  <span class="text-blue-600 font-bold cursor-pointer hover:underline" @click="openQuickBidModal(tender)">
+                  <span class="text-blue-600 font-bold cursor-pointer hover:underline" @click="openLiveBidsDrawer(tender)">
                     ⚡ Daha Düşük Teklif Ver ↗
                   </span>
                 </div>
@@ -2235,7 +2247,7 @@ onMounted(() => {
                 <div class="flex sm:flex-col gap-1.5 w-full sm:w-auto pt-1">
                   <button 
                     type="button" 
-                    @click="openTenderDetailModal(tender); selectTenderForLiveBids(tender)"
+                    @click="openTenderDetailModal(tender)"
                     class="flex-1 sm:w-full px-3 py-1.5 rounded-xl border border-slate-300 hover:bg-slate-100 text-slate-700 font-bold text-xs transition cursor-pointer"
                   >
                     Şartname İncele
@@ -2253,11 +2265,21 @@ onMounted(() => {
                   <button 
                     v-else
                     type="button" 
-                    @click="openQuickBidModal(tender)"
+                    @click="openLiveBidsDrawer(tender)"
                     class="flex-1 sm:w-full px-3.5 py-1.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition cursor-pointer shadow-xs flex items-center justify-center gap-1"
                   >
                     <Send :size="12" />
                     <span>Teklif Ver</span>
+                  </button>
+
+                  <!-- ⚡ Canlı Teklifler Çekmecesi Açıcı Buton -->
+                  <button
+                    type="button"
+                    @click="openLiveBidsDrawer(tender)"
+                    class="flex-1 sm:w-full px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-black text-xs transition cursor-pointer flex items-center justify-center gap-1"
+                  >
+                    <Sparkles :size="12" class="text-emerald-600" />
+                    <span>⚡ Canlı Teklifler ({{ getTenderBidsList(tender).length }})</span>
                   </button>
                 </div>
 
@@ -2316,7 +2338,7 @@ onMounted(() => {
                   </div>
                   <button 
                     type="button" 
-                    @click="openQuickBidModal(tender)"
+                    @click="openLiveBidsDrawer(tender)"
                     class="px-3 py-1.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-bold text-xs transition cursor-pointer"
                   >
                     Teklif Ver
@@ -2403,131 +2425,7 @@ onMounted(() => {
 
         </main>
 
-        <!-- ========================================================= -->
-        <!-- ⚡ SAĞ SÜTUN: SEÇİLEN İHALEYE ÖZEL CANLI TEKLİF SIRALAMASI -->
-        <!-- ========================================================= -->
-        <aside class="lg:col-span-3 xl:col-span-3 space-y-4">
-          
-          <!-- Canlı İhale Teklif Masası Kartı -->
-          <div class="bg-white border border-slate-300 rounded-2xl p-4 shadow-2xs space-y-3.5 sticky top-20 text-left">
-            
-            <!-- Header with Live Pulse & Tender Selector -->
-            <div class="space-y-2 border-b border-slate-100 pb-3">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <span class="relative flex h-2.5 w-2.5">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-                  </span>
-                  <h3 class="font-black text-xs text-slate-900 tracking-tight">CANLI TEKLİF SIRALAMASI</h3>
-                </div>
-                <span class="text-[9px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                  Canlı Eksiltme
-                </span>
-              </div>
-
-              <!-- Selected Tender Badge & Info -->
-              <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
-                <div class="flex items-center justify-between text-[10px]">
-                  <span class="font-mono font-bold text-blue-700">#{{ currentActiveTenderForSidebar.id }}</span>
-                  <span class="text-slate-500 font-semibold">{{ currentActiveTenderForSidebar.city || 'Türkiye Geneli' }}</span>
-                </div>
-                <h4 class="font-black text-xs text-slate-900 line-clamp-2 leading-snug">
-                  {{ currentActiveTenderForSidebar.baslik }}
-                </h4>
-                <div class="text-[10px] text-slate-500 truncate pt-0.5">
-                  🏢 {{ currentActiveTenderForSidebar.ownerCompany || currentActiveTenderForSidebar.authority || 'Kurumsal Alıcı' }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Mini Stats Banner for this Tender -->
-            <div class="grid grid-cols-2 gap-2 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center">
-              <div>
-                <div class="text-[9px] font-black text-slate-400 uppercase">Toplam Teklif</div>
-                <div class="font-mono font-black text-slate-900 text-sm">{{ activeTenderLiveBids.length }} Teklif</div>
-              </div>
-              <div>
-                <div class="text-[9px] font-black text-slate-400 uppercase">Lider Fiyat</div>
-                <div class="font-mono font-black text-emerald-600 text-sm">
-                  {{ activeTenderLiveBids[0]?.fiyat || 'Açık' }}
-                </div>
-              </div>
-            </div>
-
-            <!-- Bids Feed List (Sorted by Lowest / Best Price for this Tender) -->
-            <div class="space-y-2 max-h-[380px] overflow-y-auto pr-1 custom-scrollbar">
-              <div 
-                v-for="(bid, bIdx) in activeTenderLiveBids" 
-                :key="bIdx"
-                class="p-3 rounded-xl border transition-all hover:border-[#0084B4] hover:shadow-xs space-y-1.5"
-                :class="bIdx === 0 ? 'bg-emerald-50/60 border-emerald-300' : 'bg-white border-slate-200'"
-              >
-                <!-- Top Row: Anonymous Bidder & Rank Badge & Time -->
-                <div class="flex items-center justify-between gap-1 text-[11px]">
-                  <div class="flex items-center gap-1.5 min-w-0 font-bold" :class="bIdx === 0 ? 'text-emerald-950 font-black' : 'text-slate-800'">
-                    <span 
-                      class="px-1.5 py-0.2 rounded text-[9px] font-black shrink-0 font-mono"
-                      :class="bIdx === 0 ? 'bg-emerald-600 text-white' : (bIdx === 1 ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-600')"
-                    >
-                      {{ bIdx === 0 ? '🥇 1. Lider' : (bIdx === 1 ? '🥈 2. Sıra' : (bIdx + 1 + '. Sıra')) }}
-                    </span>
-                    <span class="truncate">{{ maskBidderName(bid, bIdx) }}</span>
-                  </div>
-                  <span class="text-[10px] text-slate-400 shrink-0 font-medium">{{ bid.tarih || bid.time || 'Az önce' }}</span>
-                </div>
-
-                <!-- Bottom Row: Price & Delivery -->
-                <div class="flex items-center justify-between pt-1 border-t border-slate-100 text-xs">
-                  <span class="text-[10px] text-slate-500 font-mono">{{ bid.sure || '7 gün' }} teslimat</span>
-                  <span class="font-mono font-black text-emerald-600">{{ bid.fiyat }}</span>
-                </div>
-              </div>
-
-              <div v-if="activeTenderLiveBids.length === 0" class="p-6 text-center text-slate-400 text-xs rounded-xl border border-dashed border-slate-200">
-                Bu ihaleye henüz teklif sunulmadı. İlk teklifi vererek liderliği alabilirsiniz!
-              </div>
-            </div>
-
-            <!-- Call to Action: Bid to Beat Leader -->
-            <div class="pt-2 border-t border-slate-100 space-y-2">
-              <div v-if="activeTenderLiveBids.length > 0" class="p-2 rounded-xl bg-amber-50 border border-amber-200 text-[10px] text-amber-900 leading-snug">
-                💡 <strong>Kazanma İpucu:</strong> Liderliği almak için <strong>{{ activeTenderLiveBids[0]?.fiyat }}</strong> altı teklif giriniz.
-              </div>
-
-              <NuxtLink 
-                v-if="isMyOwnTender(currentActiveTenderForSidebar)"
-                to="/panel/gelen-teklifler"
-                class="w-full py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-black text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-xs"
-              >
-                <Building2 :size="13" class="text-amber-700" />
-                <span>👤 Kendi İlanınız (Gelen Teklifler)</span>
-              </NuxtLink>
-              <button
-                v-else
-                type="button"
-                @click="openQuickBidModal(currentActiveTenderForSidebar)"
-                class="w-full py-2.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition cursor-pointer shadow-md shadow-blue-600/20 flex items-center justify-center gap-1.5"
-              >
-                <Send :size="13" />
-                <span>⚡ Bu İhaleye Teklif Ver</span>
-              </button>
-            </div>
-
-            <!-- Escrow Protection Badge -->
-            <div class="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200 space-y-1 text-left">
-              <div class="flex items-center gap-1.5 text-emerald-950 font-black text-xs">
-                <ShieldCheck :size="13" class="text-emerald-600" />
-                <span>Escrow Güvenli Havuz Koruması</span>
-              </div>
-              <p class="text-[9px] text-emerald-800 leading-snug">
-                Tüm teklifler ve hakedişler BDDK/TCMB onaylı hesaplarda bloke altında korunur.
-              </p>
-            </div>
-
-          </div>
-
-        </aside>
+        
 
 </div>
 </div>
