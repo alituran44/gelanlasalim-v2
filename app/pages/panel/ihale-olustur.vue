@@ -940,7 +940,7 @@ function resetFormAndCreateNew() {
             <button 
               type="button"
               @click="removeFile(index)"
-              class="p-1 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-slate-900 transition"
+              class="p-1 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-slate-900 transition cursor-pointer"
             >
               <X :size="14" />
             </button>
@@ -962,21 +962,11 @@ function resetFormAndCreateNew() {
       <!-- Gönder Butonu -->
       <div class="pt-2">
         <button 
-          v-if="isCompanyVerified"
           type="submit" 
-          class="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#0F223D] hover:bg-[#003057] text-white font-black text-sm py-4 transition shadow-xl cursor-pointer"
+          class="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#0F223D] hover:bg-[#003057] text-white font-black text-sm py-4 transition shadow-xl cursor-pointer hover:scale-[1.01] active:scale-[0.99]"
         >
           <FilePlus2 :size="16" class="text-emerald-400" />
-          İhaleyi Oluştur ve Admin Onayına Gönder
-        </button>
-        <button 
-          v-else
-          type="button" 
-          @click="handleSubmit"
-          class="w-full flex items-center justify-center gap-2 rounded-2xl bg-amber-700/80 hover:bg-amber-800 text-white font-black text-sm py-4 transition shadow-lg cursor-pointer"
-        >
-          <ShieldAlert :size="16" class="text-amber-300" />
-          Kurumsal Evrak Onayı Bekleniyor (İhale Başlatılamaz)
+          <span>İhaleyi Oluştur ve Admin Onayına Gönder</span>
         </button>
       </div>
 
