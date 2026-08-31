@@ -278,11 +278,43 @@ function openCompanyModal(companyName: string, tender?: any) {
   selectedCompanyForProfile.value = comp
 }
 
+function isMyOwnTender(tender: any): boolean {
+  if (!tender) return false
+  if (tender.isMine === true) return true
+
+  let session: any = {}
+  let myTenders: any[] = []
+  if (typeof window !== 'undefined') {
+    try {
+      session = JSON.parse(localStorage.getItem('userSession') || '{}')
+      myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+    } catch (e) {}
+  }
+
+  if (myTenders.some((mt: any) => mt.id === tender.id || (mt.baslik && mt.baslik.trim().toLowerCase() === (tender.baslik || '').trim().toLowerCase()))) {
+    return true
+  }
+
+  const currentEmail = (session.email || userSession.value?.email || '').trim().toLowerCase()
+  const tenderEmail = (tender.ownerEmail || '').trim().toLowerCase()
+  if (currentEmail && tenderEmail && currentEmail === tenderEmail) {
+    return true
+  }
+
+  const currentComp = (session.companyName || session.company || userSession.value?.companyName || userSession.value?.company || '').trim().toLowerCase()
+  const tenderComp = (tender.ownerCompany || '').trim().toLowerCase()
+  if (currentComp && tenderComp && currentComp === tenderComp) {
+    return true
+  }
+
+  return false
+}
+
+
 function openBidModal(tender: any) {
   // 1. Kendi İlanına Teklif Verme Engeli
-  const currentEmail = userSession.value?.email || ''
-  if (tender.isMine || (currentEmail && tender.ownerEmail === currentEmail)) {
-    alert(`⚠️ BU SİZİN KENDİ İLANINIZDIR:\n\n"${tender.baslik}" ihalesi sizin tarafınızdan açılmıştır. Kendi ihalelerinize teklif veremezsiniz.\n\nGelen teklifleri incelemek ve pazarlık yapmak için panelinizdeki "Gelen Teklifler" sayfasına gidebilirsiniz.`)
+  if (isMyOwnTender(tender)) {
+    alert(`🚫 KENDİ İLANINIZA TEKLİF VEREMEZSİNİZ!\n\n"${tender.baslik}" ihalesi sizin tarafınızdan açılmıştır.\n\nSistem kuralları gereği kendi açtığınız ihalelere teklif sunamazsınız.\n\nİhaleniz için gelen tedarikçi tekliflerini incelemek, değerlendirmek ve pazarlık yürütmek için lütfen "Gelen Teklifler" sayfasına gidiniz.`)
     return
   }
 
@@ -314,6 +346,11 @@ function openBidModal(tender: any) {
 }
 
 async function submitBid() {
+  if (isMyOwnTender(selectedTenderForBid.value)) {
+    alert('🚫 Kendi ilanınıza teklif veremezsiniz.')
+    showBidModal.value = false
+    return
+  }
   if (!bidForm.value.fiyat) {
     alert('Lütfen teklif fiyatınızı giriniz.')
     return
@@ -976,8 +1013,17 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             </div>
 
             <div class="flex items-center gap-2">
+              <NuxtLink
+                v-if="isMyOwnTender(tender)"
+                to="/panel/gelen-teklifler"
+                class="px-3.5 py-1.5 rounded bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                title="Bu sizin kendi ihale ilanınızdır"
+              >
+                <Building2 :size="12" class="text-amber-700" />
+                <span>👤 Kendi İlanınız</span>
+              </NuxtLink>
               <button
-                v-if="tender.durum !== 'closed' && tender.durum !== 'expired'"
+                v-else-if="tender.durum !== 'closed' && tender.durum !== 'expired'"
                 type="button"
                 @click="openBidModal(tender)"
                 class="px-4 py-1.5 rounded bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition flex items-center gap-1 cursor-pointer shadow-xs"
@@ -1432,8 +1478,16 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             >
               Kapat
             </button>
+            <NuxtLink
+              v-if="isMyOwnTender(selectedTenderForDetail)"
+              to="/panel/gelen-teklifler"
+              class="px-5 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-black text-xs transition flex items-center gap-1.5 cursor-pointer"
+            >
+              <Building2 :size="13" class="text-amber-700" />
+              <span>👤 Kendi İlanınız (Gelen Teklifleri Gör)</span>
+            </NuxtLink>
             <button
-              v-if="selectedTenderForDetail.durum !== 'closed' && selectedTenderForDetail.durum !== 'expired'"
+              v-else-if="selectedTenderForDetail.durum !== 'closed' && selectedTenderForDetail.durum !== 'expired'"
               @click="openBidModal(selectedTenderForDetail); selectedTenderForDetail = null"
               class="px-6 py-2.5 rounded-xl bg-[#0052FF] hover:bg-blue-600 text-white font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
             >

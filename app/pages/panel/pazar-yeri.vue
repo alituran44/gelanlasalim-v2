@@ -136,9 +136,47 @@ function openSpecModal(tender: any) {
   showSpecModal.value = true
 }
 
+function isMyOwnTender(tender: any): boolean {
+  if (!tender) return false
+  if (tender.isMine === true) return true
+
+  let session: any = {}
+  let myTenders: any[] = []
+  if (typeof window !== 'undefined') {
+    try {
+      session = JSON.parse(localStorage.getItem('userSession') || '{}')
+      myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+    } catch (e) {}
+  }
+
+  if (myTenders.some((mt: any) => mt.id === tender.id || (mt.baslik && mt.baslik.trim().toLowerCase() === (tender.baslik || '').trim().toLowerCase()))) {
+    return true
+  }
+
+  const currentEmail = (session.email || userSession.value?.email || '').trim().toLowerCase()
+  const tenderEmail = (tender.ownerEmail || '').trim().toLowerCase()
+  if (currentEmail && tenderEmail && currentEmail === tenderEmail) {
+    return true
+  }
+
+  const currentComp = (session.companyName || session.company || userSession.value?.companyName || userSession.value?.company || '').trim().toLowerCase()
+  const tenderComp = (tender.ownerCompany || '').trim().toLowerCase()
+  if (currentComp && tenderComp && currentComp === tenderComp) {
+    return true
+  }
+
+  return false
+}
+
+
 function openBidModal(tender: any) {
-  if (tender.durum === 'closed' || tender.durum === 'mutabakat' || tender.durum === 'anlasildi' || (tender.sure && (tender.sure.includes('Sonuçlandı') || tender.sure.includes('Mutabakat')))) {
-    alert(`⚠️ BU İHALEDE MUTABAKAT SAĞLANDI:\n\n"${tender.baslik}" ihalesinde alıcı ve tedarikçi arasında mutabakat sağlandığı için yeni teklif verilemez.\n\nİhale sahibi veya anlaşmalı tedarikçi mutabakatı iptal ederse ihale yeniden teklif alımına açılabilir.`)
+  if (isMyOwnTender(tender)) {
+    alert(`🚫 KENDİ İLANINIZA TEKLİF VEREMEZSİNİZ!\n\n"${tender.baslik}" ihalesi sizin tarafınızdan açılmıştır.\n\nSistem kuralları gereği kendi açtığınız ihalelere teklif sunamazsınız.\n\nİhaleniz için gelen teklifleri incelemek ve pazarlık yürütmek için lütfen panelinizdeki "Gelen Teklifler" sayfasına gidiniz.`)
+    return
+  }
+
+  if (tender.durum === 'closed' || tender.durum === 'mutabakat' || (tender.sure && tender.sure.includes('Sonuçlandı'))) {
+    alert(`⚠️ BU İHALEDE MUTABAKAT SAĞLANDI:\n\n"${tender.baslik}" ihalesinde mutabakat sağlandığı için yeni teklif verilemez.`)
     return
   }
 
@@ -151,7 +189,7 @@ function openBidModal(tender: any) {
     (b: any) => b.tenderId === tender.id || b.ilanBaslik === tender.baslik
   )
   if (existingBid) {
-    alert(`⚠️ DİKKAT: Bu ihaleye zaten daha önce ${existingBid.teklifFiyatim} tutarında bir teklif ilettiniz!\n\nLütfen mükerrer ayrı teklif açmak yerine panelinizdeki "Verdiğim Teklifler" sayfasından mevcut teklifinizi revize ediniz.`)
+    alert(`⚠️ DİKKAT: Bu ihaleye zaten daha önce ${existingBid.teklifFiyatim} tutarında bir teklif ilettiniz!`)
     return
   }
 
