@@ -14,47 +14,107 @@ import {
   CheckCheck, 
   Inbox, 
   MessageSquare, 
-  CheckCircle2 
+  CheckCircle2,
+  BellOff
 } from "lucide-vue-next"
 import { locale, detectLocale, setLocale } from '~/composables/useLocale'
+import { useCmsData } from '~/composables/useCmsData'
 
 const route = useRoute()
 const router = useRouter()
 const search = ref("")
 const showNotifDropdown = ref(false)
 const showUserMenu = ref(false)
+const { cmsData } = useCmsData()
 
-const notifications = ref([
-  {
-    id: 1,
-    title: 'Yeni Teklif Geldi ⚡',
-    desc: '10 KM Mıcır Yol Yapım İşi ihalesine 1.380.000 ₺ tutarında yeni teklif sunuldu.',
-    time: '5 dk önce',
-    unread: true,
-    to: '/panel/gelen-teklifler'
-  },
-  {
-    id: 2,
-    title: 'Karşı Teklif & Pazarlık 💬',
-    desc: 'Yazılım Geliştirme ihalesinde alıcı firma pazarlık mesajı iletti.',
-    time: '45 dk önce',
-    unread: true,
-    to: '/panel/yaptigim-teklifler'
-  },
-  {
-    id: 3,
-    title: 'NetGSM SMS İletildi 📱',
-    desc: 'Teklif onay ve sözleşme bilgilendirme SMS mesajı karşı tarafa iletildi.',
-    time: '2 saat önce',
-    unread: false,
-    to: '/panel/bildirimler'
+const userSession = ref<any>({})
+const readNotifs = ref<string[]>([])
+
+// Dynamically generate realistic notifications from actual user and system state
+const notifications = computed(() => {
+  const list: any[] = []
+  const currentEmail = (userSession.value?.email || '').trim().toLowerCase()
+  const compName = userSession.value?.companyName || userSession.value?.company || 'Kurumsal Hesabınız'
+
+  // 1. Check received bids on user's own tenders
+  const receivedGroups = cmsData.value?.dashboard?.receivedBids || []
+  receivedGroups.forEach((g: any) => {
+    (g.teklifler || []).forEach((tkf: any, idx: number) => {
+      const id = 'notif-bid-' + (tkf.id || idx) + '-' + g.id
+      list.push({
+        id,
+        title: '🎯 İhalenize Yeni Teklif Geldi',
+        desc: `"${g.baslik}" için ${tkf.firma} tarafından ${tkf.fiyat} teklif sunuldu.`,
+        time: tkf.tarih || 'Bugün',
+        unread: !readNotifs.value.includes(id),
+        to: '/panel/gelen-teklifler'
+      })
+    })
+  })
+
+  // 2. Check user's submitted bids
+  if (typeof window !== 'undefined') {
+    try {
+      const mySubmitted = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]')
+      mySubmitted.forEach((sb: any) => {
+        const id = 'notif-sub-' + sb.id
+        list.push({
+          id,
+          title: '⚡ Teklifiniz Alıcıya İletildi',
+          desc: `"${sb.tenderTitle || 'Satın Alma İhalesi'}" için ${sb.price} teklifiniz iletildi.`,
+          time: sb.submittedAt || 'Bugün',
+          unread: !readNotifs.value.includes(id),
+          to: '/panel/yaptigim-teklifler'
+        })
+      })
+    } catch (e) {}
   }
-])
+
+  // 3. User's active tenders
+  if (typeof window !== 'undefined') {
+    try {
+      const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+      myTenders.forEach((t: any) => {
+        const id = 'notif-tnd-' + t.id
+        list.push({
+          id,
+          title: '📄 İhale İlanınız Yayında',
+          desc: `"${t.baslik}" ihaleniz pazar yerinde yayına alındı.`,
+          time: t.olusturma || 'Bugün',
+          unread: !readNotifs.value.includes(id),
+          to: '/panel/ilanlarim'
+        })
+      })
+    } catch (e) {}
+  }
+
+  // 4. Default verified system welcome & security notification
+  if (list.length === 0) {
+    const id = 'notif-system-welcome'
+    list.push({
+      id,
+      title: '🛡️ Kurumsal Üyelik & Güvenli Havuz Aktif',
+      desc: `${compName} için 1 Ay %100 Ücretsiz B2B İhale ve Escrow koruması devrededir.`,
+      time: 'Şimdi',
+      unread: !readNotifs.value.includes(id),
+      to: '/panel/ayarlar?tab=sirket'
+    })
+  }
+
+  return list
+})
 
 const notifCount = computed(() => notifications.value.filter(n => n.unread).length)
 
 function markAllAsRead() {
-  notifications.value.forEach(n => n.unread = false)
+  notifications.value.forEach(n => {
+    if (!readNotifs.value.includes(n.id)) {
+      readNotifs.value.push(n.id)
+    }
+  })
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('topbar_read_notifs', JSON.stringify(readNotifs.value))
+  }
 }
 
 function handleLogout() {
@@ -66,14 +126,12 @@ function handleLogout() {
   router.push('/')
 }
 
-// Simulated user session — safe client-side loading
-const userSession = ref<any>({})
-
 onMounted(() => {
   detectLocale()
   if (typeof window !== 'undefined') {
     try {
       userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
+      readNotifs.value = JSON.parse(localStorage.getItem('topbar_read_notifs') || '[]')
     } catch {
       userSession.value = {}
     }
