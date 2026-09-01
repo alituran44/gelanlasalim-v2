@@ -23,8 +23,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const usercode = body.usercode || '8508408695'
-  const password = body.password || '••••••••'
-  const msgheader = body.msgheader || 'IHALECI'
+  const password = body.password || '0ZE3LG59'
+  const msgheader = body.msgheader || '8508408695'
   const cleanPhone = body.phone.replace(/[^0-9]/g, '')
 
   // NetGSM GSM format check (must start with 90 or 05)

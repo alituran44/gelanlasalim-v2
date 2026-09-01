@@ -26,8 +26,8 @@ const NETGSM_LOGS_KEY = 'netgsm_logs'
 export function useNetGsm() {
   const config = ref<NetGsmConfig>({
     usercode: '8508408695',
-    password: '••••••••',
-    msgheader: 'IHALECI',
+    password: '0ZE3LG59',
+    msgheader: '8508408695',
     apiUrl: 'https://api.netgsm.com.tr/sms/send/get',
     isActive: true,
     balanceCredits: 5000
