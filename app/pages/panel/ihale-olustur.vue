@@ -26,7 +26,8 @@ const form = ref({
   aciklama: '',
   sehir: 'Balıkesir',
   teslimatAdresi: '',
-  odemeYontemi: 'Vadeli 30 Gün',
+  odemeYontemi: '🛡️ İhaleciBurada Güvenli Emanet Havuz (Escrow - Mal Kabul Onaylı)',
+    faturaTuru: '🏢 Kurumsal E-Fatura (%20 KDV)',
   images: [] as { url: string; name: string }[],
   files: [] as { name: string; size: string; progress: number; type: string }[]
 })
@@ -195,12 +196,20 @@ const durations = [
 ]
 
 const paymentMethods = [
-  'Vadeli 30 Gün',
-  'Vadeli 60 Gün',
-  'Vadeli 90 Gün',
-  'Peşin Ödeme / Havale',
-  'Akreditif (L/C)',
-  'Mal Mukabili'
+  '🛡️ İhaleciBurada Güvenli Emanet Havuz (Escrow - Mal Kabul Onaylı)',
+  '🤝 Mal Tesliminde Peşin Banka Havalesi / EFT',
+  '📄 30 Gün Vadeli Ticari Çek / Havale',
+  '📄 60 Gün Vadeli Ticari Ödeme',
+  '📄 90 Gün Vadeli Kurumsal Ödeme',
+  '💳 3D Secure Kurumsal Kredi Kartı',
+  '🏛️ Akreditifli (L/C) Banka Teminatlı Ödeme'
+]
+
+const invoiceTypes = [
+  '🏢 Kurumsal E-Fatura (%20 KDV)',
+  '📑 Tevkifatlı E-Fatura (Satın Alma Türüne Göre)',
+  '🌱 KDV Muaf / İstisnalı Fatura',
+  '📄 Serbest Meslek Makbuzu / Hizmet Faturası'
 ]
 
 const hasDraft = ref(false)
@@ -697,7 +706,7 @@ function resetFormAndCreateNew() {
                 </span>
               </div>
               <p class="text-[11px] text-slate-600 leading-snug">
-                <strong>(Gizli Teklif Toplama):</strong> Teklifler son ana kadar gizli tutulur, süre bitiminde topluca değerlendirilir.
+                <strong>(Gizli Doğrudan Teklif Alma):</strong> Fiyatlar gizlidir. Tedarikçiler birbirinin fiyatını göremez, doğrudan sizin panelinize teklif sunarlar.
               </p>
             </div>
           </div>

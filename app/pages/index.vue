@@ -2243,6 +2243,16 @@ onMounted(() => {
                     <span class="truncate">{{ tender.ownerCompany || tender.authority || 'Kurumsal Satın Alma Masası' }}</span>
                   </button>
 
+                  <!-- 💳 Ödeme & Fatura Özeti Rozetleri -->
+                  <div class="flex items-center gap-1 flex-wrap text-[9px] text-slate-500 font-medium">
+                    <span v-if="tender.odemeYontemi" class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 truncate max-w-[130px]" :title="tender.odemeYontemi">
+                      💳 {{ tender.odemeYontemi.split('(')[0] }}
+                    </span>
+                    <span v-if="tender.faturaTuru" class="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 truncate max-w-[120px]" :title="tender.faturaTuru">
+                      📄 {{ tender.faturaTuru.split('(')[0] }}
+                    </span>
+                  </div>
+
                   <!-- ⚡ Canlı Lider Teklif Şeridi -->
                   <div 
                     v-if="getTenderBidsList(tender).length > 0"
