@@ -79,6 +79,16 @@ function getBidRankStatus(bid: any) {
 const userSession = ref<any>({})
 
 onMounted(() => {
+    // Clean deleted tenders from mySubmittedBids and myBids
+    try {
+      const activeTenderIds = new Set((cmsData.value?.dashboard?.tenders || []).map((t: any) => t.id))
+      const stored = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]')
+      const validStored = stored.filter((s: any) => activeTenderIds.has(s.tenderId) || !s.tenderId?.startsWith('IHC-'))
+      if (validStored.length !== stored.length) {
+        localStorage.setItem('mySubmittedBids', JSON.stringify(validStored))
+      }
+    } catch (e) {}
+
   if (typeof window !== 'undefined') {
     try {
       userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
@@ -165,6 +175,37 @@ const showReviewModal = ref(false)
 const reviewBuyer = ref<any>(null)
 const reviewRating = ref(5)
 const reviewComment = ref('')
+
+function deleteBid(bid: any) {
+  if (!bid) return
+  const confirmDel = confirm(`⚠️ "${bid.ilanBaslik}" ihalesine verdiğiniz ${bid.teklifFiyatim} tutarındaki teklifi geri çekmek / silmek istiyor musunuz?`)
+  if (!confirmDel) return
+
+  if (typeof window !== 'undefined') {
+    try {
+      const stored = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]').filter((b: any) => b.id !== bid.id)
+      localStorage.setItem('mySubmittedBids', JSON.stringify(stored))
+      const myBids = JSON.parse(localStorage.getItem('myBids') || '[]').filter((b: any) => b.id !== bid.id)
+      localStorage.setItem('myBids', JSON.stringify(myBids))
+      window.dispatchEvent(new Event('storage'))
+    } catch (e) {}
+  }
+
+  if (cmsData.value?.dashboard?.submittedBids) {
+    cmsData.value.dashboard.submittedBids = cmsData.value.dashboard.submittedBids.filter((b: any) => b.id !== bid.id)
+  }
+
+  if (cmsData.value?.dashboard?.receivedBids) {
+    cmsData.value.dashboard.receivedBids.forEach((g: any) => {
+      if (g.teklifler) {
+        g.teklifler = g.teklifler.filter((t: any) => t.id !== bid.id)
+      }
+    })
+  }
+
+  saveCmsData(cmsData.value)
+  alert('✓ Teklifiniz başarıyla geri çekildi / silindi.')
+}
 
 function openReviseModal(bid: any) {
   selectedBidForRevise.value = bid
@@ -586,6 +627,15 @@ function submitReview() {
                 >
                   <RotateCw :size="12" />
                   <span>Teklifi Güncelle / Revize Et</span>
+                </button>
+                <button
+                  type="button"
+                  @click="deleteBid(teklif)"
+                  class="rounded-xl px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition flex items-center gap-1 cursor-pointer border border-red-200"
+                  title="Teklifi Geri Çek / Sil"
+                >
+                  <Trash2 :size="12" />
+                  <span>Geri Çek / Sil</span>
                 </button>
               </template>
 
