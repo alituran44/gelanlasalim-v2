@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight, Lock, Clock, CheckCircle2, AlertCircle } from 'lucide-vue-next'
+import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight, Lock, Clock, CheckCircle2, AlertCircle, Trash2 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale } from '~/composables/useLocale'
 
@@ -69,14 +69,30 @@ const userSession = ref<any>({})
 
 const tendersList = computed(() => {
   const currentEmail = (userSession.value?.email || '').trim().toLowerCase()
+  const currentComp = (userSession.value?.companyName || userSession.value?.company || '').trim().toLowerCase()
   const cmsList = cmsData.value?.dashboard?.tenders || []
-  
-  if (!currentEmail) return []
+  let localList: any[] = []
+  if (typeof window !== 'undefined') {
+    try {
+      localList = JSON.parse(localStorage.getItem('myTenders') || '[]')
+    } catch (e) {}
+  }
 
-  return cmsList.filter((t: any) => {
-    const ownerEmail = (t.ownerEmail || '').trim().toLowerCase()
-    return ownerEmail && ownerEmail === currentEmail
+  const map = new Map<string, any>()
+  localList.forEach(item => {
+    if (item && item.id) map.set(item.id, item)
   })
+  cmsList.forEach(item => {
+    if (item && item.id) {
+      const ownerEmail = (item.ownerEmail || '').trim().toLowerCase()
+      const ownerComp = (item.ownerCompany || '').trim().toLowerCase()
+      if (!currentEmail || ownerEmail === currentEmail || (currentComp && ownerComp === currentComp)) {
+        map.set(item.id, item)
+      }
+    }
+  })
+
+  return Array.from(map.values())
 })
 
 const filteredTenders = computed(() => {
@@ -124,7 +140,8 @@ function republishTender(tender: any) {
 }
 
 function deleteTender(tender: any) {
-  const confirmDelete = confirm(`⚠️ DİKKAT: "${tender.baslik}" ihalesini ve bu ihaleye ait tüm teklif kayıtlarını sistemden tamamen silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.`)
+  if (!tender || !tender.id) return
+  const confirmDelete = confirm(`⚠️ DİKKAT: "${tender.baslik}" (#${tender.id}) ihalesini ve buna bağlı tüm teklif kayıtlarını sistemden kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.`)
   if (!confirmDelete) return
 
   // 1. Remove from cmsData dashboard tenders
@@ -152,9 +169,14 @@ function deleteTender(tender: any) {
     } catch (e) {}
   }
 
+  // 4. Update local reactive state
+  localTendersState.value = localTendersState.value.filter(
+    (t: any) => t.id !== tender.id && t.baslik !== tender.baslik
+  )
+
   saveCmsData(cmsData.value)
   reloadTenders()
-  alert(`🗑️ İhale Başarıyla Silindi!\n\n"${tender.baslik}" ihalesi ve bağlantılı verileri platformdan kaldırılmıştır.`)
+  alert(`🗑️ İhale Başarıyla Silindi!\n\n"${tender.baslik}" ihalesi sistemden ve pazar yerinden kalıcı olarak kaldırılmıştır.`)
 }
 
 function cancelTenderAgreement(tender: any) {
@@ -404,6 +426,16 @@ const statusTabs = computed(() => {
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5 lg:justify-end border-t lg:border-t-0 pt-3 lg:pt-0">
+          <!-- 🗑️ Belirgin Kırmızı İhaleyi Sil Butonu -->
+          <button 
+            type="button" 
+            @click.stop="deleteTender(tender)" 
+            class="px-3.5 py-2 rounded-xl text-xs font-black text-white bg-red-600 hover:bg-red-700 active:bg-red-800 transition shadow-sm flex items-center gap-1.5 cursor-pointer"
+            title="İhaleyi ve Teklifleri Kalıcı Olarak Sil"
+          >
+            <Trash2 :size="13" class="text-white" />
+            <span>İhaleyi Sil</span>
+          </button>
           <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
             {{ tender.teklifSayisi }} {{ 'Teklif Alındı' }}
           </span>
