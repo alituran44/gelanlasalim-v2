@@ -15,6 +15,7 @@ const { fetchTrHolidays, trPublicHolidays } = usePublicApis()
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const imageInputRef = ref<HTMLInputElement | null>(null)
 
+const isBudgetUnspecified = ref(true)
 const form = ref({
   ihaleYonu: 'kapali_zarf', // 'kapali_zarf' (Doğrudan Teklif Alma) | 'eksiltme' (Azaltımlı / Alım) | 'artirma' (Artırımlı / Satış)
   baslik: '',
@@ -373,13 +374,15 @@ function handleSubmit() {
       form.value.baslik = `${form.value.kategori || 'Kurumsal Satın Alma'} - ${subCat} Tedarik Talebi`
     }
 
-    // 2. Format Budget as single clean amount (no ranges)
-    let budgetVal = 'Teklif Usulü (Açık İhale)'
-    const rawAmt = form.value.butce || form.value.maxButce || form.value.minButce
-    if (rawAmt) {
-      const cleanNum = parseInt(String(rawAmt).replace(/\D/g, '')) || 0
-      if (cleanNum > 0) {
-        budgetVal = Number(cleanNum).toLocaleString('tr-TR') + ' ₺'
+    // 2. Format Budget (Optional - Default: Teklif Usulü)
+    let budgetVal = '💬 Teklif Usulü (Tedarikçilerden Fiyat Bekleniyor)'
+    if (!isBudgetUnspecified.value) {
+      const rawAmt = form.value.butce || form.value.maxButce || form.value.minButce
+      if (rawAmt) {
+        const cleanNum = parseInt(String(rawAmt).replace(/\D/g, '')) || 0
+        if (cleanNum > 0) {
+          budgetVal = Number(cleanNum).toLocaleString('tr-TR') + ' ₺'
+        }
       }
     }
 

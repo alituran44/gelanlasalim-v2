@@ -536,10 +536,12 @@ function getTenderImage(tender: any): string {
 // ==================== 7. CANLI VERİLERİ BİRLEŞTİRME ====================
 
 function formatTenderBudget(raw: any): string {
-  if (!raw) return 'Açık Eksiltme'
+  if (!raw) return '💬 Teklif Usulü (Fiyat Bekleniyor)'
   const str = String(raw).trim()
+  if (str.toLowerCase().includes('teklif') || str.toLowerCase().includes('belirtilmedi') || str.toLowerCase().includes('bekleniyor')) {
+    return '💬 Teklif Usulü (Fiyat Bekleniyor)'
+  }
   if (str.includes('-')) {
-    // If range like 50000 ₺ - 150000 ₺, extract the clean single target budget
     const parts = str.split('-')
     const maxPart = parts[parts.length - 1]
     const cleanNum = parseInt(maxPart.replace(/\D/g, '')) || 0
@@ -551,7 +553,7 @@ function formatTenderBudget(raw: any): string {
   if (cleanNum > 0) {
     return Number(cleanNum).toLocaleString('tr-TR') + ' ₺'
   }
-  return str.includes('₺') ? str : (str || 'Açık Eksiltme')
+  return str.includes('₺') ? str : '💬 Teklif Usulü'
 }
 
 function getTenderDirectionBadge(tender: any) {
