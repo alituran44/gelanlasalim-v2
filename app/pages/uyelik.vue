@@ -28,6 +28,18 @@ import { locale, detectLocale, t } from '~/composables/useLocale'
 const route = useRoute()
 const router = useRouter()
 const activeTab = ref<'login' | 'register' | 'forgot'>('register')
+const authToastMessage = ref('')
+const showAuthToast = ref(false)
+const authToastType = ref<'success' | 'info' | 'error'>('success')
+
+function triggerAuthToast(msg: string, type: 'success' | 'info' | 'error' = 'success') {
+  authToastMessage.value = msg
+  authToastType.value = type
+  showAuthToast.value = true
+  setTimeout(() => {
+    showAuthToast.value = false
+  }, 4000)
+}
 const showCookieConsent = ref(true)
 const registerStep = ref<1 | 2>(1)
 
@@ -385,6 +397,7 @@ function handleOAuth(provider = 'google') {
               const user = await res.json()
               const cleanEmail = (user.email || '').trim().toLowerCase()
               const accounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
+              const isAlreadyRegistered = !!accounts[cleanEmail]
               
               let userAccount = accounts[cleanEmail]
               if (!userAccount) {
@@ -413,6 +426,19 @@ function handleOAuth(provider = 'google') {
               registerToAdminKycQueue(userAccount)
               window.dispatchEvent(new Event('storage'))
               isSubmitting.value = false
+
+              if (activeTab.value === 'register') {
+                if (isAlreadyRegistered) {
+                  alert(`ℹ️ HESAP ZATEN KAYITLI\n\n"${cleanEmail}" Google hesabı ile sistemde zaten kayıtlı bir üyeliğiniz bulunmaktadır.\n\nMevcut hesabınızla güvenli giriş yapıldı ve yönetim panelinize yönlendiriliyorsunuz.`)
+                } else {
+                  alert(`🎉 GOOGLE İLE YENİ ÜYELİK OLUŞTURULDU\n\n"${cleanEmail}" Google hesabınızla 1 ay ücretsiz kurumsal üyeliğiniz başarıyla açıldı. Hoş geldiniz!`)
+                }
+              } else {
+                if (!isAlreadyRegistered) {
+                  alert(`✨ YENİ GOOGLE HESABI OLUŞTURULDU\n\n"${cleanEmail}" Google hesabınızla ilk kez giriş yaptığınız için hesabınız otomatik oluşturuldu.`)
+                }
+              }
+
               router.push('/panel')
               return
             } catch (err) {
@@ -449,6 +475,7 @@ function fallbackGoogleLogin() {
     const formattedName = rawUsername.charAt(0).toUpperCase() + rawUsername.slice(1)
     const accounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
 
+    const isAlreadyRegistered = !!accounts[cleanEmail]
     let userAccount = accounts[cleanEmail]
     if (!userAccount) {
       userAccount = {
@@ -473,6 +500,15 @@ function fallbackGoogleLogin() {
     localStorage.setItem('userSession', JSON.stringify(userAccount))
     registerToAdminKycQueue(userAccount)
     window.dispatchEvent(new Event('storage'))
+
+    if (activeTab.value === 'register') {
+      if (isAlreadyRegistered) {
+        alert(`ℹ️ HESAP ZATEN KAYITLI\n\n"${cleanEmail}" adresiyle sistemde zaten kayıtlı bir üyelik bulunmaktadır.\n\nMevcut hesabınızla güvenli oturum açıldı ve yönetim panelinize aktarılıyorsunuz.`)
+      } else {
+        alert(`🎉 YENİ KURUMSAL ÜYELİK\n\n"${cleanEmail}" adresiyle 1 ay ücretsiz kurumsal üyeliğiniz başarıyla açıldı.`)
+      }
+    }
+
     router.push('/panel')
   }, 500)
 }
