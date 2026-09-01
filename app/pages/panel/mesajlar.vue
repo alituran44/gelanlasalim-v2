@@ -56,7 +56,7 @@ function loadChats() {
         tenderId: queryTenderId || 'IHC-' + Date.now(),
         tender: queryTenderTitle || (queryTenderId ? `İhale (${queryTenderId})` : 'Kurumsal Satın Alma İhalesi'),
         company: compName,
-        buyerCompany: 'Ali Turan San. Tic. A.Ş.',
+        buyerCompany: userSession.value?.companyName || 'Kurumsal Alıcı Firma',
         initial: compName.charAt(0).toUpperCase(),
         status: 'online',
         orderCode: queryOrderCode || 'SIP-2026-' + Math.floor(1000 + Math.random() * 9000),

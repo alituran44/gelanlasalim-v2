@@ -306,7 +306,7 @@ const membershipPricingGlobalUSD = [
 const profileForm = ref({
   name: 'Ali',
   surname: 'Turan',
-  username: 'Ali Turan',
+  username: '',
   email: 'alituran88@gmail.com',
   phone: '5437340860',
   title: 'Yönetici'
@@ -423,10 +423,10 @@ const filteredAvailableSectors = computed(() => {
 })
 
 const companyForm = ref({
-  name: 'Ali Turan Sanayi ve Ticaret Ltd. Şti.',
-  legalName: 'Ali Turan Sanayi ve Ticaret Anonim Şirketi',
+  name: '',
+  legalName: '',
   description: 'Şirketimiz ambalaj, oluklu mukavva koli, inşaat malzemeleri ve lojistik tedarik alanında kurumsal müşterilere toptan imalat ve tedarik hizmeti sunmaktadır.',
-  contactPerson: 'Ali Turan',
+  contactPerson: '',
   phone: '0850 840 86 95',
   email: 'ihalecib@gmail.com',
   tcKimlik: '12345678901',
@@ -439,7 +439,7 @@ const companyForm = ref({
   faturaAdresi: 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale',
   city: 'Çanakkale',
   iban: 'TR56 0006 2000 0001 2345 6789 01',
-  accountHolder: 'Ali Turan',
+  accountHolder: '',
   is2FaEnabled: true
 })
 
@@ -741,7 +741,7 @@ function resetPreferences() {
 const activeAddressType = ref<'teslimat' | 'fatura'>('teslimat')
 const addresses = ref([
   { id: 1, type: 'teslimat', title: 'Merkez Ofis Depo', address: 'İsmet Paşa Mah. Çanakkale', city: 'Merkez / Çanakkale', zip: '17100', isDefault: true },
-  { id: 2, type: 'fatura', title: 'Ali Turan Şahıs Şirketi', address: '17100 Çanakkale İsmet Paşa Mah. Merkez Çanakkale', city: 'Merkez / Çanakkale', zip: '17100', isDefault: true }
+  { id: 2, type: 'fatura', title: 'Merkez Şirket Adresi', address: '17100 Çanakkale İsmet Paşa Mah. Merkez Çanakkale', city: 'Merkez / Çanakkale', zip: '17100', isDefault: true }
 ])
 
 function deleteAddress(id: number) {
@@ -1270,7 +1270,7 @@ function saveProfile() {
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label class="block text-[10px] font-black text-blue-600 uppercase mb-1">Giriş / Görünen Kullanıcı Adı</label>
-                <input v-model="profileForm.username" type="text" placeholder="Örn: Ali Turan" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-bold text-slate-900 focus:border-blue-500" style="border-color: #CBD5E1;" />
+                <input v-model="profileForm.username" type="text" placeholder="Adınız ve Soyadınız" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-bold text-slate-900 focus:border-blue-500" style="border-color: #CBD5E1;" />
               </div>
               <div>
                 <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Yetkili İsim</label>
@@ -2928,15 +2928,15 @@ function saveProfile() {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span class="text-[8px] font-black text-slate-300 block">AD SOYAD</span>
-                <span class="text-slate-700 font-bold block mt-1">Ali Turan</span>
+                <span class="text-slate-700 font-bold block mt-1">{{ profileForm.name || userSession?.name || userSession?.firstName || 'Kurumsal Kullanıcı' }} {{ profileForm.surname || userSession?.lastName || '' }}</span>
               </div>
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span class="text-[8px] font-black text-slate-300 block">E-POSTA ADRESİ</span>
-                <span class="font-mono text-slate-700 block mt-1">alituran88@gmail.com</span>
+                <span class="font-mono text-slate-700 block mt-1">{{ profileForm.email || userSession?.email || 'tanımlı değil' }}</span>
               </div>
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span class="text-[8px] font-black text-slate-300 block">UNVAN</span>
-                <span class="text-slate-700 font-bold block mt-1">Yönetici</span>
+                <span class="text-slate-700 font-bold block mt-1">{{ profileForm.title || userSession?.title || userSession?.role || 'Şirket Yetkilisi' }}</span>
               </div>
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span class="text-[8px] font-black text-slate-300 block">İLETİŞİM DURUMU</span>

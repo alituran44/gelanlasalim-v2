@@ -23,7 +23,7 @@ const router = useRouter()
 const currentStep = ref<1 | 2 | 3 | 4>(1)
 
 // Step 1: Şirket Bilgileri
-const firmaUnvani = ref('Ali Turan')
+const firmaUnvani = ref('')
 const firmaTuru = ref('Şahıs İşletmesi')
 const vergiNo = ref('43624665040')
 const vergiDairesi = ref('Çanakkale Vergi Dairesi Müdürlüğü')

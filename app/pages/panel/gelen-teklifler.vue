@@ -229,12 +229,12 @@ async function acceptTeklif(teklif: any, ilan: any) {
       userSession = JSON.parse(localStorage.getItem('userSession') || '{}')
     } catch (e) {}
   }
-  const buyerCompanyName = userSession.companyName || userSession.company || 'Ali Turan Sanayi A.Ş.'
+  const buyerCompanyName = userSession.companyName || userSession.company || 'Kurumsal Alıcı Masası'
 
   const matchingSubmitted = (cmsData.value.dashboard.submittedBids || []).find((b: any) => b.id === teklif.id)
   if (matchingSubmitted) {
     matchingSubmitted.durum = 'onaylandi'
-    matchingSubmitted.yetkili = userSession.name || 'Ali Turan (Alıcı Yetkilisi)'
+    matchingSubmitted.yetkili = userSession.name || 'Alıcı Yetkilisi'
     matchingSubmitted.telefon = userSession.phone || '0850 840 86 95'
     matchingSubmitted.eposta = userSession.email || 'ihalecib@gmail.com'
     matchingSubmitted.vergiDairesi = userSession.taxOffice ? `${userSession.taxOffice} / ${userSession.taxNo || ''}` : 'Çanakkale V.D. / 4700854210'

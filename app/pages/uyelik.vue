@@ -486,7 +486,7 @@ function handleEDevletAuth() {
       localStorage.setItem('userSession', JSON.stringify({
         email: 'edevlet_onayli@ihaleciburada.com',
         firstName: 'Ali',
-        name: 'Ali Turan (e-Devlet & MERSİS Onaylı)',
+        name: (form.value.name || form.value.firstName || 'Kurumsal Üye') + ' (e-Devlet & MERSİS Onaylı)',
         company: 'Turan Lojistik San. A.Ş.',
         role: 'company',
         verified: true,
@@ -535,8 +535,8 @@ function handleLogin() {
       pendingUserSession.value = {
         email: loginEmail.value,
         firstName: currentSession.firstName || 'Ali',
-        name: currentSession.name || 'Ali Turan',
-        username: currentSession.username || 'Ali Turan',
+        name: currentSession.name || currentSession.firstName || form.value.name || 'Kurumsal Üye',
+        username: currentSession.username || currentSession.name || 'kullanici',
         company: currentSession.company || '',
         companyName: currentSession.companyName || '',
         role: currentSession.role || 'company',
@@ -568,7 +568,7 @@ function handleLogin() {
       const sessionObj = {
         email: loginEmail.value,
         firstName: currentSession.firstName || 'Ali',
-        name: currentSession.name || 'Ali Turan',
+        name: currentSession.name || currentSession.firstName || form.value.name || 'Kurumsal Üye',
         username: currentSession.username || (loginEmail.value.split('@')[0]),
         company: currentSession.company || '',
         companyName: currentSession.companyName || '',

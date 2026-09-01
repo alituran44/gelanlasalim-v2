@@ -230,7 +230,7 @@ const bidForm = ref({
   fiyat: '',
   sure: '7 gün',
   notum: '',
-  firmaAdi: 'Ali Turan Sanayi ve Ticaret A.Ş.'
+  firmaAdi: userSession.value?.companyName || 'Kurumsal Tedarikçi'
 })
 
 onMounted(() => {
@@ -530,7 +530,7 @@ async function submitBid() {
   const newBidId = 'TKF-' + Math.floor(100 + Math.random() * 900)
 
   const myCompanyName = userSession.value.companyName || userSession.value.company || bidForm.value.firmaAdi || 'Yetkili Firma'
-  const myContact = userSession.value.name || userSession.value.firstName || 'Ali Turan'
+  const myContact = userSession.value?.name || userSession.value?.firstName || 'Firma Yetkilisi'
   const myPhone = userSession.value.phone || '0850 840 86 95'
   const myEmail = userSession.value.email || 'ihalecib@gmail.com'
   const myTax = userSession.value.taxOffice ? `${userSession.value.taxOffice} / ${userSession.value.taxNo || ''}` : 'Çanakkale V.D. 4700854210'

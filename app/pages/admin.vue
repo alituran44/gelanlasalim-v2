@@ -735,8 +735,8 @@ function syncLiveEscrowOrders() {
               orderCode: 'SIP-2026-' + Math.floor(1000 + Math.random() * 9000),
               tenderId: group.id,
               tenderTitle: group.baslik,
-              buyerCompany: group.ownerCompany || 'Ali Turan San. Tic. A.Ş.',
-              buyerFirm: group.ownerCompany || 'Ali Turan San. Tic. A.Ş.',
+              buyerCompany: group.ownerCompany || 'Kurumsal Alıcı Firma',
+              buyerFirm: group.ownerCompany || 'Kurumsal Alıcı Firma',
               supplierCompany: approvedBid.firma,
               supplierFirm: approvedBid.firma,
               totalAmount: approvedBid.fiyat,
@@ -2382,8 +2382,8 @@ function removeSubmittedBid(index: number) {
                         <div class="text-[10px] text-blue-500 font-mono font-bold">{{ order.orderCode || order.id }}</div>
                       </td>
                       <td class="p-3.5">
-                        <div><strong>Alıcı:</strong> {{ order.buyerCompany || order.buyerFirm || 'Ali Turan San. Tic. A.Ş.' }}</div>
-                        <div class="text-slate-500"><strong>Tedarikçi:</strong> {{ order.supplierCompany || order.supplierFirm || 'Ata Akademi San. Tic. A.Ş.' }}</div>
+                        <div><strong>Alıcı:</strong> {{ order.buyerCompany || order.buyerFirm || 'Kurumsal Alıcı Firma' }}</div>
+                        <div class="text-slate-500"><strong>Tedarikçi:</strong> {{ order.supplierCompany || order.supplierFirm || 'Kurumsal Tedarikçi Firma' }}</div>
                       </td>
                       <td class="p-3.5 font-mono font-black text-emerald-600 text-sm">
                         {{ order.totalAmount || order.amount }}

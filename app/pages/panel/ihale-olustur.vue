@@ -414,8 +414,8 @@ function handleSubmit() {
       } catch (e) {}
     }
     const ownerEmail = (session.email || 'ihalecib@gmail.com').trim().toLowerCase()
-    const ownerName = session.name || session.firstName || 'Ali Turan'
-    const ownerCompany = session.companyName || session.company || 'Ali Turan Sanayi A.Ş.'
+    const ownerName = session.name || session.firstName || session.name || 'Şirket Yetkilisi'
+    const ownerCompany = session.companyName || session.company || session.companyName || session.company || 'Kurumsal Şirket'
 
     const tenderObject = {
       id: newId,

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { 
   TrendingUp, 
   RotateCw, 
@@ -16,10 +16,20 @@ definePageMeta({
   layout: "dashboard"
 })
 
+const userSession = ref<any>({})
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    try {
+      userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+  }
+})
+
 const activeSorgu = ref<'ihale' | 'tedarikci'>('ihale')
 const activePeriod = ref<'30gun' | '7gun' | '90gun' | '1yil'>('30gun')
 const kiyasToggle = ref(true)
-const userName = ref('Ali Turan')
+const userName = computed(() => userSession.value?.name || userSession.value?.firstName || 'Kurumsal Yetkili')
 </script>
 
 <template>
