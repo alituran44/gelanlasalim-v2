@@ -16,7 +16,7 @@ const fileInputRef = ref<HTMLInputElement | null>(null)
 const imageInputRef = ref<HTMLInputElement | null>(null)
 
 const form = ref({
-  ihaleYonu: 'eksiltme', // 'eksiltme' (Azaltımlı / Alım) | 'artirma' (Artırımlı / Satış) | 'kapali_zarf' (Kapalı Zarf)
+  ihaleYonu: 'kapali_zarf', // 'kapali_zarf' (Doğrudan Teklif Alma) | 'eksiltme' (Azaltımlı / Alım) | 'artirma' (Artırımlı / Satış)
   baslik: '',
   kategori: 'İnşaat ve Yapı',
   sure: '7 gün',
@@ -653,7 +653,26 @@ function resetFormAndCreateNew() {
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
-            <!-- 1. Açık Eksiltme / Azaltımlı -->
+            <!-- 1. Doğrudan Teklif Alma / Kapalı Zarf Usulü (KULLANICI TALEBİ: BAŞTA) -->
+            <div 
+              @click="form.ihaleYonu = 'kapali_zarf'"
+              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
+              :class="form.ihaleYonu === 'kapali_zarf' ? 'border-purple-600 bg-purple-50/50 shadow-xs ring-2 ring-purple-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-black text-xs flex items-center gap-1.5" :class="form.ihaleYonu === 'kapali_zarf' ? 'text-purple-900' : 'text-slate-800'">
+                  <span>📑 Doğrudan Teklif Alma (Kapalı Zarf)</span>
+                </span>
+                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.ihaleYonu === 'kapali_zarf' ? 'border-purple-600 bg-purple-600 text-white text-[10px]' : 'border-slate-300'">
+                  <span v-if="form.ihaleYonu === 'kapali_zarf'">✓</span>
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-snug">
+                <strong>(Gizli Doğrudan Teklif Toplama):</strong> Fiyatlar gizlidir. Tedarikçiler birbirinin fiyatını göremez; doğrudan sizin panelinize teklif sunarlar.
+              </p>
+            </div>
+
+            <!-- 2. Açık Eksiltme / Azaltımlı -->
             <div 
               @click="form.ihaleYonu = 'eksiltme'"
               class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
@@ -672,7 +691,7 @@ function resetFormAndCreateNew() {
               </p>
             </div>
 
-            <!-- 2. Açık Artırma / Artırımlı -->
+            <!-- 3. Açık Artırma / Artırımlı -->
             <div 
               @click="form.ihaleYonu = 'artirma'"
               class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
@@ -688,25 +707,6 @@ function resetFormAndCreateNew() {
               </div>
               <p class="text-[11px] text-slate-600 leading-snug">
                 <strong>(Fiyat Artırımlı - Satış):</strong> Satıcı sizsiniz. Teklif verenler en yüksek fiyatı sunmak için yukarı yönlü yarışır.
-              </p>
-            </div>
-
-            <!-- 3. Kapalı Zarf Usulü -->
-            <div 
-              @click="form.ihaleYonu = 'kapali_zarf'"
-              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
-              :class="form.ihaleYonu === 'kapali_zarf' ? 'border-purple-600 bg-purple-50/50 shadow-xs ring-2 ring-purple-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
-            >
-              <div class="flex items-center justify-between">
-                <span class="font-black text-xs flex items-center gap-1.5" :class="form.ihaleYonu === 'kapali_zarf' ? 'text-purple-900' : 'text-slate-800'">
-                  <span>📑 Kapalı Zarf Usulü</span>
-                </span>
-                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.ihaleYonu === 'kapali_zarf' ? 'border-purple-600 bg-purple-600 text-white text-[10px]' : 'border-slate-300'">
-                  <span v-if="form.ihaleYonu === 'kapali_zarf'">✓</span>
-                </span>
-              </div>
-              <p class="text-[11px] text-slate-600 leading-snug">
-                <strong>(Gizli Doğrudan Teklif Alma):</strong> Fiyatlar gizlidir. Tedarikçiler birbirinin fiyatını göremez, doğrudan sizin panelinize teklif sunarlar.
               </p>
             </div>
           </div>
