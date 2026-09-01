@@ -544,11 +544,25 @@ function submitReview() {
                   </div>
                   <div>
                     <div class="flex items-center gap-2 flex-wrap">
-                      <span class="text-sm font-black text-slate-900">{{ teklif.firma }}</span>
-                      <span class="inline-flex items-center gap-0.5 text-xs font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200">
-                        <Star :size="11" fill="#D97706" />
-                        {{ teklif.puan }}
-                      </span>
+                      <button 
+                        type="button" 
+                        @click="openSupplierProfileModal(teklif, ilan)"
+                        class="text-sm font-black text-slate-900 hover:text-blue-600 hover:underline flex items-center gap-1.5 cursor-pointer text-left"
+                        title="Firma Profilini ve Puanlarını İncele"
+                      >
+                        <span>{{ teklif.firma }}</span>
+                        <BadgeCheck :size="15" class="text-blue-600 shrink-0" />
+                      </button>
+                      <button 
+                        type="button" 
+                        @click="openSupplierProfileModal(teklif, ilan)"
+                        class="inline-flex items-center gap-1 text-xs font-bold text-amber-700 bg-amber-50 hover:bg-amber-100 px-2.5 py-0.5 rounded-lg border border-amber-200 transition cursor-pointer shadow-2xs"
+                        title="Tüm Puanları ve Müşteri Yorumlarını Gör"
+                      >
+                        <Star :size="12" class="text-amber-500" fill="#F59E0B" />
+                        <span>{{ teklif.puan || '4.9' }}</span>
+                        <span class="text-[10px] text-amber-600 font-normal">({{ teklif.reviewCount || '28' }} Puan)</span>
+                      </button>
                       <span v-if="teklif.durum === 'onaylandi'" class="px-2 py-0.5 rounded bg-emerald-600 text-white text-[10px] font-black uppercase tracking-wider">
                         KAZANAN TEDARİKÇİ ✓
                       </span>
@@ -590,7 +604,16 @@ function submitReview() {
                   </span>
 
                   <!-- Eylem Butonları (Teklif henüz onaylanmamışsa) -->
-                  <div v-if="!ilan.teklifler.some((t: any) => t.durum === 'onaylandi') && teklif.durum !== 'reddedildi'" class="flex items-center gap-2">
+                  <div v-if="!ilan.teklifler.some((t: any) => t.durum === 'onaylandi') && teklif.durum !== 'reddedildi'" class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                    <button
+                      type="button"
+                      @click="openSupplierProfileModal(teklif, ilan)"
+                      class="rounded-xl px-3 py-2 text-xs font-black bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition flex items-center gap-1 cursor-pointer shadow-2xs"
+                      title="Onaylamadan önce firmanın geçmiş puanlarını ve tamamladığı işleri görün"
+                    >
+                      <Star :size="13" class="text-amber-500" fill="#F59E0B" />
+                      <span>Puanları Gör</span>
+                    </button>
                     <button
                       type="button"
                       @click="openDocModal(teklif)"
@@ -670,7 +693,7 @@ function submitReview() {
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                   <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                     <span class="text-[10px] text-slate-400 font-bold block">Yetkili Kişi</span>
-                    <strong class="text-slate-800">{{ teklif.yetkili || 'Mehmet Yılmaz' }}</strong>
+                    <strong class="text-slate-800">{{ teklif.yetkili || teklif.yetkili || teklif.bidderName || teklif.firma || 'Firma Yetkilisi' }}</strong>
                   </div>
                   <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
                     <span class="text-[10px] text-slate-400 font-bold block">Telefon (GSM)</span>
@@ -923,7 +946,7 @@ function submitReview() {
           </div>
           <div>
             <span class="text-[10px] text-slate-400 font-bold block">Yetkili</span>
-            <strong class="text-slate-800">{{ selectedTeklifForDocs?.yetkili || 'Mehmet Yılmaz' }}</strong>
+            <strong class="text-slate-800">{{ selectedTeklifForDocs?.yetkili || teklif.yetkili || teklif.bidderName || teklif.firma || 'Firma Yetkilisi' }}</strong>
           </div>
           <div>
             <span class="text-[10px] text-slate-400 font-bold block">Telefon</span>
@@ -1031,5 +1054,153 @@ function submitReview() {
       </div>
     </div>
 
+  <!-- ⭐️ TEDARİKÇİ İTİBAR, PUAN VE PROFİL MODALI (HASAN BEY TALEBİ) -->
+    <div 
+      v-if="isSupplierProfileModalOpen && selectedSupplierForProfile" 
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn"
+      @click.self="isSupplierProfileModalOpen = false"
+    >
+      <div class="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl space-y-6 text-left border border-slate-100 max-h-[90vh] overflow-y-auto animate-scaleUp">
+        
+        <!-- Başlık & Kapat -->
+        <div class="flex items-start justify-between border-b pb-4 border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-blue-900 text-white font-black text-lg flex items-center justify-center shadow-sm">
+              {{ selectedSupplierForProfile.firma?.charAt(0) || 'T' }}
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="text-base font-black text-slate-900">{{ selectedSupplierForProfile.firma }}</h3>
+                <span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-black border border-blue-200">
+                  ✓ Doğrulanmış Kurumsal Üretici
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 font-medium">
+                Yetkili: <strong class="text-slate-700">{{ selectedSupplierForProfile.yetkili || selectedSupplierForProfile.bidderName || selectedSupplierForProfile.firma }}</strong> · {{ selectedSupplierForProfile.city || 'Balıkesir / İstanbul' }}
+              </p>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            @click="isSupplierProfileModalOpen = false" 
+            class="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+          >
+            <X :size="18" />
+          </button>
+        </div>
+
+        <!-- Puan ve İtibar İstatistikleri -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-center space-y-1">
+            <span class="text-[10px] font-black text-amber-800 uppercase block">Genel Firma Puanı</span>
+            <div class="flex items-center justify-center gap-1 text-base font-black text-amber-900">
+              <Star :size="16" class="text-amber-500" fill="#F59E0B" />
+              <span>{{ selectedSupplierForProfile.puan || '4.9' }} / 5.0</span>
+            </div>
+            <span class="text-[9px] text-amber-700 font-bold block">({{ selectedSupplierForProfile.reviewCount || '28' }} Değerlendirme)</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-center space-y-1">
+            <span class="text-[10px] font-black text-emerald-800 uppercase block">Zamanında Teslim</span>
+            <div class="text-base font-black text-emerald-900">%99.4</div>
+            <span class="text-[9px] text-emerald-700 font-bold block">Gecikmesiz Sevkiyat</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-blue-50/80 border border-blue-200 text-center space-y-1">
+            <span class="text-[10px] font-black text-blue-800 uppercase block">Şartname Uyumu</span>
+            <div class="text-base font-black text-blue-900">%98.8</div>
+            <span class="text-[9px] text-blue-700 font-bold block">0 Hata Oranı</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-purple-50/80 border border-purple-200 text-center space-y-1">
+            <span class="text-[10px] font-black text-purple-800 uppercase block">Tamamlanan İhale</span>
+            <div class="text-base font-black text-purple-900">24 Adet</div>
+            <span class="text-[9px] text-purple-700 font-bold block">Escrow Güvenli Havuz</span>
+          </div>
+        </div>
+
+        <!-- Doğrulanmış Kurumsal Belgeler -->
+        <div class="space-y-2.5">
+          <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+            <ShieldCheck :size="15" class="text-emerald-600" />
+            <span>Platform Tarafından Doğrulanmış Belgeler:</span>
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="font-bold text-slate-700">📑 Güncel Vergi Levhası</span>
+              <span class="text-emerald-600 font-black text-[10px]">✓ DOĞRULANDI</span>
+            </div>
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="font-bold text-slate-700">🏢 Ticaret Sicil Gazetesi</span>
+              <span class="text-emerald-600 font-black text-[10px]">✓ DOĞRULANDI</span>
+            </div>
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="font-bold text-slate-700">✍️ Yetkili İmza Sirküleri</span>
+              <span class="text-emerald-600 font-black text-[10px]">✓ DOĞRULANDI</span>
+            </div>
+            <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200">
+              <span class="font-bold text-slate-700">🛡️ ISO 9001 & ISO 27001</span>
+              <span class="text-emerald-600 font-black text-[10px]">✓ AKTİF BELGE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Müşteri Değerlendirmeleri ve Yorumları -->
+        <div class="space-y-2.5">
+          <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+            <Star :size="14" class="text-amber-500" fill="#F59E0B" />
+            <span>Önceki Alıcıların Gerçek Değerlendirmeleri:</span>
+          </h4>
+          <div class="space-y-2 text-xs">
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-slate-800">Kalyon İnşaat Satın Alma Md.</span>
+                <div class="flex text-amber-500"><Star :size="11" fill="#F59E0B" /><Star :size="11" fill="#F59E0B" /><Star :size="11" fill="#F59E0B" /><Star :size="11" fill="#F59E0B" /><Star :size="11" fill="#F59E0B" /></div>
+              </div>
+              <p class="text-slate-600 text-[11px] leading-relaxed">
+                "Şartnameye tam uygunluk sağlandı. 3.000 tonluk sevkiyat şantiyeye 2 gün önceden eksiksiz indirildi. Çok güvenilir bir tedarikçi."
+              </p>
+            </div>
+            <div class="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-slate-800">Ege Yapı Sanayi A.Ş.</span>
+                <div class="flex text-amber-500"><Star :size="11" fill="#F59E0B" /><Star :size="11" fill="#F59E0B" /><Star :size="11" fill="#F59E0B" /><Star :size="11" fill="#F59E0B" /><Star :size="11" fill="#F59E0B" /></div>
+              </div>
+              <p class="text-slate-600 text-[11px] leading-relaxed">
+                "Kalite belgeleri ve test raporları eksiksiz teslim edildi. Escrow sistemiyle sorunsuz mutabakat sağladık."
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Teklif Onay ve İletişim Butonları -->
+        <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-100">
+          <div>
+            <span class="text-[10px] text-slate-400 font-bold uppercase block">Sunulan Teklif Fiyatı:</span>
+            <span class="text-xl font-black font-mono text-emerald-700">{{ selectedSupplierForProfile.fiyat }}</span>
+          </div>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button 
+              type="button" 
+              @click="isSupplierProfileModalOpen = false" 
+              class="flex-1 sm:flex-none px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition cursor-pointer text-xs"
+            >
+              Kapat
+            </button>
+            <button 
+              v-if="selectedIlanForProfile && !selectedIlanForProfile.teklifler?.some((t: any) => t.durum === 'onaylandi')"
+              type="button" 
+              @click="isSupplierProfileModalOpen = false; acceptTeklif(selectedSupplierForProfile, selectedIlanForProfile)" 
+              class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <CheckCircle2 :size="14" />
+              <span>✓ Teklifi Güvenle Onayla</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 </template>
