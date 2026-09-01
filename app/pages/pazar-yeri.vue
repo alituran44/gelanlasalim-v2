@@ -56,18 +56,19 @@ const viewMode = ref<'gelismis' | 'basit'>('gelismis')
 const hideRead = ref(false)
 
 function getTenderDirectionBadge(tender: any) {
-  const tur = (tender.tur || '').toLowerCase()
+  const tur = (tender.tur || tender.rekabetTuru || '').toLowerCase()
   const yonu = (tender.ihaleYonu || '').toLowerCase()
-  if (yonu === 'artirma' || tur.includes('artırma') || tur.includes('artırımlı')) {
+  
+  if (yonu === 'kapali_zarf' || tur.includes('kapalı') || tur.includes('doğrudan') || tur.includes('zarf')) {
+    return { 
+      label: '📑 Doğrudan Teklif Alma (Kapalı Zarf)', 
+      class: 'bg-purple-100 text-purple-950 border-purple-400 font-black' 
+    }
+  }
+  if (yonu === 'artirma' || tur.includes('artırma') || tur.includes('artırımlı') || tur.includes('satış')) {
     return { 
       label: '📈 Açık Artırma (Fiyat Artırımlı)', 
       class: 'bg-blue-100 text-blue-950 border-blue-400 font-black' 
-    }
-  }
-  if (yonu === 'kapali_zarf' || tur.includes('kapalı')) {
-    return { 
-      label: '📑 Kapalı Zarf Usulü', 
-      class: 'bg-purple-100 text-purple-950 border-purple-400 font-black' 
     }
   }
   return { 

@@ -54,15 +54,15 @@ watch(() => cmsData.value?.dashboard?.tenders, () => {
 }, { deep: true })
 
 function getTenderDirectionBadge(tender: any) {
-  const tur = (tender.tur || '').toLowerCase()
+  const tur = (tender.tur || tender.rekabetTuru || '').toLowerCase()
   const yonu = (tender.ihaleYonu || '').toLowerCase()
+  if (yonu === 'kapali_zarf' || tur.includes('kapalı') || tur.includes('doğrudan') || tur.includes('zarf')) {
+    return { label: '📑 Doğrudan Teklif Alma (Kapalı Zarf)', class: 'bg-purple-100 text-purple-900 border-purple-300 font-bold' }
+  }
   if (yonu === 'artirma' || tur.includes('artırma') || tur.includes('artırımlı')) {
-    return { label: '📈 Açık Artırma (Fiyat Artırımlı)', class: 'bg-blue-100 text-blue-800 border-blue-200' }
+    return { label: '📈 Açık Artırma (Fiyat Artırımlı)', class: 'bg-blue-100 text-blue-900 border-blue-300 font-bold' }
   }
-  if (yonu === 'kapali_zarf' || tur.includes('kapalı')) {
-    return { label: '📑 Kapalı Zarf Usulü', class: 'bg-purple-100 text-purple-800 border-purple-200' }
-  }
-  return { label: '📉 Açık Eksiltme (Fiyat Azaltımlı)', class: 'bg-emerald-100 text-emerald-800 border-emerald-200' }
+  return { label: '📉 Açık Eksiltme (Fiyat Azaltımlı)', class: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold' }
 }
 
 const userSession = ref<any>({})

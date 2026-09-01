@@ -417,12 +417,20 @@ function handleSubmit() {
     const ownerName = session.name || session.firstName || session.name || 'Şirket Yetkilisi'
     const ownerCompany = session.companyName || session.company || session.companyName || session.company || 'Kurumsal Şirket'
 
+    const tenderDirection = form.value.ihaleYonu || 'kapali_zarf'
+    let tenderTur = 'Doğrudan Teklif Alma (Kapalı Zarf)'
+    if (tenderDirection === 'eksiltme') tenderTur = 'Açık Eksiltme (Fiyat Azaltımlı / Alım)'
+    else if (tenderDirection === 'artirma') tenderTur = 'Açık Artırma (Fiyat Artırımlı / Satış)'
+
     const tenderObject = {
       id: newId,
       baslik: form.value.baslik,
       kategori: combinedCategory,
       mainCategory: form.value.kategori || 'İnşaat ve Yapı',
       subCategory: subCat,
+      ihaleYonu: tenderDirection,
+      tur: tenderTur,
+      rekabetTuru: tenderTur,
       sure: form.value.sure || '7 gün kaldı',
       teklifSayisi: 0,
       durum: 'active',
@@ -431,7 +439,8 @@ function handleSubmit() {
       butce: budgetVal,
       city: deliveryCity,
       teslimatAdresi: deliveryAddress,
-      odemeYontemi: form.value.odemeYontemi || 'Escrow Güvenli Havuz (%100 Koruma)',
+      odemeYontemi: form.value.odemeYontemi || '🛡️ İhaleciBurada Güvenli Emanet Havuz (Escrow - Mal Kabul Onaylı)',
+      faturaTuru: form.value.faturaTuru || '🏢 Kurumsal E-Fatura (%20 KDV)',
       image: primaryImg,
       images: [primaryImg],
       files: (form.value.files || []).map(f => ({ name: f.name, size: f.size, type: f.type, progress: 100 })),
