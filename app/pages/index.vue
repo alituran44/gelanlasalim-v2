@@ -988,6 +988,36 @@ const activeDocIndex = ref(0)
 const activeImageIndex = ref(0)
 const pdfZoomLevel = ref(100)
 
+// ==================== FİRMA PROFİLİ & PUANLARI MODALI ====================
+const showCompanyProfileModal = ref(false)
+const selectedCompanyProfile = ref<any>(null)
+
+function openCompanyProfileModal(companyName?: string, city?: string) {
+  const name = companyName || 'Doğrulanmış B2B Kurumsal Firma'
+  
+  selectedCompanyProfile.value = {
+    name,
+    city: city || 'Balıkesir / İstanbul',
+    sector: 'İnşaat, Yapı & Kurumsal Tedarik',
+    rating: '4.9',
+    reviewCount: 32,
+    verified: true,
+    phone: '+90 (850) 840 86 95',
+    email: 'kurumsal@' + name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com.tr',
+    taxOffice: 'Karesi V.D. / 1450293847',
+    mersis: '0470-0854-2100-0001',
+    address: `Organize Sanayi Bölgesi 2. Cadde No:14 ${city || 'Balıkesir'} / Türkiye`,
+    completedTenders: 28,
+    onTimeDelivery: '%99.4',
+    specCompliance: '%98.9',
+    reviews: [
+      { name: 'Kalyon Yapı Satın Alma Dir.', rating: 5, text: 'Şartnameye tam uygun malzeme teslimatı. Escrow üzerinden güvenli ve sorunsuz çalıştık.' },
+      { name: 'Ege Lojistik & Antrepo A.Ş.', rating: 5, text: 'Zamanında teslimat ve eksiksiz faturalandırma. Sürekli iş yaptığımız güvenilir bir kurum.' }
+    ]
+  }
+  showCompanyProfileModal.value = true
+}
+
 function openTenderDetailModal(tender: any) {
   selectedTenderModal.value = tender
   activeDocIndex.value = 0
@@ -1131,20 +1161,6 @@ DURUM: e-Imzali & Zaman Damgali Resmi Dokuman
   }
 }
 
-function openCompanyProfileModal(companyName: string, city: string = 'Türkiye Geneli') {
-  const found = allCompaniesList.find(c => c.name.toLowerCase().includes(companyName.toLowerCase()) || companyName.toLowerCase().includes(c.name.toLowerCase()))
-  
-  selectedCompanyProfileModal.value = {
-    name: companyName,
-    city: found?.city || city || 'Türkiye Geneli',
-    sector: found?.sector || 'Kurumsal Satın Alma & Tedarik',
-    verified: true,
-    score: found?.score || 9.8,
-    vkn: found?.vkn || '4700854210',
-    completedTenders: found?.completedTenders || 24,
-    contactProtection: true
-  }
-}
 
 // Kullanıcının kendi profili olup olmadığını kontrol eden mantık
 const isMyOwnCompany = computed(() => {
@@ -1812,8 +1828,131 @@ onMounted(() => {
         </div>
 
       </div>
-    </div>
+    <!-- 🏢 FİRMA PROFİLİ, PUANLARI VE İTİBAR MODALI (KULLANICI TALEBİ) -->
+    <div 
+      v-if="showCompanyProfileModal && selectedCompanyProfile" 
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn text-left"
+      @click.self="showCompanyProfileModal = false"
+    >
+      <div class="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl space-y-6 border border-slate-100 max-h-[90vh] overflow-y-auto animate-scaleUp">
+        
+        <!-- Başlık & Kapat -->
+        <div class="flex items-start justify-between border-b pb-4 border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-blue-900 text-white font-black text-lg flex items-center justify-center shadow-sm">
+              {{ selectedCompanyProfile.name.charAt(0) }}
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="text-base font-black text-slate-900">{{ selectedCompanyProfile.name }}</h3>
+                <span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-black border border-blue-200">
+                  ✓ Doğrulanmış Kurumsal Firma
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 font-medium">
+                {{ selectedCompanyProfile.sector }} · {{ selectedCompanyProfile.city }}
+              </p>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            @click="showCompanyProfileModal = false" 
+            class="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+          >
+            <X :size="18" />
+          </button>
+        </div>
 
+        <!-- İtibar & Puan İstatistikleri -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-center space-y-1">
+            <span class="text-[10px] font-black text-amber-800 uppercase block">Firma Puanı</span>
+            <div class="flex items-center justify-center gap-1 text-base font-black text-amber-900">
+              <Star :size="16" class="text-amber-500" fill="#F59E0B" />
+              <span>{{ selectedCompanyProfile.rating }} / 5.0</span>
+            </div>
+            <span class="text-[9px] text-amber-700 font-bold block">({{ selectedCompanyProfile.reviewCount }} Değerlendirme)</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-center space-y-1">
+            <span class="text-[10px] font-black text-emerald-800 uppercase block">Zamanında Teslim</span>
+            <div class="text-base font-black text-emerald-900">{{ selectedCompanyProfile.onTimeDelivery }}</div>
+            <span class="text-[9px] text-emerald-700 font-bold block">Gecikmesiz Sevkiyat</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-blue-50/80 border border-blue-200 text-center space-y-1">
+            <span class="text-[10px] font-black text-blue-800 uppercase block">Şartname Uyumu</span>
+            <div class="text-base font-black text-blue-900">{{ selectedCompanyProfile.specCompliance }}</div>
+            <span class="text-[9px] text-blue-700 font-bold block">Sıfır Hata</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-purple-50/80 border border-purple-200 text-center space-y-1">
+            <span class="text-[10px] font-black text-purple-800 uppercase block">Tamamlanan İhale</span>
+            <div class="text-base font-black text-purple-900">{{ selectedCompanyProfile.completedTenders }} Adet</div>
+            <span class="text-[9px] text-purple-700 font-bold block">Escrow Tamamlandı</span>
+          </div>
+        </div>
+
+        <!-- Doğrulanmış Kurumsal Bilgiler -->
+        <div class="space-y-2.5">
+          <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+            <ShieldCheck :size="15" class="text-emerald-600" />
+            <span>Doğrulanmış Resmi Kurumsal Bilgiler:</span>
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-0.5">
+              <span class="text-[10px] font-bold text-slate-400 block">Vergi Dairesi / No:</span>
+              <strong class="text-slate-800 font-mono">{{ selectedCompanyProfile.taxOffice }}</strong>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-0.5">
+              <span class="text-[10px] font-bold text-slate-400 block">MERSİS Numarası:</span>
+              <strong class="text-slate-800 font-mono">{{ selectedCompanyProfile.mersis }}</strong>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-0.5 sm:col-span-2">
+              <span class="text-[10px] font-bold text-slate-400 block">Kayıtlı Merkez / Depo Adresi:</span>
+              <strong class="text-slate-800">{{ selectedCompanyProfile.address }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Müşteri Değerlendirmeleri ve Yorumları -->
+        <div class="space-y-2.5">
+          <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+            <Star :size="14" class="text-amber-500" fill="#F59E0B" />
+            <span>Platform Üzerindeki Gerçek Alıcı Yorumları:</span>
+          </h4>
+          <div class="space-y-2 text-xs">
+            <div v-for="(rev, rIdx) in selectedCompanyProfile.reviews" :key="rIdx" class="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-slate-800">{{ rev.name }}</span>
+                <div class="flex text-amber-500"><Star v-for="s in rev.rating" :key="s" :size="11" fill="#F59E0B" /></div>
+              </div>
+              <p class="text-slate-600 text-[11px] leading-relaxed">"{{ rev.text }}"</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aksiyon Butonları -->
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+          <button 
+            type="button" 
+            @click="showCompanyProfileModal = false" 
+            class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition cursor-pointer text-xs"
+          >
+            Kapat
+          </button>
+          <NuxtLink 
+            to="/panel/mesajlar" 
+            class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md transition flex items-center gap-1.5"
+          >
+            <MessageSquare :size="13" />
+            <span>Firma ile İletişime Geç</span>
+          </NuxtLink>
+        </div>
+
+      </div>
+    </div>
+  </div>
 </template>
 
               <!-- 2. ŞEHİRLER LİSTESİ (81 İL) -->

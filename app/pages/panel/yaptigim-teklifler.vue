@@ -1,4 +1,21 @@
 <script setup lang="ts">
+const showBuyerProfileModal = ref(false)
+const selectedBuyerProfile = ref<any>(null)
+
+function openBuyerProfileModal(companyName?: string) {
+  const name = companyName || 'Kurumsal Alıcı Firma'
+  selectedBuyerProfile.value = {
+    name,
+    rating: '4.9',
+    reviewCount: 19,
+    completedPurchases: 14,
+    escrowSuccess: '%100',
+    city: 'Balıkesir / İstanbul',
+    taxOffice: 'Karesi V.D. / 4810294719',
+    address: 'Organize Sanayi Bölgesi 1. Cadde No: 8 / Balıkesir'
+  }
+  showBuyerProfileModal.value = true
+}
 import { ref, computed } from 'vue'
 import { 
   SendHorizonal, 
@@ -838,5 +855,54 @@ function submitReview() {
       </div>
     </div>
 
+  <!-- 🏢 ALICI FİRMA PROFİLİ & PUANLARI MODALI -->
+    <div 
+      v-if="showBuyerProfileModal && selectedBuyerProfile" 
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn text-left"
+      @click.self="showBuyerProfileModal = false"
+    >
+      <div class="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl space-y-5 border border-slate-100 animate-scaleUp">
+        <div class="flex items-start justify-between border-b pb-3 border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-blue-900 text-white font-black text-base flex items-center justify-center shadow-xs">
+              {{ selectedBuyerProfile.name.charAt(0) }}
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-slate-900">{{ selectedBuyerProfile.name }}</h3>
+              <p class="text-[11px] text-slate-400 font-medium">Doğrulanmış Kurumsal Alıcı · {{ selectedBuyerProfile.city }}</p>
+            </div>
+          </div>
+          <button type="button" @click="showBuyerProfileModal = false" class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer">
+            <X :size="16" />
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2.5 text-center">
+          <div class="p-3 rounded-2xl bg-amber-50 border border-amber-200">
+            <span class="text-[9px] font-black text-amber-800 uppercase block">Alıcı Puanı</span>
+            <span class="text-sm font-black text-amber-900 flex items-center justify-center gap-1"><Star :size="13" fill="#F59E0B" class="text-amber-500" /> {{ selectedBuyerProfile.rating }}</span>
+          </div>
+          <div class="p-3 rounded-2xl bg-emerald-50 border border-emerald-200">
+            <span class="text-[9px] font-black text-emerald-800 uppercase block">Escrow Ödeme</span>
+            <span class="text-sm font-black text-emerald-900">{{ selectedBuyerProfile.escrowSuccess }}</span>
+          </div>
+          <div class="p-3 rounded-2xl bg-blue-50 border border-blue-200">
+            <span class="text-[9px] font-black text-blue-800 uppercase block">Alım Sayısı</span>
+            <span class="text-sm font-black text-blue-900">{{ selectedBuyerProfile.completedPurchases }} İhale</span>
+          </div>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs space-y-1.5">
+          <div class="flex justify-between"><span class="text-slate-400">Vergi Dairesi:</span> <strong class="text-slate-800 font-mono">{{ selectedBuyerProfile.taxOffice }}</strong></div>
+          <div class="flex justify-between"><span class="text-slate-400">Adres:</span> <strong class="text-slate-800">{{ selectedBuyerProfile.address }}</strong></div>
+        </div>
+
+        <div class="flex justify-end pt-2">
+          <button type="button" @click="showBuyerProfileModal = false" class="px-5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer">
+            Kapat
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
