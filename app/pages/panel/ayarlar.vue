@@ -60,6 +60,14 @@ const userSession = ref<any>({})
 
 onMounted(() => {
   detectLocale()
+  if (typeof window !== 'undefined') {
+    try {
+      const savedAddresses = JSON.parse(localStorage.getItem('userAddresses') || '[]')
+      if (savedAddresses.length > 0) {
+        addresses.value = savedAddresses
+      }
+    } catch (e) {}
+  }
   activeTheme.value = globalTheme.value || 'sistem'
   if (typeof window !== 'undefined') {
     try {
@@ -1502,6 +1510,88 @@ function saveProfile() {
                 <input v-model="companyForm.faturaAdresi" type="text" placeholder="İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
               </div>
             </div>
+          </div>
+
+          <!-- 📍 PROFİL DÜZENLEMEDE ADRESLER VE SEVKİYAT NOKTALARI KARTI (KULLANICI TALEBİ) -->
+          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b pb-3" style="border-color: #F1F5F9;">
+              <div>
+                <h3 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
+                  <MapPin :size="15" class="text-blue-600" />
+                  Kayıtlı Adresler ve Sevkiyat / Fatura Noktaları
+                </h3>
+                <p class="text-[10px] text-slate-400 mt-0.5">
+                  İhalelerinizde ve tekliflerinizde kullanılacak teslimat, depo ve fatura adreslerinizi buradan yönetin.
+                </p>
+              </div>
+
+              <button 
+                type="button" 
+                @click="isNewAddressModalOpen = true" 
+                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition cursor-pointer shrink-0 self-start sm:self-auto"
+              >
+                <Plus :size="13" />
+                <span>+ Yeni Adres Ekle</span>
+              </button>
+            </div>
+
+            <!-- Adres Kartları Grid -->
+            <div v-if="addresses.length > 0" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div 
+                v-for="addr in addresses" 
+                :key="addr.id"
+                class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 hover:bg-white hover:border-blue-300 transition space-y-2 relative group"
+              >
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span 
+                      class="px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-wider"
+                      :class="addr.type === 'teslimat' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'"
+                    >
+                      {{ addr.type === 'teslimat' ? '📦 Teslimat' : '📑 Fatura' }}
+                    </span>
+                    <h4 class="text-xs font-black text-slate-800">{{ addr.title }}</h4>
+                  </div>
+                  <button 
+                    type="button" 
+                    @click="deleteAddress(addr.id)"
+                    class="p-1 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition cursor-pointer"
+                    title="Adresi Sil"
+                  >
+                    <Trash2 :size="13" />
+                  </button>
+                </div>
+
+                <p class="text-xs text-slate-600 leading-snug font-medium">{{ addr.address }}</p>
+                
+                <div class="flex items-center justify-between text-[10px] text-slate-400 font-mono pt-1 border-t border-slate-100">
+                  <span>{{ addr.city }}</span>
+                  <span>PK: {{ addr.zip || '17100' }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div v-else class="p-6 rounded-xl border border-dashed border-slate-200 text-center space-y-2 bg-slate-50">
+              <MapPin :size="20" class="text-slate-400 mx-auto" />
+              <p class="text-xs text-slate-500 font-medium">Henüz kayıtlı bir adresiniz bulunmuyor.</p>
+              <button 
+                type="button" 
+                @click="isNewAddressModalOpen = true"
+                class="text-xs font-bold text-blue-600 hover:underline"
+              >
+                + İlk Adresinizi Ekleyin
+              </button>
+            </div>
+            
+            <!-- + Yeni Adres Ekle Butonu -->
+            <button 
+              type="button" 
+              @click="isNewAddressModalOpen = true" 
+              class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-sm transition cursor-pointer shrink-0"
+            >
+              <Plus :size="14" />
+              <span>+ Yeni Adres Ekle</span>
+            </button>
           </div>
 
           <!-- Upload section -->
@@ -3597,6 +3687,154 @@ function saveProfile() {
       </div>
     </div>
 
+  <!-- 📍 YENİ ADRES EKLEME MODALI (KULLANICI TALEBİ) -->
+    <div 
+      v-if="isNewAddressModalOpen" 
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn"
+      @click.self="isNewAddressModalOpen = false"
+    >
+      <div class="w-full max-w-lg rounded-3xl bg-white p-6 shadow-2xl space-y-5 text-left border border-slate-100 animate-scaleUp">
+        <div class="flex items-center justify-between border-b pb-3 border-slate-100">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <MapPin :size="18" />
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-slate-800">Yeni Adres Ekle</h3>
+              <p class="text-[10px] text-slate-400 font-medium">Sevkiyat, depo veya fatura adresinizi sisteme kaydedin</p>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            @click="isNewAddressModalOpen = false" 
+            class="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+          >
+            <X :size="16" />
+          </button>
+        </div>
+
+        <form @submit.prevent="addAddress" class="space-y-4 text-xs">
+          <!-- Adres Türü -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase mb-1.5">Adres Türü</label>
+            <div class="grid grid-cols-2 gap-2">
+              <button 
+                type="button" 
+                @click="newAddressForm.type = 'teslimat'"
+                class="p-2.5 rounded-xl border font-bold flex items-center justify-center gap-2 transition cursor-pointer"
+                :class="newAddressForm.type === 'teslimat' ? 'bg-blue-50 text-blue-700 border-blue-300 ring-2 ring-blue-500/20' : 'bg-slate-50 text-slate-600 border-slate-200'"
+              >
+                <span>📦 Sevkiyat & Teslimat</span>
+              </button>
+              <button 
+                type="button" 
+                @click="newAddressForm.type = 'fatura'"
+                class="p-2.5 rounded-xl border font-bold flex items-center justify-center gap-2 transition cursor-pointer"
+                :class="newAddressForm.type === 'fatura' ? 'bg-purple-50 text-purple-700 border-purple-300 ring-2 ring-purple-500/20' : 'bg-slate-50 text-slate-600 border-slate-200'"
+              >
+                <span>📑 Fatura & Muhasebe</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Adres Başlığı -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+              Adres Başlığı <span class="text-red-500">*</span>
+            </label>
+            <input 
+              v-model="newAddressForm.title" 
+              type="text" 
+              placeholder="Örn: Balıkesir OSB Fabrika Deposu / Merkez Ofis" 
+              class="w-full rounded-xl border px-3.5 py-2.5 text-xs bg-white outline-none font-bold text-slate-800 focus:border-blue-500 border-slate-200" 
+              required
+            />
+          </div>
+
+          <!-- İl & İlçe & Posta Kodu -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                İl / Şehir <span class="text-red-500">*</span>
+              </label>
+              <input 
+                v-model="newAddressForm.city" 
+                type="text" 
+                placeholder="Örn: Balıkesir" 
+                class="w-full rounded-xl border px-3 py-2 text-xs bg-white outline-none font-medium text-slate-800 focus:border-blue-500 border-slate-200" 
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                İlçe <span class="text-red-500">*</span>
+              </label>
+              <input 
+                v-model="newAddressForm.district" 
+                type="text" 
+                placeholder="Örn: Altıeylül" 
+                class="w-full rounded-xl border px-3 py-2 text-xs bg-white outline-none font-medium text-slate-800 focus:border-blue-500 border-slate-200" 
+                required
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Posta Kodu</label>
+              <input 
+                v-model="newAddressForm.zip" 
+                type="text" 
+                placeholder="Örn: 10050" 
+                class="w-full rounded-xl border px-3 py-2 text-xs bg-white outline-none font-mono text-slate-800 focus:border-blue-500 border-slate-200" 
+              />
+            </div>
+          </div>
+
+          <!-- Açık Adres -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+              Açık Adres (Cadde, Sokak, No, Şantiye/Depo Bilgisi) <span class="text-red-500">*</span>
+            </label>
+            <textarea 
+              v-model="newAddressForm.address" 
+              rows="3" 
+              placeholder="Organize Sanayi Bölgesi 4. Cadde No: 18 / Şantiye Kabul Kapısı" 
+              class="w-full rounded-xl border p-3 text-xs bg-white outline-none font-medium text-slate-800 focus:border-blue-500 border-slate-200 leading-relaxed" 
+              required
+            ></textarea>
+          </div>
+
+          <!-- Varsayılan Yap Checkbox -->
+          <div class="flex items-center gap-2 pt-1">
+            <input 
+              v-model="newAddressForm.isDefault" 
+              type="checkbox" 
+              id="isDefaultAddr" 
+              class="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300 cursor-pointer" 
+            />
+            <label for="isDefaultAddr" class="text-xs font-bold text-slate-700 cursor-pointer">
+              Bu adresi varsayılan {{ newAddressForm.type === 'teslimat' ? 'teslimat' : 'fatura' }} adresi olarak ayarla
+            </label>
+          </div>
+
+          <!-- Butonlar -->
+          <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+            <button 
+              type="button" 
+              @click="isNewAddressModalOpen = false" 
+              class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition cursor-pointer"
+            >
+              İptal
+            </button>
+            <button 
+              type="submit" 
+              class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black shadow-md shadow-blue-500/20 transition cursor-pointer flex items-center gap-1.5"
+            >
+              <CheckCircle2 :size="14" />
+              <span>Adresi Kaydet</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
 </template>
 
