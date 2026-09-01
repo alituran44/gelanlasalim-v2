@@ -4,6 +4,8 @@ import { useRouter } from 'vue-router'
 import { locale } from '~/composables/useLocale'
 import { AlertCircle, Calendar, UploadCloud, FileText, FileSpreadsheet, X, Camera, Eye, Trash2, Plus, ShieldAlert, FileCheck, CheckCircle2, FilePlus2, ArrowLeft } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
+import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
+import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
 import { usePublicApis } from '~/composables/usePublicApis'
 
 definePageMeta({ layout: 'dashboard' })
@@ -362,6 +364,8 @@ function removeFile(index: number) {
 
 const titleInputRef = ref<HTMLInputElement | null>(null)
 const isSubmittingTender = ref(false)
+const showDeepSeekModal = ref(false)
+const { inspectTenderAutonomous } = useDeepSeekAgent()
 
 function handleSubmit() {
   if (isSubmittingTender.value) return
@@ -425,7 +429,11 @@ function handleSubmit() {
     if (tenderDirection === 'eksiltme') tenderTur = 'Açık Eksiltme (Fiyat Azaltımlı / Alım)'
     else if (tenderDirection === 'artirma') tenderTur = 'Açık Artırma (Fiyat Artırımlı / Satış)'
 
+    const aiInspection = inspectTenderAutonomous({ baslik: form.value.baslik, aciklama: form.value.aciklama })
     const tenderObject = {
+      aiApproved: aiInspection.status === 'approved',
+      aiScore: aiInspection.score,
+      aiReport: aiInspection,
       id: newId,
       baslik: form.value.baslik,
       kategori: combinedCategory,
@@ -1135,6 +1143,12 @@ function resetFormAndCreateNew() {
       </div>
     </div>
 
+  <DeepSeekAssistantModal 
+      :isOpen="showDeepSeekModal" 
+      :tender="{ baslik: form.baslik || 'Yeni İhale Şartnamesi', kategori: form.kategori, aciklama: form.aciklama, city: form.sehir, butce: form.butce }" 
+      @close="showDeepSeekModal = false"
+      @applySuggestedBid="(price) => { form.butce = price; showDeepSeekModal = false; }"
+    />
   </div>
 </template>
 

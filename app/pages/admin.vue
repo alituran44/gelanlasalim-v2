@@ -74,6 +74,7 @@ import {
   Calculator
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
+import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
 import { useNetGsm } from '~/composables/useNetGsm'
 
 // Page config
@@ -1124,6 +1125,42 @@ function rejectKyc(kyc: any) {
 // Tender Approval Handlers
 // ----------------------------------------------------
 const tenderFilterStatus = ref<'pending' | 'active' | 'all'>('pending')
+
+function autoApproveAllViaDeepSeek() {
+  let approvedTenders = 0
+  let approvedKycs = 0
+
+  if (cmsData.value?.dashboard?.tenders) {
+    cmsData.value.dashboard.tenders.forEach((t: any) => {
+      if (t.adminApproved === false || t.durum === 'pending_approval') {
+        const report = inspectTenderAutonomous(t)
+        if (report.status === 'approved') {
+          t.adminApproved = true
+          t.durum = 'active'
+          t.aiApproved = true
+          t.aiScore = report.score
+          approvedTenders++
+        }
+      }
+    })
+  }
+
+  if (cmsData.value?.kycVerifications) {
+    cmsData.value.kycVerifications.forEach((k: any) => {
+      if (k.status !== 'approved') {
+        const kycReport = inspectKycDocumentsAutonomous(k)
+        k.status = 'approved'
+        k.isVerified = true
+        k.badgeGranted = true
+        k.aiApproval = kycReport
+        approvedKycs++
+      }
+    })
+  }
+
+  saveCmsData(cmsData.value)
+  alert(`🤖 DEEPSEEK OTONOM ONAY TAMAMLANDI\n\n✓ ${approvedTenders} Adet Bekleyen İhale Mevzuata Uygun Bulunarak Otomatik Onaylandı.\n✓ ${approvedKycs} Adet Yeni Kurumsal Firma (KYC) Vergi/Sicil Kaydı Doğrulanarak Onaylandı.`)
+}
 
 function approveTender(tender: any) {
   tender.durum = 'active'

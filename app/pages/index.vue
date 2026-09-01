@@ -60,6 +60,8 @@ import {
   FileCheck
 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
+import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
+import DeepSeekAiBadge from '~/components/ai/DeepSeekAiBadge.vue'
 import { useCmsData } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
 
@@ -990,6 +992,13 @@ const pdfZoomLevel = ref(100)
 
 // ==================== FİRMA PROFİLİ & PUANLARI MODALI ====================
 const showCompanyProfileModal = ref(false)
+const showDeepSeekModal = ref(false)
+const selectedTenderForDeepSeek = ref<any>(null)
+
+function openDeepSeekAnalysis(tender: any) {
+  selectedTenderForDeepSeek.value = tender
+  showDeepSeekModal.value = true
+}
 const selectedCompanyProfile = ref<any>(null)
 
 function openCompanyProfileModal(companyName?: string, city?: string) {
@@ -1952,6 +1961,12 @@ onMounted(() => {
 
       </div>
     </div>
+  <DeepSeekAssistantModal 
+      :isOpen="showDeepSeekModal" 
+      :tender="selectedTenderForDeepSeek" 
+      @close="showDeepSeekModal = false"
+      @applySuggestedBid="(price) => { showDeepSeekModal = false; if (selectedTenderForDeepSeek) openQuickBid(selectedTenderForDeepSeek); }"
+    />
   </div>
 </template>
 

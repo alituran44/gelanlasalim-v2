@@ -1,0 +1,11 @@
+{
+  "name": "@deepseek-ai/harness-workspace",
+  "version": "1.0.0",
+  "description": "DeepSeek Harness Local Agent Runner and Continuous Inspector for IhaleciBurada Platform",
+  "scripts": {
+    "agent:inspect": "node scripts/inspect-tenders.js",
+    "agent:kyc": "node scripts/verify-kyc.js",
+    "agent:test": "node scripts/run-autonomous-tests.js"
+  },
+  "dependencies": {}
+}

@@ -223,6 +223,13 @@ const selectedSpecTender = ref<any>(null)
 const specActiveTab = ref<'malzeme' | 'idari' | 'teknik'>('malzeme')
 
 const showBidModal = ref(false)
+const showDeepSeekModal = ref(false)
+const selectedTenderForDeepSeek = ref<any>(null)
+
+function openDeepSeekAnalysis(tender: any) {
+  selectedTenderForDeepSeek.value = tender
+  showDeepSeekModal.value = true
+}
 const selectedTenderForBid = ref<any>(null)
 const selectedCompanyForProfile = ref<any>(null)
 const userSession = ref<any>({})
@@ -2084,7 +2091,12 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
         </div>
 
       </div>
-    </div>
-
+    <DeepSeekAssistantModal 
+      :isOpen="showDeepSeekModal" 
+      :tender="selectedTenderForDeepSeek" 
+      @close="showDeepSeekModal = false"
+      @applySuggestedBid="(price) => { showDeepSeekModal = false; if (selectedTenderForDeepSeek) openBidModal(selectedTenderForDeepSeek); }"
+    />
+  </div>
 </template>
 
