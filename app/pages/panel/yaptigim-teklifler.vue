@@ -328,12 +328,12 @@ async function submitRevise() {
   const now = new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 
   bid.teklifFiyatim = formattedPrice
-  bid.durum = 'bekliyor'
+  bid.durum = 'pazarlik_geldi'
   if (!bid.pazarlikGecmisi) bid.pazarlikGecmisi = []
 
   bid.pazarlikGecmisi.unshift({
     kim: 'Tedarikçi (Siz)',
-    mesaj: `Revize İndirimli Fiyat: ${formattedPrice} — ${revisedNotes.value}`,
+    mesaj: `Tedarikçi Karşı Teklifi / Pazarlık Yanıtı: ${formattedPrice} — ${revisedNotes.value}`,
     tarih: now,
     fiyat: formattedPrice
   })
@@ -346,11 +346,11 @@ async function submitRevise() {
     const matchingOffer = matchingSlot.teklifler.find((t: any) => t.id === bid.id)
     if (matchingOffer) {
       matchingOffer.fiyat = formattedPrice
-      matchingOffer.durum = 'bekliyor'
+      matchingOffer.durum = 'pazarlik_geldi'
       if (!matchingOffer.pazarlikGecmisi) matchingOffer.pazarlikGecmisi = []
       matchingOffer.pazarlikGecmisi.unshift({
-        kim: 'Tedarikçi Firma',
-        mesaj: `Revize İndirimli Fiyat: ${formattedPrice} — ${revisedNotes.value}`,
+        kim: 'Tedarikçi Firma (Pazarlık Yanıtı)',
+        mesaj: `Tedarikçi Karşı Teklifi: ${formattedPrice} — ${revisedNotes.value}`,
         tarih: now,
         fiyat: formattedPrice
       })

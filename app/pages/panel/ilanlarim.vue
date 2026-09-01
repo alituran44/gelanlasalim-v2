@@ -123,6 +123,40 @@ function republishTender(tender: any) {
   alert(`🎉 İLAN YENİDEN YAYINLANDI!\n\n"${tender.baslik}" ihalesi 30 gün süreyle Pazar Yeri'nde yeniden yayına alınmıştır.`)
 }
 
+function deleteTender(tender: any) {
+  const confirmDelete = confirm(`⚠️ DİKKAT: "${tender.baslik}" ihalesini ve bu ihaleye ait tüm teklif kayıtlarını sistemden tamamen silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.`)
+  if (!confirmDelete) return
+
+  // 1. Remove from cmsData dashboard tenders
+  if (cmsData.value?.dashboard?.tenders) {
+    cmsData.value.dashboard.tenders = cmsData.value.dashboard.tenders.filter(
+      (t: any) => t.id !== tender.id && t.baslik !== tender.baslik
+    )
+  }
+
+  // 2. Remove from receivedBids group
+  if (cmsData.value?.dashboard?.receivedBids) {
+    cmsData.value.dashboard.receivedBids = cmsData.value.dashboard.receivedBids.filter(
+      (g: any) => g.id !== tender.id && g.baslik !== tender.baslik
+    )
+  }
+
+  // 3. Remove from localStorage 'myTenders'
+  if (typeof window !== 'undefined') {
+    try {
+      const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]').filter(
+        (t: any) => t.id !== tender.id && t.baslik !== tender.baslik
+      )
+      localStorage.setItem('myTenders', JSON.stringify(myTenders))
+      window.dispatchEvent(new Event('storage'))
+    } catch (e) {}
+  }
+
+  saveCmsData(cmsData.value)
+  reloadTenders()
+  alert(`🗑️ İhale Başarıyla Silindi!\n\n"${tender.baslik}" ihalesi ve bağlantılı verileri platformdan kaldırılmıştır.`)
+}
+
 function cancelTenderAgreement(tender: any) {
   const confirmCancel = confirm(`⚠️ "${tender.baslik}" ihalesindeki mutabakatı iptal edip ihaleyi tekrar teklif alımına açmak istiyor musunuz?`)
   if (!confirmCancel) return
