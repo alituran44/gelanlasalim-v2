@@ -374,7 +374,7 @@ export const DEFAULT_CMS_DATA = {
     smtpHost: 'smtp.gmail.com',
     smtpPort: 587,
     smtpUser: 'ihalecib@gmail.com',
-    smtpPassword: '••••••••',
+    smtpPassword: '191214.Et',
     smtpEncryption: 'TLS',
     autoNotifications: {
       onRegister: true,
