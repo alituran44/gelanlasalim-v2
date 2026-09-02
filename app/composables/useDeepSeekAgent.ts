@@ -318,36 +318,34 @@ export function useDeepSeekAgent() {
     const missing: string[] = []
     let points = 0
 
-    // 1. Yetkili Ad Soyad Kontrolü (25 Puan)
+    // 1. Yetkili Ad Soyad Kontrolü (ZORUNLU - %40)
     const fullName = (userSession.name || userSession.firstName || userSession.authorizedPerson || '').trim()
     if (fullName.length >= 3) {
-      points += 25
+      points += 40
     } else {
       missing.push('Yetkili Adı & Soyadı')
     }
 
-    // 2. Telefon Numarası Kontrolü (25 Puan)
+    // 2. Telefon Numarası Kontrolü (ZORUNLU - %30)
     const phone = (userSession.phone || userSession.cepTelefonu || '').replace(/\D/g, '')
     if (phone.length >= 10) {
-      points += 25
+      points += 30
     } else {
       missing.push('Telefon Numarası (05xx...)')
     }
 
-    // 3. Şirket / Firma Unvanı Kontrolü (25 Puan)
-    const company = (userSession.companyName || userSession.company || userSession.legalName || (userSession.role === 'individual' ? fullName : '')).trim()
-    if (company.length >= 3) {
-      points += 25
-    } else {
-      missing.push('Şirket / Ticari Unvan')
-    }
-
-    // 4. Şehir / Lokasyon Kontrolü (25 Puan)
+    // 3. Şehir / Lokasyon Kontrolü (ZORUNLU - %30)
     const city = (userSession.city || userSession.sehir || userSession.addressCity || '').trim()
     if (city.length >= 2) {
-      points += 25
+      points += 30
     } else {
       missing.push('Faaliyet / Teslimat Şehri')
+    }
+
+    // 4. Şirket / Ticari Unvan (İSTEĞE BAĞLI - İhale Açmayı / Teklif Vermeyi Asla Engellemez)
+    const company = (userSession.companyName || userSession.company || userSession.legalName || '').trim()
+    if (company.length >= 3) {
+      // Bonus kurumsal bilgi
     }
 
     const isComplete = missing.length === 0
