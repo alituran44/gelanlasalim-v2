@@ -267,7 +267,7 @@ function verifyOtp() {
     const sessionData = {
       ...pendingUserSession.value,
       verified: true,
-      approvalStatus: 'pending'
+      approvalStatus: 'approved', kycApproved: true, badgeGranted: true, isVerified: true
     }
     localStorage.setItem('userSession', JSON.stringify(sessionData))
 
