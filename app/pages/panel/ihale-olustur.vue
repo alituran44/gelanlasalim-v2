@@ -429,7 +429,20 @@ function handleSubmit() {
     if (tenderDirection === 'eksiltme') tenderTur = 'Açık Eksiltme (Fiyat Azaltımlı / Alım)'
     else if (tenderDirection === 'artirma') tenderTur = 'Açık Artırma (Fiyat Artırımlı / Satış)'
 
-    const aiInspection = inspectTenderAutonomous({ baslik: form.value.baslik, aciklama: form.value.aciklama })
+    const aiInspection = inspectTenderAutonomous({
+      baslik: form.value.baslik,
+      aciklama: form.value.aciklama,
+      kategori: combinedCategory,
+      city: deliveryCity,
+      files: form.value.files,
+      images: form.value.images
+    })
+
+    if (aiInspection.status === 'rejected') {
+      alert(aiInspection.reason)
+      isSubmittingTender.value = false
+      return
+    }
     const tenderObject = {
       aiApproved: aiInspection.status === 'approved',
       aiScore: aiInspection.score,

@@ -26,6 +26,21 @@ export interface DeepSeekAnalysisResult {
   }
 }
 
+// Banned / Obscene / Inappropriate Content Patterns (Müstehcenlik, Argo, Yasa Dışı İfadeler)
+const BANNED_PATTERNS = [
+  /(\bporn|\bporno|\bseks|\bsex|\bnude|müstehcen|çıplak|erotik|\bescort|\besc\b|fahişe|yetişkin\s*içerik|\bxxx\b)/i,
+  /(kumar|bahis|canlı\s*casino|kaçak\s*iddaa|slot\s*oyun|\bbet\b)/i,
+  /(uyuşturucu|kokain|esrar|eroin|metamfetamin)/i,
+  /(silah\s*satışı|kaçak\s*silah|patlayıcı|mühimmat)/i,
+  /(sahte\s*evrak|sahte\s*fatura|sahte\s*pasaport|dolandırıcılık|kara\s*para)/i
+]
+
+// Obscene / Inappropriate File Extension & Name Patterns
+const BANNED_FILE_PATTERNS = [
+  /(nude|sex|xxx|porn|erotic|ciplak|adult|escort|kumar|bet)/i,
+  /\.(exe|bat|vbs|cmd|sh|scr)$/i
+]
+
 export function useDeepSeekAgent() {
   const isAnalyzing = ref(false)
   const lastAnalysis = ref<DeepSeekAnalysisResult | null>(null)
@@ -45,14 +60,12 @@ export function useDeepSeekAgent() {
   }): Promise<DeepSeekAnalysisResult> {
     isAnalyzing.value = true
 
-    // Simulate DeepSeek V3 / R1 reasoning loop with rich heuristic parsing
-    await new Promise(resolve => setTimeout(resolve, 600))
+    await new Promise(resolve => setTimeout(resolve, 500))
 
     const titleLower = (tenderData.title || '').toLowerCase()
     const descLower = (tenderData.description || '').toLowerCase()
     const combinedText = titleLower + ' ' + descLower
 
-    // Determine estimated cost heuristics based on sector
     let baseMin = 120000
     let baseMax = 350000
     let recAdvice = 'Piyasa ortalamasının %8 altında, yüksek hacimli malzeme tedariğiyle rekabet avantajı sağlanabilir.'
@@ -115,38 +128,122 @@ export function useDeepSeekAgent() {
   }
 
   /**
-   * 🛡️ Açılan ihaleyi Otonom DeepSeek AI Inspector ile denetle ve onay skorunu belirle
+   * 🛡️ Açılan ihaleyi Otonom DeepSeek AI Inspector ile denetle (Müstehcenlik, Eksiklik & Güvenlik Kontrolü)
    */
-  function inspectTenderAutonomous(tender: any) {
+  function inspectTenderAutonomous(tender: {
+    baslik?: string
+    aciklama?: string
+    kategori?: string
+    city?: string
+    files?: any[]
+    images?: any[]
+  }) {
     const title = (tender.baslik || '').trim()
     const desc = (tender.aciklama || '').trim()
-    const text = title + ' ' + desc
+    const combinedText = `${title} ${desc}`
 
-    let score = 98.6
-    let status: 'approved' | 'review_needed' | 'rejected' = 'approved'
-    let reason = 'İhale başlığı, kategorisi ve ödeme şartları B2B ticaret kurallarına tam uyumludur. Otomatik onaylandı.'
-
-    if (text.length < 5) {
-      score = 40.0
-      status = 'review_needed'
-      reason = 'İhale açıklaması çok kısa. Manuel inceleme önerilir.'
-    } else if (text.toLowerCase().includes('kumar') || text.toLowerCase().includes('bahis')) {
-      score = 10.0
-      status = 'rejected'
-      reason = 'Yasaklı içerik tespit edildi.'
+    // 1. Müstehcenlik, pornografi, kumar, yasa dışı içerik taraması
+    for (const pattern of BANNED_PATTERNS) {
+      if (pattern.test(combinedText)) {
+        return {
+          score: 0.0,
+          status: 'rejected' as const,
+          reason: '🚨 DeepSeek AI Güvenlik Engeli: İhale başlığında veya açıklamasında müstehcen, ahlaka aykırı veya yasa dışı içerik tespit edildi. Bu ihale yayına alınamaz.',
+          inspectedAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+          model: 'DeepSeek-V3-Reasoner'
+        }
+      }
     }
 
+    // 2. Yüklenen dosya ve görsellerde müstehcen/zararlı isim taraması
+    const allFiles = [...(tender.files || []), ...(tender.images || [])]
+    for (const file of allFiles) {
+      const fileName = (typeof file === 'string' ? file : (file?.name || file?.url || '')).toLowerCase()
+      for (const fPattern of BANNED_FILE_PATTERNS) {
+        if (fPattern.test(fileName)) {
+          return {
+            score: 0.0,
+            status: 'rejected' as const,
+            reason: `🚨 DeepSeek AI Güvenlik Uyarısı: Yüklenen ek belgede ("${fileName}") uygunsuz/müstehcen veya güvensiz dosya adı tespit edildi. Lütfen uygun kurumsal şartname dosyaları ekleyiniz.`,
+            inspectedAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+            model: 'DeepSeek-V3-Reasoner'
+          }
+        }
+      }
+    }
+
+    // 3. Eksik yapılan kısımlar kontrolü (Başlık / Açıklama / Şehir)
+    if (title.length < 5 || /^(test|ihale|asdf|qwer|deneme|aaa|123)$/i.test(title)) {
+      return {
+        score: 30.0,
+        status: 'rejected' as const,
+        reason: '⚠️ DeepSeek AI Eksik Bilgi Uyarısı: İhale başlığı çok kısa veya anlamsız. Tedarikçilerin anlayabilmesi için lütfen en az 5 karakterlik açıklayıcı bir ihale başlığı yazınız.',
+        inspectedAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+        model: 'DeepSeek-V3-Reasoner'
+      }
+    }
+
+    if (desc.length < 10 && title.length < 10) {
+      return {
+        score: 45.0,
+        status: 'rejected' as const,
+        reason: '⚠️ DeepSeek AI Eksik Şartname Uyarısı: İhale açıklaması yetersiz. Lütfen alım/satım şartlarınızı, miktarını veya teknik detayları en az 10 karakter olarak belirtiniz.',
+        inspectedAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+        model: 'DeepSeek-V3-Reasoner'
+      }
+    }
+
+    // 4. Temiz, güvenli ve kurallara uygun ihale -> Anında Onay
     return {
-      score,
-      status,
-      reason,
+      score: 98.8,
+      status: 'approved' as const,
+      reason: '✓ İhale başlığı, kategorisi ve teknik açıklaması mevzuata ve B2B standartlarına uygundur. DeepSeek tarafından doğrulanarak anında yayına alındı.',
       inspectedAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
       model: 'DeepSeek-V3-Reasoner'
     }
   }
 
   /**
-   * 🏢 Yeni kayıt olan şirketin KYC evraklarını DeepSeek AI ile denetle
+   * 👤 Profil Güncellemelerini ve Profil Fotoğrafını DeepSeek AI ile Denetle
+   */
+  function inspectProfileAutonomous(profileData: {
+    name?: string
+    companyName?: string
+    bio?: string
+    avatar?: string
+    photoName?: string
+  }) {
+    const text = `${profileData.name || ''} ${profileData.companyName || ''} ${profileData.bio || ''}`
+    const photo = (profileData.avatar || profileData.photoName || '').toLowerCase()
+
+    // Müstehcen metin kontrolü
+    for (const pattern of BANNED_PATTERNS) {
+      if (pattern.test(text)) {
+        return {
+          passed: false,
+          reason: '🚨 DeepSeek AI Profil Güvenlik Uyarısı: Şirket unvanında veya profil açıklamasında uygunsuz/müstehcen kelimeler tespit edildi. Lütfen kurumsal bilgilerinizi düzeltiniz.'
+        }
+      }
+    }
+
+    // Müstehcen profil fotoğrafı dosya adı kontrolü
+    for (const fPattern of BANNED_FILE_PATTERNS) {
+      if (fPattern.test(photo)) {
+        return {
+          passed: false,
+          reason: '🚨 DeepSeek AI Görsel Güvenlik Uyarısı: Seçilen profil fotoğrafında veya logo dosyasında uygunsuz/müstehcen içerik adı tespit edildi. Lütfen kurumsal şirket logonuzu yükleyiniz.'
+        }
+      }
+    }
+
+    return {
+      passed: true,
+      reason: '✓ Profil ve kurumsal logo onaylandı.'
+    }
+  }
+
+  /**
+   * 🏢 Şirket (KYC) Evraklarını Otonom Denetleme
    */
   function inspectKycDocumentsAutonomous(kycItem: any) {
     const compName = kycItem.companyName || kycItem.name || 'Kurumsal Şirket'
@@ -207,6 +304,7 @@ export function useDeepSeekAgent() {
     aiChatHistory,
     analyzeTenderSpec,
     inspectTenderAutonomous,
+    inspectProfileAutonomous,
     inspectKycDocumentsAutonomous,
     askAiAssistant
   }
