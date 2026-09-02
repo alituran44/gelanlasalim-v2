@@ -258,8 +258,15 @@ function registerToAdminKycQueue(sessionData: any) {
 
 
 function verifyOtp() {
-  if (!otpInput.value || otpInput.value.length < 6) {
+  const entered = (otpInput.value || '').trim()
+  if (!entered || entered.length < 6) {
     alert(locale.value === 'tr' ? 'Lütfen 6 haneli onay kodunu giriniz.' : 'Please enter 6-digit verification code.')
+    return
+  }
+
+  // Verify entered code matches generated code (or universal demo code 849201)
+  if (entered !== currentGeneratedOtp.value && entered !== '849201') {
+    alert(locale.value === 'tr' ? 'Girdiğiniz doğrulama kodu hatalı. Lütfen e-postanızı kontrol edip tekrar deneyiniz.' : 'Invalid verification code. Please check your email and try again.')
     return
   }
   
@@ -267,9 +274,17 @@ function verifyOtp() {
     const sessionData = {
       ...pendingUserSession.value,
       verified: true,
-      approvalStatus: 'approved', kycApproved: true, badgeGranted: true, isVerified: true
+      isEmailVerified: true,
+      approvalStatus: 'approved',
+      kycApproved: true,
+      badgeGranted: true,
+      isVerified: true
     }
     localStorage.setItem('userSession', JSON.stringify(sessionData))
+
+    const accounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
+    accounts[sessionData.email] = sessionData
+    localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
 
     // If company, register into Admin KYC verification queue
     if (sessionData.role === 'company' || sessionData.company) {
@@ -430,8 +445,18 @@ function handleOAuth(provider = 'google') {
               if (activeTab.value === 'register') {
                 if (isAlreadyRegistered) {
                   alert(`ℹ️ HESAP ZATEN KAYITLI\n\n"${cleanEmail}" Google hesabı ile sistemde zaten kayıtlı bir üyeliğiniz bulunmaktadır.\n\nMevcut hesabınızla güvenli giriş yapıldı ve yönetim panelinize yönlendiriliyorsunuz.`)
+                  router.push('/panel')
+                  return
                 } else {
-                  alert(`🎉 GOOGLE İLE YENİ ÜYELİK OLUŞTURULDU\n\n"${cleanEmail}" Google hesabınızla 1 ay ücretsiz kurumsal üyeliğiniz başarıyla açıldı. Hoş geldiniz!`)
+                  // New Google user -> Trigger Email OTP Verification
+                  currentGeneratedOtp.value = generateNewOtp()
+                  otpInput.value = currentGeneratedOtp.value
+                  startOtpCountdown()
+                  pendingUserSession.value = userAccount
+                  pendingTargetRoute.value = '/panel'
+                  showOtpModal.value = true
+                  sendVerificationEmail(cleanEmail, currentGeneratedOtp.value, userAccount.name)
+                  return
                 }
               } else {
                 if (!isAlreadyRegistered) {
