@@ -365,10 +365,26 @@ function removeFile(index: number) {
 const titleInputRef = ref<HTMLInputElement | null>(null)
 const isSubmittingTender = ref(false)
 const showDeepSeekModal = ref(false)
-const { inspectTenderAutonomous } = useDeepSeekAgent()
+const { inspectTenderAutonomous, checkAccountCompleteness } = useDeepSeekAgent()
 
 function handleSubmit() {
   if (isSubmittingTender.value) return
+
+  // 🛡️ DeepSeek Profil & Hesap Doluluk Denetimi
+  let currentSession = {} as any
+  if (typeof window !== 'undefined') {
+    try {
+      currentSession = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+  }
+  const accountCheck = checkAccountCompleteness(currentSession)
+  if (!accountCheck.canCreateTender) {
+    const goToProfile = confirm(`${accountCheck.reason}\n\nİhale açabilmek için lütfen Profil Ayarlarından eksik bilgilerinizi tamamlayınız.\n\nŞimdi Profil Ayarlarına gitmek istiyor musunuz?`)
+    if (goToProfile) {
+      router.push('/panel/ayarlar')
+    }
+    return
+  }
   isSubmittingTender.value = true
 
   try {

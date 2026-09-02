@@ -298,7 +298,77 @@ export function useDeepSeekAgent() {
     return reply
   }
 
+  
+  /**
+   * 🛡️ Kullanıcı Profil & Hesap Doluluk Oranını DeepSeek AI ile Denetle
+   * Eksik bilgi varsa ihale açamaz ve teklif veremez!
+   */
+  function checkAccountCompleteness(userSession: any) {
+    if (!userSession || typeof userSession !== 'object') {
+      return {
+        isComplete: false,
+        completenessPercent: 0,
+        missingFields: ['Kullanıcı Oturumu', 'Yetkili Adı', 'Telefon Numarası', 'Şirket Unvanı', 'Şehir'],
+        canCreateTender: false,
+        canSubmitBid: false,
+        reason: 'Lütfen işlem yapabilmek için sisteme giriş yapınız.'
+      }
+    }
+
+    const missing: string[] = []
+    let points = 0
+
+    // 1. Yetkili Ad Soyad Kontrolü (25 Puan)
+    const fullName = (userSession.name || userSession.firstName || userSession.authorizedPerson || '').trim()
+    if (fullName.length >= 3) {
+      points += 25
+    } else {
+      missing.push('Yetkili Adı & Soyadı')
+    }
+
+    // 2. Telefon Numarası Kontrolü (25 Puan)
+    const phone = (userSession.phone || userSession.cepTelefonu || '').replace(/\D/g, '')
+    if (phone.length >= 10) {
+      points += 25
+    } else {
+      missing.push('Telefon Numarası (05xx...)')
+    }
+
+    // 3. Şirket / Firma Unvanı Kontrolü (25 Puan)
+    const company = (userSession.companyName || userSession.company || userSession.legalName || (userSession.role === 'individual' ? fullName : '')).trim()
+    if (company.length >= 3) {
+      points += 25
+    } else {
+      missing.push('Şirket / Ticari Unvan')
+    }
+
+    // 4. Şehir / Lokasyon Kontrolü (25 Puan)
+    const city = (userSession.city || userSession.sehir || userSession.addressCity || '').trim()
+    if (city.length >= 2) {
+      points += 25
+    } else {
+      missing.push('Faaliyet / Teslimat Şehri')
+    }
+
+    const isComplete = missing.length === 0
+    let reason = '✓ Profil bilgileriniz eksiksizdir. Güvenli şekilde ihale açabilir ve teklif sunabilirsiniz.'
+
+    if (!isComplete) {
+      reason = `🚨 DeepSeek AI Güvenlik Uyarısı: B2B ticaret güvenliği gereği profilinizde eksik bilgiler tespit edildi (% ${points} tamamlandı). İhale açabilmek ve teklif sunabilmek için lütfen şu eksik alanları tamamlayınız: ${missing.join(', ')}.`
+    }
+
+    return {
+      isComplete,
+      completenessPercent: points,
+      missingFields: missing,
+      canCreateTender: isComplete,
+      canSubmitBid: isComplete,
+      reason
+    }
+  }
+
   return {
+    checkAccountCompleteness,
     isAnalyzing,
     lastAnalysis,
     aiChatHistory,

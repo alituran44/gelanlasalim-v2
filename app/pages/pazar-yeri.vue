@@ -49,6 +49,7 @@ useSeoMeta({
 
 const route = useRoute()
 const { cmsData, saveCmsData } = useCmsData()
+const { checkAccountCompleteness } = useDeepSeekAgent()
 const { sendSms } = useNetGsm()
 
 const activeTab = ref<'guncel' | 'gecmis' | 'sonuc' | 'detayli'>('guncel')
@@ -489,6 +490,21 @@ function isMyOwnTender(tender: any): boolean {
 
 
 function openBidModal(tender: any) {
+  let session = userSession.value || {}
+  if (!session.email && typeof window !== 'undefined') {
+    try {
+      session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+  }
+
+  const accountCheck = checkAccountCompleteness(session)
+  if (!accountCheck.canSubmitBid) {
+    const goToProfile = confirm(`${accountCheck.reason}\n\nTeklif sunabilmek için lütfen Profil Ayarlarından eksik bilgilerinizi tamamlayınız.\n\nŞimdi Profil Ayarlarına gitmek istiyor musunuz?`)
+    if (goToProfile) {
+      router.push('/panel/ayarlar')
+    }
+    return
+  }
   // 1. Kendi İlanına Teklif Verme Engeli
   if (isMyOwnTender(tender)) {
     alert(`🚫 KENDİ İLANINIZA TEKLİF VEREMEZSİNİZ!\n\n"${tender.baslik}" ihalesi sizin tarafınızdan açılmıştır.\n\nSistem kuralları gereği kendi açtığınız ihalelere teklif sunamazsınız.\n\nİhaleniz için gelen tedarikçi tekliflerini incelemek, değerlendirmek ve pazarlık yürütmek için lütfen "Gelen Teklifler" sayfasına gidiniz.`)

@@ -63,6 +63,7 @@ import { useRouter } from 'vue-router'
 import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
 import DeepSeekAiBadge from '~/components/ai/DeepSeekAiBadge.vue'
 import { useCmsData } from '~/composables/useCmsData'
+import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
 import { useNetGsm } from '~/composables/useNetGsm'
 
 definePageMeta({
@@ -127,6 +128,7 @@ const selectedCompanyProfileModal = ref<any>(null)
 const userSession = ref<any>({})
 
 const { cmsData, saveCmsData } = useCmsData()
+const { checkAccountCompleteness } = useDeepSeekAgent()
 // Clean onMounted in index.vue
 onMounted(() => {
   if (typeof window !== 'undefined') {
@@ -1445,6 +1447,23 @@ function isMyOwnTender(tender: any): boolean {
 
 
 function openQuickBidModal(tender: any) {
+  // 🛡️ DeepSeek Profil & Hesap Doluluk Denetimi
+  let session = userSession.value || {}
+  if (!session.email && typeof window !== 'undefined') {
+    try {
+      session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+  }
+
+  const accountCheck = checkAccountCompleteness(session)
+  if (!accountCheck.canSubmitBid) {
+    const goToProfile = confirm(`${accountCheck.reason}\n\nTeklif sunabilmek için lütfen Profil Ayarlarından eksik bilgilerinizi tamamlayınız.\n\nŞimdi Profil Ayarlarına gitmek istiyor musunuz?`)
+    if (goToProfile) {
+      router.push('/panel/ayarlar')
+    }
+    return
+  }
+
   if (isMyOwnTender(tender)) {
     alert(`🚫 KENDİ İLANINIZA TEKLİF VEREMEZSİNİZ!\n\n"${tender.baslik}" ihalesi sizin tarafınızdan açılmıştır.\n\nSistem kuralları ve B2B ihale mevzuatı gereği kendi açtığınız ihalelere teklif sunamazsınız.\n\nİhaleniz için gelen teklifleri incelemek ve pazarlık yürütmek için lütfen "Gelen Teklifler" sayfasına gidiniz.`)
     return
