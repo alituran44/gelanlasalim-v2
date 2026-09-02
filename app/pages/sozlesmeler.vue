@@ -129,9 +129,42 @@ function printDocument() {
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">KEP Adresi</span>
-              <strong class="text-slate-900 font-mono">ihaleciburada@hs01.kep.tr</strong>
+              <strong class="text-slate-900 font-mono">hasanhuseyin.yildirim.17@hs01.kep.tr</strong>
             </div>
           </div>
+        </div>
+      </div>
+
+      
+      <!-- 🛡️ RESMİ ARACI HİZMET SAĞLAYICI VE HUKUKİ SORUMSUZLUK BEYANI (6563 SK MADDE 9) -->
+      <div class="mb-8 rounded-3xl bg-slate-900 border-2 border-blue-600/40 p-6 sm:p-8 text-white shadow-2xl space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-blue-600/20 border border-blue-500/40 text-blue-400 flex items-center justify-center shrink-0">
+            <Scale :size="24" />
+          </div>
+          <div>
+            <span class="px-2.5 py-0.5 rounded-full bg-blue-600/30 text-blue-300 font-mono text-[10px] font-black uppercase tracking-wider border border-blue-500/30">
+              6563 SAYILI ELEKTRONİK TİCARET KANUNU VE TTK UYARINCA
+            </span>
+            <h2 class="text-base sm:text-lg font-black text-white mt-1">
+              ARACI HİZMET SAĞLAYICI VE ELEKTRONİK PAZAR YERİ HUKUKİ STATÜSÜ
+            </h2>
+          </div>
+        </div>
+
+        <div class="p-4 rounded-2xl bg-slate-800/80 border border-slate-700 text-xs text-slate-300 leading-relaxed space-y-2">
+          <p>
+            <strong class="text-white">1. Taraflar Arasındaki İlişki:</strong> İhaleciBurada (Platform), 6563 Sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun'un 2/1-d ve 9. maddeleri ile Elektronik Ticarette Hizmet Sağlayıcılar Yönetmeliği kapsamında münhasıran bir <strong>"Aracı Hizmet Sağlayıcı" (Elektronik Pazar Yeri & Yer Sağlayıcı)</strong> niteliğindedir.
+          </p>
+          <p>
+            <strong class="text-white">2. Sözleşmenin Tarafı Olmama ve Tam Sorumsuzluk:</strong> Platform; Alıcı (İhale Sahibi) ile Satıcı / Tedarikçi (Teklif Veren) arasında kurulan hiçbir alım-satım, sipariş, eser, hizmet veya taşeronluk sözleşmesinin <strong>tarafı, kefili, garantörü, komisyoncusu veya acentesi DEĞİLDİR</strong>.
+          </p>
+          <p>
+            <strong class="text-white">3. Ayıp, Teslimat, Eksik İfa ve Cayma Sorumsuzluğu:</strong> İhale konusu malların/hizmetlerin ayıplı, kusurlu, eksik olması, taahhüt edilen sürede teslim edilmemesi, şartnameye uymaması veya ödemenin gecikmesi hallerinde Platform'un hiçbir doğrudan, dolaylı veya müteselsil hukuki veya cezai sorumluluğu bulunmamaktadır. Alıcı ve Satıcı arasındaki uyuşmazlıklarda yegane muhatap sözleşmenin taraflarıdır.
+          </p>
+          <p>
+            <strong class="text-white">4. Şeffaf Komisyon Oranları:</strong> Platformumuzda <strong>Alıcı firmalardan ihale açma komisyonu alınmaz (%0 ALICI KOMİSYONU)</strong>. İhaleyi kazanan Tedarikçi firmadan ise Escrow güvenli havuz hesabı ve teknolojik pazaryeri altyapı hizmeti karşılığında yalnızca ihale kesinleşme tutarı üzerinden <strong>net %1,5 (+ KDV) Başarı & Platform Hizmet Bedeli</strong> tahakkuk ettirilir. Kazanılamayan veya iptal edilen ihalelerden hiçbir ücret tahsil edilmez.
+          </p>
         </div>
       </div>
 
@@ -249,7 +282,20 @@ function printDocument() {
               </section>
 
               <section class="space-y-2 bg-blue-50/60 p-4 rounded-xl border border-blue-200">
-                <h3 class="font-bold text-blue-950 text-sm">MADDE 2 — ARACI HİZMET SAĞLAYICI KONUMU VE TAM SORUMSUZLUK KAYDI</h3>
+                <h3 class="font-bold text-blue-950 text-sm">MADDE 2 — ARACI HİZMET SAĞLAYICI KONUMU, KOMİSYON ORANLARI VE TAM SORUMSUZLUK KAYDI</h3>
+                <div class="p-3.5 bg-white rounded-xl border border-blue-300 space-y-1.5 text-[11px] text-blue-950">
+                  <p class="font-black text-xs text-blue-900 flex items-center gap-1.5">
+                    <span>⚖️ YASAL STATÜ: 6563 SAYILI KANUN KAPSAMINDA ARACI HİZMET SAĞLAYICI</span>
+                  </p>
+                  <p>
+                    Platform işleticisi Şirket, 6563 Sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun m. 2/1-d ve m. 9 uyarınca münhasıran <strong>Aracı Hizmet Sağlayıcı (Elektronik Pazar Yeri & Yer Sağlayıcı)</strong> konumundadır. Platform; Alıcı ile Tedarikçi arasında akdedilen hiçbir ticari sözleşmenin, siparişin veya edimin <strong>tarafı, kefili, garantörü veya vekili DEĞİLDİR</strong>.
+                  </p>
+                </div>
+                <p>2.1. <strong>Komisyon ve Platform Hizmet Bedeli Oranları:</strong></p>
+                <ul class="list-disc pl-5 space-y-1 text-slate-800">
+                  <li><strong>Alıcılar (İhale Açanlar) İçin:</strong> İhale açma, teklif toplama ve satın alma süreçlerini yönetme komisyon oranı <strong>%0 (SIFIR KOMİSYON - ÜCRETSİZ)</strong> olarak uygulanır.</li>
+                  <li><strong>Tedarikçiler (Teklif Verenler) İçin:</strong> İhale kazanıldığında, Escrow güvenli ödeme havuzu ve teknolojik pazar yeri altyapı hizmeti karşılığı olarak ihale kesinleşme tutarı üzerinden <strong>net %1,5 (+ KDV) Platform Başarı ve Hizmet Bedeli</strong> tahakkuk ettirilir. İhaleyi kazanamayan tedarikçilerden %0 (hiçbir komisyon veya kesinti) alınmaz.</li>
+                </ul>
                 <p>2.1. <strong>Sözleşmenin Tarafı Olmama:</strong> Şirket, Alıcı ile Tedarikçi arasında kurulan hiçbir alım-satım, eser, hizmet, taşeronluk veya tedarik sözleşmesinin tarafı, garantörü, kefili, temsilcisi, komisyoncusu veya acentesi DEĞİLDİR. Platform münhasıran dijital bir pazar yeri ve e-ihale zemini sunmaktadır.</p>
                 <p>2.2. <strong>İçerik ve Şartname Sorumsuzluğu:</strong> 6563 Sayılı Kanun Madde 9 ve Elektronik Ticarette Hizmet Sağlayıcılar Hakkında Yönetmelik uyarınca Şirket, Kullanıcılar tarafından sisteme yüklenen teknik şartnamelerin, tekliflerin, ürün tanımlarının, lisansların, patentlerin ve görsellerin doğruluğunu, yasallığını veya ayıptan ari olduğunu araştırmakla yükümlü değildir.</p>
                 <p>2.3. <strong>Ayıp, Hasar, Eksik İfa ve Teslimat Temerrüdü:</strong> Tedarik edilen malların kusurlu, hasarlı, eksik çıkması, gecikmeli teslim edilmesi, şartname kriterlerini karşılamaması veya mücbir sebep olmaksızın hiç teslim edilmemesi durumunda tek hukuki muhatap Tedarikçi\'dir. Alıcı, bu nedenlerle Şirket\'ten hiçbir nam altında maddi, manevi veya cezai tazminat talep edemez.</p>
@@ -475,13 +521,14 @@ function printDocument() {
                   <p><strong>Vergi Dairesi & No:</strong> Çanakkale Vergi Dairesi / VKN: 4700854210</p>
                   <p><strong>MERSİS Numarası:</strong> 0470085421000001 | <strong>Ticaret Sicil No:</strong> 14520</p>
                   <p><strong>Telefon / Müşteri Destek:</strong> 0850 840 86 95 | <strong>E-Posta:</strong> ihalecib@gmail.com</p>
-                  <p><strong>KEP Adresi:</strong> ihaleciburada@hs01.kep.tr | <strong>Web Sitesi:</strong> https://ihaleciburada.com</p>
+                  <p><strong>KEP Adresi:</strong> hasanhuseyin.yildirim.17@hs01.kep.tr | <strong>Web Sitesi:</strong> https://ihaleciburada.com</p>
                 </div>
               </section>
 
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — HİZMETİN TEMEL NİTELİKLERİ VE FİYATLANDIRMA</h3>
-                <p>2.1. <strong>Hizmet Türü:</strong> Bulut tabanlı B2B e-ihale açma, teklif toplama, canlı tersine eksiltme (reverse auction), tedarikçi KYC doğrulama ve satın alma analitik raporlama yazılımı aboneliğidir.</p>
+                <p>2.1. <strong>Hizmet Türü ve Aracı Kurum Statüsü:</strong> Şirketimiz 6563 Sayılı Elektronik Ticaret Kanunu uyarınca Aracı Hizmet Sağlayıcı olup bulut tabanlı B2B e-ihale açma, teklif toplama, canlı tersine eksiltme (reverse auction), tedarikçi KYC doğrulama ve güvenli Escrow havuz entegrasyonu hizmeti sunmaktadır.</p>
+                <p>2.1.1. <strong>Platform Hizmet ve Komisyon Oranları:</strong> Alıcı firmalar için ihale açma komisyonu %0'dır. İhaleyi kazanan tedarikçi firmalardan teknolojik pazar yeri ve Escrow havuz işletim bedeli olarak ihale bedeli üzerinden net %1,5 (+ KDV) platform hizmet bedeli tahsil edilir. Kazanılamayan ihalelerden hiçbir ücret alınmaz.</p>
                 <p>2.2. <strong>Paketler ve Toplam Fiyat (Tüm Vergiler Dahil):</strong></p>
                 <ul class="list-disc pl-5 space-y-1 text-slate-600">
                   <li><strong>1 Ay Lansman Deneme Paketi:</strong> 0,00 ₺ (Ücretsiz)</li>

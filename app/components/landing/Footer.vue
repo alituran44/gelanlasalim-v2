@@ -224,7 +224,7 @@ const legalLinks = [
               <span class="text-slate-400 block">İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale</span>
               <span class="text-slate-400 block font-mono text-[10px]">Çanakkale V.D. / VKN: 4700854210</span>
               <span class="text-slate-400 block font-mono text-[10px]">MERSİS: 0470085421000001</span>
-              <span class="text-slate-400 block font-mono text-[10px]">KEP: ihaleciburada@hs01.kep.tr</span>
+              <span class="text-slate-400 block font-mono text-[10px]">KEP: hasanhuseyin.yildirim.17@hs01.kep.tr</span>
             </p>
             
             <div class="text-xs font-bold text-slate-200 space-y-1.5 pt-2 border-t border-slate-800">

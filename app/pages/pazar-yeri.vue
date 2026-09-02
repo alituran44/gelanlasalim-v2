@@ -1763,6 +1763,20 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             <ShieldCheck :size="16" class="text-blue-600 shrink-0 mt-0.5" />
             <span>Teklifiniz şifrelenerek alıcıya iletilir. İhale süresi bitene kadar diğer tedarikçiler fiyatınızı göremez.</span>
           </div>
+
+          <!-- 🛡️ ŞEFFAF KOMİSYON ORANI & ARACI KURUM BİLGİLENDİRMESİ -->
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-600 space-y-1 text-left">
+            <div class="flex items-center justify-between font-bold text-slate-800">
+              <span class="flex items-center gap-1">
+                <span class="text-blue-600">⚖️</span>
+                <span>Platform Aracılık & Escrow Hizmet Oranı:</span>
+              </span>
+              <span class="text-emerald-700 font-black font-mono">%1,5 (+ KDV)</span>
+            </div>
+            <p class="text-[10px] text-slate-500 leading-tight">
+              * Bu oran yalnızca ihale kazanıldığında hakediş tutarından tahsil edilir. İhaleyi kazanamazsanız hiçbir ücret alınmaz. Platform 6563 SK gereğince bağımsız Aracı Hizmet Sağlayıcı olup sözleşmenin tarafı, malın ayıbından veya ifasından sorumlu değildir.
+            </p>
+          </div>
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">

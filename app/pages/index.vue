@@ -3471,6 +3471,20 @@ onMounted(() => {
             ></textarea>
           </div>
 
+          <!-- 🛡️ ŞEFFAF KOMİSYON ORANI & ARACI KURUM BİLGİLENDİRMESİ -->
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl text-[11px] text-slate-600 space-y-1 text-left">
+            <div class="flex items-center justify-between font-bold text-slate-800">
+              <span class="flex items-center gap-1.5">
+                <span class="text-blue-600 font-black">⚖️</span>
+                <span>Platform Aracılık & Escrow Hizmet Bedeli:</span>
+              </span>
+              <span class="text-emerald-700 font-black font-mono">%1,5 (+ KDV)</span>
+            </div>
+            <p class="text-[10px] text-slate-500 leading-tight">
+              * Bu hizmet bedeli yalnızca ihale kazanıldığında hakediş tutarı üzerinden tahakkuk eder; kazanılamayan ihalelerde <strong>%0 (hiçbir ücret alınmaz)</strong>. Platformumuz 6563 SK kapsamında Aracı Hizmet Sağlayıcı olup alım-satım sözleşmesinin tarafı veya garantörü değildir.
+            </p>
+          </div>
+
           <!-- Aksiyonlar -->
           <div class="flex items-center gap-2 pt-2">
             <button 

@@ -433,22 +433,22 @@ const filteredAvailableSectors = computed(() => {
 const companyForm = ref({
   name: '',
   legalName: '',
-  description: 'Şirketimiz ambalaj, oluklu mukavva koli, inşaat malzemeleri ve lojistik tedarik alanında kurumsal müşterilere toptan imalat ve tedarik hizmeti sunmaktadır.',
+  description: '',
   contactPerson: '',
-  phone: '0850 840 86 95',
-  email: 'ihalecib@gmail.com',
-  tcKimlik: '12345678901',
-  taxNo: '4700854210',
-  taxOffice: 'Çanakkale Vergi Dairesi',
-  sectors: 'Ambalaj, Koli, Kağıt ve Plastik Ürünleri, İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri, Lojistik, Nakliye ve Depolama Hizmetleri',
-  mersis: '0470-0854-2100-0001',
-  sicilNo: '14520',
-  website: 'https://www.ihaleciburada.com',
-  faturaAdresi: 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale',
-  city: 'Çanakkale',
-  iban: 'TR56 0006 2000 0001 2345 6789 01',
+  phone: '',
+  email: '',
+  tcKimlik: '',
+  taxNo: '',
+  taxOffice: '',
+  sectors: '',
+  mersis: '',
+  sicilNo: '',
+  website: '',
+  faturaAdresi: '',
+  city: '',
+  iban: '',
   accountHolder: '',
-  is2FaEnabled: true
+  is2FaEnabled: false
 })
 
 function toggleSectorTag(sec: string) {

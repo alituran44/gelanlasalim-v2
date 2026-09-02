@@ -546,7 +546,7 @@ function handleEDevletAuth() {
     if (typeof window !== 'undefined') {
       localStorage.setItem('userSession', JSON.stringify({
         email: 'edevlet_onayli@ihaleciburada.com',
-        firstName: 'Ali',
+        firstName: 'Doğrulanmış Yetkili',
         name: (form.value.name || form.value.firstName || 'Kurumsal Üye') + ' (e-Devlet & MERSİS Onaylı)',
         company: 'Turan Lojistik San. A.Ş.',
         role: 'company',
@@ -593,18 +593,27 @@ function handleLogin() {
 
     if (is2Fa) {
       // Trigger real 2FA verification via modal
+      const clean2FaEmail = loginEmail.value.trim().toLowerCase()
+      const regAccounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
+      const matchedAccount = regAccounts[clean2FaEmail] || {}
+      const raw2FaPrefix = clean2FaEmail.split('@')[0]
+      const derived2FaName = raw2FaPrefix.charAt(0).toUpperCase() + raw2FaPrefix.slice(1)
+
       pendingUserSession.value = {
-        email: loginEmail.value,
-        firstName: currentSession.firstName || 'Ali',
-        name: currentSession.name || currentSession.firstName || form.value.name || 'Kurumsal Üye',
-        username: currentSession.username || currentSession.name || 'kullanici',
-        company: currentSession.company || '',
-        companyName: currentSession.companyName || '',
-        role: currentSession.role || 'company',
+        email: clean2FaEmail,
+        firstName: matchedAccount.firstName || derived2FaName,
+        lastName: matchedAccount.lastName || '',
+        name: matchedAccount.name || derived2FaName,
+        username: matchedAccount.username || derived2FaName,
+        company: matchedAccount.company || matchedAccount.companyName || (derived2FaName + ' Tedarik'),
+        companyName: matchedAccount.companyName || matchedAccount.company || (derived2FaName + ' Tedarik'),
+        phone: matchedAccount.phone || '',
+        city: matchedAccount.city || 'Balıkesir',
+        role: matchedAccount.role || 'company',
         verified: true,
         is2FaEnabled: true,
         isPremium: true,
-        subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
+        subscriptionPlan: matchedAccount.subscriptionPlan || '1 Ay Ücretsiz Kurumsal Deneme'
       }
       pendingTargetRoute.value = '/panel'
       otpInput.value = '849201'
@@ -626,20 +635,32 @@ function handleLogin() {
     }
 
     if (typeof window !== 'undefined') {
+      const cleanEmail = loginEmail.value.trim().toLowerCase()
+      const accounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
+      const existingAccount = accounts[cleanEmail] || {}
+
+      const rawPrefix = cleanEmail.split('@')[0]
+      const derivedName = rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1).replace(/[^a-zA-Z0-9]/g, ' ')
+
       const sessionObj = {
-        email: loginEmail.value,
-        firstName: currentSession.firstName || 'Ali',
-        name: currentSession.name || currentSession.firstName || form.value.name || 'Kurumsal Üye',
-        username: currentSession.username || (loginEmail.value.split('@')[0]),
-        company: currentSession.company || '',
-        companyName: currentSession.companyName || '',
-        role: currentSession.role || 'company',
+        email: cleanEmail,
+        firstName: existingAccount.firstName || derivedName,
+        lastName: existingAccount.lastName || '',
+        name: existingAccount.name || (derivedName + (existingAccount.lastName ? ' ' + existingAccount.lastName : '')),
+        username: existingAccount.username || derivedName,
+        company: existingAccount.company || existingAccount.companyName || (derivedName + ' Tedarik'),
+        companyName: existingAccount.companyName || existingAccount.company || (derivedName + ' Tedarik'),
+        phone: existingAccount.phone || '',
+        city: existingAccount.city || 'Balıkesir',
+        role: existingAccount.role || 'company',
         verified: true,
         isPremium: true,
-        subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
+        subscriptionPlan: existingAccount.subscriptionPlan || '1 Ay Ücretsiz Kurumsal Deneme'
       }
       localStorage.setItem('userSession', JSON.stringify(sessionObj))
       registerToAdminKycQueue(sessionObj)
+      window.dispatchEvent(new Event('storage'))
+      window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionObj }))
     }
     router.push('/panel')
   }, 600)

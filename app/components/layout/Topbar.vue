@@ -113,7 +113,9 @@ function markAllAsRead() {
     }
   })
   if (typeof window !== 'undefined') {
-    localStorage.setItem('topbar_read_notifs', JSON.stringify(readNotifs.value))
+    localStorage.setItem('user_read_notifications', JSON.stringify(readNotifs.value))
+    window.dispatchEvent(new CustomEvent('notifications-updated'))
+    window.dispatchEvent(new Event('storage'))
   }
 }
 
@@ -126,16 +128,30 @@ function handleLogout() {
   router.push('/')
 }
 
-onMounted(() => {
-  detectLocale()
+function refreshUserSession() {
   if (typeof window !== 'undefined') {
     try {
       userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
-      readNotifs.value = JSON.parse(localStorage.getItem('topbar_read_notifs') || '[]')
+      readNotifs.value = JSON.parse(localStorage.getItem('user_read_notifications') || '[]')
     } catch {
       userSession.value = {}
     }
   }
+}
+
+onMounted(() => {
+  detectLocale()
+  refreshUserSession()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', refreshUserSession)
+    window.addEventListener('user-session-changed', refreshUserSession)
+    window.addEventListener('notifications-updated', refreshUserSession)
+  }
+})
+
+// Route change updates session reactively
+watch(() => route.path, () => {
+  refreshUserSession()
 })
 
 const userName = computed(() => {

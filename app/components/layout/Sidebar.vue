@@ -47,8 +47,7 @@ watchEffect(() => {
   }
 })
 
-onMounted(() => {
-  detectLocale()
+function refreshSidebarSession() {
   if (typeof window !== 'undefined') {
     try {
       userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
@@ -56,6 +55,19 @@ onMounted(() => {
       userSession.value = {}
     }
   }
+}
+
+onMounted(() => {
+  detectLocale()
+  refreshSidebarSession()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', refreshSidebarSession)
+    window.addEventListener('user-session-changed', refreshSidebarSession)
+  }
+})
+
+watch(() => route.path, () => {
+  refreshSidebarSession()
 })
 
 function toggleLang() {
@@ -67,8 +79,8 @@ function toggleLang() {
 }
 
 const userRole = computed(() => userSession.value?.role || 'company')
-const userName = computed(() => userSession.value?.firstName || 'User')
-const userCompany = computed(() => userSession.value?.company || 'Your Company')
+const userName = computed(() => userSession.value?.name || userSession.value?.firstName || userSession.value?.username || 'Kullanıcı')
+const userCompany = computed(() => userSession.value?.companyName || userSession.value?.company || userSession.value?.name || 'Kurumsal Profil')
 const userInitial = computed(() => userName.value.charAt(0).toUpperCase())
 
 function logout() {

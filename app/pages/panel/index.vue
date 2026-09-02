@@ -83,13 +83,18 @@ const recentBids = computed(() => {
   return list
 })
 
-onMounted(() => {
+function reloadSession() {
   if (typeof window !== 'undefined') {
     try {
       const session = JSON.parse(localStorage.getItem('userSession') || '{}')
       userSession.value = session
       if (session.companyName || session.company) {
         companyName.value = session.companyName || session.company
+      } else if (session.name || session.firstName) {
+        companyName.value = session.name || session.firstName
+      } else if (session.email) {
+        const rawPrefix = session.email.split('@')[0]
+        companyName.value = rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1)
       }
       if (session.role) {
         userRole.value = session.role
@@ -97,6 +102,14 @@ onMounted(() => {
     } catch (e) {
       console.error(e)
     }
+  }
+}
+
+onMounted(() => {
+  reloadSession()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', reloadSession)
+    window.addEventListener('user-session-changed', reloadSession)
   }
 })
 </script>

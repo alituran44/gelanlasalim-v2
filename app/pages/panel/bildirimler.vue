@@ -100,13 +100,21 @@ const realNotifications = computed(() => {
     }))
 })
 
-onMounted(() => {
+function syncNotificationState() {
   if (typeof window !== 'undefined') {
     try {
       userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
-      deletedNotifIds.value = JSON.parse(localStorage.getItem('deletedNotifs') || '[]')
-      readNotifIds.value = JSON.parse(localStorage.getItem('readNotifs') || '[]')
+      deletedNotifIds.value = JSON.parse(localStorage.getItem('user_deleted_notifications') || localStorage.getItem('deletedNotifs') || '[]')
+      readNotifIds.value = JSON.parse(localStorage.getItem('user_read_notifications') || localStorage.getItem('readNotifs') || '[]')
     } catch (e) {}
+  }
+}
+
+onMounted(() => {
+  syncNotificationState()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', syncNotificationState)
+    window.addEventListener('notifications-updated', syncNotificationState)
   }
 })
 
@@ -117,7 +125,10 @@ function markAllRead() {
     }
   })
   if (typeof window !== 'undefined') {
+    localStorage.setItem('user_read_notifications', JSON.stringify(readNotifIds.value))
     localStorage.setItem('readNotifs', JSON.stringify(readNotifIds.value))
+    window.dispatchEvent(new CustomEvent('notifications-updated'))
+    window.dispatchEvent(new Event('storage'))
   }
 }
 
@@ -125,7 +136,10 @@ function deleteNotification(id: string) {
   if (!deletedNotifIds.value.includes(id)) {
     deletedNotifIds.value.push(id)
     if (typeof window !== 'undefined') {
+      localStorage.setItem('user_deleted_notifications', JSON.stringify(deletedNotifIds.value))
       localStorage.setItem('deletedNotifs', JSON.stringify(deletedNotifIds.value))
+      window.dispatchEvent(new CustomEvent('notifications-updated'))
+      window.dispatchEvent(new Event('storage'))
     }
   }
 }

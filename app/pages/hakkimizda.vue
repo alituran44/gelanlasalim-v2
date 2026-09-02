@@ -77,7 +77,7 @@ definePageMeta({
 
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
             <span class="text-[10px] font-black text-slate-400 uppercase">Resmi KEP Adresi</span>
-            <p class="font-bold text-slate-900 font-mono">ihaleciburada@hs01.kep.tr</p>
+            <p class="font-bold text-slate-900 font-mono">hasanhuseyin.yildirim.17@hs01.kep.tr</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
