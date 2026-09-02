@@ -1076,7 +1076,9 @@ function handleDemoLogin(role: 'company' | 'individual') {
               <span>{{ 'Sıfırlama Bağlantısı Gönderildi!' }}</span>
             </div>
             <p class="text-[11px] leading-relaxed font-medium text-emerald-800">
-              <strong>{{ forgotEmail }}</strong> adresine şifre yenileme e-postası gönderildi. Lütfen e-posta kutunuzu ve spam klasörünüzü kontrol ediniz.
+              <strong>{{ forgotEmail }}</strong> adresine şifre yenileme e-postası gönderildi.
+
+⚠️ <strong>Önemli Hatırlatma:</strong> E-posta gelen kutunuzda görünmüyorsa lütfen <strong>Spam (Gereksiz)</strong> veya <strong>Tanıtımlar</strong> klasörünü kontrol ediniz.
             </p>
             <button @click="activeTab = 'login'" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-black text-xs transition shadow-sm cursor-pointer">
               {{ 'Giriş Ekranına Dön' }}
@@ -1126,25 +1128,35 @@ function handleDemoLogin(role: 'company' | 'individual') {
             <strong class="text-slate-900 font-mono">{{ pendingUserSession?.email || email }}</strong> {{ 'adresine 6 haneli onay kodu gönderilmiştir.' }}
           </p>
 
-          <div class="space-y-2">
-            <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">{{ 'ONAY KODU (OTP)' }}</label>
+                    <div class="space-y-2">
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">{{ '6 HANELİ DOĞRULAMA KODU' }}</label>
             <input 
               v-model="otpInput" 
               type="text" 
               maxlength="6" 
-              placeholder="849201" 
-              class="w-full text-center tracking-[0.5em] text-xl font-mono font-black py-3 bg-slate-50 border-2 border-emerald-300 rounded-2xl text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all shadow-inner" 
+              placeholder="123456" 
+              class="w-full text-center tracking-[0.5em] text-xl font-mono font-black py-3 bg-slate-50 border-2 border-emerald-400 rounded-2xl text-slate-900 outline-none focus:border-emerald-600 focus:bg-white transition-all shadow-inner" 
             />
-            <span class="text-[10px] text-emerald-600 font-bold block text-center mt-1">
-              ✓ {{ 'Demo Onay Kodu Otomatik Dolduruldu: 849201' }}
-            </span>
+          </div>
+
+          <!-- ⚠️ SPAM / GEREKSİZ E-POSTA KLASÖRÜ UYARISI -->
+          <div class="p-3.5 rounded-2xl bg-amber-50/90 border border-amber-200/90 text-left space-y-1.5 shadow-2xs">
+            <div class="flex items-center gap-1.5 text-xs font-black text-amber-900">
+              <span>⚠️</span>
+              <span>E-Posta Gelmedi mi? Lütfen Spam Klasörünü Kontrol Edin</span>
+            </div>
+            <p class="text-[11px] text-amber-800 leading-relaxed font-medium">
+              E-posta servis sağlayıcılarının güvenlik filtreleri nedeniyle doğrulama maili bazen <strong>Spam (Gereksiz)</strong>, <strong>Önemsiz</strong> veya <strong>Tanıtımlar</strong> klasörüne düşebilmektedir. Lütfen bu klasörleri de kontrol ediniz.
+            </p>
           </div>
 
           <div class="flex items-center justify-between text-xs pt-1">
-            <button type="button" @click="resendOtp" class="text-blue-600 font-bold hover:underline cursor-pointer">
-              {{ 'Kodu Tekrar Gönder' }}
+            <button type="button" @click="resendOtp" :disabled="isSendingOtpEmail" class="text-blue-600 font-bold hover:underline cursor-pointer disabled:opacity-50">
+              {{ isSendingOtpEmail ? 'Gönderiliyor...' : '🔄 Yeni Kod Gönder' }}
             </button>
-            <span class="text-slate-400 font-mono text-[10px]">Kalan Süre: 02:45</span>
+            <span class="text-slate-500 font-mono text-xs font-bold bg-slate-100 px-2.5 py-1 rounded-lg">
+              ⏱️ Kalan Süre: {{ Math.floor(otpCountdown / 60) }}:{{ (otpCountdown % 60).toString().padStart(2, '0') }}
+            </span>
           </div>
 
           <button 
