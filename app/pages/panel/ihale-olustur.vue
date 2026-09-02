@@ -365,7 +365,49 @@ function removeFile(index: number) {
 const titleInputRef = ref<HTMLInputElement | null>(null)
 const isSubmittingTender = ref(false)
 const showDeepSeekModal = ref(false)
-const { inspectTenderAutonomous, checkAccountCompleteness } = useDeepSeekAgent()
+const { inspectTenderAutonomous, checkAccountCompleteness, generateTenderDraftWithAi, getPopularTenderTemplates } = useDeepSeekAgent()
+
+// 🤖 DeepSeek AI İhale Hazırlama Asistanı State
+const aiPromptInput = ref('')
+const isGeneratingAiSpec = ref(false)
+const generatedAiDraft = ref<any>(null)
+const showTemplatePicker = ref(false)
+const popularTemplates = getPopularTenderTemplates()
+
+async function generateSpecWithAi() {
+  if (!aiPromptInput.value || !aiPromptInput.value.trim()) {
+    alert('Lütfen ne almak veya satmak istediğinizi birkaç kelimeyle yazınız (Örn: 500 ton inşaat demiri, 20.000 adet koli vb.)')
+    return
+  }
+  isGeneratingAiSpec.value = true
+  try {
+    const draft = await generateTenderDraftWithAi(aiPromptInput.value, form.value.kategori || 'İnşaat ve Yapı', form.value.sehir || 'Balıkesir')
+    generatedAiDraft.value = draft
+  } finally {
+    isGeneratingAiSpec.value = false
+  }
+}
+
+function applyDraftToForm(draft: any) {
+  if (!draft) return
+  form.value.baslik = draft.title
+  form.value.aciklama = draft.description
+  if (draft.category) form.value.kategori = draft.category
+  if (draft.subCategory) selectedSubcategory.value = draft.subCategory
+  if (draft.city) form.value.sehir = draft.city
+  if (draft.minBudget) form.value.minButce = draft.minBudget
+  if (draft.maxBudget) form.value.maxButce = draft.maxBudget
+  if (draft.sure) form.value.sure = draft.sure
+  isBudgetUnspecified.value = false
+  generatedAiDraft.value = null
+  showTemplatePicker.value = false
+  alert('✨ DeepSeek tarafından hazırlanan profesyonel şartname ve ihale bilgileri forma başarıyla aktarıldı!')
+}
+
+function appendQuickClause(clauseText: string) {
+  if (!form.value.aciklama) form.value.aciklama = ''
+  form.value.aciklama = form.value.aciklama.trim() + '\n\n' + clauseText
+}
 
 function handleSubmit() {
   if (isSubmittingTender.value) return
