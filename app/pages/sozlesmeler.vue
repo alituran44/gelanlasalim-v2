@@ -163,7 +163,7 @@ function printDocument() {
             <strong class="text-white">3. Ayıp, Teslimat, Eksik İfa ve Cayma Sorumsuzluğu:</strong> İhale konusu malların/hizmetlerin ayıplı, kusurlu, eksik olması, taahhüt edilen sürede teslim edilmemesi, şartnameye uymaması veya ödemenin gecikmesi hallerinde Platform'un hiçbir doğrudan, dolaylı veya müteselsil hukuki veya cezai sorumluluğu bulunmamaktadır. Alıcı ve Satıcı arasındaki uyuşmazlıklarda yegane muhatap sözleşmenin taraflarıdır.
           </p>
           <p>
-            <strong class="text-white">4. Şeffaf Komisyon Oranları:</strong> Platformumuzda <strong>Alıcı firmalardan ihale açma komisyonu alınmaz (%0 ALICI KOMİSYONU)</strong>. İhaleyi kazanan Tedarikçi firmadan ise Escrow güvenli havuz hesabı ve teknolojik pazaryeri altyapı hizmeti karşılığında yalnızca ihale kesinleşme tutarı üzerinden <strong>net %1,5 (+ KDV) Başarı & Platform Hizmet Bedeli</strong> tahakkuk ettirilir. Kazanılamayan veya iptal edilen ihalelerden hiçbir ücret tahsil edilmez.
+            <strong class="text-white">4. Sabit %4 Escrow ve Platform Komisyonu:</strong> Platformumuzda <strong>sektör ayrımı yapılmaksızın tüm işlemler için sabit net %4 (+ KDV) Escrow Güvenli Havuz ve Platform Hizmet Bedeli</strong> uygulanır. Bu komisyon bedeli yalnızca ihale başarıyla tamamlanıp mal/hizmet teslimatı alıcı tarafından onaylandığında hakediş tutarından tahakkuk ettirilir. Kazanılamayan, sonuçsuz kalan veya iptal edilen ihalelerden hiçbir komisyon tahsil edilmez.
           </p>
         </div>
       </div>
@@ -291,11 +291,13 @@ function printDocument() {
                     Platform işleticisi Şirket, 6563 Sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun m. 2/1-d ve m. 9 uyarınca münhasıran <strong>Aracı Hizmet Sağlayıcı (Elektronik Pazar Yeri & Yer Sağlayıcı)</strong> konumundadır. Platform; Alıcı ile Tedarikçi arasında akdedilen hiçbir ticari sözleşmenin, siparişin veya edimin <strong>tarafı, kefili, garantörü veya vekili DEĞİLDİR</strong>.
                   </p>
                 </div>
-                <p>2.1. <strong>Komisyon ve Platform Hizmet Bedeli Oranları:</strong></p>
-                <ul class="list-disc pl-5 space-y-1 text-slate-800">
-                  <li><strong>Alıcılar (İhale Açanlar) İçin:</strong> İhale açma, teklif toplama ve satın alma süreçlerini yönetme komisyon oranı <strong>%0 (SIFIR KOMİSYON - ÜCRETSİZ)</strong> olarak uygulanır.</li>
-                  <li><strong>Tedarikçiler (Teklif Verenler) İçin:</strong> İhale kazanıldığında, Escrow güvenli ödeme havuzu ve teknolojik pazar yeri altyapı hizmeti karşılığı olarak ihale kesinleşme tutarı üzerinden <strong>net %1,5 (+ KDV) Platform Başarı ve Hizmet Bedeli</strong> tahakkuk ettirilir. İhaleyi kazanamayan tedarikçilerden %0 (hiçbir komisyon veya kesinti) alınmaz.</li>
-                </ul>
+                <p>2.1. <strong>Sektör Ayrımı Olmaksızın Sabit %4 Escrow Komisyonu:</strong></p>
+                <div class="p-3.5 bg-emerald-50 rounded-xl border border-emerald-300 text-emerald-950 space-y-1 text-xs">
+                  <p class="font-bold">✓ Sabit Oran Standartı: Tüm sektörlerde sabit %4 (+ KDV) Escrow ve Başarı Komisyonu uygulanır.</p>
+                  <p class="text-[11px] leading-relaxed">
+                    İhale ve satın alma işlemlerinde sektör ayrımı yapılmaksızın tüm kategorilerde aynı şeffaf oran geçerlidir. Bu komisyon yalnızca ihale kesinleşip mal kabul tutanağı onaylandığında hakediş tutarından tahsil edilir. İptal edilen, tamamlanmayan veya kazanılamayan ihalelerde hiçbir komisyon veya ücret alınmaz (%0).
+                  </p>
+                </div>
                 <p>2.1. <strong>Sözleşmenin Tarafı Olmama:</strong> Şirket, Alıcı ile Tedarikçi arasında kurulan hiçbir alım-satım, eser, hizmet, taşeronluk veya tedarik sözleşmesinin tarafı, garantörü, kefili, temsilcisi, komisyoncusu veya acentesi DEĞİLDİR. Platform münhasıran dijital bir pazar yeri ve e-ihale zemini sunmaktadır.</p>
                 <p>2.2. <strong>İçerik ve Şartname Sorumsuzluğu:</strong> 6563 Sayılı Kanun Madde 9 ve Elektronik Ticarette Hizmet Sağlayıcılar Hakkında Yönetmelik uyarınca Şirket, Kullanıcılar tarafından sisteme yüklenen teknik şartnamelerin, tekliflerin, ürün tanımlarının, lisansların, patentlerin ve görsellerin doğruluğunu, yasallığını veya ayıptan ari olduğunu araştırmakla yükümlü değildir.</p>
                 <p>2.3. <strong>Ayıp, Hasar, Eksik İfa ve Teslimat Temerrüdü:</strong> Tedarik edilen malların kusurlu, hasarlı, eksik çıkması, gecikmeli teslim edilmesi, şartname kriterlerini karşılamaması veya mücbir sebep olmaksızın hiç teslim edilmemesi durumunda tek hukuki muhatap Tedarikçi\'dir. Alıcı, bu nedenlerle Şirket\'ten hiçbir nam altında maddi, manevi veya cezai tazminat talep edemez.</p>
@@ -528,7 +530,7 @@ function printDocument() {
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — HİZMETİN TEMEL NİTELİKLERİ VE FİYATLANDIRMA</h3>
                 <p>2.1. <strong>Hizmet Türü ve Aracı Kurum Statüsü:</strong> Şirketimiz 6563 Sayılı Elektronik Ticaret Kanunu uyarınca Aracı Hizmet Sağlayıcı olup bulut tabanlı B2B e-ihale açma, teklif toplama, canlı tersine eksiltme (reverse auction), tedarikçi KYC doğrulama ve güvenli Escrow havuz entegrasyonu hizmeti sunmaktadır.</p>
-                <p>2.1.1. <strong>Platform Hizmet ve Komisyon Oranları:</strong> Alıcı firmalar için ihale açma komisyonu %0'dır. İhaleyi kazanan tedarikçi firmalardan teknolojik pazar yeri ve Escrow havuz işletim bedeli olarak ihale bedeli üzerinden net %1,5 (+ KDV) platform hizmet bedeli tahsil edilir. Kazanılamayan ihalelerden hiçbir ücret alınmaz.</p>
+                <p>2.1.1. <strong>Sabit %4 Escrow ve Hizmet Bedeli Oranı:</strong> Platformumuzda sektör ayrımı yapılmaksızın tüm işlemler için sabit net %4 (+ KDV) Escrow Güvenli Havuz ve teknolojik pazar yeri işletim bedeli tahsil edilir. Bu bedel yalnızca ihale tamamlanıp mal/hizmet teslimatı alıcı tarafından onaylandığında hakedişten kesilir; kazanılamayan ihalelerden hiçbir ücret alınmaz.</p>
                 <p>2.2. <strong>Paketler ve Toplam Fiyat (Tüm Vergiler Dahil):</strong></p>
                 <ul class="list-disc pl-5 space-y-1 text-slate-600">
                   <li><strong>1 Ay Lansman Deneme Paketi:</strong> 0,00 ₺ (Ücretsiz)</li>
@@ -639,6 +641,7 @@ function printDocument() {
                 <p>4.1. İhale mutabakatında Alıcı bedeli TCMB lisanslı güvenli havuz hesabına yatırır; tutar bloke edilir.</p>
                 <p>4.2. Tedarikçi malı sevk edip sevk irsaliyesini yükler. Alıcı malı muayene edip mal kabul onayını verdiğinde havuzdaki bloke çözülerek hakediş Tedarikçiye aktarılır.</p>
                 <p>4.3. Şirket bir banka değildir; fonlar lisanslı ödeme kuruluşu (PayTR/iyzico) nezdinde güvence altındadır.</p>
+                <p>4.4. <strong>Sabit %4 Escrow ve Platform Komisyonu:</strong> Platformumuzda sektör ayrımı yapılmaksızın tüm ihalelerde <strong>sabit net %4 (+ KDV) Escrow Güvenli Havuz ve Başarı Hizmet Bedeli</strong> uygulanır. Bu bedel yalnızca ihale tamamlanıp mal kabul onayı verildiğinde hakediş tutarından tahakkuk ettirilir. İptal edilen, sonuçlanmayan veya kazanılamayan ihalelerde hiçbir komisyon alınmaz (%0).</p>
               </section>
 
               <section class="space-y-2">

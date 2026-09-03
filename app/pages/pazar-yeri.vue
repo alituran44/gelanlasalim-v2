@@ -1765,16 +1765,16 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
           </div>
 
           <!-- 🛡️ ŞEFFAF KOMİSYON ORANI & ARACI KURUM BİLGİLENDİRMESİ -->
-          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-600 space-y-1 text-left">
-            <div class="flex items-center justify-between font-bold text-slate-800">
+          <div class="p-3 bg-emerald-50/60 border border-emerald-200 rounded-xl text-[11px] text-slate-700 space-y-1.5 text-left">
+            <div class="flex items-center justify-between font-bold text-slate-900">
               <span class="flex items-center gap-1">
-                <span class="text-blue-600">⚖️</span>
-                <span>Platform Aracılık & Escrow Hizmet Oranı:</span>
+                <span class="text-emerald-700 font-black">🛡️</span>
+                <span>Tüm Sektörlerde Sabit Escrow Komisyonu:</span>
               </span>
-              <span class="text-emerald-700 font-black font-mono">%1,5 (+ KDV)</span>
+              <span class="text-emerald-700 font-black font-mono">%4 Sabit (+ KDV)</span>
             </div>
-            <p class="text-[10px] text-slate-500 leading-tight">
-              * Bu oran yalnızca ihale kazanıldığında hakediş tutarından tahsil edilir. İhaleyi kazanamazsanız hiçbir ücret alınmaz. Platform 6563 SK gereğince bağımsız Aracı Hizmet Sağlayıcı olup sözleşmenin tarafı, malın ayıbından veya ifasından sorumlu değildir.
+            <p class="text-[10px] text-slate-600 leading-tight">
+              * Sektör ayrımı yapılmaksızın tüm işlemlerde sabit %4'tür. Bu oran yalnızca ihale kazanılıp teslimat onaylandığında hakedişten tahsil edilir. İhaleyi kazanamazsanız hiçbir ücret alınmaz. Platform 6563 SK gereğince bağımsız Aracı Hizmet Sağlayıcıdır.
             </p>
           </div>
         </div>

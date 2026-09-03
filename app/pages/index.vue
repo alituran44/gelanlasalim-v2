@@ -3472,16 +3472,16 @@ onMounted(() => {
           </div>
 
           <!-- 🛡️ ŞEFFAF KOMİSYON ORANI & ARACI KURUM BİLGİLENDİRMESİ -->
-          <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl text-[11px] text-slate-600 space-y-1 text-left">
-            <div class="flex items-center justify-between font-bold text-slate-800">
+          <div class="p-3 bg-emerald-50/60 border border-emerald-200 rounded-2xl text-[11px] text-slate-700 space-y-1.5 text-left">
+            <div class="flex items-center justify-between font-bold text-slate-900">
               <span class="flex items-center gap-1.5">
-                <span class="text-blue-600 font-black">⚖️</span>
-                <span>Platform Aracılık & Escrow Hizmet Bedeli:</span>
+                <span class="text-emerald-700 font-black">🛡️</span>
+                <span>Tüm Sektörlerde Sabit Escrow Komisyonu:</span>
               </span>
-              <span class="text-emerald-700 font-black font-mono">%1,5 (+ KDV)</span>
+              <span class="text-emerald-700 font-black font-mono">%4 Sabit (+ KDV)</span>
             </div>
-            <p class="text-[10px] text-slate-500 leading-tight">
-              * Bu hizmet bedeli yalnızca ihale kazanıldığında hakediş tutarı üzerinden tahakkuk eder; kazanılamayan ihalelerde <strong>%0 (hiçbir ücret alınmaz)</strong>. Platformumuz 6563 SK kapsamında Aracı Hizmet Sağlayıcı olup alım-satım sözleşmesinin tarafı veya garantörü değildir.
+            <p class="text-[10px] text-slate-600 leading-tight">
+              * Sektör ayrımı yapılmaksızın tüm işlemlerde sabit %4'tür. Bu hizmet bedeli yalnızca ihale kazanılıp mal/hizmet teslimatı alıcı tarafından onaylandığında hakedişten tahakkuk eder; kazanılamayan veya iptal edilen ihalelerde <strong>%0 (hiçbir ücret alınmaz)</strong>. Platformumuz 6563 SK kapsamında Aracı Hizmet Sağlayıcıdır.
             </p>
           </div>
 

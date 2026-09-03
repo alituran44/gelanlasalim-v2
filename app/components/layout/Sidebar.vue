@@ -97,6 +97,7 @@ const sidebarMenus = computed(() => {
       { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
+      { title: "Escrow & Komisyon (%4)", icon: ShieldCheck, to: "/panel/siparis-teslimat", badge: "%4 Sabit" },
       { title: "Üye Firmalar", icon: Building2, to: "/panel/firmalar" },
       { title: "Mücbir Sebep & Fesih", icon: Scale, to: "/panel/mucbir-sebep" },
       { title: "Bildirimler", icon: Bell, to: "/panel/bildirimler" },
@@ -108,6 +109,7 @@ const sidebarMenus = computed(() => {
       { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" },
+      { title: "Escrow & Fee (4%)", icon: ShieldCheck, to: "/panel/siparis-teslimat", badge: "4% Flat" },
       { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
       { title: "Force Majeure & Disputes", icon: Scale, to: "/panel/mucbir-sebep" },
       { title: "Notifications", icon: Bell, to: "/panel/bildirimler" },
@@ -241,8 +243,14 @@ const activePath = computed(() => route.path)
             class="shrink-0 transition-colors"
           />
           <span>{{ item.title }}</span>
+          <span
+            v-if="item.badge"
+            class="ml-auto px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-mono tracking-tight"
+          >
+            {{ item.badge }}
+          </span>
           <ChevronRight
-            v-if="activePath === item.to"
+            v-else-if="activePath === item.to"
             :size="14"
             class="ml-auto"
             style="color: #1EAE4C;"

@@ -220,63 +220,63 @@ if (!formState.commissionSettings) {
       {
             "id": "sec-1",
             "name": "İnşaat, Altyapı & Yapım İşi",
-            "rate": 2.5,
+            "rate": 4,
             "icon": "🏗️",
             "description": "Kaba inşaat, hazır beton, çimento, hafriyat ve şantiye yapım ihaleleri"
       },
       {
             "id": "sec-2",
             "name": "Sağlık, İlaç & Kozmetik",
-            "rate": 3,
+            "rate": 4,
             "icon": "💊",
             "description": "İlaç, serum, sarf malzeme, aşı ve kozmetik tedariği"
       },
       {
             "id": "sec-3",
             "name": "Gıda, Tarım Ürünleri & İçecek",
-            "rate": 2,
+            "rate": 4,
             "icon": "🌾",
             "description": "Toptan un, bakliyat, yağ, et, süt, yaş sebze/meyve ve içecek"
       },
       {
             "id": "sec-4",
             "name": "Tıbbi Cihaz, Laboratuvar & Hastane",
-            "rate": 3,
+            "rate": 4,
             "icon": "🩺",
             "description": "Görüntüleme sistemleri, ameliyathane donanımı ve laboratuvar kitleri"
       },
       {
             "id": "sec-5",
             "name": "Kanalizasyon, Boru, Su & Tesisat",
-            "rate": 2.5,
+            "rate": 4,
             "icon": "🚰",
             "description": "Altyapı boruları, vana, pompa, su arıtma ve sıhhi tesisat"
       },
       {
             "id": "sec-6",
             "name": "Enerji, Aydınlatma & Elektrik",
-            "rate": 2.5,
+            "rate": 4,
             "icon": "⚡",
             "description": "Trafo, jeneratör, kablo, aydınlatma armatürleri ve güneş panelleri"
       },
       {
             "id": "sec-7",
             "name": "Akaryakıt, Gazyağı & Madeni Yağ",
-            "rate": 1.5,
+            "rate": 4,
             "icon": "⛽",
             "description": "Toptan motorin, benzin, sanayi yakıtı ve madeni yağlar"
       },
       {
             "id": "sec-8",
             "name": "Endüstriyel Makine & Motor",
-            "rate": 3.5,
+            "rate": 4,
             "icon": "⚙️",
             "description": "CNC tezgahları, sanayi presleri, elektrik motorları ve konveyörler"
       },
       {
             "id": "sec-9",
             "name": "Yazılım, Bilişim & IT Hizmetleri",
-            "rate": 5,
+            "rate": 4,
             "icon": "💻",
             "description": "ERP, CRM, özel yazılım, sunucu, bulut lisansları ve IT altyapısı"
       },
@@ -290,42 +290,42 @@ if (!formState.commissionSettings) {
       {
             "id": "sec-11",
             "name": "Mobilya, Beyaz Eşya & Ofis",
-            "rate": 3.5,
+            "rate": 4,
             "icon": "🪑",
             "description": "Büro mobilyası, dayanıklı tüketim malları ve mutfak ekipmanları"
       },
       {
             "id": "sec-12",
             "name": "Hırdavat, Nalburiye, Metal & Plastik",
-            "rate": 3,
+            "rate": 4,
             "icon": "🔩",
             "description": "Bağlantı elemanları, el aletleri, profil sac ve endüstriyel plastik"
       },
       {
             "id": "sec-13",
             "name": "Yangın Algılama, Söndürme & Güvenlik",
-            "rate": 3,
+            "rate": 4,
             "icon": "🧯",
             "description": "Yangın dolapları, sprinkler, duman dedektörleri ve alarm panoları"
       },
       {
             "id": "sec-14",
             "name": "Kimyasal Maddeler, Dezenfektan & Gübre",
-            "rate": 2.5,
+            "rate": 4,
             "icon": "🧪",
             "description": "Sanayi kimyasalları, tarımsal gübre, ziraat ilaçları ve dezenfektan"
       },
       {
             "id": "sec-15",
             "name": "Matbaa, Toner, Ambalaj & Kırtasiye",
-            "rate": 3,
+            "rate": 4,
             "icon": "📦",
             "description": "Oluklu mukavva koli, ambalaj streci, fotokopi kağıdı ve toner"
       },
       {
             "id": "sec-16",
             "name": "Kent Mobilyaları, Prefabrik & Çelik",
-            "rate": 3,
+            "rate": 4,
             "icon": "🏙️",
             "description": "Park ekipmanları, konteyner, prefabrik binalar ve çelik konstrüksiyon"
       },
@@ -339,35 +339,35 @@ if (!formState.commissionSettings) {
       {
             "id": "sec-18",
             "name": "Madencilik, Doğal Kaynak & Sondaj",
-            "rate": 2.5,
+            "rate": 4,
             "icon": "⛏️",
             "description": "Mermer, kireçtaşı, agrega, maden cevheri ve sondaj ekipmanları"
       },
       {
             "id": "sec-19",
             "name": "Asansör, Yürüyen Merdiven & Otomasyon",
-            "rate": 3.5,
+            "rate": 4,
             "icon": "🛗",
             "description": "Yolcu/yük asansörleri, yürüyen bantlar ve bina otomasyonu"
       },
       {
             "id": "sec-20",
             "name": "Klima, Havalandırma & Soğutma",
-            "rate": 3,
+            "rate": 4,
             "icon": "❄️",
             "description": "VRF sistemleri, soğuk hava depoları, kazanlar ve havalandırma kanalları"
       },
       {
             "id": "sec-21",
             "name": "Savunma Sanayii, Denizcilik & Havacılık",
-            "rate": 3,
+            "rate": 4,
             "icon": "🛡️",
             "description": "Taktik ekipman, bot donanımı, aviyonik aksam ve kompozit malzemeler"
       },
       {
             "id": "sec-22",
             "name": "Taşıt, İş Makinesi & Yedek Parça",
-            "rate": 2.5,
+            "rate": 4,
             "icon": "🚜",
             "description": "Ekskavatör, loder, forklift, kamyon ve orijinal yedek parçalar"
       },
@@ -381,98 +381,98 @@ if (!formState.commissionSettings) {
       {
             "id": "sec-24",
             "name": "Reklam, Tabela & Tanıtım Materyalleri",
-            "rate": 4.5,
+            "rate": 4,
             "icon": "📢",
             "description": "Işıklı tabela, led ekran, totem, açık hava reklamcılığı ve promosyon"
       },
       {
             "id": "sec-25",
             "name": "Ormancılık, Fidan, Bitki & Peyzaj",
-            "rate": 3,
+            "rate": 4,
             "icon": "🌲",
             "description": "Fidan üretimi, çimleme, ağaçlandırma ve çevre düzenleme"
       },
       {
             "id": "sec-26",
             "name": "Hayvancılık, Veterinerlik & Yem",
-            "rate": 2,
+            "rate": 4,
             "icon": "🐄",
             "description": "Büyükbaş/küçükbaş hayvan, karma yem, premiks ve veteriner ilaçları"
       },
       {
             "id": "sec-27",
             "name": "Sanat Eserleri, Enstrüman & Heykel",
-            "rate": 5,
+            "rate": 4,
             "icon": "🎨",
             "description": "Sanatsal anıt, kent heykelleri, enstrüman ve müze sergileme"
       },
       {
             "id": "sec-28",
             "name": "Odun, Kömür & Katı Yakıtlar",
-            "rate": 2,
+            "rate": 4,
             "icon": "🪵",
             "description": "Toptan linyit kömürü, odun, pelet ve briket yakıt"
       },
       {
             "id": "sec-29",
             "name": "Hazır Yemek, Tabldot & Lokantacılık",
-            "rate": 2.5,
+            "rate": 4,
             "icon": "🍽️",
             "description": "Toplu yemek üretimi, şantiye/hastane yemekhanesi ve kumanya"
       },
       {
             "id": "sec-30",
             "name": "Elektronik, Bilgisayar & Ölçü Aletleri",
-            "rate": 3.5,
+            "rate": 4,
             "icon": "🖥️",
             "description": "PC, tablet, endüstriyel switch, multimetre ve kalibrasyon aletleri"
       },
       {
             "id": "sec-31",
             "name": "Kamera, CCTV & Haberleşme",
-            "rate": 3.5,
+            "rate": 4,
             "icon": "📹",
             "description": "IP kamera sistemleri, NVR, telsiz, fiber optik ve telsiz kuleleri"
       },
       {
             "id": "sec-32",
             "name": "Temizlik, İlaçlama & Atık Yönetimi",
-            "rate": 3,
+            "rate": 4,
             "icon": "🧹",
             "description": "Tesis temizliği, vektör ilaçlama, geri dönüşüm ve tıbbi atık bertarafı"
       },
       {
             "id": "sec-33",
             "name": "Tekstil, İş Elbiseleri & Giyim",
-            "rate": 3,
+            "rate": 4,
             "icon": "👕",
             "description": "Reflektörlü iş kıyafetleri, üniforma, ayakkabı ve kurumsal tekstil"
       },
       {
             "id": "sec-34",
             "name": "İş Sağlığı & Güvenliği (İSG)",
-            "rate": 3.5,
+            "rate": 4,
             "icon": "⛑️",
             "description": "Baret, emniyet kemeri, gaz maskesi, iş gözlüğü ve İSG donanımları"
       },
       {
             "id": "sec-35",
             "name": "Özel Güvenlik & Koruma Hizmetleri",
-            "rate": 3.5,
+            "rate": 4,
             "icon": "👮",
             "description": "Fiziki güvenlik, koruma personeli, x-ray ve güvenlik bariyerleri"
       },
       {
             "id": "sec-36",
             "name": "Eğitim, Tercümanlık & Danışmanlık",
-            "rate": 4.5,
+            "rate": 4,
             "icon": "📚",
             "description": "Kurumsal eğitimler, yeminli tercüme, anket ve pazar araştırması"
       },
       {
             "id": "sec-37",
             "name": "İşletmecilik & Tesis Yönetimi",
-            "rate": 3.5,
+            "rate": 4,
             "icon": "🤝",
             "description": "Bina yönetimi, resepsiyon, kurye ve veri giriş personeli"
       },
@@ -486,14 +486,14 @@ if (!formState.commissionSettings) {
       {
             "id": "sec-39",
             "name": "Araç Satışı & Hurda İhaleleri",
-            "rate": 2,
+            "rate": 4,
             "icon": "🚗",
             "description": "Filo araç satışları, demir/bakır hurda ve atık malzeme ihaleleri"
       },
       {
             "id": "sec-40",
             "name": "Gayrimenkul, Arsa & Kiralama",
-            "rate": 2,
+            "rate": 4,
             "icon": "🏢",
             "description": "Ticari bina, fabrika, arsa satışı, depo ve büfe/kantin kiralama"
       }
@@ -520,6 +520,15 @@ const newSectorRate = ref({
   icon: '🏢',
   description: ''
 })
+
+function setAllSectorsTo4() {
+  if (formState.commissionSettings?.sectorRates) {
+    formState.commissionSettings.sectorRates.forEach((s: any) => {
+      s.rate = 4.0
+    })
+    triggerToast('Tüm 40 sektör komisyonu sabit %4 olarak güncellendi!', 'success')
+  }
+}
 
 function addSectorRate() {
   if (!newSectorRate.value.name) return
@@ -3960,13 +3969,21 @@ function removeSubmittedBid(index: number) {
                   <div class="flex items-center gap-2">
                     <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
                       <Layers :size="16" class="text-emerald-500" />
-                      Sektör Bazlı Özel Komisyon Oranları
+                      Sektör Komisyon Oranları (Sabit %4 Standartı)
                     </h3>
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-mono">
                       {{ (formState.commissionSettings?.sectorRates || []).length }} Sektör Aktif
                     </span>
+                    <button 
+                      type="button" 
+                      @click="setAllSectorsTo4" 
+                      class="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold cursor-pointer transition"
+                      title="Tüm sektörleri standart %4 oranına sıfırla"
+                    >
+                      ⚡ Tümünü %4 Yap
+                    </button>
                   </div>
-                  <p class="text-[11px] text-slate-400 mt-0.5">Platformdaki 40 ana sektörün kar marjlarına göre özelleştirilmiş komisyon oranları ve açıklamaları.</p>
+                  <p class="text-[11px] text-emerald-400 mt-0.5 font-bold">Platform Genel Kuralı: Sektör ayrımı yapılmaksızın tüm sektörlerde standart %4 (+ KDV) Escrow komisyonu uygulanmaktadır.</p>
                 </div>
 
                 <!-- Search Input for Sectors -->

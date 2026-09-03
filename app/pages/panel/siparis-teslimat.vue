@@ -80,9 +80,9 @@ const orders = computed(() => {
           totalAmount: approved.fiyat,
           amount: approved.fiyat,
           numericAmount: numVal,
-          payoutAmount: Math.round(numVal * 0.97).toLocaleString('tr-TR') + ' ₺',
-          commissionAmount: Math.round(numVal * 0.03).toLocaleString('tr-TR') + ' ₺',
-          commissionRate: 3,
+          payoutAmount: Math.round(numVal * 0.96).toLocaleString('tr-TR') + ' ₺',
+          commissionAmount: Math.round(numVal * 0.04).toLocaleString('tr-TR') + ' ₺',
+          commissionRate: 4,
           status: 'HAVUZDA_BLOKE',
           statusLabel: 'Güvenli Havuzda Bloke Edildi',
           trackingCode: 'YK-8829104',
@@ -135,7 +135,7 @@ const totalPlatformCommission = computed(() => {
   return orders.value
     .filter(o => o.status === 'TAMAMLANDI')
     .reduce((acc, o) => {
-      const comm = (o.numericAmount || 0) * ((o.commissionRate || 3) / 100)
+      const comm = (o.numericAmount || 0) * ((o.commissionRate || 4) / 100)
       return acc + comm
     }, 0)
 })

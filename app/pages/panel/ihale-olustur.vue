@@ -731,11 +731,14 @@ function resetFormAndCreateNew() {
       <!-- KART 1: GENEL BİLGİLER -->
       <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
         <!-- 🛡️ ALICI İÇİN %0 KOMİSYON VE ARACI KURUM BİLGİLENDİRMESİ -->
-        <div class="p-3.5 bg-emerald-50/90 border border-emerald-200 rounded-2xl text-xs text-emerald-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 shadow-2xs">
+        <div class="p-3.5 bg-emerald-50/90 border border-emerald-200 rounded-2xl text-xs text-emerald-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
           <div class="flex items-center gap-2">
             <span class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-black text-[10px] tracking-wider uppercase shrink-0">%0 ALICI KOMİSYONU</span>
-            <span class="font-medium text-[11px] text-emerald-900 leading-relaxed">İhale açmak, şartname yüklemek ve tedarikçilerden rekabetçi teklif toplamak alıcı firmalar için <strong>%100 ücretsizdir</strong>. Platformumuz 6563 SK kapsamında Aracı Hizmet Sağlayıcı olup alıcılardan herhangi bir komisyon veya kesinti yapmaz.</span>
+            <span class="font-medium text-[11px] text-emerald-900 leading-relaxed">İhale açmak ve teklif toplamak alıcı firmalar için <strong>%100 ücretsizdir</strong>. Tüm sektörlerde sabit <strong>%4 Escrow Güvenli Havuz</strong> güvencesiyle mal kabulü yapılmadan ödeme aktarılmaz.</span>
           </div>
+          <NuxtLink to="/sozlesmeler?tab=kullanim" class="px-2.5 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold text-[10px] whitespace-nowrap transition">
+            Komisyon & Escrow Şartları →
+          </NuxtLink>
         </div>
 
         <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">1. İhale Genel Bilgileri</h2>

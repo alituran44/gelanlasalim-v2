@@ -30,6 +30,13 @@ definePageMeta({
 
 const { cmsData } = useCmsData()
 
+const calcAmount = ref('100.000')
+const calcNum = computed(() => {
+  return parseInt(String(calcAmount.value).replace(/\D/g, '')) || 0
+})
+const calcEscrowFee = computed(() => Math.round(calcNum.value * 0.04))
+const calcNetPayout = computed(() => Math.round(calcNum.value * 0.96))
+
 const companyName = ref('Kurumsal Üye Hesabı')
 const userRole = ref('company')
 const isVerified = ref(true)
@@ -204,6 +211,82 @@ onMounted(() => {
         </div>
       </NuxtLink>
 
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 🛡️ 3. SABİT %4 ESCROW GÜVENLİ HAVUZ VE KOMİSYON PANOSU (SEKTÖR AYRIMSIZ) -->
+    <!-- ========================================================================= -->
+    <div class="bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 rounded-2xl p-5 sm:p-6 text-white border-2 border-emerald-500/40 shadow-xl space-y-4">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-700/80 pb-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 flex items-center justify-center font-black text-lg shrink-0 shadow-inner">
+            🛡️
+          </div>
+          <div>
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-wider">
+                SEKTÖR AYRIMSIZ STANDART ORAN
+              </span>
+              <span class="text-xs text-slate-400 font-mono">TCMB & BDDK Lisanslı Güvenli Havuz</span>
+            </div>
+            <h2 class="text-base sm:text-lg font-black text-white mt-1">
+              Tüm Sektörlerde Sabit %4 Escrow & Platform Komisyonu
+            </h2>
+          </div>
+        </div>
+
+        <NuxtLink 
+          to="/sozlesmeler?tab=kullanim"
+          class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition shadow-md flex items-center gap-1.5 shrink-0"
+        >
+          <span>📋 Resmi Sözleşme Şartları</span>
+        </NuxtLink>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
+        <div class="lg:col-span-7 text-xs text-slate-300 space-y-2 leading-relaxed">
+          <p>
+            İhaleciBurada'da sürpriz veya gizli maliyet yoktur. Hangi sektörde ihale açarsanız açın veya teklif verirseniz verin, <strong>sektör ayrımı yapılmaksızın sabit %4 (+ KDV)</strong> Escrow Güvenli Havuz komisyonu uygulanır.
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1">
+            <div class="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center gap-2 text-emerald-300">
+              <span class="font-black text-base">✓</span>
+              <span><strong>İptal / Başarısız İhalelerde:</strong> %0 (Hiçbir komisyon alınmaz)</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center gap-2 text-emerald-300">
+              <span class="font-black text-base">✓</span>
+              <span><strong>Tahsilat Garantisi:</strong> Mal kabulü yapılmadan hakediş serbest kalmaz</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hızlı Canlı Hesaplayıcı -->
+        <div class="lg:col-span-5 p-3.5 rounded-xl bg-slate-800/90 border border-emerald-500/30 space-y-2.5">
+          <div class="text-[11px] font-bold text-slate-300 flex justify-between items-center">
+            <span>Canlı Komisyon Hesaplama:</span>
+            <span class="text-emerald-400 font-mono font-black">%4 Sabit</span>
+          </div>
+          <div class="relative">
+            <input 
+              v-model="calcAmount" 
+              type="text" 
+              placeholder="Örn: 100.000"
+              class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs font-mono font-black text-white outline-none focus:border-emerald-500"
+            />
+            <span class="absolute right-3 top-2 text-xs text-slate-400 font-bold">₺</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-[11px] font-mono pt-1 border-t border-slate-700">
+            <div>
+              <span class="text-[10px] text-slate-400 uppercase block">Escrow Kesintisi (%4)</span>
+              <span class="text-amber-400 font-bold font-mono">{{ calcEscrowFee.toLocaleString('tr-TR') }} ₺</span>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] text-slate-400 uppercase block">Net Hakediş</span>
+              <span class="text-emerald-400 font-black font-mono">{{ calcNetPayout.toLocaleString('tr-TR') }} ₺</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ========================================================================= -->

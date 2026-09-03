@@ -212,6 +212,16 @@ const pageTitle = computed(() => {
     <!-- Right: Actions & Links -->
     <div class="flex items-center gap-2">
 
+      <!-- 🛡️ Sabit %4 Escrow Komisyon Rozeti & Kolay Erişim Linki -->
+      <NuxtLink
+        to="/panel/siparis-teslimat"
+        class="hidden sm:flex items-center gap-1.5 rounded-xl border border-emerald-300 bg-emerald-50/90 px-3 py-1.5 text-xs font-black text-emerald-900 hover:bg-emerald-100 transition shadow-2xs"
+        title="Sektör ayrımı yapmaksızın tüm işlemlerde sabit %4 Escrow komisyonu"
+      >
+        <ShieldCheck :size="14" class="text-emerald-600" />
+        <span>Escrow Komisyonu: <strong class="text-emerald-700 font-mono font-black">%4 Sabit</strong></span>
+      </NuxtLink>
+
       <!-- Home Page Button -->
       <NuxtLink
         to="/"
