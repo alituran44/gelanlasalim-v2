@@ -1,51 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://gelanlasalim-v2.vercel.app/</loc>
-    <lastmod>2026-08-06</lastmod>
+    <loc>https://ihaleciburada.com/</loc>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://gelanlasalim-v2.vercel.app/pazar-yeri</loc>
-    <lastmod>2026-08-06</lastmod>
+    <loc>https://ihaleciburada.com/pazar-yeri</loc>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://gelanlasalim-v2.vercel.app/sozlesmeler</loc>
-    <lastmod>2026-08-06</lastmod>
+    <loc>https://ihaleciburada.com/sozlesmeler</loc>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gelanlasalim-v2.vercel.app/abonelik</loc>
-    <lastmod>2026-08-06</lastmod>
+    <loc>https://ihaleciburada.com/legal</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://ihaleciburada.com/abonelik</loc>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://gelanlasalim-v2.vercel.app/entegrasyonlar</loc>
-    <lastmod>2026-08-06</lastmod>
+    <loc>https://ihaleciburada.com/firma-dogrulama</loc>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://gelanlasalim-v2.vercel.app/yardim</loc>
-    <lastmod>2026-08-06</lastmod>
+    <loc>https://ihaleciburada.com/videolar</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ihaleciburada.com/entegrasyonlar</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ihaleciburada.com/hakkimizda</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://ihaleciburada.com/yardim</loc>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://gelanlasalim-v2.vercel.app/uyelik</loc>
-    <lastmod>2026-08-06</lastmod>
+    <loc>https://ihaleciburada.com/uyelik</loc>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://gelanlasalim-v2.vercel.app/firma-dogrulama</loc>
-    <lastmod>2026-08-06</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
   </url>
 </urlset>

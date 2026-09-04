@@ -672,13 +672,6 @@ function confirm2FaActivation() {
 
 function toggle2FA() {
   trigger2FaToggle()
-  return
-
-  companyForm.value.is2FaEnabled = !companyForm.value.is2FaEnabled
-  showToast(
-    companyForm.value.is2FaEnabled ? "E-posta ile İki Aşamalı Doğrulama başarıyla aktifleştirildi." : "İki aşamalı doğrulama kapatıldı.",
-    companyForm.value.is2FaEnabled ? "success" : "warning"
-  )
 }
 
 const profileAvatarUrl = ref<string>('')
