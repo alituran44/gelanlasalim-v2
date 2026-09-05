@@ -22,7 +22,7 @@ export default defineNuxtConfig({
 
     // Public keys (client & server)
     public: {
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://ihaleciburada.com',
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://www.ihaleciburada.com',
       gaId: process.env.NUXT_PUBLIC_GA_ID || '', // Google Analytics 4 ID (e.g. G-XXXXXXXXXX)
       googleSiteVerification: process.env.NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'google-site-verification-token',
     }
@@ -35,16 +35,16 @@ export default defineNuxtConfig({
       crawlLinks: true,
     },
     routeRules: {
-      // Statik JS/CSS varlıkları için 1 yıllık değişmez önbellek (Caching)
-      '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable' } },
-      // Görseller ve ikonlar için 7 günlük önbellek
-      '/**/*.png': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000' } },
-      '/**/*.jpg': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000' } },
-      '/**/*.ico': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000' } },
-      '/**/*.svg': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000' } },
+      // Statik JS/CSS varlıkları için 1 yıllık değişmez önbellek (Caching) & CORS serbestisi
+      '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable', 'access-control-allow-origin': '*' } },
+      // Görseller ve ikonlar için 7 günlük önbellek & CORS
+      '/**/*.png': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': '*' } },
+      '/**/*.jpg': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': '*' } },
+      '/**/*.ico': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': '*' } },
+      '/**/*.svg': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': '*' } },
       // SEO & Crawler dosyaları
-      '/robots.txt': { headers: { 'cache-control': 'public, max-age=86400' } },
-      '/sitemap.xml': { headers: { 'cache-control': 'public, max-age=86400' } },
+      '/robots.txt': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': '*' } },
+      '/sitemap.xml': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': '*' } },
       // Yasal Sayfa Kısayolları (301 Yönlendirme)
       '/legal': { redirect: { to: '/sozlesmeler', statusCode: 301 } },
       '/yasal': { redirect: { to: '/sozlesmeler', statusCode: 301 } },
@@ -89,14 +89,14 @@ export default defineNuxtConfig({
         { property: 'og:locale', content: 'tr_TR' },
         { property: 'og:title', content: 'İhaleciBurada.com — Kurumsal B2B İhale ve Satın Alma Platformu' },
         { property: 'og:description', content: 'Satın alma taleplerinizi dijital ihale ve şeffaf teklif modülü ile en avantajlı maliyete dönüştürün.' },
-        { property: 'og:url', content: 'https://ihaleciburada.com' },
+        { property: 'og:url', content: 'https://www.ihaleciburada.com' },
         { property: 'og:site_name', content: 'İhaleciBurada' },
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:title', content: 'İhaleciBurada — Kurumsal B2B İhale' },
         { name: 'twitter:description', content: 'Satın alma maliyetlerinizi dijital ihale ve doğrudan teklif ile optimize edin.' }
       ],
       link: [
-        { rel: 'canonical', href: 'https://ihaleciburada.com' },
+        { rel: 'canonical', href: 'https://www.ihaleciburada.com' },
         { rel: 'icon', type: 'image/png', href: '/logo.png' }
       ],
       script: [

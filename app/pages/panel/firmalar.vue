@@ -36,10 +36,16 @@ const showInviteModal = ref(false)
 const inviteEmail = ref('')
 const inviteCompanyName = ref('')
 const inviteCopied = ref(false)
+const inviteUrl = computed(() => {
+  if (typeof window !== 'undefined') {
+    return `${window.location.origin}/uyelik?ref=portal`
+  }
+  return 'https://www.ihaleciburada.com/uyelik?ref=portal'
+})
 
 function copyInviteLink() {
   if (typeof navigator !== 'undefined' && navigator.clipboard) {
-    navigator.clipboard.writeText('https://gelanlasalim-v2.vercel.app/uyelik?ref=portal')
+    navigator.clipboard.writeText(inviteUrl.value)
     inviteCopied.value = true
     setTimeout(() => {
       inviteCopied.value = false
@@ -261,7 +267,7 @@ function openCompanyModal(firm: any) {
         <div class="pt-2">
           <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">HIZLI PAYLAŞIM LİNKİ</label>
           <div class="flex items-center gap-2">
-            <input readonly value="https://gelanlasalim-v2.vercel.app/uyelik?ref=portal" class="flex-1 rounded-xl border px-3 py-2 bg-slate-50 text-slate-600 font-mono text-[11px] outline-none" />
+            <input readonly :value="inviteUrl" class="flex-1 rounded-xl border px-3 py-2 bg-slate-50 text-slate-600 font-mono text-[11px] outline-none" />
             <button @click="copyInviteLink" type="button" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-1 cursor-pointer">
               <CheckCircle2 v-if="inviteCopied" :size="12" class="text-emerald-600" />
               <Copy v-else :size="12" />
