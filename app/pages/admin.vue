@@ -858,7 +858,7 @@ function syncLiveState() {
         phone: usr.phone || '0850 840 86 95',
         taxNo: usr.taxNo || '4700854210',
         taxOffice: usr.taxOffice || 'Çanakkale Vergi Dairesi',
-        mersis: usr.mersis || '0470-0854-2100-0001',
+        mersis: usr.mersis || '',
         sicilNo: usr.sicilNo || '14520',
         sectors: usr.sectors || 'Tedarik, Satın Alma, Ticaret',
         authProvider: usr.authProvider || 'google',

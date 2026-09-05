@@ -224,7 +224,6 @@ const legalLinks = [
               <strong class="text-white block font-bold">İhaleciBurada Platform A.Ş.</strong>
               <span class="text-slate-400 block">İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale</span>
               <span class="text-slate-400 block font-mono text-[10px]">Çanakkale V.D. / VKN: 4700854210</span>
-              <span class="text-slate-400 block font-mono text-[10px]">MERSİS: 0470085421000001</span>
               <span class="text-slate-400 block font-mono text-[10px]">KEP: hasanhuseyin.yildirim.17@hs01.kep.tr</span>
             </p>
             

@@ -192,7 +192,7 @@ ${tender?.aciklama || tender?.baslik || 'Teknik sartname esaslarina gore temin s
 - Dogrulama Hash: SHA-256-${tender?.id || 'CERT'}-VALID-SECURE
 - Belge Adi: ${fileName}
 
-IhaleciBurada Platform A.S. | GIB VKN: 4700854210 | Mersis: 0470-0854-2100-0001
+IhaleciBurada Platform A.S. | GIB VKN: 4700854210
 ================================================================================`;
 
   const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
@@ -2030,7 +2030,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
                 <div>
                   <div class="text-[10px] font-black uppercase text-blue-900 tracking-wider">T.C. ELEKTRONİK TİCARET VE B2B İHALE SİSTEMİ</div>
                   <div class="text-base font-black text-slate-900 tracking-tight">İHALECİBURADA RESMİ İHALE ŞARTNAMESİ</div>
-                  <div class="text-[10px] text-slate-500">Mersis: 0470-0854-2100-0001 · GİB VKN: 4700854210</div>
+                  <div class="text-[10px] text-slate-500">GİB VKN: 4700854210</div>
                 </div>
               </div>
               <div class="text-right sm:border-l sm:pl-4 border-slate-200">

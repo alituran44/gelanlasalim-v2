@@ -1484,7 +1484,7 @@ function saveProfile() {
               </div>
               <div>
                 <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">MERSİS Numarası</label>
-                <input v-model="companyForm.mersis" type="text" placeholder="0470-0854-2100-0001" class="w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono bg-white outline-none" style="border-color: #E2E8F0;" />
+                <input v-model="companyForm.mersis" type="text" placeholder="Varsa MERSİS Numaranız" class="w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono bg-white outline-none" style="border-color: #E2E8F0;" />
               </div>
               <div>
                 <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Ticaret Sicil No</label>

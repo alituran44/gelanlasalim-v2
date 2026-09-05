@@ -112,10 +112,6 @@ function printDocument() {
               <strong class="text-slate-900 font-mono">Çanakkale / 4700854210</strong>
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
-              <span class="text-[9px] font-black text-slate-400 block uppercase">MERSİS No</span>
-              <strong class="text-slate-900 font-mono">0470085421000001</strong>
-            </div>
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">Ticaret Sicil No</span>
               <strong class="text-slate-900 font-mono">14520</strong>
             </div>
@@ -250,7 +246,7 @@ function printDocument() {
               RESMİ HUKUKİ METİN · YÜRÜRLÜK TARİHİ: 2026.08
             </span>
             <span class="text-[11px] font-mono font-bold text-slate-400">
-              MERSİS: 0470085421000001
+              VKN: 4700854210
             </span>
           </div>
 
@@ -521,7 +517,7 @@ function printDocument() {
                   <p><strong>Ticaret Unvanı:</strong> İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş.</p>
                   <p><strong>Merkez Adresi:</strong> İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</p>
                   <p><strong>Vergi Dairesi & No:</strong> Çanakkale Vergi Dairesi / VKN: 4700854210</p>
-                  <p><strong>MERSİS Numarası:</strong> 0470085421000001 | <strong>Ticaret Sicil No:</strong> 14520</p>
+                  <p><strong>Ticaret Sicil No:</strong> 14520</p>
                   <p><strong>Telefon / Müşteri Destek:</strong> 0850 840 86 95 | <strong>E-Posta:</strong> ihalecib@gmail.com</p>
                   <p><strong>KEP Adresi:</strong> hasanhuseyin.yildirim.17@hs01.kep.tr | <strong>Web Sitesi:</strong> https://ihaleciburada.com</p>
                 </div>
