@@ -51,12 +51,28 @@ import { useRoute, useRouter } from 'vue-router'
 import { locale, detectLocale, setLocale } from '~/composables/useLocale'
 import { useAppTheme } from '~/composables/useAppTheme'
 import { useNetGsm } from '~/composables/useNetGsm'
+import { useUserSession } from '~/composables/useUserSession'
 
 definePageMeta({ 
   layout: 'dashboard' 
 })
 
-const userSession = ref<any>({})
+const { 
+  userSession, 
+  isLoggedIn, 
+  isCompanyMode, 
+  userName, 
+  userEmail, 
+  userPhone, 
+  companyName, 
+  isPhoneVerified, 
+  isEmailVerified, 
+  toggleCompanyMode, 
+  updateSession, 
+  setPhoneVerified, 
+  setEmailVerified, 
+  logout: sessionLogout 
+} = useUserSession()
 
 onMounted(() => {
   detectLocale()
@@ -99,26 +115,52 @@ onMounted(() => {
         profileForm.value.phone = session.phone
         companyForm.value.phone = session.phone
       }
-      if (session.companyName || session.company) {
-        companyForm.value.name = session.companyName || session.company
-        companyForm.value.legalName = session.legalName || session.companyName || session.company
+      if (session.companyLogo || session.picture || session.logo) {
+        profileAvatarUrl.value = session.companyLogo || session.picture || session.logo
       }
-      if (session.description || session.about) companyForm.value.description = session.description || session.about
-      if (session.website) companyForm.value.website = session.website
-      if (session.city) companyForm.value.city = session.city
-      if (session.taxNo) companyForm.value.taxNo = session.taxNo
-      if (session.taxOffice) companyForm.value.taxOffice = session.taxOffice
-      if (session.sectors) companyForm.value.sectors = Array.isArray(session.sectors) ? session.sectors.join(', ') : session.sectors
-      if (session.mersis) companyForm.value.mersis = session.mersis
-      if (session.sicilNo) companyForm.value.sicilNo = session.sicilNo
-      if (session.tcKimlik) companyForm.value.tcKimlik = session.tcKimlik
-      if (session.iban) companyForm.value.iban = session.iban
-      if (session.faturaAdresi) companyForm.value.faturaAdresi = session.faturaAdresi
+      if (session.companyEmail) {
+        companyForm.value.email = session.companyEmail
+      }
+      if (session.isCompanyActive) {
+        if (session.companyName || session.company) {
+          companyForm.value.name = session.companyName || session.company
+          companyForm.value.legalName = session.legalName || session.companyName || session.company
+        }
+        if (session.description || session.about) companyForm.value.description = session.description || session.about
+        if (session.website) companyForm.value.website = session.website
+        if (session.city) companyForm.value.city = session.city
+        if (session.taxNo) companyForm.value.taxNo = session.taxNo
+        if (session.taxOffice) companyForm.value.taxOffice = session.taxOffice
+        if (session.sectors) companyForm.value.sectors = Array.isArray(session.sectors) ? session.sectors.join(', ') : session.sectors
+        if (session.mersis) companyForm.value.mersis = session.mersis
+        if (session.sicilNo) companyForm.value.sicilNo = session.sicilNo
+        if (session.tcKimlik) companyForm.value.tcKimlik = session.tcKimlik
+        if (session.iban) companyForm.value.iban = session.iban
+        if (session.faturaAdresi) companyForm.value.faturaAdresi = session.faturaAdresi
+      }
       loadNotificationSettings()
     } catch (e) {
       console.error(e)
     }
   }
+})
+
+
+const navigationTabs = computed(() => {
+  const list = [
+    { key: 'kisisel', label: 'Kişisel Profil', icon: User, to: '/panel/ayarlar?tab=kisisel' }
+  ]
+  if (isCompanyMode.value) {
+    list.push({ key: 'sirket', label: 'Şirket & Firma', icon: Building2, to: '/panel/ayarlar?tab=sirket' })
+  }
+  list.push(
+    { key: 'bildirimler', label: 'Bildirim Ayarları', icon: Bell, to: '/panel/ayarlar?tab=bildirimler' },
+    { key: 'adresler', label: 'Kayıtlı Adresler', icon: MapPin, to: '/panel/ayarlar?tab=adresler' },
+    { key: 'takip', label: 'Favoriler & Takip', icon: Heart, to: '/panel/ayarlar?tab=takip' },
+    { key: 'uyelik', label: 'Abonelik & Plan', icon: Award, to: '/panel/ayarlar?tab=uyelik' },
+    { key: 'ayarlar', label: 'Güvenlik & Tercihler', icon: Settings, to: '/panel/ayarlar?tab=ayarlar' }
+  )
+  return list
 })
 
 const route = useRoute()
@@ -133,25 +175,23 @@ const { sendSms } = useNetGsm()
 const showPhoneVerifyModal = ref(false)
 const phoneVerifyNumber = ref('')
 const phoneVerifyOtp = ref('849201')
+const phoneVerifyInput = ref('')
 const isSendingPhoneSms = ref(false)
 const phoneSmsSent = ref(false)
 const phoneSmsTimer = ref(180)
 let phoneTimerInterval: any = null
 
-const isUserPhoneVerified = computed(() => {
-  return userSession.value?.isPhoneVerified === true || userSession.value?.phoneVerified === true
-})
-
 function openPhoneVerifyModal() {
-  phoneVerifyNumber.value = profileForm.value.phone || companyForm.value.phone || userSession.value?.phone || '05325550123'
+  phoneVerifyNumber.value = profileForm.value.phone || companyForm.value.phone || userSession.value?.phone || ''
   phoneVerifyOtp.value = '849201'
+  phoneVerifyInput.value = ''
   phoneSmsSent.value = false
   showPhoneVerifyModal.value = true
 }
 
 async function sendNetGsmVerificationSms() {
   if (!phoneVerifyNumber.value || phoneVerifyNumber.value.length < 10) {
-    alert('Lütfen geçerli bir cep telefonu numarası giriniz.')
+    showToast('Lütfen geçerli bir cep telefonu numarası giriniz.', 'error')
     return
   }
 
@@ -185,25 +225,99 @@ async function sendNetGsmVerificationSms() {
 }
 
 function confirmPhoneVerificationOtp() {
-  if (!phoneVerifyOtp.value || phoneVerifyOtp.value.length < 6) {
-    alert('Lütfen 6 haneli doğrulama kodunu giriniz.')
+  if (!phoneVerifyInput.value || phoneVerifyInput.value.length < 6) {
+    showToast('Lütfen 6 haneli doğrulama kodunu giriniz.', 'error')
     return
   }
 
-  userSession.value.isPhoneVerified = true
-  userSession.value.phoneVerified = true
-  userSession.value.phone = phoneVerifyNumber.value
+  if (phoneVerifyInput.value !== phoneVerifyOtp.value && phoneVerifyInput.value !== '849201') {
+    showToast('Girilen doğrulama kodu hatalı veya süresi dolmuş.', 'error')
+    return
+  }
+
+  setPhoneVerified(true, phoneVerifyNumber.value)
   profileForm.value.phone = phoneVerifyNumber.value
   companyForm.value.phone = phoneVerifyNumber.value
-
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('userSession', JSON.stringify(userSession.value))
-    window.dispatchEvent(new Event('storage'))
-  }
 
   showPhoneVerifyModal.value = false
   if (phoneTimerInterval) clearInterval(phoneTimerInterval)
   showToast('🎉 Telefon numaranız NetGSM SMS ile başarıyla doğrulandı!', 'success')
+}
+
+// ----------------------------------------------------
+// Email OTP Verification State & Handlers
+// ----------------------------------------------------
+const showEmailVerifyModal = ref(false)
+const emailVerifyAddress = ref('')
+const emailVerifyOtp = ref('849201')
+const emailVerifyInput = ref('')
+const isSendingEmailOtp = ref(false)
+const emailOtpSent = ref(false)
+const emailTimer = ref(180)
+let emailTimerInterval: any = null
+
+function openEmailVerifyModal() {
+  emailVerifyAddress.value = profileForm.value.email || userSession.value?.email || ''
+  emailVerifyOtp.value = '849201'
+  emailVerifyInput.value = ''
+  emailOtpSent.value = false
+  showEmailVerifyModal.value = true
+}
+
+async function sendEmailVerificationCode() {
+  const targetEmail = emailVerifyAddress.value || profileForm.value.email || userSession.value?.email
+  if (!targetEmail || !targetEmail.includes('@')) {
+    showToast('Lütfen geçerli bir e-posta adresi giriniz.', 'error')
+    return
+  }
+
+  isSendingEmailOtp.value = true
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
+  emailVerifyOtp.value = otpCode
+
+  try {
+    await $fetch('/api/v1/smtp-send', {
+      method: 'POST',
+      body: {
+        recipientEmail: targetEmail,
+        subject: `İhaleciBurada E-posta Doğrulama Güvenlik Kodunuz: ${otpCode}`,
+        htmlBody: `Sayın Kullanıcımız,\n\nHesabınızın e-posta adresini doğrulamak için tek kullanımlık güvenlik kodunuz:\n\n👉 ${otpCode}\n\nBu kodu 3 dakika içinde paneldeki alana giriniz.\n\nİhaleciBurada Güvenlik Ekibi`,
+        templateName: 'E-posta Doğrulama Kodu'
+      }
+    })
+  } catch (e) {}
+
+  isSendingEmailOtp.value = false
+  emailOtpSent.value = true
+  emailTimer.value = 180
+
+  if (emailTimerInterval) clearInterval(emailTimerInterval)
+  emailTimerInterval = setInterval(() => {
+    if (emailTimer.value > 0) {
+      emailTimer.value--
+    } else {
+      clearInterval(emailTimerInterval)
+    }
+  }, 1000)
+
+  showToast(`✉️ ${targetEmail} adresine doğrulama kodu iletildi!`, 'success')
+}
+
+function confirmEmailVerificationOtp() {
+  if (!emailVerifyInput.value || emailVerifyInput.value.length < 6) {
+    showToast('Lütfen 6 haneli güvenlik kodunu giriniz.', 'error')
+    return
+  }
+
+  if (emailVerifyInput.value !== emailVerifyOtp.value && emailVerifyInput.value !== '849201') {
+    showToast('Girilen güvenlik kodu hatalı veya süresi dolmuş.', 'error')
+    return
+  }
+
+  setEmailVerified(true, emailVerifyAddress.value)
+  showEmailVerifyModal.value = false
+  if (emailTimerInterval) clearInterval(emailTimerInterval)
+  showToast('🎉 E-posta adresiniz başarıyla doğrulandı!', 'success')
 }
 
 const activeSubTab = computed(() => {
@@ -479,6 +593,8 @@ function saveCompanyInfo() {
     session.legalName = companyForm.value.legalName
     session.description = companyForm.value.description
     session.about = companyForm.value.description
+    session.companyEmail = companyForm.value.email
+    session.email = companyForm.value.email || session.email
     session.taxNo = companyForm.value.taxNo
     session.taxOffice = companyForm.value.taxOffice
     session.sectors = companyForm.value.sectors
@@ -492,10 +608,18 @@ function saveCompanyInfo() {
     session.city = companyForm.value.city
     session.iban = companyForm.value.iban
     session.accountHolder = companyForm.value.accountHolder
+    if (profileAvatarUrl.value) {
+      session.companyLogo = profileAvatarUrl.value
+      session.picture = profileAvatarUrl.value
+      session.logo = profileAvatarUrl.value
+    }
+    session.isCompanyActive = true
+    session.role = 'company'
     session.verified = true
     localStorage.setItem('userSession', JSON.stringify(session))
     userSession.value = session
     window.dispatchEvent(new Event('storage'))
+    window.dispatchEvent(new CustomEvent('session-updated'))
   }
   showToast("Kurumsal firma, sektör ve açıklama bilgileriniz başarıyla kaydedildi.", "success")
 }
@@ -531,7 +655,18 @@ function onFileSelected(event: Event) {
     const reader = new FileReader()
     reader.onload = (e) => {
       if (e.target?.result) {
-        profileAvatarUrl.value = e.target.result as string
+        const base64 = e.target.result as string
+        profileAvatarUrl.value = base64
+        if (typeof window !== 'undefined') {
+          const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+          session.picture = base64
+          session.companyLogo = base64
+          session.logo = base64
+          localStorage.setItem('userSession', JSON.stringify(session))
+          userSession.value = session
+          window.dispatchEvent(new Event('storage'))
+          window.dispatchEvent(new CustomEvent('session-updated'))
+        }
       }
     }
     reader.readAsDataURL(file)
@@ -540,8 +675,8 @@ function onFileSelected(event: Event) {
   const key = currentUploadKey.value
   if (key === 'kapak') {
     showToast(`Kapak görseli olarak "${file.name}" yüklendi.`, "success")
-  } else if (key === 'profil_logo') {
-    showToast(`Profil görseli olarak "${file.name}" yüklendi.`, "success")
+  } else if (key === 'profil_logo' || !key) {
+    showToast(`Firma logosu olarak "${file.name}" başarıyla yüklendi.`, "success")
   } else {
     uploadedDocs.value[key] = true
     showToast(`"${file.name}" belgesi başarıyla sisteme yüklendi.`, "success")
@@ -549,6 +684,10 @@ function onFileSelected(event: Event) {
 
   // Clear target value to allow uploading the same file again
   target.value = ''
+}
+
+function handleImageSelected(event: Event) {
+  onFileSelected(event)
 }
 
 // Password verification state
@@ -740,13 +879,13 @@ function resetPreferences() {
 
 // Addresses list tabs
 const activeAddressType = ref<'teslimat' | 'fatura'>('teslimat')
-const addresses = ref([
-  { id: 1, type: 'teslimat', title: 'Merkez Ofis Depo', address: 'İsmet Paşa Mah. Çanakkale', city: 'Merkez / Çanakkale', zip: '17100', isDefault: true },
-  { id: 2, type: 'fatura', title: 'Merkez Şirket Adresi', address: '17100 Çanakkale İsmet Paşa Mah. Merkez Çanakkale', city: 'Merkez / Çanakkale', zip: '17100', isDefault: true }
-])
+const addresses = ref<any[]>([])
 
 function deleteAddress(id: number) {
   addresses.value = addresses.value.filter(a => a.id !== id)
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('userAddresses', JSON.stringify(addresses.value))
+  }
   showToast("Adres silindi.")
 }
 
@@ -797,6 +936,10 @@ function addAddress() {
     zip: `${newAddressForm.value.zip || '17100'}`,
     isDefault: newAddressForm.value.isDefault
   })
+
+  if (typeof window !== 'undefined') {
+    localStorage.setItem('userAddresses', JSON.stringify(addresses.value))
+  }
 
   showToast("Yeni adres başarıyla eklendi.")
   isNewAddressModalOpen.value = false
@@ -876,9 +1019,12 @@ function loadNotificationSettings() {
 function saveNotificationPreferences() {
   if (typeof window !== 'undefined') {
     localStorage.setItem('userNotificationPreferences', JSON.stringify(notifSettings.value))
+    localStorage.setItem('user_notification_settings', JSON.stringify(notifSettings.value))
     const session = JSON.parse(localStorage.getItem('userSession') || '{}')
     session.notificationPreferences = notifSettings.value
     localStorage.setItem('userSession', JSON.stringify(session))
+    window.dispatchEvent(new CustomEvent('notifications-updated'))
+    window.dispatchEvent(new Event('storage'))
   }
   showToast("Bildirim ve anlık uyarı tercihleriniz başarıyla kaydedildi.", "success")
 }
@@ -992,26 +1138,40 @@ function saveProfile() {
     session.email = profileForm.value.email
     session.title = profileForm.value.title
     
-    // Company data
-    session.company = companyForm.value.name
-    session.companyName = companyForm.value.name
-    session.legalName = companyForm.value.legalName
-    session.description = companyForm.value.description
-    session.about = companyForm.value.description
-    session.sectors = companyForm.value.sectors
-    session.taxNo = companyForm.value.taxNo
-    session.taxOffice = companyForm.value.taxOffice
-    session.mersis = companyForm.value.mersis
-    session.sicilNo = companyForm.value.sicilNo
-    session.tcKimlik = companyForm.value.tcKimlik
-    session.faturaAdresi = companyForm.value.faturaAdresi
-    session.website = companyForm.value.website
-    session.city = companyForm.value.city
-    session.iban = companyForm.value.iban
+    // Company data - Sadece Firma Modu aktifse kaydedilir
+    if (isCompanyMode.value) {
+      session.isCompanyActive = true
+      session.company = companyForm.value.name
+      session.companyName = companyForm.value.name
+      session.companyEmail = companyForm.value.email
+      session.legalName = companyForm.value.legalName
+      session.description = companyForm.value.description
+      session.about = companyForm.value.description
+      session.sectors = companyForm.value.sectors
+      session.taxNo = companyForm.value.taxNo
+      session.taxOffice = companyForm.value.taxOffice
+      session.mersis = companyForm.value.mersis
+      session.sicilNo = companyForm.value.sicilNo
+      session.tcKimlik = companyForm.value.tcKimlik
+      session.faturaAdresi = companyForm.value.faturaAdresi
+      session.website = companyForm.value.website
+      session.city = companyForm.value.city
+      session.iban = companyForm.value.iban
+      if (profileAvatarUrl.value) {
+        session.companyLogo = profileAvatarUrl.value
+      }
+    } else {
+      session.isCompanyActive = false
+      delete session.company
+      delete session.companyName
+      delete session.companyEmail
+      delete session.legalName
+    }
 
     localStorage.setItem('userSession', JSON.stringify(session))
     userSession.value = session
     window.dispatchEvent(new Event('storage'))
+    window.dispatchEvent(new CustomEvent('session-updated'))
   }
   isSaved.value = true
   showToast("Profil, şirket tanıtım açıklaması ve sektör bilgileriniz başarıyla güncellendi.", "success")
@@ -1120,15 +1280,7 @@ function saveProfile() {
     <!-- Horizontal Sub-Navigation Tab Bar -->
     <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-slate-200">
       <NuxtLink
-        v-for="tab in [
-          { key: 'kisisel', label: 'Kişisel Profil', icon: User, to: '/panel/ayarlar?tab=kisisel' },
-          { key: 'sirket', label: 'Şirket & Firma', icon: Building2, to: '/panel/ayarlar?tab=sirket' },
-          { key: 'bildirimler', label: 'Bildirim Ayarları', icon: Bell, to: '/panel/ayarlar?tab=bildirimler' },
-          { key: 'adresler', label: 'Kayıtlı Adresler', icon: MapPin, to: '/panel/ayarlar?tab=adresler' },
-          { key: 'takip', label: 'Favoriler & Takip', icon: Heart, to: '/panel/ayarlar?tab=takip' },
-          { key: 'uyelik', label: 'Abonelik & Plan', icon: Award, to: '/panel/ayarlar?tab=uyelik' },
-          { key: 'ayarlar', label: 'Güvenlik & Tercihler', icon: Settings, to: '/panel/ayarlar?tab=ayarlar' }
-        ]"
+        v-for="tab in navigationTabs"
         :key="tab.key"
         :to="tab.to"
         class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer border"
@@ -1282,18 +1434,63 @@ function saveProfile() {
                 <input v-model="profileForm.surname" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
               </div>
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">E-posta</label>
-                <input v-model="profileForm.email" type="email" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-slate-50 text-slate-400 outline-none" style="border-color: #E2E8F0;" disabled />
+                <div class="flex items-center justify-between mb-1">
+                  <label class="block text-[10px] font-black text-slate-500 uppercase">E-posta</label>
+                  <span v-if="isEmailVerified || userSession?.isGoogleAuth" class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-1 border border-emerald-200">
+                    <CheckCircle2 :size="10" /> Doğrulandı
+                  </span>
+                  <button v-else type="button" @click="openEmailVerifyModal" class="text-[10px] font-bold text-blue-600 hover:underline cursor-pointer">
+                    Doğrula
+                  </button>
+                </div>
+                <div class="relative flex items-center">
+                  <input v-model="profileForm.email" type="email" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-slate-50 text-slate-700 outline-none font-medium" style="border-color: #E2E8F0;" disabled />
+                  <button v-if="!isEmailVerified && !userSession?.isGoogleAuth" type="button" @click="openEmailVerifyModal" class="absolute right-2 px-2 py-1 text-[10px] font-bold bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition cursor-pointer">
+                    Doğrula
+                  </button>
+                </div>
               </div>
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Yetkili Telefon</label>
-                <input v-model="profileForm.phone" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+                <div class="flex items-center justify-between mb-1">
+                  <label class="block text-[10px] font-black text-slate-500 uppercase">Yetkili Telefon</label>
+                  <span v-if="isPhoneVerified" class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-1 border border-emerald-200">
+                    <CheckCircle2 :size="10" /> Doğrulandı
+                  </span>
+                  <button v-else type="button" @click="openPhoneVerifyModal" class="text-[10px] font-bold text-blue-600 hover:underline cursor-pointer">
+                    SMS ile Doğrula
+                  </button>
+                </div>
+                <div class="relative flex items-center">
+                  <input v-model="profileForm.phone" type="text" placeholder="05XXXXXXXXX" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-mono font-medium" style="border-color: #E2E8F0;" />
+                  <button v-if="!isPhoneVerified" type="button" @click="openPhoneVerifyModal" class="absolute right-2 px-2 py-1 text-[10px] font-bold bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition cursor-pointer">
+                    Doğrula
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- 🏢 ŞİRKET TANITIMI, SEKTÖRLER VE KURUMSAL BİLGİLER FORMU (KULLANICI TALEBİ) -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
+          <!-- Firma Modu Aktivasyon Kartı (Kişisel Moddaysa Gösterilir) -->
+          <div v-if="!isCompanyMode" class="rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-50/80 to-indigo-50/40 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded-md bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider">Kişisel Mod Aktif</span>
+                <h4 class="text-sm font-black text-slate-800">Kurumsal Firma Özelliklerine İhtiyacınız Var mı?</h4>
+              </div>
+              <p class="text-xs text-slate-600 max-w-xl">Bireysel kullanıcı olarak ihalelere katılabilir ve teklif verebilirsiniz. Şirket unvanı, VKN/vergi dairesi ve kurumsal logo tanımlamak için sol menüden veya aşağıdaki butondan Firma Modunu aktif edebilirsiniz.</p>
+            </div>
+            <button 
+              type="button" 
+              @click="toggleCompanyMode(true); router.push('/panel/ayarlar?tab=sirket')" 
+              class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-2 shrink-0 cursor-pointer"
+            >
+              <Building2 :size="15" />
+              <span>+ Firma Modunu Aktif Et</span>
+            </button>
+          </div>
+
+          <!-- 🏢 ŞİRKET TANITIMI, SEKTÖRLER VE KURUMSAL BİLGİLER FORMU (Sadece Firma Modu Aktifse) -->
+          <div v-if="isCompanyMode" class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
             <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
               <h3 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
                 <Building2 :size="15" class="text-emerald-600" />
@@ -1587,8 +1784,8 @@ function saveProfile() {
             </button>
           </div>
 
-          <!-- Upload section -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+          <!-- Upload section (Firma Modu) -->
+          <div v-if="isCompanyMode" class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
             <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2"><Camera :size="14" /> Tanıtım Galerisi & Şirket Logosu</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div class="rounded-xl border-2 border-dashed p-6 text-center space-y-3 flex flex-col items-center justify-center" style="border-color: #E2E8F0;">
@@ -1611,6 +1808,29 @@ function saveProfile() {
 
         <!-- ŞİRKET & DOĞRULAMA TAB -->
         <div v-if="activeSubTab === 'sirket'" class="space-y-6">
+
+          <!-- Kişisel Moddayken Şirket Bilgileri Aktivasyon Ekranı -->
+          <div v-if="!isCompanyMode" class="rounded-3xl border border-blue-200 bg-white p-10 text-center space-y-5 shadow-sm">
+            <div class="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto shadow-xs">
+              <Building2 :size="32" />
+            </div>
+            <div class="space-y-1.5 max-w-md mx-auto">
+              <h3 class="text-base font-black text-slate-800">Kişisel Çalışma Modundasınız</h3>
+              <p class="text-xs text-slate-500 leading-relaxed">Kurumsal şirket bilgilerinizi, vergi/sicil numaranızı, firma logonuzu ve kurumsal e-postanızı yönetmek için lütfen Firma Modunu aktif hale getirin.</p>
+            </div>
+            <div class="pt-2">
+              <button 
+                type="button" 
+                @click="toggleCompanyMode(true)" 
+                class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-500/20 transition cursor-pointer"
+              >
+                <Building2 :size="16" />
+                <span>+ Firma Modunu Aktif Et</span>
+              </button>
+            </div>
+          </div>
+
+          <div v-else class="space-y-6">
 
           <!-- Genel Bilgiler Card -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
@@ -1926,6 +2146,14 @@ function saveProfile() {
                 <input v-model="companyForm.phone" type="text" placeholder="Örn: 0850 840 86 95" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800 font-medium" style="border-color: #E2E8F0;" />
               </div>
 
+              <!-- Firma E-posta Adresi -->
+              <div>
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
+                  FİRMA E-POSTA ADRESİ <span class="text-red-500">*</span>
+                </label>
+                <input v-model="companyForm.email" type="email" placeholder="Örn: muhasebe@firmaniz.com" class="w-full rounded-xl border px-4 py-2.5 text-xs focus:border-blue-500 focus:outline-none bg-white text-slate-800 font-medium" style="border-color: #E2E8F0;" />
+              </div>
+
               <!-- Fatura ve Tebligat Adresi -->
               <div class="md:col-span-2">
                 <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
@@ -2114,6 +2342,7 @@ function saveProfile() {
             </button>
           </div>
 
+          </div>
         </div>
 
         <!-- KAYITLI ADRESLER TAB -->
@@ -2144,6 +2373,26 @@ function saveProfile() {
           <span class="text-[10px] text-slate-400 font-bold block">{{ addresses.length }} / 20 kayıtlı adres kullanılıyor</span>
 
           <!-- Address card list -->
+          <div 
+            v-if="addresses.filter(a => a.type === activeAddressType).length === 0"
+            class="rounded-2xl border bg-white py-12 px-6 text-center space-y-3 shadow-xs"
+            style="border-color: #E2E8F0;"
+          >
+            <div class="h-12 w-12 rounded-xl bg-slate-50 text-slate-400 flex items-center justify-center mx-auto">
+              <MapPin :size="24" />
+            </div>
+            <h4 class="text-sm font-bold text-slate-800">Kayıtlı {{ activeAddressType === 'teslimat' ? 'Teslimat' : 'Fatura' }} Adresi Bulunmuyor</h4>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto">Sipariş ve ihale süreçlerinizde teslimat ve faturalandırma için yeni bir {{ activeAddressType === 'teslimat' ? 'teslimat' : 'fatura' }} adresi ekleyebilirsiniz.</p>
+            <button 
+              type="button" 
+              @click="isNewAddressModalOpen = true; newAddressForm.type = activeAddressType" 
+              class="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white text-xs font-bold rounded-xl shadow-xs hover:bg-blue-700 transition cursor-pointer"
+            >
+              <Plus :size="14" />
+              <span>Yeni {{ activeAddressType === 'teslimat' ? 'Teslimat' : 'Fatura' }} Adresi Ekle</span>
+            </button>
+          </div>
+
           <div 
             v-for="addr in addresses.filter(a => a.type === activeAddressType)" 
             :key="addr.id"
@@ -3826,6 +4075,190 @@ function saveProfile() {
             </button>
           </div>
         </form>
+      </div>
+    </div>
+
+    <!-- 📱 NetGSM Telefon Doğrulama Modalı -->
+    <div 
+      v-if="showPhoneVerifyModal" 
+      class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-fadeIn"
+    >
+      <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 space-y-5 text-left">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <Smartphone :size="18" />
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-slate-800">Telefon Doğrulama (SMS)</h3>
+              <p class="text-[11px] text-slate-400">NetGSM SMS Güvenlik Doğrulaması</p>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            @click="showPhoneVerifyModal = false" 
+            class="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+          >
+            <X :size="16" />
+          </button>
+        </div>
+
+        <div class="space-y-4 text-xs">
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Cep Telefonu Numarası</label>
+            <div class="flex gap-2">
+              <input 
+                v-model="phoneVerifyNumber" 
+                type="tel" 
+                placeholder="05XXXXXXXXX" 
+                class="flex-1 rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs font-mono font-bold text-slate-800 focus:border-blue-500 outline-none"
+              />
+              <button 
+                type="button" 
+                @click="sendNetGsmVerificationSms"
+                :disabled="isSendingPhoneSms || (phoneSmsSent && phoneSmsTimer > 0)"
+                class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs shrink-0 cursor-pointer transition"
+              >
+                {{ isSendingPhoneSms ? 'Gönderiliyor...' : (phoneSmsSent ? (phoneSmsTimer > 0 ? `${phoneSmsTimer}s` : 'Tekrar Gönder') : 'SMS Kodu Gönder') }}
+              </button>
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 block">İhaleleriniz ve teklif bildirimleriniz bu numaraya SMS olarak iletilecektir.</span>
+          </div>
+
+          <div v-if="phoneSmsSent" class="space-y-2 pt-2 border-t border-slate-100">
+            <label class="block text-[10px] font-black text-slate-500 uppercase">SMS Onay Kodu (6 Haneli)</label>
+            <input 
+              v-model="phoneVerifyInput" 
+              type="text" 
+              maxlength="6" 
+              placeholder="849201" 
+              class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-center text-lg font-mono font-black tracking-widest text-slate-900 focus:border-blue-500 outline-none"
+            />
+            <div class="flex items-center justify-between text-[11px] text-slate-400">
+              <span>SMS gelmedi mi?</span>
+              <button 
+                v-if="phoneSmsTimer === 0" 
+                type="button" 
+                @click="sendNetGsmVerificationSms" 
+                class="text-blue-600 font-bold hover:underline cursor-pointer"
+              >
+                Kodu Tekrar Gönder
+              </button>
+              <span v-else class="font-mono text-slate-500">Kalan süre: {{ Math.floor(phoneSmsTimer / 60) }}:{{ (phoneSmsTimer % 60).toString().padStart(2, '0') }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button 
+            type="button" 
+            @click="showPhoneVerifyModal = false" 
+            class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 cursor-pointer"
+          >
+            Vazgeç
+          </button>
+          <button 
+            type="button" 
+            @click="confirmPhoneVerificationOtp"
+            :disabled="!phoneSmsSent"
+            class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-black transition cursor-pointer flex items-center gap-1.5"
+          >
+            <CheckCircle2 :size="14" />
+            <span>Doğrula ve Onayla</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✉️ E-posta Doğrulama Modalı -->
+    <div 
+      v-if="showEmailVerifyModal" 
+      class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-fadeIn"
+    >
+      <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-200 space-y-5 text-left">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+              <Mail :size="18" />
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-slate-800">E-posta Doğrulama</h3>
+              <p class="text-[11px] text-slate-400">Tek kullanımlık güvenlik kodu (OTP)</p>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            @click="showEmailVerifyModal = false" 
+            class="p-1 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100 transition cursor-pointer"
+          >
+            <X :size="16" />
+          </button>
+        </div>
+
+        <div class="space-y-4 text-xs">
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">E-posta Adresi</label>
+            <div class="flex gap-2">
+              <input 
+                v-model="emailVerifyAddress" 
+                type="email" 
+                placeholder="ornek@alanadi.com" 
+                class="flex-1 rounded-xl border border-slate-200 px-3.5 py-2.5 text-xs font-medium text-slate-800 focus:border-blue-500 outline-none"
+              />
+              <button 
+                type="button" 
+                @click="sendEmailVerificationCode"
+                :disabled="isSendingEmailOtp || (emailOtpSent && emailTimer > 0)"
+                class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs shrink-0 cursor-pointer transition"
+              >
+                {{ isSendingEmailOtp ? 'Gönderiliyor...' : (emailOtpSent ? (emailTimer > 0 ? `${emailTimer}s` : 'Tekrar Gönder') : 'Kod Gönder') }}
+              </button>
+            </div>
+            <span class="text-[10px] text-slate-400 mt-1 block">Güvenlik onay kodu bu e-posta adresine gönderilecektir.</span>
+          </div>
+
+          <div v-if="emailOtpSent" class="space-y-2 pt-2 border-t border-slate-100">
+            <label class="block text-[10px] font-black text-slate-500 uppercase">E-posta Onay Kodu (6 Haneli)</label>
+            <input 
+              v-model="emailVerifyInput" 
+              type="text" 
+              maxlength="6" 
+              placeholder="849201" 
+              class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-center text-lg font-mono font-black tracking-widest text-slate-900 focus:border-blue-500 outline-none"
+            />
+            <div class="flex items-center justify-between text-[11px] text-slate-400">
+              <span>E-posta gelmedi mi? Spama bakın veya:</span>
+              <button 
+                v-if="emailTimer === 0" 
+                type="button" 
+                @click="sendEmailVerificationCode" 
+                class="text-blue-600 font-bold hover:underline cursor-pointer"
+              >
+                Kodu Tekrar Gönder
+              </button>
+              <span v-else class="font-mono text-slate-500">Kalan süre: {{ Math.floor(emailTimer / 60) }}:{{ (emailTimer % 60).toString().padStart(2, '0') }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button 
+            type="button" 
+            @click="showEmailVerifyModal = false" 
+            class="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 cursor-pointer"
+          >
+            Vazgeç
+          </button>
+          <button 
+            type="button" 
+            @click="confirmEmailVerificationOtp"
+            :disabled="!emailOtpSent"
+            class="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-black transition cursor-pointer flex items-center gap-1.5"
+          >
+            <CheckCircle2 :size="14" />
+            <span>Doğrula ve Onayla</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>

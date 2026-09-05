@@ -1,147 +1,16 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { Bell, CheckCircle2, AlertCircle, Info, Trash2, ShieldAlert, Settings, Building2, Send, Clock, Sparkles } from 'lucide-vue-next'
-import { useCmsData } from '~/composables/useCmsData'
+import { computed } from 'vue'
+import { Bell, CheckCircle2, AlertCircle, Info, Trash2, ShieldAlert, Settings, Building2, Send, Clock, Sparkles, ChevronRight } from 'lucide-vue-next'
+import { useNotifications } from '~/composables/useNotifications'
 
 definePageMeta({ layout: 'dashboard' })
 
-const { cmsData } = useCmsData()
-const userSession = ref<any>({})
-const deletedNotifIds = ref<string[]>([])
-const readNotifIds = ref<string[]>([])
+const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications()
 
-// Gerçek Sistem Verilerinden Dinamik Bildirim Üretici
-const realNotifications = computed(() => {
-  const list: any[] = []
-
-  // 1. Kendi açtığı ihalelere gelen gerçek teklif bildirimleri
-  const receivedGroups = cmsData.value?.dashboard?.receivedBids || []
-  let myTenders: any[] = []
-  if (typeof window !== 'undefined') {
-    try {
-      myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
-    } catch (e) {}
-  }
-
-  // İhale teklif bildirimleri
-  receivedGroups.forEach((group: any) => {
-    (group.teklifler || []).forEach((tkf: any, idx: number) => {
-      list.push({
-        id: 'notif-bid-' + (tkf.id || idx) + '-' + group.id,
-        type: 'success',
-        title: '🎯 İhalenize Yeni Teklif Geldi',
-        desc: `"${group.baslik} (#${group.id})" ihaleniz için ${tkf.firma} tarafından ${tkf.fiyat} tutarında ve ${tkf.sure || '7 gün'} teslimat süreli yeni bir teklif sunuldu.`,
-        time: tkf.tarih || 'Bugün',
-        link: '/panel/gelen-teklifler',
-        category: 'bid'
-      })
-    })
-  })
-
-  // 2. Kullanıcının verdiği kendi teklif bildirimleri
-  if (typeof window !== 'undefined') {
-    try {
-      const mySubmitted = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]')
-      mySubmitted.forEach((sb: any) => {
-        list.push({
-          id: 'notif-sub-' + sb.id,
-          type: 'info',
-          title: '⚡ Teklifiniz Başarıyla İletildi',
-          desc: `"${sb.tenderTitle || 'Satın Alma İhalesi'}" için ${sb.price} tutarındaki teklifiniz alıcı kuruma (${sb.buyerCompany || 'Alıcı Masası'}) güvenle ulaştırıldı.`,
-          time: sb.submittedAt || 'Bugün',
-          link: '/panel/yaptigim-teklifler',
-          category: 'submitted'
-        })
-      })
-    } catch (e) {}
-  }
-
-  // 3. Kullanıcının oluşturduğu gerçek ihalelerin bildirimleri
-  myTenders.forEach((tender: any) => {
-    list.push({
-      id: 'notif-tender-' + tender.id,
-      type: 'info',
-      title: '📄 İhale İlanınız Yayında / Onayda',
-      desc: `"${tender.baslik} (#${tender.id})" başlıklı satın alma ihaleniz oluşturuldu. ${tender.city || 'Balıkesir'} lokasyonundaki tedarikçilere teklif çağrısı iletildi.`,
-      time: tender.olusturma || 'Bugün',
-      link: '/panel/ilanlarim',
-      category: 'tender'
-    })
-  })
-
-  // 4. Şirket KYC ve Güvenli Ödeme Bildirimleri
-  const compName = userSession.value?.companyName || userSession.value?.company || 'Şirketiniz'
-  list.push({
-    id: 'notif-kyc-verified',
-    type: 'success',
-    title: '🛡️ Kurumsal Kimlik & KYC Doğrulandı',
-    desc: `${compName} kurumsal firma kaydı, Vergi Kimlik Numarası (GİB) ve Ticaret Sicil kayıtları onaylanmış olup hesabınıza Doğrulanmış Mavi Rozet tanımlanmıştır.`,
-    time: 'Bu Hafta',
-    link: '/panel/ayarlar?tab=sirket',
-    category: 'kyc'
-  })
-
-  list.push({
-    id: 'notif-escrow-active',
-    type: 'success',
-    title: '🔒 Escrow Güvenli Havuz Koruması Aktif',
-    desc: 'Tüm ihaleleriniz ve teklifleriniz BDDK/TCMB lisanslı Güvenli Ödeme Havuzu güvencesi altındadır. Hakedişler muayene kabul onayına kadar bloke edilir.',
-    time: 'Sürekli Aktif',
-    link: '/panel/siparis-teslimat',
-    category: 'escrow'
-  })
-
-  // Filter out deleted notifications and map read status
-  return list
-    .filter(n => !deletedNotifIds.value.includes(n.id))
-    .map(n => ({
-      ...n,
-      read: readNotifIds.value.includes(n.id)
-    }))
-})
-
-function syncNotificationState() {
-  if (typeof window !== 'undefined') {
-    try {
-      userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
-      deletedNotifIds.value = JSON.parse(localStorage.getItem('user_deleted_notifications') || localStorage.getItem('deletedNotifs') || '[]')
-      readNotifIds.value = JSON.parse(localStorage.getItem('user_read_notifications') || localStorage.getItem('readNotifs') || '[]')
-    } catch (e) {}
-  }
-}
-
-onMounted(() => {
-  syncNotificationState()
-  if (typeof window !== 'undefined') {
-    window.addEventListener('storage', syncNotificationState)
-    window.addEventListener('notifications-updated', syncNotificationState)
-  }
-})
+const realNotifications = computed(() => notifications.value)
 
 function markAllRead() {
-  realNotifications.value.forEach(n => {
-    if (!readNotifIds.value.includes(n.id)) {
-      readNotifIds.value.push(n.id)
-    }
-  })
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('user_read_notifications', JSON.stringify(readNotifIds.value))
-    localStorage.setItem('readNotifs', JSON.stringify(readNotifIds.value))
-    window.dispatchEvent(new CustomEvent('notifications-updated'))
-    window.dispatchEvent(new Event('storage'))
-  }
-}
-
-function deleteNotification(id: string) {
-  if (!deletedNotifIds.value.includes(id)) {
-    deletedNotifIds.value.push(id)
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('user_deleted_notifications', JSON.stringify(deletedNotifIds.value))
-      localStorage.setItem('deletedNotifs', JSON.stringify(deletedNotifIds.value))
-      window.dispatchEvent(new CustomEvent('notifications-updated'))
-      window.dispatchEvent(new Event('storage'))
-    }
-  }
+  markAllAsRead()
 }
 </script>
 

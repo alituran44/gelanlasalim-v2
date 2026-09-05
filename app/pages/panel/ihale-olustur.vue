@@ -409,23 +409,15 @@ function appendQuickClause(clauseText: string) {
   form.value.aciklama = form.value.aciklama.trim() + '\n\n' + clauseText
 }
 
-function handleSubmit() {
+async function handleSubmit() {
   if (isSubmittingTender.value) return
 
-  // 🛡️ DeepSeek Profil & Hesap Doluluk Denetimi
+  // Profil doluluk şartı tamamen kaldırıldı - Her kullanıcı doğrudan ilan açabilir
   let currentSession = {} as any
   if (typeof window !== 'undefined') {
     try {
       currentSession = JSON.parse(localStorage.getItem('userSession') || '{}')
     } catch (e) {}
-  }
-  const accountCheck = checkAccountCompleteness(currentSession)
-  if (!accountCheck.canCreateTender) {
-    const goToProfile = confirm(`${accountCheck.reason}\n\nİhale açabilmek için lütfen Profil Ayarlarından eksik bilgilerinizi tamamlayınız.\n\nŞimdi Profil Ayarlarına gitmek istiyor musunuz?`)
-    if (goToProfile) {
-      router.push('/panel/ayarlar')
-    }
-    return
   }
   isSubmittingTender.value = true
 
@@ -555,6 +547,16 @@ function handleSubmit() {
       saveCmsData(cmsData.value)
     } catch (e) {
       console.warn('saveCmsData soft error ignored:', e)
+    }
+
+    // 4b. Sync with shared server API for cross-device visibility
+    try {
+      await $fetch('/api/tenders', {
+        method: 'POST',
+        body: tenderObject
+      })
+    } catch (apiErr) {
+      console.warn('API sync warning:', apiErr)
     }
 
     // 5. Safe LocalStorage save

@@ -91,15 +91,19 @@ onMounted(() => {
                         lastName: user.family_name || '',
                         name: derivedName,
                         picture: user.picture,
-                        company: derivedName + ' Tedarik Ticaret',
-                        companyName: derivedName + ' Tedarik Ticaret',
+                        company: '',
+                        companyName: '',
                         username: derivedName,
-                        role: 'company',
+                        role: 'personal',
+                        isCompanyActive: false,
                         verified: true,
+                        isEmailVerified: true,
+                        emailVerified: true,
+                        isPhoneVerified: false,
                         isGoogleAuth: true,
                         authProvider: 'google',
                         isPremium: true,
-                        subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
+                        subscriptionPlan: '1 Ay Ücretsiz Deneme'
                       }
                       accounts[cleanEmail] = userAccount
                       localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
@@ -423,15 +427,19 @@ function handleOAuth(provider = 'google') {
                   lastName: user.family_name || '',
                   name: derivedName,
                   picture: user.picture,
-                  company: derivedName + ' San. Tic. A.Ş.',
-                  companyName: derivedName + ' San. Tic. A.Ş.',
+                  company: '',
+                  companyName: '',
                   username: derivedName,
-                  role: userRole.value || 'company',
+                  role: 'personal',
+                  isCompanyActive: false,
                   verified: true,
+                  isEmailVerified: true,
+                  emailVerified: true,
+                  isPhoneVerified: false,
                   isGoogleAuth: true,
                   authProvider: 'google',
                   isPremium: true,
-                  subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
+                  subscriptionPlan: '1 Ay Ücretsiz Deneme'
                 }
                 accounts[cleanEmail] = userAccount
                 localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
@@ -507,16 +515,20 @@ function fallbackGoogleLogin() {
         email: cleanEmail,
         firstName: formattedName,
         lastName: '',
-        name: formattedName + ' Tedarik',
-        company: formattedName + ' San. Tic. Ltd. Şti.',
-        companyName: formattedName + ' San. Tic. Ltd. Şti.',
+        name: formattedName,
+        company: '',
+        companyName: '',
         username: formattedName,
-        role: userRole.value || 'company',
+        role: 'personal',
+        isCompanyActive: false,
         verified: true,
+        isEmailVerified: true,
+        emailVerified: true,
+        isPhoneVerified: false,
         isGoogleAuth: true,
         authProvider: 'google',
         isPremium: true,
-        subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
+        subscriptionPlan: '1 Ay Ücretsiz Deneme'
       }
       accounts[cleanEmail] = userAccount
       localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))

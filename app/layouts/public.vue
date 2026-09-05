@@ -257,7 +257,7 @@ onMounted(() => {
             class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold border border-slate-300 flex items-center gap-1.5 transition"
           >
             <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-            <span class="truncate max-w-[180px]">{{ userSession?.company || userSession?.companyName || userSession?.name || userSession?.firstName || 'Kurumsal Hesabım' }}</span>
+            <span class="truncate max-w-[180px]">{{ (userSession?.isCompanyActive ? (userSession?.companyName || userSession?.company) : '') || userSession?.name || userSession?.firstName || userSession?.username || 'Hesabım' }}</span>
           </NuxtLink>
 
           <NuxtLink 

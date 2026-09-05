@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight, Lock, Clock, CheckCircle2, AlertCircle, Trash2 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale } from '~/composables/useLocale'
@@ -8,7 +8,7 @@ definePageMeta({
   layout: "dashboard"
 })
 
-const { cmsData, saveCmsData } = useCmsData()
+const { cmsData, saveCmsData, fetchServerTenders } = useCmsData()
 const isLoading = ref(true)
 const activeTab = ref<'aktif' | 'tamamlanan' | 'suresi_dolan' | 'tum'>('tum')
 const activePeriod = ref<'7gun' | '30gun' | '90gun' | '1yil'>('30gun')
@@ -32,7 +32,7 @@ function reloadTenders() {
   localTendersState.value = Array.from(map.values())
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (typeof window !== 'undefined') {
     try {
       userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
@@ -43,6 +43,12 @@ onMounted(() => {
       } catch (e) {}
     })
   }
+
+  try {
+    if (fetchServerTenders) {
+      await fetchServerTenders()
+    }
+  } catch (e) {}
   reloadTenders()
   setTimeout(() => {
     isLoading.value = false
@@ -167,7 +173,12 @@ function deleteTender(tender: any) {
     } catch (e) {}
   }
 
-  // 2. Remove from cmsData dashboard tenders
+  // 2. Remove from cmsData dashboard tenders & server API
+  try {
+    if (tender.id) {
+      $fetch('/api/tenders/' + encodeURIComponent(tender.id), { method: 'DELETE' }).catch(() => {})
+    }
+  } catch (e) {}
   if (cmsData.value?.dashboard?.tenders) {
     cmsData.value.dashboard.tenders = cmsData.value.dashboard.tenders.filter(
       (t: any) => t.id !== tender.id && t.baslik !== tender.baslik

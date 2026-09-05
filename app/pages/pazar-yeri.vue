@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import {
   Printer, 
@@ -48,7 +48,7 @@ useSeoMeta({
 })
 
 const route = useRoute()
-const { cmsData, saveCmsData } = useCmsData()
+const { cmsData, saveCmsData, fetchServerTenders } = useCmsData()
 const { checkAccountCompleteness } = useDeepSeekAgent()
 const { sendSms } = useNetGsm()
 
@@ -242,7 +242,12 @@ const bidForm = ref({
   firmaAdi: userSession.value?.companyName || 'Kurumsal Tedarikçi'
 })
 
-onMounted(() => {
+onMounted(async () => {
+  try {
+    if (fetchServerTenders) {
+      await fetchServerTenders()
+    }
+  } catch (e) {}
   if (typeof window !== 'undefined') {
     try {
       const raw = localStorage.getItem('myTenders')

@@ -15,10 +15,13 @@ import {
   Inbox, 
   MessageSquare, 
   CheckCircle2,
-  BellOff
+  BellOff,
+  LogOut
 } from "lucide-vue-next"
 import { locale, detectLocale, setLocale } from '~/composables/useLocale'
 import { useCmsData } from '~/composables/useCmsData'
+import { useNotifications } from '~/composables/useNotifications'
+import { useUserSession } from '~/composables/useUserSession'
 
 const route = useRoute()
 const router = useRouter()
@@ -27,137 +30,23 @@ const showNotifDropdown = ref(false)
 const showUserMenu = ref(false)
 const { cmsData } = useCmsData()
 
-const userSession = ref<any>({})
-const readNotifs = ref<string[]>([])
+const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications()
+const { userSession, userName, isCompanyMode, companyName, logout: sessionLogout } = useUserSession()
 
-// Dynamically generate realistic notifications from actual user and system state
-const notifications = computed(() => {
-  const list: any[] = []
-  const currentEmail = (userSession.value?.email || '').trim().toLowerCase()
-  const compName = userSession.value?.companyName || userSession.value?.company || 'Kurumsal Hesabınız'
-
-  // 1. Check received bids on user's own tenders
-  const receivedGroups = cmsData.value?.dashboard?.receivedBids || []
-  receivedGroups.forEach((g: any) => {
-    (g.teklifler || []).forEach((tkf: any, idx: number) => {
-      const id = 'notif-bid-' + (tkf.id || idx) + '-' + g.id
-      list.push({
-        id,
-        title: '🎯 İhalenize Yeni Teklif Geldi',
-        desc: `"${g.baslik}" için ${tkf.firma} tarafından ${tkf.fiyat} teklif sunuldu.`,
-        time: tkf.tarih || 'Bugün',
-        unread: !readNotifs.value.includes(id),
-        to: '/panel/gelen-teklifler'
-      })
-    })
-  })
-
-  // 2. Check user's submitted bids
-  if (typeof window !== 'undefined') {
-    try {
-      const mySubmitted = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]')
-      mySubmitted.forEach((sb: any) => {
-        const id = 'notif-sub-' + sb.id
-        list.push({
-          id,
-          title: '⚡ Teklifiniz Alıcıya İletildi',
-          desc: `"${sb.tenderTitle || 'Satın Alma İhalesi'}" için ${sb.price} teklifiniz iletildi.`,
-          time: sb.submittedAt || 'Bugün',
-          unread: !readNotifs.value.includes(id),
-          to: '/panel/yaptigim-teklifler'
-        })
-      })
-    } catch (e) {}
-  }
-
-  // 3. User's active tenders
-  if (typeof window !== 'undefined') {
-    try {
-      const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
-      myTenders.forEach((t: any) => {
-        const id = 'notif-tnd-' + t.id
-        list.push({
-          id,
-          title: '📄 İhale İlanınız Yayında',
-          desc: `"${t.baslik}" ihaleniz pazar yerinde yayına alındı.`,
-          time: t.olusturma || 'Bugün',
-          unread: !readNotifs.value.includes(id),
-          to: '/panel/ilanlarim'
-        })
-      })
-    } catch (e) {}
-  }
-
-  // 4. Default verified system welcome & security notification
-  if (list.length === 0) {
-    const id = 'notif-system-welcome'
-    list.push({
-      id,
-      title: '🛡️ Kurumsal Üyelik & Güvenli Havuz Aktif',
-      desc: `${compName} için 1 Ay %100 Ücretsiz B2B İhale ve Escrow koruması devrededir.`,
-      time: 'Şimdi',
-      unread: !readNotifs.value.includes(id),
-      to: '/panel/ayarlar?tab=sirket'
-    })
-  }
-
-  return list
-})
-
-const notifCount = computed(() => notifications.value.filter(n => n.unread).length)
-
-function markAllAsRead() {
-  notifications.value.forEach(n => {
-    if (!readNotifs.value.includes(n.id)) {
-      readNotifs.value.push(n.id)
-    }
-  })
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('user_read_notifications', JSON.stringify(readNotifs.value))
-    window.dispatchEvent(new CustomEvent('notifications-updated'))
-    window.dispatchEvent(new Event('storage'))
-  }
-}
+const notifCount = computed(() => unreadCount.value)
 
 function handleLogout() {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('userSession')
-    localStorage.removeItem('guestSession')
-  }
+  sessionLogout()
   showUserMenu.value = false
   router.push('/')
 }
 
-function refreshUserSession() {
-  if (typeof window !== 'undefined') {
-    try {
-      userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
-      readNotifs.value = JSON.parse(localStorage.getItem('user_read_notifications') || '[]')
-    } catch {
-      userSession.value = {}
-    }
-  }
-}
-
 onMounted(() => {
   detectLocale()
-  refreshUserSession()
-  if (typeof window !== 'undefined') {
-    window.addEventListener('storage', refreshUserSession)
-    window.addEventListener('user-session-changed', refreshUserSession)
-    window.addEventListener('notifications-updated', refreshUserSession)
-  }
 })
 
-// Route change updates session reactively
-watch(() => route.path, () => {
-  refreshUserSession()
-})
-
-const userName = computed(() => {
-  return userSession.value?.name || userSession.value?.firstName || userSession.value?.username || 'Hesabım'
-})
-const userInitial = computed(() => userName.value.charAt(0).toUpperCase())
+const userAvatar = computed(() => userSession.value?.picture || userSession.value?.avatar || userSession.value?.companyLogo || '')
+const userInitial = computed(() => (userName.value || 'K').charAt(0).toUpperCase())
 
 const pageTitle = computed(() => {
   if (locale.value === 'tr') {
@@ -304,47 +193,75 @@ const pageTitle = computed(() => {
         </div>
       </div>
 
-      <!-- User Profile Menu -->
-      <div class="relative">
-        <button
-          @click="showUserMenu = !showUserMenu"
-          class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-1.5 text-sm transition hover:bg-slate-50 cursor-pointer"
-        >
-          <div
-            class="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white shadow-xs"
-            style="background: #003057;"
-          >
-            {{ userInitial }}
-          </div>
-          <span class="hidden md:block font-bold text-xs text-slate-900">{{ userName }}</span>
-          <ChevronDown :size="13" class="text-slate-400" />
-        </button>
-
-        <!-- Dropdown -->
-        <div
-          v-if="showUserMenu"
-          class="absolute right-0 top-11 z-50 w-48 rounded-2xl border border-slate-200 bg-white shadow-xl py-1.5 text-left animate-fadeIn"
-        >
-          <div class="px-4 py-2 border-b border-slate-100">
-            <div class="text-xs font-bold text-slate-800 truncate">{{ userName }}</div>
-            <div class="text-[10px] text-slate-400">Onaylı Kurumsal Hesap</div>
-          </div>
-          <NuxtLink to="/panel/ayarlar" @click="showUserMenu=false"
-            class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
-            Hesap Ayarları
-          </NuxtLink>
-          <NuxtLink to="/abonelik" @click="showUserMenu=false"
-            class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
-            Üyelik Planı (1 Ay Deneme)
-          </NuxtLink>
-          <div class="my-1 border-t border-slate-100"></div>
+      <!-- User Profile & Direct Logout (Giriş / Çıkış Yan Yana) -->
+      <div class="flex items-center gap-2">
+        <div class="relative">
           <button
-            @click="handleLogout"
-            class="block w-full px-4 py-2 text-left text-xs font-bold text-red-600 hover:bg-red-50"
+            @click="showUserMenu = !showUserMenu"
+            class="flex items-center gap-2 rounded-xl border border-slate-200 px-3 py-1.5 text-sm transition hover:bg-slate-50 cursor-pointer"
           >
-            Çıkış Yap
+            <div
+              class="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold text-white shadow-xs overflow-hidden shrink-0"
+              style="background: #003057;"
+            >
+              <img v-if="userAvatar" :src="userAvatar" alt="Avatar" class="h-full w-full object-cover" />
+              <span v-else>{{ userInitial }}</span>
+            </div>
+            <div class="text-left hidden md:block leading-none">
+              <span class="block font-bold text-xs text-slate-900">{{ userName }}</span>
+              <span class="block text-[9px] font-semibold text-slate-400 mt-0.5">
+                {{ isCompanyMode ? (companyName || 'Kurumsal Hesap') : 'Kişisel Hesap' }}
+              </span>
+            </div>
+            <ChevronDown :size="13" class="text-slate-400" />
           </button>
+
+          <!-- Dropdown -->
+          <div
+            v-if="showUserMenu"
+            class="absolute right-0 top-11 z-50 w-52 rounded-2xl border border-slate-200 bg-white shadow-xl py-1.5 text-left animate-fadeIn"
+          >
+            <div class="px-4 py-2 border-b border-slate-100">
+              <div class="text-xs font-bold text-slate-800 truncate">{{ userName }}</div>
+              <div class="text-[10px] text-slate-400 font-medium">
+                {{ isCompanyMode ? (companyName || 'Kurumsal Hesap') : 'Kişisel Profil' }}
+              </div>
+            </div>
+            <NuxtLink to="/panel/ayarlar?tab=kisisel" @click="showUserMenu=false"
+              class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
+              👤 Profil Ayarları
+            </NuxtLink>
+            <NuxtLink v-if="isCompanyMode" to="/panel/ayarlar?tab=sirket" @click="showUserMenu=false"
+              class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
+              🏢 Şirket Bilgileri
+            </NuxtLink>
+            <NuxtLink to="/panel/ayarlar?tab=adresler" @click="showUserMenu=false"
+              class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
+              📍 Adreslerim
+            </NuxtLink>
+            <NuxtLink to="/abonelik" @click="showUserMenu=false"
+              class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
+              ⚡ Üyelik & Paketler
+            </NuxtLink>
+            <div class="my-1 border-t border-slate-100"></div>
+            <button
+              @click="handleLogout"
+              class="block w-full px-4 py-2 text-left text-xs font-bold text-red-600 hover:bg-red-50 cursor-pointer"
+            >
+              Çıkış Yap
+            </button>
+          </div>
         </div>
+
+        <!-- Hızlı Doğrudan Çıkış Butonu (Yan Yana) -->
+        <button
+          @click="handleLogout"
+          class="flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-700 px-3 py-2 text-xs font-bold transition shadow-2xs cursor-pointer"
+          title="Güvenli Çıkış Yap"
+        >
+          <LogOut :size="13" />
+          <span class="hidden sm:inline">Çıkış</span>
+        </button>
       </div>
 
     </div>

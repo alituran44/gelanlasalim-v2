@@ -32,13 +32,14 @@ import {
   ShieldCheck,
   Scale
 } from "lucide-vue-next"
-import { locale, detectLocale, setLocale } from '~/composables/useLocale'
+import { locale } from '~/composables/useLocale'
+
+import { useUserSession } from '~/composables/useUserSession'
 
 const route = useRoute()
 const router = useRouter()
 
-// Simulated user session — safe client-side loading
-const userSession = ref<any>({})
+const { userSession, isCompanyMode, userName, companyName, toggleCompanyMode, logout: sessionLogout } = useUserSession()
 const isTekliflerOpen = ref(true)
 
 watchEffect(() => {
@@ -47,74 +48,54 @@ watchEffect(() => {
   }
 })
 
-function refreshSidebarSession() {
-  if (typeof window !== 'undefined') {
-    try {
-      userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
-    } catch {
-      userSession.value = {}
-    }
-  }
-}
-
-onMounted(() => {
-  detectLocale()
-  refreshSidebarSession()
-  if (typeof window !== 'undefined') {
-    window.addEventListener('storage', refreshSidebarSession)
-    window.addEventListener('user-session-changed', refreshSidebarSession)
-  }
-})
-
-watch(() => route.path, () => {
-  refreshSidebarSession()
-})
-
-function toggleLang() {
-  if (locale.value === 'tr') {
-    setLocale('en')
-  } else {
-    setLocale('tr')
-  }
-}
-
-const userRole = computed(() => userSession.value?.role || 'company')
-const userName = computed(() => userSession.value?.name || userSession.value?.firstName || userSession.value?.username || 'Kullanıcı')
-const userCompany = computed(() => userSession.value?.companyName || userSession.value?.company || userSession.value?.name || 'Kurumsal Profil')
-const userInitial = computed(() => userName.value.charAt(0).toUpperCase())
+const userInitial = computed(() => (userName.value || 'K').charAt(0).toUpperCase())
 
 function logout() {
-  if (typeof window !== 'undefined') {
-    localStorage.removeItem('userSession')
-  }
+  sessionLogout()
   router.push('/')
 }
 
+function activateCompanyMode() {
+  toggleCompanyMode(true)
+  router.push('/panel/ayarlar?tab=sirket')
+}
+
 const sidebarMenus = computed(() => {
+  const isComp = isCompanyMode.value
   if (locale.value === 'tr') {
-    return [
+    const list: any[] = [
       { title: "Genel Bakış", icon: LayoutDashboard, to: "/panel" },
       { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
-      { title: "Escrow & Komisyon (%4)", icon: ShieldCheck, to: "/panel/siparis-teslimat", badge: "%4 Sabit" },
-      { title: "Üye Firmalar", icon: Building2, to: "/panel/firmalar" },
+      { title: "Escrow & Komisyon (%4)", icon: ShieldCheck, to: "/panel/siparis-teslimat", badge: "%4 Sabit" }
+    ]
+    if (isComp) {
+      list.push({ title: "Üye Firmalar", icon: Building2, to: "/panel/firmalar" })
+    }
+    list.push(
       { title: "Mücbir Sebep & Fesih", icon: Scale, to: "/panel/mucbir-sebep" },
       { title: "Bildirimler", icon: Bell, to: "/panel/bildirimler" },
       { title: "Profil & Hesap", icon: Settings, to: "/panel/ayarlar?tab=kisisel" }
-    ]
+    )
+    return list
   } else {
-    return [
+    const list: any[] = [
       { title: "Dashboard", icon: LayoutDashboard, to: "/panel" },
       { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" },
-      { title: "Escrow & Fee (4%)", icon: ShieldCheck, to: "/panel/siparis-teslimat", badge: "4% Flat" },
-      { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
+      { title: "Escrow & Fee (4%)", icon: ShieldCheck, to: "/panel/siparis-teslimat", badge: "4% Flat" }
+    ]
+    if (isComp) {
+      list.push({ title: "Verified Companies", icon: Building2, to: "/panel/firmalar" })
+    }
+    list.push(
       { title: "Force Majeure & Disputes", icon: Scale, to: "/panel/mucbir-sebep" },
       { title: "Notifications", icon: Bell, to: "/panel/bildirimler" },
       { title: "Account & Profile", icon: Settings, to: "/panel/ayarlar?tab=kisisel" }
-    ]
+    )
+    return list
   }
 })
 
@@ -131,16 +112,57 @@ const activePath = computed(() => route.path)
       </NuxtLink>
     </div>
 
-    <!-- Rol Etiketi -->
-    <div class="px-5 py-3">
-      <span
-        class="inline-flex items-center rounded-md px-2.5 py-1 text-xs font-bold"
-        :style="userRole === 'company'
-          ? 'background: rgba(0,82,255,0.18); color: #00C2FF; border: 1px solid rgba(0,194,255,0.3);'
-          : 'background: rgba(37,99,235,0.12); color: #2563EB;'"
-      >
-        {{ userRole === 'company' ? '🏢 Onaylı Kurumsal Hesap' : '👤 Bireysel Üye' }}
-      </span>
+    <!-- Çalışma Modu Kartı (Kişisel / Bireysel vs Kurumsal Firma) -->
+    <div class="px-4 py-3 mx-3 my-2 rounded-xl bg-white/5 border border-white/10 text-left">
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="text-[10px] font-black uppercase tracking-wider text-slate-400">
+          Çalışma Modu
+        </span>
+        <span
+          class="text-[10px] font-bold px-2 py-0.5 rounded-full"
+          :class="isCompanyMode ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' : 'bg-blue-500/20 text-blue-300 border border-blue-500/30'"
+        >
+          {{ isCompanyMode ? '🏢 Firma' : '👤 Kişisel' }}
+        </span>
+      </div>
+
+      <!-- Kişisel Modda iken Firma Modunu Aktif Et Butonu -->
+      <div v-if="!isCompanyMode" class="space-y-1">
+        <p class="text-[11px] text-slate-300 leading-tight">
+          Bireysel / kişisel hesaptasınız.
+        </p>
+        <button
+          type="button"
+          @click="activateCompanyMode"
+          class="w-full mt-1.5 py-1.5 px-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold flex items-center justify-center gap-1.5 transition shadow-sm cursor-pointer"
+        >
+          <Building2 :size="12" />
+          <span>Firma Modunu Aktif Et</span>
+        </button>
+      </div>
+
+      <!-- Firma Modunda iken Firma Bilgisi & Kişisel Moda Dön -->
+      <div v-else class="space-y-1">
+        <p class="text-[11px] text-emerald-300 font-bold truncate" :title="companyName">
+          {{ companyName || 'Kurumsal Firma' }}
+        </p>
+        <div class="flex items-center justify-between gap-1 pt-1">
+          <NuxtLink
+            to="/panel/ayarlar?tab=sirket"
+            class="text-[10px] text-blue-400 hover:underline flex items-center gap-0.5"
+          >
+            <span>Şirket Bilgileri</span>
+          </NuxtLink>
+          <button
+            type="button"
+            @click="toggleCompanyMode(false)"
+            class="text-[10px] text-slate-400 hover:text-slate-200 cursor-pointer"
+            title="Kişisel moda geç"
+          >
+            Kişisele Dön
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Yeni İhale Oluştur Butonu -->
@@ -284,7 +306,7 @@ const activePath = computed(() => route.path)
         </div>
         <div class="flex-1 min-w-0">
           <div class="text-xs font-semibold text-white truncate">{{ userName }}</div>
-          <div class="text-[10px] truncate" style="color: #64748B;">{{ userCompany }}</div>
+          <div class="text-[10px] truncate" style="color: #64748B;">{{ isCompanyMode ? (companyName || 'Kurumsal Hesap') : 'Kişisel Hesap' }}</div>
         </div>
       </div>
       <button
