@@ -300,68 +300,31 @@ export function useDeepSeekAgent() {
 
   
   /**
-   * 🛡️ Kullanıcı Profil & Hesap Doluluk Oranını DeepSeek AI ile Denetle
-   * Eksik bilgi varsa ihale açamaz ve teklif veremez!
+   * 🛡️ Kullanıcı Profil & Hesap Doluluk Oranı
+   * (Profil doluluk şartı tamamen kaldırılmıştır - İhale açmayı ve teklif vermeyi asla engellemez)
    */
   function checkAccountCompleteness(userSession: any) {
     if (!userSession || typeof userSession !== 'object') {
       return {
-        isComplete: false,
-        completenessPercent: 0,
-        missingFields: ['Kullanıcı Oturumu', 'Yetkili Adı', 'Telefon Numarası', 'Şirket Unvanı', 'Şehir'],
-        canCreateTender: false,
-        canSubmitBid: false,
-        reason: 'Lütfen işlem yapabilmek için sisteme giriş yapınız.'
+        isComplete: true,
+        completenessPercent: 100,
+        missingFields: [],
+        canCreateTender: true,
+        canSubmitBid: true,
+        reason: '✓ Giriş yapıldı. İhale açabilir ve teklif verebilirsiniz.'
       }
     }
 
     const missing: string[] = []
-    let points = 0
-
-    // 1. Yetkili Ad Soyad Kontrolü (ZORUNLU - %40)
-    const fullName = (userSession.name || userSession.firstName || userSession.authorizedPerson || '').trim()
-    if (fullName.length >= 3) {
-      points += 40
-    } else {
-      missing.push('Yetkili Adı & Soyadı')
-    }
-
-    // 2. Telefon Numarası Kontrolü (ZORUNLU - %30)
-    const phone = (userSession.phone || userSession.cepTelefonu || '').replace(/\D/g, '')
-    if (phone.length >= 10) {
-      points += 30
-    } else {
-      missing.push('Telefon Numarası (05xx...)')
-    }
-
-    // 3. Şehir / Lokasyon Kontrolü (ZORUNLU - %30)
-    const city = (userSession.city || userSession.sehir || userSession.addressCity || '').trim()
-    if (city.length >= 2) {
-      points += 30
-    } else {
-      missing.push('Faaliyet / Teslimat Şehri')
-    }
-
-    // 4. Şirket / Ticari Unvan (İSTEĞE BAĞLI - İhale Açmayı / Teklif Vermeyi Asla Engellemez)
-    const company = (userSession.companyName || userSession.company || userSession.legalName || '').trim()
-    if (company.length >= 3) {
-      // Bonus kurumsal bilgi
-    }
-
-    const isComplete = missing.length === 0
-    let reason = '✓ Profil bilgileriniz eksiksizdir. Güvenli şekilde ihale açabilir ve teklif sunabilirsiniz.'
-
-    if (!isComplete) {
-      reason = `🚨 DeepSeek AI Güvenlik Uyarısı: B2B ticaret güvenliği gereği profilinizde eksik bilgiler tespit edildi (% ${points} tamamlandı). İhale açabilmek ve teklif sunabilmek için lütfen şu eksik alanları tamamlayınız: ${missing.join(', ')}.`
-    }
+    let points = 100
 
     return {
-      isComplete,
+      isComplete: true,
       completenessPercent: points,
-      missingFields: missing,
-      canCreateTender: isComplete,
-      canSubmitBid: isComplete,
-      reason
+      missingFields: [],
+      canCreateTender: true,
+      canSubmitBid: true,
+      reason: '✓ Profiliniz hazırdır. İhale açabilir ve teklif sunabilirsiniz.'
     }
   }
 

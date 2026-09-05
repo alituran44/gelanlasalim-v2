@@ -502,14 +502,7 @@ function openBidModal(tender: any) {
     } catch (e) {}
   }
 
-  const accountCheck = checkAccountCompleteness(session)
-  if (!accountCheck.canSubmitBid) {
-    const goToProfile = confirm(`${accountCheck.reason}\n\nTeklif sunabilmek için lütfen Profil Ayarlarından eksik bilgilerinizi tamamlayınız.\n\nŞimdi Profil Ayarlarına gitmek istiyor musunuz?`)
-    if (goToProfile) {
-      router.push('/panel/ayarlar')
-    }
-    return
-  }
+  // Profil doluluk şartı tamamen kaldırıldı - Her kullanıcı doğrudan teklif verebilir
   // 1. Kendi İlanına Teklif Verme Engeli
   if (isMyOwnTender(tender)) {
     alert(`🚫 KENDİ İLANINIZA TEKLİF VEREMEZSİNİZ!\n\n"${tender.baslik}" ihalesi sizin tarafınızdan açılmıştır.\n\nSistem kuralları gereği kendi açtığınız ihalelere teklif sunamazsınız.\n\nİhaleniz için gelen tedarikçi tekliflerini incelemek, değerlendirmek ve pazarlık yürütmek için lütfen "Gelen Teklifler" sayfasına gidiniz.`)
