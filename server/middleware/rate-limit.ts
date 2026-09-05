@@ -8,15 +8,16 @@ interface RateLimitRecord {
 
 const rateLimitMap = new Map<string, RateLimitRecord>()
 
-// Clean up stale entries every 5 minutes
-setInterval(() => {
-  const now = Date.now()
-  for (const [key, record] of rateLimitMap.entries()) {
-    if (now > record.resetTime) {
-      rateLimitMap.delete(key)
+// Lazy cleanup function without persistent background timers
+function cleanupStale(now: number) {
+  if (rateLimitMap.size > 100) {
+    for (const [key, record] of rateLimitMap.entries()) {
+      if (now > record.resetTime) {
+        rateLimitMap.delete(key)
+      }
     }
   }
-}, 5 * 60 * 1000)
+}
 
 export default defineEventHandler((event) => {
   const path = event.node.req.url || ''
@@ -26,13 +27,15 @@ export default defineEventHandler((event) => {
     return
   }
 
+  const now = Date.now()
+  cleanupStale(now)
+
   // Get client IP address
   const forwardedFor = getRequestHeader(event, 'x-forwarded-for')
   const clientIp = (forwardedFor ? forwardedFor.split(',')[0].trim() : '') ||
     event.node.req.socket.remoteAddress ||
     '127.0.0.1'
 
-  const now = Date.now()
   const windowMs = 60 * 1000 // 1 minute window
 
   // Stricter limit for SMS, OTP, and Payment endpoints (15 req/min)
