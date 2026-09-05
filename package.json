@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "nuxt generate",
+    "postbuild": "node -e \"const fs=require('fs'); if (fs.existsSync('.output/public')) { fs.cpSync('.output/public', '.vercel/output/static', {recursive:true, force:true}); console.log('Copied .output/public to .vercel/output/static'); }\"",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
