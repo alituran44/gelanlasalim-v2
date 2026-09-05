@@ -35,7 +35,7 @@
       ]
     },
     {
-      "source": "/(.*\\.(?:ico|png|jpg|jpeg|svg|webp|woff|woff2|ttf|eot|css|js))",
+      "source": "/(.*\\.(?:ico|png|jpg|jpeg|svg|webp|woff|woff2|ttf|eot|css|js|json))",
       "headers": [
         {
           "key": "Access-Control-Allow-Origin",
