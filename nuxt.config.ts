@@ -30,6 +30,7 @@ export default defineNuxtConfig({
 
   // 2. RATE LIMIT, CACHING & COMPRESS (Nitro Configuration)
   nitro: {
+    preset: 'vercel',
     compressPublicAssets: true, // Gzip (.gz) ve Brotli (.br) otomatik sıkıştırma
     prerender: {
       crawlLinks: true,
