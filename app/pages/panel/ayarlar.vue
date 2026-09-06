@@ -1313,7 +1313,7 @@ function saveProfile() {
                     <h2 class="text-xl font-black tracking-tight">{{ profileForm.name }} {{ profileForm.surname }}</h2>
                     <span class="rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
                       <ShieldCheck :size="11" class="text-amber-400" />
-                      ✓ {{ 'e-Devlet & MERSİS ONAYLI' }}
+                      ✓ {{ 'e-Devlet Onaylı' }}
                     </span>
                   </div>
                   <p class="text-xs text-slate-300 font-medium flex items-center gap-3">
@@ -3155,7 +3155,7 @@ function saveProfile() {
                 { id: 'tercihler', label: 'Uygulama tercihleri' },
                 { id: 'guvenlik', label: 'Güvenlik' },
                 { id: 'bildirim-tercihleri', label: 'Bildirimler' },
-                { id: 'profil-kaynagi', label: 'Profil kaynağı' }
+                ...(isCompanyMode ? [{ id: 'profil-kaynagi', label: 'Sözleşmeler & Onaylar' }] : [])
               ]"
               :key="sec.id"
               type="button"
@@ -3194,7 +3194,7 @@ function saveProfile() {
           </div>
 
           <!-- Top horizontal card row (with icons on the left) -->
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="grid grid-cols-1 gap-4" :class="isCompanyMode ? 'md:grid-cols-4' : 'md:grid-cols-3'">
             <!-- Card 1 -->
             <div @click="scrollToSection('tercihler')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
               <div class="flex items-start gap-2.5">
@@ -3231,44 +3231,45 @@ function saveProfile() {
               <span class="text-[9px] text-blue-600 font-bold mt-2 inline-flex items-center gap-0.5">Aç <ArrowRight :size="9" /></span>
             </div>
 
-            <!-- Card 4 -->
-            <div @click="scrollToSection('profil-kaynagi')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
+            <!-- Card 4 (Sadece Firma Modu Aktifse) -->
+            <div v-if="isCompanyMode" @click="scrollToSection('profil-kaynagi')" class="rounded-xl border bg-white p-4 flex flex-col justify-between min-h-[90px] shadow-sm text-left hover:bg-slate-50/50 cursor-pointer" style="border-color: #E2E8F0;">
               <div class="flex items-start gap-2.5">
                 <FileText :size="14" class="text-blue-600 mt-0.5 shrink-0" />
                 <div>
-                  <h4 class="text-[11px] font-black text-slate-800 leading-tight">Profil kaynağı</h4>
-                  <p class="text-[9px] text-slate-400 mt-1 leading-normal">Profil veri korunması bilgileri tek kaynaktan düzenleyin.</p>
+                  <h4 class="text-[11px] font-black text-slate-800 leading-tight">Sözleşmeler & Onaylar</h4>
+                  <p class="text-[9px] text-slate-400 mt-1 leading-normal">Kurumsal onay ve KVKK sözleşmelerini yönetin.</p>
                 </div>
               </div>
               <span class="text-[9px] text-blue-600 font-bold mt-2 inline-flex items-center gap-0.5">Aç <ArrowRight :size="9" /></span>
             </div>
           </div>
 
-          <!-- Hesap ve Kurumsal Bilgiler Card -->
+          <!-- Hesap ve Bilgiler Card -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
             <div class="flex items-center gap-2.5 pb-2 border-b" style="border-color: #F1F5F9;">
-              <Building :size="15" class="text-blue-600" />
+              <Building v-if="isCompanyMode" :size="15" class="text-blue-600" />
+              <User v-else :size="15" class="text-blue-600" />
               <div>
-                <span class="text-[8px] font-black text-slate-300 block">SİTE VE İLETİŞİM</span>
-                <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">Hesap ve Kurumsal Bilgiler</h3>
+                <span class="text-[8px] font-black text-slate-300 block">{{ isCompanyMode ? 'SİTE VE KURUMSAL İLETİŞİM' : 'KİŞİSEL HESAP BİLGİLERİ' }}</span>
+                <h3 class="text-xs font-black uppercase text-slate-700 mt-0.5">{{ isCompanyMode ? 'Hesap ve Kurumsal Bilgiler' : 'Hesap ve Profil Bilgileri' }}</h3>
               </div>
             </div>
             <p class="text-[10px] text-slate-400 leading-normal">
-              Kimlik ve kurumsal bilgiler: Önemli ve Kurumsal Kimlik sayfalarından yönetilir.
+              {{ isCompanyMode ? 'Kimlik ve kurumsal bilgiler: Şirket ve Kurumsal Kimlik ayarlarından yönetilir.' : 'Kişisel profil ve iletişim detaylarınız.' }}
             </p>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span class="text-[8px] font-black text-slate-300 block">AD SOYAD</span>
-                <span class="text-slate-700 font-bold block mt-1">{{ profileForm.name || userSession?.name || userSession?.firstName || 'Kurumsal Kullanıcı' }} {{ profileForm.surname || userSession?.lastName || '' }}</span>
+                <span class="text-slate-700 font-bold block mt-1">{{ userName || profileForm.name || 'Kullanıcı' }} {{ profileForm.surname || '' }}</span>
               </div>
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span class="text-[8px] font-black text-slate-300 block">E-POSTA ADRESİ</span>
                 <span class="font-mono text-slate-700 block mt-1">{{ profileForm.email || userSession?.email || 'tanımlı değil' }}</span>
               </div>
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <span class="text-[8px] font-black text-slate-300 block">UNVAN</span>
-                <span class="text-slate-700 font-bold block mt-1">{{ profileForm.title || userSession?.title || userSession?.role || 'Şirket Yetkilisi' }}</span>
+                <span class="text-[8px] font-black text-slate-300 block">{{ isCompanyMode ? 'UNVAN / ROL' : 'HESAP TÜRÜ' }}</span>
+                <span class="text-slate-700 font-bold block mt-1">{{ isCompanyMode ? (profileForm.title || userSession?.title || userSession?.role || 'Şirket Yetkilisi') : (profileForm.title || 'Bireysel Kullanıcı') }}</span>
               </div>
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span class="text-[8px] font-black text-slate-300 block">İLETİŞİM DURUMU</span>
@@ -3648,8 +3649,8 @@ function saveProfile() {
             </div>
           </div>
 
-          <!-- Sözleşmeler & Onaylar Card -->
-          <div id="profil-kaynagi" class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
+          <!-- Sözleşmeler & Onaylar Card (Sadece Firma Modu Aktifse) -->
+          <div v-if="isCompanyMode" id="profil-kaynagi" class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
             <div class="flex items-center gap-2.5 pb-2 border-b" style="border-color: #F1F5F9;">
               <FileText :size="15" class="text-blue-600" />
               <div>

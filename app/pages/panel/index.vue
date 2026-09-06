@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { 
   ShieldCheck, 
+  User,
   CheckCircle2, 
   AlertCircle, 
   Plus, 
@@ -22,6 +23,7 @@ import {
   ChevronRight
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
+import { useUserSession } from '~/composables/useUserSession'
 import { locale } from '~/composables/useLocale'
 
 definePageMeta({
@@ -29,6 +31,20 @@ definePageMeta({
 })
 
 const { cmsData } = useCmsData()
+const { 
+  userSession, 
+  isCompanyMode, 
+  userName, 
+  companyName: sessionCompanyName,
+  isLoggedIn 
+} = useUserSession()
+
+const displayName = computed(() => {
+  if (isCompanyMode.value) {
+    return sessionCompanyName.value || userSession.value?.companyName || userSession.value?.company || userName.value || 'Kurumsal Üye Hesabı'
+  }
+  return userName.value || 'Kullanıcı'
+})
 
 const calcAmount = ref('100.000')
 const calcNum = computed(() => {
@@ -37,13 +53,10 @@ const calcNum = computed(() => {
 const calcEscrowFee = computed(() => Math.round(calcNum.value * 0.04))
 const calcNetPayout = computed(() => Math.round(calcNum.value * 0.96))
 
-const companyName = ref('Kurumsal Üye Hesabı')
 const userRole = ref('company')
 const isVerified = ref(true)
 
 // ==================== DİNAMİK İLANLAR & TEKLİFLER LİSTESİ ====================
-const userSession = ref<any>({})
-
 const myActiveTenders = computed(() => {
   const currentEmail = (userSession.value?.email || '').trim().toLowerCase()
   const allTenders = cmsData.value?.dashboard?.tenders || []
@@ -94,15 +107,6 @@ function reloadSession() {
   if (typeof window !== 'undefined') {
     try {
       const session = JSON.parse(localStorage.getItem('userSession') || '{}')
-      userSession.value = session
-      if (session.companyName || session.company) {
-        companyName.value = session.companyName || session.company
-      } else if (session.name || session.firstName) {
-        companyName.value = session.name || session.firstName
-      } else if (session.email) {
-        const rawPrefix = session.email.split('@')[0]
-        companyName.value = rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1)
-      }
       if (session.role) {
         userRole.value = session.role
       }
@@ -129,15 +133,23 @@ onMounted(() => {
     <div class="bg-gradient-to-r from-[#0F223D] via-[#1A365D] to-[#0F223D] rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
       <div class="space-y-1.5">
         <div class="flex items-center gap-2 flex-wrap">
-          <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase flex items-center gap-1">
-            <ShieldCheck :size="12" />
-            <span>Onaylı Kurumsal Firma</span>
+          <span 
+            class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase flex items-center gap-1 border"
+            :class="isCompanyMode ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-blue-500/20 text-blue-300 border-blue-400/30'"
+          >
+            <ShieldCheck v-if="isCompanyMode" :size="12" />
+            <User v-else :size="12" />
+            <span>{{ isCompanyMode ? 'Onaylı Kurumsal Firma' : 'Kişisel / Bireysel Hesap' }}</span>
           </span>
           <span class="text-xs text-slate-300">|</span>
-          <span class="text-xs text-slate-300">1 Ay Ücretsiz Kurumsal Deneme</span>
+          <span class="text-xs text-slate-300">{{ isCompanyMode ? '1 Ay Ücretsiz Kurumsal Deneme' : 'Kişisel Çalışma Alanı' }}</span>
         </div>
-        <h1 class="text-xl sm:text-2xl font-black tracking-tight">{{ companyName }}</h1>
-        <p class="text-xs text-slate-300">İhalelerinizi yönetebilir, gelen teklifleri inceleyebilir ve satın alma süreçlerinizi takip edebilirsiniz.</p>
+        <h1 class="text-xl sm:text-2xl font-black tracking-tight">{{ displayName }}</h1>
+        <p class="text-xs text-slate-300">
+          {{ isCompanyMode 
+              ? 'İhalelerinizi yönetebilir, gelen teklifleri inceleyebilir ve satın alma süreçlerinizi takip edebilirsiniz.' 
+              : 'Bireysel kullanıcı olarak açık ihaleleri inceleyebilir, teklif verebilir veya dilediğinizde Firma Modunu aktif edebilirsiniz.' }}
+        </p>
       </div>
 
       <div class="flex flex-wrap items-center gap-2.5">
@@ -149,11 +161,12 @@ onMounted(() => {
           <span>+ Yeni İhale / İlan Aç</span>
         </NuxtLink>
         <NuxtLink 
-          to="/panel/ayarlar" 
+          :to="isCompanyMode ? '/panel/ayarlar?tab=sirket' : '/panel/ayarlar?tab=kisisel'" 
           class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition border border-white/20 flex items-center gap-1.5 cursor-pointer"
         >
-          <Building2 :size="15" class="text-sky-300" />
-          <span>🏢 Kurumsal Ayarlar</span>
+          <Building2 v-if="isCompanyMode" :size="15" class="text-sky-300" />
+          <User v-else :size="15" class="text-sky-300" />
+          <span>{{ isCompanyMode ? '🏢 Kurumsal Ayarlar' : '👤 Profil Ayarları' }}</span>
         </NuxtLink>
       </div>
     </div>
