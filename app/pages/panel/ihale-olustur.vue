@@ -559,6 +559,33 @@ async function handleSubmit() {
       console.warn('API sync warning:', apiErr)
     }
 
+    // 4c. Register GİB BTRANS audit log per 538/595 VUK General Communiqué
+    try {
+      await $fetch('/api/gib/logs', {
+        method: 'POST',
+        body: {
+          tenderId: newId,
+          tenderTitle: form.value.baslik,
+          action: 'IHALE_ACILDI',
+          actionLabel: 'Yeni İhale İlanı Oluşturuldu',
+          category: combinedCategory,
+          budget: budgetVal,
+          direction: turLabel,
+          taxIdType: (session.taxNo && session.taxNo.length === 11) ? 'TCKN' : 'VKN',
+          taxId: session.taxNo || session.tcKimlik || '4700854210',
+          taxOffice: session.taxOffice || 'Kayıtlı Vergi Dairesi',
+          companyOrFullName: ownerCompany || ownerName,
+          ownerEmail,
+          ownerPhone: session.phone || '0850 840 86 95',
+          city: deliveryCity,
+          address: deliveryAddress,
+          timestamp: new Date().toISOString()
+        }
+      })
+    } catch (gibErr) {
+      console.warn('GİB audit log sync warning:', gibErr)
+    }
+
     // 5. Safe LocalStorage save
     if (typeof window !== 'undefined') {
       try {

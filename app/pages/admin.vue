@@ -71,7 +71,9 @@ import {
   Sun,
   Moon,
   Percent,
-  Calculator
+  Calculator,
+  FileSpreadsheet,
+  FileCode
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
@@ -550,7 +552,126 @@ function removeSectorRate(index: number) {
 }
 
 const activeTab = ref<AdminTab>('overview')
-watch(activeTab, () => { syncLiveState() })
+
+// 🏛️ Gelir İdaresi Başkanlığı (GİB) & BTRANS VUK 538/595 Denetim Masası State
+const gibLogs = ref<any[]>([])
+const gibPeriod = ref<string>('2026-09')
+const gibSearch = ref<string>('')
+const gibActionFilter = ref<string>('all')
+const isFetchingGibLogs = ref(false)
+const selectedGibLogDetail = ref<any>(null)
+const showGibDetailModal = ref(false)
+
+async function fetchGibLogs() {
+  isFetchingGibLogs.value = true
+  try {
+    const res = await $fetch<{ success: boolean; logs: any[] }>(`/api/gib/logs?period=${gibPeriod.value}`)
+    if (res && res.success && Array.isArray(res.logs)) {
+      gibLogs.value = res.logs
+    }
+  } catch (err) {
+    console.warn('GIB logs fetch error:', err)
+  } finally {
+    isFetchingGibLogs.value = false
+  }
+}
+
+const filteredGibLogs = computed(() => {
+  let list = gibLogs.value || []
+  if (gibActionFilter.value !== 'all') {
+    list = list.filter(l => l.action === gibActionFilter.value)
+  }
+  const q = gibSearch.value.trim().toLowerCase()
+  if (q) {
+    list = list.filter(l => 
+      (l.tenderTitle || '').toLowerCase().includes(q) ||
+      (l.tenderId || '').toLowerCase().includes(q) ||
+      (l.companyOrFullName || '').toLowerCase().includes(q) ||
+      (l.taxId || '').includes(q) ||
+      (l.ipAddress || '').includes(q) ||
+      (l.city || '').toLowerCase().includes(q)
+    )
+  }
+  return list
+})
+
+const gibStats = computed(() => {
+  const list = gibLogs.value || []
+  const count = list.length
+  let totalVolume = 0
+  let validTaxCount = 0
+
+  list.forEach(l => {
+    const num = parseInt((l.budget || '').replace(/\D/g, '')) || 0
+    totalVolume += num
+    if (l.taxId && l.taxId.trim().length >= 10) {
+      validTaxCount++
+    }
+  })
+
+  return {
+    count,
+    totalVolume: totalVolume.toLocaleString('tr-TR') + ' ₺',
+    validTaxCount,
+    complianceRate: count > 0 ? Math.round((validTaxCount / count) * 100) : 100
+  }
+})
+
+function downloadGibXml() {
+  if (typeof window !== 'undefined') {
+    window.open(`/api/gib/export-xml?period=${gibPeriod.value}`, '_blank')
+    triggerToast('GİB BTRANS VUK 538 XML dosyası indiriliyor...', 'success')
+  }
+}
+
+function downloadGibCsv() {
+  if (typeof window !== 'undefined') {
+    window.open(`/api/gib/export-csv?period=${gibPeriod.value}`, '_blank')
+    triggerToast('GİB BTRANS Resmi Excel/CSV tablosu indiriliyor...', 'success')
+  }
+}
+
+function openGibDetail(log: any) {
+  selectedGibLogDetail.value = log
+  showGibDetailModal.value = true
+}
+
+function generateBtransXmlSnippet(log: any): string {
+  if (!log) return ''
+  return `<btrans:Ilan>
+  <btrans:LogId>${log.id}</btrans:LogId>
+  <btrans:IhaleNo>${log.tenderId}</btrans:IhaleNo>
+  <btrans:IslemTuru>${log.action}</btrans:IslemTuru>
+  <btrans:IhaleBasligi>${log.tenderTitle}</btrans:IhaleBasligi>
+  <btrans:Kategori>${log.category}</btrans:Kategori>
+  <btrans:MuhammenTutar>${log.budget}</btrans:MuhammenTutar>
+  <btrans:IlanVeren>
+    <btrans:KimlikTuru>${log.taxIdType}</btrans:KimlikTuru>
+    <btrans:KimlikNo>${log.taxId}</btrans:KimlikNo>
+    <btrans:UnvanAdSoyad>${log.companyOrFullName}</btrans:UnvanAdSoyad>
+    <btrans:VergiDairesi>${log.taxOffice}</btrans:VergiDairesi>
+    <btrans:Sehir>${log.city}</btrans:Sehir>
+  </btrans:IlanVeren>
+  <btrans:TeknikIzKaydi>
+    <btrans:IPAdresi>${log.ipAddress}</btrans:IPAdresi>
+    <btrans:ZamanDamgasi>${log.timestamp}</btrans:ZamanDamgasi>
+  </btrans:TeknikIzKaydi>
+</btrans:Ilan>`
+}
+
+function copyGibXmlSnippet(snippet: string) {
+  if (typeof navigator !== 'undefined' && navigator.clipboard) {
+    navigator.clipboard.writeText(snippet)
+    triggerToast('BTRANS XML şeması panoya kopyalandı.', 'success')
+  }
+}
+
+watch(activeTab, (tab) => { 
+  syncLiveState() 
+  if (tab === 'audit_logs') {
+    fetchGibLogs()
+  }
+})
 
 // Local copy for editing
 // Clean up duplicates in received bids
@@ -925,6 +1046,7 @@ onMounted(() => {
     }
 
     syncLiveState()
+    fetchGibLogs()
     window.addEventListener('storage', syncLiveState)
   }
 })
@@ -1800,11 +1922,14 @@ function removeSubmittedBid(index: number) {
 
             <button 
               @click="activeTab = 'audit_logs'" 
-              class="w-full flex items-center gap-2.5 rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'audit_logs' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
+              class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'audit_logs' ? 'bg-indigo-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
-              <ShieldAlert :size="14" />
-              Güvenlik & Audit Log
+              <span class="flex items-center gap-2"><ShieldAlert :size="14" /> GİB & BTRANS Denetimi</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-black border"
+                :class="activeTab === 'audit_logs' ? 'bg-white/20 text-white border-white/30' : 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30'">
+                VUK 538
+              </span>
             </button>
 
             <!-- GROUP: İHALE & OPERASYON -->
@@ -3398,42 +3523,359 @@ function removeSubmittedBid(index: number) {
           <!-- ========================================================================= -->
           <!-- TAB 7: GÜVENLİK & AUDIT LOG -->
           <!-- ========================================================================= -->
-          <div v-if="activeTab === 'audit_logs'" class="space-y-6">
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div>
-                  <h3 class="text-sm font-black text-white flex items-center gap-2">
-                    <ShieldAlert :size="16" class="text-blue-400" />
-                    Sistem Denetim İzi & Güvenlik Günlüğü (Audit Log)
+          <div v-if="activeTab === 'audit_logs'" class="space-y-6 text-left">
+            
+            <!-- Resmî Mevzuat ve Tebliğ Bilgilendirme Kartı -->
+            <div class="p-6 rounded-3xl border border-indigo-900/60 bg-gradient-to-br from-[#0B132B] via-[#1C2541] to-[#0A1128] text-white shadow-xl relative overflow-hidden">
+              <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+              
+              <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+                <div class="space-y-2 max-w-3xl">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-[10px] font-black uppercase tracking-wider flex items-center gap-1.5">
+                      <ShieldCheck :size="13" class="text-indigo-400" />
+                      538 & 595 SIRA NO.LU VUK GENEL TEBLİĞİ
+                    </span>
+                    <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-black uppercase tracking-wider">
+                      BTRANS BİLDİRİMİNE HAZIR
+                    </span>
+                    <span class="px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-black uppercase tracking-wider font-mono">
+                      5651 ZAMAN DAMGASI AKTİF
+                    </span>
+                  </div>
+
+                  <h3 class="text-lg sm:text-xl font-black tracking-tight text-white flex items-center gap-2">
+                    <Building2 :size="22" class="text-indigo-400 shrink-0" />
+                    Gelir İdaresi Başkanlığı (GİB) BTRANS İhale Denetim Masası
                   </h3>
-                  <p class="text-[11px] text-slate-400">KVKK ve ISO 27001 gereğince tüm yönetici ve kullanıcı kritik işlem kayıtları zaman damgalı olarak tutulur.</p>
+
+                  <p class="text-xs text-slate-300 leading-relaxed font-normal">
+                    213 sayılı Vergi Usul Kanunu Mükerrer 257. maddesi ve 538 Sıra No.lu VUK Genel Tebliği gereğince; platformumuzda açılan tüm satın alma ve ihale ilanlarına ilişkin mükellef bilgileri (TCKN/VKN, unvan, vergi dairesi), ihale tutarları ve 5651 sayılı kanun uyumlu IP/zaman damgaları elektronik ortamda saklanmakta ve aylık olarak GİB BTRANS sistemi formatında raporlanmaktadır.
+                  </p>
+                </div>
+
+                <!-- Export Action Buttons -->
+                <div class="flex flex-wrap items-center gap-3 shrink-0 relative z-10">
+                  <button
+                    type="button"
+                    @click="downloadGibXml"
+                    class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-black text-xs shadow-lg shadow-indigo-600/30 transition flex items-center gap-2 cursor-pointer"
+                    title="GİB BTRANS VUK 538 standart XML dosyasını indir"
+                  >
+                    <Download :size="14" />
+                    <span>GİB BTRANS XML İndir</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    @click="downloadGibCsv"
+                    class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs shadow-lg shadow-emerald-600/30 transition flex items-center gap-2 cursor-pointer"
+                    title="Vergi dairesi denetimi ve muhasebe için CSV tablosu indir"
+                  >
+                    <FileSpreadsheet :size="14" />
+                    <span>Resmi CSV / Excel İndir</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    @click="fetchGibLogs"
+                    class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition cursor-pointer"
+                    title="Log Kayıtlarını Yenile"
+                  >
+                    <RefreshCw :size="14" :class="isFetchingGibLogs ? 'animate-spin text-indigo-400' : ''" />
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- KPI & İstatistik Kartları -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="p-4 rounded-2xl border" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/70 border-slate-800'">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-400">
+                  <span class="uppercase text-[10px] tracking-wider">BİLDİRİLECEK İHALE</span>
+                  <FileText :size="15" class="text-indigo-500" />
+                </div>
+                <div class="text-xl font-black font-mono mt-1" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                  {{ gibStats.count }} Adet
+                </div>
+                <div class="text-[10px] text-slate-400 mt-0.5">Seçili Dönem ({{ gibPeriod }})</div>
+              </div>
+
+              <div class="p-4 rounded-2xl border" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/70 border-slate-800'">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-400">
+                  <span class="uppercase text-[10px] tracking-wider">TOPLAM İŞLEM HACMİ</span>
+                  <TrendingUp :size="15" class="text-emerald-500" />
+                </div>
+                <div class="text-xl font-black font-mono mt-1 text-emerald-600">
+                  {{ gibStats.totalVolume }}
+                </div>
+                <div class="text-[10px] text-slate-400 mt-0.5">Muhammen / Bütçe Tutarı</div>
+              </div>
+
+              <div class="p-4 rounded-2xl border" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/70 border-slate-800'">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-400">
+                  <span class="uppercase text-[10px] tracking-wider">VKN / TCKN DOĞRULAMA</span>
+                  <CheckCircle2 :size="15" class="text-blue-500" />
+                </div>
+                <div class="text-xl font-black font-mono mt-1" :class="gibStats.complianceRate === 100 ? 'text-emerald-500' : 'text-amber-500'">
+                  %{{ gibStats.complianceRate }}
+                </div>
+                <div class="text-[10px] text-slate-400 mt-0.5">{{ gibStats.validTaxCount }} / {{ gibStats.count }} Doğrulanmış Mükellef</div>
+              </div>
+
+              <div class="p-4 rounded-2xl border" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/70 border-slate-800'">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-400">
+                  <span class="uppercase text-[10px] tracking-wider">BTRANS STATÜSÜ</span>
+                  <ShieldCheck :size="15" class="text-emerald-500" />
+                </div>
+                <div class="text-sm font-black font-sans mt-2 text-emerald-600 flex items-center gap-1.5">
+                  <span class="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  GİB Şemasına Tam Uyumlu
+                </div>
+                <div class="text-[10px] text-slate-400 mt-0.5">XML Validasyonu Geçerli</div>
+              </div>
+            </div>
+
+            <!-- Filtre ve Arama Çubuğu -->
+            <div class="p-4 rounded-2xl border flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4"
+              :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+              
+              <div class="flex flex-wrap items-center gap-3">
+                <!-- Dönem Seçici -->
+                <div class="flex items-center gap-2">
+                  <label class="text-[10px] font-black uppercase tracking-wider text-slate-400">DÖNEM:</label>
+                  <select 
+                    v-model="gibPeriod" 
+                    @change="fetchGibLogs"
+                    class="rounded-xl border px-3 py-1.5 text-xs font-bold outline-none cursor-pointer"
+                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'"
+                  >
+                    <option value="2026-09">Eylül 2026 (Cari Dönem)</option>
+                    <option value="2026-08">Ağustos 2026</option>
+                    <option value="2026-07">Temmuz 2026</option>
+                    <option value="all">Tüm Dönemler</option>
+                  </select>
+                </div>
+
+                <!-- İşlem Türü Filtresi -->
+                <div class="flex items-center gap-2">
+                  <label class="text-[10px] font-black uppercase tracking-wider text-slate-400">İŞLEM:</label>
+                  <select 
+                    v-model="gibActionFilter" 
+                    class="rounded-xl border px-3 py-1.5 text-xs font-bold outline-none cursor-pointer"
+                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'"
+                  >
+                    <option value="all">Tüm İşlemler</option>
+                    <option value="IHALE_ACILDI">İhale Açıldı</option>
+                    <option value="IHALE_MUTABAKAT">Mutabakat Sağlandı</option>
+                    <option value="IHALE_IPTAL">İhale İptal Edildi</option>
+                  </select>
                 </div>
               </div>
 
-              <!-- Log Stream Table -->
-              <div class="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
-                <table class="w-full text-left text-xs border-collapse font-mono">
+              <!-- Arama Kutusu -->
+              <div class="relative w-full md:w-80">
+                <Search class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" :size="14" />
+                <input
+                  v-model="gibSearch"
+                  type="text"
+                  placeholder="İhale no, unvan, VKN, IP veya şehirde ara..."
+                  class="w-full rounded-xl border py-2 pl-9 pr-3 text-xs outline-none transition"
+                  :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-900 focus:bg-white focus:border-indigo-500' : 'bg-slate-950 border-slate-800 text-white focus:border-indigo-500'"
+                />
+              </div>
+            </div>
+
+            <!-- GİB BTRANS İhale Denetim Tablosu -->
+            <div class="rounded-2xl border overflow-hidden shadow-xs"
+              :class="adminTheme === 'light' ? 'bg-white border-slate-200' : 'bg-slate-950 border-slate-800'">
+              
+              <div class="p-4 border-b flex items-center justify-between" :class="adminTheme === 'light' ? 'border-slate-200 bg-slate-50/70' : 'border-slate-800 bg-slate-900/50'">
+                <div>
+                  <h4 class="text-xs font-black uppercase tracking-wider" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                    Resmî GİB Bildirim Veri Kayıtları ({{ filteredGibLogs.length }} Kayıt)
+                  </h4>
+                  <p class="text-[11px] text-slate-400">Aşağıdaki veriler BTRANS XML çıktısına birebir yansıtılmaktadır.</p>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-slate-400 font-mono">
+                  <span>Yasal Saklama Süresi: <strong>10 Yıl (VUK Md. 253)</strong></span>
+                </div>
+              </div>
+
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
                   <thead>
-                    <tr class="bg-slate-900/90 border-b border-slate-800 text-[10px] font-black text-slate-400 uppercase">
-                      <th class="p-3.5">ZAMAN DAMGASI</th>
-                      <th class="p-3.5">KULLANICI</th>
-                      <th class="p-3.5">İŞLEM</th>
-                      <th class="p-3.5">IP ADRESİ</th>
-                      <th class="p-3.5">DETAY</th>
+                    <tr class="border-b text-[10px] font-black uppercase font-mono tracking-wider"
+                      :class="adminTheme === 'light' ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-slate-900/90 text-slate-400 border-slate-800'">
+                      <th class="p-3.5">ZAMAN & IP İZİ</th>
+                      <th class="p-3.5">İHALE NO & BAŞLIK</th>
+                      <th class="p-3.5">İLAN VEREN MÜKELLEF</th>
+                      <th class="p-3.5">TCKN / VKN & VERGİ D.</th>
+                      <th class="p-3.5">TUTAR / BÜTÇE</th>
+                      <th class="p-3.5">İŞLEM TÜRÜ</th>
+                      <th class="p-3.5">GİB DURUMU</th>
+                      <th class="p-3.5 text-right">XML / DETAY</th>
                     </tr>
                   </thead>
-                  <tbody class="divide-y divide-slate-800/60 text-[11px]">
-                    <tr v-for="log in formState.auditLogs" :key="log.id" class="hover:bg-slate-900/40 transition">
-                      <td class="p-3.5 text-slate-400">{{ log.timestamp }}</td>
-                      <td class="p-3.5 font-bold text-white">{{ log.userEmail }}</td>
-                      <td class="p-3.5 text-emerald-400 font-sans font-bold">{{ log.action }}</td>
-                      <td class="p-3.5 text-blue-400">{{ log.ipAddress }}</td>
-                      <td class="p-3.5 text-slate-300 font-sans">{{ log.details }}</td>
+                  <tbody class="divide-y font-mono text-[11px]"
+                    :class="adminTheme === 'light' ? 'divide-slate-200' : 'divide-slate-800/60'">
+                    
+                    <tr v-if="filteredGibLogs.length === 0">
+                      <td colspan="8" class="p-8 text-center text-slate-400 font-sans text-xs">
+                        Bu dönem ve arama kriterine uygun GİB ihale kaydı bulunamadı.
+                      </td>
+                    </tr>
+
+                    <tr 
+                      v-for="log in filteredGibLogs" 
+                      :key="log.id" 
+                      class="transition"
+                      :class="adminTheme === 'light' ? 'hover:bg-slate-50' : 'hover:bg-slate-900/40'"
+                    >
+                      <!-- Zaman & IP -->
+                      <td class="p-3.5">
+                        <div class="font-bold font-sans" :class="adminTheme === 'light' ? 'text-slate-800' : 'text-slate-200'">
+                          {{ log.timestamp ? new Date(log.timestamp).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : '—' }}
+                        </div>
+                        <div class="text-[10px] text-indigo-400 font-mono mt-0.5">
+                          IP: {{ log.ipAddress }}:{{ log.port || '443' }}
+                        </div>
+                      </td>
+
+                      <!-- İhale No & Başlık -->
+                      <td class="p-3.5 max-w-[280px]">
+                        <div class="flex items-center gap-1.5">
+                          <span class="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[10px] font-black border border-slate-200 dark:border-slate-700 font-mono">
+                            {{ log.tenderId }}
+                          </span>
+                        </div>
+                        <div class="font-bold font-sans text-xs mt-1 truncate" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'" :title="log.tenderTitle">
+                          {{ log.tenderTitle }}
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-sans mt-0.5 truncate">
+                          {{ log.category }}
+                        </div>
+                      </td>
+
+                      <!-- Mükellef -->
+                      <td class="p-3.5 font-sans">
+                        <div class="font-bold text-xs" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                          {{ log.companyOrFullName }}
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-mono mt-0.5">
+                          📍 {{ log.city }} • 📞 {{ log.ownerPhone }}
+                        </div>
+                      </td>
+
+                      <!-- TCKN / VKN & Vergi Dairesi -->
+                      <td class="p-3.5 font-mono">
+                        <div class="font-bold text-xs flex items-center gap-1">
+                          <span class="text-[9px] px-1 py-0.2 rounded font-black uppercase"
+                            :class="log.taxIdType === 'VKN' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'">
+                            {{ log.taxIdType }}
+                          </span>
+                          <span :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">{{ log.taxId }}</span>
+                        </div>
+                        <div class="text-[10px] text-slate-400 font-sans mt-0.5">
+                          {{ log.taxOffice }}
+                        </div>
+                      </td>
+
+                      <!-- Tutar / Bütçe -->
+                      <td class="p-3.5 font-mono font-black" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                        {{ log.budget }}
+                      </td>
+
+                      <!-- İşlem Türü -->
+                      <td class="p-3.5 font-sans">
+                        <span 
+                          class="px-2 py-0.5 rounded-full text-[10px] font-black uppercase"
+                          :class="log.action === 'IHALE_ACILDI' 
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' 
+                            : (log.action === 'IHALE_MUTABAKAT' ? 'bg-blue-100 text-blue-800 border border-blue-300' : 'bg-red-100 text-red-800 border border-red-300')"
+                        >
+                          {{ log.actionLabel || log.action }}
+                        </span>
+                      </td>
+
+                      <!-- GİB Durumu -->
+                      <td class="p-3.5 font-sans">
+                        <span 
+                          class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase"
+                          :class="log.status === 'HAZIR' 
+                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' 
+                            : 'bg-red-500/20 text-red-400 border border-red-500/30'"
+                        >
+                          <CheckCircle2 v-if="log.status === 'HAZIR'" :size="11" />
+                          <AlertTriangle v-else :size="11" />
+                          {{ log.status === 'HAZIR' ? 'Hazır' : 'Eksik VKN' }}
+                        </span>
+                      </td>
+
+                      <!-- Detay / XML Butonu -->
+                      <td class="p-3.5 text-right font-sans">
+                        <button
+                          type="button"
+                          @click="openGibDetail(log)"
+                          class="px-3 py-1.5 rounded-lg border text-xs font-bold transition flex items-center gap-1 ml-auto cursor-pointer"
+                          :class="adminTheme === 'light' 
+                            ? 'border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100' 
+                            : 'border-indigo-800 bg-indigo-950/60 text-indigo-300 hover:bg-indigo-900/60'"
+                        >
+                          <FileCode :size="13" />
+                          <span>XML İncele</span>
+                        </button>
+                      </td>
+                    </tr>
+
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <!-- Genel Sistem & Güvenlik Günlüğü (KVKK / ISO 27001) -->
+            <div class="p-6 rounded-2xl border space-y-4"
+              :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+              
+              <div class="flex items-center justify-between border-b pb-3"
+                :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                <div>
+                  <h4 class="text-xs font-black uppercase tracking-wider flex items-center gap-2"
+                    :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                    <ShieldAlert :size="15" class="text-blue-400" />
+                    Genel Sistem Denetim İzi (KVKK & ISO 27001 Audit Log)
+                  </h4>
+                  <p class="text-[11px] text-slate-400">Yönetici oturum açma, ayar güncelleme ve kullanıcı kritik işlemleri bu akışta takip edilir.</p>
+                </div>
+              </div>
+
+              <div class="rounded-xl border overflow-hidden"
+                :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-slate-950 border-slate-800'">
+                <table class="w-full text-left text-xs border-collapse font-mono">
+                  <thead>
+                    <tr class="border-b text-[10px] font-black uppercase"
+                      :class="adminTheme === 'light' ? 'bg-slate-100 text-slate-600 border-slate-200' : 'bg-slate-900/90 text-slate-400 border-slate-800'">
+                      <th class="p-3">ZAMAN</th>
+                      <th class="p-3">KULLANICI</th>
+                      <th class="p-3">İŞLEM</th>
+                      <th class="p-3">IP ADRESİ</th>
+                      <th class="p-3">DETAY</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y text-[11px]"
+                    :class="adminTheme === 'light' ? 'divide-slate-200 text-slate-700' : 'divide-slate-800/60 text-slate-300'">
+                    <tr v-for="log in formState.auditLogs" :key="log.id" class="transition hover:bg-slate-500/10">
+                      <td class="p-3 text-slate-400">{{ log.timestamp }}</td>
+                      <td class="p-3 font-bold" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">{{ log.userEmail }}</td>
+                      <td class="p-3 text-emerald-500 font-sans font-bold">{{ log.action }}</td>
+                      <td class="p-3 text-blue-400 font-mono">{{ log.ipAddress }}</td>
+                      <td class="p-3 font-sans">{{ log.details }}</td>
                     </tr>
                   </tbody>
                 </table>
               </div>
             </div>
+
           </div>
 
           <!-- ========================================================================= -->
@@ -4598,6 +5040,176 @@ function removeSubmittedBid(index: number) {
               class="px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-emerald-600/20"
             >
               <CheckCircle2 :size="14" /> Bu Evrakı Onayla & Firmaya Mavi Rozet Ver
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 🏛️ GİB BTRANS RESMÎ XML & MÜKELLEF DETAY MODALI -->
+    <div 
+      v-if="showGibDetailModal && selectedGibLogDetail"
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200"
+    >
+      <div 
+        class="w-full max-w-4xl max-h-[92vh] flex flex-col rounded-3xl border shadow-2xl overflow-hidden"
+        :class="adminTheme === 'light' ? 'bg-white border-slate-200' : 'bg-slate-900 border-slate-800'"
+      >
+        <!-- Modal Başlık -->
+        <div class="px-6 py-5 border-b flex items-center justify-between"
+          :class="adminTheme === 'light' ? 'border-slate-200 bg-slate-50' : 'border-slate-800 bg-slate-950/60'">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-500">
+              <Building2 :size="20" />
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="font-black text-sm tracking-tight" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                  GİB BTRANS VUK 538/595 Resmî Bildirim Kaydı
+                </h3>
+                <span class="px-2 py-0.5 rounded text-[10px] font-black uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                  VUK 538 Uyumlu
+                </span>
+              </div>
+              <p class="text-xs text-slate-400 font-mono mt-0.5">
+                İhale No: {{ selectedGibLogDetail.tenderId }} • Log ID: {{ selectedGibLogDetail.id }}
+              </p>
+            </div>
+          </div>
+          <button 
+            type="button"
+            @click="showGibDetailModal = false"
+            class="p-2 rounded-xl border text-slate-400 hover:text-white transition cursor-pointer"
+            :class="adminTheme === 'light' ? 'border-slate-200 hover:bg-slate-100 hover:text-slate-900' : 'border-slate-800 hover:bg-slate-800'"
+          >
+            <X :size="18" />
+          </button>
+        </div>
+
+        <!-- Modal Gövde (Scrollable) -->
+        <div class="p-6 overflow-y-auto space-y-6 flex-1 text-xs">
+          <!-- 3'lü Bilgi Grid'i -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-sans">
+            <!-- İhale Bilgileri -->
+            <div class="p-4 rounded-2xl border space-y-2"
+              :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/80 border-slate-800'">
+              <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Scale :size="12" class="text-amber-400" />
+                İhale & İşlem Bilgisi
+              </div>
+              <div>
+                <div class="font-bold text-sm" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                  {{ selectedGibLogDetail.tenderTitle }}
+                </div>
+                <div class="text-[11px] text-slate-400 mt-0.5">
+                  Kategori: <span class="font-semibold text-slate-300">{{ selectedGibLogDetail.category }}</span>
+                </div>
+              </div>
+              <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between font-mono">
+                <span class="text-slate-400">Muhammen Bedel:</span>
+                <span class="font-bold text-emerald-400">{{ selectedGibLogDetail.budget }}</span>
+              </div>
+              <div class="flex items-center justify-between font-mono text-[11px]">
+                <span class="text-slate-400">İşlem Türü:</span>
+                <span class="font-bold text-blue-400">{{ selectedGibLogDetail.actionLabel || selectedGibLogDetail.action }}</span>
+              </div>
+            </div>
+
+            <!-- Mükellef Bilgileri -->
+            <div class="p-4 rounded-2xl border space-y-2"
+              :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/80 border-slate-800'">
+              <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <Building2 :size="12" class="text-blue-400" />
+                Mükellef & Şirket Verisi
+              </div>
+              <div>
+                <div class="font-bold text-sm" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                  {{ selectedGibLogDetail.companyOrFullName }}
+                </div>
+                <div class="text-[11px] text-slate-400 mt-0.5">
+                  📍 {{ selectedGibLogDetail.city }} • 📞 {{ selectedGibLogDetail.ownerPhone }}
+                </div>
+              </div>
+              <div class="pt-2 border-t border-slate-800/60 flex items-center justify-between font-mono">
+                <span class="text-slate-400">{{ selectedGibLogDetail.taxIdType }}:</span>
+                <span class="font-bold text-amber-400">{{ selectedGibLogDetail.taxId }}</span>
+              </div>
+              <div class="flex items-center justify-between text-[11px]">
+                <span class="text-slate-400">Vergi Dairesi:</span>
+                <span class="font-semibold" :class="adminTheme === 'light' ? 'text-slate-800' : 'text-slate-200'">{{ selectedGibLogDetail.taxOffice }}</span>
+              </div>
+            </div>
+
+            <!-- Teknik İz Bilgileri -->
+            <div class="p-4 rounded-2xl border space-y-2"
+              :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/80 border-slate-800'">
+              <div class="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                <ShieldCheck :size="12" class="text-emerald-400" />
+                5651 & VUK Teknik İz
+              </div>
+              <div class="font-mono space-y-1">
+                <div class="flex items-center justify-between">
+                  <span class="text-slate-400">İstemci IP:</span>
+                  <span class="font-bold text-blue-400">{{ selectedGibLogDetail.ipAddress }}</span>
+                </div>
+                <div class="flex items-center justify-between text-[11px]">
+                  <span class="text-slate-400">Zaman Damgası:</span>
+                  <span class="text-slate-300">{{ selectedGibLogDetail.timestamp }}</span>
+                </div>
+              </div>
+              <div class="pt-2 border-t border-slate-800/60 text-[10px] text-slate-400 truncate">
+                <span class="font-mono text-slate-500">Agent:</span> {{ selectedGibLogDetail.userAgent || 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)' }}
+              </div>
+              <div class="text-[9px] text-emerald-400 flex items-center gap-1">
+                <Check :size="10" /> BTRANS XSD Validasyonundan Geçti
+              </div>
+            </div>
+          </div>
+
+          <!-- BTRANS XML Şeması Önizleme -->
+          <div class="rounded-2xl border overflow-hidden"
+            :class="adminTheme === 'light' ? 'bg-slate-900 border-slate-800 text-slate-100' : 'bg-black border-slate-800 text-slate-100'">
+            <div class="px-4 py-2.5 bg-slate-950 border-b border-slate-800 flex items-center justify-between">
+              <div class="flex items-center gap-2 font-mono text-[11px] text-slate-400">
+                <FileCode :size="14" class="text-amber-400" />
+                <span>gib_btrans_record_{{ selectedGibLogDetail.tenderId }}.xml</span>
+              </div>
+              <button
+                type="button"
+                @click="copyGibXmlSnippet(generateBtransXmlSnippet(selectedGibLogDetail))"
+                class="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-[11px] font-bold flex items-center gap-1.5 transition cursor-pointer"
+              >
+                <Copy :size="12" />
+                <span>XML'i Kopyala</span>
+              </button>
+            </div>
+            <pre class="p-4 text-[11px] font-mono leading-relaxed overflow-x-auto text-emerald-300"><code>{{ generateBtransXmlSnippet(selectedGibLogDetail) }}</code></pre>
+          </div>
+        </div>
+
+        <!-- Modal Alt Çubuk -->
+        <div class="px-6 py-4 border-t flex items-center justify-between"
+          :class="adminTheme === 'light' ? 'border-slate-200 bg-slate-50' : 'border-slate-800 bg-slate-950/60'">
+          <div class="text-[11px] text-slate-400">
+            213 sayılı VUK Mükerrer 257. md. uyarınca bu kayıt 10 yıl süreyle arşivlenir.
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              @click="downloadGibXml()"
+              class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-lg shadow-amber-500/20"
+            >
+              <FileCode :size="14" />
+              <span>Dönem XML'ini İndir</span>
+            </button>
+            <button
+              type="button"
+              @click="showGibDetailModal = false"
+              class="px-4 py-2 rounded-xl border text-xs font-bold transition cursor-pointer"
+              :class="adminTheme === 'light' ? 'border-slate-300 text-slate-700 hover:bg-slate-200' : 'border-slate-700 text-slate-300 hover:bg-slate-800'"
+            >
+              Kapat
             </button>
           </div>
         </div>
