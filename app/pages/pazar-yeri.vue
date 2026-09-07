@@ -607,7 +607,32 @@ async function submitBid() {
   })
 
   tender.teklifSayisi = (tender.teklifSayisi || 0) + 1
+  tender.liderTeklif = formattedPrice
   saveCmsData(cmsData.value)
+
+  // Sync with shared server API for cross-device visibility
+  try {
+    await $fetch('/api/bids', {
+      method: 'POST',
+      body: {
+        id: newBidId,
+        tenderId: tender.id,
+        tenderTitle: tender.baslik,
+        ownerEmail: tender.ownerEmail || '',
+        firma: myCompanyName,
+        fiyat: formattedPrice,
+        sure: bidForm.value.sure,
+        yetkili: myContact,
+        telefon: myPhone,
+        eposta: myEmail,
+        vergiDairesi: myTax,
+        adres: myAddress,
+        notum: bidForm.value.notum
+      }
+    })
+  } catch (apiErr) {
+    console.warn('Bid API sync warning:', apiErr)
+  }
 
   if (typeof window !== 'undefined') {
     try {

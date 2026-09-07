@@ -841,8 +841,9 @@ export function useCmsData() {
         cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
       }
     }
-    // Fetch live tenders from server API so all devices stay synchronized
+    // Fetch live tenders and bids from server API so all devices stay synchronized
     fetchServerTenders()
+    fetchServerBids()
   }
 
   async function fetchServerTenders() {
@@ -871,6 +872,47 @@ export function useCmsData() {
     }
   }
 
+  async function fetchServerBids() {
+    if (typeof window === 'undefined') return
+    try {
+      const res = await $fetch<{ success: boolean; bids: any[] }>('/api/bids')
+      if (res && res.success && Array.isArray(res.bids)) {
+        if (!cmsDataRef.value.dashboard) cmsDataRef.value.dashboard = {} as any
+        if (!Array.isArray(cmsDataRef.value.dashboard.receivedBids)) {
+          cmsDataRef.value.dashboard.receivedBids = []
+        }
+
+        const groupMap = new Map<string, any>()
+        ;(cmsDataRef.value.dashboard.receivedBids || []).forEach((g: any) => {
+          if (g && g.id) groupMap.set(g.id, { ...g, teklifler: [...(g.teklifler || [])] })
+        })
+
+        res.bids.forEach((bid: any) => {
+          let group = groupMap.get(bid.tenderId)
+          if (!group) {
+            group = {
+              id: bid.tenderId,
+              baslik: bid.tenderTitle || 'Satın Alma İhalesi',
+              kategori: bid.kategori || 'Genel',
+              bitis: bid.sure || '7 gün kaldı',
+              teklifler: []
+            }
+            groupMap.set(bid.tenderId, group)
+          }
+          const exists = (group.teklifler || []).some((t: any) => t.id === bid.id)
+          if (!exists) {
+            group.teklifler.unshift(bid)
+          }
+        })
+
+        cmsDataRef.value.dashboard.receivedBids = Array.from(groupMap.values())
+        safeLocalStorageSet('cmsData', cmsDataRef.value)
+      }
+    } catch (e) {
+      console.warn('Could not fetch server bids:', e)
+    }
+  }
+
   function saveCmsData(newData: any) {
     cmsDataRef.value = JSON.parse(JSON.stringify(newData))
     safeLocalStorageSet('cmsData', cmsDataRef.value)
@@ -885,6 +927,7 @@ export function useCmsData() {
     cmsData: cmsDataRef,
     saveCmsData,
     resetCmsData,
-    fetchServerTenders
+    fetchServerTenders,
+    fetchServerBids
   }
 }

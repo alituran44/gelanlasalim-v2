@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { 
   Search, 
   SlidersHorizontal, 
@@ -29,7 +29,7 @@ definePageMeta({
   layout: "dashboard"
 })
 
-const { cmsData, saveCmsData } = useCmsData()
+const { cmsData, saveCmsData, fetchServerTenders, fetchServerBids } = useCmsData()
 const { sendSms } = useNetGsm()
 
 function getTenderDirectionBadge(tender: any) {
@@ -58,12 +58,34 @@ const detailActiveTab = ref<'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'firmala
 
 const showBidModal = ref(false)
 const selectedTenderForBid = ref<any>(null)
+const userSession = ref<any>({})
 
 const bidForm = ref({
   fiyat: '',
   sure: '7 gün',
   notum: '',
   firmaAdi: 'Kaya Tedarik & İnşaat Ltd.'
+})
+
+onMounted(async () => {
+  if (fetchServerTenders) {
+    try {
+      await fetchServerTenders()
+    } catch (e) {}
+  }
+  if (fetchServerBids) {
+    try {
+      await fetchServerBids()
+    } catch (e) {}
+  }
+  if (typeof window !== 'undefined') {
+    try {
+      userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
+      if (userSession.value.companyName || userSession.value.company) {
+        bidForm.value.firmaAdi = userSession.value.companyName || userSession.value.company
+      }
+    } catch (e) {}
+  }
 })
 
 const allTenders = computed(() => {
@@ -225,11 +247,18 @@ async function submitBid() {
   const tender = selectedTenderForBid.value
   const newBidId = 'TKF-' + Math.floor(100 + Math.random() * 900)
 
-  cmsData.value.dashboard.submittedBids.unshift({
+  const myCompanyName = userSession.value?.companyName || userSession.value?.company || bidForm.value.firmaAdi || 'Yetkili Firma'
+  const myContact = userSession.value?.name || userSession.value?.firstName || 'Firma Yetkilisi'
+  const myPhone = userSession.value?.phone || '0850 840 86 95'
+  const myEmail = userSession.value?.email || 'ihalecib@gmail.com'
+  const myTax = userSession.value?.taxOffice ? `${userSession.value?.taxOffice} / ${userSession.value?.taxNo || ''}` : 'Çanakkale V.D. / 4700854210'
+  const myAddress = userSession.value?.faturaAdresi || 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale'
+
+  const newSubmittedBid = {
     id: newBidId,
     tenderId: tender.id,
     ilanBaslik: tender.baslik,
-    aliciFirma: tender.city + ' Kurumsal Alıcı',
+    aliciFirma: tender.ownerCompany || (tender.city + ' Kurumsal Alıcı'),
     kategori: tender.kategori,
     teklifFiyatim: formattedPrice,
     sure: bidForm.value.sure,
@@ -238,7 +267,9 @@ async function submitBid() {
     bitisTarihi: tender.sure || '7 gün',
     notum: bidForm.value.notum,
     pazarlikGecmisi: []
-  })
+  }
+
+  cmsData.value.dashboard.submittedBids.unshift(newSubmittedBid)
 
   let targetReceivedGroup = cmsData.value.dashboard.receivedBids.find((g: any) => g.id === tender.id || g.baslik === tender.baslik)
   if (!targetReceivedGroup) {
@@ -254,27 +285,60 @@ async function submitBid() {
 
   targetReceivedGroup.teklifler.unshift({
     id: newBidId,
-    firma: bidForm.value.firmaAdi,
+    firma: myCompanyName,
     fiyat: formattedPrice,
     sure: bidForm.value.sure,
-    puan: 4.8,
+    puan: 5.0,
     durum: 'bekliyor',
-    yetkili: 'Ahmet Yılmaz',
-    telefon: '+90 532 999 00 11',
-    eposta: 'teklif@kayatedarik.com',
-    vergiDairesi: 'Balıkesir V.D. / 5920192847',
-    adres: 'Organize Sanayi Bölgesi 2. Cadde Balıkesir',
+    yetkili: myContact,
+    telefon: myPhone,
+    eposta: myEmail,
+    vergiDairesi: myTax,
+    adres: myAddress,
     pazarlikGecmisi: []
   })
 
   tender.teklifSayisi = (tender.teklifSayisi || 0) + 1
+  tender.liderTeklif = formattedPrice
   saveCmsData(cmsData.value)
+
+  // Sync with shared server API for cross-device visibility
+  try {
+    await $fetch('/api/bids', {
+      method: 'POST',
+      body: {
+        id: newBidId,
+        tenderId: tender.id,
+        tenderTitle: tender.baslik,
+        ownerEmail: tender.ownerEmail || '',
+        firma: myCompanyName,
+        fiyat: formattedPrice,
+        sure: bidForm.value.sure,
+        yetkili: myContact,
+        telefon: myPhone,
+        eposta: myEmail,
+        vergiDairesi: myTax,
+        adres: myAddress,
+        notum: bidForm.value.notum
+      }
+    })
+  } catch (apiErr) {
+    console.warn('Bid API sync warning:', apiErr)
+  }
+
+  if (typeof window !== 'undefined') {
+    try {
+      const myBids = JSON.parse(localStorage.getItem('myBids') || '[]')
+      myBids.unshift(newSubmittedBid)
+      localStorage.setItem('myBids', JSON.stringify(myBids))
+    } catch (e) {}
+  }
 
   await sendSms({
     recipientPhone: '+90 532 000 11 22',
     recipientName: 'İhale Sahibi Firma',
     templateName: 'Yeni Teklif Bildirimi',
-    messageBody: `Sayın Yetkili, "${tender.baslik}" ihaleniz için ${bidForm.value.firmaAdi} tarafından ${formattedPrice} tutarında yeni bir teklif verildi. Panelinizi inceleyiniz.`
+    messageBody: `Sayın Yetkili, "${tender.baslik}" ihaleniz için ${myCompanyName} tarafından ${formattedPrice} tutarında yeni bir teklif verildi. Panelinizi inceleyiniz.`
   })
 
   showBidModal.value = false

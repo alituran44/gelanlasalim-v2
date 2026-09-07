@@ -65,6 +65,7 @@ const sidebarMenus = computed(() => {
   if (locale.value === 'tr') {
     const list: any[] = [
       { title: "Genel Bakış", icon: LayoutDashboard, to: "/panel" },
+      { title: "Profil & Hesap", icon: Settings, to: "/panel/ayarlar?tab=kisisel" },
       { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
@@ -75,13 +76,13 @@ const sidebarMenus = computed(() => {
     }
     list.push(
       { title: "Mücbir Sebep & Fesih", icon: Scale, to: "/panel/mucbir-sebep" },
-      { title: "Bildirimler", icon: Bell, to: "/panel/bildirimler" },
-      { title: "Profil & Hesap", icon: Settings, to: "/panel/ayarlar?tab=kisisel" }
+      { title: "Bildirimler", icon: Bell, to: "/panel/bildirimler" }
     )
     return list
   } else {
     const list: any[] = [
       { title: "Dashboard", icon: LayoutDashboard, to: "/panel" },
+      { title: "Account & Profile", icon: Settings, to: "/panel/ayarlar?tab=kisisel" },
       { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" },
@@ -92,8 +93,7 @@ const sidebarMenus = computed(() => {
     }
     list.push(
       { title: "Force Majeure & Disputes", icon: Scale, to: "/panel/mucbir-sebep" },
-      { title: "Notifications", icon: Bell, to: "/panel/bildirimler" },
-      { title: "Account & Profile", icon: Settings, to: "/panel/ayarlar?tab=kisisel" }
+      { title: "Notifications", icon: Bell, to: "/panel/bildirimler" }
     )
     return list
   }

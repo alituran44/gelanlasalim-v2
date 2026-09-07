@@ -212,35 +212,12 @@ onMounted(() => {
 
       </div>
 
-      <!-- ALT İKİNCİ ŞERİT: YENİ ÜYELİK, GİRİŞ YAP, ÜYELİK UZAT & İHALE AÇ -->
+      <!-- ALT İKİNCİ ŞERİT: İHALE AÇ & GİRİŞ / ÇIKIŞ BÖLÜMÜ -->
       <div class="max-w-[1400px] mx-auto mt-2 pt-2 border-t border-slate-200 flex flex-col md:flex-row items-center justify-between gap-3">
         
-        <!-- Sol: Kurumsal Butonlar Grubu -->
+        <!-- Sol: İhale ve Abonelik Aksiyonları -->
         <div class="flex flex-wrap items-center gap-2.5">
-          <!-- 1. Yeni Üyelik (Giriş yapılmamışsa görünür) -->
-          <NuxtLink 
-            v-if="!isLoggedIn" 
-            to="/uyelik?tab=register" 
-            class="px-3.5 py-1.5 rounded-lg bg-[#059669] hover:bg-[#047857] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-emerald-700/30 transition cursor-pointer"
-          >
-            <span>👤+ Yeni üyelik</span>
-          </NuxtLink>
-
-          <!-- 2. Giriş Yap (Giriş yapılmamışsa görünür, giriş yapılınca otomatik gizlenir) -->
-          <NuxtLink 
-            v-if="!isLoggedIn" 
-            to="/uyelik?tab=login" 
-            class="px-3.5 py-1.5 rounded-lg bg-[#0F223D] hover:bg-[#1E293B] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-slate-700/40 transition cursor-pointer"
-          >
-            <span>🔑 Giriş Yap</span>
-          </NuxtLink>
-
-          <!-- 3. Üyelik Uzat -->
-          <NuxtLink to="/abonelik" class="px-3.5 py-1.5 rounded-lg bg-[#0284C7] hover:bg-[#0369A1] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-sky-700/30 transition cursor-pointer">
-            <span>🔄 Üyelik uzat</span>
-          </NuxtLink>
-
-          <!-- 4. İhale Aç (Büyük, Yatayda Geniş ve Yanıp Sönen Dikkat Çekici Buton) -->
+          <!-- 1. İhale Aç (Büyük, Yatayda Geniş ve Yanıp Sönen Dikkat Çekici Buton) -->
           <NuxtLink 
             to="/panel/ihale-olustur" 
             class="px-6 py-2 rounded-xl bg-gradient-to-r from-orange-600 via-amber-500 to-orange-600 bg-[length:200%_auto] hover:bg-right text-white font-black text-sm shadow-md shadow-orange-600/30 flex items-center gap-1.5 border border-orange-400 transition-all duration-300 animate-pulse hover:scale-105 cursor-pointer tracking-wide"
@@ -248,33 +225,58 @@ onMounted(() => {
             <span class="text-base leading-none">✨</span>
             <span>+ İHALE AÇ</span>
           </NuxtLink>
+
+          <!-- 2. Üyelik Uzat -->
+          <NuxtLink to="/abonelik" class="px-3.5 py-1.5 rounded-lg bg-[#0284C7] hover:bg-[#0369A1] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-sky-700/30 transition cursor-pointer">
+            <span>🔄 Üyelik uzat</span>
+          </NuxtLink>
         </div>
 
-        <!-- Sağ: Giriş Yapılmışsa Kullanıcı Profili ve Çıkış Butonu -->
-        <div v-if="isLoggedIn" class="flex items-center gap-2.5 text-xs">
-          <NuxtLink 
-            to="/panel/ayarlar"
-            class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold border border-slate-300 flex items-center gap-1.5 transition"
-          >
-            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-            <span class="truncate max-w-[180px]">{{ (userSession?.isCompanyActive ? (userSession?.companyName || userSession?.company) : '') || userSession?.name || userSession?.firstName || userSession?.username || 'Hesabım' }}</span>
-          </NuxtLink>
+        <!-- Sağ: Kullanıcı Giriş / Çıkış & Profil Alanı (Her Zaman Sağda Aynı Yerde) -->
+        <div class="flex items-center gap-2.5 text-xs">
+          <!-- Giriş Yapılmamışsa: Yeni Üyelik & Giriş Yap Butonları -->
+          <template v-if="!isLoggedIn">
+            <NuxtLink 
+              to="/uyelik?tab=register" 
+              class="px-3.5 py-1.5 rounded-lg bg-[#059669] hover:bg-[#047857] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-emerald-700/30 transition cursor-pointer"
+            >
+              <span>👤+ Yeni üyelik</span>
+            </NuxtLink>
 
-          <NuxtLink 
-            to="/panel" 
-            class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center gap-1 shadow-xs"
-          >
-            <span>🎛️ Panelime Git</span>
-          </NuxtLink>
+            <NuxtLink 
+              to="/uyelik?tab=login" 
+              class="px-3.5 py-1.5 rounded-lg bg-[#0F223D] hover:bg-[#1E293B] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-slate-700/40 transition cursor-pointer"
+            >
+              <span>🔑 Giriş Yap</span>
+            </NuxtLink>
+          </template>
 
-          <button 
-            @click="handleLogout" 
-            class="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 font-bold border border-red-200 transition flex items-center gap-1 cursor-pointer"
-            title="Güvenli Çıkış Yap"
-          >
-            <LogOut :size="13" />
-            <span>Çıkış Yap</span>
-          </button>
+          <!-- Giriş Yapılmışsa: Profil, Panel ve Çıkış Butonları -->
+          <template v-else>
+            <NuxtLink 
+              to="/panel/ayarlar"
+              class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold border border-slate-300 flex items-center gap-1.5 transition"
+            >
+              <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+              <span class="truncate max-w-[180px]">{{ (userSession?.isCompanyActive ? (userSession?.companyName || userSession?.company) : '') || userSession?.name || userSession?.firstName || userSession?.username || 'Hesabım' }}</span>
+            </NuxtLink>
+
+            <NuxtLink 
+              to="/panel" 
+              class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold transition flex items-center gap-1 shadow-xs"
+            >
+              <span>🎛️ Panelime Git</span>
+            </NuxtLink>
+
+            <button 
+              @click="handleLogout" 
+              class="px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 font-bold border border-red-200 transition flex items-center gap-1 cursor-pointer"
+              title="Güvenli Çıkış Yap"
+            >
+              <LogOut :size="13" />
+              <span>Çıkış Yap</span>
+            </button>
+          </template>
         </div>
 
       </div>

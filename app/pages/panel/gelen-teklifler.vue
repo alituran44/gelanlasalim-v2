@@ -40,54 +40,74 @@ definePageMeta({ layout: 'dashboard' })
 const route = useRoute()
 const expandedIlan = ref<string | null>(route.query.ilan as string || null)
 
-const { cmsData, saveCmsData } = useCmsData()
+const { cmsData, saveCmsData, fetchServerTenders, fetchServerBids } = useCmsData()
 const { sendSms } = useNetGsm()
 
-
 const userSession = ref<any>({})
-
-const myTendersList = computed(() => {
-  const currentEmail = (userSession.value?.email || '').trim().toLowerCase()
-  const allTenders = cmsData.value?.dashboard?.tenders || []
-  if (!currentEmail) return []
-  return allTenders.filter((t: any) => (t.ownerEmail || '').trim().toLowerCase() === currentEmail)
-})
-
-const myTenderIds = computed(() => myTendersList.value.map((t: any) => t.id))
 
 const filteredReceivedBids = computed(() => {
   const currentEmail = (userSession.value?.email || '').trim().toLowerCase()
   const allReceived = cmsData.value?.dashboard?.receivedBids || []
   const allTenders = cmsData.value?.dashboard?.tenders || []
 
-  // Check user's own tenders
-  if (currentEmail) {
-    const myTenders = allTenders.filter((t: any) => (t.ownerEmail || '').trim().toLowerCase() === currentEmail)
-    const myTenderIds = myTenders.map((t: any) => t.id)
-    if (myTenderIds.length > 0) {
-      return allReceived.filter((g: any) => myTenderIds.includes(g.id) || myTenders.some((mt: any) => mt.baslik === g.baslik))
-    }
+  let localMyTenderIds: string[] = []
+  let localMyTenderTitles: string[] = []
+  if (typeof window !== 'undefined') {
+    try {
+      const localMy = JSON.parse(localStorage.getItem('myTenders') || '[]')
+      localMyTenderIds = localMy.map((t: any) => t.id).filter(Boolean)
+      localMyTenderTitles = localMy.map((t: any) => (t.baslik || '').trim().toLowerCase()).filter(Boolean)
+    } catch (e) {}
   }
 
-  // Fallback: If user has created tenders in storage
+  // Check user's own tenders by email or local storage
+  const myTenders = allTenders.filter((t: any) => {
+    const ownerEmail = (t.ownerEmail || '').trim().toLowerCase()
+    if (currentEmail && ownerEmail && currentEmail === ownerEmail) return true
+    if (localMyTenderIds.includes(t.id)) return true
+    if (localMyTenderTitles.includes((t.baslik || '').trim().toLowerCase())) return true
+    return false
+  })
+  const myTenderIds = myTenders.map((t: any) => t.id).concat(localMyTenderIds)
+
+  if (myTenderIds.length > 0) {
+    const matched = allReceived.filter((g: any) => 
+      myTenderIds.includes(g.id) || 
+      myTenders.some((mt: any) => mt.baslik === g.baslik) ||
+      localMyTenderTitles.includes((g.baslik || '').trim().toLowerCase())
+    )
+    if (matched.length > 0) return matched
+  }
+
+  // Fallback: Return all received tender groups so data is never lost or hidden
   return allReceived
 })
 
 const toplamGelenTeklifler = computed(() => {
   let count = 0
-  const list = cmsData.value?.dashboard?.receivedBids || []
+  const list = filteredReceivedBids.value || []
   list.forEach((item: any) => {
     count += (item.teklifler || []).length
   })
   return count
 })
 
-const ilanlar = computed(() => cmsData.value?.dashboard?.receivedBids || [])
+const ilanlar = computed(() => filteredReceivedBids.value || [])
 
-onMounted(() => {
+onMounted(async () => {
   if (typeof window !== 'undefined') {
     try {
       userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+  }
+  if (fetchServerTenders) {
+    try {
+      await fetchServerTenders()
+    } catch (e) {}
+  }
+  if (fetchServerBids) {
+    try {
+      await fetchServerBids()
     } catch (e) {}
   }
   if (typeof window !== 'undefined') {

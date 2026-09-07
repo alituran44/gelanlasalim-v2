@@ -1324,8 +1324,8 @@ function saveProfile() {
                 </div>
               </div>
 
-              <!-- Overall Score Pill -->
-              <div class="bg-white/10 p-4 rounded-2xl border border-white/15 text-center min-w-[200px]">
+              <!-- Overall Score Pill (Yalnızca Firma Modunda Görünür) -->
+              <div v-if="isCompanyMode" class="bg-white/10 p-4 rounded-2xl border border-white/15 text-center min-w-[200px]">
                 <span class="text-[9px] font-black text-amber-300 uppercase tracking-widest block">GENEL VERİLEN PUAN</span>
                 <div class="text-2xl font-black text-white font-mono flex items-center justify-center gap-1.5 mt-1">
                   <Star :size="18" class="text-amber-400 fill-amber-400" />
@@ -1334,10 +1334,19 @@ function saveProfile() {
                 </div>
                 <div class="text-[9px] font-bold text-amber-400 mt-1">⭐⭐⭐⭐⭐ (28 Onaylı Yorum)</div>
               </div>
+              <!-- Kişisel Mod Statü Rozeti -->
+              <div v-else class="bg-white/10 p-4 rounded-2xl border border-white/15 text-center min-w-[200px]">
+                <span class="text-[9px] font-black text-sky-300 uppercase tracking-widest block">HESAP STATÜSÜ</span>
+                <div class="text-base font-black text-white flex items-center justify-center gap-1.5 mt-1">
+                  <User :size="16" class="text-sky-400" />
+                  <span>Kişisel Hesap</span>
+                </div>
+                <div class="text-[9px] font-bold text-slate-300 mt-1">👤 Bireysel Profil Aktif</div>
+              </div>
             </div>
 
-            <!-- Kıstas & Seviye Çizelgesi (Benchmark Gauge Bar) -->
-            <div class="p-4 rounded-2xl bg-white/10 border border-white/15 space-y-3">
+            <!-- Kıstas & Seviye Çizelgesi (Yalnızca Firma Modunda) -->
+            <div v-if="isCompanyMode" class="p-4 rounded-2xl bg-white/10 border border-white/15 space-y-3">
               <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-white font-bold gap-2">
                 <span class="flex items-center gap-1.5 text-amber-300 uppercase text-[10px] font-black tracking-wider">
                   <Award :size="14" class="text-amber-400" />
@@ -1383,8 +1392,8 @@ function saveProfile() {
             </div>
           </div>
 
-          <!-- Strength Score -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm grid grid-cols-1 md:grid-cols-5 gap-6" style="border-color: #E2E8F0;">
+          <!-- Kurumsal Profil Durumu (Firma Modu Aktifse) -->
+          <div v-if="isCompanyMode" class="rounded-2xl border bg-white p-6 shadow-sm grid grid-cols-1 md:grid-cols-5 gap-6" style="border-color: #E2E8F0;">
             <div class="md:col-span-2 flex flex-col items-center justify-center text-center gap-3">
               <div class="relative h-24 w-24 flex items-center justify-center">
                 <svg class="absolute transform -rotate-90 w-full h-full">
@@ -1414,6 +1423,32 @@ function saveProfile() {
                 </div>
               </div>
             </div>
+          </div>
+
+          <!-- Kişisel Hesap Durumu (Bireysel Moddaysa) -->
+          <div v-else class="rounded-2xl border bg-white p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6" style="border-color: #E2E8F0;">
+            <div class="flex items-center gap-4">
+              <div class="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
+                <ShieldCheck :size="28" />
+              </div>
+              <div class="space-y-1">
+                <span class="text-[10px] font-black text-blue-600 uppercase tracking-wider block">KİŞİSEL PROFİL GÜVENLİĞİ</span>
+                <h4 class="text-sm font-black text-slate-900">Bireysel Kullanıcı Profili Doğrulandı</h4>
+                <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium">
+                  <span class="flex items-center gap-1 text-emerald-600 font-bold"><CheckCircle2 :size="13" /> e-Devlet Doğrulaması</span>
+                  <span class="flex items-center gap-1 text-emerald-600 font-bold"><CheckCircle2 :size="13" /> E-Posta Onaylı</span>
+                  <span class="flex items-center gap-1 text-emerald-600 font-bold"><CheckCircle2 :size="13" /> SMS Korumalı</span>
+                </div>
+              </div>
+            </div>
+            <button
+              type="button"
+              @click="toggleCompanyMode"
+              class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs shadow-md shadow-blue-600/20 transition-all cursor-pointer flex items-center gap-2 shrink-0"
+            >
+              <Building2 :size="15" />
+              <span>🏢 Firma Modunu Aktif Et</span>
+            </button>
           </div>
 
           <!-- Kişisel Bilgiler Form -->

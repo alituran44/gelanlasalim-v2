@@ -16,7 +16,8 @@ import {
   MessageSquare, 
   CheckCircle2,
   BellOff,
-  LogOut
+  LogOut,
+  Building2
 } from "lucide-vue-next"
 import { locale, detectLocale, setLocale } from '~/composables/useLocale'
 import { useCmsData } from '~/composables/useCmsData'
@@ -31,7 +32,7 @@ const showUserMenu = ref(false)
 const { cmsData } = useCmsData()
 
 const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications()
-const { userSession, userName, isCompanyMode, companyName, logout: sessionLogout } = useUserSession()
+const { userSession, userName, isCompanyMode, companyName, toggleCompanyMode, logout: sessionLogout } = useUserSession()
 
 const notifCount = computed(() => unreadCount.value)
 
@@ -193,8 +194,23 @@ const pageTitle = computed(() => {
         </div>
       </div>
 
-      <!-- User Profile & Direct Logout (Giriş / Çıkış Yan Yana) -->
+      <!-- User Profile, Mode Switch & Direct Logout (Sağda Aynı Yerde) -->
       <div class="flex items-center gap-2">
+        <!-- 🏢 Firma Modu / 👤 Kişisel Mod Hızlı Geçiş Butonu -->
+        <button
+          type="button"
+          @click="toggleCompanyMode"
+          class="flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-bold transition shadow-xs cursor-pointer"
+          :class="isCompanyMode 
+            ? 'border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100' 
+            : 'border-blue-200 bg-blue-50 text-blue-800 hover:bg-blue-100'"
+          :title="isCompanyMode ? 'Kişisel Moda Geç' : 'Firma Modunu Aktif Et'"
+        >
+          <Building2 v-if="isCompanyMode" :size="13" class="text-emerald-600 shrink-0" />
+          <User v-else :size="13" class="text-blue-600 shrink-0" />
+          <span class="hidden md:inline">{{ isCompanyMode ? '🏢 Firma Modu' : '👤 Kişisel Mod' }}</span>
+        </button>
+
         <div class="relative">
           <button
             @click="showUserMenu = !showUserMenu"
