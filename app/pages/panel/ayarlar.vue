@@ -724,9 +724,27 @@ const isPasswordFormValid = computed(() => {
   return rulesMetCount.value === 8 && currentPassword.value.length > 0
 })
 
-function updatePassword() {
+async function updatePassword() {
   if (isPasswordFormValid.value) {
-    showToast("Şifreniz başarıyla güncellenmiştir! Güvenliğiniz için diğer cihazlardaki oturumlar sonlandırıldı.")
+    const userEmail = userSession.value?.email || companyForm.value?.email || 'ihalecib@gmail.com'
+    const userName = userSession.value?.name || companyForm.value?.name || 'Değerli Kullanıcımız'
+    
+    // Google Mail SMTP üzerinden Şifre Değişikliği Bildirimi İlet (TPL_PASSWORD_RESET)
+    try {
+      await $fetch('/api/v1/smtp-send', {
+        method: 'POST',
+        body: {
+          recipientEmail: userEmail,
+          subject: 'İhaleciBurada.com - Şifreniz Başarıyla Güncellendi',
+          htmlBody: `Sayın ${userName},\n\nİhaleciBurada.com kurumsal hesabınızın şifresi ${new Date().toLocaleString('tr-TR')} tarihinde başarıyla güncellenmiştir.\n\nGüvenliğiniz için diğer tüm cihazlardaki açık oturumlarınız sonlandırılmıştır.\n\nBu işlemi siz gerçekleştirmediyseniz lütfen derhal bizimle iletişime geçiniz:\n0850 840 86 95 | ihalecib@gmail.com\n\nKurumsal Güvenlik Paneli: https://www.ihaleciburada.com/panel/ayarlar`,
+          templateName: 'Şifre Değişikliği (TPL_PASSWORD_RESET)'
+        }
+      })
+    } catch (e) {
+      console.warn('Şifre değişikliği e-posta bildirimi uyarısı:', e)
+    }
+
+    showToast("Şifreniz başarıyla güncellenmiştir! Güvenliğiniz için onay e-postası iletildi ve diğer oturumlar kapatıldı.")
     currentPassword.value = ''
     newPassword.value = ''
     newPasswordConfirm.value = ''

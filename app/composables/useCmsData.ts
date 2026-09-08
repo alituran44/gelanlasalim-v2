@@ -387,22 +387,34 @@ export const DEFAULT_CMS_DATA = {
     subscribers: [] as any[],
     templates: [
     {
+        "id": "TPL_PASSWORD_RESET",
+        "name": "Şifre Değişikliği / Sıfırlama Bildirimi",
+        "subject": "İhaleciBurada.com - Şifreniz Başarıyla Güncellendi",
+        "content": "Sayın [Yetkili Adı / Firma Adı],\n\nİhaleciBurada.com kurumsal hesabınızın şifresi başarıyla güncellenmiştir.\n\nİşlem Zamanı: [Tarih/Saat]\n\nBu işlemi siz gerçekleştirmediyseniz lütfen derhal hesabınıza giriş yaparak şifrenizi sıfırlayın veya 0850 840 86 95 numaralı kurumsal destek hattımızla iletişime geçin.\n\nHesap Güvenlik Paneli: [Panel Linki]\n\nSaygılarımızla,\nİhaleciBurada Güvenlik & Operasyon Masası"
+    },
+    {
+        "id": "TPL_NEW_TENDER",
+        "name": "Yeni İhale Açıldı & Yayına Alındı Bildirimi",
+        "subject": "Yeni Satın Alma İhalesi: [İhale Başlığı]",
+        "content": "Sayın [Firma Adı] Yetkilisi,\n\nPlatformumuzda oluşturduğunuz \"[İhale Başlığı]\" başlıklı satın alma ihalesi onaylanarak başarıyla yayına alınmıştır.\n\n• İhale Başlığı: [İhale Başlığı]\n• Kategori: [Kategori]\n• Başlangıç Bütçesi: [Lider Fiyat]\n• Kalan Süre: [Kalan Süre]\n\nİhale ilanınızı ve gelen teklifleri kurumsal yönetim panelinizden anlık olarak takip edebilirsiniz:\n[Panel Linki]\n\nİhaleciBurada.com Satın Alma Masası"
+    },
+    {
+        "id": "TPL_BID_SUBMITTED",
+        "name": "Teklif Verildi Teyidi (Tedarikçiye Bildirim)",
+        "subject": "Teklifiniz Başarıyla İletildi: [İhale Başlığı]",
+        "content": "Sayın [Firma Adı] Yetkilisi,\n\n\"[İhale Başlığı]\" başlıklı satın alma ihalesine sunmuş olduğunuz [Sunulan Fiyat] tutarındaki fiyat teklifiniz alıcı kuruma başarıyla ulaştırılmıştır.\n\n• Teklif Durumu: Değerlendirmede\n• İhale Sahibi Kurum: [Alıcı Kurum]\n\nTeklifinizin durumunu, karşı pazarlık tekliflerini ve canlı eksiltme odasını kurumsal panelinizden takip edebilirsiniz:\n[Panel Linki]\n\nİhaleciBurada Tedarik Zinciri Masası"
+    },
+    {
+        "id": "TPL_NEW_BID",
+        "name": "İhalenize Yeni Teklif Geldi (Alıcıya Bildirim)",
+        "subject": "İhalenize Yeni Teklif Geldi: [İhale Başlığı]",
+        "content": "Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz \"[İhale Başlığı]\" başlıklı satın alma ilanı için onaylı tedarikçi [Firma Adı] tarafından yeni bir fiyat teklifi sunuldu.\n\n• Sunulan Teklif: [Lider Fiyat] TL\n• Teklif Veren Firma: [Firma Adı]\n• Teslimat & Şartname: Uygun\n\nTeklifi incelemek, tedarikçinin belgelerini görüntülemek ve karşı pazarlık teklifinizi iletmek için kurumsal panelinize giriş yapınız:\n[Panel Linki]\n\nİhaleciBurada B2B Operasyon Masası"
+    },
+    {
         "id": "TPL_WELCOME",
         "name": "Kurumsal Hoş Geldiniz & KYC Onayı",
         "subject": "İhaleciBurada.com Kurumsal Üyeliğiniz ve 1 Ay Ücretsiz Deneme Paketiniz Onaylandı!",
         "content": "Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza 1 Ay %100 Ücretsiz Lansman Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nİhaleciBurada Platform A.Ş.\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"
-    },
-    {
-        "id": "TPL_NEW_TENDER",
-        "name": "Yeni İhale Yayını & Şartname Teklif Çağrısı",
-        "subject": "Yeni İhale İlanı: [İhale Başlığı] için Teklif Süreci Başladı",
-        "content": "Sayın Tedarikçimiz,\n\nFaaliyet gösterdiğiniz sektörde yeni bir satın alma ihalesi onaylanarak yayına alınmıştır.\n\n• İhale Başlığı: [İhale Başlığı]\n• Başlangıç Bütçesi: [Lider Fiyat]\n• Kalan Süre: [Kalan Süre]\n\nTeknik şartnameyi indirmek ve doğrudan fiyat teklifinizi iletmek için bağlantıyı ziyaret ediniz:\n[Panel Linki]\n\nİhaleciBurada.com Satın Alma Masası"
-    },
-    {
-        "id": "TPL_NEW_BID",
-        "name": "İhaleye Yeni Teklif Geldi Bildirimi",
-        "subject": "İhalenize Yeni Teklif Geldi: [İhale Başlığı]",
-        "content": "Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz \"[İhale Başlığı]\" başlıklı satın alma ilanı için onaylı bir tedarikçi firma tarafından yeni bir fiyat teklifi sunuldu.\n\n• Sunulan Teklif: [Lider Fiyat] TL\n• Teklif Veren: [Firma Adı]\n\nTeklifi incelemek ve karşı pazarlık teklifinizi iletmek için kurumsal panelinize giriş yapınız:\n[Panel Linki]\n\nİhaleciBurada B2B Operasyon"
     },
     {
         "id": "TPL_AUCTION_START",

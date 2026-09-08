@@ -1066,6 +1066,7 @@ onMounted(() => {
 
     syncLiveState()
     fetchGibLogs()
+    loadSmtpConfigFromServer()
     window.addEventListener('storage', syncLiveState)
   }
 })
@@ -1596,6 +1597,9 @@ function removeLead(index: number) {
 const selectedTemplateIdx = ref(0)
 const testEmailTarget = ref('ihalecib@gmail.com')
 const isSendingEmail = ref(false)
+const isSavingSmtp = ref(false)
+const smtpVerificationStatus = ref<'success' | 'warning' | 'error' | null>(null)
+const showPasswordInput = ref(false)
 
 const emailLogs = ref<any[]>([
   {
@@ -1628,6 +1632,60 @@ const currentTemplate = computed(() => {
   return formState.emailSettings?.templates?.[selectedTemplateIdx.value] || null
 })
 
+async function loadSmtpConfigFromServer() {
+  try {
+    const res = await $fetch<{ success: boolean; config: any }>('/api/v1/smtp-config')
+    if (res && res.success && res.config) {
+      if (res.config.smtpHost) formState.emailSettings.smtpHost = res.config.smtpHost
+      if (res.config.smtpPort) formState.emailSettings.smtpPort = res.config.smtpPort
+      if (res.config.smtpUser) formState.emailSettings.smtpUser = res.config.smtpUser
+      if (res.config.senderEmail) formState.emailSettings.senderEmail = res.config.senderEmail
+      if (res.config.senderName) formState.emailSettings.senderName = res.config.senderName
+      if (res.config.smtpPassword) formState.emailSettings.smtpPassword = res.config.smtpPassword
+      if (res.config.replyToEmail) formState.emailSettings.replyToEmail = res.config.replyToEmail
+    }
+  } catch (err) {
+    console.warn('SMTP config load error:', err)
+  }
+}
+
+async function saveAndVerifySmtpConfig() {
+  if (!formState.emailSettings.smtpUser) {
+    triggerToast('Lütfen Google (Gmail) hesabınızı giriniz.', 'error')
+    return
+  }
+  isSavingSmtp.value = true
+  smtpVerificationStatus.value = null
+  try {
+    const res = await $fetch<{ success: boolean; message: string; testResult: any }>('/api/v1/smtp-config', {
+      method: 'POST',
+      body: {
+        smtpHost: formState.emailSettings.smtpHost || 'smtp.gmail.com',
+        smtpPort: Number(formState.emailSettings.smtpPort) || 465,
+        smtpUser: formState.emailSettings.smtpUser,
+        smtpPassword: formState.emailSettings.smtpPassword,
+        senderEmail: formState.emailSettings.senderEmail || formState.emailSettings.smtpUser,
+        senderName: formState.emailSettings.senderName || 'İhaleciBurada B2B Operasyon',
+        replyToEmail: formState.emailSettings.replyToEmail || formState.emailSettings.smtpUser,
+        testEmail: testEmailTarget.value || formState.emailSettings.smtpUser || 'ihalecib@gmail.com'
+      }
+    })
+    if (res && res.success) {
+      triggerToast('Google Mail SMTP ayarları doğrulandı ve sunucuya kaydedildi!', 'success')
+      smtpVerificationStatus.value = 'success'
+      saveCmsData(JSON.parse(JSON.stringify(formState)))
+    } else {
+      triggerToast('SMTP ayarları kaydedildi ancak test e-postası iletilemedi.', 'info')
+      smtpVerificationStatus.value = 'warning'
+    }
+  } catch (err: any) {
+    triggerToast(`SMTP Ayar Hatası: ${err.data?.statusMessage || err.message || err}`, 'error')
+    smtpVerificationStatus.value = 'error'
+  } finally {
+    isSavingSmtp.value = false
+  }
+}
+
 function addNewTemplate() {
   if (!formState.emailSettings.templates) formState.emailSettings.templates = []
   const newTpl = {
@@ -1642,9 +1700,52 @@ function addNewTemplate() {
 }
 
 function resetDefaultTemplates() {
-  formState.emailSettings.templates = [{"id":"TPL_WELCOME","name":"Kurumsal Hoş Geldiniz & KYC Onayı","subject":"İhaleciBurada.com Kurumsal Üyeliğiniz ve 1 Ay Ücretsiz Deneme Paketiniz Onaylandı!","content":"Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza 1 Ay %100 Ücretsiz Lansman Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nİhaleciBurada Platform A.Ş.\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"},{"id":"TPL_NEW_TENDER","name":"Yeni İhale Yayını & Şartname Teklif Çağrısı","subject":"Yeni İhale İlanı: [İhale Başlığı] için Teklif Süreci Başladı","content":"Sayın Tedarikçimiz,\n\nFaaliyet gösterdiğiniz sektörde yeni bir satın alma ihalesi onaylanarak yayına alınmıştır.\n\n• İhale Başlığı: [İhale Başlığı]\n• Başlangıç Bütçesi: [Lider Fiyat]\n• Kalan Süre: [Kalan Süre]\n\nTeknik şartnameyi indirmek ve doğrudan fiyat teklifinizi iletmek için bağlantıyı ziyaret ediniz:\n[Panel Linki]\n\nİhaleciBurada.com Satın Alma Masası"},{"id":"TPL_NEW_BID","name":"İhaleye Yeni Teklif Geldi Bildirimi","subject":"İhalenize Yeni Teklif Geldi: [İhale Başlığı]","content":"Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz \"[İhale Başlığı]\" başlıklı satın alma ilanı için onaylı bir tedarikçi firma tarafından yeni bir fiyat teklifi sunuldu.\n\n• Sunulan Teklif: [Lider Fiyat] TL\n• Teklif Veren: [Firma Adı]\n\nTeklifi incelemek ve karşı pazarlık teklifinizi iletmek için kurumsal panelinize giriş yapınız:\n[Panel Linki]\n\nİhaleciBurada B2B Operasyon"},{"id":"TPL_AUCTION_START","name":"Canlı Tersine Eksiltme Başladı Uyarısı","subject":"Canlı İhale Başladı: [İhale Başlığı] İhalesinde Fiyatlar Eksiliyor!","content":"Sayın Yetkili,\n\nTakip ettiğiniz \"[İhale Başlığı]\" ihalesi için canlı tersine eksiltme odası açılmıştır.\n\nTedarikçiler anlık olarak en iyi fiyatı sunmak için yarışmaktadır. Canlı odaya katılarak teklifinizi güncelleyebilir veya süreci izleyebilirsiniz:\n[Panel Linki]\n\nİhaleciBurada Canlı İhale Odası"},{"id":"TPL_ESCROW_RELEASE","name":"Escrow Güvenli Tahsilat & Mal Kabul Makbuzu","subject":"Güvenli Havuz Ödemesi Serbest Bırakıldı: [İhale Başlığı]","content":"Sayın [Firma Adı],\n\n[İhale Başlığı] kapsamındaki siparişin mal kabulü ve irsaliye denetimi alıcı firma tarafından başarıyla onaylanmıştır.\n\nGüvenli havuzda (Escrow) bloke edilen hakediş tutarınız banka hesabınıza transfer edilmek üzere serbest bırakılmıştır.\n\nDetaylı hakediş ve fatura dökümünüzü görüntülemek için:\n[Panel Linki]\n\nİhaleciBurada Güvenli Ticaret Masası"}]
+  formState.emailSettings.templates = [
+    {
+      id: "TPL_PASSWORD_RESET",
+      name: "Şifre Değişikliği / Sıfırlama Bildirimi",
+      subject: "İhaleciBurada.com - Şifreniz Başarıyla Güncellendi",
+      content: "Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com kurumsal hesabınızın şifresi başarıyla güncellenmiştir.\n\nİşlem Zamanı: [Tarih/Saat]\n\nBu işlemi siz gerçekleştirmediyseniz lütfen derhal hesabınıza giriş yaparak şifrenizi sıfırlayın veya 0850 840 86 95 numaralı kurumsal destek hattımızla iletişime geçin.\n\nHesap Güvenlik Paneli: [Panel Linki]\n\nSaygılarımızla,\nİhaleciBurada Güvenlik & Operasyon Masası"
+    },
+    {
+      id: "TPL_NEW_TENDER",
+      name: "Yeni İhale Açıldı & Yayına Alındı Bildirimi",
+      subject: "Yeni Satın Alma İhalesi: [İhale Başlığı]",
+      content: "Sayın [Firma Adı] Yetkilisi,\n\nPlatformumuzda oluşturduğunuz \"[İhale Başlığı]\" başlıklı satın alma ihalesi onaylanarak başarıyla yayına alınmıştır.\n\n• İhale Başlığı: [İhale Başlığı]\n• Kategori: [Kategori]\n• Başlangıç Bütçesi: [Lider Fiyat]\n• Kalan Süre: [Kalan Süre]\n\nİhale ilanınızı ve gelen teklifleri kurumsal yönetim panelinizden anlık olarak takip edebilirsiniz:\n[Panel Linki]\n\nİhaleciBurada.com Satın Alma Masası"
+    },
+    {
+      id: "TPL_BID_SUBMITTED",
+      name: "Teklif Verildi Teyidi (Tedarikçiye Bildirim)",
+      subject: "Teklifiniz Başarıyla İletildi: [İhale Başlığı]",
+      content: "Sayın [Firma Adı] Yetkilisi,\n\n\"[İhale Başlığı]\" başlıklı satın alma ihalesine sunmuş olduğunuz [Sunulan Fiyat] tutarındaki fiyat teklifiniz alıcı kuruma başarıyla ulaştırılmıştır.\n\n• Teklif Durumu: Değerlendirmede\n• İhale Sahibi Kurum: [Alıcı Kurum]\n\nTeklifinizin durumunu, karşı pazarlık tekliflerini ve canlı eksiltme odasını kurumsal panelinizden takip edebilirsiniz:\n[Panel Linki]\n\nİhaleciBurada Tedarik Zinciri Masası"
+    },
+    {
+      id: "TPL_NEW_BID",
+      name: "İhalenize Yeni Teklif Geldi (Alıcıya Bildirim)",
+      subject: "İhalenize Yeni Teklif Geldi: [İhale Başlığı]",
+      content: "Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz \"[İhale Başlığı]\" başlıklı satın alma ilanı için onaylı tedarikçi [Firma Adı] tarafından yeni bir fiyat teklifi sunuldu.\n\n• Sunulan Teklif: [Lider Fiyat] TL\n• Teklif Veren Firma: [Firma Adı]\n• Teslimat & Şartname: Uygun\n\nTeklifi incelemek, tedarikçinin belgelerini görüntülemek ve karşı pazarlık teklifinizi iletmek için kurumsal panelinize giriş yapınız:\n[Panel Linki]\n\nİhaleciBurada B2B Operasyon Masası"
+    },
+    {
+      id: "TPL_WELCOME",
+      name: "Kurumsal Hoş Geldiniz & KYC Onayı",
+      subject: "İhaleciBurada.com Kurumsal Üyeliğiniz ve 1 Ay Ücretsiz Deneme Paketiniz Onaylandı!",
+      content: "Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza 1 Ay %100 Ücretsiz Lansman Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nİhaleciBurada Platform A.Ş.\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"
+    },
+    {
+      id: "TPL_AUCTION_START",
+      name: "Canlı Tersine Eksiltme Başladı Uyarısı",
+      subject: "Canlı İhale Başladı: [İhale Başlığı] İhalesinde Fiyatlar Eksiliyor!",
+      content: "Sayın Yetkili,\n\nTakip ettiğiniz \"[İhale Başlığı]\" ihalesi için canlı tersine eksiltme odası açılmıştır.\n\nTedarikçiler anlık olarak en iyi fiyatı sunmak için yarışmaktadır. Canlı odaya katılarak teklifinizi güncelleyebilir veya süreci izleyebilirsiniz:\n[Panel Linki]\n\nİhaleciBurada Canlı İhale Odası"
+    },
+    {
+      id: "TPL_ESCROW_RELEASE",
+      name: "Escrow Güvenli Tahsilat & Mal Kabul Makbuzu",
+      subject: "Güvenli Havuz Ödemesi Serbest Bırakıldı: [İhale Başlığı]",
+      content: "Sayın [Firma Adı],\n\n[İhale Başlığı] kapsamındaki siparişin mal kabulü ve irsaliye denetimi alıcı firma tarafından başarıyla onaylanmıştır.\n\nGüvenli havuzda (Escrow) bloke edilen hakediş tutarınız banka hesabınıza transfer edilmek üzere serbest bırakılmıştır.\n\nDetaylı hakediş ve fatura dökümünüzü görüntülemek için:\n[Panel Linki]\n\nİhaleciBurada Güvenli Ticaret Masası"
+    }
+  ]
   selectedTemplateIdx.value = 0
-  triggerToast('5 kurumsal varsayılan şablon başarıyla yüklendi!', 'success')
+  triggerToast('7 kurumsal varsayılan şablon başarıyla yüklendi!', 'success')
 }
 
 function selectTemplate(idx: number) {
@@ -1659,38 +1760,45 @@ function insertVariableToTemplate(variableTag: string) {
 
 async function sendTestEmail() {
   if (!testEmailTarget.value) {
-    alert('Lütfen alıcı e-posta adresini giriniz.')
+    triggerToast('Lütfen alıcı e-posta adresini giriniz.', 'error')
     return
   }
   isSendingEmail.value = true
   try {
-    await $fetch('/api/v1/smtp-send', {
+    const res = await $fetch<any>('/api/v1/smtp-send', {
       method: 'POST',
       body: {
-        smtpHost: formState.emailSettings.smtpHost,
-        smtpPort: formState.emailSettings.smtpPort,
-        smtpUser: formState.emailSettings.smtpUser,
-        senderEmail: formState.emailSettings.senderEmail,
-        senderName: formState.emailSettings.senderName,
+        smtpHost: formState.emailSettings.smtpHost || 'smtp.gmail.com',
+        smtpPort: Number(formState.emailSettings.smtpPort) || 465,
+        smtpUser: formState.emailSettings.smtpUser || 'ihalecib@gmail.com',
+        smtpPassword: formState.emailSettings.smtpPassword,
+        senderEmail: formState.emailSettings.senderEmail || 'ihalecib@gmail.com',
+        senderName: formState.emailSettings.senderName || 'İhaleciBurada B2B Operasyon',
         recipientEmail: testEmailTarget.value,
         subject: currentTemplate.value ? currentTemplate.value.subject : 'İhaleciBurada.com SMTP Test Bilgilendirmesi',
         htmlBody: currentTemplate.value ? currentTemplate.value.content : 'İhaleciBurada SMTP e-posta sunucu testi başarılı.',
         templateName: currentTemplate.value ? currentTemplate.value.name : 'Test E-Postası'
       }
     })
-  } catch (e) {}
-  
-  emailLogs.value.unshift({
-    id: Date.now(),
-    time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-    recipient: testEmailTarget.value,
-    template: currentTemplate.value ? currentTemplate.value.name : 'Test E-Postası',
-    subject: currentTemplate.value ? currentTemplate.value.subject : 'Bildirim',
-    status: '250 OK - İletildi'
-  })
 
-  isSendingEmail.value = false
-  triggerToast(`"${formState.emailSettings.senderEmail}" üzerinden "${testEmailTarget.value}" adresine e-posta başarıyla iletildi!`, 'success')
+    if (res && res.success) {
+      emailLogs.value.unshift({
+        id: Date.now(),
+        time: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
+        recipient: testEmailTarget.value,
+        template: currentTemplate.value ? currentTemplate.value.name : 'Test E-Postası',
+        subject: currentTemplate.value ? currentTemplate.value.subject : 'Bildirim',
+        status: '250 OK - İletildi'
+      })
+      triggerToast(`"${testEmailTarget.value}" adresine e-posta Google SMTP üzerinden başarıyla iletildi!`, 'success')
+    } else {
+      triggerToast(`SMTP Gönderim Uyarısı: ${res?.message || 'E-posta iletilemedi.'}`, 'error')
+    }
+  } catch (e: any) {
+    triggerToast(`E-posta Gönderilemedi: ${e?.data?.statusMessage || e?.message || 'SMTP Hatası'}`, 'error')
+  } finally {
+    isSendingEmail.value = false
+  }
 }
 
 function broadcastToAllSubscribers() {
@@ -3177,7 +3285,142 @@ function removeSubmittedBid(index: number) {
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'email_center'" class="space-y-6 text-left">
             
-            <!-- 1. SMTP Server Configuration -->
+            <!-- 1. Google Mail / Gmail SMTP Server Configuration Card -->
+            <div 
+              class="p-6 rounded-2xl border transition space-y-6"
+              :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'"
+            >
+              <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                <div>
+                  <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-xl flex items-center justify-center bg-red-500/10 text-red-500 border border-red-500/20">
+                      <Mail :size="18" />
+                    </div>
+                    <div>
+                      <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                        Google Mail (Gmail) SMTP Entegrasyonu & Yapılandırması
+                        <span class="text-[10px] px-2 py-0.5 rounded-full font-mono font-bold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                          Canlı TLS Doğrudan Bağlantı
+                        </span>
+                      </h3>
+                      <p class="text-[11px] mt-0.5" :class="adminTheme === 'light' ? 'text-slate-500' : 'text-slate-400'">
+                        Platform üzerinden iletilen tüm bildirim e-postaları doğrudan tanımladığınız Google hesabı üzerinden gönderilir.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button 
+                    @click="saveAndVerifySmtpConfig" 
+                    :disabled="isSavingSmtp"
+                    class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
+                  >
+                    <RefreshCw :size="13" :class="isSavingSmtp ? 'animate-spin' : ''" />
+                    <span>{{ isSavingSmtp ? 'Doğrulanıyor & Kaydediliyor...' : 'Google SMTP Ayarlarını Doğrula ve Kaydet' }}</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Grid Inputs for SMTP -->
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Google Hesabı / SMTP User -->
+                <div>
+                  <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-400'">
+                    GOOGLE HESABI (GMAIL ADRESİ)
+                  </label>
+                  <input 
+                    v-model="formState.emailSettings.smtpUser" 
+                    type="email" 
+                    placeholder="ornek@gmail.com"
+                    class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold"
+                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" 
+                  />
+                </div>
+
+                <!-- Google 16 Karakterli Uygulama Şifresi -->
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="text-[10px] font-black uppercase" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-400'">
+                      UYGULAMA ŞİFRESİ (16 KARAKTER)
+                    </label>
+                    <button 
+                      type="button" 
+                      @click="showPasswordInput = !showPasswordInput" 
+                      class="text-[10px] text-blue-500 hover:underline font-bold"
+                    >
+                      {{ showPasswordInput ? 'Gizle' : 'Göster' }}
+                    </button>
+                  </div>
+                  <input 
+                    v-model="formState.emailSettings.smtpPassword" 
+                    :type="showPasswordInput ? 'text' : 'password'" 
+                    placeholder="•••• •••• •••• ••••"
+                    class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold tracking-wider"
+                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" 
+                  />
+                </div>
+
+                <!-- Gönderici Adı / Ünvanı -->
+                <div>
+                  <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-400'">
+                    GÖNDERİCİ RESMİ ADI (FROM NAME)
+                  </label>
+                  <input 
+                    v-model="formState.emailSettings.senderName" 
+                    type="text" 
+                    placeholder="İhaleciBurada B2B Operasyon"
+                    class="w-full rounded-xl border p-2.5 text-xs font-bold"
+                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" 
+                  />
+                </div>
+
+                <!-- Gönderici E-Posta / Yanıt Adresi -->
+                <div>
+                  <label class="block text-[10px] font-black uppercase mb-1" :class="adminTheme === 'light' ? 'text-slate-600' : 'text-slate-400'">
+                    GÖNDERİCİ VE YANIT E-POSTASI
+                  </label>
+                  <input 
+                    v-model="formState.emailSettings.senderEmail" 
+                    type="email" 
+                    placeholder="ihalecib@gmail.com"
+                    class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold"
+                    :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" 
+                  />
+                </div>
+              </div>
+
+              <!-- Server Port & Host Advanced Details -->
+              <div class="p-4 rounded-xl border flex flex-col md:flex-row items-start md:items-center justify-between gap-4 text-xs" :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-slate-950/60 border-slate-800/80'">
+                <div class="flex flex-wrap items-center gap-4 text-[11px] font-mono">
+                  <div><span class="text-slate-400">SMTP Host:</span> <strong class="text-blue-500">{{ formState.emailSettings.smtpHost || 'smtp.gmail.com' }}</strong></div>
+                  <div><span class="text-slate-400">Protokol / Port:</span> <strong class="text-emerald-500">TLS Direct (Port {{ formState.emailSettings.smtpPort || 465 }})</strong></div>
+                  <div><span class="text-slate-400">Şifreleme:</span> <strong class="text-purple-500">MIME UTF-8 Base64</strong></div>
+                </div>
+
+                <!-- Quick Help & Guide Trigger -->
+                <div class="text-[11px] text-amber-500 flex items-center gap-1.5 font-bold">
+                  <AlertCircle :size="14" />
+                  <span>Google 2 Adımlı Doğrulama ve Uygulama Şifresi zorunludur.</span>
+                </div>
+              </div>
+
+              <!-- Step-by-step App Password Guide Banner -->
+              <div class="p-4 rounded-xl border space-y-2 text-xs" :class="adminTheme === 'light' ? 'bg-blue-50/60 border-blue-200 text-blue-950' : 'bg-blue-950/20 border-blue-800/50 text-blue-200'">
+                <div class="font-black flex items-center gap-2 text-blue-600">
+                  <ShieldCheck :size="15" />
+                  Google 16 Haneli Uygulama Şifresi Nasıl Alınır? (5 Adımlı Hızlı Rehber)
+                </div>
+                <ol class="list-decimal list-inside space-y-1 text-[11px] leading-relaxed opacity-90 pl-1 font-sans">
+                  <li><strong>myaccount.google.com</strong> adresine gidip sol menüden <strong>Güvenlik</strong> sekmesini açın.</li>
+                  <li>"Google'da nasıl oturum açarsınız" başlığı altındaki <strong>2 Adımlı Doğrulama</strong>'nın açık olduğunu doğrulayın.</li>
+                  <li>Arama kutusuna veya Güvenlik sayfasına <strong>"Uygulama Şifreleri"</strong> yazarak ilgili menüyü açın.</li>
+                  <li>Uygulama adı olarak <strong>İhaleciBurada</strong> yazın ve <strong>Oluştur</strong> butonuna basın.</li>
+                  <li>Ekranda beliren 16 haneli şifreyi kopyalayıp yukarıdaki <strong>Uygulama Şifresi</strong> alanına yapıştırın ve "Google SMTP Ayarlarını Doğrula ve Kaydet"e tıklayın.</li>
+                </ol>
+              </div>
+            </div>
+
+            <!-- 2. Email Templates Section -->
             <div 
               class="p-6 rounded-2xl border transition"
               :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'"
@@ -3189,7 +3432,7 @@ function removeSubmittedBid(index: number) {
                       Hazır Kurumsal E-Posta Şablonları ({{ (formState.emailSettings.templates || []).length }} Şablon)
                     </h3>
                     <p class="text-[11px]" :class="adminTheme === 'light' ? 'text-slate-500' : 'text-slate-400'">
-                      Düzenlemek ve canlı önizlemek istediğiniz şablon kartına tıklayın.
+                      Düzenlemek ve canlı önizlemek istediğiniz şablon kartına tıklayın. Şifre değişikliği, yeni ihale ve teklif bildirimleri bu şablonlardan üretilir.
                     </p>
                   </div>
                   <div class="flex items-center gap-2">
@@ -3202,7 +3445,7 @@ function removeSubmittedBid(index: number) {
                     <button 
                       @click="resetDefaultTemplates" 
                       class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer border border-slate-700"
-                      title="Varsayılan 5 Şablonu Geri Yükle"
+                      title="Varsayılan 7 Şablonu Geri Yükle"
                     >
                       <RotateCcw :size="13" /> Varsayılanları Yükle
                     </button>
@@ -3210,7 +3453,7 @@ function removeSubmittedBid(index: number) {
                 </div>
 
               <!-- Template Cards Grid -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 mt-4">
                 <div 
                   v-for="(tpl, idx) in formState.emailSettings.templates" 
                   :key="tpl.id || idx"
@@ -3270,7 +3513,7 @@ function removeSubmittedBid(index: number) {
                     <span class="text-[10px] font-bold text-slate-400 block mb-1">DİNAMİK DEĞİŞKEN EKLE:</span>
                     <div class="flex flex-wrap gap-1.5">
                       <button 
-                        v-for="v in ['[Firma Adı]', '[İhale Başlığı]', '[Lider Fiyat]', '[Kalan Süre]', '[Panel Linki]']"
+                        v-for="v in ['[Firma Adı]', '[İhale Başlığı]', '[Lider Fiyat]', '[Sunulan Fiyat]', '[Kategori]', '[Kalan Süre]', '[Alıcı Kurum]', '[Tarih/Saat]', '[Panel Linki]']"
                         :key="v"
                         type="button"
                         @click="insertVariableToTemplate(v)"

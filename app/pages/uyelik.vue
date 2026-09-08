@@ -572,17 +572,30 @@ function handleEDevletAuth() {
   }, 900)
 }
 
-function handleForgotPassword() {
+async function handleForgotPassword() {
   if (!forgotEmail.value) {
     errorMessage.value = 'Lütfen e-posta adresinizi girin.'
     return
   }
   isSubmitting.value = true
   errorMessage.value = ''
-  setTimeout(() => {
-    isSubmitting.value = false
-    forgotSubmitted.value = true
-  }, 800)
+
+  try {
+    await $fetch('/api/v1/smtp-send', {
+      method: 'POST',
+      body: {
+        recipientEmail: forgotEmail.value.trim(),
+        subject: 'İhaleciBurada.com - Şifre Sıfırlama Bağlantısı',
+        htmlBody: `Sayın Kullanıcımız,\n\nİhaleciBurada.com hesabınız için şifre sıfırlama talebinde bulundunuz.\n\nYeni şifrenizi belirlemek için lütfen aşağıdaki bağlantıya tıklayın:\nhttps://www.ihaleciburada.com/uyelik?mode=reset&email=${encodeURIComponent(forgotEmail.value.trim())}\n\nBu talebi siz yapmadıysanız bu e-postayı dikkate almayınız. Hesabınız güvendedir.\n\nİhaleciBurada Güvenlik & Destek Masası\n0850 840 86 95`,
+        templateName: 'Şifre Sıfırlama Talebi (TPL_PASSWORD_RESET)'
+      }
+    })
+  } catch (e) {
+    console.warn('Şifre sıfırlama e-postası iletilemedi:', e)
+  }
+
+  isSubmitting.value = false
+  forgotSubmitted.value = true
 }
 
 function handleLogin() {

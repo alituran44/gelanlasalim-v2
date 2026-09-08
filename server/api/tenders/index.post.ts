@@ -1,5 +1,6 @@
 import { addTender, TenderItem } from '~~/server/utils/tendersStore'
 import { addGibLog } from '~~/server/utils/gibAuditStore'
+import { sendViaGoogleSmtp, getStoredSmtpConfig } from '~~/server/utils/smtpClient'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -81,6 +82,31 @@ export default defineEventHandler(async (event) => {
       })
     } catch (gibErr) {
       console.warn('[GIB 595 Log] Auto-record warning:', gibErr)
+    }
+
+    // Otomatik E-Posta Bildirimi: İhale Açıldığında Sahibine Bilgilendirme (TPL_NEW_TENDER)
+    try {
+      const recipient = saved.ownerEmail || (body as any).ownerEmail || (body as any).email || 'ihalecib@gmail.com'
+      if (recipient && recipient.includes('@')) {
+        const storedConfig = getStoredSmtpConfig()
+        const passwordToUse = storedConfig.smtpPassword || process.env.GMAIL_APP_PASSWORD || ''
+        if (passwordToUse) {
+          sendViaGoogleSmtp({
+            host: storedConfig.smtpHost || 'smtp.gmail.com',
+            port: storedConfig.smtpPort || 465,
+            user: storedConfig.smtpUser || 'ihalecib@gmail.com',
+            pass: passwordToUse,
+            from: storedConfig.senderEmail || 'ihalecib@gmail.com',
+            fromName: storedConfig.senderName || 'İhaleciBurada B2B Operasyon',
+            to: recipient,
+            subject: `Yeni Satın Alma İhalesi Yayında: ${saved.baslik}`,
+            html: `Sayın ${saved.ownerCompany || 'Yetkili'},\n\nPlatformumuzda oluşturduğunuz "${saved.baslik}" başlıklı satın alma ihalesi onaylanarak başarıyla yayına alınmıştır.\n\n• İhale Kodu: ${saved.id}\n• İhale Başlığı: ${saved.baslik}\n• Kategori: ${saved.kategori}\n• Bütçe: ${saved.butce}\n• Kalan Süre: ${saved.sure}\n\nİhale ilanınızı ve gelen teklifleri kurumsal yönetim panelinizden anlık olarak takip edebilirsiniz:\nhttps://www.ihaleciburada.com/panel/ihalelerim\n\nİhaleciBurada.com Satın Alma Masası`,
+            templateName: 'Yeni İhale Yayını (TPL_NEW_TENDER)'
+          }).catch(mailErr => console.warn('[Auto-Mail] Tender created dispatch background error:', mailErr))
+        }
+      }
+    } catch (mailErr) {
+      console.warn('[Auto-Mail] Tender created email setup warning:', mailErr)
     }
 
     return {

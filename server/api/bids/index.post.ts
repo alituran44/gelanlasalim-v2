@@ -1,5 +1,6 @@
 import { addBid, BidItem, sanitizeInput, validateBidSubmission } from '~~/server/utils/bidsStore'
 import { getAllTenders, addTender } from '~~/server/utils/tendersStore'
+import { sendViaGoogleSmtp, getStoredSmtpConfig } from '~~/server/utils/smtpClient'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -72,6 +73,49 @@ export default defineEventHandler(async (event) => {
       targetTender.teklifSayisi = (targetTender.teklifSayisi || 0) + 1
       targetTender.liderTeklif = formattedPrice
       addTender(targetTender)
+    }
+
+    // Otomatik E-Posta Bildirimleri: Teklif Verildiğinde ve Teklif Alındığında
+    try {
+      const storedConfig = getStoredSmtpConfig()
+      const passwordToUse = storedConfig.smtpPassword || process.env.GMAIL_APP_PASSWORD || ''
+
+      if (passwordToUse) {
+        // A) Teklif Verildiğinde Tedarikçiye Teyit E-Postası (TPL_BID_SUBMITTED)
+        if (saved.eposta && saved.eposta.includes('@')) {
+          sendViaGoogleSmtp({
+            host: storedConfig.smtpHost || 'smtp.gmail.com',
+            port: storedConfig.smtpPort || 465,
+            user: storedConfig.smtpUser || 'ihalecib@gmail.com',
+            pass: passwordToUse,
+            from: storedConfig.senderEmail || 'ihalecib@gmail.com',
+            fromName: storedConfig.senderName || 'İhaleciBurada B2B Operasyon',
+            to: saved.eposta,
+            subject: `Teklifiniz Başarıyla İletildi: ${tenderTitle}`,
+            html: `Sayın ${saved.firma} Yetkilisi,\n\n"${tenderTitle}" başlıklı satın alma ihalesine sunmuş olduğunuz ${saved.fiyat} tutarındaki fiyat teklifiniz alıcı kuruma başarıyla ulaştırılmıştır.\n\n• Teklif Kodu: ${saved.id}\n• İhale Başlığı: ${tenderTitle}\n• Sunulan Fiyat: ${saved.fiyat}\n• Geçerlilik Süresi: ${saved.sure}\n\nTeklifinizin durumunu kurumsal yönetim panelinizden anlık olarak takip edebilirsiniz:\nhttps://www.ihaleciburada.com/panel/tekliflerim\n\nİhaleciBurada Tedarik Zinciri Masası`,
+            templateName: 'Teklif Verildi Teyidi (TPL_BID_SUBMITTED)'
+          }).catch(err => console.warn('[Auto-Mail] Bidder confirmation failed:', err))
+        }
+
+        // B) Teklif Alındığında İhale Sahibine Bildirim E-Postası (TPL_NEW_BID)
+        const tenderOwner = ownerEmail || targetTender?.ownerEmail || 'ihalecib@gmail.com'
+        if (tenderOwner && tenderOwner.includes('@')) {
+          sendViaGoogleSmtp({
+            host: storedConfig.smtpHost || 'smtp.gmail.com',
+            port: storedConfig.smtpPort || 465,
+            user: storedConfig.smtpUser || 'ihalecib@gmail.com',
+            pass: passwordToUse,
+            from: storedConfig.senderEmail || 'ihalecib@gmail.com',
+            fromName: storedConfig.senderName || 'İhaleciBurada B2B Operasyon',
+            to: tenderOwner,
+            subject: `İhalenize Yeni Teklif Geldi: ${tenderTitle}`,
+            html: `Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz "${tenderTitle}" başlıklı satın alma ilanınız için onaylı tedarikçi "${saved.firma}" tarafından yeni bir fiyat teklifi sunuldu.\n\n• İhale Başlığı: ${tenderTitle}\n• Sunulan Teklif: ${saved.fiyat}\n• Teklif Veren Firma: ${saved.firma}\n• Teklif Yetkilisi: ${saved.yetkili}\n\nTeklifi incelemek ve karşı teklifinizi iletmek için kurumsal panelinize giriş yapınız:\nhttps://www.ihaleciburada.com/panel/ihalelerim\n\nİhaleciBurada B2B Operasyon Masası`,
+            templateName: 'Yeni Teklif Bildirimi (TPL_NEW_BID)'
+          }).catch(err => console.warn('[Auto-Mail] Tender owner notification failed:', err))
+        }
+      }
+    } catch (mailErr) {
+      console.warn('[Auto-Mail] Bid submission email dispatch warning:', mailErr)
     }
 
     return {
