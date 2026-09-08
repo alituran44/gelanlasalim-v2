@@ -617,6 +617,25 @@ const gibStats = computed(() => {
   }
 })
 
+const isSyncingGib = ref(false)
+
+async function syncGibTenders() {
+  isSyncingGib.value = true
+  try {
+    const res = await $fetch<{ success: boolean; message: string; syncedCount: number; totalLogs: number }>('/api/gib/sync-tenders', {
+      method: 'POST'
+    })
+    if (res && res.success) {
+      triggerToast(res.message || `${res.syncedCount} ihale GİB havuzuna senkronize edildi.`, 'success')
+      await fetchGibLogs()
+    }
+  } catch (err: any) {
+    triggerToast('İhale senkronizasyonu başarısız: ' + (err.message || 'Bilinmeyen hata'), 'error')
+  } finally {
+    isSyncingGib.value = false
+  }
+}
+
 function downloadGibXml() {
   if (typeof window !== 'undefined') {
     window.open(`/api/gib/export-xml?period=${gibPeriod.value}`, '_blank')
@@ -3525,6 +3544,37 @@ function removeSubmittedBid(index: number) {
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'audit_logs'" class="space-y-6 text-left">
             
+            <!-- 595 SIRA NO'LU VUK GENEL TEBLİĞİ YASAL SORUMLULUK BİLGİLENDİRMESİ -->
+            <div class="p-6 rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-950/40 via-slate-900 to-slate-950 text-slate-100 shadow-xl relative overflow-hidden">
+              <div class="flex items-start gap-4">
+                <div class="p-3 rounded-2xl bg-amber-500/20 text-amber-400 shrink-0 border border-amber-500/30">
+                  <Scale :size="24" />
+                </div>
+                <div class="space-y-2 text-xs">
+                  <div class="flex flex-wrap items-center gap-2">
+                    <span class="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black uppercase tracking-wider border border-amber-500/30">
+                      595 SIRA NO'LU VUK GENEL TEBLİĞİ UYUMU
+                    </span>
+                    <span class="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black uppercase tracking-wider border border-emerald-500/30">
+                      YER SAĞLAYICI YÜKÜMLÜLÜĞÜ
+                    </span>
+                  </div>
+                  <h4 class="font-black text-white text-sm sm:text-base tracking-tight">
+                    İNTERNET ÜZERİNDEN VERİLEN İLANLARDA VATANDAŞLARIN VE İLAN VEREN ŞİRKETLERİN BİR SORUMLULUĞU BULUNMAMAKTADIR
+                  </h4>
+                  <p class="text-slate-300 leading-relaxed font-normal">
+                    Yakın zamanda <strong>595 No'lu VUK Genel Tebliği</strong> ile getirilen internette girilen ilanların Gelir İdaresi Başkanlığı'na (GİB) bildirimi hususu, vatandaş ve ilan veren şirketler ile ilgili münferit bir sorumluluk değildir.
+                  </p>
+                  <p class="text-slate-300 leading-relaxed font-normal">
+                    Bu bildirimlerdeki yasal sorumluluk; Sahibinden.com, Arabam.com, Letgo ve benzeri yer sağlayıcılar veya sosyal ağ sağlayıcılara ait olduğu gibi, B2B ihale alanında <strong>İhaleciBurada.com platformumuza (yer sağlayıcıya)</strong> aittir. Bu düzenleme ile her vatandaşın ya da şirketin ayrı ayrı GİB'e bildirim yapma zorunluluğu bulunmamaktadır. Vatandaş veya şirket ilan verdiğinde, yasal bildirimini ilan verdiği yer sağlayıcı otomatik olarak gerçekleştirir.
+                  </p>
+                  <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-amber-200/90 leading-relaxed font-mono">
+                    💡 <strong>Düzenlemenin Amacı:</strong> Gelir İdaresi Başkanlığı'nın platformdaki veriler ile mükelleflerin beyanlarını doğrudan karşılaştırmasını sağlamak ve ilanlar ile gerçekleşen satışlar arasındaki uyumu sıkı takip etmektir. Bu sebeple platformumuzda açılan tüm ihaleler, verilen teklifler ve nihai mutabakatlar 5651 sayılı kanun uyumlu IP, port ve zaman damgası ile kayıt altına alınarak GİB BTRANS standartlarında arşivlenmektedir.
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- Resmî Mevzuat ve Tebliğ Bilgilendirme Kartı -->
             <div class="p-6 rounded-3xl border border-indigo-900/60 bg-gradient-to-br from-[#0B132B] via-[#1C2541] to-[#0A1128] text-white shadow-xl relative overflow-hidden">
               <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -3554,8 +3604,19 @@ function removeSubmittedBid(index: number) {
                   </p>
                 </div>
 
-                <!-- Export Action Buttons -->
+                <!-- Export & Sync Action Buttons -->
                 <div class="flex flex-wrap items-center gap-3 shrink-0 relative z-10">
+                  <button
+                    type="button"
+                    @click="syncGibTenders"
+                    :disabled="isSyncingGib"
+                    class="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs shadow-lg shadow-blue-600/30 transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                    title="Sistemdeki tüm ihaleleri GİB BTRANS kayıtlarına senkronize et"
+                  >
+                    <RefreshCw :size="14" :class="isSyncingGib ? 'animate-spin' : ''" />
+                    <span>{{ isSyncingGib ? 'Senkronize Ediliyor...' : 'Tüm İhaleleri GİB\'e Senkronize Et' }}</span>
+                  </button>
+
                   <button
                     type="button"
                     @click="downloadGibXml"
