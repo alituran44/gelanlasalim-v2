@@ -20,10 +20,12 @@ import {
 import FloatingSupportWidget from '~/components/common/FloatingSupportWidget.vue'
 import PaymentBadges from '~/components/common/PaymentBadges.vue'
 import Footer from '~/components/landing/Footer.vue'
+import { useNotifications } from '~/composables/useNotifications'
 
 const route = useRoute()
 const userSession = ref<any>(null)
 const activeNavTab = ref('anasayfa')
+const { unreadCount } = useNotifications()
 
 const isLoggedIn = computed(() => {
   if (!userSession.value) return false
@@ -166,7 +168,12 @@ onMounted(() => {
             class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer relative shadow-xs"
           >
             <span>🔔 Bildirimler</span>
-            <span class="h-4 min-w-[16px] px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center">3</span>
+            <span 
+              v-if="isLoggedIn && unreadCount > 0" 
+              class="h-4 min-w-[16px] px-1 rounded-full bg-red-600 text-white text-[9px] font-black flex items-center justify-center animate-pulse"
+            >
+              {{ unreadCount }}
+            </span>
           </NuxtLink>
 
           <!-- 4. Yayındaki İhalelerim -->
