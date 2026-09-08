@@ -3,6 +3,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "prebuild": "node scripts/clean-output.js",
     "build": "nuxt build",
     "postbuild": "node scripts/resolve-vercel-output.js",
     "dev": "nuxt dev",

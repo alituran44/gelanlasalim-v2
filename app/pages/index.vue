@@ -125,10 +125,10 @@ const quoteFileInputRef = ref<HTMLInputElement | null>(null)
 const isSubmittingQuickOffer = ref(false)
 
 // Shared server tenders & bids from REST API
-const { data: serverTendersData } = await useAsyncData('landing-server-tenders', () => 
+const { data: serverTendersData } = useAsyncData('landing-server-tenders', () => 
   $fetch('/api/tenders').catch(() => ({ tenders: [] }))
 )
-const { data: serverBidsData, refresh: refreshServerBids } = await useAsyncData('landing-server-bids', () => 
+const { data: serverBidsData, refresh: refreshServerBids } = useAsyncData('landing-server-bids', () => 
   $fetch('/api/bids').catch(() => ({ bids: [] }))
 )
 
