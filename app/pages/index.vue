@@ -122,6 +122,15 @@ const quickOfferNotes = ref('')
 const quickOfferDuration = ref('7 gün')
 const quickOfferFiles = ref<Array<{ name: string; size: string; type: string; url?: string }>>([])
 const quoteFileInputRef = ref<HTMLInputElement | null>(null)
+const isSubmittingQuickOffer = ref(false)
+
+// Shared server tenders & bids from REST API
+const { data: serverTendersData } = await useAsyncData('landing-server-tenders', () => 
+  $fetch('/api/tenders').catch(() => ({ tenders: [] }))
+)
+const { data: serverBidsData, refresh: refreshServerBids } = await useAsyncData('landing-server-bids', () => 
+  $fetch('/api/bids').catch(() => ({ bids: [] }))
+)
 
 // Firma Profil Modalı (Dışarıdan Görünüm & Düzenle Yetkisi)
 const selectedCompanyProfileModal = ref<any>(null)
@@ -494,11 +503,13 @@ const seedTenders: any[] = [
     "id": "IHC-2026-901",
     "baslik": "Balıkesir OSB Çelik Konstrüksiyon Fabrika Binası & Çatı Kaplama Yapım İşi",
     "aciklama": "Balıkesir Organize Sanayi Bölgesinde 12.000 m² kapalı alana sahip çelik konstrüksiyon üretim tesisi, sandviç panel çatı ve cephe kaplama işleri anahtar teslim ihale usulüyle yaptırılacaktır.",
-    "kategori": "İnşaat - Altyapı - Üstyapı - Yapım İşi",
+    "kategori": "İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri",
+    "categoryId": 1,
     "mainCategory": "İnşaat & Yapı",
     "subCategory": "Çelik Yapı & Çatı",
     "city": "Balıkesir",
     "ownerCompany": "Marmara Çelik ve Ağır Sanayi A.Ş.",
+    "ownerEmail": "ihale@marmaracelik.com.tr",
     "authority": "Balıkesir OSB Müdürlüğü",
     "butce": "18.500.000 ₺",
     "sure": "24 gün kaldı",
@@ -512,17 +523,21 @@ const seedTenders: any[] = [
     "aiApproved": true,
     "aiScore": 99.2,
     "olusturma": "01.09.2026",
+    "startDate": "2026-09-01T08:00:00.000Z",
+    "endDate": "2026-10-02T17:00:00.000Z",
     "isBaseline": true
   },
   {
     "id": "IHC-2026-902",
     "baslik": "Marmara & Ege Bölgesi 15.000 Tonluk Endüstriyel Hammadde Nakliye & Lojistik İhalesi",
     "aciklama": "Çanakkale ve Balıkesir limanlarından Bursa, Kocaeli ve İzmir fabrikalarına yıl boyu 15.000 ton dökme ve paletli hammadde taşımacılığı için özmal/kiralık araç filosu temin ihalesidir.",
-    "kategori": "Lojistik ve Nakliye Hizmetleri",
+    "kategori": "Nakliye - Taşımacılık Hizmetleri - Servis İhaleleri",
+    "categoryId": 10,
     "mainCategory": "Lojistik & Taşımacılık",
     "subCategory": "Karayolu Nakliye",
     "city": "Çanakkale",
     "ownerCompany": "Mega Lojistik ve Dağıtım A.Ş.",
+    "ownerEmail": "lojistik@megadagitim.com.tr",
     "authority": "T.C. Ulaştırma ve Altyapı Bakanlığı",
     "butce": "4.200.000 ₺",
     "sure": "18 gün kaldı",
@@ -536,17 +551,21 @@ const seedTenders: any[] = [
     "aiApproved": true,
     "aiScore": 98.7,
     "olusturma": "01.09.2026",
+    "startDate": "2026-09-01T08:00:00.000Z",
+    "endDate": "2026-09-26T17:00:00.000Z",
     "isBaseline": true
   },
   {
     "id": "IHC-2026-903",
     "baslik": "Endüstriyel 5 Eksenli CNC İşleme Merkezi & Talaşlı İmalat Robotik Hücre Alımı",
     "aciklama": "Otomotiv yan sanayi parça üretimi için yüksek hassasiyetli 2 adet 5 eksenli dikey CNC dik işleme merkezi, takım tutucular ve robotik yükleme hücresi satın alma ihalesidir.",
-    "kategori": "Sanayi ve Makine Ekipmanları",
+    "kategori": "Endüstriyel Makine - Motor - Konveyör İhaleleri",
+    "categoryId": 8,
     "mainCategory": "Makine & Ekipman",
     "subCategory": "CNC & Takım Tezgahları",
     "city": "Bursa",
     "ownerCompany": "Anadolu Çelik ve Metal Sanayi A.Ş.",
+    "ownerEmail": "satinalma@anadolucelik.com.tr",
     "authority": "Bursa Organize Sanayi Bölgesi",
     "butce": "8.900.000 ₺",
     "sure": "15 gün kaldı",
@@ -560,17 +579,21 @@ const seedTenders: any[] = [
     "aiApproved": true,
     "aiScore": 98.4,
     "olusturma": "01.09.2026",
+    "startDate": "2026-09-01T08:00:00.000Z",
+    "endDate": "2026-09-23T17:00:00.000Z",
     "isBaseline": true
   },
   {
     "id": "IHC-2026-904",
     "baslik": "100.000 Adet Ofset Baskılı Oluklu Mukavva Koli & İhracat Ambalajı Tedariği",
     "aciklama": "Gıda ve tekstil ihracatında kullanılmak üzere dopel oluklu mukavva, flexo 4 renk baskılı koli, separatör ve kraft kutu alımı için yıllık çerçeve sözleşme ihalesi.",
-    "kategori": "Ambalaj, Koli ve Kağıt",
+    "kategori": "Matbaa - Toner - Kartuş - Ambalaj - Kırtasiye İhaleleri",
+    "categoryId": 15,
     "mainCategory": "Ambalaj & Kağıt",
     "subCategory": "Mukavva Koli",
     "city": "İzmir",
     "ownerCompany": "Ege Ambalaj ve İhracat Sanayi A.Ş.",
+    "ownerEmail": "kurumsal@egeambalaj.com.tr",
     "authority": "Ege İhracatçı Birlikleri",
     "butce": "1.650.000 ₺",
     "sure": "12 gün kaldı",
@@ -584,17 +607,21 @@ const seedTenders: any[] = [
     "aiApproved": true,
     "aiScore": 99,
     "olusturma": "01.09.2026",
+    "startDate": "2026-09-01T08:00:00.000Z",
+    "endDate": "2026-09-20T17:00:00.000Z",
     "isBaseline": true
   },
   {
     "id": "IHC-2026-905",
     "baslik": "Bandırma 2.5 MW Endüstriyel Çatı Güneş Enerji Santrali (GES) EPC Kurulumu",
     "aciklama": "Fabrika çatısına 2.5 MWp gücünde monokristal güneş panelleri, inverterler, OG trafo merkezi, SCADA izleme sistemi ve TEDAŞ kabulü dahil anahtar teslim GES kurulumu.",
-    "kategori": "Enerji, Akaryakıt ve GES Tesisatı",
+    "kategori": "Enerji - Aydınlatma - Sinyalizasyon - Elektrik Tesisatı İhaleleri",
+    "categoryId": 6,
     "mainCategory": "Enerji & Elektrik",
     "subCategory": "GES & Güneş Paneli",
     "city": "Balıkesir",
     "ownerCompany": "Global Enerji ve Güneş Sistemleri",
+    "ownerEmail": "proje@globalenerji.com.tr",
     "authority": "Balıkesir Bandırma Belediyesi",
     "butce": "28.000.000 ₺",
     "sure": "20 gün kaldı",
@@ -608,17 +635,21 @@ const seedTenders: any[] = [
     "aiApproved": true,
     "aiScore": 99.5,
     "olusturma": "01.09.2026",
+    "startDate": "2026-09-01T08:00:00.000Z",
+    "endDate": "2026-09-28T17:00:00.000Z",
     "isBaseline": true
   },
   {
     "id": "IHC-2026-906",
     "baslik": "Kurumsal Bulut Sunucu Altyapısı, Firewall Donanımı & 3 Yıllık Siber Güvenlik Hizmeti",
     "aciklama": "Şirket merkez ve bölge ofisleri için Tier-3 sertifikalı hibrit bulut sunucuları, yedekli NGFW güvenlik duvarı cihazları ve 7/24 SOC izleme hizmet alımı ihalesidir.",
-    "kategori": "Bilişim, Yazılım ve IT Ekipmanı",
+    "kategori": "Yazılım - Bilgi Yönetim Hizmetleri - Bilişim İhaleleri",
+    "categoryId": 9,
     "mainCategory": "Teknoloji & Yazılım",
     "subCategory": "Sunucu & Donanım",
     "city": "İstanbul",
     "ownerCompany": "Avrasya Bilişim ve Yazılım A.Ş.",
+    "ownerEmail": "bilgi@avrasyabilisim.com.tr",
     "authority": "Bilişim Vadisi Teknopark",
     "butce": "3.400.000 ₺",
     "sure": "9 gün kaldı",
@@ -632,17 +663,21 @@ const seedTenders: any[] = [
     "aiApproved": true,
     "aiScore": 98.9,
     "olusturma": "01.09.2026",
+    "startDate": "2026-09-01T08:00:00.000Z",
+    "endDate": "2026-09-17T17:00:00.000Z",
     "isBaseline": true
   },
   {
     "id": "IHC-2026-907",
     "baslik": "1.200 Ton Sertifikalı Ekmeklik Buğday & Endüstriyel Un Tedarik İhalesi",
     "aciklama": "Marmara Bölgesi un fabrikaları ve fırın işletmeleri için yüksek proteinli, analiz raporlu 1.200 ton ekmeklik buğday doğrudan alım ihalesidir.",
-    "kategori": "Gıda, İkram ve Yemek Hizmetleri",
+    "kategori": "Gıda - Tarım Ürünleri - Yiyecek - İçecek İhaleleri",
+    "categoryId": 3,
     "mainCategory": "Tarım & Gıda",
     "subCategory": "Tahıl & Un",
     "city": "Çanakkale",
     "ownerCompany": "Akdeniz Gıda ve Soğuk Depo A.Ş.",
+    "ownerEmail": "tedarik@akdenizgida.com.tr",
     "authority": "Toprak Mahsulleri Ofisi (TMO)",
     "butce": "14.500.000 ₺",
     "sure": "16 gün kaldı",
@@ -656,17 +691,21 @@ const seedTenders: any[] = [
     "aiApproved": true,
     "aiScore": 99.1,
     "olusturma": "01.09.2026",
+    "startDate": "2026-09-01T08:00:00.000Z",
+    "endDate": "2026-09-24T17:00:00.000Z",
     "isBaseline": true
   },
   {
     "id": "IHC-2026-908",
     "baslik": "Şehir Hastaneleri 2026 Yılı Tıbbi Sarf, Cerrahi Setler & Sterilizasyon Malzemeleri",
     "aciklama": "Steril ameliyathane örtü setleri, cerrahi eldivenler, kan alma tüpleri ve antiseptik solüsyon alımı için 1 yıllık toplu tedarik ihalesidir.",
-    "kategori": "Medikal ve Sağlık Sarf Malzemeleri",
+    "kategori": "Sağlık - İlaç - Kozmetik - Medikal İhaleleri",
+    "categoryId": 2,
     "mainCategory": "Sağlık & Medikal",
     "subCategory": "Tıbbi Sarf",
     "city": "Balıkesir",
     "ownerCompany": "Balıkesir Sağlık ve Medikal Grubu",
+    "ownerEmail": "medikal@balikesirsaglik.com.tr",
     "authority": "Balıkesir İl Sağlık Müdürlüğü",
     "butce": "6.800.000 ₺",
     "sure": "22 gün kaldı",
@@ -680,17 +719,21 @@ const seedTenders: any[] = [
     "aiApproved": true,
     "aiScore": 99.4,
     "olusturma": "01.09.2026",
+    "startDate": "2026-09-01T08:00:00.000Z",
+    "endDate": "2026-09-30T17:00:00.000Z",
     "isBaseline": true
   },
   {
     "id": "IHC-2026-909",
     "baslik": "300.000 Litre Euro Dizel Motorin & Madeni Yağ Filo Tedarik İhalesi",
     "aciklama": "Şirket lojistik filosu ve iş makineleri için istasyondan taşıt tanıma sistemi (TTS) ve şantiye dökme akaryakıt tankı teslimli motorin tedarik ihalesidir.",
-    "kategori": "Enerji, Akaryakıt ve GES Tesisatı",
+    "kategori": "Akaryakıt - Gazyağı - Madeni Yağ İhaleleri",
+    "categoryId": 7,
     "mainCategory": "Akaryakıt & Enerji",
     "subCategory": "Euro Dizel",
     "city": "Kocaeli",
     "ownerCompany": "Marmara Altyapı ve İnşaat Grubu",
+    "ownerEmail": "yakit@marmaraaltyapi.com.tr",
     "authority": "Kocaeli Dilovası OSB",
     "butce": "12.600.000 ₺",
     "sure": "14 gün kaldı",
@@ -704,17 +747,21 @@ const seedTenders: any[] = [
     "aiApproved": true,
     "aiScore": 98.8,
     "olusturma": "01.09.2026",
+    "startDate": "2026-09-01T08:00:00.000Z",
+    "endDate": "2026-09-22T17:00:00.000Z",
     "isBaseline": true
   },
   {
     "id": "IHC-2026-910",
     "baslik": "250 Takım Ergonomik Ofis Çalışma Masası, Koltuk & Arşiv Dolapları Alımı",
     "aciklama": "Yeni açılacak kurumsal genel müdürlük binası için E1 normunda ahşap çalışma istasyonları, fileli ergonomik çalışma koltukları ve kilitli çelik evrak dolapları alımıdır.",
-    "kategori": "İnşaat - Altyapı - Üstyapı - Yapım İşi",
+    "kategori": "Mobilya - Beyaz Eşya - Mutfak - Züccaciye İhaleleri",
+    "categoryId": 11,
     "mainCategory": "Ofis & Mobilya",
     "subCategory": "Ofis Donanımı",
     "city": "Ankara",
     "ownerCompany": "Avrasya Bilişim ve Yazılım A.Ş.",
+    "ownerEmail": "idari@avrasyabilisim.com.tr",
     "authority": "Ankara OSTİM OSB",
     "butce": "2.100.000 ₺",
     "sure": "11 gün kaldı",
@@ -728,6 +775,36 @@ const seedTenders: any[] = [
     "aiApproved": true,
     "aiScore": 99.1,
     "olusturma": "01.09.2026",
+    "startDate": "2026-09-01T08:00:00.000Z",
+    "endDate": "2026-09-19T17:00:00.000Z",
+    "isBaseline": true
+  },
+  {
+    "id": "IHC-2026-900",
+    "baslik": "Kocaeli OSB Endüstriyel Atık Su Arıtma Tesisi Bakım & Filtre Değişim İşi",
+    "aciklama": "Kocaeli Dilovası OSB atık su arıtma tesisinde membran filtre değişimi ve 6 aylık periyodik bakım ihalesi süresi dolup tamamlanmıştır.",
+    "kategori": "Kanalizasyon - Boru - Su - Doğalgaz - Sıhhi Tesisat İhaleleri",
+    "categoryId": 5,
+    "mainCategory": "Kanalizasyon & Su",
+    "subCategory": "Arıtma Tesisi",
+    "city": "Kocaeli",
+    "ownerCompany": "Dilovası OSB Atıksu Arıtma A.Ş.",
+    "ownerEmail": "ihale@dilovasiosb.org.tr",
+    "authority": "Kocaeli Dilovası OSB",
+    "butce": "1.450.000 ₺",
+    "sure": "Sona Erdi / Kapandı",
+    "durum": "closed",
+    "ihaleYonu": "kapali_zarf",
+    "tur": "Hizmet Alımı",
+    "usul": "Kapalı Zarf Usulü",
+    "teklifSayisi": 5,
+    "liderTeklif": "1.380.000 ₺",
+    "adminApproved": true,
+    "aiApproved": true,
+    "aiScore": 99.4,
+    "olusturma": "20.08.2026",
+    "startDate": "2026-08-20T08:00:00.000Z",
+    "endDate": "2026-09-05T17:00:00.000Z",
     "isBaseline": true
   }
 ]
@@ -834,17 +911,43 @@ function maskBidderName(bid: any, idx?: number): string {
 
 function getTenderBidsList(tender: any): any[] {
   if (!tender) return []
-  const group = (cmsData.value?.dashboard?.receivedBids || []).find((g: any) => g.id === tender.id || g.baslik === tender.baslik)
-  let rawBids: any[] = []
-  if (group && group.teklifler) {
-    rawBids = [...group.teklifler]
+  const tId = tender.id
+  const tTitle = tender.baslik
+
+  // 1. Server API bids
+  const serverList = (serverBidsData.value?.bids || []).filter((b: any) => b.tenderId === tId || b.tenderTitle === tTitle)
+
+  // 2. CMS receivedBids
+  const group = (cmsData.value?.dashboard?.receivedBids || []).find((g: any) => g.id === tId || g.baslik === tTitle)
+  const cmsList = group?.teklifler || []
+
+  // 3. Local storage submitted bids
+  let localList: any[] = []
+  if (typeof window !== 'undefined') {
+    try {
+      const mySubmitted = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]')
+      localList = mySubmitted.filter((b: any) => b.tenderId === tId || b.tenderTitle === tTitle)
+    } catch (e) {}
   }
 
+  // Deduplicate by ID or bidder & price
+  const map = new Map<string, any>()
+  serverList.forEach((b: any) => map.set(b.id || (b.firma + b.fiyat), b))
+  cmsList.forEach((b: any) => {
+    const key = b.id || (b.firma + b.fiyat)
+    if (!map.has(key)) map.set(key, b)
+  })
+  localList.forEach((b: any) => {
+    const key = b.id || (b.firma + b.price)
+    if (!map.has(key)) map.set(key, { ...b, firma: b.bidderName || b.firma, fiyat: b.price || b.fiyat })
+  })
+
+  const rawBids = Array.from(map.values())
   const isArtirma = (tender.ihaleYonu === 'artirma') || (tender.tur || '').toLowerCase().includes('artırma')
 
   rawBids.sort((a, b) => {
-    const pA = parseInt(String(a.fiyat || '0').replace(/\D/g, '')) || 0
-    const pB = parseInt(String(b.fiyat || '0').replace(/\D/g, '')) || 0
+    const pA = parseInt(String(a.fiyat || a.price || '0').replace(/\D/g, '')) || 0
+    const pB = parseInt(String(b.fiyat || b.price || '0').replace(/\D/g, '')) || 0
     return isArtirma ? (pB - pA) : (pA - pB)
   })
 
@@ -949,6 +1052,9 @@ function openTenderByIdOrBid(bid: any) {
 }
 
 const allTenders = computed(() => {
+  const apiTenders = (serverTendersData.value?.tenders || []).filter(
+    (t: any) => t.adminApproved === true && t.durum !== 'pending_approval' && t.durum !== 'rejected'
+  )
   const cmsTenders = (cmsData.value?.dashboard?.tenders || []).filter(
     (t: any) => t.adminApproved === true && t.durum !== 'pending_approval' && t.durum !== 'rejected'
   )
@@ -962,11 +1068,13 @@ const allTenders = computed(() => {
     } catch (e) {}
   }
 
-  const combined = [...localTenders, ...cmsTenders, ...seedTenders]
+  // Priority: local tenders, apiTenders, cmsTenders, seedTenders
+  const combined = [...localTenders, ...apiTenders, ...cmsTenders, ...seedTenders]
   const seen = new Set()
   return combined.filter(item => {
-    const duplicate = seen.has(item.id || item.baslik)
-    seen.add(item.id || item.baslik)
+    const key = item.id || item.baslik
+    const duplicate = seen.has(key)
+    seen.add(key)
     return !duplicate
   })
 })
@@ -977,16 +1085,17 @@ const todayOngoingCount = computed(() => allTenders.value.filter(t => t.durum ==
 const todayFinishedCount = computed(() => allTenders.value.filter(t => t.durum === 'closed').length)
 
 // ==================== 8. DİNAMİK SAYAÇ VE FİLTRE HESAPLAMALARI ====================
-function getCategoryCount(catName: string) {
-  const words = catName.toLowerCase()
-    .replace(/[-–,/()]/g, ' ')
-    .split(/\s+/)
-    .filter(w => w.length > 3 && !['ihaleleri', 'ürünler', 'hizmetleri', 'alım', 'işleri', 'satışı'].includes(w))
+function getCategoryCount(cat: any) {
+  const catId = typeof cat === 'object' ? cat.id : (typeof cat === 'number' ? cat : null)
+  const catName = typeof cat === 'object' ? (cat.name || '') : String(cat || '')
+  const normName = catName.trim().toLowerCase()
 
   return allTenders.value.filter((t: any) => {
-    const k = (t.kategori || '').toLowerCase()
-    const b = (t.baslik || '').toLowerCase()
-    return words.some(w => k.includes(w) || b.includes(w))
+    if (catId && t.categoryId) {
+      return Number(t.categoryId) === Number(catId)
+    }
+    const tCat = (t.kategori || '').trim().toLowerCase()
+    return tCat === normName || tCat.startsWith(normName) || normName.startsWith(tCat)
   }).length
 }
 
@@ -1023,7 +1132,7 @@ function getCompanyCount(compName: string) {
 const filteredCategoryTree = computed(() => {
   const list = allCategoriesList.map(c => ({
     ...c,
-    count: getCategoryCount(c.name)
+    count: getCategoryCount(c)
   }))
   if (!leftSidebarSearch.value.trim()) return list
   const q = leftSidebarSearch.value.toLocaleLowerCase('tr').trim()
@@ -1095,15 +1204,14 @@ const filteredTendersList = computed(() => {
 
   // Kategori Filtresi
   if (selectedCategory.value && selectedCategory.value !== 'Tümü') {
-    const catWords = selectedCategory.value.toLowerCase()
-      .replace(/[-–,/()]/g, ' ')
-      .split(/\s+/)
-      .filter(w => w.length > 3 && !['ihaleleri', 'ürünler', 'hizmetleri', 'alım', 'işleri', 'satışı'].includes(w))
-    
-    list = list.filter(t => {
-      const k = (t.kategori || '').toLowerCase()
-      const b = (t.baslik || '').toLowerCase()
-      return catWords.some(w => k.includes(w) || b.includes(w))
+    const targetCat = allCategoriesList.find(c => c.name === selectedCategory.value || c.short === selectedCategory.value)
+    list = list.filter((t: any) => {
+      if (targetCat && t.categoryId) {
+        return Number(t.categoryId) === Number(targetCat.id)
+      }
+      const tCat = (t.kategori || '').trim().toLowerCase()
+      const sel = selectedCategory.value.trim().toLowerCase()
+      return tCat === sel || tCat.startsWith(sel) || sel.startsWith(tCat)
     })
   }
 
@@ -1493,7 +1601,9 @@ function removeQuoteFile(index: number) {
   quickOfferFiles.value.splice(index, 1)
 }
 
-function submitQuickOffer() {
+async function submitQuickOffer() {
+  if (isSubmittingQuickOffer.value) return
+
   if (!quickBidTender.value) {
     alert('Lütfen bir ihale seçiniz.')
     return
@@ -1503,6 +1613,13 @@ function submitQuickOffer() {
 
   if (isMyOwnTender(tender)) {
     alert('🚫 Kendi açtığınız bir ihaleye teklif veremezsiniz!')
+    showQuickBidModal.value = false
+    return
+  }
+
+  // Süre kontrolü
+  if (tender.durum === 'closed' || (tender.endDate && new Date(tender.endDate) < new Date())) {
+    alert('🚫 Bu ihalenin süresi dolduğu için yeni teklif kabul edilmemektedir.')
     showQuickBidModal.value = false
     return
   }
@@ -1519,6 +1636,8 @@ function submitQuickOffer() {
     return
   }
 
+  isSubmittingQuickOffer.value = true
+
   // Current session resolution
   let session: any = {}
   if (typeof window !== 'undefined') {
@@ -1532,9 +1651,10 @@ function submitQuickOffer() {
   const formattedPrice = Number(numericPrice).toLocaleString('tr-TR') + ' ₺'
   const fullPriceLabel = formattedPrice + ' (' + vatLabel + ')'
   const now = new Date().toLocaleDateString('tr-TR') + ' ' + new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+  const newBidId = 'TKF-' + Math.floor(100000 + Math.random() * 900000)
 
   const bidObj = {
-    id: 'BID-' + Math.floor(100000 + Math.random() * 900000),
+    id: newBidId,
     tenderId: tender.id,
     tenderTitle: tender.baslik,
     tenderCategory: tender.kategori,
@@ -1557,81 +1677,122 @@ function submitQuickOffer() {
     isMine: true
   }
 
-  // 1. LocalStorage update
-  if (typeof window !== 'undefined') {
-    try {
-      const myBids = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]')
-      myBids.unshift(bidObj)
-      localStorage.setItem('mySubmittedBids', JSON.stringify(myBids))
-
-      const myBidsGen = JSON.parse(localStorage.getItem('myBids') || '[]')
-      myBidsGen.unshift({
-        id: bidObj.id,
+  try {
+    // 1. Sunucu API'sine kaydet (/api/bids)
+    await $fetch('/api/bids', {
+      method: 'POST',
+      body: {
+        id: newBidId,
         tenderId: tender.id,
-        ilanBaslik: tender.baslik,
-        teklifFiyatim: fullPriceLabel,
-        tarih: now,
-        status: 'Değerlendirmede',
-        bidderName: bidderCompany
-      })
-      localStorage.setItem('myBids', JSON.stringify(myBidsGen))
-    } catch (e) {
-      console.warn('localStorage bid sync error', e)
-    }
-  }
-
-  // 2. Sync to CMS Data
-  if (cmsData.value) {
-    if (!cmsData.value.dashboard) cmsData.value.dashboard = {} as any
-    if (!Array.isArray(cmsData.value.dashboard.receivedBids)) cmsData.value.dashboard.receivedBids = []
-
-    let targetGroup = cmsData.value.dashboard.receivedBids.find((g: any) => g.id === tender.id || g.baslik === tender.baslik)
-    if (!targetGroup) {
-      targetGroup = {
-        id: tender.id,
-        baslik: tender.baslik,
-        kategori: tender.kategori,
-        teklifler: []
+        tenderTitle: tender.baslik,
+        ownerEmail: tender.ownerEmail || '',
+        firma: bidderCompany,
+        fiyat: formattedPrice,
+        sure: quickOfferDuration.value || '7 gün',
+        yetkili: session.name || session.username || 'Yetkili',
+        telefon: session.phone || session.telefon || '0850 840 86 95',
+        eposta: session.email || '',
+        adres: (session.city || tender.city || 'Balıkesir') + ' / Türkiye',
+        notum: quickOfferNotes.value || 'Şartname ve teknik kriterler uyarınca teklifimizdir.'
       }
-      cmsData.value.dashboard.receivedBids.unshift(targetGroup)
-    }
-
-    if (!Array.isArray(targetGroup.teklifler)) targetGroup.teklifler = []
-    targetGroup.teklifler.unshift({
-      id: bidObj.id,
-      firma: bidderCompany,
-      fiyat: formattedPrice,
-      sure: quickOfferDuration.value || '7 gün',
-      durum: 'degerlendirmede',
-      tarih: 'Az önce',
-      adres: (session.city || tender.city || 'Balıkesir') + ' / Türkiye',
-      aciklama: quickOfferNotes.value || '',
-      files: [...quickOfferFiles.value]
     })
 
-    if (tender.teklifSayisi !== undefined) {
-      tender.teklifSayisi = (tender.teklifSayisi || 0) + 1
+    // Sunucu tekliflerini anında tazele
+    await refreshServerBids()
+
+    // 2. LocalStorage güncellemesi
+    if (typeof window !== 'undefined') {
+      try {
+        const myBids = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]')
+        myBids.unshift(bidObj)
+        localStorage.setItem('mySubmittedBids', JSON.stringify(myBids))
+
+        const myBidsGen = JSON.parse(localStorage.getItem('myBids') || '[]')
+        myBidsGen.unshift({
+          id: bidObj.id,
+          tenderId: tender.id,
+          ilanBaslik: tender.baslik,
+          teklifFiyatim: fullPriceLabel,
+          tarih: now,
+          status: 'Değerlendirmede',
+          bidderName: bidderCompany
+        })
+        localStorage.setItem('myBids', JSON.stringify(myBidsGen))
+
+        const notifications = JSON.parse(localStorage.getItem('userNotifications') || '[]')
+        notifications.unshift({
+          id: Date.now(),
+          title: 'Teklifiniz Başarıyla İletildi',
+          desc: `"${tender.baslik}" ihalesine ${fullPriceLabel} tutarındaki teklifiniz alıcıya sunuldu.`,
+          date: 'Şimdi',
+          read: false,
+          type: 'bid'
+        })
+        localStorage.setItem('userNotifications', JSON.stringify(notifications))
+      } catch (e) {
+        console.warn('localStorage bid sync error', e)
+      }
     }
 
-    try {
-      saveCmsData(cmsData.value)
-    } catch (err) {
-      console.warn('saveCmsData warning', err)
+    // 3. Sync to CMS Data
+    if (cmsData.value) {
+      if (!cmsData.value.dashboard) cmsData.value.dashboard = {} as any
+      if (!Array.isArray(cmsData.value.dashboard.receivedBids)) cmsData.value.dashboard.receivedBids = []
+
+      let targetGroup = cmsData.value.dashboard.receivedBids.find((g: any) => g.id === tender.id || g.baslik === tender.baslik)
+      if (!targetGroup) {
+        targetGroup = {
+          id: tender.id,
+          baslik: tender.baslik,
+          kategori: tender.kategori,
+          teklifler: []
+        }
+        cmsData.value.dashboard.receivedBids.unshift(targetGroup)
+      }
+
+      if (!Array.isArray(targetGroup.teklifler)) targetGroup.teklifler = []
+      targetGroup.teklifler.unshift({
+        id: bidObj.id,
+        firma: bidderCompany,
+        fiyat: formattedPrice,
+        sure: quickOfferDuration.value || '7 gün',
+        durum: 'degerlendirmede',
+        tarih: 'Az önce',
+        adres: (session.city || tender.city || 'Balıkesir') + ' / Türkiye',
+        aciklama: quickOfferNotes.value || '',
+        files: [...quickOfferFiles.value]
+      })
+
+      if (tender.teklifSayisi !== undefined) {
+        tender.teklifSayisi = (tender.teklifSayisi || 0) + 1
+      }
+      tender.liderTeklif = formattedPrice
+
+      try {
+        saveCmsData(cmsData.value)
+      } catch (err) {
+        console.warn('saveCmsData warning', err)
+      }
     }
+
+    // Dispatch storage event for other components
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('storage'))
+    }
+
+    showQuickBidModal.value = false
+    offerSuccessToastMsg.value = `"${tender.baslik}" ihalesine ${fullPriceLabel} tutarındaki teklifiniz başarıyla iletildi!`
+    showOfferSuccessToast.value = true
+
+    setTimeout(() => {
+      showOfferSuccessToast.value = false
+    }, 5000)
+  } catch (err: any) {
+    console.error('Teklif gönderme hatası:', err)
+    alert(err?.data?.statusMessage || err?.message || 'Teklif sunucuya iletilirken bir hata oluştu.')
+  } finally {
+    isSubmittingQuickOffer.value = false
   }
-
-  // Dispatch storage event for other components
-  if (typeof window !== 'undefined') {
-    window.dispatchEvent(new Event('storage'))
-  }
-
-  showQuickBidModal.value = false
-  offerSuccessToastMsg.value = `"${tender.baslik}" ihalesine ${fullPriceLabel} tutarındaki teklifiniz başarıyla iletildi!`
-  showOfferSuccessToast.value = true
-
-  setTimeout(() => {
-    showOfferSuccessToast.value = false
-  }, 5000)
 }
 
 onMounted(() => {
@@ -2575,8 +2736,10 @@ onMounted(() => {
                 <img 
                   :src="getTenderImage(tender)" 
                   :alt="tender.baslik"
+                  loading="lazy"
+                  decoding="async"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  @error="($event.target as any).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'"
+                  @error="($event.target as any).src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'600\' height=\'400\' viewBox=\'0 0 600 400\'><rect width=\'600\' height=\'400\' fill=\'%230b1329\'/><text x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%2338bdf8\' font-size=\'22\' font-family=\'sans-serif\'>İhaleciBurada Kurumsal İhale</text></svg>'"
                 />
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
 
@@ -3091,8 +3254,10 @@ onMounted(() => {
             <img
               :src="(selectedTenderModal.images?.[activeImageIndex]?.url) || (typeof selectedTenderModal.images?.[activeImageIndex] === 'string' ? selectedTenderModal.images[activeImageIndex] : getTenderImage(selectedTenderModal))"
               :alt="selectedTenderModal.baslik"
+              loading="lazy"
+              decoding="async"
               class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-102"
-              @error="($event.target as any).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'"
+              @error="($event.target as any).src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'600\' height=\'400\' viewBox=\'0 0 600 400\'><rect width=\'600\' height=\'400\' fill=\'%230b1329\'/><text x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%2338bdf8\' font-size=\'22\' font-family=\'sans-serif\'>İhaleciBurada Kurumsal İhale</text></svg>'"
             />
 
             <!-- Önceki / Sonraki Butonları -->
@@ -3130,8 +3295,11 @@ onMounted(() => {
             >
               <img
                 :src="imgItem.url || imgItem"
+                :alt="selectedTenderModal?.baslik || 'İhale Görseli'"
+                loading="lazy"
+                decoding="async"
                 class="w-full h-full object-cover"
-                @error="($event.target as any).src = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'"
+                @error="($event.target as any).src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%230b1329\'/></svg>'"
               />
             </div>
           </div>
@@ -3481,13 +3649,204 @@ onMounted(() => {
             <button 
               type="button" 
               @click.prevent="submitQuickOffer" 
-              class="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition cursor-pointer shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2"
+              :disabled="isSubmittingQuickOffer"
+              :class="isSubmittingQuickOffer ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
+              class="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2"
             >
               <Send :size="14" />
-              <span>Teklifi Gönder</span>
+              <span>{{ isSubmittingQuickOffer ? 'İletiliyor...' : 'Teklifi Gönder' }}</span>
             </button>
           </div>
         </form>
+
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- ⚡ 4. CANLI TEKLİFLER YAN ÇEKMECESİ (DRAWER) -->
+    <!-- ========================================================================= -->
+    <div v-if="showLiveBidsDrawer && drawerTender" class="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-xs flex justify-end animate-fadeIn">
+      <!-- Dışarı tıklama ile kapatma overlay -->
+      <div class="absolute inset-0 cursor-pointer" @click="showLiveBidsDrawer = false"></div>
+
+      <!-- Çekmece Gövdesi (Sağ Panel) -->
+      <div class="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col z-10 animate-slideLeft">
+        
+        <!-- Çekmece Başlığı -->
+        <div class="p-4 sm:p-5 border-b border-slate-200 bg-slate-900 text-white flex items-start justify-between gap-3">
+          <div class="space-y-1 pr-2">
+            <div class="flex items-center gap-2 flex-wrap">
+              <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300 font-mono text-[10px] font-black border border-emerald-500/30">
+                ⚡ CANLI EKSİLTME
+              </span>
+              <span class="font-mono text-slate-400 text-[10px]">
+                {{ drawerTender.id }}
+              </span>
+            </div>
+            <h3 class="font-black text-sm text-white line-clamp-2 leading-snug">
+              {{ drawerTender.baslik }}
+            </h3>
+            <p class="text-[11px] text-slate-400">
+              {{ drawerTender.ownerCompany || drawerTender.authority }} • {{ drawerTender.city || 'Balıkesir' }}
+            </p>
+          </div>
+          <button 
+            type="button" 
+            @click="showLiveBidsDrawer = false" 
+            class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer shrink-0"
+          >
+            <X :size="18" />
+          </button>
+        </div>
+
+        <!-- İhale Özet Şeridi -->
+        <div class="p-3.5 bg-slate-50 border-b border-slate-200 grid grid-cols-3 gap-2 text-center text-xs">
+          <div class="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+            <span class="text-[9px] text-slate-500 font-bold uppercase block">Kategori</span>
+            <span class="font-bold text-slate-800 text-[10px] truncate block" :title="drawerTender.kategori">
+              {{ drawerTender.kategori?.split('-')[0]?.trim() || 'Genel' }}
+            </span>
+          </div>
+          <div class="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+            <span class="text-[9px] text-slate-500 font-bold uppercase block">Yaklaşık Maliyet</span>
+            <span class="font-black text-slate-900 text-[11px] font-mono block">
+              {{ formatTenderBudget(drawerTender.butce) }}
+            </span>
+          </div>
+          <div class="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
+            <span class="text-[9px] text-slate-500 font-bold uppercase block">Kalan Süre</span>
+            <span class="font-black text-blue-700 text-[11px] block">
+              {{ drawerTender.sure || 'Canlı İhale' }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Teklif Listesi Alanı (Scroll Edilebilir) -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3 custom-scrollbar bg-slate-50/50">
+          <div class="flex items-center justify-between pb-1">
+            <span class="text-xs font-black text-slate-700 uppercase tracking-wide">
+              Sunulan Teklifler ({{ drawerTenderLiveBids.length }})
+            </span>
+            <span class="text-[10px] text-slate-500 font-medium">
+              Gizlilik Kalkanı ile Şifreli
+            </span>
+          </div>
+
+          <!-- Teklif Varsa Sıralı Liste -->
+          <div v-if="drawerTenderLiveBids.length > 0" class="space-y-2.5">
+            <div 
+              v-for="(bid, idx) in drawerTenderLiveBids" 
+              :key="bid.id || idx"
+              class="p-3.5 rounded-2xl border transition-all duration-200"
+              :class="[
+                idx === 0 
+                  ? 'bg-emerald-50 border-emerald-300 shadow-xs' 
+                  : (bid.isMine ? 'bg-blue-50/80 border-blue-300 shadow-2xs' : 'bg-white border-slate-200 hover:border-slate-300 shadow-2xs')
+              ]"
+            >
+              <div class="flex items-start justify-between gap-2">
+                <div class="flex items-center gap-2">
+                  <!-- Sıralama Rozeti -->
+                  <span 
+                    class="w-6 h-6 rounded-full flex items-center justify-center font-bold text-xs"
+                    :class="[
+                      idx === 0 ? 'bg-amber-400 text-amber-950 shadow-xs' : 
+                      (idx === 1 ? 'bg-slate-300 text-slate-800' : 
+                      (idx === 2 ? 'bg-amber-700/30 text-amber-900' : 'bg-slate-100 text-slate-600'))
+                    ]"
+                  >
+                    {{ idx === 0 ? '🥇' : (idx === 1 ? '🥈' : (idx === 2 ? '🥉' : (idx + 1))) }}
+                  </span>
+
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-black text-xs text-slate-900">
+                        {{ maskBidderName(bid, idx) }}
+                      </span>
+                      <span v-if="idx === 0" class="px-1.5 py-0.5 rounded text-[9px] font-black bg-emerald-600 text-white">
+                        LİDER TEKLİF
+                      </span>
+                    </div>
+                    <span class="text-[10px] text-slate-500">
+                      {{ bid.tarih || 'Bugün' }} • {{ bid.adres || bid.city || 'Doğrulanmış Tedarikçi' }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Teklif Fiyatı -->
+                <div class="text-right shrink-0">
+                  <span 
+                    class="text-sm font-black font-mono block"
+                    :class="idx === 0 ? 'text-emerald-700' : (bid.isMine ? 'text-blue-700' : 'text-slate-900')"
+                  >
+                    {{ bid.fiyat }}
+                  </span>
+                  <span class="text-[9px] text-slate-400 font-medium">
+                    {{ bid.sure || '7 gün teslimat' }}
+                  </span>
+                </div>
+              </div>
+
+              <!-- Ek Açıklama / Not -->
+              <p v-if="bid.notum || bid.aciklama" class="mt-2 pt-2 border-t border-slate-100 text-[11px] text-slate-600 italic">
+                "{{ bid.notum || bid.aciklama }}"
+              </p>
+            </div>
+          </div>
+
+          <!-- Teklif Yoksa Boş Durum -->
+          <div v-else class="p-8 text-center bg-white rounded-2xl border border-slate-200 space-y-2">
+            <div class="w-10 h-10 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto">
+              <Sparkles :size="20" />
+            </div>
+            <h4 class="font-bold text-slate-700 text-xs">Henüz Teklif Verilmedi</h4>
+            <p class="text-[11px] text-slate-500">
+              Bu ihale için ilk teklifi siz vererek en avantajlı pozisyonu yakalayabilirsiniz.
+            </p>
+          </div>
+        </div>
+
+        <!-- Çekmece Alt Aksiyon Butonları -->
+        <div class="p-4 border-t border-slate-200 bg-white space-y-2">
+          <div class="flex items-center justify-between text-[11px] text-slate-500 pb-1">
+            <span>Minimum Eksiltme Adımı:</span>
+            <span class="font-mono font-bold text-slate-700">10.000 ₺</span>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <button 
+              type="button" 
+              @click="showLiveBidsDrawer = false; openTenderDetailModal(drawerTender)"
+              class="flex-1 py-2.5 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-xs transition cursor-pointer text-center"
+            >
+              Şartnameyi Aç
+            </button>
+
+            <!-- Teklif Ver Butonu -->
+            <button 
+              v-if="!isMyOwnTender(drawerTender) && drawerTender.durum !== 'closed'"
+              type="button" 
+              @click="showLiveBidsDrawer = false; openQuickBidModal(drawerTender)"
+              class="flex-1 py-2.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition cursor-pointer shadow-md flex items-center justify-center gap-1.5"
+            >
+              <Send :size="13" />
+              <span>Teklif Ver</span>
+            </button>
+            <div 
+              v-else-if="drawerTender.durum === 'closed'"
+              class="flex-1 py-2.5 rounded-xl bg-slate-100 text-slate-400 font-bold text-xs text-center border border-slate-200"
+            >
+              İhale Kapandı
+            </div>
+            <NuxtLink 
+              v-else
+              to="/panel/gelen-teklifler"
+              class="flex-1 py-2.5 rounded-xl bg-amber-50 text-amber-900 border border-amber-300 font-bold text-xs text-center flex items-center justify-center gap-1"
+            >
+              Kendi İlanınız
+            </NuxtLink>
+          </div>
+        </div>
 
       </div>
     </div>
