@@ -350,7 +350,11 @@ function goStep2() {
       pendingUserSession.value = {
         email: email.value,
         firstName: firstName.value,
-        name: `${firstName.value} ${lastName.value}`,
+        lastName: lastName.value,
+        surname: lastName.value,
+        name: `${firstName.value} ${lastName.value}`.trim(),
+        username: `${firstName.value} ${lastName.value}`.trim(),
+        phone: phone.value,
         company: 'Bireysel Üye',
         role: 'individual',
         sektorler: ['bireysel'],
@@ -385,9 +389,15 @@ function handleRegister() {
     pendingUserSession.value = {
       email: email.value,
       firstName: firstName.value,
-      name: `${firstName.value} ${lastName.value}`,
+      lastName: lastName.value,
+      surname: lastName.value,
+      name: `${firstName.value} ${lastName.value}`.trim(),
+      username: `${firstName.value} ${lastName.value}`.trim(),
+      phone: phone.value,
       company: userRole.value === 'company' ? companyName.value : 'Bireysel Üye',
+      companyName: userRole.value === 'company' ? companyName.value : '',
       role: userRole.value,
+      isCompanyActive: userRole.value === 'company',
       sektorler: seciliSektorler.value,
       mailBildirimi: mailBildirimi.value,
       isPremium: false
@@ -556,12 +566,19 @@ function handleEDevletAuth() {
   setTimeout(() => {
     isSubmitting.value = false
     if (typeof window !== 'undefined') {
+      const authName = (firstName.value ? `${firstName.value} ${lastName.value}` : '').trim() || 'Doğrulanmış Yetkili'
+      const compName = companyName.value || 'Doğrulanmış B2B Üretici A.Ş.'
       localStorage.setItem('userSession', JSON.stringify({
-        email: 'edevlet_onayli@ihaleciburada.com',
-        firstName: 'Doğrulanmış Yetkili',
-        name: (form.value.name || form.value.firstName || 'Kurumsal Üye') + ' (e-Devlet & MERSİS Onaylı)',
-        company: 'Turan Lojistik San. A.Ş.',
+        email: email.value || 'edevlet_onayli@ihaleciburada.com',
+        firstName: firstName.value || 'Doğrulanmış',
+        lastName: lastName.value || 'Yetkili',
+        surname: lastName.value || 'Yetkili',
+        name: authName + ' (e-Devlet Onaylı)',
+        username: authName,
+        company: compName,
+        companyName: compName,
         role: 'company',
+        isCompanyActive: true,
         verified: true,
         isEDevletVerified: true,
         isPremium: true,
@@ -627,8 +644,9 @@ function handleLogin() {
       pendingUserSession.value = {
         email: clean2FaEmail,
         firstName: matchedAccount.firstName || derived2FaName,
-        lastName: matchedAccount.lastName || '',
-        name: matchedAccount.name || derived2FaName,
+        lastName: matchedAccount.lastName || matchedAccount.surname || '',
+        surname: matchedAccount.lastName || matchedAccount.surname || '',
+        name: matchedAccount.name || (derived2FaName + (matchedAccount.lastName ? ' ' + matchedAccount.lastName : '')),
         username: matchedAccount.username || derived2FaName,
         company: matchedAccount.company || matchedAccount.companyName || (derived2FaName + ' Tedarik'),
         companyName: matchedAccount.companyName || matchedAccount.company || (derived2FaName + ' Tedarik'),
@@ -670,7 +688,8 @@ function handleLogin() {
       const sessionObj = {
         email: cleanEmail,
         firstName: existingAccount.firstName || derivedName,
-        lastName: existingAccount.lastName || '',
+        lastName: existingAccount.lastName || existingAccount.surname || '',
+        surname: existingAccount.lastName || existingAccount.surname || '',
         name: existingAccount.name || (derivedName + (existingAccount.lastName ? ' ' + existingAccount.lastName : '')),
         username: existingAccount.username || derivedName,
         company: existingAccount.company || existingAccount.companyName || (derivedName + ' Tedarik'),

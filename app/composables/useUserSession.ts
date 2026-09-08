@@ -76,6 +76,7 @@ export function useUserSession() {
     loadSessionFromStorage()
     window.addEventListener('storage', loadSessionFromStorage)
     window.addEventListener('session-updated', loadSessionFromStorage)
+    window.addEventListener('user-session-changed', loadSessionFromStorage)
   }
 
   const isLoggedIn = computed(() => {
@@ -84,23 +85,31 @@ export function useUserSession() {
 
   // Bireysel (Kişisel) vs Kurumsal (Firma) Modu
   const isCompanyMode = computed(() => {
-    return userSession.value?.isCompanyActive === true
+    return userSession.value?.isCompanyActive === true || userSession.value?.role === 'company'
   })
 
   const userName = computed(() => {
-    return (
-      userSession.value?.name ||
-      userSession.value?.firstName ||
-      userSession.value?.username ||
-      'Kullanıcı'
-    )
+    if (userSession.value?.name && userSession.value.name.trim()) {
+      return userSession.value.name.trim()
+    }
+    if (userSession.value?.firstName || userSession.value?.lastName) {
+      const full = `${userSession.value?.firstName || ''} ${userSession.value?.lastName || ''}`.trim()
+      if (full) return full
+    }
+    if (userSession.value?.username && userSession.value.username.trim()) {
+      return userSession.value.username.trim()
+    }
+    if (userSession.value?.email) {
+      const prefix = userSession.value.email.split('@')[0]
+      return prefix.charAt(0).toUpperCase() + prefix.slice(1).replace(/[^a-zA-Z0-9]/g, ' ')
+    }
+    return 'Kullanıcı'
   })
 
   const userEmail = computed(() => userSession.value?.email || '')
   const userPhone = computed(() => userSession.value?.phone || '')
 
   const companyName = computed(() => {
-    if (!isCompanyMode.value) return ''
     return userSession.value?.companyName || userSession.value?.company || ''
   })
 

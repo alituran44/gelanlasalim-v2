@@ -24,26 +24,22 @@ const currentStep = ref<1 | 2 | 3 | 4>(1)
 
 // Step 1: Şirket Bilgileri
 const firmaUnvani = ref('')
-const firmaTuru = ref('Şahıs İşletmesi')
-const vergiNo = ref('43624665040')
-const vergiDairesi = ref('Çanakkale Vergi Dairesi Müdürlüğü')
-const il = ref('Çanakkale')
-const ilce = ref('Merkez')
-const mahalle = ref('İsmetpaşa Mah.')
-const postaKodu = ref('17100')
-const acikAdres = ref('Büyük Hamam Sokak Taşöz Apt. No:52/1 Merkez / Çanakkale')
+const firmaTuru = ref('Limited Şirket (LTD)')
+const vergiNo = ref('')
+const vergiDairesi = ref('')
+const il = ref('')
+const ilce = ref('')
+const mahalle = ref('')
+const postaKodu = ref('')
+const acikAdres = ref('')
 const faturaAdresiAyni = ref(true)
 
 // Step 2: Kişisel Bilgiler
-const ad = ref('Ali')
-const soyad = ref('Turan')
-const yetkiliTckn = ref('43624665040')
+const ad = ref('')
+const soyad = ref('')
+const yetkiliTckn = ref('')
 const unvanRol = ref('Yönetici')
-const faaliyetSektoru = ref<string[]>([
-  'Yazılım & IT Hizmetleri',
-  'Reklam & Pazarlama',
-  'Elektrik & Elektronik'
-])
+const faaliyetSektoru = ref<string[]>([])
 
 // Step 3: Beyan
 const beyanKabul = ref(true)
@@ -93,10 +89,45 @@ const step3Errors = ref('')
 onMounted(() => {
   if (typeof window !== 'undefined') {
     const session = JSON.parse(localStorage.getItem('userSession') || '{}')
-    if (session.firstName) {
-      ad.value = session.firstName
-      soyad.value = session.lastName || ''
-      firmaUnvani.value = session.company || `${session.firstName} ${session.lastName}`
+    if (session.firstName && session.lastName) {
+      ad.value = session.firstName.trim()
+      soyad.value = session.lastName.trim()
+    } else if (session.firstName && !session.lastName) {
+      const parts = String(session.firstName).trim().split(/\s+/)
+      if (parts.length > 1) {
+        soyad.value = parts.pop() || ''
+        ad.value = parts.join(' ')
+      } else {
+        ad.value = session.firstName.trim()
+        soyad.value = session.surname?.trim() || ''
+      }
+    } else if (session.name) {
+      const parts = String(session.name).trim().split(/\s+/)
+      if (parts.length > 1) {
+        soyad.value = session.lastName?.trim() || session.surname?.trim() || parts.pop() || ''
+        ad.value = parts.join(' ')
+      } else {
+        ad.value = session.name.trim()
+        soyad.value = session.lastName?.trim() || session.surname?.trim() || ''
+      }
+    }
+
+    if (session.company || session.companyName) {
+      firmaUnvani.value = session.companyName || session.company
+    } else if (ad.value) {
+      firmaUnvani.value = `${ad.value} ${soyad.value}`.trim()
+    }
+
+    if (session.taxNo) vergiNo.value = session.taxNo
+    if (session.taxOffice) vergiDairesi.value = session.taxOffice
+    if (session.tcKimlik) yetkiliTckn.value = session.tcKimlik
+    if (session.title) unvanRol.value = session.title
+    if (session.city) il.value = session.city
+    if (session.faturaAdresi || session.address) acikAdres.value = session.faturaAdresi || session.address
+    if (Array.isArray(session.sectors) && session.sectors.length > 0) {
+      faaliyetSektoru.value = session.sectors
+    } else if (typeof session.sectors === 'string' && session.sectors) {
+      faaliyetSektoru.value = session.sectors.split(',').map((s: string) => s.trim()).filter(Boolean)
     }
   }
 })

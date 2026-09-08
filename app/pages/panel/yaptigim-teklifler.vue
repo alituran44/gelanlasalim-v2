@@ -301,7 +301,7 @@ async function acceptCounterOffer(teklif: any) {
     tenderTitle: teklif.ilanBaslik,
     buyerCompany: teklif.aliciFirma || userSession.value?.companyName || 'Kurumsal Alıcı Firma',
     buyerFirm: teklif.aliciFirma || userSession.value?.companyName || 'Kurumsal Alıcı Firma',
-    buyerEmail: 'alituran44@gmail.com',
+    buyerEmail: teklif.aliciEmail || userSession.value?.email || 'satinlama@firma.com',
     supplierCompany: teklif.firma || 'Ata Akademi San. Tic. A.Ş.',
     supplierFirm: teklif.firma || 'Ata Akademi San. Tic. A.Ş.',
     supplierEmail: 'tedarikci@gmail.com',
@@ -689,7 +689,7 @@ function submitReview() {
           <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
             <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
               <span class="text-[10px] text-slate-400 font-bold block">Alıcı Yetkilisi</span>
-              <strong class="text-slate-800">{{ teklif.yetkili || 'Ahmet Yılmaz' }}</strong>
+              <strong class="text-slate-800">{{ teklif.yetkili || 'Alıcı Kurum Yetkilisi' }}</strong>
             </div>
             <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-100">
               <span class="text-[10px] text-slate-400 font-bold block">İletişim Telefonu</span>

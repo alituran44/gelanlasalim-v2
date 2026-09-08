@@ -94,56 +94,109 @@ onMounted(() => {
       if (prefs.timezone) timezone.value = prefs.timezone
     } catch (e) {}
   }
+  syncProfileFromSession()
   if (typeof window !== 'undefined') {
-    try {
-      const session = JSON.parse(localStorage.getItem('userSession') || '{}')
-      userSession.value = session
-      if (session.email) {
-        profileForm.value.email = session.email
-        companyForm.value.email = session.email
-      }
-      if (session.firstName || session.name) {
-        profileForm.value.name = session.firstName || session.name
-        profileForm.value.username = session.username || session.name || session.firstName
-        companyForm.value.contactPerson = session.name || session.firstName
-      }
-      if (session.username) {
-        profileForm.value.username = session.username
-      }
-      if (session.lastName) profileForm.value.surname = session.lastName
-      if (session.phone) {
-        profileForm.value.phone = session.phone
-        companyForm.value.phone = session.phone
-      }
-      if (session.companyLogo || session.picture || session.logo) {
-        profileAvatarUrl.value = session.companyLogo || session.picture || session.logo
-      }
-      if (session.companyEmail) {
-        companyForm.value.email = session.companyEmail
-      }
-      if (session.isCompanyActive) {
-        if (session.companyName || session.company) {
-          companyForm.value.name = session.companyName || session.company
-          companyForm.value.legalName = session.legalName || session.companyName || session.company
-        }
-        if (session.description || session.about) companyForm.value.description = session.description || session.about
-        if (session.website) companyForm.value.website = session.website
-        if (session.city) companyForm.value.city = session.city
-        if (session.taxNo) companyForm.value.taxNo = session.taxNo
-        if (session.taxOffice) companyForm.value.taxOffice = session.taxOffice
-        if (session.sectors) companyForm.value.sectors = Array.isArray(session.sectors) ? session.sectors.join(', ') : session.sectors
-        if (session.mersis) companyForm.value.mersis = session.mersis
-        if (session.sicilNo) companyForm.value.sicilNo = session.sicilNo
-        if (session.tcKimlik) companyForm.value.tcKimlik = session.tcKimlik
-        if (session.iban) companyForm.value.iban = session.iban
-        if (session.faturaAdresi) companyForm.value.faturaAdresi = session.faturaAdresi
-      }
-      loadNotificationSettings()
-    } catch (e) {
-      console.error(e)
-    }
+    window.addEventListener('storage', syncProfileFromSession)
+    window.addEventListener('session-updated', syncProfileFromSession)
+    window.addEventListener('user-session-changed', syncProfileFromSession)
   }
 })
+
+function syncProfileFromSession() {
+  if (typeof window === 'undefined') return
+  try {
+    const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    userSession.value = session
+    
+    if (session.email) {
+      profileForm.value.email = session.email
+      companyForm.value.email = session.companyEmail || session.email
+    } else {
+      profileForm.value.email = ''
+    }
+
+    if (session.phone) {
+      profileForm.value.phone = session.phone
+      companyForm.value.phone = session.phone
+    } else {
+      profileForm.value.phone = ''
+    }
+
+    if (session.title) {
+      profileForm.value.title = session.title
+    } else {
+      profileForm.value.title = 'Yetkili'
+    }
+
+    // Temiz ve hatasız Ad / Soyad ayrıştırma (asla eski/sabit isim kalıntıları sızmaz)
+    if (session.firstName && session.lastName) {
+      profileForm.value.name = session.firstName.trim()
+      profileForm.value.surname = session.lastName.trim()
+    } else if (session.firstName && !session.lastName) {
+      const parts = String(session.firstName).trim().split(/\s+/)
+      if (parts.length > 1) {
+        profileForm.value.surname = parts.pop() || ''
+        profileForm.value.name = parts.join(' ')
+      } else {
+        profileForm.value.name = session.firstName.trim()
+        profileForm.value.surname = session.surname?.trim() || ''
+      }
+    } else if (session.name) {
+      const parts = String(session.name).trim().split(/\s+/)
+      if (parts.length > 1) {
+        profileForm.value.surname = session.lastName?.trim() || session.surname?.trim() || parts.pop() || ''
+        profileForm.value.name = parts.join(' ')
+      } else {
+        profileForm.value.name = session.name.trim()
+        profileForm.value.surname = session.lastName?.trim() || session.surname?.trim() || ''
+      }
+    } else if (session.username) {
+      const parts = String(session.username).trim().split(/\s+/)
+      if (parts.length > 1) {
+        profileForm.value.surname = parts.pop() || ''
+        profileForm.value.name = parts.join(' ')
+      } else {
+        profileForm.value.name = session.username.trim()
+        profileForm.value.surname = ''
+      }
+    } else if (session.email) {
+      const prefix = session.email.split('@')[0]
+      const cleanPrefix = prefix.charAt(0).toUpperCase() + prefix.slice(1).replace(/[^a-zA-Z0-9]/g, ' ')
+      profileForm.value.name = cleanPrefix
+      profileForm.value.surname = ''
+    } else {
+      profileForm.value.name = 'Kullanıcı'
+      profileForm.value.surname = ''
+    }
+
+    profileForm.value.username = session.username || `${profileForm.value.name} ${profileForm.value.surname}`.trim()
+    companyForm.value.contactPerson = `${profileForm.value.name} ${profileForm.value.surname}`.trim()
+
+    if (session.companyLogo || session.picture || session.avatar || session.logo) {
+      profileAvatarUrl.value = session.companyLogo || session.picture || session.avatar || session.logo
+    }
+
+    if (session.companyName || session.company) {
+      companyForm.value.name = session.companyName || session.company
+      companyForm.value.legalName = session.legalName || session.companyName || session.company
+    }
+    if (session.description || session.about) companyForm.value.description = session.description || session.about
+    if (session.website) companyForm.value.website = session.website
+    if (session.city) companyForm.value.city = session.city
+    if (session.taxNo) companyForm.value.taxNo = session.taxNo
+    if (session.taxOffice) companyForm.value.taxOffice = session.taxOffice
+    if (session.sectors) companyForm.value.sectors = Array.isArray(session.sectors) ? session.sectors.join(', ') : session.sectors
+    if (session.mersis) companyForm.value.mersis = session.mersis
+    if (session.sicilNo) companyForm.value.sicilNo = session.sicilNo
+    if (session.tcKimlik) companyForm.value.tcKimlik = session.tcKimlik
+    if (session.iban) companyForm.value.iban = session.iban
+    if (session.faturaAdresi) companyForm.value.faturaAdresi = session.faturaAdresi
+    
+    loadNotificationSettings()
+  } catch (e) {
+    console.error('Error syncing profile from session:', e)
+  }
+}
 
 
 const navigationTabs = computed(() => {
@@ -424,14 +477,38 @@ const membershipPricingGlobalUSD = [
   }
 ]
 
-// Personal Profile data
+// Personal Profile data - Dinamik oturumdan beslenen temiz başlangıç
 const profileForm = ref({
-  name: 'Ali',
-  surname: 'Turan',
+  name: '',
+  surname: '',
   username: '',
-  email: 'alituran88@gmail.com',
-  phone: '5437340860',
-  title: 'Yönetici'
+  email: '',
+  phone: '',
+  title: 'Yetkili'
+})
+
+const profileDisplayName = computed(() => {
+  if (profileForm.value.username && profileForm.value.username.trim()) {
+    return profileForm.value.username.trim()
+  }
+  const full = `${profileForm.value.name || ''} ${profileForm.value.surname || ''}`.trim()
+  if (full) return full
+  if (userName.value && userName.value !== 'Kullanıcı') return userName.value
+  if (profileForm.value.email) {
+    const prefix = profileForm.value.email.split('@')[0]
+    return prefix.charAt(0).toUpperCase() + prefix.slice(1).replace(/[^a-zA-Z0-9]/g, ' ')
+  }
+  return 'Kullanıcı Hesabı'
+})
+
+const profileInitials = computed(() => {
+  const nameToUse = profileDisplayName.value
+  if (!nameToUse) return 'K'
+  const parts = nameToUse.split(/\s+/).filter(Boolean)
+  if (parts.length > 1) {
+    return `${parts[0].charAt(0)}${parts[parts.length - 1].charAt(0)}`.toUpperCase()
+  }
+  return nameToUse.slice(0, 2).toUpperCase()
 })
 
 // Company & Verification details
@@ -781,7 +858,7 @@ async function trigger2FaToggle() {
 }
 
 async function send2FaEmailOtp() {
-  const targetEmail = profileForm.value.email || userSession.value?.email || 'ihalecib@gmail.com'
+  const targetEmail = profileForm.value.email || userSession.value?.email || 'destek@ihaleciburada.com'
   isSending2FaEmail.value = true
   const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString()
   twoFaOtpInput.value = generatedOtp
@@ -1147,8 +1224,9 @@ const isSaved = ref(false)
 function saveProfile() {
   if (typeof window !== 'undefined') {
     const session = JSON.parse(localStorage.getItem('userSession') || '{}')
-    session.username = profileForm.value.username || profileForm.value.name
-    session.name = profileForm.value.username || (profileForm.value.name + (profileForm.value.surname ? ' ' + profileForm.value.surname : '')).trim()
+    const fullName = `${profileForm.value.name || ''} ${profileForm.value.surname || ''}`.trim()
+    session.name = fullName || profileForm.value.username || session.name || 'Kullanıcı'
+    session.username = profileForm.value.username || fullName || session.name
     session.firstName = profileForm.value.name
     session.lastName = profileForm.value.surname
     session.surname = profileForm.value.surname
@@ -1322,22 +1400,22 @@ function saveProfile() {
               <div class="flex items-center gap-4">
                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 p-0.5 shadow-lg shrink-0">
                   <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-amber-400 font-black text-xl font-mono">
-                    {{ profileForm.name.charAt(0) }}{{ profileForm.surname.charAt(0) }}
+                    {{ profileInitials }}
                   </div>
                 </div>
 
                 <div class="space-y-1 text-white">
                   <div class="flex flex-wrap items-center gap-2">
-                    <h2 class="text-xl font-black tracking-tight">{{ profileForm.name }} {{ profileForm.surname }}</h2>
+                    <h2 class="text-xl font-black tracking-tight">{{ profileDisplayName }}</h2>
                     <span class="rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
                       <ShieldCheck :size="11" class="text-amber-400" />
                       ✓ {{ 'e-Devlet Onaylı' }}
                     </span>
                   </div>
                   <p class="text-xs text-slate-300 font-medium flex items-center gap-3">
-                    <span>📧 {{ profileForm.email }}</span>
-                    <span>•</span>
-                    <span>📞 +90 {{ profileForm.phone }}</span>
+                    <span v-if="profileForm.email || userSession?.email">📧 {{ profileForm.email || userSession?.email }}</span>
+                    <span v-if="(profileForm.email || userSession?.email) && (profileForm.phone || userSession?.phone)">•</span>
+                    <span v-if="profileForm.phone || userSession?.phone">📞 +90 {{ profileForm.phone || userSession?.phone }}</span>
                   </p>
                 </div>
               </div>
@@ -1558,11 +1636,11 @@ function saveProfile() {
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Şirket / Ticari Firma Adı</label>
-                <input v-model="companyForm.name" type="text" placeholder="Örn: Turan Ambalaj Sanayi Ltd. Şti." class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-bold text-slate-800" style="border-color: #E2E8F0;" />
+                <input v-model="companyForm.name" type="text" placeholder="Örn: ABC Tedarik Sanayi Ltd. Şti." class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-bold text-slate-800" style="border-color: #E2E8F0;" />
               </div>
               <div>
                 <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Resmi Yasal Unvan (Fatura)</label>
-                <input v-model="companyForm.legalName" type="text" placeholder="Örn: Turan Ambalaj Kağıt ve Plastik San. Tic. A.Ş." class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-bold text-slate-800" style="border-color: #E2E8F0;" />
+                <input v-model="companyForm.legalName" type="text" placeholder="Örn: ABC Tedarik ve Lojistik San. Tic. A.Ş." class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-bold text-slate-800" style="border-color: #E2E8F0;" />
               </div>
             </div>
 
@@ -2585,7 +2663,7 @@ function saveProfile() {
                     <span class="text-xs font-black text-slate-800">E-Posta Bildirimleri</span>
                     <span class="text-[9px] bg-blue-50 text-blue-700 border border-blue-200 px-1.5 py-0.2 rounded font-bold">Önerilen</span>
                   </div>
-                  <p class="text-[11px] text-slate-500">{{ profileForm.email || 'alituran88@gmail.com' }} adresine resmi ihale özetleri ve teklif detayları iletilir.</p>
+                  <p class="text-[11px] text-slate-500">{{ profileForm.email || userSession?.email || 'Kayıtlı e-posta adresinize' }} resmi ihale özetleri ve teklif detayları iletilir.</p>
                 </div>
                 <button 
                   type="button" 
@@ -2604,7 +2682,7 @@ function saveProfile() {
                     <span class="text-xs font-black text-slate-800">SMS Anlık Mesajları</span>
                     <span class="text-[9px] bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.2 rounded font-bold">Hızlı Uyarı</span>
                   </div>
-                  <p class="text-[11px] text-slate-500">+90 {{ profileForm.phone || '543 734 08 60' }} numarasına acil ihale sonuçları ve güvenlik kodları SMS ile iletilir.</p>
+                  <p class="text-[11px] text-slate-500">{{ (profileForm.phone || userSession?.phone) ? ('+90 ' + (profileForm.phone || userSession?.phone)) : 'Kayıtlı telefon numaranıza' }} acil ihale sonuçları ve güvenlik kodları SMS ile iletilir.</p>
                 </div>
                 <button 
                   type="button" 
@@ -3314,7 +3392,7 @@ function saveProfile() {
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span class="text-[8px] font-black text-slate-300 block">AD SOYAD</span>
-                <span class="text-slate-700 font-bold block mt-1">{{ userName || profileForm.name || 'Kullanıcı' }} {{ profileForm.surname || '' }}</span>
+                <span class="text-slate-700 font-bold block mt-1">{{ profileDisplayName }}</span>
               </div>
               <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
                 <span class="text-[8px] font-black text-slate-300 block">E-POSTA ADRESİ</span>
@@ -3494,7 +3572,7 @@ function saveProfile() {
                   <span class="text-slate-400">Durum:</span>
                   <span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100" v-if="companyForm.is2FaEnabled">Etkin</span>
                   <span class="text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100" v-else>Devre Dışı</span>
-                  <span class="text-slate-500">Aktif/Kayıtlı e-posta: <strong>{{ profileForm.email || userSession.email || 'ihalecib@gmail.com' }}</strong></span>
+                  <span class="text-slate-500">Aktif/Kayıtlı e-posta: <strong>{{ profileForm.email || userSession?.email || 'destek@ihaleciburada.com' }}</strong></span>
                 </div>
                 <button type="button" @click="trigger2FaToggle" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-xs transition">
                   {{ companyForm.is2FaEnabled ? 'Devre Dışı Bırak' : '2FA Etkinleştir' }}

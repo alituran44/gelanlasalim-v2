@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { 
   HelpCircle, 
   Search, 
@@ -42,11 +42,22 @@ function toggleFaq(index: number) {
 
 // Support Form State
 const supportSubject = ref('İhale ve Teklifler')
-const supportEmail = ref('alituran88@gmail.com')
+const supportEmail = ref('')
 const supportMessage = ref('')
 const kvkkAccepted1 = ref(false)
 const kvkkAccepted2 = ref(false)
 const isSubmitted = ref(false)
+
+onMounted(() => {
+  if (typeof window !== 'undefined') {
+    try {
+      const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+      if (session.email) {
+        supportEmail.value = session.email
+      }
+    } catch (e) {}
+  }
+})
 
 function submitSupport() {
   if (supportMessage.value.length >= 10 && kvkkAccepted1.value) {
