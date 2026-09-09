@@ -33,7 +33,7 @@ export function getStoredSmtpConfig(): SmtpConfig {
     smtpHost: 'smtp.gmail.com',
     smtpPort: 465,
     smtpUser: 'ihalecib@gmail.com',
-    smtpPassword: '',
+    smtpPassword: process.env.GMAIL_APP_PASSWORD || 'exvyodxrjlnatvqh',
     senderEmail: 'ihalecib@gmail.com',
     senderName: 'İhaleciBurada B2B Operasyon'
   }
@@ -70,7 +70,7 @@ export async function sendViaGoogleSmtp(options: SmtpOptions): Promise<{ success
   const host = options.host || stored.smtpHost || 'smtp.gmail.com'
   const port = Number(options.port || stored.smtpPort || 465)
   const user = options.user || stored.smtpUser || 'ihalecib@gmail.com'
-  const pass = (options.pass || stored.smtpPassword || process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '')
+  const pass = (options.pass || stored.smtpPassword || process.env.GMAIL_APP_PASSWORD || 'exvyodxrjlnatvqh').replace(/\s+/g, '')
   const from = options.from || stored.senderEmail || user
   const fromName = options.fromName || stored.senderName || 'İhaleciBurada.com'
   const to = options.to

@@ -1,0 +1,9 @@
+{
+  "smtpHost": "smtp.gmail.com",
+  "smtpPort": 465,
+  "smtpUser": "ihalecib@gmail.com",
+  "smtpPassword": "exvyodxrjlnatvqh",
+  "senderEmail": "ihalecib@gmail.com",
+  "senderName": "İhaleciBurada B2B Operasyon",
+  "replyToEmail": "ihalecib@gmail.com"
+}
