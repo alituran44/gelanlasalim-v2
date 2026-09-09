@@ -257,7 +257,7 @@ async function acceptTeklif(teklif: any, ilan: any) {
     matchingSubmitted.yetkili = userSession.name || 'Alıcı Yetkilisi'
     matchingSubmitted.telefon = userSession.phone || '0850 840 86 95'
     matchingSubmitted.eposta = userSession.email || 'ihalecib@gmail.com'
-    matchingSubmitted.vergiDairesi = userSession.taxOffice ? `${userSession.taxOffice} / ${userSession.taxNo || ''}` : 'Çanakkale V.D. / 4700854210'
+    matchingSubmitted.vergiDairesi = userSession.taxOffice ? `${userSession.taxOffice} / ${userSession.taxNo || ''}` : 'Çanakkale V.D. / 8680383525'
     matchingSubmitted.adres = userSession.address || 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale'
   }
 
@@ -962,7 +962,7 @@ function submitReview() {
         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
           <div>
             <span class="text-[10px] text-slate-400 font-bold block">Vergi No / Daire</span>
-            <strong class="text-slate-800">{{ selectedTeklifForDocs?.vergiDairesi || 'Karesi V.D. 4700854210' }}</strong>
+            <strong class="text-slate-800">{{ selectedTeklifForDocs?.vergiDairesi || 'Karesi V.D. 8680383525' }}</strong>
           </div>
           <div>
             <span class="text-[10px] text-slate-400 font-bold block">Yetkili</span>

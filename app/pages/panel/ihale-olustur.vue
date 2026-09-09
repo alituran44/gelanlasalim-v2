@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { locale } from '~/composables/useLocale'
-import { AlertCircle, Calendar, UploadCloud, FileText, FileSpreadsheet, X, Camera, Eye, Trash2, Plus, ShieldAlert, FileCheck, CheckCircle2, FilePlus2, ArrowLeft } from 'lucide-vue-next'
+import { AlertCircle, Calendar, UploadCloud, FileText, FileSpreadsheet, FileCode, X, Camera, Eye, Trash2, Plus, ShieldAlert, FileCheck, CheckCircle2, FilePlus2, ArrowLeft } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
@@ -376,8 +376,10 @@ function handleFileChange(event: Event) {
     const file = target.files[i]
     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2) + ' MB'
     let fileType = 'word'
-    if (file.name.endsWith('.pdf')) fileType = 'pdf'
-    else if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) fileType = 'excel'
+    const lowerName = file.name.toLowerCase()
+    if (lowerName.endsWith('.pdf')) fileType = 'pdf'
+    else if (lowerName.endsWith('.xls') || lowerName.endsWith('.xlsx')) fileType = 'excel'
+    else if (lowerName.endsWith('.dwg') || lowerName.endsWith('.dxf')) fileType = 'cad'
 
     form.value.files.push({
       name: file.name,
@@ -631,7 +633,7 @@ async function handleSubmit() {
           budget: budgetVal,
           direction: turLabel,
           taxIdType: (session.taxNo && session.taxNo.length === 11) ? 'TCKN' : 'VKN',
-          taxId: session.taxNo || session.tcKimlik || '4700854210',
+          taxId: session.taxNo || session.tcKimlik || '8680383525',
           taxOffice: session.taxOffice || 'Kayıtlı Vergi Dairesi',
           companyOrFullName: ownerCompany || ownerName,
           ownerEmail,
@@ -1284,14 +1286,14 @@ function resetFormAndCreateNew() {
         >
           <UploadCloud :size="28" class="text-slate-400 group-hover:text-blue-600 transition" />
           <div>
-            <span class="text-xs font-bold text-slate-700">Teknik veya İdari Şartname Dosyası Yükleyin</span>
-            <p class="text-[10px] text-slate-400 mt-1">PDF, Word veya Excel (Maks: 10MB)</p>
+            <span class="text-xs font-bold text-slate-700">Teknik Şartname & DWG Çizim / Proje Dosyası Yükleyin</span>
+            <p class="text-[10px] text-slate-400 mt-1">PDF, Word, Excel veya DWG / DXF (AutoCAD Çizim) · Mobil ve Masaüstü Uyumlu (Maks: 50MB)</p>
           </div>
           <input 
             ref="fileInputRef"
             type="file"
             multiple
-            accept=".pdf,.doc,.docx,.xls,.xlsx"
+            accept=".dwg,.dxf,.pdf,.doc,.docx,.xls,.xlsx,application/acad,application/x-acad,application/autocad_dwg,image/vnd.dwg,application/dwg,application/x-dwg,application/octet-stream,*/*"
             class="hidden"
             @change="handleFileChange"
           />
@@ -1309,12 +1311,16 @@ function resetFormAndCreateNew() {
             <!-- File Icon type -->
             <FileText v-if="file.type === 'pdf'" :size="16" class="text-red-500 shrink-0" />
             <FileSpreadsheet v-else-if="file.type === 'excel'" :size="16" class="text-emerald-600 shrink-0" />
+            <FileCode v-else-if="file.type === 'cad'" :size="16" class="text-amber-500 shrink-0" />
             <FileText v-else :size="16" class="text-blue-600 shrink-0" />
 
             <!-- File details -->
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-700 truncate pr-4">{{ file.name }}</span>
+                <div class="flex items-center gap-1.5 truncate pr-4">
+                  <span class="text-xs font-bold text-slate-700 truncate">{{ file.name }}</span>
+                  <span v-if="file.type === 'cad'" class="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20 shrink-0">AutoCAD DWG</span>
+                </div>
                 <span class="text-[10px] text-slate-400 shrink-0 font-medium">{{ file.size }}</span>
               </div>
               

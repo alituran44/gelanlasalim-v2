@@ -110,7 +110,7 @@ export function addGibLog(item: Partial<GibAuditLogItem>): GibAuditLogItem {
     budget: item.budget || 'Teklif Usulü',
     direction: item.direction || 'Kapalı Zarf Usulü',
     taxIdType: item.taxIdType || (item.taxId && item.taxId.length === 11 ? 'TCKN' : 'VKN'),
-    taxId: item.taxId || '4700854210',
+    taxId: item.taxId || '8680383525',
     taxOffice: item.taxOffice || 'Kayıtlı Vergi Dairesi',
     companyOrFullName: item.companyOrFullName || 'Doğrulanmış Kullanıcı',
     ownerEmail: item.ownerEmail || 'ihalecib@gmail.com',
@@ -155,7 +155,7 @@ export function generateBtransXml(logs: GibAuditLogItem[], period = '2026-09'): 
   xml += `<btrans:BTRANS_ILAN_BILDIRIMI xmlns:btrans="http://www.gib.gov.tr/btrans/vuk538" tebligNo="538_595_VUK" donem="${period}" olusturmaTarihi="${nowStr}">\n`
   xml += `  <btrans:AraciHizmetSaglayici>\n`
   xml += `    <btrans:Unvan>İHALECİBURADA B2B BİLGİ TEKNOLOJİLERİ VE TİCARET A.Ş.</btrans:Unvan>\n`
-  xml += `    <btrans:VKN>4700854210</btrans:VKN>\n`
+  xml += `    <btrans:VKN>8680383525</btrans:VKN>\n`
   xml += `    <btrans:VergiDairesi>Çanakkale Vergi Dairesi</btrans:VergiDairesi>\n`
   xml += `    <btrans:WebAdresi>https://www.ihaleciburada.com</btrans:WebAdresi>\n`
   xml += `    <btrans:IletisimEposta>ihalecib@gmail.com</btrans:IletisimEposta>\n`

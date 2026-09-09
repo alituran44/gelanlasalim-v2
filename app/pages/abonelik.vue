@@ -217,7 +217,7 @@ onMounted(() => {
         transferName.value = fullName.trim()
         cardName.value = fullName.trim()
         billingCompanyTitle.value = userSession.value.companyName || (fullName.trim() ? fullName.trim() + ' Ticaret' : 'Örnek Sanayi ve Ticaret A.Ş.')
-        billingTaxNo.value = userSession.value.taxNumber || '4700854210'
+        billingTaxNo.value = userSession.value.taxNumber || '8680383525'
         billingTaxOffice.value = userSession.value.taxOffice || 'Çanakkale Vergi Dairesi'
         billingAddress.value = userSession.value.address || 'İsmetpaşa Mah. Büyük Hamam Sok. No:52/1'
         billingPhone.value = userSession.value.phone || '0850 840 86 95'
@@ -604,7 +604,7 @@ function completeCheckout() {
                     </div>
                     <div>
                       <label class="block text-[10px] font-bold text-slate-600 mb-0.5">VKN / TCKN *</label>
-                      <input v-model="billingTaxNo" type="text" placeholder="4700854210" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white font-mono focus:border-blue-600 focus:outline-none" required />
+                      <input v-model="billingTaxNo" type="text" placeholder="8680383525" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white font-mono focus:border-blue-600 focus:outline-none" required />
                     </div>
                   </div>
 

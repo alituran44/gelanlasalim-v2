@@ -207,7 +207,7 @@ ${tender?.aciklama || tender?.baslik || 'Teknik sartname esaslarina gore temin s
 - Dogrulama Hash: SHA-256-${tender?.id || 'CERT'}-VALID-SECURE
 - Belge Adi: ${fileName}
 
-IhaleciBurada Platform A.S. | GIB VKN: 4700854210
+IhaleciBurada Platform A.S. | GIB VKN: 8680383525
 ================================================================================`;
 
   const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
@@ -579,7 +579,7 @@ async function submitBid() {
     const myContact = userSession.value?.name || userSession.value?.firstName || 'Firma Yetkilisi'
     const myPhone = userSession.value.phone || '0850 840 86 95'
     const myEmail = userSession.value.email || 'ihalecib@gmail.com'
-    const myTax = userSession.value.taxOffice ? `${userSession.value.taxOffice} / ${userSession.value.taxNo || ''}` : 'Çanakkale V.D. 4700854210'
+    const myTax = userSession.value.taxOffice ? `${userSession.value.taxOffice} / ${userSession.value.taxNo || ''}` : 'Çanakkale V.D. 8680383525'
     const myAddress = userSession.value.faturaAdresi || 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale'
 
     const newSubmittedBid = {
@@ -2081,7 +2081,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
                 <div>
                   <div class="text-[10px] font-black uppercase text-blue-900 tracking-wider">T.C. ELEKTRONİK TİCARET VE B2B İHALE SİSTEMİ</div>
                   <div class="text-base font-black text-slate-900 tracking-tight">İHALECİBURADA RESMİ İHALE ŞARTNAMESİ</div>
-                  <div class="text-[10px] text-slate-500">GİB VKN: 4700854210</div>
+                  <div class="text-[10px] text-slate-500">GİB VKN: 8680383525</div>
                 </div>
               </div>
               <div class="text-right sm:border-l sm:pl-4 border-slate-200">

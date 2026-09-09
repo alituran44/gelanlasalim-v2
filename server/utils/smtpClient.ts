@@ -1,4 +1,4 @@
-import tls from 'node:tls'
+import nodemailer from 'nodemailer'
 import fs from 'node:fs'
 import path from 'node:path'
 
@@ -61,92 +61,33 @@ export function saveStoredSmtpConfig(config: Partial<SmtpConfig>): SmtpConfig {
 }
 
 /**
- * Native Node.js Zero-Dependency TLS SMTP Client for Google Mail / Gmail (smtp.gmail.com:465)
+ * Enterprise Production SMTP Client using Nodemailer with full Google Mail (Gmail) compatibility.
+ * Supports Gmail Service presets, Port 465 (Direct SSL) and Port 587 (STARTTLS).
  */
-export function sendViaGoogleSmtp(options: SmtpOptions): Promise<{ success: boolean; message: string; code?: string; timestamp?: string }> {
-  return new Promise((resolve) => {
-    const stored = getStoredSmtpConfig()
+export async function sendViaGoogleSmtp(options: SmtpOptions): Promise<{ success: boolean; message: string; code?: string; timestamp?: string }> {
+  const stored = getStoredSmtpConfig()
 
-    const host = options.host || stored.smtpHost || 'smtp.gmail.com'
-    const port = Number(options.port || stored.smtpPort || 465)
-    const user = options.user || stored.smtpUser || 'ihalecib@gmail.com'
-    const pass = (options.pass || stored.smtpPassword || '').replace(/\s+/g, '')
-    const from = options.from || stored.senderEmail || user
-    const fromName = options.fromName || stored.senderName || 'İhaleciBurada.com'
-    const to = options.to
-    const subject = options.subject
-    const bodyContent = options.html || options.text || ''
+  const host = options.host || stored.smtpHost || 'smtp.gmail.com'
+  const port = Number(options.port || stored.smtpPort || 465)
+  const user = options.user || stored.smtpUser || 'ihalecib@gmail.com'
+  const pass = (options.pass || stored.smtpPassword || process.env.GMAIL_APP_PASSWORD || '').replace(/\s+/g, '')
+  const from = options.from || stored.senderEmail || user
+  const fromName = options.fromName || stored.senderName || 'İhaleciBurada.com'
+  const to = options.to
+  const subject = options.subject
+  const rawBody = options.html || options.text || ''
 
-    if (!user || !pass) {
-      return resolve({
-        success: false,
-        code: 'MISSING_CREDENTIALS',
-        message: 'Google e-posta adresi veya 16 haneli Google Uygulama Şifresi girilmemiş. Lütfen Admin Paneli > E-Posta Merkezi sekmesinden şifrenizi kaydediniz.',
-        timestamp: new Date().toISOString()
-      })
+  if (!user || !pass) {
+    return {
+      success: false,
+      code: 'MISSING_CREDENTIALS',
+      message: 'Google e-posta adresi veya 16 haneli Google Uygulama Şifresi girilmemiş. Lütfen Admin Paneli > E-Posta Merkezi sekmesinden şifrenizi kaydediniz.',
+      timestamp: new Date().toISOString()
     }
+  }
 
-    const socket = tls.connect({ host, port, timeout: 12000 }, () => {})
-
-    let step = 0
-    let hasResolved = false
-
-    const finish = (result: { success: boolean; message: string; code?: string }) => {
-      if (!hasResolved) {
-        hasResolved = true
-        try {
-          socket.write('QUIT\r\n')
-          socket.end()
-        } catch (e) {}
-        resolve({
-          ...result,
-          timestamp: new Date().toISOString()
-        })
-      }
-    }
-
-    socket.on('data', (chunk) => {
-      const response = chunk.toString()
-
-      if (step === 0 && response.startsWith('220')) {
-        step = 1
-        socket.write('EHLO localhost\r\n')
-      } else if (step === 1 && response.startsWith('250')) {
-        step = 2
-        socket.write('AUTH LOGIN\r\n')
-      } else if (step === 2 && response.startsWith('334')) {
-        step = 3
-        const b64User = Buffer.from(user, 'utf-8').toString('base64')
-        socket.write(`${b64User}\r\n`)
-      } else if (step === 3 && response.startsWith('334')) {
-        step = 4
-        const b64Pass = Buffer.from(pass, 'utf-8').toString('base64')
-        socket.write(`${b64Pass}\r\n`)
-      } else if (step === 4) {
-        if (response.startsWith('235')) {
-          step = 5
-          socket.write(`MAIL FROM:<${from}>\r\n`)
-        } else {
-          return finish({
-            success: false,
-            code: 'AUTH_FAILED',
-            message: `Google Giriş Hatası: Kullanıcı adı veya uygulama şifresi kabul edilmedi (${response.trim()}). Lütfen Google Hesabınızdan 16 haneli Uygulama Şifresi oluşturup girdiğinizden emin olun.`
-          })
-        }
-      } else if (step === 5 && response.startsWith('250')) {
-        step = 6
-        socket.write(`RCPT TO:<${to}>\r\n`)
-      } else if (step === 6 && response.startsWith('250')) {
-        step = 7
-        socket.write('DATA\r\n')
-      } else if (step === 7 && response.startsWith('354')) {
-        step = 8
-        const dateStr = new Date().toUTCString()
-        const b64Subject = `=?UTF-8?B?${Buffer.from(subject, 'utf-8').toString('base64')}?=`
-        const b64FromName = `=?UTF-8?B?${Buffer.from(fromName, 'utf-8').toString('base64')}?=`
-        
-        // Wrap body in a beautiful, responsive HTML email shell
-        const htmlFormatted = bodyContent.includes('<html') ? bodyContent : `
+  // Wrap body in a beautiful, responsive HTML email shell if not already wrapped
+  const htmlFormatted = rawBody.includes('<html') ? rawBody : `
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -169,7 +110,7 @@ export function sendViaGoogleSmtp(options: SmtpOptions): Promise<{ success: bool
       <div style="font-size: 11px; color: #93c5fd; margin-top: 4px;">B2B Elektronik Satın Alma & Canlı Ters İhale Platformu</div>
     </div>
     <div class="content">
-${bodyContent}
+${rawBody}
     </div>
     <div class="button-wrap">
       <a href="https://www.ihaleciburada.com/panel" class="button">İşlemi İncele & Yönetim Paneline Git →</a>
@@ -182,52 +123,68 @@ ${bodyContent}
 </body>
 </html>`
 
-        const b64Body = Buffer.from(htmlFormatted, 'utf-8').toString('base64')
+  try {
+    const isGmailHost = host.toLowerCase().includes('gmail.com') || host.toLowerCase().includes('googlemail.com')
 
-        const mimeMsg = [
-          `Date: ${dateStr}`,
-          `From: ${b64FromName} <${from}>`,
-          `To: <${to}>`,
-          `Subject: ${b64Subject}`,
-          `MIME-Version: 1.0`,
-          `Content-Type: text/html; charset=UTF-8`,
-          `Content-Transfer-Encoding: base64`,
-          ``,
-          b64Body,
-          `.`
-        ].join('\r\n') + '\r\n'
+    const transportOptions: any = isGmailHost
+      ? {
+          service: 'gmail',
+          auth: {
+            user,
+            pass
+          },
+          tls: {
+            rejectUnauthorized: false
+          }
+        }
+      : {
+          host,
+          port,
+          secure: port === 465,
+          auth: {
+            user,
+            pass
+          },
+          tls: {
+            rejectUnauthorized: false
+          }
+        }
 
-        socket.write(mimeMsg)
-      } else if (step === 8 && response.startsWith('250')) {
-        return finish({
-          success: true,
-          code: 'SMTP_SENT',
-          message: `E-posta ${to} adresine Google SMTP (${host}:${port}) üzerinden başarıyla iletildi.`
-        })
-      } else if (response.startsWith('5') || response.startsWith('4')) {
-        return finish({
-          success: false,
-          code: 'SMTP_ERROR',
-          message: `Google SMTP Hatası: ${response.trim()}`
-        })
-      }
+    const transporter = nodemailer.createTransport(transportOptions)
+
+    const info = await transporter.sendMail({
+      from: `"${fromName}" <${from}>`,
+      to,
+      subject,
+      text: options.text || rawBody.replace(/<[^>]*>/g, ''),
+      html: htmlFormatted
     })
 
-    socket.on('error', (err) => {
-      finish({
-        success: false,
-        code: 'CONNECTION_ERROR',
-        message: `Google SMTP Sunucusuna bağlanılamadı: ${err.message}`
-      })
-    })
+    return {
+      success: true,
+      code: 'SMTP_SENT',
+      message: `E-posta ${to} adresine Google SMTP (${host}:${port}) üzerinden başarıyla iletildi. (ID: ${info.messageId})`,
+      timestamp: new Date().toISOString()
+    }
+  } catch (err: any) {
+    console.error('[SMTP Send Error]:', err)
+    const rawError = err?.message || String(err)
+    let code = 'SMTP_ERROR'
+    let friendlyMessage = rawError
 
-    socket.on('timeout', () => {
-      socket.destroy()
-      finish({
-        success: false,
-        code: 'TIMEOUT',
-        message: 'Google SMTP sunucusundan 12 saniye içinde yanıt alınamadı (Zaman aşımı).'
-      })
-    })
-  })
+    if (rawError.includes('535') || rawError.includes('Username and Password not accepted') || err?.code === 'EAUTH') {
+      code = 'AUTH_FAILED'
+      friendlyMessage = 'Google Giriş Hatası (535 Bad Credentials): Normal hesap şifreniz Google tarafından reddedildi. Google Güvenlik kuralları gereği https://myaccount.google.com/apppasswords adresinden "İhaleciBurada" adıyla 16 haneli bir "Uygulama Şifresi" üretip onu girmelisiniz.'
+    } else if (rawError.includes('ECONNREFUSED') || rawError.includes('ETIMEDOUT') || rawError.includes('ENOTFOUND')) {
+      code = 'CONNECTION_ERROR'
+      friendlyMessage = `Google SMTP Sunucusuna (${host}:${port}) bağlanılamadı. Lütfen sunucu bağlantısını ve port ayarını (465 veya 587) kontrol ediniz.`
+    }
+
+    return {
+      success: false,
+      code,
+      message: friendlyMessage,
+      timestamp: new Date().toISOString()
+    }
+  }
 }

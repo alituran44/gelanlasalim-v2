@@ -1863,7 +1863,7 @@ function saveProfile() {
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
               <div>
                 <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">T.C. Kimlik / VKN (Vergi No)</label>
-                <input v-model="companyForm.taxNo" type="text" placeholder="4700854210" class="w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono bg-white outline-none" style="border-color: #E2E8F0;" />
+                <input v-model="companyForm.taxNo" type="text" placeholder="8680383525" class="w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono bg-white outline-none" style="border-color: #E2E8F0;" />
               </div>
               <div>
                 <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Bağlı Vergi Dairesi</label>

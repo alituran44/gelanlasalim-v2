@@ -247,7 +247,7 @@ export function useDeepSeekAgent() {
    */
   function inspectKycDocumentsAutonomous(kycItem: any) {
     const compName = kycItem.companyName || kycItem.name || 'Kurumsal Şirket'
-    const taxNo = kycItem.taxNo || '4700854210'
+    const taxNo = kycItem.taxNo || '8680383525'
     const taxOffice = kycItem.taxOffice || 'Karesi V.D.'
 
     return {

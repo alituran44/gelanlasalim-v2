@@ -57,6 +57,7 @@ import {
   Landmark,
   Compass,
   UploadCloud,
+  FileCode,
   FileCheck
 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
@@ -86,6 +87,8 @@ const readMode = ref<'goster' | 'gizle'>('goster')
 
 // ==================== ARAMA VE FİLTRE DURUMLARI ====================
 const selectedCategory = ref<string>('Tümü')
+const selectedSubCategory = ref<string>('Tümü')
+const expandedCategoryId = ref<number | null>(null)
 const selectedCity = ref<string>('Tümü')
 const selectedAuthority = ref<string>('Tümü')
 const selectedSector = ref<string>('Tümü')
@@ -196,6 +199,70 @@ const allCategoriesList = [
   { id: 39, name: 'Menkul Mallar - Araç Satışı ve Hurda İhaleleri', short: 'Araç & Hurda Satışı', icon: '🚗' },
   { id: 40, name: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri', short: 'Gayrimenkul & Arsa', icon: '🏢' }
 ]
+
+// ==================== 1.1 ALT KATEGORİLER HARİTASI (TÜM 40 KATEGORİ İÇİN EKSİKSİZ) ====================
+const categorySubcategoriesMap: Record<number, string[]> = {
+  1: ['Bina Yapımı & Taahhüt', 'Yol, Köprü & Viyadük', 'Hafriyat, Kazı & Dolgu', 'Çelik Konstrüksiyon', 'Prefabrik Yapılar', 'İzolasyon & Su Yalıtımı', 'Boya, Sıva & Alçıpan', 'Tadilat & Restorasyon'],
+  2: ['Tıbbi Cihaz & Sarf Malzemeleri', 'İlaç & Serum Tedariği', 'Laboratuvar Kitleri & Reaktifler', 'Ortopedi & Protez Ürünleri', 'Kişisel Koruyucu Hijyen', 'Dental & Diş Sağlığı'],
+  3: ['Kuru Gıda, Bakliyat & Hububat', 'Et, Tavuk & Şarküteri', 'Süt & Süt Ürünleri', 'Sebze & Meyve Toptan', 'Un, Şeker & Yağ', 'Konserve, Salça & Sos', 'Dondurulmuş Gıda'],
+  4: ['Görüntüleme & Radyoloji (MR, CT)', 'Hasta Başı Monitörleri', 'Cerrahi El Aletleri', 'Sterilizatör & Otoklav', 'Hastane Yatağı & Mobilyası', 'Laboratuvar Analiz Cihazları'],
+  5: ['Kanalizasyon & Altyapı Boruları', 'İçme Suyu Şebekesi', 'Doğalgaz Boru & Tesisatı', 'Sıhhi Tesisat & Armatürler', 'Pompalar & Hidroforlar', 'Vana, Sayaç & Ek Parçalar'],
+  6: ['Güneş Enerjisi (GES) Sistemleri', 'Trafo, Pano & Kablolar', 'Sokak & Çevre Aydınlatma', 'İç Mekan LED Aydınlatma', 'Jeneratör & Kesintisiz Güç Kaynağı', 'Elektrik Tesisat Malzemeleri'],
+  7: ['Motorin & Mazot Alımı', 'Kurşunsuz Benzin', 'Madeni Yağ & Gres', 'LPG & Otogaz', 'Gazyağı & Özel Yakıtlar'],
+  8: ['CNC & Takım Tezgahları', 'Kompresör & Basınçlı Hava', 'Konveyör & Bant Sistemleri', 'Endüstriyel Motor & Redüktör', 'Paketleme & Dolum Makineleri', 'Hidrolik & Pnömatik Aksam'],
+  9: ['Özel Yazılım Geliştirme', 'ERP & Kurumsal Yazılımlar', 'Bulut Sunucu & Hosting', 'Siber Güvenlik & Firewall', 'Veri Tabanı & Yedekleme', 'Mobil Uygulama Geliştirme'],
+  10: ['Şehirlerarası Karayolu Nakliye', 'Personel & Öğrenci Servis Taşımacılığı', 'Denizyolu & Konteyner', 'Havayolu Kargo', 'Depolama & Lojistik Dağıtım', 'Soğuk Hava Zinciri Taşımacılığı'],
+  11: ['Ofis & Büro Mobilyaları', 'Mutfak Ekipmanları & Endüstriyel Mutfak', 'Beyaz Eşya & Ankastre', 'Otel & Yurt Mobilyaları', 'Depo & Arşiv Raf Sistemleri', 'Züccaciye & Porselen'],
+  12: ['Civata, Somun & Bağlantı Elemanları', 'El Aletleri & Güç Aletleri', 'Sac, Profil & Demir Ürünleri', 'Plastik Hammadde & Boru', 'Kilit, Menteşe & Nalburiye', 'Boya Tabancası & Aşındırıcılar'],
+  13: ['Yangın Algılama & İhbar Panelleri', 'Otomatik Sprinkler Söndürme', 'Yangın Tüpleri & Dolapları', 'Davlumbaz Söndürme Sistemleri', 'Gazlı Söndürme (FM200)', 'Yangın Kapıları & Kaçış Donanımları'],
+  14: ['Endüstriyel Kimyasallar', 'Tarımsal Gübreler & Zirai İlaç', 'Su Şartlandırma Kimyasalları', 'Yüzey Temizleme Kimyasalları', 'Havuz Kimyasalları', 'Laboratuvar Saf Kimyasalları'],
+  15: ['Ofset & Dijital Matbaa Baskısı', 'Orijinal & Muadil Toner/Kartuş', 'Koli, Karton Kutu & Ambalaj', 'Kağıt, Fotokopi & Kırtasiye', 'Etiket, Barkod & Ribon', 'Promosyon Ürünleri & Baskı'],
+  16: ['Park & Bahçe Kent Mobilyaları', 'Prefabrik Şantiye & Ofis Yapıları', 'Alüminyum & PVC Doğrama', 'Otobüs Durağı & Kamelya', 'Çocuk Oyun Parkı Ekipmanları', 'Güvenlik Kulübeleri'],
+  17: ['Statik & Betonarme Projelendirme', 'Mimari Tasarım & 3D Modelleme', 'Zemin Etüdü & Geoteknik', 'Mekanik & Elektrik Proje Çizimi', 'Harita & İmar Danışmanlığı', 'Teknik Müşavirlik & Kontrollük'],
+  18: ['Sondaj & Kuyu Açma Hizmetleri', 'Mermer, Granit & Taş Ocakları', 'Maden Çıkarma & Kırma-Eleme', 'Kömür & Linyit Ocak İşletmeciliği', 'Jeolojik Etüt & Rezerv Tespiti'],
+  19: ['Yolcu & Yük Asansörleri', 'Yürüyen Merdiven & Bantlar', 'Bina Otomasyon Sistemleri (BMS)', 'Otomatik Kapı & Bariyer Sistemleri', 'Asansör Periyodik Bakım & Revizyon'],
+  20: ['Merkezi VRF/VRV Klima Sistemleri', 'Chiller Soğutma Grupları', 'Havalandırma Kanalları & Menfezler', 'Kazan Dairesi & Isıtma Tesisatı', 'Hassas Kontrollü Sistem Klimaları', 'Rooftop Paket Klimalar'],
+  21: ['Savunma Elektroniği & İletişim', 'Deniz Araçları & Bot Bakım-Onarım', 'Havacılık Yedek Parça & Sarf', 'Askeri Üniforma & Taktik Donanım', 'Balistik Koruyucu Yelek & Kask'],
+  22: ['Binek & Ticari Araç Alımı', 'İş Makinesi Alım & Kiralama', 'Otomotiv Orijinal Yedek Parça', 'Kamyon, Çekici & Dorse', 'Lastik, Akü & Filtre Setleri', 'Araç Periyodik Bakım & Onarım'],
+  23: [
+    'Düğün, Nişan, Kına & Nikah Organizasyonu',
+    'Evlilik Teklifi & Doğum Günü Organizasyonları',
+    'Toplu Yeme-İçme & İftar Organizasyonları',
+    'Konser, Festival, Sahne & Müzik Organizasyonları',
+    'Hac ve Umre Organizasyon Paketleri',
+    'Kültür, Doğa & Gezi Turları',
+    'Kurumsal Kongre, Seminer, Fuar & Lansman',
+    'Catering & Açık Büfe İkram Hizmetleri',
+    'Ses, Işık, Truss & Sahne Sistemleri Kiralama'
+  ],
+  24: ['Işıklı & Işıksız Tabela', 'Billboard & Raket Reklam Üniteleri', 'Totem & Yönlendirme Panoları', 'Araç Giydirme & Cephe Kaplama', 'Fuar Standı Tasarım & Kurulumu', 'Dijital LED Ekran Sistemleri'],
+  25: ['Peyzaj Proje & Uygulama', 'Otomatik Bahçe Sulama Sistemleri', 'Ağaçlandırma & Fidan Dikimi', 'Rulo Çim & Çimlendirme', 'Mevsimlik Çiçek & Süs Bitkileri', 'Budama, Çim Biçme & Bakım'],
+  26: ['Büyükbaş & Küçükbaş Besi Yemi', 'Kanatlı Yemi & Premiks', 'Veteriner Aşı & İlaçları', 'Sağım & Ahır Ekipmanları', 'Canlı Hayvan Alım & Satımı', 'Suni Tohumlama Malzemeleri'],
+  27: ['Bronz, Mermer & Fiber Heykel Yapımı', 'Mimari & Şehir Maketleri', 'Müzik Aletleri & Ses Teçhizatı', 'Geleneksel El Sanatları & Rölyef', 'Dekoratif Sanat Panoları'],
+  28: ['Sanayi & Isınma Kömürü', 'Pelet & Briket Yakıtı', 'Odun & Odun Briketi', 'Kok Kömürü & Biyokütle Yakıt'],
+  29: ['Toplu Tabldot Yemek Üretimi', 'Özel Davet & Protokol İkramları', 'Kumanya & Sandviç Paketleri', 'Kantin & Kafeterya İşletmeciliği', 'Hastane & Okul Diyet Menüleri'],
+  30: ['Masaüstü PC & İş İstasyonları', 'Dizüstü Bilgisayar (Laptop)', 'Sunucu (Server) & Storage', 'Ağ Anahtarı (Switch) & Router', 'Lazer Yazıcı & Fotokopi Makineleri', 'Ölçü Aletleri (Multimetre, Osiloskop)'],
+  31: ['IP Güvenlik Kamerası & NVR Sistemleri', 'Araç Takip & Filo Yönetimi GPS', 'SCADA & Uzaktan İzleme Telemetri', 'Telsiz & Trunk Haberleşme', 'Plaka Tanıma (PTS) Sistemleri'],
+  32: [
+    'Bina, Tesis & Ofis Temizliği',
+    'Hastane & Sağlık Kuruluşu Hijyen Temizliği',
+    'Okul, Üniversite & Yurt Temizliği',
+    'Endüstriyel Fabrika & Atölye Temizliği',
+    'Dış Cephe & Cam Temizleme',
+    'Haşere & Kemirgen İlaçlama (Pest Kontrol)',
+    'Dezenfeksiyon & Sterilizasyon Hizmetleri',
+    'Geri Dönüşüm, Hurda & Atık Yönetimi',
+    'Çöp Toplama & Katı Atık Nakliyesi'
+  ],
+  33: ['Kurumsal İş Kıyafetleri & Tulum', 'Güvenlik Görevlisi Üniformaları', 'Spor Kıyafetleri & Formalar', 'İş Ayakkabısı, Çizme & Çelik Burun', 'Termal İçlik & Yağmurluk', 'Spor Malzemeleri & Saha Donanımları'],
+  34: ['Baret, Emniyet Kemeri & Yaşam Hattı', 'Koruyucu Gözlük & Kulaklık', 'Solunum Maskeleri (FFP2/FFP3/Gaz)', 'Yanmaz & Antistatik İş Elbiseleri', 'İlk Yardım & Acil Müdahale Dolapları', 'İSG Uyarı & İkaz Levhaları'],
+  35: ['Silahlı & Silahsız Özel Güvenlik', 'Tesis & Şantiye Bekçilik Hizmeti', 'VIP Yakın Koruma & Refakat', 'Etkinlik & Konser Güvenliği', 'X-Ray & Kapı Dedektörü Operatörlüğü'],
+  36: ['Yeminli Tercüme & Çeviri Hizmetleri', 'Kurumsal Personel Eğitimleri', 'Piyasa Araştırması & Anket Hizmeti', 'Mesleki Yeterlilik & Sertifikasyon', 'Akademik & Stratejik Raporlama'],
+  37: ['Sosyal Tesis & Misafirhane İşletmeciliği', 'Danışma, Karşılama & Resepsiyon Hizmeti', 'Bina & Site Yönetim Hizmetleri', 'Bordrolama & Destek Personeli Temini', 'Posta, Evrak Dağıtım & Kurye'],
+  38: ['Filo Kasko & Trafik Sigortası', 'Yangın & Deprem (DASK) Sigortası', 'Grup Sağlık & Ferdi Kaza Sigortası', 'Mali Müşavirlik & Bağımsız Denetim', 'Hukuki Danışmanlık & Tahkim'],
+  39: ['Hacizli & Kurum İkinci El Araç Satışı', 'Hurda Demir, Bakır & Alüminyum', 'Hurda Kağıt, Karton & Plastik', 'Kullanım Dışı Elektronik Hurda (E-Atık)', 'Ekonomik Ömrünü Tamamlamış Taşıt Satışı'],
+  40: ['Kamu & Özel Mülk Arsa Satışları', 'Ticari İşyeri & Dükkan İhaleleri', 'Kantin & Çay Ocağı Kiralama', 'Hizmet Binası & Depo Kiralama', 'Otopark İşletmesi Kiralama İhaleleri']
+}
 
 // ==================== 2. TÜRKİYE 81 İL LİSTESİ ====================
 const all81Cities = [
@@ -826,16 +893,50 @@ function getCompanyCount(compName: string) {
   return allTenders.value.filter((t: any) => (t.ownerCompany || '').toLowerCase().includes(q)).length
 }
 
-// Sol panel kategori listesi
+// Sol panel kategori listesi (Alt kategorilerle birlikte)
 const filteredCategoryTree = computed(() => {
   const list = allCategoriesList.map(c => ({
     ...c,
+    subcategories: categorySubcategoriesMap[c.id] || [],
     count: getCategoryCount(c)
   }))
   if (!leftSidebarSearch.value.trim()) return list
   const q = leftSidebarSearch.value.toLocaleLowerCase('tr').trim()
-  return list.filter(c => c.name.toLocaleLowerCase('tr').includes(q) || c.short.toLocaleLowerCase('tr').includes(q))
+  return list.filter(c => {
+    const nameMatch = c.name.toLocaleLowerCase('tr').includes(q) || c.short.toLocaleLowerCase('tr').includes(q)
+    const subMatch = (c.subcategories || []).some((s: string) => s.toLocaleLowerCase('tr').includes(q))
+    return nameMatch || subMatch
+  })
 })
+
+function toggleCategoryExpand(cat: any) {
+  if (expandedCategoryId.value === cat.id) {
+    expandedCategoryId.value = null
+  } else {
+    expandedCategoryId.value = cat.id
+    selectedCategory.value = cat.name
+    selectedSubCategory.value = 'Tümü'
+    currentPage.value = 1
+  }
+}
+
+function selectSubCategory(cat: any, subName: string) {
+  selectedCategory.value = cat.name
+  selectedSubCategory.value = subName
+  currentPage.value = 1
+}
+
+function getSubCategoryCount(catName: string, subName: string) {
+  if (!subName || subName === 'Tümü') return getCategoryCount(catName)
+  const normSub = subName.trim().toLowerCase()
+  return allTenders.value.filter((t: any) => {
+    const tSub = (t.subCategory || '').trim().toLowerCase()
+    const tCat = (t.kategori || '').trim().toLowerCase()
+    const tTitle = (t.baslik || '').trim().toLowerCase()
+    const tDesc = (t.aciklama || '').trim().toLowerCase()
+    return tSub === normSub || tSub.includes(normSub) || tTitle.includes(normSub) || tCat.includes(normSub) || tDesc.includes(normSub)
+  }).length
+}
 
 // Sol panel şehir listesi (81 İl)
 const filteredCitiesTree = computed(() => {
@@ -910,6 +1011,18 @@ const filteredTendersList = computed(() => {
       const tCat = (t.kategori || '').trim().toLowerCase()
       const sel = selectedCategory.value.trim().toLowerCase()
       return tCat === sel || tCat.startsWith(sel) || sel.startsWith(tCat)
+    })
+  }
+
+  // Alt Kategori Filtresi
+  if (selectedSubCategory.value && selectedSubCategory.value !== 'Tümü') {
+    const subQ = selectedSubCategory.value.trim().toLowerCase()
+    list = list.filter((t: any) => {
+      const tSub = (t.subCategory || '').trim().toLowerCase()
+      const tCat = (t.kategori || '').trim().toLowerCase()
+      const tTitle = (t.baslik || '').trim().toLowerCase()
+      const tDesc = (t.aciklama || '').trim().toLowerCase()
+      return tSub === subQ || tSub.includes(subQ) || tTitle.includes(subQ) || tDesc.includes(subQ)
     })
   }
 
@@ -1016,6 +1129,8 @@ const paginatedTenders = computed(() => {
 
 function resetAllFilters() {
   selectedCategory.value = 'Tümü'
+  selectedSubCategory.value = 'Tümü'
+  expandedCategoryId.value = null
   selectedCity.value = 'Tümü'
   selectedAuthority.value = 'Tümü'
   selectedSector.value = 'Tümü'
@@ -1159,7 +1274,7 @@ ${tender?.aciklama || tender?.baslik || 'Teknik sartname esaslarina gore temin s
 - Dogrulama Hash: SHA-256-${tender?.id || 'CERT'}-VALID-SECURE
 - Belge Adi: ${fileName}
 
-IhaleciBurada Platform A.S. | GIB VKN: 4700854210
+IhaleciBurada Platform A.S. | GIB VKN: 8680383525
 ================================================================================`;
 
   const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
@@ -1279,8 +1394,10 @@ function handleQuoteFileChange(event: Event) {
     const file = target.files[i]
     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2) + ' MB'
     let fileType = 'pdf'
-    if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) fileType = 'excel'
-    else if (file.name.endsWith('.doc') || file.name.endsWith('.docx')) fileType = 'word'
+    const lower = file.name.toLowerCase()
+    if (lower.endsWith('.xls') || lower.endsWith('.xlsx')) fileType = 'excel'
+    else if (lower.endsWith('.doc') || lower.endsWith('.docx')) fileType = 'word'
+    else if (lower.endsWith('.dwg') || lower.endsWith('.dxf')) fileType = 'cad'
 
     const reader = new FileReader()
     reader.onload = (e) => {
@@ -1740,7 +1857,7 @@ onMounted(() => {
               <template v-if="activeLeftTab === 'kategoriler'">
                 <button
                   type="button"
-                  @click="selectedCategory = 'Tümü'; currentPage = 1"
+                  @click="selectedCategory = 'Tümü'; selectedSubCategory = 'Tümü'; expandedCategoryId = null; currentPage = 1"
                   class="w-full p-2 rounded-lg text-left flex items-center justify-between transition cursor-pointer text-xs group"
                   :class="selectedCategory === 'Tümü' ? 'bg-[#0084B4] text-white font-black shadow-2xs' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-700 font-semibold'"
                 >
@@ -1756,25 +1873,80 @@ onMounted(() => {
                   </span>
                 </button>
 
-                <button
+                <div 
                   v-for="cat in filteredCategoryTree"
                   :key="cat.id"
-                  type="button"
-                  @click="selectedCategory = cat.name; currentPage = 1"
-                  class="w-full p-2 rounded-lg text-left flex items-center justify-between transition cursor-pointer text-xs group"
-                  :class="selectedCategory === cat.name ? 'bg-[#0084B4] text-white font-black shadow-2xs' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-700 font-semibold'"
+                  class="rounded-lg overflow-hidden transition-all duration-200"
                 >
-                  <div class="flex items-center gap-2 truncate pr-1">
-                    <span class="shrink-0">{{ cat.icon }}</span>
-                    <span class="truncate text-[11px]">{{ cat.name }}</span>
-                  </div>
-                  <span 
-                    class="px-1.5 py-0.2 rounded text-[10px] font-mono shrink-0"
-                    :class="selectedCategory === cat.name ? 'bg-white/20 text-white font-bold' : 'bg-slate-100 text-slate-500 font-medium group-hover:bg-blue-50 group-hover:text-blue-700'"
+                  <!-- Kategori Başlığı & Genişletme Çubuğu -->
+                  <div
+                    @click="toggleCategoryExpand(cat)"
+                    class="w-full p-2 rounded-lg text-left flex items-center justify-between transition cursor-pointer text-xs group"
+                    :class="selectedCategory === cat.name ? 'bg-[#0084B4] text-white font-black shadow-2xs' : 'text-slate-700 hover:bg-slate-50 hover:text-blue-700 font-semibold'"
                   >
-                    {{ cat.count }}
-                  </span>
-                </button>
+                    <div class="flex items-center gap-2 truncate pr-1">
+                      <span class="shrink-0">{{ cat.icon }}</span>
+                      <span class="truncate text-[11px]">{{ cat.name }}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 shrink-0">
+                      <span 
+                        class="px-1.5 py-0.2 rounded text-[10px] font-mono shrink-0"
+                        :class="selectedCategory === cat.name ? 'bg-white/20 text-white font-bold' : 'bg-slate-100 text-slate-500 font-medium group-hover:bg-blue-50 group-hover:text-blue-700'"
+                      >
+                        {{ cat.count }}
+                      </span>
+                      <ChevronDown 
+                        :size="13" 
+                        class="transition-transform duration-200"
+                        :class="[
+                          expandedCategoryId === cat.id ? 'rotate-180' : '',
+                          selectedCategory === cat.name ? 'text-white' : 'text-slate-400 group-hover:text-blue-700'
+                        ]"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- 📂 AÇILIR ALT KATEGORİLER LİSTESİ -->
+                  <div 
+                    v-if="expandedCategoryId === cat.id && cat.subcategories && cat.subcategories.length > 0"
+                    class="ml-3 pl-2.5 py-1 my-1 border-l-2 border-[#0084B4]/40 space-y-0.5 animate-fadeIn"
+                  >
+                    <!-- Tüm Alt Kategoriler seçeneği -->
+                    <button
+                      type="button"
+                      @click.stop="selectSubCategory(cat, 'Tümü')"
+                      class="w-full px-2 py-1.5 rounded-md text-left flex items-center justify-between text-[11px] transition cursor-pointer"
+                      :class="selectedCategory === cat.name && selectedSubCategory === 'Tümü' ? 'bg-blue-50 text-blue-700 font-bold' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 font-medium'"
+                    >
+                      <span class="truncate flex items-center gap-1.5">
+                        <span class="text-[10px] opacity-60">🔹</span>
+                        <span>Tümü (Tüm İlanlar)</span>
+                      </span>
+                      <span class="text-[9px] font-mono opacity-70">({{ cat.count }})</span>
+                    </button>
+
+                    <!-- Tekil Alt Kategoriler -->
+                    <button
+                      v-for="sub in cat.subcategories"
+                      :key="sub"
+                      type="button"
+                      @click.stop="selectSubCategory(cat, sub)"
+                      class="w-full px-2 py-1.5 rounded-md text-left flex items-center justify-between text-[11px] transition cursor-pointer"
+                      :class="selectedCategory === cat.name && selectedSubCategory === sub ? 'bg-[#0084B4] text-white font-bold shadow-2xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 font-medium'"
+                    >
+                      <span class="truncate flex items-center gap-1.5">
+                        <span class="text-[10px]" :class="selectedCategory === cat.name && selectedSubCategory === sub ? 'text-white' : 'text-slate-400'">•</span>
+                        <span class="truncate">{{ sub }}</span>
+                      </span>
+                      <span 
+                        class="text-[9px] font-mono px-1 py-0.2 rounded"
+                        :class="selectedCategory === cat.name && selectedSubCategory === sub ? 'bg-white/20 text-white' : 'text-slate-400'"
+                      >
+                        {{ getSubCategoryCount(cat.name, sub) }}
+                      </span>
+                    </button>
+                  </div>
+                </div>
               
     <!-- ========================================================================= -->
     <!-- 📑 RESMİ ŞARTNAME PDF AÇICI & DOKÜMAN GÖRÜNTÜLEYİCİ MODAL -->
@@ -1845,7 +2017,7 @@ onMounted(() => {
                 <div>
                   <div class="text-[10px] font-black uppercase text-blue-900 tracking-wider">T.C. ELEKTRONİK TİCARET VE B2B İHALE SİSTEMİ</div>
                   <div class="text-base font-black text-slate-900 tracking-tight">İHALECİBURADA RESMİ İHALE ŞARTNAMESİ</div>
-                  <div class="text-[10px] text-slate-500">GİB VKN: 4700854210</div>
+                  <div class="text-[10px] text-slate-500">GİB VKN: 8680383525</div>
                 </div>
               </div>
               <div class="text-right sm:border-l sm:pl-4 border-slate-200">
@@ -2342,7 +2514,13 @@ onMounted(() => {
               <!-- Kategori Rozeti -->
               <span v-if="selectedCategory !== 'Tümü'" class="px-2 py-0.5 rounded-full bg-sky-100 text-[#0084B4] border border-sky-200 font-bold text-[11px] flex items-center gap-1">
                 <span>Kategori: {{ selectedCategory }}</span>
-                <button type="button" @click="selectedCategory = 'Tümü'" class="hover:text-red-600 cursor-pointer"><X :size="11" /></button>
+                <button type="button" @click="selectedCategory = 'Tümü'; selectedSubCategory = 'Tümü'" class="hover:text-red-600 cursor-pointer"><X :size="11" /></button>
+              </span>
+
+              <!-- Alt Kategori Rozeti -->
+              <span v-if="selectedSubCategory !== 'Tümü'" class="px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-200 font-bold text-[11px] flex items-center gap-1">
+                <span>Alt Kategori: {{ selectedSubCategory }}</span>
+                <button type="button" @click="selectedSubCategory = 'Tümü'" class="hover:text-red-600 cursor-pointer"><X :size="11" /></button>
               </span>
 
               <!-- Şehir Rozeti -->
@@ -2805,7 +2983,7 @@ onMounted(() => {
                   <div>
                     <div class="text-[10px] font-black uppercase text-blue-900 tracking-wider">T.C. ELEKTRONİK TİCARET VE B2B İHALE SİSTEMİ</div>
                     <div class="text-base font-black text-slate-900 tracking-tight">İHALECİBURADA RESMİ İHALE ŞARTNAMESİ</div>
-                    <div class="text-[10px] text-slate-500">GİB VKN: 4700854210</div>
+                    <div class="text-[10px] text-slate-500">GİB VKN: 8680383525</div>
                   </div>
                 </div>
                 <div class="text-right sm:border-l sm:pl-4 border-slate-200">
@@ -3264,7 +3442,7 @@ onMounted(() => {
               ref="quoteFileInputRef"
               type="file" 
               multiple 
-              accept=".pdf,.xls,.xlsx,.doc,.docx" 
+              accept=".dwg,.dxf,.pdf,.xls,.xlsx,.doc,.docx,application/acad,application/x-acad,application/autocad_dwg,image/vnd.dwg,application/dwg,application/x-dwg,application/octet-stream,*/*" 
               class="hidden" 
               @change="handleQuoteFileChange"
             />
@@ -3275,8 +3453,8 @@ onMounted(() => {
               class="border-2 border-dashed border-slate-300 hover:border-blue-500 bg-slate-50/70 hover:bg-blue-50/30 p-3 rounded-2xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1 group"
             >
               <UploadCloud :size="20" class="text-slate-400 group-hover:text-blue-600 transition-colors" />
-              <span class="text-xs font-bold text-slate-700 group-hover:text-blue-700">Teklif Cetveli / Şartname Dosyası Ekle</span>
-              <span class="text-[10px] text-slate-400">PDF, Excel (.xlsx, .xls) veya Word</span>
+              <span class="text-xs font-bold text-slate-700 group-hover:text-blue-700">Teklif Cetveli, Şartname & DWG Çizim Ekle</span>
+              <span class="text-[10px] text-slate-400">PDF, Excel, Word veya DWG / DXF (AutoCAD Çizim)</span>
             </div>
 
             <!-- Yüklenen Dosyalar Listesi -->
@@ -3287,8 +3465,10 @@ onMounted(() => {
                 class="flex items-center justify-between p-2 rounded-xl bg-slate-100 border border-slate-200 text-xs"
               >
                 <div class="flex items-center gap-2 truncate pr-2">
-                  <FileText :size="14" class="text-blue-600 shrink-0" />
+                  <FileCode v-if="f.type === 'cad'" :size="14" class="text-amber-500 shrink-0" />
+                  <FileText v-else :size="14" class="text-blue-600 shrink-0" />
                   <span class="truncate font-bold text-slate-800">{{ f.name }}</span>
+                  <span v-if="f.type === 'cad'" class="text-[9px] px-1 py-0.2 rounded font-mono font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20 shrink-0">DWG</span>
                   <span class="text-[10px] text-slate-400 font-mono shrink-0">({{ f.size }})</span>
                 </div>
                 <button type="button" @click="removeQuoteFile(idx)" class="text-red-500 hover:text-red-700 p-1 cursor-pointer">

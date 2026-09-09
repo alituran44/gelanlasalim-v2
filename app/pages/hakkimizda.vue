@@ -62,7 +62,7 @@ definePageMeta({
 
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
             <span class="text-[10px] font-black text-slate-400 uppercase">Vergi Dairesi & No (VKN)</span>
-            <p class="font-bold text-slate-900 font-mono">Çanakkale V.D. / 4700854210</p>
+            <p class="font-bold text-slate-900 font-mono">Çanakkale V.D. / 8680383525</p>
           </div>
 
           

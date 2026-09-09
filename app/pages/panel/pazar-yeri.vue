@@ -257,7 +257,7 @@ async function submitBid() {
   const myContact = userSession.value?.name || userSession.value?.firstName || 'Firma Yetkilisi'
   const myPhone = userSession.value?.phone || '0850 840 86 95'
   const myEmail = userSession.value?.email || 'ihalecib@gmail.com'
-  const myTax = userSession.value?.taxOffice ? `${userSession.value?.taxOffice} / ${userSession.value?.taxNo || ''}` : 'Çanakkale V.D. / 4700854210'
+  const myTax = userSession.value?.taxOffice ? `${userSession.value?.taxOffice} / ${userSession.value?.taxNo || ''}` : 'Çanakkale V.D. / 8680383525'
   const myAddress = userSession.value?.faturaAdresi || 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale'
 
   const newSubmittedBid = {
