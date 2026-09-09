@@ -94,7 +94,7 @@ onMounted(() => {
           <span class="hidden sm:flex items-center gap-1">
             <span class="text-indigo-600">✉</span>
             <strong>E-posta:</strong> 
-            <a href="mailto:destek@ihaleciburada.com" class="text-blue-700 hover:underline">destek@ihaleciburada.com</a>
+            <a href="mailto:ihalecib@gmail.com" class="text-blue-700 hover:underline">ihalecib@gmail.com</a>
           </span>
         </div>
         <div>

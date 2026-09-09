@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-const SCHEMA_VERSION = 'v2026_09_10_production_v2'
+const SCHEMA_VERSION = 'v2026_09_10_production_v3'
 
 // Clean state for platform - zero dummy / mock data
 export const DEFAULT_CMS_DATA = {
@@ -631,7 +631,7 @@ export const DEFAULT_CMS_DATA = {
 ] as any[],
   contact: {
     address: 'İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye',
-    email: 'destek@ihaleciburada.com',
+    email: 'ihalecib@gmail.com',
     workHoursWeekdays: 'Pazartesi - Cuma: 09:00 - 18:00',
     workHoursSaturday: 'Cumartesi: 10:00 - 14:00'
   },
@@ -1025,7 +1025,7 @@ export const DEFAULT_CMS_DATA = {
     announcementTicker: '⚡ Tüm alıcı ve tedarikçi firmalarımıza ilk 1 ay boyunca %100 ücretsiz kurumsal deneme paketi!',
     googleAnalyticsId: 'G-IHALECIBURADA2026',
     supportPhone: '0850 840 86 95',
-    supportEmail: 'destek@ihaleciburada.com',
+    supportEmail: 'ihalecib@gmail.com',
     primaryCurrency: 'TRY (₺)',
     allowGuestBrowsing: true,
     enableEmailAlerts: true

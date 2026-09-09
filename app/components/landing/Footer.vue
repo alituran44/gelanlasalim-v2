@@ -234,9 +234,9 @@ const legalLinks = [
                 <Phone :size="13" />
                 <span>0850 840 86 95</span>
               </a>
-              <a href="mailto:destek@ihaleciburada.com" class="flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition-colors">
+              <a href="mailto:ihalecib@gmail.com" class="flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition-colors">
                 <Mail :size="13" />
-                <span>destek@ihaleciburada.com</span>
+                <span>ihalecib@gmail.com</span>
               </a>
             </div>
           </div>

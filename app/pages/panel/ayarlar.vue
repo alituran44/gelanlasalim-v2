@@ -917,7 +917,7 @@ async function trigger2FaToggle() {
 }
 
 async function send2FaEmailOtp() {
-  const targetEmail = profileForm.value.email || userSession.value?.email || 'destek@ihaleciburada.com'
+  const targetEmail = profileForm.value.email || userSession.value?.email || 'ihalecib@gmail.com'
   isSending2FaEmail.value = true
   const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString()
   twoFaOtpInput.value = generatedOtp
@@ -3631,7 +3631,7 @@ function saveProfile() {
                   <span class="text-slate-400">Durum:</span>
                   <span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100" v-if="companyForm.is2FaEnabled">Etkin</span>
                   <span class="text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100" v-else>Devre Dışı</span>
-                  <span class="text-slate-500">Aktif/Kayıtlı e-posta: <strong>{{ profileForm.email || userSession?.email || 'destek@ihaleciburada.com' }}</strong></span>
+                  <span class="text-slate-500">Aktif/Kayıtlı e-posta: <strong>{{ profileForm.email || userSession?.email || 'ihalecib@gmail.com' }}</strong></span>
                 </div>
                 <button type="button" @click="trigger2FaToggle" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-xs transition">
                   {{ companyForm.is2FaEnabled ? 'Devre Dışı Bırak' : '2FA Etkinleştir' }}

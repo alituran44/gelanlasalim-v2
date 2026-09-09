@@ -121,7 +121,7 @@ function printDocument() {
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">Resmi E-Posta</span>
-              <strong class="text-slate-900">destek@ihaleciburada.com</strong>
+              <strong class="text-slate-900">ihalecib@gmail.com</strong>
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">KEP Adresi</span>
@@ -518,7 +518,7 @@ function printDocument() {
                   <p><strong>Merkez Adresi:</strong> İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</p>
                   <p><strong>Vergi Dairesi & No:</strong> Çanakkale Vergi Dairesi / VKN: 9560161511</p>
                   <p><strong>Ticaret Sicil No:</strong> Çanakkale Ticaret Sicil Müdürlüğü - 14520</p>
-                  <p><strong>Telefon / Müşteri Destek:</strong> 0850 840 86 95 | <strong>E-Posta:</strong> destek@ihaleciburada.com</p>
+                  <p><strong>Telefon / Müşteri Destek:</strong> 0850 840 86 95 | <strong>E-Posta:</strong> ihalecib@gmail.com</p>
                   <p><strong>KEP Adresi:</strong> hasanhuseyin.yildirim.17@hs01.kep.tr | <strong>Web Sitesi:</strong> https://ihaleciburada.com</p>
                 </div>
               </section>
