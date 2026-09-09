@@ -66,8 +66,8 @@ definePageMeta({
           </div>
 
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
-            <span class="text-[10px] font-black text-slate-400 uppercase">Ticaret Sicil Numarası</span>
-            <p class="font-bold text-slate-900 font-mono">Çanakkale Ticaret Sicil Müdürlüğü - 14520</p>
+            <span class="text-[10px] font-black text-slate-400 uppercase">Faaliyet Alanı</span>
+            <p class="font-bold text-slate-900">B2B İhale ve Tedarik Platformu</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">

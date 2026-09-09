@@ -225,7 +225,6 @@ const legalLinks = [
               <span class="text-blue-400 block font-semibold text-[11px]">İhaleciBurada Ticari İşletmesi</span>
               <span class="text-slate-400 block">İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale</span>
               <span class="text-slate-400 block font-mono text-[10px]">Çanakkale V.D. / VKN: 9560161511</span>
-              <span class="text-slate-400 block font-mono text-[10px]">Çanakkale Ticaret Sicil No: 14520</span>
               <span class="text-slate-400 block font-mono text-[10px]">KEP: hasanhuseyin.yildirim.17@hs01.kep.tr</span>
             </p>
             

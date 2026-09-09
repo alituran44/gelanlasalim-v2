@@ -999,7 +999,7 @@ function syncLiveState() {
         taxNo: usr.taxNo || '9560161511',
         taxOffice: usr.taxOffice || 'Çanakkale Vergi Dairesi',
         mersis: usr.mersis || '',
-        sicilNo: usr.sicilNo || '14520',
+        sicilNo: usr.sicilNo || '',
         sectors: usr.sectors || 'Tedarik, Satın Alma, Ticaret',
         authProvider: usr.authProvider || 'google',
         uploadedDocs: verificationDocs?.files?.map((f: any) => f.name) || ['Vergi Levhası', 'İmza Sirküleri', 'Faaliyet Belgesi'],
@@ -5166,7 +5166,7 @@ function removeSubmittedBid(index: number) {
                 </tr>
                 <tr class="border-b border-slate-800">
                   <td class="p-2 font-bold bg-slate-100 border-r border-slate-800 text-slate-700">TİCARET SİCİL NO / MERSİS</td>
-                  <td class="p-2 font-mono text-slate-800">Sicil No: {{ previewingDoc.kyc.sicilNo || '14520' }} • MERSİS: {{ previewingDoc.kyc.mersis || '0' + previewingDoc.kyc.taxNo + '00001' }}</td>
+                  <td class="p-2 font-mono text-slate-800">{{ previewingDoc.kyc.sicilNo ? ('Sicil No: ' + previewingDoc.kyc.sicilNo + ' • ') : '' }}MERSİS: {{ previewingDoc.kyc.mersis || '0' + previewingDoc.kyc.taxNo + '00001' }}</td>
                 </tr>
                 <tr class="border-b border-slate-800">
                   <td class="p-2 font-bold bg-slate-100 border-r border-slate-800 text-slate-700">İŞE BAŞLAMA TARİHİ</td>
@@ -5302,7 +5302,7 @@ function removeSubmittedBid(index: number) {
                 ÇANAKKALE TİCARET SİCİLİ MÜDÜRLÜĞÜ'NDEN İLAN
               </div>
               <div class="text-xs space-y-1 font-mono bg-slate-50 p-3 rounded-lg border border-slate-200">
-                <div><strong>Ticaret Sicil No:</strong> 14520</div>
+                <div><strong>Ticaret Sicil No:</strong> {{ previewingDoc.kyc.sicilNo || '-' }}</div>
                 <div><strong>Ticaret Unvanı:</strong> {{ previewingDoc.kyc.companyName }}</div>
                 <div><strong>MERSİS No:</strong> {{ previewingDoc.kyc.mersis || '0436-2466-5040-0001' }}</div>
                 <div><strong>Sermaye:</strong> 2.500.000,00 Türk Lirası (Tamamı Ödenmiştir)</div>
@@ -5338,7 +5338,7 @@ function removeSubmittedBid(index: number) {
                 </tr>
                 <tr class="border-b border-slate-800">
                   <td class="p-2.5 font-bold bg-slate-100 border-r border-slate-800">ODA SİCİL NUMARASI</td>
-                  <td class="p-2.5 font-mono font-bold">{{ previewingDoc.kyc.sicilNo || '14520' }}</td>
+                  <td class="p-2.5 font-mono font-bold">{{ previewingDoc.kyc.sicilNo || '-' }}</td>
                 </tr>
                 <tr class="border-b border-slate-800">
                   <td class="p-2.5 font-bold bg-slate-100 border-r border-slate-800">VERGİ NO & DAİRESİ</td>

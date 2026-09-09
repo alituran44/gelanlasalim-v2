@@ -1875,7 +1875,7 @@ function saveProfile() {
               </div>
               <div>
                 <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Ticaret Sicil No</label>
-                <input v-model="companyForm.sicilNo" type="text" placeholder="14520" class="w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono bg-white outline-none" style="border-color: #E2E8F0;" />
+                <input v-model="companyForm.sicilNo" type="text" placeholder="Varsa Ticaret Sicil No" class="w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono bg-white outline-none" style="border-color: #E2E8F0;" />
               </div>
             </div>
 
@@ -2317,7 +2317,7 @@ function saveProfile() {
                 <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">
                   TİCARET SİCİL NO / ODA KAYIT NO
                 </label>
-                <input v-model="companyForm.sicilNo" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="Örn: 14520 / Çanakkale TSO" />
+                <input v-model="companyForm.sicilNo" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs outline-none focus:border-blue-500 bg-white text-slate-800" style="border-color: #E2E8F0;" placeholder="Varsa Sicil / Oda Kayıt No" />
               </div>
 
               <!-- İrtibat Yetkilisi -->

@@ -208,7 +208,7 @@ ${tender?.aciklama || tender?.baslik || 'Teknik sartname esaslarina gore temin s
 - Dogrulama Hash: SHA-256-${tender?.id || 'CERT'}-VALID-SECURE
 - Belge Adi: ${fileName}
 
-Hasan Hüseyin Yıldırım (İhaleciBurada) | GIB VKN: 9560161511 | Çanakkale TSM - 14520
+Hasan Hüseyin Yıldırım (İhaleciBurada) | GIB VKN: 9560161511
 ================================================================================`;
 
   const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
