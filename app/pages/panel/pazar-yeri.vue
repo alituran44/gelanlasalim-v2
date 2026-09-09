@@ -24,6 +24,7 @@ import {
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
+import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_METHODS } from '~/utils/taxonomy'
 
 definePageMeta({
   layout: "dashboard"
@@ -95,37 +96,9 @@ const allTenders = computed(() => {
   return cmsData.value?.dashboard?.tenders || []
 })
 
-const categories = [
-  'Tümü',
-  'Organizasyon ve Etkinlik',
-  'Turizm, Hac-Umre ve Gezi Turları',
-  'İnşaat ve Yapı',
-  'Sanayi ve Makine',
-  'Lojistik ve Taşımacılık',
-  'Ambalaj ve Kağıt',
-  'Bilgisayar ve Teknoloji',
-  'Gıda ve Hizmet',
-  'Enerji ve Altyapı'
-]
-
-const methods = [
-  'Tümü',
-  'Sabit Paket & Kontenjan',
-  'Açık İhale',
-  'Kapalı Zarf',
-  'Doğrudan Temin'
-]
-
-const cities = [
-  'Tümü',
-  'İstanbul',
-  'Ankara',
-  'İzmir',
-  'Bursa',
-  'Kocaeli',
-  'Gaziantep',
-  'Adana'
-]
+const categories = computed(() => ['Tümü', ...ALL_40_CATEGORIES.map(c => c.name)])
+const methods = TENDER_METHODS
+const cities = computed(() => ['Tümü', ...ALL_81_CITIES])
 
 const filteredTenders = computed(() => {
   const q = searchQuery.value.trim().toLowerCase()

@@ -24,7 +24,7 @@ export default defineNuxtConfig({
     public: {
       siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://www.ihaleciburada.com',
       gaId: process.env.NUXT_PUBLIC_GA_ID || '', // Google Analytics 4 ID (e.g. G-XXXXXXXXXX)
-      googleSiteVerification: process.env.NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'google-site-verification-token',
+      googleSiteVerification: process.env.NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '',
     }
   },
 
@@ -78,14 +78,13 @@ export default defineNuxtConfig({
           name: 'description',
           content: 'İhaleciBurada.com ile kurumsal satın alma taleplerinizi yayınlayın, onaylı tedarikçilerden en rekabetçi teklifleri anında toplayın ve güvenle ticaret yapın.'
         },
-        { name: 'author', content: 'İhaleciBurada Bilişim ve Tedarik A.Ş.' },
+        { name: 'author', content: 'Hasan Hüseyin Yıldırım - İhaleciBurada' },
         { name: 'theme-color', content: '#0F223D' },
         { name: 'robots', content: 'index, follow' },
-        // Google Search Console Doğrulama Meta Etiketi
-        {
+        ...(process.env.NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION ? [{
           name: 'google-site-verification',
-          content: process.env.NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION || 'google-site-verification-token'
-        },
+          content: process.env.NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION
+        }] : []),
         { property: 'og:type', content: 'website' },
         { property: 'og:locale', content: 'tr_TR' },
         { property: 'og:title', content: 'İhaleciBurada.com — Kurumsal B2B İhale ve Satın Alma Platformu' },

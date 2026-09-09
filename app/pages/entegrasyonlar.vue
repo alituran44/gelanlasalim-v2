@@ -18,7 +18,7 @@ import {
 } from 'lucide-vue-next'
 
 definePageMeta({
-  layout: 'dashboard'
+  layout: 'public'
 })
 
 const route = useRoute()
@@ -135,7 +135,7 @@ function importExcelItems() {
 </script>
 
 <template>
-  <div class="space-y-6 text-left">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 text-left">
     <!-- Header -->
     <div class="flex flex-col gap-1.5">
       <h1 class="text-2xl font-black text-slate-800 tracking-tight">ERP & Sistem Entegrasyonları</h1>

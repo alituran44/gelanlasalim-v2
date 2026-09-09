@@ -12,6 +12,7 @@ import {
   Bell,
   HeartHandshake
 } from 'lucide-vue-next'
+import { ALL_81_CITIES, COMMON_TAX_OFFICES } from '~/utils/taxonomy'
 
 definePageMeta({
   layout: 'public' // Header & Footer matching public pages
@@ -54,13 +55,7 @@ const bildirimGenel = ref(true)
 
 // Static selections
 const companyTypes = ['Şahıs İşletmesi', 'Limited Şirket (LTD)', 'Anonim Şirket (A.Ş.)', 'Kolektif Şirket']
-const taxOffices = [
-  'Çanakkale Vergi Dairesi Müdürlüğü',
-  'İstanbul Büyük Mükellefler Vergi Dairesi',
-  'Ankara Kızılbey Vergi Dairesi',
-  'İzmir Kordon Vergi Dairesi',
-  'Balıkesir Karesi Vergi Dairesi'
-]
+const taxOffices = COMMON_TAX_OFFICES
 const roles = ['Yönetici', 'Satın Alma Sorumlusu', 'Tedarik Yöneticisi', 'Finans Direktörü']
 const sectorsList = [
   'Elektrik & Elektronik',
@@ -358,13 +353,17 @@ function saveAllAndRedirect() {
           <!-- Vergi Dairesi -->
           <div>
             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Vergi Dairesi *</label>
-            <select 
+            <input 
               v-model="vergiDairesi" 
+              list="taxOfficesList"
+              type="text"
+              placeholder="Örn: Çanakkale Vergi Dairesi Müdürlüğü"
               class="w-full rounded-xl border px-4 py-3 text-xs bg-white outline-none transition"
               :class="step1Errors.vergiDairesi ? 'border-red-500' : 'border-slate-200 focus:border-blue-500'"
-            >
-              <option v-for="office in taxOffices" :key="office" :value="office">{{ office }}</option>
-            </select>
+            />
+            <datalist id="taxOfficesList">
+              <option v-for="office in taxOffices" :key="office" :value="office" />
+            </datalist>
             <p v-if="step1Errors.vergiDairesi" class="text-[10px] text-red-500 mt-1 font-semibold">{{ step1Errors.vergiDairesi }}</p>
           </div>
         </div>
@@ -374,27 +373,26 @@ function saveAllAndRedirect() {
           <h3 class="text-sm font-bold text-slate-800 border-b pb-2" style="border-color: #F1F5F9;">Fatura Adresi</h3>
 
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- İl -->
+            <!-- İl (81 İl) -->
             <div>
               <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">İl *</label>
               <select v-model="il" class="w-full rounded-xl border px-4 py-3 text-xs bg-white outline-none" :class="step1Errors.il ? 'border-red-500' : 'border-slate-200'">
-                <option value="Çanakkale">Çanakkale</option>
-                <option value="Balıkesir">Balıkesir</option>
-                <option value="İstanbul">İstanbul</option>
-                <option value="Ankara">Ankara</option>
+                <option value="" disabled>İl Seçiniz</option>
+                <option v-for="city in ALL_81_CITIES" :key="city" :value="city">{{ city }}</option>
               </select>
               <p v-if="step1Errors.il" class="text-[10px] text-red-500 mt-1 font-semibold">{{ step1Errors.il }}</p>
             </div>
 
-            <!-- İlçe -->
+            <!-- İlçe (Esnek Giriş) -->
             <div>
               <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">İlçe *</label>
-              <select v-model="ilce" class="w-full rounded-xl border px-4 py-3 text-xs bg-white outline-none" :class="step1Errors.ilce ? 'border-red-500' : 'border-slate-200'">
-                <option value="Merkez">Merkez</option>
-                <option value="Ayvalık">Ayvalık</option>
-                <option value="Çankaya">Çankaya</option>
-                <option value="Kadıköy">Kadıköy</option>
-              </select>
+              <input 
+                v-model="ilce" 
+                type="text"
+                placeholder="Örn: Merkez, Çankaya, Kadıköy, Nilüfer" 
+                class="w-full rounded-xl border px-4 py-3 text-xs bg-white outline-none" 
+                :class="step1Errors.ilce ? 'border-red-500' : 'border-slate-200'"
+              />
               <p v-if="step1Errors.ilce" class="text-[10px] text-red-500 mt-1 font-semibold">{{ step1Errors.ilce }}</p>
             </div>
           </div>

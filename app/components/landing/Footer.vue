@@ -50,7 +50,7 @@ const platformLinks = [
   { label: "B2B Pazar Yeri & İlanlar", to: "/pazar-yeri" },
   { label: "Yeni İhale Aç & Teklif Al", to: "/panel/ihale-olustur" },
   { label: "Canlı Tersine Eksiltme", to: "/panel/canli-etkinlikler" },
-  { label: "Escrow & Komisyon Oranları (%4)", to: "/sozlesmeler?tab=kullanim" },
+  { label: "Escrow & Komisyon Oranları (%0 Alıcı / %4 Başarı Bedeli)", to: "/sozlesmeler?tab=kullanim" },
   { label: "Üyelik & Lansman Planları", to: "/abonelik" },
   { label: "Firma Doğrulama (Mavi Rozet)", to: "/firma-dogrulama" },
   { label: "Video Rehberler & Akademi", to: "/videolar" },
@@ -163,13 +163,13 @@ const legalLinks = [
 
           <!-- Sosyal Medya İkonları -->
           <div class="flex items-center gap-2 pt-2">
-            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-blue-600 hover:border-blue-600 transition-all shadow-xs" title="LinkedIn">
+            <a href="https://www.linkedin.com/company/ihaleciburada" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-blue-600 hover:border-blue-600 transition-all shadow-xs" title="LinkedIn">
               <Linkedin :size="14" />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-pink-600 hover:border-pink-600 transition-all shadow-xs" title="Instagram">
+            <a href="https://www.instagram.com/ihaleciburada" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-pink-600 hover:border-pink-600 transition-all shadow-xs" title="Instagram">
               <Instagram :size="14" />
             </a>
-            <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-blue-700 hover:border-blue-700 transition-all shadow-xs" title="Facebook">
+            <a href="https://www.facebook.com/ihaleciburada" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-blue-700 hover:border-blue-700 transition-all shadow-xs" title="Facebook">
               <Facebook :size="14" />
             </a>
           </div>
@@ -221,9 +221,11 @@ const legalLinks = [
               <span>ŞİRKET KÜNYESİ</span>
             </h4>
             <p class="text-[11px] leading-relaxed text-slate-300 font-medium space-y-1">
-              <strong class="text-white block font-bold">İhaleciBurada Platform A.Ş.</strong>
+              <strong class="text-white block font-bold">Hasan Hüseyin Yıldırım</strong>
+              <span class="text-blue-400 block font-semibold text-[11px]">İhaleciBurada Ticari İşletmesi</span>
               <span class="text-slate-400 block">İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale</span>
               <span class="text-slate-400 block font-mono text-[10px]">Çanakkale V.D. / VKN: 9560161511</span>
+              <span class="text-slate-400 block font-mono text-[10px]">Çanakkale Ticaret Sicil No: 14520</span>
               <span class="text-slate-400 block font-mono text-[10px]">KEP: hasanhuseyin.yildirim.17@hs01.kep.tr</span>
             </p>
             
@@ -232,9 +234,9 @@ const legalLinks = [
                 <Phone :size="13" />
                 <span>0850 840 86 95</span>
               </a>
-              <a href="mailto:ihalecib@gmail.com" class="flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition-colors">
+              <a href="mailto:destek@ihaleciburada.com" class="flex items-center gap-1.5 text-blue-400 hover:text-blue-300 transition-colors">
                 <Mail :size="13" />
-                <span>ihalecib@gmail.com</span>
+                <span>destek@ihaleciburada.com</span>
               </a>
             </div>
           </div>

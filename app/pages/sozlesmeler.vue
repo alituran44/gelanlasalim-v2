@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { 
@@ -99,7 +99,7 @@ function printDocument() {
               <span>T.C. TİCARET BAKANLIĞI & VERGİ SİCİLİNE KAYITLI RESMİ ŞİRKET BİLGİLERİ</span>
             </div>
             <h2 class="text-lg font-black text-slate-900 tracking-tight">
-              İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş.
+              Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)
             </h2>
             <p class="text-xs text-slate-500 font-medium leading-relaxed">
               Platformumuz 6563 Sayılı Elektronik Ticaret Kanunu, 6102 Sayılı Türk Ticaret Kanunu ve 6493 Sayılı Ödeme Hizmetleri mevzuatına tam uyumlu olarak TCMB & BDDK lisanslı ödeme geçitleri (PayTR, iyzico) altyapısıyla faaliyet göstermektedir.
@@ -113,7 +113,7 @@ function printDocument() {
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">Ticaret Sicil No</span>
-              <strong class="text-slate-900 font-mono">14520</strong>
+              <strong class="text-slate-900 font-mono">Çanakkale TSM - 14520</strong>
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">Kurumsal Destek</span>
@@ -121,7 +121,7 @@ function printDocument() {
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">Resmi E-Posta</span>
-              <strong class="text-slate-900">ihalecib@gmail.com</strong>
+              <strong class="text-slate-900">destek@ihaleciburada.com</strong>
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">KEP Adresi</span>
@@ -159,7 +159,7 @@ function printDocument() {
             <strong class="text-white">3. Ayıp, Teslimat, Eksik İfa ve Cayma Sorumsuzluğu:</strong> İhale konusu malların/hizmetlerin ayıplı, kusurlu, eksik olması, taahhüt edilen sürede teslim edilmemesi, şartnameye uymaması veya ödemenin gecikmesi hallerinde Platform'un hiçbir doğrudan, dolaylı veya müteselsil hukuki veya cezai sorumluluğu bulunmamaktadır. Alıcı ve Satıcı arasındaki uyuşmazlıklarda yegane muhatap sözleşmenin taraflarıdır.
           </p>
           <p>
-            <strong class="text-white">4. Sabit %4 Escrow ve Platform Komisyonu:</strong> Platformumuzda <strong>sektör ayrımı yapılmaksızın tüm işlemler için sabit net %4 (+ KDV) Escrow Güvenli Havuz ve Platform Hizmet Bedeli</strong> uygulanır. Bu komisyon bedeli yalnızca ihale başarıyla tamamlanıp mal/hizmet teslimatı alıcı tarafından onaylandığında hakediş tutarından tahakkuk ettirilir. Kazanılamayan, sonuçsuz kalan veya iptal edilen ihalelerden hiçbir komisyon tahsil edilmez.
+            <strong class="text-white">4. Sabit %4 Escrow ve Platform Komisyonu:</strong> Platformumuzda <strong>alıcılar (ihale açan kurum ve şirketler) için %0 Komisyon (Sıfır Komisyon)</strong> uygulanır. İhaleyi kazanan satıcı/tedarikçiler için ise sektör ayrımı yapılmaksızın tüm işlemler için sabit net <strong>%4 (+ KDV) Escrow Güvenli Havuz ve Banka Transfer Altyapı Bedeli</strong> uygulanır. Bu komisyon bedeli yalnızca ihale başarıyla tamamlanıp mal/hizmet teslimatı alıcı tarafından onaylandığında hakediş tutarından tahakkuk ettirilir. Kazanılamayan, sonuçsuz kalan veya iptal edilen ihalelerden hiçbir komisyon tahsil edilmez (%0).
           </p>
         </div>
       </div>
@@ -287,11 +287,11 @@ function printDocument() {
                     Platform işleticisi Şirket, 6563 Sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun m. 2/1-d ve m. 9 uyarınca münhasıran <strong>Aracı Hizmet Sağlayıcı (Elektronik Pazar Yeri & Yer Sağlayıcı)</strong> konumundadır. Platform; Alıcı ile Tedarikçi arasında akdedilen hiçbir ticari sözleşmenin, siparişin veya edimin <strong>tarafı, kefili, garantörü veya vekili DEĞİLDİR</strong>.
                   </p>
                 </div>
-                <p>2.1. <strong>Sektör Ayrımı Olmaksızın Sabit %4 Escrow Komisyonu:</strong></p>
+                <p>2.1. <strong>Alıcılar İçin %0 Komisyon, Kazanan Tedarikçiler İçin Sabit %4 Escrow Bedeli:</strong></p>
                 <div class="p-3.5 bg-emerald-50 rounded-xl border border-emerald-300 text-emerald-950 space-y-1 text-xs">
-                  <p class="font-bold">✓ Sabit Oran Standartı: Tüm sektörlerde sabit %4 (+ KDV) Escrow ve Başarı Komisyonu uygulanır.</p>
+                  <p class="font-bold">✓ Şeffaf Oran Standardı: Alıcılar İçin %0 Komisyon; Kazanan Tedarikçiler İçin Teslimat Onayında Sabit %4 (+ KDV) Escrow Altyapı Bedeli.</p>
                   <p class="text-[11px] leading-relaxed">
-                    İhale ve satın alma işlemlerinde sektör ayrımı yapılmaksızın tüm kategorilerde aynı şeffaf oran geçerlidir. Bu komisyon yalnızca ihale kesinleşip mal kabul tutanağı onaylandığında hakediş tutarından tahsil edilir. İptal edilen, tamamlanmayan veya kazanılamayan ihalelerde hiçbir komisyon veya ücret alınmaz (%0).
+                    Platformumuzda ihale açan, teklif toplayan ve satın alma gerçekleştiren kurum ve işletmelerden kesinlikle komisyon tahsil edilmez (%0). İhaleyi kazanan satıcı/tedarikçilerden ise, sektör ayrımı yapılmaksızın tüm kategorilerde yalnızca mal veya hizmet teslimatı alıcı tarafından onaylanıp hakediş serbest bırakıldığında %4 (+ KDV) Escrow Güvenli Havuz ve Banka Transfer Altyapı Bedeli tahsil edilir. İptal edilen, tamamlanmayan veya kazanılamayan ihalelerde hiçbir ücret veya komisyon alınmaz.
                   </p>
                 </div>
                 <p>2.1. <strong>Sözleşmenin Tarafı Olmama:</strong> Şirket, Alıcı ile Tedarikçi arasında kurulan hiçbir alım-satım, eser, hizmet, taşeronluk veya tedarik sözleşmesinin tarafı, garantörü, kefili, temsilcisi, komisyoncusu veya acentesi DEĞİLDİR. Platform münhasıran dijital bir pazar yeri ve e-ihale zemini sunmaktadır.</p>
@@ -302,7 +302,7 @@ function printDocument() {
 
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — KURUMSAL ÜYELİK, TEMSİL YETKİSİ VE HESAP GÜVENLİĞİ</h3>
-                <p>3.1. Platform yalnızca Türk Ticaret Kanunu uyarınca tescil edilmiş tacirlerin ve tüzel kişilerin kullanımına açıktır. Bireysel tüketici (B2C) işlemlerine kapalıdır.</p>
+                <p>3.1. Platform; Türk Ticaret Kanunu ve Vergi Usul Kanunu uyarınca faaliyet gösteren sermaye şirketleri (A.Ş., Ltd. Şti.), şahıs işletmeleri/şahıs firmaları, serbest meslek erbabları ve yetkili ticari temsilcilerin kurumsal B2B satın alma ve ihale işlemlerine açıktır. 6502 sayılı Kanun kapsamındaki nihai tüketici (B2C) işlemlerine kapalıdır.</p>
                 <p>3.2. Üyelik hesabı açan kişi, temsil ettiği şirketi ilzam ve taahhüt altına sokmaya hukuken tam yetkili olduğunu (İmza Sirküleri veya şirket içi vekaletname ile yetkilendirildiğini) beyan ve taahhüt eder. Yetkisiz temsil durumunda hesabı açan ve işlem yapan gerçek kişi Türk Borçlar Kanunu Madde 46 uyarınca şahsen ve müteselsilen sorumludur.</p>
                 <p>3.3. Hesap kullanıcı adı, şifre, API anahtarı ve 2FA kodlarının güvenliği münhasıran Kullanıcı\'ya aittir. Kullanıcı hesabından yapılan tüm ihale açma, şartname yükleme, teklif verme ve onaylama işlemleri Kullanıcı\'yı kesin olarak bağlar.</p>
                 <p>3.4. Şirket, şüpheli gördüğü hesapları tek taraflı olarak askıya alma, ek resmi evrak talep etme ve kural ihlali durumunda üyeliği derhal sonlandırma yetkisine sahiptir.</p>
@@ -343,7 +343,7 @@ function printDocument() {
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 9 — DELİL SÖZLEŞMESİ (HMK 193), UYGULANACAK HUKUK VE YETKİLİ MAHKEME</h3>
                 <p>9.1. <strong>HMK 193 Delil Sözleşmesi:</strong> Taraflar arasında doğabilecek her türlü ticari ve hukuki uyuşmazlıkta Şirket\'in sunucu logları, veri tabanı kayıtları, zaman damgalı sistem günlükleri, e-posta yazışmaları ve sistem kayıtları Hukuk Muhakemeleri Kanunu Madde 193 uyarınca münhasır, bağlayıcı ve kesin delil teşkil eder.</p>
-                <p>9.2. <strong>Uygulanacak Hukuk ve Yetki:</strong> İşbu Sözleşme Türkiye Cumhuriyeti Kanunlarına tabidir. Uyuşmazlıkların çözümünde İstanbul ve Balıkesir Mahkemeleri ile İcra Daireleri münhasıran yetkilidir.</p>
+                <p>9.2. <strong>Uygulanacak Hukuk ve Yetki:</strong> İşbu Sözleşme Türkiye Cumhuriyeti Kanunlarına tabidir. Uyuşmazlıkların çözümünde Çanakkale Mahkemeleri ile İcra Daireleri münhasıran yetkilidir.</p>
               </section>
             </div>
           </article>
@@ -514,11 +514,11 @@ function printDocument() {
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — SATICI / HİZMET SAĞLAYICI BİLGİLERİ</h3>
                 <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 font-medium">
-                  <p><strong>Ticaret Unvanı:</strong> İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş.</p>
+                  <p><strong>Ticaret Unvanı:</strong> Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)</p>
                   <p><strong>Merkez Adresi:</strong> İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</p>
                   <p><strong>Vergi Dairesi & No:</strong> Çanakkale Vergi Dairesi / VKN: 9560161511</p>
-                  <p><strong>Ticaret Sicil No:</strong> 14520</p>
-                  <p><strong>Telefon / Müşteri Destek:</strong> 0850 840 86 95 | <strong>E-Posta:</strong> ihalecib@gmail.com</p>
+                  <p><strong>Ticaret Sicil No:</strong> Çanakkale Ticaret Sicil Müdürlüğü - 14520</p>
+                  <p><strong>Telefon / Müşteri Destek:</strong> 0850 840 86 95 | <strong>E-Posta:</strong> destek@ihaleciburada.com</p>
                   <p><strong>KEP Adresi:</strong> hasanhuseyin.yildirim.17@hs01.kep.tr | <strong>Web Sitesi:</strong> https://ihaleciburada.com</p>
                 </div>
               </section>
@@ -526,7 +526,7 @@ function printDocument() {
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — HİZMETİN TEMEL NİTELİKLERİ VE FİYATLANDIRMA</h3>
                 <p>2.1. <strong>Hizmet Türü ve Aracı Kurum Statüsü:</strong> Şirketimiz 6563 Sayılı Elektronik Ticaret Kanunu uyarınca Aracı Hizmet Sağlayıcı olup bulut tabanlı B2B e-ihale açma, teklif toplama, canlı tersine eksiltme (reverse auction), tedarikçi KYC doğrulama ve güvenli Escrow havuz entegrasyonu hizmeti sunmaktadır.</p>
-                <p>2.1.1. <strong>Sabit %4 Escrow ve Hizmet Bedeli Oranı:</strong> Platformumuzda sektör ayrımı yapılmaksızın tüm işlemler için sabit net %4 (+ KDV) Escrow Güvenli Havuz ve teknolojik pazar yeri işletim bedeli tahsil edilir. Bu bedel yalnızca ihale tamamlanıp mal/hizmet teslimatı alıcı tarafından onaylandığında hakedişten kesilir; kazanılamayan ihalelerden hiçbir ücret alınmaz.</p>
+                <p>2.1.1. <strong>Alıcılar İçin %0 Komisyon, Kazanan Tedarikçiler İçin Sabit %4 Escrow Bedeli:</strong> Platformumuzda alıcılar için ihale açma ve satın alma süreçleri %0 komisyondur (ücretsizdir). İhaleyi kazanan satıcı/tedarikçilerden ise, sektör ayrımı yapılmaksızın tüm kategorilerde yalnızca mal veya hizmet teslimatı alıcı tarafından onaylanıp hakediş serbest bırakıldığında sabit net %4 (+ KDV) Escrow Güvenli Havuz ve teknolojik altyapı bedeli tahsil edilir. İptal edilen, tamamlanmayan veya kazanılamayan ihalelerden hiçbir ücret veya komisyon kesilmez.</p>
                 <p>2.2. <strong>Paketler ve Toplam Fiyat (Tüm Vergiler Dahil):</strong></p>
                 <ul class="list-disc pl-5 space-y-1 text-slate-600">
                   <li><strong>1 Ay Lansman Deneme Paketi:</strong> 0,00 ₺ (Ücretsiz)</li>

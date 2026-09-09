@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
@@ -306,7 +306,7 @@ function completeCheckout() {
           {{ 'İhtiyacınıza Uygun Esnek Ödeme Planı Seçin' }}
         </h1>
         <p class="text-xs text-slate-500 font-medium leading-relaxed">
-          {{ 'Yurt içi (₺ TRY) veya yurt dışı ($ USD / € EUR) ödeme seçeneklerimizden firmanıza en uygun paketi tercih edin. Şeffaf fiyatlandırma, 0 komisyon.' }}
+          {{ 'Alıcılar için %0 komisyon ile sınırsız ihale açma, tedarikçiler için şeffaf paketler ve yalnızca ihale kazanıldığında net %4 Escrow altyapı güvencesi.' }}
         </p>
 
         <!-- MARKET REGION TOGGLE SWITCH -->
@@ -462,7 +462,7 @@ function completeCheckout() {
       <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
         <div>
           <h2 class="text-lg font-black text-slate-900">{{ 'Tüm Paketlerde Dahil Olan Standart Özellikler' }}</h2>
-          <p class="text-xs text-slate-500 mt-0.5">{{ 'Herhangi bir gizli ücret veya ek komisyon bulunmamaktadır.' }}</p>
+          <p class="text-xs text-slate-500 mt-0.5">{{ 'Alıcılar için her zaman %0 Komisyon; tedarikçiler için yalnızca teslimat onayında %4 Escrow altyapı bedeli.' }}</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-slate-100">
@@ -726,7 +726,7 @@ function completeCheckout() {
               <!-- Bank Transfer (Domestic) -->
               <div v-else-if="activePaymentChannel === 'bank_transfer'" class="space-y-3">
                 <div class="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs space-y-2">
-                  <div class="font-bold text-slate-800">Garanti BBVA TR — İhaleciBurada Bilişim A.Ş.</div>
+                  <div class="font-bold text-slate-800">Garanti BBVA TR — Hasan Hüseyin Yıldırım (İhaleciBurada)</div>
                   <div class="font-mono text-blue-700 font-bold select-all text-[11px]">TR91 0006 2000 0001 2345 6789 99</div>
                   <div class="text-[10px] text-slate-500">Açıklama alanına firmanızın vergi numarasını veya unvanını yazınız.</div>
                 </div>

@@ -1,4 +1,4 @@
-﻿<script setup lang="ts">
+<script setup lang="ts">
 import { 
   Building2, 
   ShieldCheck, 
@@ -43,8 +43,8 @@ definePageMeta({
       <div class="rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
           <div>
-            <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest block">T.C. TİCARET SİCİLİNE VE VERGİ DAİRESİNE KAYITLI RESMİ ŞİRKET</span>
-            <h2 class="text-xl font-black text-slate-900 mt-1">İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş.</h2>
+            <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest block">T.C. TİCARET SİCİLİNE VE VERGİ DAİRESİNE KAYITLI RESMİ İŞLETME</span>
+            <h2 class="text-xl font-black text-slate-900 mt-1">Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)</h2>
           </div>
           <div class="flex items-center gap-2">
             <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold">
@@ -57,7 +57,7 @@ definePageMeta({
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
             <span class="text-[10px] font-black text-slate-400 uppercase">Ticaret Unvanı</span>
-            <p class="font-bold text-slate-900">İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş.</p>
+            <p class="font-bold text-slate-900">Hasan Hüseyin Yıldırım</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
@@ -65,11 +65,9 @@ definePageMeta({
             <p class="font-bold text-slate-900 font-mono">Çanakkale V.D. / 9560161511</p>
           </div>
 
-          
-
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
             <span class="text-[10px] font-black text-slate-400 uppercase">Ticaret Sicil Numarası</span>
-            <p class="font-bold text-slate-900 font-mono">14520 (Çanakkale TSO)</p>
+            <p class="font-bold text-slate-900 font-mono">Çanakkale Ticaret Sicil Müdürlüğü - 14520</p>
           </div>
 
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
@@ -79,7 +77,7 @@ definePageMeta({
 
           <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-1">
             <span class="text-[10px] font-black text-slate-400 uppercase">Müşteri Destek & Çağrı</span>
-            <p class="font-bold text-blue-700">0850 840 86 95 / ihalecib@gmail.com</p>
+            <p class="font-bold text-blue-700">0850 840 86 95 / destek@ihaleciburada.com</p>
           </div>
         </div>
 

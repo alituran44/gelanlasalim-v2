@@ -35,6 +35,7 @@ import {
 } from 'lucide-vue-next'
 import { useCmsData, DEFAULT_CMS_DATA } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
+import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_TYPES, TENDER_METHODS } from '~/utils/taxonomy'
 
 definePageMeta({
   layout: "public"
@@ -207,7 +208,7 @@ ${tender?.aciklama || tender?.baslik || 'Teknik sartname esaslarina gore temin s
 - Dogrulama Hash: SHA-256-${tender?.id || 'CERT'}-VALID-SECURE
 - Belge Adi: ${fileName}
 
-IhaleciBurada Platform A.S. | GIB VKN: 9560161511
+Hasan Hüseyin Yıldırım (İhaleciBurada) | GIB VKN: 9560161511 | Çanakkale TSM - 14520
 ================================================================================`;
 
   const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
@@ -299,53 +300,10 @@ const allTenders = computed(() => {
 })
 
 
-const categories = [
-  'Tümü',
-  'Organizasyon, Düğün, Etkinlik ve Sahne Hizmetleri',
-  'Turizm, Hac - Umre ve Gezi Turları',
-  'İnşaat - Altyapı - Üstyapı - Yapım İşi',
-  'Mobilya - Beyaz Eşya - Mutfak - Züccaciye İhaleleri',
-  'Sanayi ve Makine Ekipmanları',
-  'Lojistik ve Nakliye Hizmetleri',
-  'Ambalaj, Koli ve Kağıt',
-  'Bilişim, Yazılım ve IT Ekipmanı',
-  'Enerji, Akaryakıt ve GES Tesisatı',
-  'Gıda, İkram ve Yemek Hizmetleri',
-  'Medikal ve Sağlık Sarf Malzemeleri'
-]
-
-const types = [
-  'Tümü',
-  'Mal Alımı',
-  'Hizmet Alımı',
-  'Yapım İşi',
-  'Danışmanlık'
-]
-
-const methods = [
-  'Tümü',
-  'Sabit Fiyatlı Paket & Kontenjan',
-  'Açık İhale',
-  'Açık Eksiltme',
-  'Pazarlık Usulü (21/f)',
-  'Doğrudan Temin',
-  'Belli İstekliler'
-]
-
-const cities = [
-  'Tümü',
-  'Ankara',
-  'İstanbul',
-  'İzmir',
-  'Bursa',
-  'Kocaeli',
-  'Çanakkale',
-  'Gaziantep',
-  'Adana',
-  'Tekirdağ',
-  'Antalya',
-  'Konya'
-]
+const categories = computed(() => ['Tümü', ...ALL_40_CATEGORIES.map(c => c.name)])
+const types = TENDER_TYPES
+const methods = TENDER_METHODS
+const cities = computed(() => ['Tümü', ...ALL_81_CITIES])
 
 const costRanges = [
   'Tümü',
