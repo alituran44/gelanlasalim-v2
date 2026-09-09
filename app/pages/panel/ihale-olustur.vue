@@ -19,21 +19,34 @@ const imageInputRef = ref<HTMLInputElement | null>(null)
 
 const isBudgetUnspecified = ref(true)
 const form = ref({
-  ihaleYonu: 'kapali_zarf', // 'kapali_zarf' (Doğrudan Teklif Alma) | 'eksiltme' (Azaltımlı / Alım) | 'artirma' (Artırımlı / Satış)
+  ihaleYonu: 'kapali_zarf', // 'kapali_zarf' | 'eksiltme' | 'artirma' | 'sabit_paket'
   baslik: '',
-  kategori: 'İnşaat ve Yapı',
+  kategori: 'Organizasyon ve Etkinlik',
   sure: '7 gün',
   minButce: '',
   maxButce: '',
   butce: '',
+  kisiBasiFiyat: '',
+  currency: 'USD',
+  hedefKontenjan: 40,
+  paketDahilHizmetler: [] as string[],
   aciklama: '',
   sehir: 'Balıkesir',
   teslimatAdresi: '',
   odemeYontemi: '🛡️ İhaleciBurada Güvenli Emanet Havuz (Escrow - Mal Kabul Onaylı)',
-    faturaTuru: '🏢 Kurumsal E-Fatura (%20 KDV)',
+  faturaTuru: '🏢 Kurumsal E-Fatura (%20 KDV)',
   images: [] as { url: string; name: string }[],
   files: [] as { name: string; size: string; progress: number; type: string }[]
 })
+
+function toggleFeature(feat: string) {
+  const idx = form.value.paketDahilHizmetler.indexOf(feat)
+  if (idx >= 0) {
+    form.value.paketDahilHizmetler.splice(idx, 1)
+  } else {
+    form.value.paketDahilHizmetler.push(feat)
+  }
+}
 
 onMounted(async () => {
   await fetchTrHolidays(2026)
@@ -161,8 +174,27 @@ const categoryMap = {
     'Bilgisayar Bakımı', 'Sunucu Bakımı'
   ],
   'Organizasyon ve Etkinlik': [
-    'Fuar Organizasyonu', 'Kongre', 'Seminer', 'Konser', 'Festival', 'Catering',
-    'Sahne Sistemleri', 'Ses ve Işık Sistemleri'
+    'Düğün, Nişan, Kına & Nikah Organizasyonu',
+    'Doğum Günü, Baby Shower & Özel Parti',
+    'Evlilik Teklifi & Sürpriz Organizasyonları',
+    'Toplu Yeme-İçme & İftar Organizasyonları',
+    'Konser, Festival, Sahne & Müzik Organizasyonları',
+    'Kurumsal Etkinlik, Kongre, Fuar & Lansman',
+    'Catering & Kokteyl Hizmetleri',
+    'Ses, Işık, Truss & Sahne Sistemleri',
+    'Mezuniyet, Balo & Özel Gün Kutlamaları',
+    'Sünnet & Dini Merasim Organizasyonları',
+    'Fuar Standı Kurulumu & Hostes Hizmetleri'
+  ],
+  'Turizm, Hac-Umre ve Gezi Turları': [
+    'Hac ve Umre Organizasyon Paketleri',
+    'Yurt Dışı Kültür & Turistik Tatil Turları',
+    'Yurt İçi Kültür & Doğa Gezileri',
+    'Günübirlik Turlar & Boğaz / Tekne Gezileri',
+    'Okul, Üniversite & Gençlik Turları',
+    'Kurumsal Bayi & Teşvik (Incentive) Gezileri',
+    'Otel, Konaklama & Havalimanı Transfer Hizmetleri',
+    'Vize Danışmanlığı & Seyahat Sigortası'
   ],
   'Diğer': [
     'Muhtelif Alımlar', 'Karma İhaleler', 'Özel Projeler', 'Açık Artırmalar', 'Tasfiye Satışları',
@@ -445,9 +477,11 @@ async function handleSubmit() {
 
     // 3. Unique ID
     const ihaleYonuVal = form.value.ihaleYonu || 'eksiltme'
-    const turLabel = ihaleYonuVal === 'artirma' 
-      ? 'Açık Artırma (Fiyat Artırımlı)' 
-      : (ihaleYonuVal === 'kapali_zarf' ? 'Kapalı Zarf Usulü' : 'Açık Eksiltme (Fiyat Azaltımlı)')
+    const turLabel = ihaleYonuVal === 'sabit_paket'
+      ? 'Sabit Fiyatlı Paket & Kontenjan Toplama'
+      : (ihaleYonuVal === 'artirma' 
+        ? 'Açık Artırma (Fiyat Artırımlı)' 
+        : (ihaleYonuVal === 'kapali_zarf' ? 'Kapalı Zarf Usulü' : 'Açık Eksiltme (Fiyat Azaltımlı)'))
 
     const newId = 'IHC-2026-' + Math.floor(100 + Math.random() * 900)
     createdId.value = newId
@@ -457,11 +491,21 @@ async function handleSubmit() {
     let primaryImg = form.value.images?.[0]?.url || 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
     const catLow = (form.value.kategori || '').toLowerCase()
     if (!form.value.images?.length) {
-      if (catLow.includes('lojistik') || catLow.includes('nakliye') || catLow.includes('havayolu')) primaryImg = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
-      else if (catLow.includes('inşaat') || catLow.includes('yapı')) primaryImg = 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80'
-      else if (catLow.includes('makine') || catLow.includes('metal')) primaryImg = 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&auto=format&fit=crop&q=80'
-      else if (catLow.includes('ambalaj') || catLow.includes('koli')) primaryImg = 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80'
-      else if (catLow.includes('bilişim') || catLow.includes('ofis')) primaryImg = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80'
+      if (catLow.includes('organizasyon') || catLow.includes('düğün') || catLow.includes('etkinlik') || catLow.includes('konser') || catLow.includes('iftar')) {
+        primaryImg = 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&auto=format&fit=crop&q=80'
+      } else if (catLow.includes('hac') || catLow.includes('umre') || catLow.includes('turizm') || catLow.includes('gezi')) {
+        primaryImg = 'https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?w=600&auto=format&fit=crop&q=80'
+      } else if (catLow.includes('lojistik') || catLow.includes('nakliye') || catLow.includes('havayolu')) {
+        primaryImg = 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
+      } else if (catLow.includes('inşaat') || catLow.includes('yapı')) {
+        primaryImg = 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80'
+      } else if (catLow.includes('makine') || catLow.includes('metal')) {
+        primaryImg = 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&auto=format&fit=crop&q=80'
+      } else if (catLow.includes('ambalaj') || catLow.includes('koli')) {
+        primaryImg = 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80'
+      } else if (catLow.includes('bilişim') || catLow.includes('ofis')) {
+        primaryImg = 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80'
+      }
     }
 
     let session: any = {}
@@ -476,8 +520,17 @@ async function handleSubmit() {
 
     const tenderDirection = form.value.ihaleYonu || 'kapali_zarf'
     let tenderTur = 'Doğrudan Teklif Alma (Kapalı Zarf)'
-    if (tenderDirection === 'eksiltme') tenderTur = 'Açık Eksiltme (Fiyat Azaltımlı / Alım)'
+    if (tenderDirection === 'sabit_paket') tenderTur = 'Sabit Fiyatlı Paket & Kontenjan Toplama'
+    else if (tenderDirection === 'eksiltme') tenderTur = 'Açık Eksiltme (Fiyat Azaltımlı / Alım)'
     else if (tenderDirection === 'artirma') tenderTur = 'Açık Artırma (Fiyat Artırımlı / Satış)'
+
+    let calculatedBudget = budgetVal
+    if (tenderDirection === 'sabit_paket') {
+      const priceStr = form.value.kisiBasiFiyat ? Number(String(form.value.kisiBasiFiyat).replace(/\D/g, '')).toLocaleString('tr-TR') : '1.000'
+      const currSymbol = form.value.currency === 'USD' ? '$' : (form.value.currency === 'EUR' ? '€' : '₺')
+      const quota = form.value.hedefKontenjan || 40
+      calculatedBudget = `Kişi Başı: ${priceStr} ${currSymbol} (${quota} Kişi Kontenjan)`
+    }
 
     const aiInspection = inspectTenderAutonomous({
       baslik: form.value.baslik,
@@ -510,7 +563,13 @@ async function handleSubmit() {
       durum: 'active',
       adminApproved: true,
       statusLabel: 'Canlı Yayında',
-      butce: budgetVal,
+      butce: tenderDirection === 'sabit_paket' ? calculatedBudget : budgetVal,
+      isSabitPaket: tenderDirection === 'sabit_paket',
+      kisiBasiFiyat: form.value.kisiBasiFiyat || '1000',
+      currency: form.value.currency || 'USD',
+      hedefKontenjan: form.value.hedefKontenjan || 40,
+      mevcutKatilimci: 0,
+      paketDahilHizmetler: form.value.paketDahilHizmetler || [],
       city: deliveryCity,
       teslimatAdresi: deliveryAddress,
       odemeYontemi: form.value.odemeYontemi || '🛡️ İhaleciBurada Güvenli Emanet Havuz (Escrow - Mal Kabul Onaylı)',
@@ -783,7 +842,7 @@ function resetFormAndCreateNew() {
             </span>
           </div>
 
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-1">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
             <!-- 1. Doğrudan Teklif Alma / Kapalı Zarf Usulü (KULLANICI TALEBİ: BAŞTA) -->
             <div 
               @click="form.ihaleYonu = 'kapali_zarf'"
@@ -792,14 +851,14 @@ function resetFormAndCreateNew() {
             >
               <div class="flex items-center justify-between">
                 <span class="font-black text-xs flex items-center gap-1.5" :class="form.ihaleYonu === 'kapali_zarf' ? 'text-purple-900' : 'text-slate-800'">
-                  <span>📑 Doğrudan Teklif Alma (Kapalı Zarf)</span>
+                  <span>📑 Doğrudan Teklif Alma</span>
                 </span>
                 <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.ihaleYonu === 'kapali_zarf' ? 'border-purple-600 bg-purple-600 text-white text-[10px]' : 'border-slate-300'">
                   <span v-if="form.ihaleYonu === 'kapali_zarf'">✓</span>
                 </span>
               </div>
               <p class="text-[11px] text-slate-600 leading-snug">
-                <strong>(Gizli Doğrudan Teklif Toplama):</strong> Fiyatlar gizlidir. Tedarikçiler birbirinin fiyatını göremez; doğrudan sizin panelinize teklif sunarlar.
+                <strong>(Kapalı Zarf):</strong> Fiyatlar gizlidir. Tedarikçiler birbirinin teklifini görmeden doğrudan size sunar.
               </p>
             </div>
 
@@ -818,7 +877,7 @@ function resetFormAndCreateNew() {
                 </span>
               </div>
               <p class="text-[11px] text-slate-600 leading-snug">
-                <strong>(Fiyat Azaltımlı - Satın Alma):</strong> Alıcı sizsiniz. Tedarikçiler en düşük fiyatı vermek için aşağı yönlü yarışır.
+                <strong>(Fiyat Azaltımlı - Alım):</strong> Alıcı sizsiniz. Tedarikçiler en düşük fiyatı vermek için yarışır.
               </p>
             </div>
 
@@ -837,7 +896,26 @@ function resetFormAndCreateNew() {
                 </span>
               </div>
               <p class="text-[11px] text-slate-600 leading-snug">
-                <strong>(Fiyat Artırımlı - Satış):</strong> Satıcı sizsiniz. Teklif verenler en yüksek fiyatı sunmak için yukarı yönlü yarışır.
+                <strong>(Fiyat Artırımlı - Satış):</strong> Satıcı sizsiniz. Alıcılar en yüksek teklif için yukarı yönlü yarışır.
+              </p>
+            </div>
+
+            <!-- 4. Sabit Fiyatlı Paket & Kontenjan Toplama -->
+            <div 
+              @click="form.ihaleYonu = 'sabit_paket'"
+              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
+              :class="form.ihaleYonu === 'sabit_paket' ? 'border-amber-500 bg-amber-50/70 shadow-xs ring-2 ring-amber-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-black text-xs flex items-center gap-1.5" :class="form.ihaleYonu === 'sabit_paket' ? 'text-amber-900' : 'text-slate-800'">
+                  <span>🏷️ Sabit Paket & Kontenjan</span>
+                </span>
+                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.ihaleYonu === 'sabit_paket' ? 'border-amber-500 bg-amber-500 text-white text-[10px]' : 'border-slate-300'">
+                  <span v-if="form.ihaleYonu === 'sabit_paket'">✓</span>
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-snug">
+                <strong>(Tur, Umre, Etkinlik & Grup):</strong> Kişi başı sabit fiyat (örn: 1000$ / 1100$) ile hedef kontenjan/üye toplayın.
               </p>
             </div>
           </div>
@@ -881,8 +959,95 @@ function resetFormAndCreateNew() {
             </select>
           </div>
 
+          <!-- SABİT FİYATLI PAKET & KONTENJAN ALANI -->
+          <div v-if="form.ihaleYonu === 'sabit_paket'" class="col-span-1 md:col-span-2 space-y-4 rounded-2xl border-2 border-amber-400 bg-amber-50/70 p-4 shadow-sm">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-amber-900 uppercase tracking-wider flex items-center gap-1.5">
+                <span>🏷️ KİŞİ BAŞI SABİT PAKET ÜCRETİ & HEDEF KONTENJAN</span>
+              </span>
+              <span class="text-[10px] font-black text-amber-900 bg-amber-200/80 px-2.5 py-0.5 rounded border border-amber-300">
+                Sabit Fiyatlı Grup İlanı
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <!-- Kişi Başı Paket Fiyatı -->
+              <div>
+                <label class="block text-[10px] font-bold text-slate-700 mb-1">
+                  KİŞİ BAŞI SABİT ÜCRET *
+                </label>
+                <div class="relative">
+                  <input 
+                    v-model="form.kisiBasiFiyat" 
+                    type="text" 
+                    placeholder="Örn: 1000 veya 1100" 
+                    class="w-full rounded-xl border p-2.5 text-xs outline-none bg-white transition focus:border-amber-600 focus:ring-2 focus:ring-amber-100 font-bold pr-12"
+                    style="border-color: #CBD5E1; color: #0F172A;"
+                  />
+                  <div class="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs font-black text-slate-500 pointer-events-none">
+                    {{ form.currency }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Para Birimi -->
+              <div>
+                <label class="block text-[10px] font-bold text-slate-700 mb-1">
+                  PARA BİRİMİ *
+                </label>
+                <select 
+                  v-model="form.currency" 
+                  class="w-full rounded-xl border p-2.5 text-xs outline-none bg-white transition focus:border-amber-600 focus:ring-2 focus:ring-amber-100 font-bold cursor-pointer"
+                  style="border-color: #CBD5E1; color: #0F172A;"
+                >
+                  <option value="USD">$ USD (Amerikan Doları)</option>
+                  <option value="EUR">€ EUR (Euro)</option>
+                  <option value="TRY">₺ TRY (Türk Lirası)</option>
+                </select>
+              </div>
+
+              <!-- Hedef Kontenjan Sayısı -->
+              <div>
+                <label class="block text-[10px] font-bold text-slate-700 mb-1">
+                  HEDEF KONTENJAN (KİŞİ SAYISI) *
+                </label>
+                <input 
+                  v-model.number="form.hedefKontenjan" 
+                  type="number" 
+                  min="1"
+                  placeholder="Örn: 40" 
+                  class="w-full rounded-xl border p-2.5 text-xs outline-none bg-white transition focus:border-amber-600 focus:ring-2 focus:ring-amber-100 font-bold"
+                  style="border-color: #CBD5E1; color: #0F172A;"
+                />
+              </div>
+            </div>
+
+            <!-- Pakete Dahil Hizmetler (Hızlı Etiketler) -->
+            <div>
+              <label class="block text-[10px] font-bold text-slate-700 mb-1.5">
+                PAKETE DÂHİL HİZMETLER (İşaretleyin)
+              </label>
+              <div class="flex flex-wrap gap-1.5">
+                <button
+                  v-for="feature in ['Gidiş-Dönüş Uçak Bileti', 'Lüks Otel Konaklama', 'Vize & Pasaport İşlemleri', 'Rehberlik & Din Hizmetleri', 'Havalimanı & Otel Transfer', 'Sabah & Akşam Yemeği', 'Ziyaret Yerleri Gezisi', 'Seyahat Sağlık Sigortası', 'Ses-Işık & Sahne Ekipmanı', 'Fotoğraf & Video Çekimi', 'Düğün / Nişan Masa Süsleme', 'Toplu İftar Menüsü']"
+                  :key="feature"
+                  type="button"
+                  @click="toggleFeature(feature)"
+                  class="px-2.5 py-1 rounded-lg text-xs font-semibold border transition cursor-pointer"
+                  :class="form.paketDahilHizmetler.includes(feature) ? 'bg-amber-600 text-white border-amber-600 shadow-xs' : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'"
+                >
+                  <span v-if="form.paketDahilHizmetler.includes(feature)">✓ </span>{{ feature }}
+                </button>
+              </div>
+            </div>
+
+            <p class="text-[11px] text-amber-900/90 leading-relaxed font-medium">
+              💡 <strong>Örnek Kullanım:</strong> Umre kafilesi veya turistik gezi için kişi başı <strong>{{ form.kisiBasiFiyat || '1.000' }} {{ form.currency }}</strong> belirleyerek <strong>{{ form.hedefKontenjan || 40 }} kişilik</strong> katılımcı/üye başvurusu toplayabilirsiniz.
+            </p>
+          </div>
+
           <!-- Pazarlık & Bütçe Aralığı (Min Taban - Maks Tavan) -->
-          <div class="col-span-1 md:col-span-2 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80 space-y-3">
+          <div v-else class="col-span-1 md:col-span-2 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80 space-y-3">
             <div class="flex items-center justify-between">
               <label class="block text-[10px] font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
                 <span>💰 PAZARLIK VE BÜTÇE ARALIĞI</span>

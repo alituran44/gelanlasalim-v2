@@ -566,13 +566,20 @@ function formatTenderBudget(raw: any): string {
   if (cleanNum > 0) {
     return Number(cleanNum).toLocaleString('tr-TR') + ' ₺'
   }
-  return str.includes('₺') ? str : '💬 Teklif Usulü'
+  return str.includes('₺') || str.includes('$') || str.includes('€') ? str : '💬 Teklif Usulü'
 }
 
 function getTenderDirectionBadge(tender: any) {
   const tur = (tender.tur || tender.rekabetTuru || '').toLowerCase()
   const yonu = (tender.ihaleYonu || '').toLowerCase()
   
+  if (yonu === 'sabit_paket' || tender.isSabitPaket || tur.includes('sabit') || tur.includes('paket') || tur.includes('kontenjan')) {
+    return { 
+      label: '🏷️ Sabit Paket & Kontenjan', 
+      fullLabel: '🏷️ Sabit Fiyatlı Paket & Kontenjan Toplama',
+      class: 'bg-amber-100 text-amber-950 border-amber-400 font-black shadow-2xs' 
+    }
+  }
   if (yonu === 'kapali_zarf' || tur.includes('kapalı') || tur.includes('doğrudan') || tur.includes('zarf')) {
     return { 
       label: '📑 Doğrudan Teklif Alma (Kapalı Zarf)', 

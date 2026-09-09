@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { 
   ShieldCheck, 
   User,
@@ -20,7 +21,15 @@ import {
   X,
   Sparkles,
   ExternalLink,
-  ChevronRight
+  ChevronRight,
+  LayoutDashboard,
+  Settings,
+  Mail,
+  Phone,
+  Save,
+  MapPin,
+  Lock,
+  Bell
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useUserSession } from '~/composables/useUserSession'
@@ -30,13 +39,16 @@ definePageMeta({
   layout: "dashboard"
 })
 
+const route = useRoute()
+const router = useRouter()
 const { cmsData } = useCmsData()
 const { 
   userSession, 
   isCompanyMode, 
   userName, 
   companyName: sessionCompanyName,
-  isLoggedIn 
+  isLoggedIn,
+  toggleCompanyMode 
 } = useUserSession()
 
 const displayName = computed(() => {
@@ -103,6 +115,71 @@ const recentBids = computed(() => {
   return list
 })
 
+const activeTab = ref<'genel_bakis' | 'profil'>(route.query.tab === 'profil' ? 'profil' : 'genel_bakis')
+
+watch(() => route.query.tab, (newTab) => {
+  if (newTab === 'profil') activeTab.value = 'profil'
+  else if (newTab === 'genel_bakis' || !newTab) activeTab.value = 'genel_bakis'
+})
+
+function setTab(tab: 'genel_bakis' | 'profil') {
+  activeTab.value = tab
+  router.replace({ query: { ...route.query, tab } })
+}
+
+const editProfileForm = ref({
+  name: '',
+  username: '',
+  email: '',
+  phone: '',
+  companyName: '',
+  taxNo: '',
+  taxOffice: '',
+  sectors: '',
+  city: 'Balıkesir'
+})
+const profileSaveSuccess = ref(false)
+
+function syncProfileForm() {
+  if (typeof window === 'undefined') return
+  const s = userSession.value || {}
+  editProfileForm.value = {
+    name: s.name || userName.value || '',
+    username: s.username || s.name || userName.value || '',
+    email: s.email || '',
+    phone: s.phone || '',
+    companyName: s.companyName || s.company || '',
+    taxNo: s.taxNo || '',
+    taxOffice: s.taxOffice || '',
+    sectors: s.sectors || '',
+    city: s.city || 'Balıkesir'
+  }
+}
+
+function savePanelProfile() {
+  if (typeof window === 'undefined') return
+  const current = JSON.parse(localStorage.getItem('userSession') || '{}')
+  current.name = editProfileForm.value.name.trim() || current.name
+  current.username = editProfileForm.value.username.trim() || current.username
+  current.phone = editProfileForm.value.phone.trim()
+  current.companyName = editProfileForm.value.companyName.trim()
+  current.company = editProfileForm.value.companyName.trim()
+  current.taxNo = editProfileForm.value.taxNo.trim()
+  current.taxOffice = editProfileForm.value.taxOffice.trim()
+  current.sectors = editProfileForm.value.sectors.trim()
+  current.city = editProfileForm.value.city.trim()
+
+  localStorage.setItem('userSession', JSON.stringify(current))
+  userSession.value = current
+  window.dispatchEvent(new Event('storage'))
+  window.dispatchEvent(new CustomEvent('user-session-changed', { detail: current }))
+
+  profileSaveSuccess.value = true
+  setTimeout(() => {
+    profileSaveSuccess.value = false
+  }, 3000)
+}
+
 function reloadSession() {
   if (typeof window !== 'undefined') {
     try {
@@ -110,6 +187,7 @@ function reloadSession() {
       if (session.role) {
         userRole.value = session.role
       }
+      syncProfileForm()
     } catch (e) {
       console.error(e)
     }
@@ -118,11 +196,16 @@ function reloadSession() {
 
 onMounted(() => {
   reloadSession()
+  syncProfileForm()
   if (typeof window !== 'undefined') {
     window.addEventListener('storage', reloadSession)
     window.addEventListener('user-session-changed', reloadSession)
   }
 })
+
+watch(() => userSession.value, () => {
+  syncProfileForm()
+}, { deep: true })
 </script>
 
 <template>
@@ -160,17 +243,51 @@ onMounted(() => {
           <Plus :size="15" />
           <span>+ Yeni İhale / İlan Aç</span>
         </NuxtLink>
-        <NuxtLink 
-          :to="isCompanyMode ? '/panel/ayarlar?tab=sirket' : '/panel/ayarlar?tab=kisisel'" 
+        <button 
+          type="button"
+          @click="setTab(activeTab === 'profil' ? 'genel_bakis' : 'profil')"
           class="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition border border-white/20 flex items-center gap-1.5 cursor-pointer"
         >
           <Building2 v-if="isCompanyMode" :size="15" class="text-sky-300" />
           <User v-else :size="15" class="text-sky-300" />
-          <span>{{ isCompanyMode ? '🏢 Kurumsal Ayarlar' : '👤 Profil Ayarları' }}</span>
-        </NuxtLink>
+          <span>{{ activeTab === 'profil' ? '📊 Genel Bakışa Dön' : (isCompanyMode ? '🏢 Kurumsal Profil & Hesap' : '👤 Profil & Hesap') }}</span>
+        </button>
       </div>
     </div>
 
+    <!-- ========================================================================= -->
+    <!-- 🔀 SEKME DEĞİŞTİRİCİ: GENEL BAKIŞ & PROFİL BİRLEŞİMİ -->
+    <!-- ========================================================================= -->
+    <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
+      <button 
+        type="button" 
+        @click="setTab('genel_bakis')"
+        class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border"
+        :class="activeTab === 'genel_bakis' 
+          ? 'bg-[#0F223D] text-white border-[#0F223D] shadow-xs' 
+          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'"
+      >
+        <LayoutDashboard :size="15" />
+        <span>📊 Genel Bakış & İhale İstatistikleri</span>
+      </button>
+
+      <button 
+        type="button" 
+        @click="setTab('profil')"
+        class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border"
+        :class="activeTab === 'profil' 
+          ? 'bg-[#0F223D] text-white border-[#0F223D] shadow-xs' 
+          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'"
+      >
+        <User :size="15" />
+        <span>👤 Profil & Hesap Bilgileri</span>
+      </button>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- GÖRÜNÜM A: GENEL BAKIŞ & METRİKLER -->
+    <!-- ========================================================================= -->
+    <template v-if="activeTab === 'genel_bakis'">
     <!-- ========================================================================= -->
     <!-- 📊 2. SADE 4'LÜ DURUM VE SAYAÇ KARTLARI -->
     <!-- ========================================================================= -->
@@ -396,6 +513,256 @@ onMounted(() => {
       </div>
 
     </div>
+    </template>
+
+    <!-- ========================================================================= -->
+    <!-- GÖRÜNÜM B: ENTEGRE PROFİL & HESAP YÖNETİMİ -->
+    <!-- ========================================================================= -->
+    <template v-else-if="activeTab === 'profil'">
+      <div class="space-y-6">
+        
+        <!-- Üst Profil Bilgi & Statü Özeti -->
+        <div class="rounded-2xl border bg-white p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6" style="border-color: #E2E8F0;">
+          <div class="flex items-center gap-4">
+            <div class="w-16 h-16 rounded-2xl bg-[#0F223D] text-emerald-400 flex items-center justify-center font-black text-2xl shrink-0 shadow-md">
+              {{ (editProfileForm.name || displayName || 'K').charAt(0).toUpperCase() }}
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <h2 class="text-xl font-black text-slate-900">{{ editProfileForm.name || displayName }}</h2>
+                <span 
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 border"
+                  :class="isCompanyMode ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200'"
+                >
+                  <ShieldCheck :size="12" />
+                  <span>{{ isCompanyMode ? 'Onaylı Kurumsal Firma' : 'Kişisel / Bireysel Hesap' }}</span>
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 font-medium flex items-center gap-3 flex-wrap">
+                <span v-if="editProfileForm.email" class="flex items-center gap-1">
+                  <Mail :size="12" class="text-slate-400" /> {{ editProfileForm.email }}
+                </span>
+                <span v-if="editProfileForm.phone" class="flex items-center gap-1">
+                  <Phone :size="12" class="text-slate-400" /> {{ editProfileForm.phone }}
+                </span>
+                <span v-if="editProfileForm.city" class="flex items-center gap-1">
+                  <MapPin :size="12" class="text-slate-400" /> {{ editProfileForm.city }}
+                </span>
+              </p>
+            </div>
+          </div>
+
+          <!-- Firma Modu / Bireysel Mod Hızlı Geçiş -->
+          <div class="flex items-center gap-3 shrink-0">
+            <button
+              type="button"
+              @click="toggleCompanyMode(!isCompanyMode)"
+              class="px-4 py-2.5 rounded-xl border font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-xs"
+              :class="isCompanyMode 
+                ? 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100' 
+                : 'bg-blue-50 text-blue-900 border-blue-200 hover:bg-blue-100'"
+            >
+              <Building2 :size="14" />
+              <span>{{ isCompanyMode ? '👤 Kişisel Moda Geç' : '🏢 Firma Modunu Aktif Et' }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Başarı Mesajı Bildirimi -->
+        <div v-if="profileSaveSuccess" class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold flex items-center gap-2">
+          <CheckCircle2 :size="16" class="text-emerald-600 shrink-0" />
+          <span>Profil ve hesap bilgileriniz başarıyla güncellendi ve sisteme kaydedildi.</span>
+        </div>
+
+        <!-- 1. Kişisel & Yetkili Bilgileri Formu -->
+        <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+          <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
+              <User :size="15" class="text-blue-600" />
+              Kişisel Yetkili Bilgileri
+            </h3>
+            <span class="text-[10px] font-bold text-slate-400">Temel İletişim</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-black text-slate-600 uppercase mb-1">Ad ve Soyad</label>
+              <input 
+                v-model="editProfileForm.name" 
+                type="text" 
+                placeholder="Adınız ve Soyadınız" 
+                class="w-full rounded-xl border p-3 text-xs outline-none bg-white text-slate-900 font-bold focus:border-blue-600"
+                style="border-color: #CBD5E1;"
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-600 uppercase mb-1">Giriş / Görünen Kullanıcı Adı</label>
+              <input 
+                v-model="editProfileForm.username" 
+                type="text" 
+                placeholder="Kullanıcı adınız" 
+                class="w-full rounded-xl border p-3 text-xs outline-none bg-white text-slate-900 font-bold focus:border-blue-600"
+                style="border-color: #CBD5E1;"
+              />
+            </div>
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="block text-[10px] font-black text-slate-600 uppercase">E-posta Adresi</label>
+                <span class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200 flex items-center gap-1">
+                  <CheckCircle2 :size="10" /> Doğrulandı
+                </span>
+              </div>
+              <input 
+                v-model="editProfileForm.email" 
+                type="email" 
+                disabled 
+                class="w-full rounded-xl border p-3 text-xs outline-none bg-slate-50 text-slate-600 font-medium cursor-not-allowed"
+                style="border-color: #E2E8F0;"
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-600 uppercase mb-1">Telefon Numarası</label>
+              <input 
+                v-model="editProfileForm.phone" 
+                type="text" 
+                placeholder="05XXXXXXXXX" 
+                class="w-full rounded-xl border p-3 text-xs outline-none bg-white text-slate-900 font-mono font-medium focus:border-blue-600"
+                style="border-color: #CBD5E1;"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Kurumsal Firma Bilgileri Formu (Firma Modu) -->
+        <div v-if="isCompanyMode" class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+          <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
+              <Building2 :size="15" class="text-emerald-600" />
+              Kurumsal Şirket Bilgileri
+            </h3>
+            <span class="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 text-[10px] font-black border border-emerald-200">
+              🏢 Kurumsal Üye
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[10px] font-black text-slate-600 uppercase mb-1">Şirket / Ticari Firma Adı</label>
+              <input 
+                v-model="editProfileForm.companyName" 
+                type="text" 
+                placeholder="Örn: ABC Tedarik Ltd. Şti." 
+                class="w-full rounded-xl border p-3 text-xs outline-none bg-white text-slate-900 font-bold focus:border-emerald-600"
+                style="border-color: #CBD5E1;"
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-600 uppercase mb-1">Kayıtlı Şehir / İl</label>
+              <input 
+                v-model="editProfileForm.city" 
+                type="text" 
+                placeholder="Örn: Balıkesir" 
+                class="w-full rounded-xl border p-3 text-xs outline-none bg-white text-slate-900 font-bold focus:border-emerald-600"
+                style="border-color: #CBD5E1;"
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-600 uppercase mb-1">Vergi Dairesi</label>
+              <input 
+                v-model="editProfileForm.taxOffice" 
+                type="text" 
+                placeholder="Örn: Balıkesir Vergi Dairesi" 
+                class="w-full rounded-xl border p-3 text-xs outline-none bg-white text-slate-900 font-medium focus:border-emerald-600"
+                style="border-color: #CBD5E1;"
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-600 uppercase mb-1">Vergi Kimlik Numarası (VKN)</label>
+              <input 
+                v-model="editProfileForm.taxNo" 
+                type="text" 
+                placeholder="10 Haneli VKN" 
+                class="w-full rounded-xl border p-3 text-xs outline-none bg-white text-slate-900 font-mono font-medium focus:border-emerald-600"
+                style="border-color: #CBD5E1;"
+              />
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-[10px] font-black text-slate-600 uppercase mb-1">Faaliyet Sektörleri</label>
+              <input 
+                v-model="editProfileForm.sectors" 
+                type="text" 
+                placeholder="Örn: İnşaat, Organizasyon ve Etkinlik, Turizm ve Hac-Umre, Gıda, Lojistik" 
+                class="w-full rounded-xl border p-3 text-xs outline-none bg-white text-slate-900 font-medium focus:border-emerald-600"
+                style="border-color: #CBD5E1;"
+              />
+            </div>
+          </div>
+        </div>
+
+        <!-- Kaydet Butonu -->
+        <div class="flex items-center justify-between gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+          <p class="text-xs text-slate-500 font-medium">
+            Bilgilerinizi güncelledikten sonra aşağıdaki butona tıklayarak değişiklikleri sisteme kaydedebilirsiniz.
+          </p>
+          <button 
+            type="button" 
+            @click="savePanelProfile"
+            class="px-6 py-3 rounded-xl bg-[#0F223D] hover:bg-[#003057] text-white font-black text-xs transition flex items-center gap-2 shadow-md cursor-pointer shrink-0"
+          >
+            <Save :size="15" class="text-emerald-400" />
+            <span>💾 Profil Bilgilerini Kaydet</span>
+          </button>
+        </div>
+
+        <!-- 3. Gelişmiş Ayarlar Hızlı Erişim Kartları -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+          <NuxtLink 
+            to="/panel/ayarlar?tab=guvenlik" 
+            class="p-4 rounded-xl bg-white border border-slate-200 hover:border-blue-500 transition shadow-xs group space-y-1.5"
+          >
+            <div class="flex items-center justify-between text-slate-500">
+              <span class="text-xs font-bold text-slate-800">Şifre & 2FA Güvenliği</span>
+              <Lock :size="16" class="text-blue-600 group-hover:scale-110 transition" />
+            </div>
+            <p class="text-[11px] text-slate-500">E-posta onaylı 2FA iki aşamalı giriş ve şifre yönetimi</p>
+          </NuxtLink>
+
+          <NuxtLink 
+            to="/panel/ayarlar?tab=sirket" 
+            class="p-4 rounded-xl bg-white border border-slate-200 hover:border-emerald-500 transition shadow-xs group space-y-1.5"
+          >
+            <div class="flex items-center justify-between text-slate-500">
+              <span class="text-xs font-bold text-slate-800">Şirket Evrakları & VKN</span>
+              <Building2 :size="16" class="text-emerald-600 group-hover:scale-110 transition" />
+            </div>
+            <p class="text-[11px] text-slate-500">Vergi levhası, imza sirküleri ve faaliyet belgeleri</p>
+          </NuxtLink>
+
+          <NuxtLink 
+            to="/panel/ayarlar?tab=bildirimler" 
+            class="p-4 rounded-xl bg-white border border-slate-200 hover:border-amber-500 transition shadow-xs group space-y-1.5"
+          >
+            <div class="flex items-center justify-between text-slate-500">
+              <span class="text-xs font-bold text-slate-800">Bildirim Tercihleri</span>
+              <Bell :size="16" class="text-amber-600 group-hover:scale-110 transition" />
+            </div>
+            <p class="text-[11px] text-slate-500">E-posta, SMS ve anlık ihale teklif uyarı ayarları</p>
+          </NuxtLink>
+
+          <NuxtLink 
+            to="/panel/ayarlar?tab=sozlesmeler" 
+            class="p-4 rounded-xl bg-white border border-slate-200 hover:border-purple-500 transition shadow-xs group space-y-1.5"
+          >
+            <div class="flex items-center justify-between text-slate-500">
+              <span class="text-xs font-bold text-slate-800">Sözleşmeler & KVKK</span>
+              <FileCheck :size="16" class="text-purple-600 group-hover:scale-110 transition" />
+            </div>
+            <p class="text-[11px] text-slate-500">Platform ana sözleşmesi, gizlilik ve rıza onayları</p>
+          </NuxtLink>
+        </div>
+
+      </div>
+    </template>
 
   </div>
 </template>

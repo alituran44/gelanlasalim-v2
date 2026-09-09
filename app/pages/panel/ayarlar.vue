@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import {
   Sun,
   Moon,
@@ -598,6 +598,8 @@ const availableSectors = [
   'Finans ve Sigorta Hizmetleri',
   'Emlakçılık Hizmetleri',
   'Eğitim ve Öğrenim Hizmetleri',
+  'Organizasyon, Düğün, Etkinlik ve Sahne Hizmetleri',
+  'Turizm, Hac - Umre ve Gezi Turları',
   'Turizm - Ödüllendirme Hizmetleri - Organizasyon İhaleleri',
   'Otel, Restoran ve Perakende Ticaret Hizmetleri',
   'Reklam - Tabela - Billboard - Tanıtım Materyalleri İhaleleri',
@@ -641,6 +643,63 @@ const companyForm = ref({
   accountHolder: '',
   is2FaEnabled: false
 })
+
+function syncSessionToForms() {
+  if (typeof window === 'undefined') return
+  try {
+    const raw = localStorage.getItem('userSession')
+    const session = raw ? JSON.parse(raw) : (userSession.value || {})
+    if (session && typeof session === 'object') {
+      const sessionFullName = session.name || ''
+      const parts = sessionFullName.split(' ').filter(Boolean)
+      const inferredFirst = parts.length > 1 ? parts.slice(0, -1).join(' ') : (parts[0] || '')
+      const inferredLast = parts.length > 1 ? parts[parts.length - 1] : ''
+
+      profileForm.value.name = session.firstName || inferredFirst || profileForm.value.name || ''
+      profileForm.value.surname = session.lastName || session.surname || inferredLast || profileForm.value.surname || ''
+      profileForm.value.username = session.username || sessionFullName || profileForm.value.username || ''
+      profileForm.value.email = session.email || profileForm.value.email || ''
+      profileForm.value.phone = session.phone || profileForm.value.phone || ''
+      profileForm.value.title = session.title || profileForm.value.title || 'Yetkili'
+
+      companyForm.value.name = session.companyName || session.company || companyForm.value.name || ''
+      companyForm.value.legalName = session.legalName || companyForm.value.legalName || ''
+      companyForm.value.description = session.description || session.about || companyForm.value.description || ''
+      companyForm.value.contactPerson = session.contactPerson || sessionFullName || companyForm.value.contactPerson || ''
+      companyForm.value.phone = session.companyPhone || session.phone || companyForm.value.phone || ''
+      companyForm.value.email = session.companyEmail || session.email || companyForm.value.email || ''
+      companyForm.value.tcKimlik = session.tcKimlik || companyForm.value.tcKimlik || ''
+      companyForm.value.taxNo = session.taxNo || companyForm.value.taxNo || ''
+      companyForm.value.taxOffice = session.taxOffice || companyForm.value.taxOffice || ''
+      companyForm.value.sectors = session.sectors || companyForm.value.sectors || ''
+      companyForm.value.website = session.website || companyForm.value.website || ''
+      companyForm.value.faturaAdresi = session.faturaAdresi || companyForm.value.faturaAdresi || ''
+      companyForm.value.city = session.city || companyForm.value.city || ''
+      companyForm.value.iban = session.iban || companyForm.value.iban || ''
+      companyForm.value.accountHolder = session.accountHolder || companyForm.value.accountHolder || ''
+      companyForm.value.is2FaEnabled = !!session.is2FaEnabled
+
+      if (session.picture || session.companyLogo || session.logo) {
+        profileAvatarUrl.value = session.picture || session.companyLogo || session.logo
+      }
+    }
+  } catch (e) {
+    console.error('Session sync error:', e)
+  }
+}
+
+onMounted(() => {
+  syncSessionToForms()
+  loadNotificationSettings()
+  if (typeof window !== 'undefined') {
+    window.addEventListener('storage', syncSessionToForms)
+    window.addEventListener('user-session-changed', syncSessionToForms)
+  }
+})
+
+watch(() => userSession.value, () => {
+  syncSessionToForms()
+}, { deep: true })
 
 function toggleSectorTag(sec: string) {
   let list = [...selectedSectorsList.value]

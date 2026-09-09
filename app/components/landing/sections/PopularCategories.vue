@@ -6,14 +6,14 @@ const { cmsData } = useCmsData()
 const tenders = computed(() => cmsData.value?.dashboard?.tenders || [])
 
 const rawCategories = [
+  { name: "Organizasyon", icon: "🎉" },
+  { name: "Turizm & Umre", icon: "🕋" },
   { name: "İnşaat", icon: "🏗️" },
   { name: "Yazılım", icon: "💻" },
   { name: "Elektrik", icon: "⚡" },
   { name: "Makine", icon: "⚙️" },
   { name: "Sağlık", icon: "🏥" },
-  { name: "Lojistik", icon: "🚛" },
-  { name: "Eğitim", icon: "🎓" },
-  { name: "Güvenlik", icon: "🛡️" }
+  { name: "Lojistik", icon: "🚛" }
 ]
 
 const categories = computed(() => {

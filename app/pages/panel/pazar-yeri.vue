@@ -35,6 +35,9 @@ const { sendSms } = useNetGsm()
 function getTenderDirectionBadge(tender: any) {
   const tur = (tender.tur || '').toLowerCase()
   const yonu = (tender.ihaleYonu || '').toLowerCase()
+  if (yonu === 'sabit_paket' || tender.isSabitPaket || tur.includes('sabit') || tur.includes('paket') || tur.includes('kontenjan')) {
+    return { label: '🏷️ Sabit Paket & Kontenjan', class: 'bg-amber-100 text-amber-900 border-amber-300 font-bold' }
+  }
   if (yonu === 'artirma' || tur.includes('artırma') || tur.includes('artırımlı')) {
     return { label: '📈 Açık Artırma (Fiyat Artırımlı)', class: 'bg-blue-100 text-blue-800 border-blue-200' }
   }
@@ -64,7 +67,7 @@ const bidForm = ref({
   fiyat: '',
   sure: '7 gün',
   notum: '',
-  firmaAdi: 'Kaya Tedarik & İnşaat Ltd.'
+  firmaAdi: ''
 })
 
 onMounted(async () => {
@@ -81,8 +84,8 @@ onMounted(async () => {
   if (typeof window !== 'undefined') {
     try {
       userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
-      if (userSession.value.companyName || userSession.value.company) {
-        bidForm.value.firmaAdi = userSession.value.companyName || userSession.value.company
+      if (userSession.value.companyName || userSession.value.company || userSession.value.name) {
+        bidForm.value.firmaAdi = userSession.value.companyName || userSession.value.company || userSession.value.name
       }
     } catch (e) {}
   }
@@ -94,6 +97,8 @@ const allTenders = computed(() => {
 
 const categories = [
   'Tümü',
+  'Organizasyon ve Etkinlik',
+  'Turizm, Hac-Umre ve Gezi Turları',
   'İnşaat ve Yapı',
   'Sanayi ve Makine',
   'Lojistik ve Taşımacılık',
@@ -105,6 +110,7 @@ const categories = [
 
 const methods = [
   'Tümü',
+  'Sabit Paket & Kontenjan',
   'Açık İhale',
   'Kapalı Zarf',
   'Doğrudan Temin'

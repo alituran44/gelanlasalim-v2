@@ -60,6 +60,12 @@ function getTenderDirectionBadge(tender: any) {
   const tur = (tender.tur || tender.rekabetTuru || '').toLowerCase()
   const yonu = (tender.ihaleYonu || '').toLowerCase()
   
+  if (yonu === 'sabit_paket' || tender.isSabitPaket || tur.includes('sabit') || tur.includes('paket') || tur.includes('kontenjan')) {
+    return { 
+      label: '🏷️ Sabit Fiyatlı Paket & Kontenjan', 
+      class: 'bg-amber-100 text-amber-950 border-amber-400 font-black' 
+    }
+  }
   if (yonu === 'kapali_zarf' || tur.includes('kapalı') || tur.includes('doğrudan') || tur.includes('zarf')) {
     return { 
       label: '📑 Doğrudan Teklif Alma (Kapalı Zarf)', 
@@ -96,6 +102,12 @@ function getTenderImage(tender: any): string {
   }
 
   const text = ((tender.baslik || '') + ' ' + (tender.kategori || '') + ' ' + (tender.mainCategory || '')).toLowerCase()
+  if (text.includes('organizasyon') || text.includes('düğün') || text.includes('etkinlik') || text.includes('konser') || text.includes('iftar')) {
+    return 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('hac') || text.includes('umre') || text.includes('turizm') || text.includes('gezi')) {
+    return 'https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?w=600&auto=format&fit=crop&q=80'
+  }
   if (text.includes('lojistik') || text.includes('nakliye') || text.includes('taşımacılık') || text.includes('havayolu') || text.includes('kargo') || text.includes('uçak')) {
     return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
   }
@@ -126,6 +138,9 @@ function getTenderImage(tender: any): string {
 function formatTenderBudget(raw: any): string {
   if (!raw) return 'Açık Eksiltme'
   const str = String(raw).trim()
+  if (str.includes('Kişi Başı') || str.includes('Kontenjan')) {
+    return str
+  }
   if (str.includes('-')) {
     // If range like 50000 ₺ - 150000 ₺, extract the clean single target budget
     const parts = str.split('-')
@@ -139,7 +154,7 @@ function formatTenderBudget(raw: any): string {
   if (cleanNum > 0) {
     return Number(cleanNum).toLocaleString('tr-TR') + ' ₺'
   }
-  return str.includes('₺') ? str : (str || 'Açık Eksiltme')
+  return str.includes('₺') || str.includes('$') || str.includes('€') ? str : (str || 'Açık Eksiltme')
 }
 
 function downloadTenderFile(doc: any, tender: any) {
@@ -286,6 +301,8 @@ const allTenders = computed(() => {
 
 const categories = [
   'Tümü',
+  'Organizasyon, Düğün, Etkinlik ve Sahne Hizmetleri',
+  'Turizm, Hac - Umre ve Gezi Turları',
   'İnşaat - Altyapı - Üstyapı - Yapım İşi',
   'Mobilya - Beyaz Eşya - Mutfak - Züccaciye İhaleleri',
   'Sanayi ve Makine Ekipmanları',
@@ -307,6 +324,7 @@ const types = [
 
 const methods = [
   'Tümü',
+  'Sabit Fiyatlı Paket & Kontenjan',
   'Açık İhale',
   'Açık Eksiltme',
   'Pazarlık Usulü (21/f)',

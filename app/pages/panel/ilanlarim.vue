@@ -62,6 +62,9 @@ watch(() => cmsData.value?.dashboard?.tenders, () => {
 function getTenderDirectionBadge(tender: any) {
   const tur = (tender.tur || tender.rekabetTuru || '').toLowerCase()
   const yonu = (tender.ihaleYonu || '').toLowerCase()
+  if (yonu === 'sabit_paket' || tender.isSabitPaket || tur.includes('sabit') || tur.includes('paket') || tur.includes('kontenjan')) {
+    return { label: '🏷️ Sabit Paket & Kontenjan', class: 'bg-amber-100 text-amber-900 border-amber-300 font-bold' }
+  }
   if (yonu === 'kapali_zarf' || tur.includes('kapalı') || tur.includes('doğrudan') || tur.includes('zarf')) {
     return { label: '📑 Doğrudan Teklif Alma (Kapalı Zarf)', class: 'bg-purple-100 text-purple-900 border-purple-300 font-bold' }
   }

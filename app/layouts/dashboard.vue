@@ -40,8 +40,7 @@ onMounted(() => {
 const sidebarMenus = computed(() => {
   if (locale.value === 'tr') {
     return [
-      { title: "Genel Bakış", icon: LayoutDashboard, to: "/panel" },
-      { title: "Profil & Hesap", icon: Settings, to: "/panel/ayarlar?tab=kisisel" },
+      { title: "Genel Bakış & Profil", icon: LayoutDashboard, to: "/panel" },
       { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
@@ -50,8 +49,7 @@ const sidebarMenus = computed(() => {
     ]
   } else {
     return [
-      { title: "Dashboard", icon: LayoutDashboard, to: "/panel" },
-      { title: "Account & Profile", icon: Settings, to: "/panel/ayarlar?tab=kisisel" },
+      { title: "Overview & Profile", icon: LayoutDashboard, to: "/panel" },
       { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" },
