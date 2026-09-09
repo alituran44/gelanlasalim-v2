@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
           budget: t.butce || '💬 Teklif Usulü',
           direction: t.usul || (t.ihaleYonu === 'eksiltme' ? 'Açık Eksiltme' : 'Kapalı Zarf Usulü'),
           taxIdType: 'VKN',
-          taxId: (t as any).taxId || (t as any).vkn || '8680383525',
+          taxId: (t as any).taxId || (t as any).vkn || '9560161511',
           taxOffice: (t as any).taxOffice || `${t.city || 'İstanbul'} Vergi Dairesi`,
           companyOrFullName: t.ownerCompany || 'Doğrulanmış İhale Sahibi',
           ownerEmail: t.ownerEmail || 'ihalecib@gmail.com',

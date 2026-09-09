@@ -996,7 +996,7 @@ function syncLiveState() {
         authorizedPerson: usr.name || usr.firstName || 'Yetkili',
         email: usr.email,
         phone: usr.phone || '0850 840 86 95',
-        taxNo: usr.taxNo || '8680383525',
+        taxNo: usr.taxNo || '9560161511',
         taxOffice: usr.taxOffice || 'Çanakkale Vergi Dairesi',
         mersis: usr.mersis || '',
         sicilNo: usr.sicilNo || '14520',

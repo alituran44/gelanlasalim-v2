@@ -633,7 +633,7 @@ async function handleSubmit() {
           budget: budgetVal,
           direction: turLabel,
           taxIdType: (session.taxNo && session.taxNo.length === 11) ? 'TCKN' : 'VKN',
-          taxId: session.taxNo || session.tcKimlik || '8680383525',
+          taxId: session.taxNo || session.tcKimlik || '9560161511',
           taxOffice: session.taxOffice || 'Kayıtlı Vergi Dairesi',
           companyOrFullName: ownerCompany || ownerName,
           ownerEmail,

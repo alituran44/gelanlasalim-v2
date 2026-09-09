@@ -109,7 +109,7 @@ function printDocument() {
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full lg:w-auto text-[11px] font-medium text-slate-700 shrink-0">
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">Vergi Dairesi & VKN</span>
-              <strong class="text-slate-900 font-mono">Çanakkale / 8680383525</strong>
+              <strong class="text-slate-900 font-mono">Çanakkale / 9560161511</strong>
             </div>
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-200">
               <span class="text-[9px] font-black text-slate-400 block uppercase">Ticaret Sicil No</span>
@@ -246,7 +246,7 @@ function printDocument() {
               RESMİ HUKUKİ METİN · YÜRÜRLÜK TARİHİ: 2026.08
             </span>
             <span class="text-[11px] font-mono font-bold text-slate-400">
-              VKN: 8680383525
+              VKN: 9560161511
             </span>
           </div>
 
@@ -516,7 +516,7 @@ function printDocument() {
                 <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-1.5 font-medium">
                   <p><strong>Ticaret Unvanı:</strong> İhaleciBurada Bilişim ve Elektronik Ticaret Platformu A.Ş.</p>
                   <p><strong>Merkez Adresi:</strong> İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</p>
-                  <p><strong>Vergi Dairesi & No:</strong> Çanakkale Vergi Dairesi / VKN: 8680383525</p>
+                  <p><strong>Vergi Dairesi & No:</strong> Çanakkale Vergi Dairesi / VKN: 9560161511</p>
                   <p><strong>Ticaret Sicil No:</strong> 14520</p>
                   <p><strong>Telefon / Müşteri Destek:</strong> 0850 840 86 95 | <strong>E-Posta:</strong> ihalecib@gmail.com</p>
                   <p><strong>KEP Adresi:</strong> hasanhuseyin.yildirim.17@hs01.kep.tr | <strong>Web Sitesi:</strong> https://ihaleciburada.com</p>

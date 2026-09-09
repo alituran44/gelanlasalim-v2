@@ -66,7 +66,7 @@ export default defineEventHandler(async (event) => {
         budget: saved.butce,
         direction: saved.usul,
         taxIdType: ((body as any).taxIdType) || ((body as any).taxNo?.length === 11 ? 'TCKN' : 'VKN'),
-        taxId: (body as any).taxId || (body as any).taxNo || (body as any).vkn || (body as any).tckn || '8680383525',
+        taxId: (body as any).taxId || (body as any).taxNo || (body as any).vkn || (body as any).tckn || '9560161511',
         taxOffice: (body as any).taxOffice || (body as any).vergiDairesi || `${saved.city} Vergi Dairesi`,
         companyOrFullName: saved.ownerCompany || (body as any).unvan || 'Kayıtlı İhale Sahibi',
         ownerEmail: saved.ownerEmail || 'ihalecib@gmail.com',
