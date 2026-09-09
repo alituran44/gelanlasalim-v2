@@ -43,108 +43,7 @@ function getFilePath(): string {
   return BACKUP_FILE
 }
 
-const SEED_GIB_LOGS: GibAuditLogItem[] = [
-  {
-    id: 'GIB-2026-0901',
-    tenderId: 'IHC-2026-901',
-    tenderTitle: 'Balıkesir OSB Çelik Konstrüksiyon Fabrika Binası & Çatı Kaplama Yapım İşi',
-    action: 'IHALE_ACILDI',
-    actionLabel: 'Yeni İhale İlanı Oluşturuldu',
-    category: 'İnşaat ve Yapı / Çelik Yapı & Çatı',
-    budget: '18.500.000 ₺',
-    direction: 'Kapalı Zarf Usulü',
-    taxIdType: 'VKN',
-    taxId: '5920192847',
-    taxOffice: 'Balıkesir Vergi Dairesi',
-    companyOrFullName: 'Marmara Çelik ve Ağır Sanayi A.Ş.',
-    ownerEmail: 'satinalma@marmaracelik.com.tr',
-    ownerPhone: '+90 266 281 10 00',
-    city: 'Balıkesir',
-    address: 'Organize Sanayi Bölgesi 14. Cadde No:8 Balıkesir',
-    ipAddress: '176.240.112.45',
-    port: '54128',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/128.0.0.0',
-    timestamp: '2026-09-01T09:14:22.000Z',
-    period: '2026-09',
-    status: 'HAZIR',
-    url: 'https://www.ihaleciburada.com/panel/pazar-yeri?id=IHC-2026-901'
-  },
-  {
-    id: 'GIB-2026-0902',
-    tenderId: 'IHC-2026-902',
-    tenderTitle: 'Marmara & Ege Bölgesi 15.000 Tonluk Endüstriyel Hammadde Nakliye & Lojistik İhalesi',
-    action: 'IHALE_ACILDI',
-    actionLabel: 'Yeni İhale İlanı Oluşturuldu',
-    category: 'Lojistik ve Taşımacılık / Karayolu Nakliye',
-    budget: '4.200.000 ₺',
-    direction: 'Açık Eksiltme (Fiyat Azaltımlı)',
-    taxIdType: 'VKN',
-    taxId: '4700854210',
-    taxOffice: 'Çanakkale Vergi Dairesi',
-    companyOrFullName: 'Mega Lojistik ve Dağıtım A.Ş.',
-    ownerEmail: 'operasyon@megalojistik.com.tr',
-    ownerPhone: '+90 286 217 40 50',
-    city: 'Çanakkale',
-    address: 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale',
-    ipAddress: '88.255.190.12',
-    port: '49821',
-    userAgent: 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)',
-    timestamp: '2026-09-01T11:30:15.000Z',
-    period: '2026-09',
-    status: 'HAZIR',
-    url: 'https://www.ihaleciburada.com/panel/pazar-yeri?id=IHC-2026-902'
-  },
-  {
-    id: 'GIB-2026-0903',
-    tenderId: 'IHC-2026-903',
-    tenderTitle: 'Endüstriyel 5 Eksenli CNC İşleme Merkezi & Talaşlı İmalat Robotik Hücre Alımı',
-    action: 'IHALE_ACILDI',
-    actionLabel: 'Yeni İhale İlanı Oluşturuldu',
-    category: 'Sanayi ve Makine / CNC & Takım Tezgahları',
-    budget: '8.900.000 ₺',
-    direction: 'Kapalı Zarf Usulü',
-    taxIdType: 'VKN',
-    taxId: '0681928471',
-    taxOffice: 'Bursa Nilüfer Vergi Dairesi',
-    companyOrFullName: 'Anadolu Çelik ve Metal Sanayi A.Ş.',
-    ownerEmail: 'tedarik@anadolumetal.com.tr',
-    ownerPhone: '+90 224 441 90 90',
-    city: 'Bursa',
-    address: 'Nilüfer Organize Sanayi Bölgesi Mavi Cadde Bursa',
-    ipAddress: '195.175.204.60',
-    port: '51204',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/128.0.0.0',
-    timestamp: '2026-09-02T14:45:00.000Z',
-    period: '2026-09',
-    status: 'HAZIR',
-    url: 'https://www.ihaleciburada.com/panel/pazar-yeri?id=IHC-2026-903'
-  },
-  {
-    id: 'GIB-2026-0904',
-    tenderId: 'IHC-2026-904',
-    tenderTitle: 'E-Ticaret & İhracat Ambalajı İçin 200.000 Adet Çift Dalga Kraft Koli Alımı',
-    action: 'IHALE_ACILDI',
-    actionLabel: 'Yeni İhale İlanı Oluşturuldu',
-    category: 'Ambalaj ve Kağıt / Oluklu Mukavva Koli',
-    budget: '1.650.000 ₺',
-    direction: 'Açık Eksiltme',
-    taxIdType: 'VKN',
-    taxId: '3819283746',
-    taxOffice: 'İlyasbey Vergi Dairesi',
-    companyOrFullName: 'Paketle Ambalaj ve Lojistik Sanayi Ltd. Şti.',
-    ownerEmail: 'info@paketleambalaj.com.tr',
-    ownerPhone: '+90 262 642 11 22',
-    city: 'Kocaeli',
-    address: 'Gebze Plastikçiler OSB Kocaeli',
-    ipAddress: '212.156.40.18',
-    port: '48320',
-    userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Edge/128.0.0.0',
-    timestamp: '2026-09-03T16:10:00.000Z',
-    period: '2026-09',
-    status: 'HAZIR',
-    url: 'https://www.ihaleciburada.com/panel/pazar-yeri?id=IHC-2026-904'
-  }
-]
+const SEED_GIB_LOGS: GibAuditLogItem[] = []
 
 function readFromDisk(): GibAuditLogItem[] | null {
   const filePath = getFilePath()
@@ -178,14 +77,14 @@ function writeToDisk(logs: GibAuditLogItem[]): void {
 export function getAllGibLogs(): GibAuditLogItem[] {
   if (inMemoryGibLogs === null) {
     const disk = readFromDisk()
-    if (disk && disk.length > 0) {
-      inMemoryGibLogs = disk
-    } else {
-      inMemoryGibLogs = [...SEED_GIB_LOGS]
-      writeToDisk(inMemoryGibLogs)
-    }
+    inMemoryGibLogs = disk || []
   }
   return inMemoryGibLogs
+}
+
+export function clearAllGibLogs(): void {
+  inMemoryGibLogs = []
+  writeToDisk([])
 }
 
 export function addGibLog(item: Partial<GibAuditLogItem>): GibAuditLogItem {

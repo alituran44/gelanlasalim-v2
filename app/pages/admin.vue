@@ -1125,22 +1125,40 @@ function handleSave() {
   triggerToast('Tüm değişiklikler başarıyla kaydedildi ve anında yayına alındı!', 'success')
 }
 
-function handleFullSystemWipe() {
+async function handleFullSystemWipe() {
   const confirmWipe = confirm('⚠️ TÜM SİSTEMİ VE TEST VERİLERİNİ TEMİZLEME ONAYI\n\nTüm kullanıcılar, açılan ihaleler, teklifler, emanet siparişleri, mesajlaşmalar ve KYC kayıtları tamamen sıfırlanacak; sistem tertemiz sıfır noktasına getirilecektir.\n\nBu işlemi onaylıyor musunuz?')
   if (!confirmWipe) return
 
+  // 1. Wipe server-side tenders, bids and gib audit logs
+  try {
+    await $fetch('/api/admin/wipe', { method: 'POST' })
+  } catch (e) {
+    console.warn('Sunucu temizleme uyarısı:', e)
+  }
+
+  // 2. Wipe client storage
   if (typeof window !== 'undefined') {
     try {
       localStorage.removeItem('cmsData')
       localStorage.removeItem('myTenders')
+      localStorage.removeItem('myBids')
       localStorage.removeItem('mySubmittedBids')
       localStorage.removeItem('allRegisteredUsers')
       localStorage.removeItem('user_accounts_registry')
+      localStorage.removeItem('registeredUsers')
+      localStorage.removeItem('kycVerifications')
       localStorage.removeItem('companyVerificationDocs')
       localStorage.removeItem('b2b_messages_chats')
       localStorage.removeItem('tenderDraft')
       localStorage.removeItem('userNotifications')
-      localStorage.setItem('cmsData_version', 'v2026_09_01_clean_slate_production_v1')
+      localStorage.removeItem('crmLeads')
+      localStorage.removeItem('bids')
+      localStorage.removeItem('adminAuditLogs')
+      localStorage.removeItem('userSession')
+      localStorage.removeItem('user_session')
+      localStorage.removeItem('auth_user')
+      localStorage.removeItem('b2b_user')
+      localStorage.setItem('cmsData_version', 'v2026_09_09_clean_zero_data_v1')
     } catch (e) {}
   }
 
@@ -1160,6 +1178,7 @@ function handleFullSystemWipe() {
   formState.escrowOrders = []
   formState.kycVerifications = []
   formState.liveAuctionRooms = []
+  formState.registeredCompanies = []
   if (formState.crmSettings) formState.crmSettings.leads = []
   if (formState.emailSettings) formState.emailSettings.subscribers = []
   formState.auditLogs = []
@@ -1169,6 +1188,36 @@ function handleFullSystemWipe() {
   setTimeout(() => {
     if (typeof window !== 'undefined') window.location.reload()
   }, 1000)
+}
+
+function deleteKyc(kyc: any) {
+  if (!confirm(`"${kyc.companyName || kyc.email}" kullanıcısını ve doğrulama kaydını sistemden silmek istediğinize emin misiniz?`)) return
+  
+  formState.kycVerifications = formState.kycVerifications.filter((k: any) => k.id !== kyc.id && k.email !== kyc.email)
+  
+  if (formState.crmSettings?.leads) {
+    formState.crmSettings.leads = formState.crmSettings.leads.filter((l: any) => l.email !== kyc.email)
+  }
+
+  if (typeof window !== 'undefined') {
+    try {
+      const allUsers = JSON.parse(localStorage.getItem('allRegisteredUsers') || '[]')
+      const filtered = allUsers.filter((u: any) => u.email !== kyc.email)
+      localStorage.setItem('allRegisteredUsers', JSON.stringify(filtered))
+
+      const regUsers = JSON.parse(localStorage.getItem('user_accounts_registry') || '[]')
+      const filteredReg = regUsers.filter((u: any) => u.email !== kyc.email)
+      localStorage.setItem('user_accounts_registry', JSON.stringify(filteredReg))
+
+      const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+      if (session && session.email === kyc.email) {
+        localStorage.removeItem('userSession')
+      }
+    } catch (e) {}
+  }
+
+  saveCmsData(JSON.parse(JSON.stringify(formState)))
+  triggerToast(`"${kyc.companyName || kyc.email}" kaydı sistemden silindi.`, 'info')
 }
 
 function handleReset() {
@@ -2530,6 +2579,13 @@ function removeSubmittedBid(index: number) {
                         class="px-3.5 py-1.5 bg-red-950/40 hover:bg-red-900/60 text-red-400 rounded-lg text-xs font-black transition flex items-center gap-1 cursor-pointer"
                       >
                         <XCircle :size="13" /> Reddet
+                      </button>
+                      <button 
+                        @click="deleteKyc(kyc)"
+                        class="px-3 py-1.5 bg-slate-800 hover:bg-red-950/70 text-slate-400 hover:text-red-400 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                        title="Kullanıcıyı ve Kaydını Sistemden Sil"
+                      >
+                        <Trash2 :size="13" /> Sil
                       </button>
                     </div>
                   </div>
