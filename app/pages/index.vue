@@ -157,6 +157,102 @@ onMounted(() => {
 })
 const { sendSms } = useNetGsm()
 
+// ==================== SIKÇA SORULAN SORULAR & İLK TEKLİF TALEBİ FORMU ====================
+const activeFaqIndex = ref<number | null>(0) // 0 means first item open by default like screenshot
+function toggleFaq(index: number) {
+  activeFaqIndex.value = activeFaqIndex.value === index ? null : index
+}
+
+const faqList = [
+  {
+    q: 'İhaleciBurada üzerinden satış yapmak güvenli mi?',
+    a: 'Evet. Platforma katılan firmalardan tüzel kişilik bilgileri, vergi dairesi ve VKN doğrulaması alınır; gerekli görülen durumlarda ek resmi belge incelemesi yapılır. Verileriniz TLS 1.3 ve AES-256 ile şifreli bağlantı üzerinden korunur; 6563 sayılı Elektronik Ticaret Kanunu ve 6698 sayılı KVKK standartlarına tam uyumlu olarak TCMB lisanslı güvenli Escrow havuzu altyapısıyla çalışılır. Mal veya hizmet teslimatı alıcı tarafından onaylanana kadar ödeme güvence altında tutulur.'
+  },
+  {
+    q: 'Ödeme nasıl yapılır?',
+    a: 'Alıcı firmalar ödemelerini TCMB & BDDK lisanslı ödeme kuruluşları (PayTR / iyzico) altyapısı üzerinden 3D Secure güvenceli kurumsal kredi kartı veya doğrudan güvenli havuz IBAN hesabına havale/EFT ile yapar. Ödeme, teslimat şartnameye uygun biçimde gerçekleşip alıcı tarafından onaylanana kadar bloke havuzunda saklanır; onay verildiğinde satıcıya aktarılır.'
+  },
+  {
+    q: 'İhaleciBurada taraflardan komisyon alıyor mu?',
+    a: 'Alıcılar (ihale açan ve satın alma yapan kurumlar) için platform kullanımı tamamen %0 Komisyondur (Ücretsizdir). İhaleyi kazanan satıcı/tedarikçilerden ise sektör ayrımı yapılmaksızın tüm işlemler için sabit net %4 (+ KDV) Escrow Güvenli Havuz ve teknolojik altyapı bedeli uygulanır. Tamamlanmayan, iptal edilen veya kazanılamayan ihalelerden hiçbir komisyon tahsil edilmez.'
+  },
+  {
+    q: 'Anlaşmazlık olursa İhaleciBurada\'nın rolü nedir?',
+    a: 'İhaleciBurada, 6563 Sayılı Elektronik Ticaret Kanunu m. 9 uyarınca Aracı Hizmet Sağlayıcı (Elektronik Pazar Yeri) niteliğindedir. Uyuşmazlıklarda şartname, sevk irsaliyesi, teslim kodu ve teklif kayıtlarını zaman damgalı sistem loglarıyla doğrular; Escrow bloke tutarını dondurarak tarafların uzlaşması veya yetkili mercilerin kararına kadar fonları koruma altında tutar.'
+  },
+  {
+    q: 'İhaleyi açan firma, ihaleyi yayından kaldırabilir mi?',
+    a: 'İhale sahibi alıcı firma, teklif toplama süresi dolmadan önce veya şartnamede esaslı değişiklik gereken hallerde gerekçesini belirterek ihaleyi iptal edebilir veya yayından kaldırabilir. Ancak kazanan teklifin kabul edildiği ve bağlayıcı sözleşmenin kurulduğu aşamadan sonraki işlemler Türk Borçlar Kanunu ve Kullanıcı Sözleşmesi hükümlerine tabidir.'
+  },
+  {
+    q: 'İhaleye teklif verdikten sonra teklifimi geri çekebilir miyim?',
+    a: 'Teklif veren tedarikçiler, teklifin sisteme girilmesinden itibaren ilk 24 saat içerisinde (ihalenin kapanış saatinden önce olmak kaydıyla) teklifini sistem üzerinden geri çekebilir veya revize edebilir. İhale kapandıktan veya alıcı tarafından kabul edildikten sonra verilen teklif geri alınamaz, bağlayıcı bir ticari taahhüt (icap) teşkil eder.'
+  }
+]
+
+const leadForm = ref({
+  firstName: '',
+  lastName: '',
+  email: '',
+  phone: '',
+  description: ''
+})
+const isSubmittingLead = ref(false)
+const leadSubmitSuccess = ref(false)
+const leadFormError = ref('')
+
+async function submitLeadRequest() {
+  leadFormError.value = ''
+  if (!leadForm.value.firstName.trim() || !leadForm.value.lastName.trim()) {
+    leadFormError.value = 'Lütfen ad ve soyadınızı eksiksiz girin.'
+    return
+  }
+  if (!leadForm.value.email.trim() || !leadForm.value.email.includes('@')) {
+    leadFormError.value = 'Lütfen geçerli bir kurumsal e-posta adresi girin.'
+    return
+  }
+  if (!leadForm.value.phone.trim() || leadForm.value.phone.length < 10) {
+    leadFormError.value = 'Lütfen en az 10 haneli geçerli bir telefon numarası girin.'
+    return
+  }
+
+  isSubmittingLead.value = true
+  try {
+    if (typeof window !== 'undefined') {
+      const existing = JSON.parse(localStorage.getItem('ihaleInquiries') || '[]')
+      existing.unshift({
+        id: 'TALEP-' + Date.now(),
+        ...leadForm.value,
+        createdAt: new Date().toISOString()
+      })
+      localStorage.setItem('ihaleInquiries', JSON.stringify(existing))
+    }
+    
+    try {
+      await $fetch('/api/v1/sms-bildirim', {
+        method: 'POST',
+        body: {
+          phone: leadForm.value.phone,
+          message: `Sayin ${leadForm.value.firstName} ${leadForm.value.lastName}, IhaleciBurada teklif talebiniz alinmistir. Danismanimiz en kisa surede sizinle iletisime gececektir.`
+        }
+      }).catch(() => {})
+    } catch {}
+
+    leadSubmitSuccess.value = true
+    leadForm.value = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      description: ''
+    }
+  } catch (err: any) {
+    leadFormError.value = 'Talebiniz kaydedilirken bir sorun oluştu. Lütfen tekrar deneyin.'
+  } finally {
+    isSubmittingLead.value = false
+  }
+}
+
 // ==================== 1. KATEGORİLER LİSTESİ (İNŞAAT, SAĞLIK, TARIM İLK 3 SIRADA) ====================
 const allCategoriesList = [
   { id: 1, name: 'İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri', short: 'İnşaat & Altyapı', icon: '🏗️' },
@@ -2568,6 +2664,336 @@ onMounted(() => {
 
 </div>
 </div>
+
+    <!-- ========================================================================= -->
+    <!-- ❓ SIKÇA SORULAN SORULAR (PLATFORM HAKKINDA MERAK EDİLENLER) -->
+    <!-- ========================================================================= -->
+    <section class="w-full bg-[#0b0f19] border-t border-slate-800 py-16 px-4 sm:px-6 text-left">
+      <div class="max-w-4xl mx-auto space-y-8">
+        
+        <!-- Başlık Alanı -->
+        <div class="text-center space-y-2">
+          <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
+            Sıkça sorulan sorular.
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-400 font-medium">
+            Platform hakkında merak edilenler.
+          </p>
+        </div>
+
+        <!-- Akordeon Listesi -->
+        <div class="space-y-3">
+          <div 
+            v-for="(item, idx) in faqList" 
+            :key="idx"
+            class="rounded-2xl border transition duration-200 overflow-hidden"
+            :class="activeFaqIndex === idx ? 'bg-[#121826] border-blue-500/50 shadow-lg' : 'bg-[#0f1422] border-slate-800 hover:border-slate-700'"
+          >
+            <button 
+              type="button"
+              @click="toggleFaq(idx)"
+              class="w-full px-5 sm:px-6 py-4 sm:py-5 flex items-center justify-between gap-4 text-left transition cursor-pointer"
+            >
+              <span class="text-xs sm:text-sm font-bold text-white leading-snug">
+                {{ item.q }}
+              </span>
+              <div 
+                class="w-7 h-7 rounded-full bg-slate-800/80 border border-slate-700 flex items-center justify-center shrink-0 transition-transform duration-200"
+                :class="activeFaqIndex === idx ? 'rotate-180 bg-blue-600/30 text-blue-400 border-blue-500/40' : 'text-slate-400'"
+              >
+                <ChevronDown :size="15" />
+              </div>
+            </button>
+
+            <!-- Cevap Alanı -->
+            <div 
+              v-show="activeFaqIndex === idx" 
+              class="px-5 sm:px-6 pb-5 pt-1 text-xs text-slate-300 leading-relaxed font-normal border-t border-slate-800/60"
+            >
+              <p>{{ item.a }}</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tüm Soruları Gör Bağlantısı -->
+        <div class="text-center pt-2">
+          <NuxtLink 
+            to="/sozlesmeler?tab=ihale-kurallari" 
+            class="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition"
+          >
+            <span>Tüm soruları gör</span>
+            <ChevronRight :size="13" />
+          </NuxtLink>
+        </div>
+
+        <!-- Hâlâ Sorularınız mı Var? Destek Kartı -->
+        <div class="pt-6 flex flex-col items-center justify-center text-center space-y-2.5">
+          <div class="w-9 h-9 rounded-2xl bg-blue-600/20 border border-blue-500/30 text-blue-400 flex items-center justify-center shadow-xs">
+            <MessageSquare :size="16" />
+          </div>
+          <div class="space-y-0.5">
+            <h4 class="text-xs font-bold text-white">Hâlâ sorularınız mı var?</h4>
+            <p class="text-[11px] text-slate-400 font-medium">Ekibimiz yardıma hazır. İş saatleri içerisinde yanıtlanır.</p>
+          </div>
+          <div class="pt-1">
+            <NuxtLink 
+              to="/panel/mesajlar" 
+              class="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition shadow-md"
+            >
+              <span>Bize ulaşın</span>
+              <Plus :size="13" />
+            </NuxtLink>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================================= -->
+    <!-- 🚀 İLK TEKLİF TALEBİNİZİ BİRLİKTE AÇALIM (BLUE HERO BANNER & FORM) -->
+    <!-- ========================================================================= -->
+    <section class="w-full bg-[#0b0f19] pb-16 sm:pb-24 px-4 sm:px-6 text-left">
+      <div class="max-w-6xl mx-auto">
+        <div class="rounded-3xl bg-[#1d4ed8] p-6 sm:p-10 lg:p-12 shadow-2xl border border-blue-500/30 relative overflow-hidden">
+          
+          <!-- Arka Plan Dekoratif Işıklandırma -->
+          <div class="absolute -right-24 -top-24 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute -left-24 -bottom-24 w-96 h-96 bg-blue-800/40 rounded-full blur-3xl pointer-events-none"></div>
+
+          <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+            
+            <!-- Sol Sütun: Açıklama ve Süreç Adımları (5 Kolon) -->
+            <div class="lg:col-span-5 space-y-6 text-white">
+              
+              <div class="space-y-2">
+                <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">
+                  İlk teklif talebinizi birlikte açalım.
+                </h2>
+                <p class="text-xs sm:text-sm text-blue-100 leading-relaxed font-medium">
+                  Alım ve tedarikçi limiti ayırt etmeksizin, farklı ihtiyaçlarla başlayın.
+                </p>
+              </div>
+
+              <!-- İlan Talebi Oluşturmanın 3 Adımı -->
+              <div class="space-y-3 pt-2">
+                <div class="text-[10px] font-black uppercase tracking-widest text-blue-200">
+                  İLAN TALEBİ OLUŞTURMANIN 3 ADIMI
+                </div>
+
+                <div class="space-y-4 text-xs">
+                  <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-blue-500/40 border border-blue-300/40 flex items-center justify-center font-black text-[11px] shrink-0 text-white">
+                      1
+                    </div>
+                    <div class="space-y-0.5">
+                      <strong class="block text-white font-bold">Talebi bırakın</strong>
+                      <p class="text-blue-100 text-[11px]">E-posta ve telefon bilgisi paylaşın.</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-blue-500/40 border border-blue-300/40 flex items-center justify-center font-black text-[11px] shrink-0 text-white">
+                      2
+                    </div>
+                    <div class="space-y-0.5">
+                      <strong class="block text-white font-bold">İhtiyacı netleştirelim</strong>
+                      <p class="text-blue-100 text-[11px]">Kategori, şartname ve teklif yapısını birlikte belirleyelim.</p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start gap-3">
+                    <div class="w-6 h-6 rounded-full bg-blue-500/40 border border-blue-300/40 flex items-center justify-center font-black text-[11px] shrink-0 text-white">
+                      3
+                    </div>
+                    <div class="space-y-0.5">
+                      <strong class="block text-white font-bold">Tedarikçilerden hazır teklifler alın</strong>
+                      <p class="text-blue-100 text-[11px]">Nitelikli üreticilerden anında teklif akışını görün.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- İlan Talebi Oluşturduğunuzda Neler Kazanırsınız? -->
+              <div class="space-y-2 pt-2 border-t border-blue-400/30">
+                <div class="text-[10px] font-black uppercase tracking-widest text-blue-200">
+                  İLAN TALEBİ OLUŞTURDUĞUNUZDA NELER KAZANIRSINIZ?
+                </div>
+
+                <ul class="space-y-1.5 text-xs text-blue-50 font-medium">
+                  <li class="flex items-center gap-2">
+                    <Check :size="13" class="text-blue-200 shrink-0" />
+                    <span>İlk ihaleniz için ücretsiz danışmanlık desteği</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <Check :size="13" class="text-blue-200 shrink-0" />
+                    <span>İhtiyacınıza uygun kategori ve ihale kurgusu</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <Check :size="13" class="text-blue-200 shrink-0" />
+                    <span>Şartname ve teklif yapısının profesyonel kontrolü</span>
+                  </li>
+                  <li class="flex items-center gap-2">
+                    <Check :size="13" class="text-blue-200 shrink-0" />
+                    <span>Türkiye merkezli uzman destek ekibi</span>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+
+            <!-- Sağ Sütun: Hızlı Lead ve Talep Formu (7 Kolon) -->
+            <div class="lg:col-span-7">
+              <div class="bg-[#0b0f19] border border-slate-800/80 rounded-2xl sm:rounded-3xl p-6 sm:p-8 shadow-2xl space-y-4">
+                
+                <h3 class="text-sm sm:text-base font-bold text-white leading-snug">
+                  Size ulaşabilmemiz için e-posta ve telefon bilgilerinizi birlikte girin.
+                </h3>
+
+                <!-- Başarı Durumu (Success Message) -->
+                <div v-if="leadSubmitSuccess" class="p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/50 text-emerald-200 space-y-1.5 text-center animate-fadeIn">
+                  <div class="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto mb-1">
+                    <CheckCircle2 :size="22" />
+                  </div>
+                  <strong class="block text-sm font-black text-white">Talebiniz Başarıyla Alındı!</strong>
+                  <p class="text-xs text-emerald-300">
+                    Kurumsal satın alma uzmanımız en kısa süre içinde paylaştığınız bilgiler üzerinden sizinle iletişime geçecektir.
+                  </p>
+                  <button 
+                    type="button" 
+                    @click="leadSubmitSuccess = false" 
+                    class="mt-2 text-[11px] underline text-emerald-400 hover:text-white cursor-pointer font-bold"
+                  >
+                    Yeni bir talep bırak
+                  </button>
+                </div>
+
+                <!-- Form Alanları -->
+                <form v-else @submit.prevent="submitLeadRequest" class="space-y-3.5">
+                  
+                  <!-- Hata Bildirimi -->
+                  <div v-if="leadFormError" class="p-2.5 rounded-xl bg-rose-950/60 border border-rose-500/50 text-rose-200 text-xs flex items-center gap-2">
+                    <AlertCircle :size="14" class="text-rose-400 shrink-0" />
+                    <span>{{ leadFormError }}</span>
+                  </div>
+
+                  <!-- Ad & Soyad -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                      <div class="flex items-center justify-between text-[11px]">
+                        <label class="text-slate-300 font-bold">Ad</label>
+                        <span class="text-[10px] text-slate-500">Zorunlu</span>
+                      </div>
+                      <input 
+                        v-model="leadForm.firstName"
+                        type="text" 
+                        placeholder="Adınız"
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-[#121826] border border-slate-700 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-blue-500 transition"
+                      />
+                    </div>
+
+                    <div class="space-y-1">
+                      <div class="flex items-center justify-between text-[11px]">
+                        <label class="text-slate-300 font-bold">Soyad</label>
+                        <span class="text-[10px] text-slate-500">Zorunlu</span>
+                      </div>
+                      <input 
+                        v-model="leadForm.lastName"
+                        type="text" 
+                        placeholder="Soyadınız"
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-[#121826] border border-slate-700 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-blue-500 transition"
+                      />
+                    </div>
+                  </div>
+
+                  <!-- E-posta & Telefon -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="space-y-1">
+                      <div class="flex items-center justify-between text-[11px]">
+                        <label class="text-slate-300 font-bold">E-posta</label>
+                        <span class="text-[10px] text-slate-500">Zorunlu</span>
+                      </div>
+                      <input 
+                        v-model="leadForm.email"
+                        type="email" 
+                        placeholder="ornek@sirket.com.tr"
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-[#121826] border border-slate-700 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-blue-500 transition"
+                      />
+                    </div>
+
+                    <div class="space-y-1">
+                      <div class="flex items-center justify-between text-[11px]">
+                        <label class="text-slate-300 font-bold">Telefon</label>
+                        <span class="text-[10px] text-slate-500">Zorunlu</span>
+                      </div>
+                      <input 
+                        v-model="leadForm.phone"
+                        type="tel" 
+                        placeholder="05XX XXX XX XX"
+                        class="w-full px-3.5 py-2.5 rounded-xl bg-[#121826] border border-slate-700 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-blue-500 transition font-mono"
+                      />
+                      <span class="text-[10px] text-slate-500 block">Türkiye cep telefonu: 05XX XXX XX XX</span>
+                    </div>
+                  </div>
+
+                  <!-- Teklif Talebi İhtiyacınız (Opsiyonel) -->
+                  <div class="space-y-1">
+                    <div class="flex items-center justify-between text-[11px]">
+                      <label class="text-slate-300 font-bold">Teklif talebi ihtiyacınız (opsiyonel)</label>
+                    </div>
+                    <textarea 
+                      v-model="leadForm.description"
+                      rows="3"
+                      placeholder="Ne satın almak istiyorsunuz? Kısaca yazabilirsiniz."
+                      class="w-full px-3.5 py-2.5 rounded-xl bg-[#121826] border border-slate-700 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-blue-500 transition resize-none"
+                    ></textarea>
+                  </div>
+
+                  <!-- Gönder Butonu -->
+                  <button 
+                    type="submit" 
+                    :disabled="isSubmittingLead"
+                    class="w-full py-3.5 px-5 rounded-xl bg-white hover:bg-slate-100 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition cursor-pointer"
+                  >
+                    <span v-if="isSubmittingLead">İşleniyor...</span>
+                    <span v-else class="flex items-center gap-2">
+                      <span>İlk teklif talebi için destek isteyin</span>
+                      <ArrowRight :size="15" />
+                    </span>
+                  </button>
+
+                  <!-- Gizlilik Uyarısı -->
+                  <p class="text-[10px] text-slate-400 text-center leading-relaxed">
+                    Ad, soyad, e-posta ve telefon bilgileriniz yalnızca bu talebinize dönüş yapmak için kullanılır. 
+                    <NuxtLink to="/sozlesmeler?tab=gizlilik" class="underline text-slate-300 hover:text-white font-semibold">
+                      Gizlilik ayrıntıları
+                    </NuxtLink>
+                  </p>
+
+                </form>
+
+                <!-- Kart Altı Rehber Bağlantıları -->
+                <div class="pt-3 border-t border-slate-800 text-[11px] text-slate-400 flex flex-wrap items-center justify-between gap-2">
+                  <span>Önce kendiniz incelemek ister misiniz?</span>
+                  <div class="flex items-center gap-3">
+                    <NuxtLink to="/panel/ihale-olustur" class="text-blue-400 hover:text-blue-300 font-bold transition flex items-center gap-1">
+                      <span>Teklif talebi açma adımlarını görün</span>
+                      <ArrowRight :size="11" />
+                    </NuxtLink>
+                    <NuxtLink to="/sozlesmeler?tab=aracilik" class="text-slate-300 hover:text-white font-bold transition flex items-center gap-1">
+                      <span>Kurumsal Danışmanlık</span>
+                      <ArrowRight :size="11" />
+                    </NuxtLink>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
 
     <!-- ========================================================================= -->
     <!-- 📄 1. İNTERAKTİF ÇOKLU ŞARTNAME, PDF VE GÖRSEL GALERİSİ MODALI -->
