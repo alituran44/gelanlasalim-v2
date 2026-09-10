@@ -99,6 +99,17 @@ onMounted(() => {
     window.addEventListener('storage', syncProfileFromSession)
     window.addEventListener('session-updated', syncProfileFromSession)
     window.addEventListener('user-session-changed', syncProfileFromSession)
+
+    const tab = route.query.tab as string
+    if (tab === 'guvenlik') {
+      setTimeout(() => {
+        document.getElementById('guvenlik')?.scrollIntoView({ behavior: 'smooth' })
+      }, 300)
+    } else if (tab === 'sozlesmeler') {
+      setTimeout(() => {
+        document.getElementById('sozlesmeler')?.scrollIntoView({ behavior: 'smooth' })
+      }, 300)
+    }
   }
 })
 
@@ -374,6 +385,8 @@ function confirmEmailVerificationOtp() {
 }
 
 const activeSubTab = computed(() => {
+  const tab = (route.query.tab as string) || ''
+  if (tab === 'guvenlik' || tab === 'sozlesmeler') return 'ayarlar'
   return (route.query.tab as 'kisisel' | 'sirket' | 'adresler' | 'bildirimler' | 'takip' | 'ticaret' | 'uyelik' | 'ayarlar') || 'ayarlar'
 })
 
@@ -3951,7 +3964,7 @@ function saveProfile() {
           </div>
 
           <!-- Sözleşmeler & Onaylar Card (Sadece Firma Modu Aktifse) -->
-          <div v-if="isCompanyMode" id="profil-kaynagi" class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
+          <div v-if="isCompanyMode" id="sozlesmeler" class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
             <div class="flex items-center gap-2.5 pb-2 border-b" style="border-color: #F1F5F9;">
               <FileText :size="15" class="text-blue-600" />
               <div>

@@ -715,50 +715,87 @@ watch(() => userSession.value, () => {
         </div>
 
         <!-- 3. Gelişmiş Ayarlar Hızlı Erişim Kartları -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
-          <NuxtLink 
-            to="/panel/ayarlar?tab=guvenlik" 
-            class="p-4 rounded-xl bg-white border border-slate-200 hover:border-blue-500 transition shadow-xs group space-y-1.5"
-          >
-            <div class="flex items-center justify-between text-slate-500">
-              <span class="text-xs font-bold text-slate-800">Şifre & 2FA Güvenliği</span>
-              <Lock :size="16" class="text-blue-600 group-hover:scale-110 transition" />
-            </div>
-            <p class="text-[11px] text-slate-500">E-posta onaylı 2FA iki aşamalı giriş ve şifre yönetimi</p>
-          </NuxtLink>
+        <div class="space-y-2 pt-2">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 px-1">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-700">Gelişmiş Ayarlar ve Güvenlik</span>
+            <span class="text-[11px] font-medium text-slate-500 flex items-center gap-1">
+              <span>(Tıklayarak düzenleyebilirsiniz)</span>
+            </span>
+          </div>
 
-          <NuxtLink 
-            to="/panel/ayarlar?tab=sirket" 
-            class="p-4 rounded-xl bg-white border border-slate-200 hover:border-emerald-500 transition shadow-xs group space-y-1.5"
-          >
-            <div class="flex items-center justify-between text-slate-500">
-              <span class="text-xs font-bold text-slate-800">Şirket Evrakları & VKN</span>
-              <Building2 :size="16" class="text-emerald-600 group-hover:scale-110 transition" />
-            </div>
-            <p class="text-[11px] text-slate-500">Vergi levhası, imza sirküleri ve faaliyet belgeleri</p>
-          </NuxtLink>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <NuxtLink 
+              to="/panel/ayarlar?tab=guvenlik" 
+              title="Tıklayarak düzenleyebilirsiniz"
+              class="p-4 rounded-xl bg-white border border-slate-200 hover:border-blue-500 transition shadow-xs group space-y-2 flex flex-col justify-between"
+            >
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-slate-500">
+                  <span class="text-xs font-bold text-slate-800">Şifre & 2FA Güvenliği</span>
+                  <Lock :size="16" class="text-blue-600 group-hover:scale-110 transition" />
+                </div>
+                <p class="text-[11px] text-slate-500 leading-snug">E-posta onaylı 2FA iki aşamalı giriş ve şifre yönetimi</p>
+              </div>
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400 group-hover:text-blue-600 transition">
+                <span>Tıklayarak düzenleyebilirsiniz</span>
+                <ChevronRight :size="12" class="group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </NuxtLink>
 
-          <NuxtLink 
-            to="/panel/ayarlar?tab=bildirimler" 
-            class="p-4 rounded-xl bg-white border border-slate-200 hover:border-amber-500 transition shadow-xs group space-y-1.5"
-          >
-            <div class="flex items-center justify-between text-slate-500">
-              <span class="text-xs font-bold text-slate-800">Bildirim Tercihleri</span>
-              <Bell :size="16" class="text-amber-600 group-hover:scale-110 transition" />
-            </div>
-            <p class="text-[11px] text-slate-500">E-posta, SMS ve anlık ihale teklif uyarı ayarları</p>
-          </NuxtLink>
+            <NuxtLink 
+              to="/panel/ayarlar?tab=sirket" 
+              title="Tıklayarak düzenleyebilirsiniz"
+              class="p-4 rounded-xl bg-white border border-slate-200 hover:border-emerald-500 transition shadow-xs group space-y-2 flex flex-col justify-between"
+            >
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-slate-500">
+                  <span class="text-xs font-bold text-slate-800">Şirket Evrakları & VKN</span>
+                  <Building2 :size="16" class="text-emerald-600 group-hover:scale-110 transition" />
+                </div>
+                <p class="text-[11px] text-slate-500 leading-snug">Vergi levhası, imza sirküleri ve faaliyet belgeleri</p>
+              </div>
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400 group-hover:text-emerald-600 transition">
+                <span>Tıklayarak düzenleyebilirsiniz</span>
+                <ChevronRight :size="12" class="group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </NuxtLink>
 
-          <NuxtLink 
-            to="/panel/ayarlar?tab=sozlesmeler" 
-            class="p-4 rounded-xl bg-white border border-slate-200 hover:border-purple-500 transition shadow-xs group space-y-1.5"
-          >
-            <div class="flex items-center justify-between text-slate-500">
-              <span class="text-xs font-bold text-slate-800">Sözleşmeler & KVKK</span>
-              <FileCheck :size="16" class="text-purple-600 group-hover:scale-110 transition" />
-            </div>
-            <p class="text-[11px] text-slate-500">Platform ana sözleşmesi, gizlilik ve rıza onayları</p>
-          </NuxtLink>
+            <NuxtLink 
+              to="/panel/ayarlar?tab=bildirimler" 
+              title="Tıklayarak düzenleyebilirsiniz"
+              class="p-4 rounded-xl bg-white border border-slate-200 hover:border-amber-500 transition shadow-xs group space-y-2 flex flex-col justify-between"
+            >
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-slate-500">
+                  <span class="text-xs font-bold text-slate-800">Bildirim Tercihleri</span>
+                  <Bell :size="16" class="text-amber-600 group-hover:scale-110 transition" />
+                </div>
+                <p class="text-[11px] text-slate-500 leading-snug">E-posta, SMS ve anlık ihale teklif uyarı ayarları</p>
+              </div>
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400 group-hover:text-amber-600 transition">
+                <span>Tıklayarak düzenleyebilirsiniz</span>
+                <ChevronRight :size="12" class="group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </NuxtLink>
+
+            <NuxtLink 
+              to="/panel/ayarlar?tab=sozlesmeler" 
+              title="Tıklayarak düzenleyebilirsiniz"
+              class="p-4 rounded-xl bg-white border border-slate-200 hover:border-purple-500 transition shadow-xs group space-y-2 flex flex-col justify-between"
+            >
+              <div class="space-y-1.5">
+                <div class="flex items-center justify-between text-slate-500">
+                  <span class="text-xs font-bold text-slate-800">Sözleşmeler & KVKK</span>
+                  <FileCheck :size="16" class="text-purple-600 group-hover:scale-110 transition" />
+                </div>
+                <p class="text-[11px] text-slate-500 leading-snug">Platform ana sözleşmesi, gizlilik ve rıza onayları</p>
+              </div>
+              <div class="pt-2 border-t border-slate-100 flex items-center justify-between text-[10px] font-bold text-slate-400 group-hover:text-purple-600 transition">
+                <span>Tıklayarak düzenleyebilirsiniz</span>
+                <ChevronRight :size="12" class="group-hover:translate-x-0.5 transition-transform" />
+              </div>
+            </NuxtLink>
+          </div>
         </div>
 
       </div>
