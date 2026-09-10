@@ -184,7 +184,7 @@ async function processEscrowPayment() {
     order.history.unshift({
       title: `Güvenli Havuz Ödemesi Bloke Edildi (${order.totalAmount})`,
       date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      by: 'İyzico / PayTR Pazaryeri Escrow'
+      by: 'Paynkolay Pazaryeri Escrow'
     })
 
     saveCmsData(cmsData.value)
@@ -194,10 +194,10 @@ async function processEscrowPayment() {
       recipientPhone: '+90 532 555 01 23',
       recipientName: order.supplierFirm,
       templateName: 'Havuz Ödeme Bloke Bildirimi',
-      messageBody: `GÜVENLİ HAVUZ BİLDİRİMİ: "${order.tenderTitle}" ihalesi için ${order.totalAmount} tutarındaki alıcı ödemesi İyzico güvenceli havuz hesabında bloke edilmiştir. Sevkiyata başlayabilirsiniz.`
+      messageBody: `GÜVENLİ HAVUZ BİLDİRİMİ: "${order.tenderTitle}" ihalesi için ${order.totalAmount} tutarındaki alıcı ödemesi Paynkolay güvenceli havuz hesabında bloke edilmiştir. Sevkiyata başlayabilirsiniz.`
     })
 
-    alert(`🔒 ÖDEME GÜVENLİ HAVUZDA BLOKE EDİLDİ!\n\n${order.totalAmount} tutarındaki sipariş bedeli İyzico/PayTR BDDK güvenceli havuz hesabına alınmıştır.\nTedarikçi firmaya sevkiyat başlatma bildirimi SMS ile iletildi.`)
+    alert(`🔒 ÖDEME GÜVENLİ HAVUZDA BLOKE EDİLDİ!\n\n${order.totalAmount} tutarındaki sipariş bedeli Paynkolay BDDK & TCMB güvenceli havuz hesabına alınmıştır.\nTedarikçi firmaya sevkiyat başlatma bildirimi SMS ile iletildi.`)
   }, 1200)
 }
 
@@ -251,7 +251,7 @@ async function releaseEscrowFunds() {
     order.history.unshift({
       title: `Mal Kabulü Onaylandı ➔ Split Payment: ${order.payoutAmount} Tedarikçi IBAN'ına, ${order.commissionAmount} Komisyon Platforma Aktarıldı ✓`,
       date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      by: 'Alıcı Onayı & İyzico Dağıtım API'
+      by: 'Alıcı Onayı & Paynkolay Dağıtım API'
     })
 
     saveCmsData(cmsData.value)
@@ -355,7 +355,7 @@ function submitDispute() {
         </div>
         <div class="text-[10px] text-slate-300 mt-1 font-medium flex items-center gap-1">
           <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-          İyzico / PayTR Korumalı Hesapta
+          Paynkolay Korumalı Hesapta
         </div>
       </div>
 
@@ -516,7 +516,7 @@ function submitDispute() {
                 <CheckCircle2 v-if="order.status !== 'ODEME_BEKLENIYOR'" :size="14" class="text-emerald-600" />
                 <Lock v-else :size="14" />
               </div>
-              <p class="text-[10px] text-slate-500 font-medium leading-snug">İyzico/PayTR Güvenli Havuzunda Bloke</p>
+              <p class="text-[10px] text-slate-500 font-medium leading-snug">Paynkolay Güvenli Havuzunda Bloke</p>
             </div>
 
             <!-- Step 2: Sevkiyat -->
@@ -694,7 +694,7 @@ function submitDispute() {
             </div>
             <div>
               <span class="text-[9px] font-black text-emerald-600 uppercase tracking-wider block">GÜVENLİ HAVUZ ÖDEMESİ</span>
-              <h3 class="text-base font-black text-slate-900">İyzico / PayTR Escrow Güvencesi</h3>
+              <h3 class="text-base font-black text-slate-900">Paynkolay Escrow Güvencesi</h3>
             </div>
           </div>
           <button @click="showPaymentModal = false" class="text-slate-400 hover:text-slate-700 p-2 cursor-pointer">

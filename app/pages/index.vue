@@ -170,7 +170,7 @@ const faqList = [
   },
   {
     q: 'Ödeme nasıl yapılır?',
-    a: 'Alıcı firmalar ödemelerini TCMB & BDDK lisanslı ödeme kuruluşları (PayTR / iyzico) altyapısı üzerinden 3D Secure güvenceli kurumsal kredi kartı veya doğrudan güvenli havuz IBAN hesabına havale/EFT ile yapar. Ödeme, teslimat şartnameye uygun biçimde gerçekleşip alıcı tarafından onaylanana kadar bloke havuzunda saklanır; onay verildiğinde satıcıya aktarılır.'
+    a: 'Alıcı firmalar ödemelerini TCMB & BDDK lisanslı ödeme kuruluşu (Paynkolay - Aktif Bank) altyapısı üzerinden 3D Secure güvenceli kurumsal kredi kartı veya doğrudan güvenli havuz IBAN hesabına havale/EFT ile yapar. Ödeme, teslimat şartnameye uygun biçimde gerçekleşip alıcı tarafından onaylanana kadar bloke havuzunda saklanır; onay verildiğinde satıcıya aktarılır.'
   },
   {
     q: 'İhaleciBurada taraflardan komisyon alıyor mu?',

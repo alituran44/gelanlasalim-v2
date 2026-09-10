@@ -4896,7 +4896,7 @@ function removeSubmittedBid(index: number) {
                     </div>
                   </div>
                   <p class="text-[10px] text-slate-500">
-                    * Otomatik TCMB lisanslı ödeme kuruluşu (İyzico / PayTR) split payment protokolü ile teslimat onaylandığı anda komisyon platform havuzuna, kalan hakediş ise tedarikçi IBAN hesabına aktarılır.
+                    * Otomatik TCMB lisanslı ödeme kuruluşu (Paynkolay - Aktif Bank) split payment protokolü ile teslimat onaylandığı anda komisyon platform havuzuna, kalan hakediş ise tedarikçi IBAN hesabına aktarılır.
                   </p>
                 </div>
               </div>

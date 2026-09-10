@@ -257,7 +257,7 @@ const legalLinks = [
       <div class="pt-6 border-t border-slate-800/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
         <div class="text-slate-400 font-medium text-[11px] flex items-center gap-2">
           <span class="text-emerald-400 font-bold flex items-center gap-1">
-            <CheckCircle2 :size="13" /> PayTR & iyzico 3D Secure
+            <CheckCircle2 :size="13" /> Paynkolay 3D Secure
           </span>
           <span>•</span>
           <span>TCMB & BDDK Lisanslı Güvenli Ödeme Altyapısı</span>

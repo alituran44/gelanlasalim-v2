@@ -179,9 +179,9 @@ const userSession = ref<any>({})
 
 const selectedPackage = ref<any>(null)
 const isCheckoutOpen = ref(false)
-const activePaymentChannel = ref<string>('paytr')
+const activePaymentChannel = ref<string>('paynkolay')
 
-// Corporate Billing Information Fields (Mandatory for PayTR / iyzico)
+// Corporate Billing Information Fields (Mandatory for Paynkolay / Aktif Bank)
 const billingCompanyTitle = ref('')
 const billingTaxNo = ref('')
 const billingTaxOffice = ref('')
@@ -202,7 +202,7 @@ const transferName = ref('')
 const isProcessing = ref(false)
 const showSuccessScreen = ref(false)
 
-// Compliance Checkboxes (Mandatory for PayTR / iyzico)
+// Compliance Checkboxes (Mandatory for Paynkolay / Aktif Bank)
 const preInfoApproved = ref(true)
 const distanceSalesApproved = ref(true)
 const refundPolicyApproved = ref(true)
@@ -246,7 +246,7 @@ function startFreeTrial() {
 function openCheckout(pkg: any) {
   selectedPackage.value = pkg
   if (paymentRegion.value === 'domestic') {
-    activePaymentChannel.value = 'paytr'
+    activePaymentChannel.value = 'paynkolay'
   } else {
     activePaymentChannel.value = 'stripe'
   }
@@ -557,7 +557,7 @@ function completeCheckout() {
               </div>
             </div>
 
-            <!-- PAID SCREEN (PAYTR & İYZİCO FULL COMPLIANCE) -->
+            <!-- PAID SCREEN (PAYNKOLAY FULL COMPLIANCE) -->
             <div v-else-if="!showSuccessScreen" class="space-y-5 text-left">
               
               <!-- Order Summary & Tax Breakdown Box -->
@@ -574,54 +574,47 @@ function completeCheckout() {
                   <span>Hesaplanan KDV (%20):</span>
                   <span>{{ currencySymbol }}{{ ((selectedPackage?.price || 0) - ((selectedPackage?.price || 0) / 1.2)).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
                 </div>
-                <hr class="border-blue-200" />
-                <div class="flex items-center justify-between text-slate-900 font-black text-sm">
-                  <span>Toplam Ödenecek (KDV Dahil):</span>
-                  <span class="text-blue-700 font-mono">{{ currencySymbol }}{{ (selectedPackage?.price || 0).toLocaleString('tr-TR') }},00</span>
+                <div class="pt-2 border-t border-blue-200 flex items-center justify-between font-black text-sm text-blue-950">
+                  <span>Ödenecek Toplam Tutar:</span>
+                  <span>{{ currencySymbol }}{{ (selectedPackage?.price || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
                 </div>
               </div>
 
-              <!-- Corporate Billing Information Form (Zorunlu Fatura Bilgileri) -->
-              <div class="space-y-3 p-4 rounded-2xl bg-slate-50 border border-slate-200">
+              <!-- Corporate Billing Information Box -->
+              <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                 <div class="flex items-center justify-between">
-                  <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-1">
-                    <Building2 :size="12" class="text-blue-600" />
-                    <span>E-FATURA / ŞİRKET BİLGİLERİ</span>
+                  <span class="text-[10px] font-black uppercase text-slate-500 tracking-wider flex items-center gap-1">
+                    <Building :size="12" class="text-blue-600" />
+                    FATURA VE VERGİ BİLGİLERİ
                   </span>
-                  <span class="text-[9px] font-bold text-blue-600 bg-blue-100/60 px-2 py-0.5 rounded">GİB Uyumlu</span>
+                  <span class="text-[9px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                    Otomatik E-Fatura
+                  </span>
                 </div>
 
-                <div class="grid grid-cols-1 gap-2.5 text-xs">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
                   <div>
-                    <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Şirket Ticaret Unvanı / Ad Soyad *</label>
-                    <input v-model="billingCompanyTitle" type="text" placeholder="Örn: ABC Sanayi ve Ticaret Ltd. Şti." class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white focus:border-blue-600 focus:outline-none" required />
+                    <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">Firma Unvanı *</label>
+                    <input v-model="billingCompanyTitle" type="text" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-medium focus:ring-1 focus:ring-blue-500 bg-white" placeholder="Şirket Tam Unvanı" />
                   </div>
-
-                  <div class="grid grid-cols-2 gap-2">
-                    <div>
-                      <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Vergi Dairesi *</label>
-                      <input v-model="billingTaxOffice" type="text" placeholder="Çanakkale V.D." class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white focus:border-blue-600 focus:outline-none" required />
-                    </div>
-                    <div>
-                      <label class="block text-[10px] font-bold text-slate-600 mb-0.5">VKN / TCKN *</label>
-                      <input v-model="billingTaxNo" type="text" placeholder="9560161511" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white font-mono focus:border-blue-600 focus:outline-none" required />
-                    </div>
-                  </div>
-
                   <div>
-                    <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Fatura Tebligat Adresi *</label>
-                    <input v-model="billingAddress" type="text" placeholder="İsmetpaşa Mah. Taşöz Apt. No:52/1" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white focus:border-blue-600 focus:outline-none" required />
+                    <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">Vergi No / TCKN *</label>
+                    <input v-model="billingTaxNo" type="text" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-mono font-medium focus:ring-1 focus:ring-blue-500 bg-white" placeholder="10 haneli VKN veya 11 haneli TCKN" />
                   </div>
-
-                  <div class="grid grid-cols-2 gap-2">
-                    <div>
-                      <label class="block text-[10px] font-bold text-slate-600 mb-0.5">İl / Şehir *</label>
-                      <input v-model="billingCity" type="text" placeholder="Çanakkale" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white focus:border-blue-600 focus:outline-none" required />
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">Vergi Dairesi *</label>
+                    <input v-model="billingTaxOffice" type="text" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-medium focus:ring-1 focus:ring-blue-500 bg-white" placeholder="Vergi Dairesi Adı" />
+                  </div>
+                  <div>
+                    <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">Şehir & İlçe *</label>
+                    <div class="grid grid-cols-2 gap-1">
+                      <input v-model="billingCity" type="text" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-medium focus:ring-1 focus:ring-blue-500 bg-white" placeholder="İl" />
+                      <input v-model="billingDistrict" type="text" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-medium focus:ring-1 focus:ring-blue-500 bg-white" placeholder="İlçe" />
                     </div>
-                    <div>
-                      <label class="block text-[10px] font-bold text-slate-600 mb-0.5">Fatura E-Posta *</label>
-                      <input v-model="billingEmail" type="email" placeholder="muhasebe@firma.com" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs bg-white focus:border-blue-600 focus:outline-none" required />
-                    </div>
+                  </div>
+                  <div class="sm:col-span-2">
+                    <label class="block text-[10px] text-slate-500 font-semibold mb-0.5">Fatura Adresi *</label>
+                    <input v-model="billingAddress" type="text" class="w-full px-2.5 py-1.5 rounded-lg border border-slate-300 text-xs font-medium focus:ring-1 focus:ring-blue-500 bg-white" placeholder="Açık adres (Cadde, Mahalle, Kapı No)" />
                   </div>
                 </div>
               </div>
@@ -633,29 +626,20 @@ function completeCheckout() {
                 </label>
                 
                 <!-- Domestic Gateways -->
-                <div v-if="paymentRegion === 'domestic'" class="grid grid-cols-3 gap-2">
+                <div v-if="paymentRegion === 'domestic'" class="grid grid-cols-2 gap-2">
                   <button 
-                    @click="activePaymentChannel = 'paytr'"
+                    @click="activePaymentChannel = 'paynkolay'"
                     class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1 cursor-pointer"
-                    :class="activePaymentChannel === 'paytr' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-xs' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
+                    :class="activePaymentChannel === 'paynkolay' ? 'border-orange-600 bg-orange-50 text-orange-700 font-bold shadow-xs' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
                   >
                     <CreditCard :size="16" />
-                    <span class="text-[10px]">PayTR 3D</span>
-                  </button>
-
-                  <button 
-                    @click="activePaymentChannel = 'iyzico'"
-                    class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1 cursor-pointer"
-                    :class="activePaymentChannel === 'iyzico' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-xs' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
-                  >
-                    <CreditCard :size="16" />
-                    <span class="text-[10px]">iyzico Korumalı</span>
+                    <span class="text-[10px]">Paynkolay 3D Secure</span>
                   </button>
 
                   <button 
                     @click="activePaymentChannel = 'bank_transfer'"
                     class="flex flex-col items-center justify-center p-3 border rounded-xl transition duration-150 gap-1 cursor-pointer"
-                    :class="activePaymentChannel === 'bank_transfer' ? 'border-blue-600 bg-blue-50 text-blue-700 font-bold shadow-xs' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
+                    :class="activePaymentChannel === 'bank_transfer' ? 'border-orange-600 bg-orange-50 text-orange-700 font-bold shadow-xs' : 'border-slate-200 text-slate-600 hover:bg-slate-50'"
                   >
                     <Building :size="16" />
                     <span class="text-[10px]">Havale / EFT</span>
@@ -755,14 +739,14 @@ function completeCheckout() {
               <p class="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
                 {{ selectedPackage?.isTrial 
                   ? '1 ay boyunca tüm kurumsal B2B ihale ve ihale ve satın alma modüllerini 0 ₺ bedelle sınırsız kullanabilirsiniz.'
-                  : 'Ödemeniz PayTR / iyzico onayından geçti. E-Faturanız oluşturuldu ve kurumsal panel erişiminiz anında aktifleştirildi.' 
+                  : 'Ödemeniz Paynkolay onayından geçti. E-Faturanız oluşturuldu ve kurumsal panel erişiminiz anında aktifleştirildi.' 
                 }}
               </p>
             </div>
 
           </div>
 
-          <!-- Modal Footer with PayTR & iyzico Required Checkboxes -->
+          <!-- Modal Footer with Paynkolay Required Checkboxes -->
           <div class="p-5 bg-slate-50 border-t border-slate-100 space-y-3 text-left">
             <div v-if="!showSuccessScreen" class="space-y-2 text-[10px] text-slate-600 font-medium">
               <!-- Checkbox 1: Mesafeli Satış & Abonelik Sözleşmesi (Ön Bilgilendirme ve İptal/İade Dahil) -->

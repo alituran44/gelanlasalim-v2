@@ -92,7 +92,7 @@ function printDocument() {
         </div>
       </div>
 
-      <!-- PAYTR & İYZİCO RESMİ SATICI KÜNYESİ (MERCHANT IDENTITY & REGISTRATION BANNER) -->
+      <!-- PAYNKOLAY RESMİ SATICI KÜNYESİ (MERCHANT IDENTITY & REGISTRATION BANNER) -->
       <div class="mb-8 rounded-3xl bg-white border border-slate-200 p-6 sm:p-7 shadow-xs">
         <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div class="space-y-1.5 max-w-2xl">
@@ -104,7 +104,7 @@ function printDocument() {
               Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)
             </h2>
             <p class="text-xs text-slate-500 font-medium leading-relaxed">
-              Platformumuz 6563 Sayılı Elektronik Ticaret Kanunu, 6102 Sayılı Türk Ticaret Kanunu ve 6493 Sayılı Ödeme Hizmetleri mevzuatına tam uyumlu olarak TCMB & BDDK lisanslı ödeme geçitleri (PayTR, iyzico) altyapısıyla faaliyet göstermektedir.
+              Platformumuz 6563 Sayılı Elektronik Ticaret Kanunu, 6102 Sayılı Türk Ticaret Kanunu ve 6493 Sayılı Ödeme Hizmetleri mevzuatına tam uyumlu olarak TCMB & BDDK lisanslı ödeme altyapısı (Paynkolay - Aktif Bank) üzerinden faaliyet göstermektedir.
             </p>
           </div>
 
@@ -317,7 +317,7 @@ function printDocument() {
               <!-- 4. Paket, ücret ve ödeme -->
               <section class="space-y-2 bg-blue-50/50 p-4 rounded-xl border border-blue-200">
                 <h3 class="font-bold text-blue-950 text-sm">4. PAKET, ÜCRET VE ÖDEME</h3>
-                <p><strong>4.1.</strong> İhaleciBurada, platformda gösterdiği üyelik paketlerini gerçek birer hizmet ve kullanım hakkı teklifi olarak sunar; paketin kapsamı, hak ve kotaları, süresi, bedeli ve vergileri işlem öncesinde platformda gösterilen güncel bilgilere göre belirlenir ve bu sözleşmenin sürekli hükümlerine tabidir. Paket edinimi, yenileme ve plan değişikliğinde, işlem sırasında ödeme adımında fiilen sunulan ve kullanılabilir olan ödeme yöntemleri ile bunların işlem öncesinde açıklanan koşulları uygulanır. Kartlı ödeme sunulduğunda bu ödeme, işlem öncesinde açıklanan koşullar altında TCMB ve BDDK lisanslı ödeme hizmeti sağlayıcıları (PayTR / iyzico) altyapısı üzerinden alınır; bu hüküm hiçbir ödeme yönteminin, paketin veya aktivasyonun her zaman kullanılabilir olduğunu göstermez ve ödeme adımında sunulmayan bir yöntemin kullanılabilir olduğu anlamına gelmez. Mevcut ücretsiz erişim, yetki ve kotalar ile geçmişte geçerli biçimde edinilmiş haklar kendi kapsamlarında değerlendirilir; ücretsiz hesap bütün işlevlerin sınırsız olduğu veya hiçbir işlemin yapılamayacağı anlamına gelmez. Üyelik süresi sonunda kendiliğinden yenilenmez; yenileme üyenin talebiyle ve o tarihte geçerli koşullarla yapılır.</p>
+                <p><strong>4.1.</strong> İhaleciBurada, platformda gösterdiği üyelik paketlerini gerçek birer hizmet ve kullanım hakkı teklifi olarak sunar; paketin kapsamı, hak ve kotaları, süresi, bedeli ve vergileri işlem öncesinde platformda gösterilen güncel bilgilere göre belirlenir ve bu sözleşmenin sürekli hükümlerine tabidir. Paket edinimi, yenileme ve plan değişikliğinde, işlem sırasında ödeme adımında fiilen sunulan ve kullanılabilir olan ödeme yöntemleri ile bunların işlem öncesinde açıklanan koşulları uygulanır. Kartlı ödeme sunulduğunda bu ödeme, işlem öncesinde açıklanan koşullar altında TCMB ve BDDK lisanslı ödeme hizmeti sağlayıcıları (Paynkolay / Aktif Bank) altyapısı üzerinden alınır; bu hüküm hiçbir ödeme yönteminin, paketin veya aktivasyonun her zaman kullanılabilir olduğunu göstermez ve ödeme adımında sunulmayan bir yöntemin kullanılabilir olduğu anlamına gelmez. Mevcut ücretsiz erişim, yetki ve kotalar ile geçmişte geçerli biçimde edinilmiş haklar kendi kapsamlarında değerlendirilir; ücretsiz hesap bütün işlevlerin sınırsız olduğu veya hiçbir işlemin yapılamayacağı anlamına gelmez. Üyelik süresi sonunda kendiliğinden yenilenmez; yenileme üyenin talebiyle ve o tarihte geçerli koşullarla yapılır.</p>
                 <p><strong>4.2.</strong> Üyelik paketlerinden ayrı olarak danışmanlık hizmeti de sunulmaya devam eder. Müşterinin mutabakatından önce hizmetin kapsamı, başlangıç ve bitişi, bedeli, vergi ve toplam tutarı, havale veya ödeme şartları ve kullanım hakları açıklanır ve ayrı sözleşmeyle ilişkilendirilir. Bu metin kart saklama, otomatik yenileme, otomatik tahsilat veya işlem öncesinde açıklanmamış yeni bir ücret yetkisi vermez; tek başına herhangi bir ödeme aracına başvurma yetkisi oluşturmaz ve herhangi bir ödeme yönteminin kullanılabilirliğini, kesintisizliğini veya bir açılış tarihini taahhüt etmez.</p>
                 <p><strong>4.3.</strong> Platformun ihale aracılığı nedeniyle işlem bedeli üzerinden komisyon alması bu sözleşmeyle alıcılar için kararlaştırılmamıştır (%0 Alıcı Komisyonu). Geçmiş üyelik ilişkilerinden doğmuş geçerli bedeller ile ayrı danışmanlık bedeli birbirinden ayrıdır. Bu hüküm danışmanlık sözleşmesindeki bedeli kaldırmaz veya değiştirmez; geçmiş kayıt yeni satış veya yeniden tahsilat izni sayılamaz.</p>
                 <p><strong>4.4.</strong> Üyelik veya danışmanlık bedeli ile alıcı ve tedarikçi arasındaki mal veya hizmet bedeli ayrıdır. Paketin sona ermesi, yenilenmemesi ya da paket koşullarındaki bir değişiklik, daha önce kurulan alım-satım ilişkisini, doğmuş borçları, geçmiş sözleşme ve kabul kayıtlarını kendiliğinden ortadan kaldırmaz. Geçerli bağımsız ücretli üyeliğin kalan süresi ve ayrı hizmet sonu 24 saatlik ödeme penceresi kendi koşullarıyla korunur; bu pencere teklif geri çekme süresi veya kart yenileme yetkisi değildir. İade ve sona erme sonuçları uygulanabilir hukuk ile işlem öncesinde geçerli şekilde kararlaştırılmış koşullara göre değerlendirilir.</p>
@@ -473,7 +473,7 @@ function printDocument() {
               <!-- 4. Ücretler ve doğrudan ödeme -->
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">4. ÜCRETLER VE DOĞRUDAN ÖDEME</h3>
-                <p><strong>4.1.</strong> İhaleciBurada, platformda gösterdiği üyelik paketlerini gerçek birer hizmet ve kullanım hakkı teklifi olarak sunar; paketin kapsamı, hak ve kotaları, süresi, bedeli ve vergileri işlem öncesinde platformda gösterilen güncel bilgilere göre belirlenir. Paket edinimi ve plan değişikliğinde, işlem sırasında ödeme adımında fiilen sunulan ve kullanılabilir olan ödeme yöntemleri ile bunların işlem öncesinde açıklanan koşulları uygulanır; kartlı ödeme sunulduğunda bu ödeme, işlem öncesinde açıklanan koşullar altında BDDK ve TCMB lisanslı ödeme hizmeti sağlayıcıları (PayTR / iyzico) altyapısı üzerinden alınır. Üyelik paketlerinden ayrı olarak danışmanlık hizmeti de sunulur; müşterinin mutabakatından önce bu hizmetin türü, kapsamı, başlangıç ve bitişi, tutarı veya hesaplanma yöntemi, vergi ve toplam bedeli ile havale veya ödeme şartları açıklanır. Bu sözleşme kart saklama, otomatik yenileme veya otomatik tahsilat yetkisi vermez; herhangi bir ödeme yönteminin kullanılabilirliğini, kesintisizliğini veya bir açılış tarihini taahhüt etmez.</p>
+                <p><strong>4.1.</strong> İhaleciBurada, platformda gösterdiği üyelik paketlerini gerçek birer hizmet ve kullanım hakkı teklifi olarak sunar; paketin kapsamı, hak ve kotaları, süresi, bedeli ve vergileri işlem öncesinde platformda gösterilen güncel bilgilere göre belirlenir. Paket edinimi ve plan değişikliğinde, işlem sırasında ödeme adımında fiilen sunulan ve kullanılabilir olan ödeme yöntemleri ile bunların işlem öncesinde açıklanan koşulları uygulanır; kartlı ödeme sunulduğunda bu ödeme, işlem öncesinde açıklanan koşullar altında BDDK ve TCMB lisanslı ödeme hizmeti sağlayıcıları (Paynkolay / Aktif Bank) altyapısı üzerinden alınır. Üyelik paketlerinden ayrı olarak danışmanlık hizmeti de sunulur; müşterinin mutabakatından önce bu hizmetin türü, kapsamı, başlangıç ve bitişi, tutarı veya hesaplanma yöntemi, vergi ve toplam bedeli ile havale veya ödeme şartları açıklanır. Bu sözleşme kart saklama, otomatik yenileme veya otomatik tahsilat yetkisi vermez; herhangi bir ödeme yönteminin kullanılabilirliğini, kesintisizliğini veya bir açılış tarihini taahhüt etmez.</p>
                 <p><strong>4.2.</strong> Bu sözleşmeyle alıcılar için ihale bedeli üzerinden komisyon, ihale başına komisyon veya başarı komisyonu kararlaştırılmamıştır (%0 Alıcı Komisyonu). Geçmiş üyelik ilişkilerinden doğmuş geçerli bedeller ve ayrıca geçerli biçimde kararlaştırılan danışmanlık bedeli farklıdır. Ayrı danışmanlık sözleşmesindeki bedel kaldırılmaz veya değiştirilmez. Paket koşullarındaki bir değişiklik geçmişte edinilmiş hakları veya bağımsız ücretli üyeliğin kalan süresini kendiliğinden kaldırmaz.</p>
                 <p><strong>4.3.</strong> Mal veya hizmetin ticaret bedeli alıcı ile satıcı arasında doğrudan ödenir. Bu metin İşletmeci nezdinde emanet hesap, tahsilat garantisi veya ödeme kuruluşu hizmeti kurmaz; İşletmecinin ayrı danışmanlık alacağını ortadan kaldırmaz. Ücret değişikliği mevcut dönem veya başlamış işlem için geriye dönük yeni borç doğurmaz. Gelecekte yeni bir ücret veya satış modeli uygulanması bu metinle kararlaştırılmış değildir; böyle bir değişiklik ayrıca yetkili karar, önceden açıklanan geçerli koşullar ve kanuni güvenceler gerektirir.</p>
               </section>
@@ -783,7 +783,7 @@ function printDocument() {
           <!-- 4. ÖN BİLGİLENDİRME FORMU (PRE-INFORMATION FORM) -->
           <article v-if="activeTab === 'on-bilgilendirme'" class="space-y-6">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="px-3 py-1 bg-amber-50 text-amber-800 font-mono text-xs font-bold rounded-lg border border-amber-200">PAYTR & İYZİCO ZORUNLU FORMU</span>
+              <span class="px-3 py-1 bg-amber-50 text-amber-800 font-mono text-xs font-bold rounded-lg border border-amber-200">PAYNKOLAY ZORUNLU FORMU</span>
               <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">6563 SK & MESAFELİ SÖZLEŞMELER</span>
               <span class="text-xs text-slate-400">Yürürlük: 2026.08</span>
             </div>
@@ -826,7 +826,7 @@ function printDocument() {
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — TESLİMAT VE İFA BİLGİLERİ</h3>
                 <p>3.1. Hizmet tamamen dijital ortamda sunulmakta olup herhangi bir fiziksel kargo teslimatı bulunmamaktadır.</p>
-                <p>3.2. Ödeme onayı lisanslı ödeme kuruluşu (PayTR, iyzico) veya banka tarafından teyit edildiği anda, abonenin kullanıcı hesabı anında ve otomatik olarak aktif edilir. Giriş bilgileri ve aktivasyon onayı kayıtlı e-posta adresine iletilir.</p>
+                <p>3.2. Ödeme onayı lisanslı ödeme kuruluşu (Paynkolay - Aktif Bank) veya banka tarafından teyit edildiği anda, abonenin kullanıcı hesabı anında ve otomatik olarak aktif edilir. Giriş bilgileri ve aktivasyon onayı kayıtlı e-posta adresine iletilir.</p>
                 <p>3.3. E-Fatura / e-Arşiv faturası, Vergi Usul Kanunu uyarınca en geç yedi (7) gün içinde abonenin şirket unvanı ve VKN/TCKN bilgileriyle düzenlenerek e-posta ile gönderilir.</p>
               </section>
 
@@ -847,7 +847,7 @@ function printDocument() {
           <article v-if="activeTab === 'mesafeli-satis'" class="space-y-6">
             <div class="flex flex-wrap items-center gap-2">
               <span class="px-3 py-1 bg-indigo-50 text-indigo-800 font-mono text-xs font-bold rounded-lg border border-indigo-200">B2B TİCARİ ABONELİK</span>
-              <span class="px-3 py-1 bg-slate-100 text-slate-800 font-mono text-xs font-bold rounded-lg border border-slate-200">PAYTR & İYZİCO 3D SECURE</span>
+              <span class="px-3 py-1 bg-slate-100 text-slate-800 font-mono text-xs font-bold rounded-lg border border-slate-200">PAYNKOLAY 3D SECURE</span>
               <span class="text-xs text-slate-400">Yürürlük: 2026.08</span>
             </div>
 
@@ -862,7 +862,7 @@ function printDocument() {
               <section class="space-y-2 bg-blue-50/60 p-4 rounded-xl border border-blue-200">
                 <h3 class="font-bold text-blue-950 text-sm">MADDE 3 — ANINDA DİJİTAL İFA VE TESLİMAT</h3>
                 <p>3.1. Hizmet tamamen dijital ortamda sunulmakta olup herhangi bir fiziksel kargo teslimatı veya kargo bedeli bulunmamaktadır.</p>
-                <p>3.2. PayTR / iyzico 3D Secure ödeme onayı alındığı anda veya 1 Aylık Ücretsiz Deneme başlatıldığında, abonenin kullanıcı hesabı <strong>anında (0 saniye gecikmeyle)</strong> aktif edilir.</p>
+                <p>3.2. Paynkolay (Aktif Bank) 3D Secure ödeme onayı alındığı anda veya 1 Aylık Ücretsiz Deneme başlatıldığında, abonenin kullanıcı hesabı <strong>anında (0 saniye gecikmeyle)</strong> aktif edilir.</p>
                 <p>3.3. E-Fatura / e-Arşiv faturası en geç 7 iş günü içerisinde düzenlenerek abonenin e-posta adresine iletilir.</p>
               </section>
 
@@ -921,7 +921,7 @@ function printDocument() {
                 <h3 class="font-bold text-emerald-950 text-sm">KURAL 4 — ESCROW GÜVENLİ HAVUZ VE HAKEDİŞ AKTARIMI</h3>
                 <p>4.1. İhale mutabakatında Alıcı bedeli TCMB lisanslı güvenli havuz hesabına yatırır; tutar bloke edilir.</p>
                 <p>4.2. Tedarikçi malı sevk edip sevk irsaliyesini yükler. Alıcı malı muayene edip mal kabul onayını verdiğinde havuzdaki bloke çözülerek hakediş Tedarikçiye aktarılır.</p>
-                <p>4.3. Şirket bir banka değildir; fonlar lisanslı ödeme kuruluşu (PayTR/iyzico) nezdinde güvence altındadır.</p>
+                <p>4.3. Şirket bir banka değildir; fonlar lisanslı ödeme kuruluşu (Paynkolay - Aktif Bank) nezdinde güvence altındadır.</p>
                 <p>4.4. <strong>Sabit %4 Escrow ve Platform Komisyonu:</strong> Platformumuzda sektör ayrımı yapılmaksızın tüm ihalelerde <strong>sabit net %4 (+ KDV) Escrow Güvenli Havuz ve Başarı Hizmet Bedeli</strong> uygulanır. Bu bedel yalnızca ihale tamamlanıp mal kabul onayı verildiğinde hakediş tutarından tahakkuk ettirilir. İptal edilen, sonuçlanmayan veya kazanılamayan ihalelerde hiçbir komisyon alınmaz (%0).</p>
               </section>
 

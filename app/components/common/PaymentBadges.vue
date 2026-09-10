@@ -45,24 +45,15 @@ defineProps<{
       </svg>
     </div>
 
-    <!-- İYZİCO İLE ÖDE LOGOSU -->
-    <div class="h-8 px-3 rounded-lg bg-[#0F223D] border border-blue-900/60 shadow-xs flex items-center gap-1.5 transition hover:opacity-95" title="iyzico ile Güvenli Öde">
-      <svg viewBox="0 0 110 32" class="h-4 w-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <text x="4" y="21" font-family="'Inter', sans-serif" font-size="15" font-weight="900" fill="#1EAE4C">iyzi</text>
-        <text x="32" y="21" font-family="'Inter', sans-serif" font-size="15" font-weight="900" fill="#00C2FF">co</text>
-        <text x="54" y="21" font-family="'Inter', sans-serif" font-size="9" font-weight="700" fill="#E2E8F0" letter-spacing="0.3">ile Öde</text>
-      </svg>
-      <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
-    </div>
-
-    <!-- PAYTR 3D SECURE LOGOSU -->
-    <div class="h-8 px-3 rounded-lg bg-[#0F223D] border border-blue-900/60 shadow-xs flex items-center gap-1.5 transition hover:opacity-95" title="PayTR 3D Secure">
-      <div class="flex items-center gap-1 font-sans">
-        <span class="font-black text-xs text-white">Pay</span>
-        <span class="font-black text-xs text-[#00C2FF]">TR</span>
-        <span class="text-[9px] font-bold text-amber-400 ml-0.5">3D</span>
+    <!-- PAYNKOLAY 3D SECURE LOGOSU (AKTİF BANK) -->
+    <div class="h-8 px-3 rounded-lg bg-[#0F223D] border border-orange-500/40 shadow-xs flex items-center gap-1.5 transition hover:border-orange-500/70" title="Paynkolay (Aktif Bank) 3D Secure Güvenli Ödeme">
+      <div class="flex items-center tracking-tight font-sans">
+        <span class="font-black text-xs text-white">pay</span>
+        <span class="font-black text-sm text-[#FF5A00] leading-none px-0.5 font-mono">n</span>
+        <span class="font-black text-xs text-white">kolay</span>
+        <span class="text-[9px] font-black text-[#FF7A1A] bg-orange-500/20 border border-orange-500/40 px-1 py-0.2 rounded ml-1.5 uppercase">3D</span>
       </div>
-      <span class="h-1.5 w-1.5 rounded-full bg-[#00C2FF]"></span>
+      <span class="h-1.5 w-1.5 rounded-full bg-[#FF5A00]"></span>
     </div>
 
     <!-- 256-BIT SSL & TCMB SEAL -->

@@ -39,7 +39,7 @@ definePageMeta({
         </p>
       </div>
 
-      <!-- PAYTR & İYZİCO ONAYLI RESMİ ŞİRKET KÜNYESİ (MERCHANT REGISTRY) -->
+      <!-- PAYNKOLAY ONAYLI RESMİ ŞİRKET KÜNYESİ (MERCHANT REGISTRY) -->
       <div class="rounded-3xl bg-white border border-slate-200 p-6 sm:p-8 shadow-xs space-y-6">
         <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-slate-100 pb-5">
           <div>
@@ -106,9 +106,9 @@ definePageMeta({
           <div class="h-10 w-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center">
             <ShieldCheck :size="20" />
           </div>
-          <h3 class="text-sm font-black text-slate-900">PayTR & iyzico 3D Secure</h3>
+          <h3 class="text-sm font-black text-slate-900">Paynkolay 3D Secure</h3>
           <p class="text-xs text-slate-600 leading-relaxed font-medium">
-            TCMB ve BDDK lisanslı ödeme geçitleri (PayTR ve iyzico) altyapısıyla kredi kartı bilgileriniz kaydedilmeden doğrudan banka SMS onayıyla tahsil edilir.
+            TCMB ve BDDK lisanslı ödeme geçidi (Paynkolay - Aktif Bank) altyapısıyla kredi kartı bilgileriniz kaydedilmeden doğrudan banka SMS onayıyla tahsil edilir.
           </p>
         </div>
 

@@ -287,7 +287,7 @@ async function acceptTeklif(teklif: any, ilan: any) {
       shippingCompany: 'Lojistik / Ambar',
       trackingCode: '',
       notes: 'İhale başarıyla sonuçlandı. Güvenli havuz ödemesi bloke edildi.',
-      paymentMethod: 'PayTR / iyzico 3D Güvenli Havuz',
+      paymentMethod: 'Paynkolay 3D Güvenli Havuz',
       createdAt: 'Bugün',
       updatedAt: 'Şimdi',
       history: [

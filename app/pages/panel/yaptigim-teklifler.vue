@@ -320,7 +320,7 @@ async function acceptCounterOffer(teklif: any) {
     shippingCompany: 'Yurtiçi Kargo & Borusan Lojistik',
     deliveryDate: '3 iş günü',
     notes: 'İhale mutabakatı tamamlandı. Havuz ödemesi bloke edildi.',
-    paymentMethod: 'PayTR / iyzico 3D Güvenli Havuz',
+    paymentMethod: 'Paynkolay 3D Güvenli Havuz',
     createdAt: new Date().toLocaleDateString('tr-TR'),
     updatedAt: 'Şimdi'
   }
