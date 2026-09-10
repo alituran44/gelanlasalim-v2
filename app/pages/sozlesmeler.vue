@@ -544,103 +544,108 @@ function printDocument() {
             </div>
           </article>
 
-          <!-- 3. GİZLİLİK POLİTİKASI (PRIVACY POLICY) -->
+          <!-- 3. GİZLİLİK POLİTİKASI & KVKK AYDINLATMA METNİ -->
           <article v-if="activeTab === 'gizlilik'" class="space-y-6">
             <div class="flex flex-wrap items-center gap-2">
-              <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">TİCARİ SIR & ENDÜSTRİYEL VERİ</span>
-              <span class="px-3 py-1 bg-emerald-50 text-emerald-800 font-mono text-xs font-bold rounded-lg border border-emerald-200">TLS 1.3 & AES-256</span>
-              <span class="text-xs text-slate-400">Revizyon: 2026.08</span>
-            </div>
-
-            <h1 class="text-2xl font-black tracking-tight text-slate-900">
-              {{ '2. Gizlilik, Veri Güvenliği ve Ticari Sırların Korunması Politikası' }}
-            </h1>
-            
-            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-              {{ 'Bu Gizlilik ve Ticari Sırların Korunması Politikası ("Politika"), İhaleciBurada B2B Elektronik İhale Platformu ("Platform") üzerinde işlem yapan Alıcı ve Tedarikçilerin ticari sır niteliğindeki maliyet verileri, şartnameleri, CAD çizimleri, teklif birim fiyatları ve sistem işlem loglarının korunması, işlenmesi, şifrelenmesi ve saklanmasına ilişkin kuralları ve platform işleticisinin sorumluluk muafiyetlerini düzenler.' }}
-            </p>
-
-            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 1 — TOPLANAN TİCARİ VE TEKNİK VERİLERİN KAPSAMI</h3>
-                <p>1.1. <strong>Kurumsal Kimlik ve Doğrulama Verileri:</strong> Şirket ticaret unvanı, Vergi Kimlik Numarası (VKN), Vergi Dairesi, MERSİS numarası, Ticaret Sicil Gazetesi kuruluş ve pay dökümleri, Noter Onaylı İmza Sirküleri, Faaliyet Belgesi ve şirket yetkilisinin kurumsal iletişim bilgileri.</p>
-                <p>1.2. <strong>İhale ve Satın Alma Şartname Verileri:</strong> Alıcı tarafından yüklenen malzeme listeleri, metraj cetvelleri, teknik şartnameler, CAD/DWG teknik çizim dosyaları, iş programları, kalite toleransları ve tahmini satın alma bütçeleri.</p>
-                <p>1.3. <strong>Teklif, İndirim ve Maliyet Verileri:</strong> Tedarikçiler tarafından sunulan malzeme birim fiyatları, iskonto oranları, teslim süreleri, nakliye/lojistik şartları, ödeme vadeleri, banka IBAN bilgileri ve Escrow bloke hesap mutabakat kayıtları.</p>
-                <p>1.4. <strong>Sistem Güvenlik ve Denetim Logları:</strong> 5651 Sayılı Kanun uyarınca zaman damgalı IP adresleri, oturum açma/kapama zamanları, verilen tekliflerin nanosaniye bazlı zaman damgaları, parola değişiklikleri ve 2FA doğrulama işlem kayıtları.</p>
-              </section>
-
-              <section class="space-y-2 bg-blue-50/60 p-4 rounded-xl border border-blue-200">
-                <h3 class="font-bold text-blue-950 text-sm">BÖLÜM 2 — KAPALI ZARF VE ANONİM TEKLİF GİZLİLİK ZIRHI</h3>
-                <p>2.1. <strong>Tedarikçi Anonimliği Kuralı:</strong> Canlı eksiltme süresince yarışan tedarikçilerin ticari unvanları sistem tarafından otomatik olarak maskelenir (Firma-1, Firma-2, vb.). Hiçbir katılımcı, diğer rakip firmaların kim olduğunu, kurumsal unvanını veya detaylı maliyet analizini canlı ekranda göremez.</p>
-                <p>2.2. <strong>Alıcıya Sunum:</strong> Alıcı, yalnızca ihale tamamlandıktan sonra veya şartnamede açıkça belirtilen teklif açma gün ve saatinde teklif veren tüm tedarikçilerin kimlik ve detaylı fiyat analiz tablolarına erişebilir.</p>
-                <p>2.3. <strong>Veri Satışı Yasağı:</strong> Şirket personeli ve yöneticileri, platformda oluşan hiçbir ihale fiyatını, tedarikçi teklifini veya satın alma şartnamesini üçüncü şahıslara, rakip platformlara veya reklam ağlarına satmayacağını, kiralamayacağını ve paylaşmayacağını açıkça taahhüt eder.</p>
-              </section>
-
-              <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 3 — ŞARTNAME, PATENT VE TELİF SORUMSUZLUK KAYDI</h3>
-                <p>3.1. Alıcı tarafından sisteme yüklenen teknik şartname, formül, patentli tasarım veya CAD çizimlerinin üçüncü tarafların sınai mülkiyet haklarını, patentlerini veya ticari sırlarını ihlal etmesinden kaynaklanan her türlü hukuki, cezai ve idari sorumluluk münhasıran Alıcı\'ya aittir.</p>
-                <p>3.2. Şirket, yüklenen şartnamelerin içeriğini önceden incelemek, patent veri tabanlarında araştırmak veya doğrulamakla yükümlü değildir. Hak ihlali iddiasında bulunan hak sahipleri "Uyar-Kaldır" mekanizması kapsamında <strong>ihalecib@gmail.com</strong> adresine noter onaylı delilleriyle başvurduğunda ilgili içerik derhal incelemeye alınır.</p>
-              </section>
-
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">BÖLÜM 4 — KRİPTOGRAFİK GÜVENLİK STANDARTLARI VE SİBER RİSKLER</h3>
-                <p>4.1. Tüm web trafiği ve API veri iletimi modern TLS 1.3 şifreleme protokolleri ile güvence altına alınmıştır. Durağan veritabanı kayıtları AES-256 algoritmasıyla şifrelenerek Türkiye sınırları içerisindeki ISO 27001 sertifikalı Tier-3 veri merkezlerinde saklanmaktadır.</p>
-                <p>4.2. <strong>Kullanıcı İhmal Muafiyeti:</strong> Kullanıcı\'nın kendi personeline ait şifrelerin çalınması, 2FA kodlarının paylaşılması, kullanıcı cihazındaki virüs/trojan/keylogger yazılımları veya oltalama (phishing) saldırıları neticesinde yaşanabilecek bilgi sızıntılarından Şirket sorumlu tutulamaz.</p>
-                <p>4.3. <strong>Yasal Mercilere Açıklama:</strong> Mahkeme kararları, Cumhuriyet Başsavcılığı müzekkereleri, MASAK, Rekabet Kurumu veya BTK gibi yetkili resmi kurumların kanuna uygun yazılı talepleri doğrultusunda bilgi verilmesi gizlilik ihlali teşkil etmez.</p>
-              </section>
-            </div>
-          </article>
-
-          <!-- 3. KVKK / GDPR (DATA PROCESSING AGREEMENT - DPA) -->
-          <article v-if="activeTab === 'kvkk'" class="space-y-6">
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">6698 SAYILI KVKK</span>
+              <span class="px-3 py-1 bg-blue-50 text-blue-900 font-mono text-xs font-bold rounded-lg border border-blue-200">6698 SAYILI KVKK UYUMLU</span>
               <span class="px-3 py-1 bg-purple-50 text-purple-800 font-mono text-xs font-bold rounded-lg border border-purple-200">VERİ SORUMLUSU AYDINLATMA METNİ</span>
-              <span class="text-xs text-slate-400">Versiyon: 2026.08</span>
+              <span class="px-3 py-1 bg-emerald-50 text-emerald-800 font-mono text-xs font-bold rounded-lg border border-emerald-200">TLS 1.3 & AES-256 GÜVENLİK</span>
+              <span class="text-xs text-slate-400 font-mono">Belge Sürümü: TR-2026-09-10-03-R1</span>
             </div>
 
             <h1 class="text-2xl font-black tracking-tight text-slate-900">
-              {{ '3. KVKK Aydınlatma Metni ve Veri İşleme Sözleşmesi (DPA)' }}
+              {{ 'İhaleciBurada Üyelik ve Platform İşlemleri KVKK Aydınlatma Metni' }}
             </h1>
             
-            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
-              {{ '6698 Sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") Madde 10 uyarınca, veri sorumlusu sıfatıyla İhaleciBurada B2B platform işleticisi tarafından işlenen kişisel verilere ilişkin aydınlatma metnidir.' }}
-            </p>
+            <!-- Veri Sorumlusu ve Yasal Tanıtım Kutusu -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+              <p class="font-semibold text-slate-900">
+                {{ '6698 sayılı Kişisel Verilerin Korunması Kanunu ("KVKK") m. 10 uyarınca, veri sorumlusu sıfatıyla Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi) tarafından işlenen kişisel verilere ilişkin aydınlatma metnidir.' }}
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-200 text-[11px]">
+                <div><strong>Veri Sorumlusu:</strong> Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)</div>
+                <div><strong>Vergi Dairesi / VKN:</strong> Çanakkale V.D. / 9560161511</div>
+                <div><strong>Tebligat Adresi:</strong> İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</div>
+                <div><strong>Kurumsal Destek:</strong> 0850 840 86 95</div>
+                <div><strong>Resmi E-Posta:</strong> ihalecib@gmail.com</div>
+                <div><strong>KEP Adresi:</strong> hasanhuseyin.yildirim.17@hs01.kep.tr</div>
+              </div>
+            </div>
 
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
+              
+              <!-- 1. Kapsam ve veri sorumlusu -->
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 1 — VERİ SORUMLUSUNUN KİMLİĞİ VE İRTİBAT KANALLARI</h3>
-                <p>1.1. Veri Sorumlusu: İhaleciBurada B2B Elektronik İhale ve Ticaret Platformu İşleticisi.</p>
-                <p>1.2. Adres: İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</p>
-                <p>1.3. E-Posta: <strong>ihalecib@gmail.com</strong> | DPO İletişim: <strong>0850 840 86 95</strong></p>
+                <h3 class="font-bold text-slate-900 text-sm">1. KAPSAM VE VERİ SORUMLUSU</h3>
+                <p><strong>1.1.</strong> Bu metin, İhaleciBurada hesabı açan gerçek kişiler ile şirket hesabındaki temsilci ve yetkili kullanıcıların üyelik ve platform işlemlerine ilişkin kişisel verilerini konu alır. Veri sorumlusu: <strong>Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)</strong>; adres: Çanakkale, Türkiye (Tebligat Adresi: İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye); VKN: 9560161511; Çanakkale Vergi Dairesi; telefon: 0850 840 86 95; başvuru kanalları: <strong>ihalecib@gmail.com</strong> ve <strong>hasanhuseyin.yildirim.17@hs01.kep.tr</strong>. İhaleciBurada marka ve platform adı tek başına tüzel kişi kimliği değildir.</p>
+                <p><strong>1.2.</strong> Şirket bilgileri, bir gerçek kişiyi belirlediği veya belirlenebilir kıldığı ölçüde kişisel veridir. Şirket adına işlem yapan kişinin verisi, sırf şirket sözleşmenin tarafı olduğu için sözleşmenin ifası şartına dayanılarak işlenemez. Aşağıdaki faaliyetler, ilgili kişinin konumu ve gerçekten yürütülen işlemle sınırlıdır.</p>
+                <p><strong>1.3.</strong> Genel Gizlilik Politikası, çerez, isteğe bağlı amaç ve kurumsal bilgilendirmeler ayrı kapsamları açıklar. Bu bildirim için rıza verilmesi istenmez. Metnin açılması veya okunduğunun bildirilmesi, sözleşme kabulü ya da isteğe bağlı işlemlere açık rıza değildir.</p>
               </section>
 
+              <!-- 2. Hesap açılması ve kullanılması -->
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — İŞLENEN KİŞİSEL VERİ KATEGORİLERİ</h3>
-                <p>2.1. <strong>Kimlik Verisi:</strong> Şirket temsilcisi veya yetkili çalışanının Adı, Soyadı, T.C. Kimlik Numarası, İmza Sirkülerindeki imza örneği.</p>
-                <p>2.2. <strong>İletişim Verisi:</strong> Kurumsal e-posta adresi, cep telefonu numarası, şirket resmi tebligat adresi, KEP adresi.</p>
-                <p>2.3. <strong>İşlem Güvenliği Verisi:</strong> IP adresleri, port bilgileri, şifrelenmiş parola hashleri, oturum çerezleri, sisteme giriş-çıkış zaman damgaları.</p>
-                <p>2.4. <strong>Finansal ve Hukuki İşlem Verisi:</strong> Banka hesap IBAN bilgisi, e-Fatura kayıtları, ödeme dekontları, ihale tutanakları ve adli müzekkere kayıtları.</p>
+                <h3 class="font-bold text-slate-900 text-sm">2. HESAP AÇILMASI VE KULLANILMASI</h3>
+                <p><strong>2.1.</strong> Kayıt formunda bildirilen ad, soyad, iletişim ve hesap bilgileri; hesap açılması, kimlik doğrulama, hesaba erişim ve hesapla ilgili hizmet bildirimleri için elektronik form ve hesap işlemleri üzerinden otomatik veya kısmen otomatik yollarla toplanır. Gerçek kişinin tarafı olduğu üyelik ilişkisinin kurulması veya ifası için doğrudan gerekli işlem bakımından hukuki sebep, 6698 sayılı Kanun'un 5/2-c maddesidir. Pazarlama bu kapsama dahil değildir.</p>
+                <p><strong>2.2.</strong> Şirket temsilcisi veya yetkili kullanıcının ad, iş iletişim, görev ve yetki bilgileri; şirket hesabını doğru kişiyle ilişkilendirmek ve yetkili erişimi yönetmek amacıyla kişinin beyanından ve yetkilendirme kayıtlarından alınır. Bu faaliyet için 5/2-f kapsamında meşru menfaat dayanağı ancak gereklilik ve temel haklar dengesi sağlandığında kullanılabilir. Başka bir kişiden alınan bilgiler bakımından da ilgili kişiye kanuni zamanda ayrıca bilgi verilmesi gerekir.</p>
+                <p><strong>2.3.</strong> Oturum, erişim ve işlem zamanları ile gerçekten üretilen güvenlik kayıtları, yetkisiz erişimi ve kötüye kullanımı tespit etmek için otomatik olarak işlenir; bu amaç için 5/2-f şartları ayrıca değerlendirilir. Gösterilen belge ve gerçek kabul/geri alma işlemlerine ilişkin kayıtların bir hakkın tesisi, kullanılması veya korunması için gerekli muhafazasında 5/2-e uygulanır. Bir gösterim kaydı, verilmemiş rıza veya görülmemiş belge için kabul kanıtına dönüştürülemez.</p>
               </section>
 
-              <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 3 — KİŞİSEL VERİ İŞLEMENİN HUKUKİ SEBEPLERİ VE AMAÇLARI</h3>
-                <p>3.1. <strong>Sözleşmenin Kurulması ve İfası (KVKK Madde 5/2-c):</strong> Üyelik kaydının oluşturulması, ihalelerin açılması, tekliflerin kabul edilmesi, abonelik paketlerinin faturalandırılması ve Escrow ödeme mutabakatının sağlanması.</p>
-                <p>3.2. <strong>Kanuni Yükümlülüklerin Yerine Getirilmesi (KVKK Madde 5/2-ç):</strong> 6563 sayılı Kanun, 6102 sayılı TTK, 213 sayılı VUK ve 5651 sayılı İnternet Ortamında Yapılan Yayınların Düzenlenmesi Kanunu gereği yasal log ve muhasebe kayıtlarının tutulması.</p>
-                <p>3.3. <strong>Meşru Menfaat ve Güvenlik (KVKK Madde 5/2-f):</strong> Canlı eksiltmelerde hile, kartel ve manipülasyonun engellenmesi, sistem performansının optimize edilmesi ve siber güvenlik altyapısının korunması.</p>
+              <!-- 3. Platform işlemleri ve danışmanlık -->
+              <section class="space-y-2 bg-blue-50/50 p-4 rounded-xl border border-blue-200">
+                <h3 class="font-bold text-blue-950 text-sm">3. PLATFORM İŞLEMLERİ VE DANIŞMANLIK</h3>
+                <p><strong>3.1.</strong> Kullanıcının talebiyle yürütülen ihale, teklif, işlem iletişimi ve uyuşmazlık süreçlerinde beyan edilen kişi iletişim bilgileri, işlem içeriği, belgeler ve işlem kayıtları elektronik giriş, yükleme ve süreç kayıtlarından elde edilir. İlgili gerçek kişinin taraf olduğu sözleşme için doğrudan gerekli işlemler 5/2-c; şirket yetkilisinin işlem koordinasyonu için gerekli işlemler şartları sağlanmış 5/2-f; somut hak talebi ve uyuşmazlık kanıtlarının gerekli işlenmesi 5/2-e bakımından ayrı değerlendirilir. İşlem verisi kendiliğinden pazarlama veya herkese açık profil verisi olmaz.</p>
+                <p><strong>3.2.</strong> Danışmanlık başvurusu ve hizmetin yürütülmesi için iletişim bilgileriniz, ihtiyaç talebiniz, kararlaştırılan kapsam, dönem ve bedel, temsil bilgileriniz, sözleşme sürümü, tarafların imzalı nüshaları ile inceleme ve hizmet durumu kayıtları işlenir. Amaç, talebinizi yanıtlamak, kararlaştırılan hizmeti yürütmek ve tarafların haklarını korumaktır. Hukuki sebepler, kişinin sözleşmenin tarafı veya şirket temsilcisi olmasına göre 3.1’de ayrılan şartlardır. İmza ve hizmete başlama koşulları ayrı danışmanlık sözleşmenizde yer alır.</p>
+                <p><strong>3.3.</strong> Fatura, banka havalesi, ödeme referansı ve muhasebe kayıtları; ilgili mevzuatın gerektirdiği kayıt ve bildirim yükümlülükleri için Kanun’un 5/2-ç maddesi, somut bir alacak veya uyuşmazlıkta gerekli kanıtın korunması için 5/2-e maddesi kapsamında işlenir. Yalnız ilgili yükümlülük veya hak talebi için gereken veriler kullanılır. Bu veriler isteğe bağlı pazarlama izninin konusu değildir.</p>
               </section>
 
+              <!-- 4. İsteğe bağlı faaliyetlerin sınırı -->
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 4 — KİŞİSEL VERİLERİN AKTARILDIĞI TARAFLAR VE SAKLAMA SÜRELERİ</h3>
-                <p>4.1. Kişisel verileriniz yalnızca; kanunen yetkili kamu kurum ve kuruluşlarına (BTK, Gelir İdaresi, Mahkemeler, Savcılıklar), TCMB/BDDK lisanslı ödeme kuruluşlarına (İyzico, PayTR vb.) ve bağımsız mali müşavirlik/denetim firmalarına yasal çerçevede aktarılır.</p>
-                <p>4.2. Kişisel veriler ve ticari işlem günlükleri, Türk Ticaret Kanunu ve Vergi Usul Kanunu gereğince işlem tarihinden itibaren on (10) yıl boyunca saklanır; sürenin bitiminde re\'sen silinir veya anonim hale getirilir.</p>
+                <h3 class="font-bold text-slate-900 text-sm">4. İSTEĞE BAĞLI FAALİYETLERİN SINIRI</h3>
+                <p><strong>4.1.</strong> Firma profilindeki isteğe bağlı kişisel tanıtım içeriği Dijital Varlıklar ve Görsel İçerik Bilgilendirmesinde; işlem karşı tarafının girdiği puan ve yorumlar Firma Değerlendirmeleri ve Puan Bilgilendirmesinde; İhaleciBurada tanıtım ve bilgilendirme iletileri Ticari İletişim Amacı metninde açıklanır. Bu faaliyetlerin verileri, toplama yöntemleri, amaçları, alıcıları ve hukuki sebepleri kendi bölümlerinde ayrılmıştır. Firma işlem değerlendirmesi, ayrı kişisel davranış/profil analiziyle aynı değildir. Açık Rıza Tercihleri Bilgilendirmesi bu faaliyetler arasındaki seçim sınırlarını gösterir; hesap açılması veya genel metnin okunması hepsine izin sayılmaz.</p>
+                <p><strong>4.2.</strong> Çerez ve benzeri teknolojiler için Çerez Politikası ile işlevsel, analitik ve pazarlama tercih bildirimleri ayrıca geçerlidir. Bir kategoriyi seçmek, ayrı ticari ileti onayı veya her türlü yurt dışı aktarım yetkisi değildir. Zorunlu güvenlik işlemleri isteğe bağlı analitik adı altında; analitik de yalnız “güvenlik” etiketiyle zorunlu gösterilemez.</p>
+                <p><strong>4.3.</strong> Rıza vermemek, rızadan bağımsız geçerli şartlarla sunulan temel hizmetlere erişimin kısıtlanmasına veya cezalandırmaya gerekçe olamaz. Rıza geri alınabilir; veri sorumlusuna ulaşmasıyla ileriye etkili olur. Geri alma öncesinde hukuka uygun yapılmış işlemleri geriye dönük olarak hukuka aykırı kılmaz; başka geçerli şart bulunmayan gelecekteki işleme veya süresiz saklamaya izin vermez. Aynı isteğe bağlı faaliyeti sürdürmek için geri almadan sonra hukuki sebep değiştirilerek rızanın geri alınması etkisizleştirilemez.</p>
               </section>
 
+              <!-- 5. Alıcılar ve yurt dışı aktarım -->
               <section class="space-y-2">
-                <h3 class="font-bold text-slate-900 text-sm">MADDE 5 — İLGİLİ KİŞİNİN HAKLARI VE BAŞVURU USULÜ (KVKK MADDE 11)</h3>
-                <p>5.1. Veri sahipleri; verilerinin işlenip işlenmediğini öğrenme, işlenme amacına uygun kullanılıp kullanılmadığını bilme, yurt içinde/dışında aktarıldığı 3. kişileri bilme, eksik/yanlış işlenmişse düzeltilmesini isteme, silinmesini/yok edilmesini talep etme ve kanuna aykırı işleme sebebiyle zarara uğraması halinde zararın giderilmesini talep etme hakkına sahiptir.</p>
-                <p>5.2. Başvurular; Veri Sorumlusuna Başvuru Usul ve Esasları Hakkında Tebliğ uyarınca kimlik teyidi yapılabilen kayıtlı kurumsal e-posta veya noter kanalıyla iletildiğinde en geç 30 gün içinde gerekçeli olarak ücretsiz yanıtlanır.</p>
+                <h3 class="font-bold text-slate-900 text-sm">5. ALICILAR VE YURT DIŞI AKTARIM</h3>
+                <p><strong>5.1.</strong> Bir işlemin karşı tarafına kişi iletişim veya işlem içeriği verilmesi, yalnız ilgili işlemin yürütülmesi için gerekli kapsamla sınırlıdır. Tüm üyelerin veya kamuoyunun erişebileceği yayın ayrı bir faaliyettir; işlem karşı tarafıyla paylaşım, dizinde herkese açık yayın izni oluşturmaz. Veri sorumlusu, ilgili paylaşım başlamadan önce paylaşılan verileri, alıcı gruplarını ve paylaşım amacını açıklamakla yükümlüdür.</p>
+                <p><strong>5.2.</strong> Altyapı hizmet sağlayıcıları, işlem için gerekli meslek danışmanları ve kanunen yetkili makamlarla paylaşım, her alıcının görevi ve ilgili amaç için gerekli veriyle sınırlıdır. İç ekip erişimi görev gereğiyle sınırlanır. Kişisel veriler üçüncü kişilere ticari amaçlarla satılmaz.</p>
+                <p><strong>5.3.</strong> Yurt dışından erişim dahil yurt dışı aktarımda, yurt içindeki işleme şartına ek olarak Kanun'un 9. maddesine uygun aktarım koşulları gerekir. Düzenli altyapı aktarımı, genel bir rıza kutusuyla arızi aktarım istisnasına dönüştürülemez. Aktarım koşulları, ilgili faaliyet ve kullanılan hukuki yol bakımından sağlanmak zorundadır.</p>
               </section>
+
+              <!-- 6. Saklama, veri sınırı ve güvenlik -->
+              <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                <h3 class="font-bold text-slate-900 text-sm">6. SAKLAMA, VERİ SINIRI VE GÜVENLİK</h3>
+                <p><strong>6.1.</strong> Saklama süresi veri türüne ve sürenin başlangıç olayına göre ayrılır. <strong>Vergi Usul Kanunu’nun 253. maddesi</strong> kapsamındaki defter ve belgeler, ilgili oldukları yılı izleyen takvim yılından başlayarak <strong>5 yıl</strong> muhafaza edilir. <strong>Türk Ticaret Kanunu’nun 82. maddesi</strong> kapsamındaki belgeler <strong>10 yıl</strong> saklanır. Bu on yıllık süre, 82/6. madde uyarınca, belge türüne göre ticari defterlere son kaydın yapıldığı, envanterin çıkarıldığı, ara bilançonun düzenlendiği, yılsonu finansal tabloları ile konsolide finansal tabloların hazırlandığı, ticari yazışmaların yapıldığı veya muhasebe belgelerinin oluştuğu takvim yılının bitiminde başlar. Aynı belge her iki kanunun kapsamına giriyorsa daha geç sona eren kanuni saklama yükümlülüğü korunur. Bu süreler tüm profil, gezinme veya güvenlik verilerine uygulanmaz. Hesap verisinin aktif kullanım süresi üyelik ilişkisine; işlem, onay ve uyuşmazlık kanıtının ek muhafazası ilgili hakkın korunması ihtiyacına, uygulanabilir kanuni süreye ve varsa devam eden yargı veya inceleme sürecine bağlıdır. Muhafaza amacı sona eren veri yeni pazarlama amacıyla kullanılamaz; 6.2’deki imha yükümlülüğü uygulanır.</p>
+                <p><strong>6.2.</strong> İşleme şartlarının tamamı ortadan kalktığında veriler kanuni usule göre silinir, yok edilir veya anonim hâle getirilir. Rıza geri alma, hesap kapatma ve yasal muhafaza ayrı değerlendirilir; tüm kopyaların anında silindiği taahhüt edilmez. Takma ad, IP kısaltması veya doğrudan tanımlayıcının çıkarılması tek başına anonimleştirme değildir.</p>
+                <p><strong>6.3.</strong> İşlemle ilgisiz üçüncü kişi veya özel nitelikli verileri, parola ve tek kullanımlık kodları serbest metin ve dosyalara eklemeyin. Bu uyarı veri sorumlusunun veri minimizasyonu ve gerekli teknik/idari tedbirleri alma yükümlülüğünü size devretmez. Belirli bir sertifika, şifreleme kapsamı, yedekleme süresi veya kusursuz güvenlik bu metinle garanti edilmez.</p>
+              </section>
+
+              <!-- 7. Haklarınız ve başvuru -->
+              <section class="space-y-2 bg-emerald-50/50 p-4 rounded-xl border border-emerald-200">
+                <h3 class="font-bold text-emerald-950 text-sm">7. HAKLARINIZ VE BAŞVURU (KVKK MADDE 11)</h3>
+                <p><strong>7.1.</strong> Kanun'un 11. maddesindeki haklarınız saklıdır. Verilerinizin işlenip işlenmediğini öğrenebilir, işlenmişse bilgi isteyebilir; işleme amacını, amaca uygun kullanımı ve yurt içi/yurt dışı alıcıları öğrenebilirsiniz. Eksik veya yanlış verinin düzeltilmesini, kanuni şartlarla silme veya yok etmeyi ve bu işlemlerin aktarılan üçüncü kişilere bildirilmesini talep edebilir; münhasıran otomatik analizle aleyhinize ortaya çıkan sonuca itiraz edebilir ve hukuka aykırı işleme nedeniyle zararınızın giderilmesini isteyebilirsiniz. Bu özet kanuni hakları sınırlamaz.</p>
+                <p><strong>7.2.</strong> Başvurunuzu <strong>İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</strong> adresine yazılı olarak veya <strong>hasanhuseyin.yildirim.17@hs01.kep.tr</strong> adresine KEP yoluyla iletebilirsiniz. Daha önce İhaleciBurada’ya bildirdiğiniz ve sistemde kayıtlı e-posta adresinizden <strong>ihalecib@gmail.com</strong> adresine de başvurabilirsiniz. Güvenli elektronik imza ve mobil imza dahil Tebliğin izin verdiği diğer yöntemler saklıdır. Platformumuzun <strong>/sozlesmeler?tab=gizlilik</strong> sayfasında yer alan kurumsal iletişim kanalları talebinizi hazırlamanıza yardımcı olur; formu kullanmak veya KEP hesabı edinmek zorunda değilsiniz. Kimlik ve temsil yetkisi yalnız talep için gerekli ölçüde doğrulanır.</p>
+                <p><strong>7.3.</strong> Başvurular talebin niteliğine göre en kısa sürede ve en geç <strong>otuz (30) gün</strong> içinde sonuçlandırılır. İşlem ayrıca bir maliyet gerektirirse yalnız Kişisel Verileri Koruma Kurulu'nun belirlediği tarifedeki ücret uygulanabilir. Kanuni şikâyet ve diğer başvuru hakları saklıdır; bu metnin kabulü hak kullanmanın şartı değildir.</p>
+              </section>
+
+              <!-- 8. Bilgilendirme ve sürüm kayıtları -->
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">8. BİLGİLENDİRME VE SÜRÜM KAYITLARI</h3>
+                <p><strong>8.1.</strong> Aydınlatma, rıza dahil hangi işleme şartı kullanılırsa kullanılsın yerine getirilir. Yeni amaçla işlemden önce o amaca ilişkin bildirim ayrıca yapılır. Sitede daha sonra bir metin yayımlamak, daha önce eksik bırakılan aydınlatmayı veya verilmemiş rızayı geriye dönük tamamlamaz.</p>
+                <p><strong>8.2.</strong> Veri sorumlusu, size sunulan dil, belge sürümü ve yürürlük bilgisini ilgili gösterim ve işlem kayıtlarıyla ilişkili olarak korumak ve Türkçe ile İngilizce metinlerin kapsamını tutarlı tutmakla yükümlüdür. Eski belge ve kayıtlar sonradan yeni metin kabul edilmiş gibi değiştirilemez.</p>
+                <p><strong>8.3.</strong> Aydınlatma, sözleşme kabulü veya isteğe bağlı veri işlemeye rıza değildir. Verileriniz yeni bir amaçla işlenecekse bu amaç işleme başlamadan önce size açıklanır ve gerektiğinde ayrıca rızanız alınır.</p>
+              </section>
+
+              <!-- 9. B2B Ticari Sırların Korunması ve Kriptografik Güvenlik Standartları -->
+              <section class="space-y-2 bg-slate-900 text-white p-5 rounded-2xl border border-slate-800">
+                <h3 class="font-bold text-blue-400 text-sm">9. B2B TİCARİ SIRLARIN KORUNMASI VE KRİPTOGRAFİK GÜVENLİK STANDARTLARI</h3>
+                <p class="text-slate-300 text-xs"><strong>9.1. Kapalı Zarf ve Canlı İhale Anonimliği:</strong> Canlı eksiltme süresince yarışan tedarikçilerin ticari unvanları sistem tarafından otomatik olarak maskelenir (Firma-1, Firma-2 vb.). Hiçbir katılımcı, diğer rakip firmaların kimliğini veya birim maliyet dökümünü canlı ekranda göremez. İhale fiyatları ve satın alma şartnameleri asla üçüncü şahıslara veya reklam ağlarına satılamaz, devredilemez.</p>
+                <p class="text-slate-300 text-xs"><strong>9.2. Kriptografik Güvenlik (TLS 1.3 & AES-256):</strong> Tüm web trafiği ve API veri iletimi modern TLS 1.3 şifreleme protokolleri ile güvence altına alınmıştır. Durağan veritabanı kayıtları AES-256 algoritmasıyla şifrelenerek Türkiye sınırları içerisindeki ISO 27001 sertifikalı Tier-3 veri merkezlerinde saklanmaktadır.</p>
+                <p class="text-slate-300 text-xs"><strong>9.3. Şartname, Telif ve Uyar-Kaldır:</strong> Sisteme yüklenen teknik şartname, CAD çizimleri veya belgelerden doğan fikri ve sınai mülkiyet hakları sahiplerine aittir. Hak ihlali iddialarında <strong>ihalecib@gmail.com</strong> adresine noter onaylı delillerle başvurulduğunda yasal uyar-kaldır prosedürü derhal işletilir.</p>
+              </section>
+
             </div>
           </article>
 
