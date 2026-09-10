@@ -15,9 +15,9 @@ export default defineNuxtConfig({
     netgsmUsercode: process.env.NETGSM_USERCODE || '8508408695',
     netgsmPassword: process.env.NETGSM_PASSWORD || '',
     netgsmHeader: process.env.NETGSM_HEADER || '8508408695',
-    paytrMerchantId: process.env.PAYTR_MERCHANT_ID || '',
-    paytrMerchantKey: process.env.PAYTR_MERCHANT_KEY || '',
-    paytrMerchantSalt: process.env.PAYTR_MERCHANT_SALT || '',
+    paynkolayMerchantId: process.env.PAYNKOLAY_MERCHANT_ID || '',
+    paynkolaySecretKey: process.env.PAYNKOLAY_SECRET_KEY || '',
+    paynkolayTerminalId: process.env.PAYNKOLAY_TERMINAL_ID || '',
     deepseekApiKey: process.env.DEEPSEEK_API_KEY || '',
 
     // Public keys (client & server)
