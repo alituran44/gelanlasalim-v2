@@ -58,7 +58,10 @@ import {
   Compass,
   UploadCloud,
   FileCode,
-  FileCheck
+  FileCheck,
+  Cpu,
+  Database,
+  Network
 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
@@ -2664,6 +2667,313 @@ onMounted(() => {
 
 </div>
 </div>
+
+    <!-- ========================================================================= -->
+    <!-- ⚡ KURUMSAL ERP & SİSTEM ENTEGRASYONLARI -->
+    <!-- ========================================================================= -->
+    <section class="w-full bg-[#080c16] border-t border-slate-800/80 py-16 px-4 sm:px-6 text-left">
+      <div class="max-w-[1440px] mx-auto space-y-12">
+
+        <!-- Üst Başlık & Açıklama -->
+        <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-6 pb-6 border-b border-slate-800/60">
+          <div class="space-y-3 max-w-3xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-[11px] font-bold uppercase tracking-wider">
+              <Network :size="13" class="text-sky-400" />
+              <span>B2B Entegrasyon Ekosistemi & Canlı Protokoller</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-white tracking-tight">
+              ERP, Muhasebe ve Finans Sistemlerinizle Tam Entegre.
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-400 font-medium leading-relaxed">
+              İhaleciBurada; kurumunuzun mevcut ERP altyapısı, e-Dönüşüm mekanizmaları ve güvenli ödeme sistemleriyle çift yönlü (bi-directional) senkronize çalışır. Manuel ihale açma ve teklif aktarım hatalarını sıfırlayın.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <NuxtLink
+              to="/entegrasyonlar"
+              class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs shadow-lg shadow-sky-600/20 transition cursor-pointer"
+            >
+              <span>Tüm Entegrasyon Detayları & Test Ortamı</span>
+              <ArrowRight :size="14" />
+            </NuxtLink>
+          </div>
+        </div>
+
+        <!-- Entegrasyon Kartları Grid (8 Adet) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- 1. SAP -->
+          <NuxtLink
+            to="/entegrasyonlar?tab=sap"
+            class="group bg-[#0d1322]/90 hover:bg-[#11182c] border border-slate-800 hover:border-sky-500/50 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 shadow-md cursor-pointer block"
+          >
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-sky-400 group-hover:scale-105 transition-transform">
+                  <Cpu :size="20" />
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                  Bi-Directional
+                </span>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-white group-hover:text-sky-300 transition">
+                  SAP S/4HANA & ECC 6.0
+                </h3>
+                <p class="text-[11px] text-sky-400/90 font-mono mt-0.5 font-bold">RFC · IDoc · OData REST</p>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Satın alma taleplerini (PR) otomatik ihaleye dönüştürün; sonuçlanan teklifleri ve satıcı faturalarını SAP sisteminize otomatik aktarın.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 group-hover:text-sky-400 font-bold transition">
+              <span>Kurulum & Parametreler</span>
+              <ArrowRight :size="13" class="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </NuxtLink>
+
+          <!-- 2. LOGO & NETSİS -->
+          <NuxtLink
+            to="/entegrasyonlar?tab=logo"
+            class="group bg-[#0d1322]/90 hover:bg-[#11182c] border border-slate-800 hover:border-sky-500/50 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 shadow-md cursor-pointer block"
+          >
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center text-teal-400 group-hover:scale-105 transition-transform">
+                  <Database :size="20" />
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono uppercase tracking-wider bg-sky-500/10 border border-sky-500/30 text-sky-400">
+                  Canlı Entegre
+                </span>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-white group-hover:text-teal-300 transition">
+                  Logo & Netsis ERP
+                </h3>
+                <p class="text-[11px] text-teal-400/90 font-mono mt-0.5 font-bold">Tiger 3 · Netsis 3 · REST Servis</p>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Logo ve Netsis stok kartları, cari hesaplar, sipariş fişleri ve ambar girişleriyle anlık iki yönlü veri eşitleme.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 group-hover:text-teal-400 font-bold transition">
+              <span>Bağlantı Ayarları</span>
+              <ArrowRight :size="13" class="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </NuxtLink>
+
+          <!-- 3. MICROSOFT DYNAMICS -->
+          <NuxtLink
+            to="/entegrasyonlar?tab=dynamics"
+            class="group bg-[#0d1322]/90 hover:bg-[#11182c] border border-slate-800 hover:border-sky-500/50 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 shadow-md cursor-pointer block"
+          >
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-transform">
+                  <Layers :size="20" />
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                  API v2.0 Aktif
+                </span>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-white group-hover:text-blue-300 transition">
+                  Microsoft Dynamics 365
+                </h3>
+                <p class="text-[11px] text-blue-400/90 font-mono mt-0.5 font-bold">Business Central · F&O · Dataverse</p>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Tedarik zinciri, onay hiyerarşileri ve maliyet merkezi mutabakatı; ihale sözleşmelerini Dynamics kayıtlarına bağlama.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 group-hover:text-blue-400 font-bold transition">
+              <span>Azure AD & Yetki</span>
+              <ArrowRight :size="13" class="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </NuxtLink>
+
+          <!-- 4. GİB E-FATURA & E-İRSALİYE -->
+          <div
+            class="bg-[#0d1322]/90 hover:bg-[#11182c] border border-slate-800 hover:border-sky-500/50 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 shadow-md"
+          >
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                  <FileCheck :size="20" />
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                  GİB Standart
+                </span>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-white">
+                  GİB e-Fatura & e-İrsaliye
+                </h3>
+                <p class="text-[11px] text-emerald-400/90 font-mono mt-0.5 font-bold">UBL-TR 1.2 · Özel Entegratör</p>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Gelir İdaresi Başkanlığı mevzuatına tam uyumlu otomatik e-Fatura kesimi, kabul/red yanıtı ve e-İrsaliye sevkiyat kontrolü.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-bold">
+              <span>Otomatik Eşleştirme</span>
+              <BadgeCheck :size="14" class="text-emerald-400" />
+            </div>
+          </div>
+
+          <!-- 5. PAYNKOLAY (AKTİF BANK) -->
+          <div
+            class="bg-[#0d1322]/90 hover:bg-[#11182c] border border-slate-800 hover:border-sky-500/50 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 shadow-md"
+          >
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+                  <LockKeyhole :size="20" />
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono uppercase tracking-wider bg-amber-500/10 border border-amber-500/30 text-amber-400">
+                  BDDK Lisanslı
+                </span>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-white">
+                  Paynkolay Sanal POS
+                </h3>
+                <p class="text-[11px] text-amber-400/90 font-mono mt-0.5 font-bold">Aktif Bank Escrow & 3D Secure</p>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                İhale teminat bedelleri, B2B Escrow havuz güvencesi ve muayene kabul onaylı otomatik hakediş transferleri.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-bold">
+              <span>Havuz Bloke Güvencesi</span>
+              <ShieldCheck :size="14" class="text-amber-400" />
+            </div>
+          </div>
+
+          <!-- 6. REST API & WEBHOOKS -->
+          <NuxtLink
+            to="/entegrasyonlar?tab=api"
+            class="group bg-[#0d1322]/90 hover:bg-[#11182c] border border-slate-800 hover:border-sky-500/50 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 shadow-md cursor-pointer block"
+          >
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform">
+                  <Network :size="20" />
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono uppercase tracking-wider bg-purple-500/10 border border-purple-500/30 text-purple-400">
+                  OpenAPI 3.0
+                </span>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-white group-hover:text-purple-300 transition">
+                  Geliştirici API & Webhooks
+                </h3>
+                <p class="text-[11px] text-purple-400/90 font-mono mt-0.5 font-bold">REST · JSON · Bearer Token</p>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Kurum içi özel yazılımlar, depo otomasyonları ve CRM sistemleri için anlık webhook olayları ve geniş uç nokta desteği.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 group-hover:text-purple-400 font-bold transition">
+              <span>Canlı API Dokümanı</span>
+              <ArrowRight :size="13" class="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </NuxtLink>
+
+          <!-- 7. EXCEL / CSV AKTARIMI -->
+          <NuxtLink
+            to="/entegrasyonlar?tab=api"
+            class="group bg-[#0d1322]/90 hover:bg-[#11182c] border border-slate-800 hover:border-sky-500/50 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 shadow-md cursor-pointer block"
+          >
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+                  <FileSpreadsheet :size="20" />
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono uppercase tracking-wider bg-emerald-500/10 border border-emerald-500/30 text-emerald-400">
+                  Toplu İçe Aktarım
+                </span>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-white group-hover:text-emerald-300 transition">
+                  Excel & CSV Şartname
+                </h3>
+                <p class="text-[11px] text-emerald-400/90 font-mono mt-0.5 font-bold">.xlsx · .xls · .csv Parser</p>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                On binlerce kalemlik birim fiyat cetvellerini ve şartname listelerini tek tıkla yükleyin, anında teklif toplamaya başlayın.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 group-hover:text-emerald-400 font-bold transition">
+              <span>Şablonu İncele</span>
+              <ArrowRight :size="13" class="group-hover:translate-x-1 transition-transform" />
+            </div>
+          </NuxtLink>
+
+          <!-- 8. NETGSM SMS ALTYAPISI -->
+          <div
+            class="bg-[#0d1322]/90 hover:bg-[#11182c] border border-slate-800 hover:border-sky-500/50 rounded-2xl p-5 flex flex-col justify-between transition-all duration-200 shadow-md"
+          >
+            <div class="space-y-3">
+              <div class="flex items-center justify-between">
+                <div class="w-10 h-10 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400">
+                  <Zap :size="20" />
+                </div>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-bold font-mono uppercase tracking-wider bg-cyan-500/10 border border-cyan-500/30 text-cyan-400">
+                  Anlık SMS Gateway
+                </span>
+              </div>
+              <div>
+                <h3 class="text-base font-black text-white">
+                  NetGSM Kurumsal SMS
+                </h3>
+                <p class="text-[11px] text-cyan-400/90 font-mono mt-0.5 font-bold">OTP · Eksiltme · İhale Alarmları</p>
+              </div>
+              <p class="text-xs text-slate-400 leading-relaxed">
+                Son dakika teklif eksiltmeleri, karşı teklif uyarıları, ihale sonuçları ve güvenlik OTP kodları anlık SMS ile cebinizde.
+              </p>
+            </div>
+            <div class="pt-4 mt-4 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-400 font-bold">
+              <span>Canlı Bildirim</span>
+              <CheckCircle2 :size="14" class="text-cyan-400" />
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Alt Güvence & Özellik Çubuğu -->
+        <div class="p-6 rounded-2xl bg-[#0b101d] border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="flex flex-wrap items-center gap-6 text-xs text-slate-400">
+            <div class="flex items-center gap-2">
+              <CheckCircle2 :size="15" class="text-emerald-400" />
+              <span>TLS 1.3 & mTLS Şifreli İletişim</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <CheckCircle2 :size="15" class="text-emerald-400" />
+              <span>IP Whitelisting & API Token Güvenliği</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <CheckCircle2 :size="15" class="text-emerald-400" />
+              <span>Sandbox & Test Simülasyon Ortamı</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <CheckCircle2 :size="15" class="text-emerald-400" />
+              <span>7/24 Kesintisiz %99.9 Uptime SLA</span>
+            </div>
+          </div>
+
+          <NuxtLink
+            to="/entegrasyonlar"
+            class="text-xs font-bold text-sky-400 hover:text-sky-300 flex items-center gap-1.5 whitespace-nowrap transition"
+          >
+            <span>ERP Kurulum Kılavuzunu İncele</span>
+            <ArrowRight :size="14" />
+          </NuxtLink>
+        </div>
+
+      </div>
+    </section>
 
     <!-- ========================================================================= -->
     <!-- ❓ SIKÇA SORULAN SORULAR (PLATFORM HAKKINDA MERAK EDİLENLER) -->
