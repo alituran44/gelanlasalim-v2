@@ -1,6 +1,33 @@
-# İhaleciBurada B2B Platformu
-> İhaleciBurada, kurumsal alıcıların satın alma taleplerini yayınlayıp onaylı tedarikçilerden kapalı zarf ve canlı eksiltme usulüyle teklif topladığı Türkiye merkezli B2B ters ihale platformudur.
+# İhaleciBurada
 
-- Web: https://www.ihaleciburada.com
-- Model: B2B Ters İhale & Satın Alma
-- Güvenlik: GİB Vergi Levhası, KEP ve E-İmza Onaylı
+> Türkiye'nin En Kapsamlı B2B İhale, Doğrudan Satın Alma ve Canlı Teklif Eksiltme Portalı.
+
+İhaleciBurada (işletici: UK ELEKTRİK MALZEMELERİ SANAYİ TİCARET LİMİTED ŞİRKETİ / Acsisco), kurumsal alıcıların satın alma taleplerini onaylı tedarikçilerle buluşturan, şeffaf teklif eksiltme (reverse auction), 3D Secure güvenli Escrow bloke havuz ödemesi ve ERP entegrasyonu sunan yeni nesil B2B ticaret platformudur.
+
+## Temel Özellikler
+- **Tersine İhale & Canlı Eksiltme**: Alıcı teknik şartnameyi ve hedef bütçeyi yayınlar; tedarikçiler canlı, şeffaf rekabetle teklif sunarak fiyat eksiltir.
+- **Doğrulanmış B2B Tedarikçi Ağı**: Vergi levhası, imza sirküleri, MERSİS ve ticaret sicil kayıtları kontrol edilmiş onaylı üretici ve toptancılar.
+- **Paynkolay Escrow Güvenli Havuz**: Hakediş bedelleri Aktif Bank iştiraki Paynkolay altyapısında bloke edilir, muayene ve kabul onayı sonrası yükleniciye aktarılır.
+- **81 İl & 28 Sektör Kapsamı**: Türkiye'nin tüm illerinde inşaattan sağlığa, gıdadan endüstriyel makineye 28 CPV sektörü.
+- **ERP Entegrasyonu**: SAP (S/4HANA & ECC 6.0), Logo, Netsis, Microsoft Dynamics 365, OpenAPI REST ve Webhooks desteği.
+
+## Önemli Bağlantılar
+- [Anasayfa & Canlı İhaleler](https://ihaleciburada.com/): Günlük yayınlanan güncel ihaleler, teklif verme ve filtreleme motoru.
+- [B2B Pazar Yeri](https://ihaleciburada.com/pazar-yeri): Doğrudan ürün ve toptan malzeme tedarik ilanları.
+- [ERP Entegrasyonları](https://ihaleciburada.com/entegrasyonlar): SAP, Logo, Netsis, Dynamics ve REST API bağlantı kılavuzları.
+- [Abonelik & Kurumsal Paketler](https://ihaleciburada.com/abonelik): B2B üyelik ve ihale katılım paketleri.
+- [Firma Doğrulama & KYC](https://ihaleciburada.com/firma-dogrulama): Kurumsal kimlik ve belge doğrulama süreçleri.
+- [Yasal Sözleşmeler & KVKK](https://ihaleciburada.com/sozlesmeler): Kullanıcı sözleşmesi, platform aracılık sözleşmesi, KVKK aydınlatma metni ve Escrow şartları.
+- [Yardım & Destek](https://ihaleciburada.com/yardim): Sıkça sorulan sorular, ihale açma ve teklif verme rehberleri.
+- [Hakkımızda](https://ihaleciburada.com/hakkimizda): Şirket künyesi, kurumsal vizyon ve ticari bilgiler.
+
+## Kurumsal Bilgiler
+- **İşletmeci**: UK ELEKTRİK MALZEMELERİ SANAYİ TİCARET LİMİTED ŞİRKETİ (Acsisco)
+- **Vergi Dairesi / No**: Kurtdereli V.D. / 8871209277
+- **MERSİS**: 0887120927700001
+- **Ticaret Sicil No**: Balıkesir Ticaret Sicili / 22008
+- **Adres**: Bahçelievler Mah. 5083 Sk. No:11/A Altıeylül / Balıkesir / Türkiye
+- **İletişim**: info@acsisco.com | KEP: uk.acsisco@hs09.kep.tr | Tel: 0850 840 86 95
+
+## Detaylı Bilgi
+- [llms-full.txt](https://ihaleciburada.com/llms-full.txt): Kapsamlı sektör taksonomisi, ihale mevzuatı, teklif protokolleri ve ERP API dokümantasyonu.

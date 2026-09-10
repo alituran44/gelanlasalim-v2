@@ -21,3 +21,8 @@ if (process.platform === 'win32') {
 }
 console.log('[clean-output] Done.')
 
+try {
+  await import('./build-sitemap.js')
+} catch (e) {
+  console.warn('[clean-output] Could not run build-sitemap:', e)
+}

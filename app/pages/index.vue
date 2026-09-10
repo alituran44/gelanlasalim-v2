@@ -193,6 +193,84 @@ const faqList = [
   }
 ]
 
+// ==================== SEMANTİK SEO & JSON-LD STRUCTURED DATA (AEO / GEO) ====================
+useHead({
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'Organization',
+            '@id': 'https://ihaleciburada.com/#organization',
+            'name': 'İhaleciBurada',
+            'legalName': 'UK ELEKTRİK MALZEMELERİ SANAYİ TİCARET LİMİTED ŞİRKETİ',
+            'alternateName': ['Acsisco', 'ihaleciburada.com', 'İhaleci Burada B2B'],
+            'url': 'https://ihaleciburada.com',
+            'logo': {
+              '@type': 'ImageObject',
+              'url': 'https://ihaleciburada.com/logo.png',
+              'caption': 'İhaleciBurada Logo'
+            },
+            'description': "Türkiye'nin en kapsamlı B2B tersine ihale, doğrudan satın alma, şeffaf eksiltme ve Escrow güvenli havuz ticaret platformu.",
+            'address': {
+              '@type': 'PostalAddress',
+              'streetAddress': 'Bahçelievler Mahallesi 5083 Sokak No:11/A',
+              'addressLocality': 'Altıeylül',
+              'addressRegion': 'Balıkesir',
+              'postalCode': '10050',
+              'addressCountry': 'TR'
+            },
+            'contactPoint': {
+              '@type': 'ContactPoint',
+              'telephone': '+90-850-840-86-95',
+              'contactType': 'customer service',
+              'email': 'info@acsisco.com',
+              'availableLanguage': ['tr', 'en']
+            },
+            'taxID': '8871209277',
+            'vatID': 'TR8871209277',
+            'sameAs': [
+              'https://twitter.com/ihaleciburada',
+              'https://www.linkedin.com/company/ihaleciburada'
+            ]
+          },
+          {
+            '@type': 'WebSite',
+            '@id': 'https://ihaleciburada.com/#website',
+            'url': 'https://ihaleciburada.com',
+            'name': 'İhaleciBurada',
+            'description': "Türkiye'nin En Kapsamlı B2B İhale ve Satın Alma Portalı",
+            'publisher': { '@id': 'https://ihaleciburada.com/#organization' },
+            'inLanguage': 'tr-TR',
+            'potentialAction': {
+              '@type': 'SearchAction',
+              'target': {
+                '@type': 'EntryPoint',
+                'urlTemplate': 'https://ihaleciburada.com/?q={search_term_string}'
+              },
+              'query-input': 'required name=search_term_string'
+            }
+          },
+          {
+            '@type': 'FAQPage',
+            '@id': 'https://ihaleciburada.com/#faq',
+            'mainEntity': faqList.map(item => ({
+              '@type': 'Question',
+              'name': item.q,
+              'acceptedAnswer': {
+                '@type': 'Answer',
+                'text': item.a
+              }
+            }))
+          }
+        ]
+      })
+    }
+  ]
+})
+
 const leadForm = ref({
   firstName: '',
   lastName: '',

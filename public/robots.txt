@@ -1,5 +1,67 @@
+# ==============================================================================
+# İhaleciBurada (ihaleciburada.com) — Robots.txt Policy
+# Standart Arama Motorları & AI / GEO (Generative Engine Optimization) Kuralları
+# ==============================================================================
+
+# 1. Genel Arama Motoru Botları (Googlebot, Bingbot, Yandex vb.)
 User-agent: *
 Allow: /
+Disallow: /admin/
 Disallow: /admin
 Disallow: /panel/
+Disallow: /panel
+Disallow: /api/
+
+# 2. Yapay Zeka Arama & Alıntı Botları (OpenAI ChatGPT & SearchGPT)
+User-agent: GPTBot
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin/
+Disallow: /panel/
+Disallow: /api/
+
+# 3. Perplexity AI Search Crawler
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin/
+Disallow: /panel/
+Disallow: /api/
+
+# 4. Anthropic Claude Crawler
+User-agent: ClaudeBot
+User-agent: anthropic-ai
+Allow: /
+Disallow: /admin/
+Disallow: /panel/
+Disallow: /api/
+
+# 5. Google AI Overviews & Extended
+User-agent: Google-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /panel/
+Disallow: /api/
+
+# 6. Apple Intelligence & Search
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /admin/
+Disallow: /panel/
+Disallow: /api/
+
+# 7. Diğer Büyük Dil Modeli Tarayıcıları
+User-agent: Bytespider
+User-agent: CCBot
+Allow: /
+Disallow: /admin/
+Disallow: /panel/
+Disallow: /api/
+
+# ==============================================================================
+# SITEMAP & MACHINE-READABLE AI DISCOVERY FILES (llms.txt standard)
+# ==============================================================================
 Sitemap: https://ihaleciburada.com/sitemap.xml
+
+# LLMs Discovery (2026 AEO Standard):
+# https://ihaleciburada.com/llms.txt
+# https://ihaleciburada.com/llms-full.txt
