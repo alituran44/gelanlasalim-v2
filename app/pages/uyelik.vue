@@ -764,9 +764,16 @@ function handleDemoLogin(role: 'company' | 'individual') {
   <div class="min-h-[calc(100vh-76px)] bg-slate-50 flex items-stretch">
     <!-- Split Screen Skyscraper (Left Panel) -->
     <div class="hidden lg:flex lg:w-1/2 relative bg-slate-950 overflow-hidden flex-col justify-between p-12 text-left">
-      <!-- Gradient overlay and lights -->
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.15),transparent)]"></div>
-      <div class="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-blue-900/20 to-transparent"></div>
+      <!-- Architectural Skyscraper Background Image -->
+      <img
+        src="/auth_skyscraper_bg.jpg"
+        alt="İhaleciBurada Kurumsal B2B Genel Merkez"
+        class="absolute inset-0 w-full h-full object-cover object-center opacity-40 mix-blend-luminosity scale-100 transition-transform duration-700 hover:scale-105"
+      />
+      <!-- Gradient overlay and lights for high contrast readability -->
+      <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-950/85"></div>
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(37,99,235,0.2),transparent_70%)]"></div>
+      <div class="absolute bottom-0 left-0 right-0 h-96 bg-gradient-to-t from-blue-900/25 to-transparent"></div>
 
       <!-- Header brand -->
       <div class="relative z-10 flex items-center justify-between">
@@ -778,7 +785,7 @@ function handleDemoLogin(role: 'company' | 'individual') {
           class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-black transition border border-white/20 backdrop-blur-md shadow-md cursor-pointer"
         >
           <Home :size="15" class="text-amber-400" />
-          <span>{{ '🏠 Ana Sayfaya Dön' }}</span>
+          <span>{{ 'Ana Sayfaya Dön' }}</span>
         </NuxtLink>
       </div>
 
@@ -846,7 +853,7 @@ function handleDemoLogin(role: 'company' | 'individual') {
             class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-black transition-all shadow-sm cursor-pointer"
           >
             <Home :size="15" class="text-amber-400" />
-            <span>{{ '🏠 Ana Sayfaya Dön' }}</span>
+            <span>{{ 'Ana Sayfaya Dön' }}</span>
           </NuxtLink>
         </div>
 
