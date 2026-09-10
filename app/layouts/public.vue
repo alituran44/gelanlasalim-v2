@@ -166,22 +166,6 @@ onMounted(() => {
           </NuxtLink>
 
           <NuxtLink 
-            to="/firma-dogrulama"
-            :class="route.path === '/firma-dogrulama' ? 'bg-[#0F223D] border-b-2 border-amber-400 text-white shadow-inner' : 'bg-[#1E3A8A] hover:bg-[#172554] text-slate-100'"
-            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer shadow-xs"
-          >
-            <span>🛡️ Firma Doğrulama</span>
-          </NuxtLink>
-
-          <NuxtLink 
-            to="/sozlesmeler"
-            :class="route.path.startsWith('/sozlesmeler') ? 'bg-[#0F223D] border-b-2 border-amber-400 text-white shadow-inner' : 'bg-[#1E3A8A] hover:bg-[#172554] text-slate-100'"
-            class="px-3.5 py-2 rounded-t-lg transition flex items-center gap-1.5 cursor-pointer shadow-xs"
-          >
-            <span>⚖️ Resmi Sözleşmeler</span>
-          </NuxtLink>
-
-          <NuxtLink 
             to="/sozlesmeler?tab=hakkimizda"
             class="px-3.5 py-2 rounded-t-lg bg-[#1E3A8A] hover:bg-[#172554] text-slate-100 transition flex items-center gap-1.5 cursor-pointer shadow-xs"
           >
