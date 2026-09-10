@@ -34,10 +34,10 @@ const activeTab = ref<TabKey>('kullanim')
 function normalizeTab(rawTab: string | undefined): TabKey {
   if (!rawTab) return 'kullanim'
   const t = rawTab.toLowerCase()
-  if (t === 'kullanim' || t === 'sla' || t === 'tedarikci-uyum') return 'kullanim'
-  if (t === 'gizlilik' || t === 'kvkk' || t === 'bilgi-guvenligi') return 'gizlilik'
+  if (t === 'kullanim' || t === 'kullanici' || t === 'sla' || t === 'tedarikci-uyum') return 'kullanim'
+  if (t === 'gizlilik' || t === 'kvkk' || t === 'riza' || t === 'bilgi-guvenligi') return 'gizlilik'
   if (t === 'mesafeli-satis' || t === 'on-bilgilendirme' || t === 'iptal-iade' || t === 'teslimat') return 'mesafeli-satis'
-  if (t === 'ihale-kurallari' || t === 'escrow') return 'ihale-kurallari'
+  if (t === 'ihale-kurallari' || t === 'aracilik' || t === 'escrow') return 'ihale-kurallari'
   if (t === 'cerezler' || t === 'cookies') return 'cerezler'
   if (t === 'hakkimizda' || t === 'kariyer' || t === 'is-ortakligi' || t === 'blog' || t === 'basin') return 'hakkimizda'
   return 'kullanim'

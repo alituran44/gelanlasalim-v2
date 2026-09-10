@@ -21,7 +21,11 @@ import {
   Eye,
   EyeOff,
   CheckCircle2,
-  Home
+  Home,
+  ArrowRight,
+  FileText,
+  AlertCircle,
+  X
 } from 'lucide-vue-next'
 import { locale, detectLocale, t } from '~/composables/useLocale'
 
@@ -142,10 +146,13 @@ const phone = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 const showPassword = ref(false)
+const showConfirmPassword = ref(false)
 const showLoginPassword = ref(false)
 const userRole = ref<'company' | 'individual'>('company')
 const companyName = ref('')
 const agreeKvkk = ref(false)
+const agreeUserAgreement = ref(false)
+const agreePlatformAgreement = ref(false)
 
 const loginEmail = ref('')
 const loginPassword = ref('')
@@ -352,16 +359,36 @@ async function resendOtp() {
 }
 
 function handleRegister() {
-  if (!email.value || !password.value || !firstName.value || !lastName.value || !phone.value) {
-    errorMessage.value = 'Lütfen tüm zorunlu alanları doldurun.'
+  if (!firstName.value.trim() || !lastName.value.trim()) {
+    errorMessage.value = 'Lütfen ad ve soyadınızı giriniz.'
     return
   }
-  if (password.value.length < 6) {
-    errorMessage.value = 'Şifreniz en az 6 karakter olmalıdır.'
+  if (!email.value.trim()) {
+    errorMessage.value = 'Lütfen kurumsal e-posta adresinizi giriniz.'
     return
   }
-  if (!agreeKvkk.value) {
-    errorMessage.value = 'Lütfen KVKK ve Üyelik Sözleşmesini kabul edin.'
+  if (!phone.value.trim()) {
+    errorMessage.value = 'Lütfen telefon numaranızı giriniz.'
+    return
+  }
+  if (!password.value) {
+    errorMessage.value = 'Lütfen bir şifre belirleyiniz.'
+    return
+  }
+  if (password.value.length < 10) {
+    errorMessage.value = 'Şifreniz en az 10 karakter olmalıdır.'
+    return
+  }
+  if (!confirmPassword.value) {
+    errorMessage.value = 'Lütfen şifrenizi tekrar giriniz.'
+    return
+  }
+  if (password.value !== confirmPassword.value) {
+    errorMessage.value = 'Girdiğiniz şifreler birbiriyle eşleşmiyor.'
+    return
+  }
+  if (!agreeUserAgreement.value || !agreePlatformAgreement.value) {
+    errorMessage.value = 'Lütfen Kullanıcı Sözleşmesini ve Platform Aracılık Sözleşmesini onaylayınız.'
     return
   }
 
@@ -807,7 +834,7 @@ function handleDemoLogin(role: 'company' | 'individual') {
 
     <!-- Form Right Panel -->
     <div class="w-full lg:w-1/2 flex flex-col justify-between px-6 py-8 sm:px-12 lg:px-20 bg-white">
-      <div class="mx-auto w-full max-w-md text-left">
+      <div class="mx-auto w-full max-w-md sm:max-w-lg text-left">
         <!-- Top Navigation Bar (Mobile & Desktop) -->
         <div class="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
           <NuxtLink to="/" class="flex items-center gap-2">
@@ -839,9 +866,19 @@ function handleDemoLogin(role: 'company' | 'individual') {
         </div>
 
         <!-- REGISTRATION FORM -->
-        <div v-if="activeTab === 'register'">
+        <div v-if="activeTab === 'register'" class="space-y-6">
+          <!-- Başlık & Açıklama -->
+          <div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-slate-950 mb-2">
+              Hesabını <span class="text-[#0e3a8c]">aç.</span>
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-500 font-normal leading-relaxed">
+              Kredi kartı gerekmez. E-posta doğrulaması sonrası kurumsal bilgilerini tamamlayarak başlayın.
+            </p>
+          </div>
+
           <!-- OAuth Giriş Butonları -->
-          <div class="space-y-2 mb-5">
+          <div class="space-y-2">
             <button
               type="button"
               @click="handleOAuth('google')"
@@ -854,82 +891,246 @@ function handleDemoLogin(role: 'company' | 'individual') {
           </div>
 
           <!-- Ayraç -->
-          <div class="relative flex items-center mb-5">
-            <div class="flex-1 border-t" style="border-color: #E2E8F0;"></div>
+          <div class="relative flex items-center">
+            <div class="flex-1 border-t border-slate-200"></div>
             <span class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ 'veya form ile devam edin' }}</span>
-            <div class="flex-1 border-t" style="border-color: #E2E8F0;"></div>
+            <div class="flex-1 border-t border-slate-200"></div>
           </div>
 
-          <!-- Standart Normal Kayıt Formu -->
+          <!-- Standart Kayıt Formu -->
           <form @submit.prevent="handleRegister" class="space-y-4">
-            <div class="grid grid-cols-2 gap-4">
+            <!-- Ad & Soyad -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">{{ 'Ad *' }}</label>
-                <div class="relative">
-                  <User :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="firstName" type="text" required aria-label="Adınız" placeholder="Adınız" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-xs font-semibold text-slate-800">{{ 'Ad' }}</label>
+                  <span class="text-[11px] text-slate-400 font-normal">{{ 'Zorunlu' }}</span>
                 </div>
+                <input
+                  v-model="firstName"
+                  type="text"
+                  required
+                  placeholder="Mehmet"
+                  class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0e3a8c] focus:ring-1 focus:ring-[#0e3a8c] transition-all min-h-[42px]"
+                />
               </div>
               <div>
-                <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">{{ 'Soyad *' }}</label>
-                <div class="relative">
-                  <User :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="lastName" type="text" required aria-label="Soyadınız" placeholder="Soyadınız" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
+                <div class="flex items-center justify-between mb-1.5">
+                  <label class="text-xs font-semibold text-slate-800">{{ 'Soyad' }}</label>
+                  <span class="text-[11px] text-slate-400 font-normal">{{ 'Zorunlu' }}</span>
                 </div>
+                <input
+                  v-model="lastName"
+                  type="text"
+                  required
+                  placeholder="Yılmaz"
+                  class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0e3a8c] focus:ring-1 focus:ring-[#0e3a8c] transition-all min-h-[42px]"
+                />
               </div>
             </div>
 
+            <!-- Kurumsal e-posta -->
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">{{ 'E-Posta Adresi *' }}</label>
-              <div class="relative">
-                <Mail :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="email" type="email" required aria-label="E-Posta Adresi" placeholder="name@email.com" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="text-xs font-semibold text-slate-800">{{ 'Kurumsal e-posta' }}</label>
+                <span class="text-[11px] text-slate-400 font-normal">{{ 'Zorunlu' }}</span>
               </div>
+              <input
+                v-model="email"
+                type="email"
+                required
+                placeholder="ad.soyad@firma.com.tr"
+                class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0e3a8c] focus:ring-1 focus:ring-[#0e3a8c] transition-all min-h-[42px]"
+              />
             </div>
 
+            <!-- Telefon -->
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">{{ 'Telefon *' }}</label>
-              <div class="relative">
-                <Phone :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="phone" type="tel" required aria-label="Telefon Numarası" placeholder="+90 (555) 555 55 55" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="text-xs font-semibold text-slate-800">{{ 'Telefon' }}</label>
+                <span class="text-[11px] text-slate-400 font-normal">{{ 'Zorunlu' }}</span>
               </div>
+              <input
+                v-model="phone"
+                type="tel"
+                required
+                placeholder="+90 5__ ___ __ __"
+                class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0e3a8c] focus:ring-1 focus:ring-[#0e3a8c] transition-all min-h-[42px]"
+              />
             </div>
 
+            <!-- Şifre -->
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">{{ 'Şifre *' }}</label>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="text-xs font-semibold text-slate-800">{{ 'Şifre' }}</label>
+                <span class="text-[11px] text-slate-400 font-normal">{{ 'Zorunlu' }}</span>
+              </div>
               <div class="relative">
-                <LockKeyhole :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="password" :type="showPassword ? 'text' : 'password'" required aria-label="Şifreniz" placeholder="Minimum 6 karakter" class="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
-                <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer">
-                  <EyeOff v-if="showPassword" :size="14" />
-                  <Eye v-else :size="14" />
+                <input
+                  v-model="password"
+                  :type="showPassword ? 'text' : 'password'"
+                  required
+                  placeholder="••••••••••"
+                  class="w-full px-3.5 pr-10 py-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0e3a8c] focus:ring-1 focus:ring-[#0e3a8c] transition-all min-h-[42px]"
+                />
+                <button
+                  type="button"
+                  @click="showPassword = !showPassword"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-0.5"
+                  aria-label="Şifreyi Göster"
+                >
+                  <EyeOff v-if="showPassword" :size="16" />
+                  <Eye v-else :size="16" />
                 </button>
               </div>
+
+              <!-- Şifre Kuralları & Uyarı -->
+              <div class="mt-2 space-y-1 text-left">
+                <div v-if="password.length > 0 && password.length < 10" class="flex items-center gap-1.5 text-xs text-rose-600 font-semibold">
+                  <AlertCircle :size="14" class="shrink-0" />
+                  <span>{{ 'En az 10 karakter.' }}</span>
+                </div>
+                <p class="text-[11px] text-slate-500 font-mono tracking-tight">
+                  {{ '10+ karakter · büyük/küçük harf · rakam · özel karakter' }}
+                </p>
+              </div>
             </div>
 
-            <!-- KVKK Onay Kutusu -->
-            <div class="flex items-start gap-2.5 py-1">
-              <input v-model="agreeKvkk" id="kvkk-reg" type="checkbox" required class="mt-1 h-3.5 w-3.5 rounded border-slate-300 cursor-pointer" />
-              <label for="kvkk-reg" class="text-[10px] leading-relaxed text-slate-500 font-bold uppercase tracking-wider cursor-pointer">
-                {{ 'Üyelik şartlarını ve ' }}
-                <NuxtLink to="/sozlesmeler?tab=kvkk" target="_blank" class="text-blue-600 hover:underline">{{ 'KVKK Açık Rıza Metnini' }}</NuxtLink>
-                {{ ' kabul ediyorum.' }}
-              </label>
+            <!-- Şifre tekrarı -->
+            <div>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="text-xs font-semibold text-slate-800">{{ 'Şifre tekrarı' }}</label>
+                <span class="text-[11px] text-slate-400 font-normal">{{ 'Zorunlu' }}</span>
+              </div>
+              <div class="relative">
+                <input
+                  v-model="confirmPassword"
+                  :type="showConfirmPassword ? 'text' : 'password'"
+                  required
+                  placeholder="Şifrenizi tekrar girin"
+                  class="w-full px-3.5 pr-10 py-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0e3a8c] focus:ring-1 focus:ring-[#0e3a8c] transition-all min-h-[42px]"
+                />
+                <button
+                  type="button"
+                  @click="showConfirmPassword = !showConfirmPassword"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-0.5"
+                  aria-label="Şifre Tekrarını Göster"
+                >
+                  <EyeOff v-if="showConfirmPassword" :size="16" />
+                  <Eye v-else :size="16" />
+                </button>
+              </div>
+              <div v-if="confirmPassword && password !== confirmPassword" class="mt-1 flex items-center gap-1.5 text-xs text-rose-600 font-semibold">
+                <AlertCircle :size="13" class="shrink-0" />
+                <span>{{ 'Şifreler birbiriyle eşleşmiyor.' }}</span>
+              </div>
             </div>
 
-            <!-- Bilgilendirme Notu: Şirket bilgileri profilden düzenlenebilir -->
-            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-[11px] text-slate-600 flex items-start gap-2.5">
-              <Building2 :size="16" class="text-blue-600 shrink-0 mt-0.5" />
-              <span class="leading-relaxed">
-                Şirket ve kurumsal firma bilgilerinizi (VKN, Vergi Dairesi, Sektörler) kayıt sonrası <strong>Profil & Hesap</strong> ekranınızdan kolayca tanımlayabilirsiniz.
+            <!-- ZORUNLU SÖZLEŞMELER -->
+            <div class="pt-2 space-y-2 text-left">
+              <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                {{ 'ZORUNLU SÖZLEŞMELER' }}
               </span>
+
+              <!-- Kullanıcı Sözleşmesi -->
+              <div class="border border-slate-200 rounded-lg p-3 flex items-center justify-between gap-3 bg-white">
+                <label class="flex items-center gap-2.5 cursor-pointer text-xs font-medium text-slate-700 select-none">
+                  <input
+                    v-model="agreeUserAgreement"
+                    type="checkbox"
+                    required
+                    class="h-4 w-4 rounded border-slate-300 text-[#0e3a8c] focus:ring-[#0e3a8c] cursor-pointer"
+                  />
+                  <span>{{ 'Kullanıcı sözleşmesini okudum ve kabul ediyorum.' }}</span>
+                </label>
+                <NuxtLink
+                  to="/sozlesmeler?tab=kullanici"
+                  target="_blank"
+                  class="text-xs font-semibold text-[#0e3a8c] underline hover:text-blue-900 shrink-0"
+                >
+                  {{ 'Oku ve Onayla' }}
+                </NuxtLink>
+              </div>
+
+              <!-- Platform Aracılık Sözleşmesi -->
+              <div class="border border-slate-200 rounded-lg p-3 flex items-center justify-between gap-3 bg-white">
+                <label class="flex items-center gap-2.5 cursor-pointer text-xs font-medium text-slate-700 select-none">
+                  <input
+                    v-model="agreePlatformAgreement"
+                    type="checkbox"
+                    required
+                    class="h-4 w-4 rounded border-slate-300 text-[#0e3a8c] focus:ring-[#0e3a8c] cursor-pointer"
+                  />
+                  <span>{{ 'Platform aracılık ve kullanım sözleşmesini kabul ediyorum.' }}</span>
+                </label>
+                <NuxtLink
+                  to="/sozlesmeler?tab=aracilik"
+                  target="_blank"
+                  class="text-xs font-semibold text-[#0e3a8c] underline hover:text-blue-900 shrink-0"
+                >
+                  {{ 'Oku ve Onayla' }}
+                </NuxtLink>
+              </div>
+
+              <!-- KVKK Aydınlatma Metni -->
+              <div class="border border-slate-200/70 bg-slate-50/60 rounded-lg p-3 flex items-center gap-2 text-xs text-slate-700">
+                <ShieldCheck :size="16" class="text-blue-700 shrink-0" />
+                <div class="flex-1 text-xs">
+                  {{ 'Kişisel verileriniz KVKK Aydınlatma Metni kapsamında işlenmektedir.' }}
+                  <NuxtLink to="/sozlesmeler?tab=kvkk" target="_blank" class="font-bold text-[#0e3a8c] underline hover:text-blue-900 ml-1">
+                    {{ 'Metni Oku' }}
+                  </NuxtLink>
+                </div>
+              </div>
             </div>
 
-            <div v-if="errorMessage" class="rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-bold text-red-700">⚠️ {{ errorMessage }}</div>
+            <!-- AÇIK RIZA ONAYLARI (KVKK M.5/1) -->
+            <div class="pt-2 space-y-2 text-left">
+              <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                {{ 'AÇIK RIZA ONAYLARI (KVKK M.5/1)' }}
+              </span>
 
-            <button type="submit" :disabled="isSubmitting" class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white transition-all disabled:opacity-50 cursor-pointer shadow-md hover:bg-[#003057]" style="background: #003057;">
-              <span>{{ isSubmitting ? 'Kayıt Yapılıyor...' : 'Kayıt Ol ve Başla' }}</span>
-              <ChevronRight v-if="!isSubmitting" :size="14" />
+              <!-- Açık Rıza Kartı -->
+              <div class="border border-blue-200 bg-[#eef3fb] rounded-xl p-3.5 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-800 shrink-0">
+                    <FileText :size="16" />
+                  </div>
+                  <div>
+                    <h4 class="text-xs font-bold text-slate-900">{{ 'Açık Rıza Metni (KVKK m.5/1)' }}</h4>
+                    <p class="text-[11px] text-slate-500 leading-tight mt-0.5">{{ 'İsteğe bağlı açık rıza metnini inceleyin; onay kutuları ayrıca seçilir.' }}</p>
+                  </div>
+                </div>
+                <NuxtLink
+                  to="/sozlesmeler?tab=riza"
+                  target="_blank"
+                  class="text-xs font-bold text-[#0e3a8c] hover:underline flex items-center gap-1 shrink-0"
+                >
+                  <span>{{ 'Metni Oku' }}</span>
+                  <ArrowRight :size="12" />
+                </NuxtLink>
+              </div>
+
+              <!-- Açık Rıza Açıklama Kutusu -->
+              <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/60 text-xs text-slate-600 leading-relaxed">
+                {{ 'Açık rıza onayları isteğe bağlıdır. Vermemeniz halinde temel platform hizmetlerinden yararlanmaya devam edebilirsiniz.' }}
+              </div>
+            </div>
+
+            <!-- Error Banner -->
+            <div v-if="errorMessage" class="rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-bold text-red-700">
+              ⚠️ {{ errorMessage }}
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              :disabled="isSubmitting"
+              class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 px-6 text-sm font-bold text-white transition-all disabled:opacity-50 cursor-pointer shadow-sm hover:opacity-95"
+              style="background-color: #0e3a8c;"
+            >
+              <span>{{ isSubmitting ? 'Hesap Oluşturuluyor...' : 'Hesabımı oluştur' }}</span>
+              <ArrowRight v-if="!isSubmitting" :size="16" />
             </button>
           </form>
         </div>
