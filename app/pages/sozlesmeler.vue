@@ -23,6 +23,7 @@ const router = useRouter()
 
 export type TabKey = 
   | 'kullanim' 
+  | 'aracilik'
   | 'gizlilik' 
   | 'mesafeli-satis'
   | 'ihale-kurallari'
@@ -35,9 +36,10 @@ function normalizeTab(rawTab: string | undefined): TabKey {
   if (!rawTab) return 'kullanim'
   const t = rawTab.toLowerCase()
   if (t === 'kullanim' || t === 'kullanici' || t === 'sla' || t === 'tedarikci-uyum') return 'kullanim'
+  if (t === 'aracilik' || t === 'platform-aracilik' || t === 'aracilik-sozlesmesi') return 'aracilik'
   if (t === 'gizlilik' || t === 'kvkk' || t === 'riza' || t === 'bilgi-guvenligi') return 'gizlilik'
   if (t === 'mesafeli-satis' || t === 'on-bilgilendirme' || t === 'iptal-iade' || t === 'teslimat') return 'mesafeli-satis'
-  if (t === 'ihale-kurallari' || t === 'aracilik' || t === 'escrow') return 'ihale-kurallari'
+  if (t === 'ihale-kurallari' || t === 'escrow') return 'ihale-kurallari'
   if (t === 'cerezler' || t === 'cookies') return 'cerezler'
   if (t === 'hakkimizda' || t === 'kariyer' || t === 'is-ortakligi' || t === 'blog' || t === 'basin') return 'hakkimizda'
   return 'kullanim'
@@ -169,11 +171,11 @@ function printDocument() {
         <!-- Sidebar Navigation (4 cols) -->
         <div class="lg:col-span-4 space-y-4">
           
-          <!-- Legal Contracts Group (5 Essential Tabs) -->
+          <!-- Legal Contracts Group (6 Essential Tabs) -->
           <div class="bg-white rounded-2xl border border-slate-200 p-4 space-y-1.5 shadow-xs">
             <div class="text-[10px] font-black text-blue-900 uppercase tracking-widest px-3 mb-2 flex items-center gap-1.5">
               <Scale :size="13" class="text-blue-600" />
-              <span>RESMİ SÖZLEŞMELER (5 TEMEL BELGE)</span>
+              <span>RESMİ SÖZLEŞMELER (6 TEMEL BELGE)</span>
             </div>
 
             <button 
@@ -186,12 +188,21 @@ function printDocument() {
             </button>
 
             <button 
+              @click="setTab('aracilik')"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'aracilik' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
+            >
+              <Scale :size="15" />
+              <span>2. Platform Aracılık Sözleşmesi</span>
+            </button>
+
+            <button 
               @click="setTab('gizlilik')"
               class="w-full flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'gizlilik' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
             >
               <Shield :size="15" />
-              <span>2. Gizlilik Politikası & KVKK Aydınlatma</span>
+              <span>3. Gizlilik Politikası & KVKK Aydınlatma</span>
             </button>
 
             <button 
@@ -200,7 +211,7 @@ function printDocument() {
               :class="activeTab === 'mesafeli-satis' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
             >
               <ShieldCheck :size="15" />
-              <span>3. Mesafeli Satış & Abonelik Sözleşmesi</span>
+              <span>4. Mesafeli Satış & Abonelik Sözleşmesi</span>
             </button>
 
             <button 
@@ -209,7 +220,7 @@ function printDocument() {
               :class="activeTab === 'ihale-kurallari' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
             >
               <Gavel :size="15" />
-              <span>4. B2B İhale ve Satın Alma Kuralları</span>
+              <span>5. B2B İhale ve Satın Alma Kuralları</span>
             </button>
 
             <button 
@@ -218,7 +229,7 @@ function printDocument() {
               :class="activeTab === 'cerezler' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
             >
               <CookieIcon :size="15" />
-              <span>5. Çerez (Cookie) Politikası</span>
+              <span>6. Çerez (Cookie) Politikası</span>
             </button>
           </div>
 
@@ -406,7 +417,134 @@ function printDocument() {
             </div>
           </article>
 
-          <!-- 2. GİZLİLİK POLİTİKASI (PRIVACY POLICY) -->
+          <!-- 2. PLATFORM ARACILIK SÖZLEŞMESİ -->
+          <article v-if="activeTab === 'aracilik'" class="space-y-6">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-3 py-1 bg-blue-50 text-blue-900 font-mono text-xs font-bold rounded-lg border border-blue-200">6563 SK ARACI HİZMET SAĞLAYICI</span>
+              <span class="px-3 py-1 bg-emerald-50 text-emerald-800 font-mono text-xs font-bold rounded-lg border border-emerald-200">B2B TİCARİ VE MESLEKİ İŞLEMLER</span>
+              <span class="text-xs text-slate-400 font-mono">Belge Sürümü: TR-2026-09-10-02-R1</span>
+            </div>
+
+            <h1 class="text-2xl font-black tracking-tight text-slate-900">
+              {{ 'İhaleciBurada Platform Aracılık Sözleşmesi' }}
+            </h1>
+            
+            <!-- İşletmeci ve Yasal Tanıtım Kutusu -->
+            <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-700 leading-relaxed space-y-2">
+              <p class="font-semibold text-slate-900">
+                {{ 'Bu sözleşme, İhaleciBurada platformunu işleten Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi) ile kendi işletmesi adına platform aracılık hizmetinden yararlanan üye arasındadır. Hesabı kullanan yetkili kullanıcının temsil yetkisi, işletmenin hak ve borçlarından ayrı değerlendirilir; salt hesap erişimi kişisel ve müteselsil sorumluluk yaratmaz.' }}
+              </p>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-slate-200 text-[11px]">
+                <div><strong>İşletmeci:</strong> Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)</div>
+                <div><strong>Vergi Dairesi / VKN:</strong> Çanakkale V.D. / 9560161511</div>
+                <div><strong>Adres:</strong> Çanakkale, Türkiye</div>
+                <div><strong>Müşteri Destek & Tel:</strong> 0850 840 86 95</div>
+                <div><strong>Resmi E-Posta:</strong> ihalecib@gmail.com</div>
+                <div><strong>KEP Adresi:</strong> hasanhuseyin.yildirim.17@hs01.kep.tr</div>
+              </div>
+            </div>
+
+            <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
+              
+              <!-- 1. Taraflar ve sözleşme ilişkisi -->
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">1. TARAFLAR VE SÖZLEŞME İLİŞKİSİ</h3>
+                <p><strong>1.1.</strong> Bu sözleşme, İhaleciBurada platformunu işleten <strong>Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)</strong> (İşletmeci) ile kendi işletmesi adına platform aracılık hizmetinden yararlanan üye arasındadır. Hesabı kullanan yetkili kullanıcının temsil yetkisi, işletmenin hak ve borçlarından ayrı değerlendirilir; salt hesap erişimi kişisel ve müteselsil sorumluluk yaratmaz. İhaleciBurada platformun adıdır; tek başına ayrı bir sözleşme tarafını tanımlamaz. İşletmeci: Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi). Adres: Çanakkale, Türkiye. VKN: 9560161511; Çanakkale Vergi Dairesi. Telefon: 0850 840 86 95. E-posta: ihalecib@gmail.com; KEP: hasanhuseyin.yildirim.17@hs01.kep.tr.</p>
+                <p><strong>1.2.</strong> Platform işletmelerin ticari ve mesleki işlemlerine yöneliktir. Bu amaç, somut işlemin niteliğini, tarafların kanuni statüsünü veya uygulanması zorunlu koruyucu hükümleri tek başına belirlemez. Bu sözleşme bir faaliyet izni, sicil kaydı, güven damgası veya kanuni istisnadan yararlanıldığı beyanı değildir.</p>
+                <p><strong>1.3.</strong> Kullanıcı Sözleşmesi hesap ve genel kullanım ilişkisini; bu metin aracılık hizmetini düzenler. Birlikte uygulanacak belgeler adları ve sürümleriyle kabul öncesinde sunulur. Metinler çatışırsa sırf belgenin adı veya bağlantı adresi ek borç ya da üstünlük yaratmaz; geçerli biçimde kararlaştırılan koşullar ve uygulanabilir yorum kuralları esas alınır.</p>
+              </section>
+
+              <!-- 2. Aracılık kapsamı ve ayrı danışmanlık -->
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">2. ARACILIK KAPSAMI VE AYRI DANIŞMANLIK</h3>
+                <p><strong>2.1.</strong> Aracılık hizmeti, ilgili yetki, kota ve geçerli kullanım hakları kapsamında ihtiyaç ve ihale yayımlama, teklif iletme, karşılaştırma, sonuçlandırma ve işlem kayıtlarının takibi için elektronik altyapı sunar. Kullanılabilen işlevler ve sınırlamalar hizmet alınmadan önce açıklanır; her üyenin bütün işlevleri sınırsız kullanacağı taahhüt edilmez. Paket veya ücretli hak kaydı, kapsam dışındaki işlevlerin de açık olduğu anlamına gelmez; her paketin kapsamı, kotaları ve süresi kendi koşullarıyla uygulanır. Bu hüküm üyeler arasında bir sohbet işlevi sunulduğu anlamına gelmez.</p>
+                <p><strong>2.2.</strong> İhale türüne göre ilanı yayımlayan, teklif veren, alıcı ve satıcı rolleri değişebilir. Proje fazlası veya stok satışları dahil işlemlerin tamamının yalnız aşağı yönlü fiyat rekabetiyle veya tek bir ihale yöntemiyle yürütüldüğü söylenemez. Somut teklif ve işlem koşulları ilgili ihale ekranında ayrıca gösterilir.</p>
+                <p><strong>2.3.</strong> İhaleciBurada danışmanlığı ayrı sözleşmeye tabidir; başlangıç, bitiş, kapsam ve bedel koordinatörle müzakere edilir, sözleşmeye işlenir ve bedel mutabık havale veya ödeme şartlarıyla ödenir. Kayıt ve ihtiyaç bildirimi tek başına hizmeti başlatmaz. Şartların belirlenmesi, sistemce doldurulan aynı sözleşmenin önce İhaleciBurada onaylı, ardından müşteri tarafından da onaylı tam nüshasının yüklenmesi, koordinatör incelemesi ve aktivasyon koşulları korunur. Bu aracılık metni imzalı sözleşmeyi değiştirmez, ikinci kayıt sözleşmesi veya ek personel onayı getirmez ve müşterinin bağlayıcı karar yetkisini devretmez. Bir ödeme belgesinin yüklenmesi tek başına ödeme kanıtı veya otomatik aktivasyon değildir.</p>
+              </section>
+
+              <!-- 3. Tarafların işlemleri ve platformun konumu -->
+              <section class="space-y-2 bg-blue-50/50 p-4 rounded-xl border border-blue-200">
+                <h3 class="font-bold text-blue-950 text-sm">3. TARAFLARIN İŞLEMLERİ VE PLATFORMUN KONUMU</h3>
+                <p><strong>3.1.</strong> Üye, kendi yetkisi kapsamında doğru ve hukuka uygun ilan, teklif ve işlem bilgisi sunar; karşı tarafın koşullarını kabul etmeden önce inceler. Platformun elektronik altyapısı eksik temsil yetkisini veya irade beyanını tamamlamaz. Taslak kayıt, başarısız işlem veya sözleşme numarası tek başına geçerli sözleşme kurulduğunu kanıtlamaz.</p>
+                <p><strong>3.2.</strong> Olağan kazanan belirlemede taslak seçim ile bağlayıcı sonuçlandırma ayrıdır; geçerli teklifin yetkili kabulünden sonra olağan akışta kazanan teklif verenin ikinci bir platform kabulü aranmaz. Hemen al gibi önceden açıklanmış özel işlemler kendi koşullarıyla değerlendirilir. Kanuni hata, geçersizlik ve başvuru hakları saklıdır.</p>
+                <p><strong>3.3.</strong> Yalnız platformu işletmek İşletmeciyi üyeler arasındaki mal veya hizmet sözleşmesinin satıcısı, alıcısı, kefili veya ödeme garantörü yapmaz (6563 Sayılı Kanun Madde 9). Kendi adına ayrıca üstlendiği ve kanundan doğan yükümlülükleri korunur. Üyeler arasındaki uyuşmazlıkta destek iletişimi, bağlayıcı yargı kararı veya tarafların haklarından feragati sayılmaz.</p>
+              </section>
+
+              <!-- 4. Ücretler ve doğrudan ödeme -->
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">4. ÜCRETLER VE DOĞRUDAN ÖDEME</h3>
+                <p><strong>4.1.</strong> İhaleciBurada, platformda gösterdiği üyelik paketlerini gerçek birer hizmet ve kullanım hakkı teklifi olarak sunar; paketin kapsamı, hak ve kotaları, süresi, bedeli ve vergileri işlem öncesinde platformda gösterilen güncel bilgilere göre belirlenir. Paket edinimi ve plan değişikliğinde, işlem sırasında ödeme adımında fiilen sunulan ve kullanılabilir olan ödeme yöntemleri ile bunların işlem öncesinde açıklanan koşulları uygulanır; kartlı ödeme sunulduğunda bu ödeme, işlem öncesinde açıklanan koşullar altında BDDK ve TCMB lisanslı ödeme hizmeti sağlayıcıları (PayTR / iyzico) altyapısı üzerinden alınır. Üyelik paketlerinden ayrı olarak danışmanlık hizmeti de sunulur; müşterinin mutabakatından önce bu hizmetin türü, kapsamı, başlangıç ve bitişi, tutarı veya hesaplanma yöntemi, vergi ve toplam bedeli ile havale veya ödeme şartları açıklanır. Bu sözleşme kart saklama, otomatik yenileme veya otomatik tahsilat yetkisi vermez; herhangi bir ödeme yönteminin kullanılabilirliğini, kesintisizliğini veya bir açılış tarihini taahhüt etmez.</p>
+                <p><strong>4.2.</strong> Bu sözleşmeyle alıcılar için ihale bedeli üzerinden komisyon, ihale başına komisyon veya başarı komisyonu kararlaştırılmamıştır (%0 Alıcı Komisyonu). Geçmiş üyelik ilişkilerinden doğmuş geçerli bedeller ve ayrıca geçerli biçimde kararlaştırılan danışmanlık bedeli farklıdır. Ayrı danışmanlık sözleşmesindeki bedel kaldırılmaz veya değiştirilmez. Paket koşullarındaki bir değişiklik geçmişte edinilmiş hakları veya bağımsız ücretli üyeliğin kalan süresini kendiliğinden kaldırmaz.</p>
+                <p><strong>4.3.</strong> Mal veya hizmetin ticaret bedeli alıcı ile satıcı arasında doğrudan ödenir. Bu metin İşletmeci nezdinde emanet hesap, tahsilat garantisi veya ödeme kuruluşu hizmeti kurmaz; İşletmecinin ayrı danışmanlık alacağını ortadan kaldırmaz. Ücret değişikliği mevcut dönem veya başlamış işlem için geriye dönük yeni borç doğurmaz. Gelecekte yeni bir ücret veya satış modeli uygulanması bu metinle kararlaştırılmış değildir; böyle bir değişiklik ayrıca yetkili karar, önceden açıklanan geçerli koşullar ve kanuni güvenceler gerektirir.</p>
+              </section>
+
+              <!-- 5. Görünürlük, sıralama ve işlem adaleti -->
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">5. GÖRÜNÜRLÜK, SIRALAMA VE İŞLEM ADALETİ</h3>
+                <p><strong>5.1.</strong> İhale sonuçlandırması, firma dizini görünürlüğü, arama sırası ve üye değerlendirmeleri farklı işlevlerdir. Bir listede yer almak veya üst sırada görünmek, ihaleyi kazanma, ifa kapasitesi veya kalite garantisi değildir. İlgili işlem için gösterilen yetki ve teklif kuralları korunur.</p>
+                <p><strong>5.2.</strong> Bir sıralama veya tavsiye işlevi sunuluyorsa kullanılan temel parametreler, bunların önceliği ve varsa geçmişte geçerli biçimde edinilmiş görünürlük hakkının etkisi ilgili hizmet açıklamasında belirtilir. Kayıtlarda ücretli görünürlük alanı bulunması bugün satın alınabilir yeni bir seçenek sunulduğu anlamına gelmez. Bu açıklama, kaynak kodunun veya diğer üyelerin gizli bilgilerinin yayımlanması anlamına gelmez. Açıklanmamış bir puanın nesnel ticari yeterlilik ölçüsü olduğu kabul edilmez.</p>
+                <p><strong>5.3.</strong> Sahte teklif, danışıklılık, yanıltıcı değerlendirme ve diğer üyelerin gizli bilgilerinin izinsiz kullanımı yasaktır. Kanuni hak arama veya yetkili mercilere başvuru tek başına cezalandırıcı sıralama düşürme ya da hizmet kısıtlama sebebi yapılamaz. Üyelerin meşru doğrudan iletişimi ve doğrudan ödemesi sırf platform dışında gerçekleştiği için otomatik ceza doğurmaz.</p>
+              </section>
+
+              <!-- 6. Destek, bildirim ve hak ihlali başvuruları -->
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">6. DESTEK, BİLDİRİM VE HAK İHLALİ BAŞVURULARI</h3>
+                <p><strong>6.1.</strong> Hesabına erişebilen üye, platform hizmetine ilişkin destek talebini hesap içindeki Destek & İletişim alanından iletebilir. Talebin konusu, ilgili işlem veya içerik ve sorunun açıklaması gerekli kapsamla sınırlı sunulur. Başvurunun kayda alınması, talebin haklı bulunduğu veya uyuşmazlığın çözüldüğü anlamına gelmez.</p>
+                <p><strong>6.2.</strong> Hesabınıza erişemediğinizde veya içerikle ilgili fikri ya da sınai hak ihlali bildirmek istediğinizde <strong>ihalecib@gmail.com</strong> adresine yazabilirsiniz. Bildirimde başvuranın kimliği ve iletişim yolu, hak veya yetki dayanağı, ilgili içeriğin bağlantısı/işlem numarası, itirazın açıklaması ve gerekli dayanak belgeler bulunmalıdır. Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)’ne yapılacak yazılı bildirimler için 1.1’deki adres, KEP için <strong>hasanhuseyin.yildirim.17@hs01.kep.tr</strong> kullanılabilir. İlgili başvuruya kanunen özgü yöntem ve içerik şartları saklıdır. Başvuru tek başına ihlalin kesin kanıtı sayılmaz; ilgili tarafların açıklama ve itiraz hakları korunur.</p>
+                <p><strong>6.3.</strong> Destek başvurusu kanunen gereken muhataba ve yöntemle yapılacak ihtar, ayıp bildirimi, dava veya diğer başvuruların yerine kendiliğinden geçmez. Kanuni süreler saklıdır. Bu metin bütün başvurular için tek tip cevap veya çözüm süresi taahhüt etmez; uygulanacak özel süre ve güvenceler ilgili başvuru türü için ayrıca açıklanır.</p>
+              </section>
+
+              <!-- 7. Hizmet kısıtlamaları ve inceleme -->
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">7. HİZMET KISITLAMALARI VE İNCELEME</h3>
+                <p><strong>7.1.</strong> Hukuka aykırı içerik, sahte kimlik veya belge, yetkisiz erişim, kötü amaçlı teknik faaliyet, teklif danışıklılığı ya da ciddi sözleşme ihlali halinde gerekli ve ölçülü işlem veya erişim tedbirleri uygulanabilir. Her ihlal otomatik sürekli kapatma, bütün ücretlerin kaybı veya önceden kararlaştırılmamış ceza doğurmaz.</p>
+                <p><strong>7.2.</strong> Tedbirin gerekçesi, kapsamı ve başvuru imkânı ilgili üyeye açıklanır; açıklamanın kanunen yasak olduğu veya somut güvenliği tehlikeye düşürdüğü durumlar ayrıca değerlendirilir. Uygulanması gereken ön bildirim, açıklama isteme, süre ve itiraz güvenceleri ortadan kaldırılamaz. Acil tedbir, her durumda kalıcı kapatma anlamına gelmez.</p>
+                <p><strong>7.3.</strong> Tedbirler mevcut sözleşmeleri, gerekli belgeye erişimi ve tarafların hak arama imkânlarını dikkate alır. Teknik bakım veya güvenlik kesintisi her teklifi kendiliğinden iptal etmez ya da her süreyi otomatik uzatmaz. Mevcut bir işlemin sonucu belirsizse mükerrer bağlayıcı işlemden önce kayıtların kontrol edilmesi önerilir.</p>
+              </section>
+
+              <!-- 8. İçerik ve fikri haklar -->
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">8. İÇERİK VE FİKRİ HAKLAR</h3>
+                <p><strong>8.1.</strong> Üye, yüklediği ilan, teklif, görsel ve teknik belgenin kullanım ve paylaşımına yetkili olmalıdır. Üye, İşletmeciye yalnız kararlaştırılan hizmet için gerekli saklama, gösterim ve iletim bakımından sınırlı ve münhasır olmayan kullanım izni verir. İzin, içeriğin ilgili işlemde belirlenen gizlilik ve erişim koşullarına tabidir; yayımlanmak üzere sunulan ilan veya dizin içeriğinin belirlenmiş hedef kitleye gösterimini kapsar, gizli teklif ve belgeleri herkese açma yetkisi vermez. İçerik mülkiyeti devredilmez. İşlem amacı dışında tanıtım, yeniden yayımlama veya alt lisans için sınırsız bir yetki verilmez.</p>
+                <p><strong>8.2.</strong> Platform yazılımı, marka, tasarım ve diğer korunan unsurlardaki haklar ilgili hak sahiplerine aittir. Yetkisiz kopyalama, teknik güvenliğin aşılması ve hukuka aykırı toplu veri çekimi yasaktır; kanuni kullanım ve inceleme istisnaları saklıdır. Üyeye ait içerik platformun bütün içeriklerinin işletmeciye ait olduğu iddiasıyla sahiplenilmez.</p>
+                <p><strong>8.3.</strong> İstatistiksel kullanım, işlemin amacı, gizlilik ve kişisel veri kurallarıyla sınırlıdır. Kimliksiz olduğu ileri sürülen veri gerçekten kişi veya işletmeyle ilişkilendirilebiliyorsa yalnız bu adlandırma onu sınırsız kullanıma açmaz. Bu hüküm yeni bir pazarlama izni veya başka işletmelerle rekabette sınırsız veri kullanımı yetkisi değildir.</p>
+              </section>
+
+              <!-- 9. Ticari gizlilik ve kişisel veriler -->
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">9. TİCARİ GİZLİLİK VE KİŞİSEL VERİLER</h3>
+                <p><strong>9.1.</strong> İşletmeci ve üye, hizmet kapsamında edindikleri kamuya açık olmayan fiyat, teklif, strateji, teknik dosya ve iş bilgilerini yetkisiz kişilerle veya işlem amacı dışında paylaşmaz. İlgili ihale için belirlenen gizlilik ve erişim koşulları korunur. Kamuya açık bilgi, bağımsız geliştirilen bilgi, hukuki danışmanlık ve kanuni yükümlülük veya hak arama için gerekli açıklama bu yasağın dışındadır. Açıklama gerekli kapsamla sınırlanır; kanunun yasakladığı bir ön bildirim yükümlülüğü yaratılmaz.</p>
+                <p><strong>9.2.</strong> Gizlilik yükümlülüğünün süresi, bilginin korunma niteliği, geçerli sözleşmesel şartlar ve uygulanabilir hukukla değerlendirilir. Sözleşmenin sona ermesi bütün ticari bilgileri kendiliğinden kamuya açmaz. Gizlilik süresi ile kişisel veri saklama süresi aynı kavram değildir.</p>
+                <p><strong>9.3.</strong> Kişisel veri amaçları, hukuki sebepleri, alıcılar, aktarım koşulları ve haklar ilgili aydınlatmalarda açıklanır. Bu sözleşme açık rıza, ticari ileti izni veya bütün veri türleri için tek tip saklama yetkisi yerine geçmez. İsteğe bağlı izinler ve zorunlu hizmet işlemleri ayrı değerlendirilir.</p>
+              </section>
+
+              <!-- 10. Özen ve sorumluluk -->
+              <section class="space-y-2 bg-amber-50/50 p-4 rounded-xl border border-amber-200">
+                <h3 class="font-bold text-amber-950 text-sm">10. ÖZEN VE SORUMLULUK</h3>
+                <p><strong>10.1.</strong> İşletmeci kendi hizmeti, güvenliği, işlem ve bildirimleri ile kanuni inceleme ve müdahale yükümlülüklerinden sorumludur. Bütün üye beyanlarını önceden doğruladığı, her işlemin başarıya ulaşacağı veya kesintisiz ve hatasız hizmet vereceği garanti edilmez; bu durum kendi yükümlülüklerini ortadan kaldırmaz.</p>
+                <p><strong>10.2.</strong> Kast, ağır kusur veya önceden kaldırılamayan sorumluluk hiçbir hükümle dışlanmaz. Üyenin ya da İşletmecinin tazmin sorumluluğu ihlal, kusur, zarar ve illiyet bağı yönünden somut olay ve uygulanabilir hukukla belirlenir. Bu metin ayrıca bir parasal sorumluluk tavanı veya bütün dolaylı zararları kapsayan mutlak muafiyet getirmez.</p>
+                <p><strong>10.3.</strong> Platformda teslim kodu veya sevkiyat kaydı kullanılması, her durumda mülkiyet ve hasar riskinin devri, kusursuz ifa veya ayıp haklarından feragat değildir. Üyeler arasındaki geçerli ticari şartlar ve kanuni haklar saklıdır. Bu sözleşme tek tip garanti süresi, gecikme cezası veya ticaret bedelinin iadesi garantisi oluşturmaz.</p>
+              </section>
+
+              <!-- 11. Süre, sona erme ve kayıtlara erişim -->
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">11. SÜRE, SONA ERME VE KAYITLARA ERİŞİM</h3>
+                <p><strong>11.1.</strong> Aracılık ilişkisi bu sözleşmenin geçerli biçimde kurulmasıyla başlar; geçmişte edinilmiş hizmet haklarının ve ayrı danışmanlığın dönemleri kendi geçerli ticari şartlarında belirlenir. Hesabın kapatılması veya aracılık ilişkisinin sona ermesi doğmuş borçları, devam eden üyeler arası sözleşmeleri ve gerekli delilleri kendiliğinden ortadan kaldırmaz. Ayrı hizmet sonu 24 saatlik ödeme penceresi kendi koşullarıyla korunur; bu pencere teklif geri çekme süresi veya kart yenileme yetkisi değildir.</p>
+                <p><strong>11.2.</strong> Sona erme sonrasında hangi sözleşme, işlem ve üye verilerine hangi yöntemle ve ne süreyle erişilebileceği hizmet açıklamasında belirtilir. Üyenin kendi verilerine ve belgelerine ilişkin kanuni hakları, diğer kişilerin hakları ve güvenlik kuralları birlikte korunur. İşletmecinin bir kaydı saklaması, üyeye o kayda sınırsız veya süresiz erişim sağlandığı anlamına gelmez.</p>
+                <p><strong>11.3.</strong> Haklı neden, kanuni fesih, bildirim ve giderim hakları saklıdır. Sona erme koşulları diğer geçerli sözleşmelerin kapsamını aşacak şekilde otomatik sonuç doğurmaz. Mücbir sebep yalnız etkilediği yükümlülük ve süre bakımından değerlendirilir; gerekli bildirim ve zararı azaltma yükümlülüklerini kendiliğinden kaldırmaz.</p>
+              </section>
+
+              <!-- 12. Sürüm, delil ve uyuşmazlık -->
+              <section class="space-y-2">
+                <h3 class="font-bold text-slate-900 text-sm">12. SÜRÜM, DELİL VE UYUŞMAZLIK</h3>
+                <p><strong>12.1.</strong> Değişiklikler önceki kabul veya imzalı belgeleri geriye dönük değiştirmez. Geleceğe yönelik değişikliğin kapsamı, yürürlük zamanı, gerekli bildirim ve kabul ile uygulanabilecek fesih hakları somut hizmet ve kanuni güvencelerle belirlenir. Salt site ziyareti yeni bir yükümlülüğün kabulü değildir.</p>
+                <p><strong>12.2.</strong> Elektronik kayıtlar hukuken değerlendirilebilen delillerdir (HMK Madde 193); aksi delil sunma ve doğruluğa itiraz hakları korunur. Bir hükmün geçersizliği, kısmi geçersizlik ve genel işlem koşullarının yazılmamış sayılmasına ilişkin kanuni sonuçlar gözetilerek değerlendirilir. Geçersiz hüküm yerine üyeye yeni bir borç yüklenmez.</p>
+                <p><strong>12.3.</strong> Türk hukuku uygulanır; uygulanması zorunlu kanunlar ihtilafı, görev ve yetki kuralları saklıdır. Uyuşmazlıkların çözümünde <strong>Çanakkale Mahkemeleri ve İcra Daireleri</strong> yetkilidir. Bu sözleşme her üye için münhasır mahkeme seçimi yapmaz veya kanuni başvuru hakkını kaldırmaz. TR/EN çeviri farkı, üyenin görmediği ek bir yükümlülük yaratmaz; geçerli biçimde kabul edilen metin ve uygulanabilir yorum kuralları esas alınır.</p>
+              </section>
+            </div>
+          </article>
+
+          <!-- 3. GİZLİLİK POLİTİKASI (PRIVACY POLICY) -->
           <article v-if="activeTab === 'gizlilik'" class="space-y-6">
             <div class="flex flex-wrap items-center gap-2">
               <span class="px-3 py-1 bg-blue-50 text-blue-800 font-mono text-xs font-bold rounded-lg border border-blue-200">TİCARİ SIR & ENDÜSTRİYEL VERİ</span>
