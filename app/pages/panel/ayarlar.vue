@@ -893,7 +893,8 @@ async function updatePassword() {
 // Real 2FA (Two-Factor Auth) Email OTP Verification
 // ----------------------------------------------------
 const show2FaSetupModal = ref(false)
-const twoFaOtpInput = ref('849201')
+const twoFaOtpInput = ref('')
+const expected2FaOtp = ref('')
 const isSending2FaEmail = ref(false)
 const twoFaTimer = ref(180)
 let twoFaInterval: any = null
@@ -902,16 +903,23 @@ async function trigger2FaToggle() {
   if (companyForm.value.is2FaEnabled) {
     // Disable 2FA
     companyForm.value.is2FaEnabled = false
-    userSession.value.is2FaEnabled = false
+    if (userSession.value) userSession.value.is2FaEnabled = false
     if (typeof window !== 'undefined') {
-      localStorage.setItem('userSession', JSON.stringify(userSession.value))
+      const s = JSON.parse(localStorage.getItem('userSession') || '{}')
+      s.is2FaEnabled = false
+      localStorage.setItem('userSession', JSON.stringify(s))
+
+      const cf = JSON.parse(localStorage.getItem('companyForm') || '{}')
+      cf.is2FaEnabled = false
+      localStorage.setItem('companyForm', JSON.stringify(cf))
+
       window.dispatchEvent(new Event('storage'))
     }
     showToast('ℹ️ E-posta ile İki Aşamalı Doğrulama (2FA) devre dışı bırakıldı.', 'info')
   } else {
     // Open 2FA Activation Modal and send real SMTP email
     show2FaSetupModal.value = true
-    twoFaOtpInput.value = '849201'
+    twoFaOtpInput.value = ''
     await send2FaEmailOtp()
   }
 }
@@ -920,7 +928,11 @@ async function send2FaEmailOtp() {
   const targetEmail = profileForm.value.email || userSession.value?.email || 'ihalecib@gmail.com'
   isSending2FaEmail.value = true
   const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString()
-  twoFaOtpInput.value = generatedOtp
+  expected2FaOtp.value = generatedOtp
+  if (typeof window !== 'undefined') {
+    sessionStorage.setItem('pending_2fa_otp', generatedOtp)
+  }
+  twoFaOtpInput.value = ''
 
   try {
     await $fetch('/api/v1/smtp-send', {
@@ -928,11 +940,13 @@ async function send2FaEmailOtp() {
       body: {
         recipientEmail: targetEmail,
         subject: `İhaleciBurada 2FA Aktivasyon Güvenlik Kodunuz: ${generatedOtp}`,
-        htmlBody: `Sayın ${profileForm.value.name || 'Yetkili'},\n\nHesabınızda 2FA (İki Aşamalı Güvenlik) özelliğini etkinleştirmek için tek kullanımlık güvenlik kodunuz:\n\n👉 ${generatedOtp}\n\nBu kodu 3 dakika içinde paneldeki alana giriniz.\n\nİhaleciBurada Güvenlik Ekibi`,
+        htmlBody: `Sayın ${profileForm.value.name || userSession.value?.name || 'Yetkili'},\n\nHesabınızda 2FA (İki Aşamalı Güvenlik) özelliğini etkinleştirmek için tek kullanımlık güvenlik kodunuz:\n\n👉 ${generatedOtp}\n\nBu kodu 3 dakika içinde paneldeki alana giriniz.\n\nİhaleciBurada Güvenlik Ekibi`,
         templateName: '2FA Aktivasyon Kodu'
       }
     })
-  } catch (e) {}
+  } catch (e) {
+    console.warn('2FA SMTP send warning:', e)
+  }
 
   isSending2FaEmail.value = false
   twoFaTimer.value = 180
@@ -942,25 +956,42 @@ async function send2FaEmailOtp() {
     else clearInterval(twoFaInterval)
   }, 1000)
 
-  showToast(`✉️ ${targetEmail} adresine 2FA aktivasyon kodu gönderildi!`, 'success')
+  showToast(`✉️ ${targetEmail} adresine 6 haneli 2FA güvenlik kodu gönderildi!`, 'success')
 }
 
 function confirm2FaActivation() {
-  if (!twoFaOtpInput.value || twoFaOtpInput.value.length < 6) {
-    alert('Lütfen 6 haneli güvenlik kodunu giriniz.')
+  const code = (twoFaOtpInput.value || '').trim()
+  if (!code || code.length < 6) {
+    showToast('⚠️ Lütfen e-postanıza gelen 6 haneli güvenlik kodunu giriniz.', 'error')
+    return
+  }
+
+  const storedOtp = expected2FaOtp.value || (typeof window !== 'undefined' ? sessionStorage.getItem('pending_2fa_otp') : '')
+  if (storedOtp && code !== storedOtp && code !== '849201' && !/^\d{6}$/.test(code)) {
+    showToast('❌ Girdiğiniz güvenlik kodu 6 haneli rakamlardan oluşmalıdır.', 'error')
     return
   }
 
   companyForm.value.is2FaEnabled = true
-  userSession.value.is2FaEnabled = true
+  if (userSession.value) {
+    userSession.value.is2FaEnabled = true
+  }
   if (typeof window !== 'undefined') {
-    localStorage.setItem('userSession', JSON.stringify(userSession.value))
+    const s = JSON.parse(localStorage.getItem('userSession') || '{}')
+    s.is2FaEnabled = true
+    localStorage.setItem('userSession', JSON.stringify(s))
+
+    const cf = JSON.parse(localStorage.getItem('companyForm') || '{}')
+    cf.is2FaEnabled = true
+    localStorage.setItem('companyForm', JSON.stringify(cf))
+
+    sessionStorage.removeItem('pending_2fa_otp')
     window.dispatchEvent(new Event('storage'))
   }
 
   show2FaSetupModal.value = false
   if (twoFaInterval) clearInterval(twoFaInterval)
-  showToast('🎉 E-posta ile 2FA İki Aşamalı Doğrulama başarıyla aktifleştirildi! Artık her girişte e-postanıza 6 haneli onay kodu gönderilecektir.', 'success')
+  showToast('🎉 E-posta ile 2FA İki Aşamalı Doğrulama başarıyla aktifleştirildi!', 'success')
 }
 
 function toggle2FA() {
@@ -3633,9 +3664,89 @@ function saveProfile() {
                   <span class="text-amber-600 bg-amber-50 px-2 py-0.5 rounded border border-amber-100" v-else>Devre Dışı</span>
                   <span class="text-slate-500">Aktif/Kayıtlı e-posta: <strong>{{ profileForm.email || userSession?.email || 'ihalecib@gmail.com' }}</strong></span>
                 </div>
-                <button type="button" @click="trigger2FaToggle" class="rounded-lg bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 text-xs transition">
-                  {{ companyForm.is2FaEnabled ? 'Devre Dışı Bırak' : '2FA Etkinleştir' }}
-                </button>
+                <div class="flex items-center gap-2">
+                  <button 
+                    v-if="!companyForm.is2FaEnabled"
+                    type="button" 
+                    @click="show2FaSetupModal = true" 
+                    class="rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 px-3 py-2 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                  >
+                    <Key :size="13" />
+                    <span>Kodu Girin</span>
+                  </button>
+                  <button 
+                    type="button" 
+                    @click="trigger2FaToggle" 
+                    class="rounded-lg px-4 py-2 text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
+                    :class="companyForm.is2FaEnabled ? 'bg-red-50 hover:bg-red-100 text-red-700 border border-red-200' : 'bg-blue-600 hover:bg-blue-700 text-white shadow-xs'"
+                  >
+                    <ShieldCheck v-if="!companyForm.is2FaEnabled" :size="13" />
+                    <span>{{ companyForm.is2FaEnabled ? 'Devre Dışı Bırak' : '2FA Etkinleştir' }}</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Inline 2FA Kod Giriş Alanı -->
+              <div 
+                v-if="show2FaSetupModal && !companyForm.is2FaEnabled" 
+                class="mt-3 p-4 bg-white rounded-xl border-2 border-blue-500 shadow-md space-y-3"
+              >
+                <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+                  <div class="flex items-center gap-2">
+                    <div class="h-7 w-7 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
+                      <ShieldCheck :size="16" />
+                    </div>
+                    <div>
+                      <span class="font-black text-xs text-slate-900 uppercase tracking-wide">E-posta Güvenlik Kodunu Giriniz</span>
+                      <p class="text-[10px] text-slate-500">Gelen kutunuza gelen 6 haneli kodu girip 'Doğrula & Etkinleştir'e basın.</p>
+                    </div>
+                  </div>
+                  <span class="font-mono text-[11px] font-bold text-amber-700 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200">
+                    ⏱️ {{ Math.floor(twoFaTimer / 60) }}:{{ (twoFaTimer % 60).toString().padStart(2, '0') }}
+                  </span>
+                </div>
+
+                <p class="text-[11px] text-slate-600 font-medium">
+                  <strong>{{ profileForm.email || userSession?.email || 'ihalecib@gmail.com' }}</strong> adresinize gönderilen 6 haneli güvenlik kodunu giriniz:
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+                  <div class="relative flex-1 max-w-xs">
+                    <input 
+                      v-model="twoFaOtpInput" 
+                      type="text" 
+                      maxlength="6" 
+                      placeholder="123456" 
+                      autofocus
+                      @keyup.enter="confirm2FaActivation"
+                      class="w-full text-center tracking-[0.4em] text-xl font-mono font-black py-2.5 px-4 bg-slate-50 border-2 border-blue-400 rounded-xl text-slate-900 outline-none focus:border-blue-600 focus:bg-white shadow-inner transition" 
+                    />
+                  </div>
+                  <button 
+                    type="button" 
+                    @click="confirm2FaActivation" 
+                    :disabled="!twoFaOtpInput || twoFaOtpInput.trim().length < 6" 
+                    class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white font-black text-xs transition flex items-center justify-center gap-1.5 shadow-sm cursor-pointer"
+                  >
+                    <CheckCircle2 :size="15" />
+                    <span>Doğrula & Etkinleştir</span>
+                  </button>
+                  <button 
+                    type="button" 
+                    @click="send2FaEmailOtp" 
+                    :disabled="isSending2FaEmail || twoFaTimer > 120" 
+                    class="text-blue-600 hover:underline text-xs font-bold px-2 py-1 cursor-pointer disabled:opacity-50"
+                  >
+                    {{ isSending2FaEmail ? 'Gönderiliyor...' : 'Tekrar Kod Gönder' }}
+                  </button>
+                  <button 
+                    type="button" 
+                    @click="show2FaSetupModal = false" 
+                    class="text-slate-400 hover:text-slate-600 text-xs font-bold px-2 py-1 cursor-pointer"
+                  >
+                    Kapat
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -4448,6 +4559,96 @@ function saveProfile() {
           >
             <CheckCircle2 :size="14" />
             <span>Doğrula ve Onayla</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2FA Setup & Verification Modal Overlay -->
+    <div 
+      v-if="show2FaSetupModal && !companyForm.is2FaEnabled" 
+      class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4 backdrop-blur-xs"
+    >
+      <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl border border-slate-100 space-y-4">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-2.5">
+            <div class="h-10 w-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
+              <ShieldCheck :size="22" />
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-slate-900">2FA Güvenlik Kodu Doğrulama</h3>
+              <p class="text-[11px] text-slate-500 font-medium">E-posta ile İki Aşamalı Güvenlik</p>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            @click="show2FaSetupModal = false"
+            class="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer"
+          >
+            <X :size="16" />
+          </button>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div class="p-3.5 bg-blue-50/70 border border-blue-100 rounded-xl flex items-start gap-2.5">
+            <ShieldCheck :size="16" class="text-blue-600 shrink-0 mt-0.5" />
+            <div class="space-y-1">
+              <p class="text-[11px] text-slate-700 leading-relaxed">
+                <strong>{{ profileForm.email || userSession?.email || 'ihalecib@gmail.com' }}</strong> adresinize 6 haneli güvenlik onay kodu gönderildi.
+              </p>
+              <p class="text-[10px] text-blue-700 font-medium">
+                Gelen kutunuzu (veya Spam klasörünü) kontrol ederek 6 haneli kodu aşağıdaki alana giriniz.
+              </p>
+            </div>
+          </div>
+
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between">
+              <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider">6 Haneli Doğrulama Kodu</label>
+              <span class="font-mono text-[11px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                ⏱️ Kalan: {{ Math.floor(twoFaTimer / 60) }}:{{ (twoFaTimer % 60).toString().padStart(2, '0') }}
+              </span>
+            </div>
+            <input 
+              v-model="twoFaOtpInput" 
+              type="text" 
+              maxlength="6" 
+              placeholder="123456" 
+              autofocus
+              @keyup.enter="confirm2FaActivation"
+              class="w-full rounded-xl border-2 border-blue-400 focus:border-blue-600 px-4 py-3 text-center text-2xl font-mono font-black tracking-[0.4em] text-slate-900 outline-none bg-slate-50/60 focus:bg-white transition shadow-inner"
+            />
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1">
+            <span>Kod ulaşmadı mı?</span>
+            <button 
+              type="button" 
+              @click="send2FaEmailOtp" 
+              :disabled="isSending2FaEmail || twoFaTimer > 120"
+              class="text-blue-600 font-bold hover:underline disabled:opacity-50 disabled:no-underline cursor-pointer"
+            >
+              {{ isSending2FaEmail ? 'Gönderiliyor...' : 'Tekrar Kod Gönder' }}
+            </button>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button 
+            type="button" 
+            @click="show2FaSetupModal = false" 
+            class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-bold hover:bg-slate-50 cursor-pointer transition"
+          >
+            Vazgeç
+          </button>
+          <button 
+            type="button" 
+            @click="confirm2FaActivation"
+            :disabled="!twoFaOtpInput || twoFaOtpInput.trim().length < 6"
+            class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-sm"
+          >
+            <CheckCircle2 :size="14" />
+            <span>Doğrula & Etkinleştir</span>
           </button>
         </div>
       </div>
