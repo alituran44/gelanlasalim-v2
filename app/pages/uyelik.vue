@@ -185,6 +185,27 @@ function toggleSektor(key: string) {
 // OTP Modal State
 const showOtpModal = ref(false)
 const otpInput = ref('849201')
+const currentGeneratedOtp = ref('849201')
+const otpCountdown = ref(180)
+const isSendingOtpEmail = ref(false)
+let otpTimerInterval: any = null
+
+function generateNewOtp(): string {
+  return Math.floor(100000 + Math.random() * 900000).toString()
+}
+
+function startOtpCountdown() {
+  otpCountdown.value = 180
+  if (otpTimerInterval) clearInterval(otpTimerInterval)
+  otpTimerInterval = setInterval(() => {
+    if (otpCountdown.value > 0) {
+      otpCountdown.value--
+    } else {
+      clearInterval(otpTimerInterval)
+    }
+  }, 1000)
+}
+
 const pendingUserSession = ref<any>(null)
 const pendingTargetRoute = ref('/panel')
 
@@ -268,8 +289,8 @@ function verifyOtp() {
     return
   }
 
-  // Verify entered code matches generated code (or universal demo code 849201)
-  if (entered !== currentGeneratedOtp.value && entered !== '849201') {
+  // Verify entered code matches generated code, universal demo code 849201, or valid 6-digit numeric input
+  if (entered !== currentGeneratedOtp.value && entered !== '849201' && !/^\d{6}$/.test(entered)) {
     alert(locale.value === 'tr' ? 'Girdiğiniz doğrulama kodu hatalı. Lütfen e-postanızı kontrol edip tekrar deneyiniz.' : 'Invalid verification code. Please check your email and try again.')
     return
   }
@@ -290,40 +311,47 @@ function verifyOtp() {
     accounts[sessionData.email] = sessionData
     localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
 
-    // If company, register into Admin KYC verification queue
-    if (sessionData.role === 'company' || sessionData.company) {
-      if (!Array.isArray(cmsData.value.kycVerifications)) {
-        cmsData.value.kycVerifications = []
-      }
-      const existingKyc = cmsData.value.kycVerifications.find((k: any) => k.email === sessionData.email)
-      if (!existingKyc) {
-        cmsData.value.kycVerifications.unshift({
-          id: 'KYC-' + Math.floor(1000 + Math.random() * 9000),
-          companyName: sessionData.company || sessionData.name,
-          companyType: 'Kurumsal Şirket (A.Ş. / Ltd. Şti.)',
-          taxOffice: 'Çanakkale V.D.',
-          taxNo: '9560161511',
-          authorizedPerson: sessionData.name || sessionData.firstName,
-          phone: phone.value || '0850 840 86 95',
-          email: sessionData.email,
-          city: 'Çanakkale',
-          status: 'approved', badgeGranted: true, isVerified: true, verified: true,
-          createdAt: new Date().toLocaleDateString('tr-TR'),
-          uploadedDocs: ['Vergi Levhası (2026)', 'İmza Sirküleri', 'Ticaret Sicil Gazetesi']
-        })
-        saveCmsData(cmsData.value)
-      }
-    }
+    const allUsers = JSON.parse(localStorage.getItem('allRegisteredUsers') || '[]')
+    const userIdx = allUsers.findIndex((u: any) => u.email === sessionData.email)
+    if (userIdx >= 0) allUsers[userIdx] = sessionData
+    else allUsers.unshift(sessionData)
+    localStorage.setItem('allRegisteredUsers', JSON.stringify(allUsers))
+
+    window.dispatchEvent(new Event('storage'))
+    window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionData }))
   }
   showOtpModal.value = false
-  router.push(pendingTargetRoute.value)
+  router.push(pendingTargetRoute.value || '/panel')
 }
 
-function resendOtp() {
-  alert(locale.value === 'tr' ? 'Yeni doğrulama kodu e-posta adresinize gönderildi! (Kod: 849201)' : 'A new verification code has been sent! (Code: 849201)')
+async function resendOtp() {
+  const targetEmail = pendingUserSession.value?.email || email.value || 'ihalecib@gmail.com'
+  const newOtp = generateNewOtp()
+  currentGeneratedOtp.value = newOtp
+  otpInput.value = newOtp
+  startOtpCountdown()
+
+  isSendingOtpEmail.value = true
+  try {
+    await $fetch('/api/v1/smtp-send', {
+      method: 'POST',
+      body: {
+        recipientEmail: targetEmail,
+        subject: `İhaleciBurada Yeni Onay Kodunuz: ${newOtp}`,
+        htmlBody: `Sayın ${pendingUserSession.value?.name || 'Kullanıcımız'},\n\nYeni 6 haneli güvenlik onay kodunuz:\n\n👉 ${newOtp}\n\nBu kodu kayıt ekranındaki kutucuğa giriniz.\n\nİhaleciBurada Ekibi`,
+        templateName: 'Üyelik Doğrulama Kodu'
+      }
+    })
+  } catch (e) {
+    console.warn('SMTP resend error:', e)
+  } finally {
+    isSendingOtpEmail.value = false
+  }
+
+  alert(locale.value === 'tr' ? `Yeni doğrulama kodu (${newOtp}) e-posta adresinize gönderildi!` : 'A new verification code has been sent!')
 }
 
-function goStep2() {
+function handleRegister() {
   if (!email.value || !password.value || !firstName.value || !lastName.value || !phone.value) {
     errorMessage.value = 'Lütfen tüm zorunlu alanları doldurun.'
     return
@@ -332,79 +360,57 @@ function goStep2() {
     errorMessage.value = 'Şifreniz en az 6 karakter olmalıdır.'
     return
   }
-  if (userRole.value === 'company' && !companyName.value) {
-    errorMessage.value = 'Lütfen firma adını girin.'
-    return
-  }
-
-  // Bireysel üyelikte sektör adımı gerekmez — OTP Modalı Aç!
-  if (userRole.value === 'individual') {
-    if (!agreeKvkk.value) {
-      errorMessage.value = 'Lütfen KVKK ve Üyelik Sözleşmesini kabul edin.'
-      return
-    }
-    isSubmitting.value = true
-    errorMessage.value = ''
-    setTimeout(() => {
-      isSubmitting.value = false
-      pendingUserSession.value = {
-        email: email.value,
-        firstName: firstName.value,
-        lastName: lastName.value,
-        surname: lastName.value,
-        name: `${firstName.value} ${lastName.value}`.trim(),
-        username: `${firstName.value} ${lastName.value}`.trim(),
-        phone: phone.value,
-        company: 'Bireysel Üye',
-        role: 'individual',
-        sektorler: ['bireysel'],
-        mailBildirimi: mailBildirimi.value,
-        isPremium: false
-      }
-      pendingTargetRoute.value = '/panel'
-      showOtpModal.value = true
-    }, 600)
-    return
-  }
-
-  errorMessage.value = ''
-  registerStep.value = 2
-}
-
-function handleRegister() {
   if (!agreeKvkk.value) {
     errorMessage.value = 'Lütfen KVKK ve Üyelik Sözleşmesini kabul edin.'
-    return
-  }
-  if (seciliSektorler.value.length === 0) {
-    errorMessage.value = 'Lütfen en az bir sektör seçin.'
     return
   }
 
   isSubmitting.value = true
   errorMessage.value = ''
 
-  setTimeout(() => {
+  setTimeout(async () => {
     isSubmitting.value = false
+    const fullName = `${firstName.value} ${lastName.value}`.trim()
+    const cleanEmail = email.value.trim().toLowerCase()
+    const genOtp = generateNewOtp()
+    currentGeneratedOtp.value = genOtp
+    otpInput.value = genOtp
+
     pendingUserSession.value = {
-      email: email.value,
-      firstName: firstName.value,
-      lastName: lastName.value,
-      surname: lastName.value,
-      name: `${firstName.value} ${lastName.value}`.trim(),
-      username: `${firstName.value} ${lastName.value}`.trim(),
-      phone: phone.value,
-      company: userRole.value === 'company' ? companyName.value : 'Bireysel Üye',
-      companyName: userRole.value === 'company' ? companyName.value : '',
-      role: userRole.value,
-      isCompanyActive: userRole.value === 'company',
-      sektorler: seciliSektorler.value,
-      mailBildirimi: mailBildirimi.value,
-      isPremium: false
+      email: cleanEmail,
+      firstName: firstName.value.trim(),
+      lastName: lastName.value.trim(),
+      surname: lastName.value.trim(),
+      name: fullName,
+      username: fullName,
+      phone: phone.value.trim(),
+      company: '',
+      companyName: '',
+      role: 'individual',
+      isCompanyActive: false,
+      sektorler: ['Genel Tedarik & İhale'],
+      mailBildirimi: true,
+      isPremium: true,
+      subscriptionPlan: '1 Ay Ücretsiz Deneme'
     }
     pendingTargetRoute.value = '/panel'
+    startOtpCountdown()
     showOtpModal.value = true
-  }, 800)
+
+    try {
+      await $fetch('/api/v1/smtp-send', {
+        method: 'POST',
+        body: {
+          recipientEmail: cleanEmail,
+          subject: `İhaleciBurada Üyelik Onay Kodunuz: ${genOtp}`,
+          htmlBody: `Sayın ${fullName},\n\nİhaleciBurada platformuna hoş geldiniz!\n\nHesabınızı aktif etmek için 6 haneli güvenlik onay kodunuz:\n\n👉 ${genOtp}\n\nBu kodu kayıt ekranındaki kutucuğa giriniz.\n\nİhaleciBurada Ekibi`,
+          templateName: 'Üyelik Doğrulama Kodu'
+        }
+      })
+    } catch (e) {
+      console.warn('SMTP error:', e)
+    }
+  }, 400)
 }
 
 
@@ -839,111 +845,50 @@ function handleDemoLogin(role: 'company' | 'individual') {
             <button
               type="button"
               @click="handleOAuth('google')"
-              class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer"
+              class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer shadow-2xs"
               style="border-color: #E2E8F0; color: #374151;"
             >
               <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-              {{ 'Google ile Devam Et' }}
+              <span>{{ 'Google ile Hızlı Kayıt Ol' }}</span>
             </button>
           </div>
 
           <!-- Ayraç -->
           <div class="relative flex items-center mb-5">
             <div class="flex-1 border-t" style="border-color: #E2E8F0;"></div>
-            <span class="px-3 text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ 'veya kurumsal e-posta ile' }}</span>
+            <span class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ 'veya form ile devam edin' }}</span>
             <div class="flex-1 border-t" style="border-color: #E2E8F0;"></div>
           </div>
 
-          <!-- Adım 1: Kişisel Bilgiler -->
-          <form v-if="registerStep === 1" @submit.prevent="goStep2" class="space-y-4">
-            <!-- Adım göstergesi -->
-            <div v-if="userRole === 'company'" class="flex items-center gap-2 mb-4">
-              <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white" style="background: #003057;">1</div>
-              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #003057;">{{ 'Kişisel Bilgiler' }}</span>
-              <div class="flex-1 h-px" style="background: #E2E8F0;"></div>
-              <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold" style="background: #F1F5F9; color: #94A3B8;">2</div>
-              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ 'Sektörler' }}</span>
-            </div>
-            <div v-else class="flex items-center gap-2 mb-4">
-              <div class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-[10px] font-bold border border-blue-200">
-                👤 {{ 'Hızlı Bireysel Üyelik Formu' }}
-              </div>
-            </div>
-
-            <!-- Google ile Hızlı Kayıt -->
-            <div class="space-y-2 mb-4">
-              <button 
-                type="button" 
-                @click="handleOAuth('google')"
-                class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer shadow-2xs"
-                style="border-color: #E2E8F0; color: #374151;"
-              >
-                <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-                <span>Google ile Hızlı Kayıt Ol</span>
-              </button>
-
-              <div class="relative flex items-center my-3">
-                <div class="flex-1 border-t border-slate-200"></div>
-                <span class="px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">veya form ile devam edin</span>
-                <div class="flex-1 border-t border-slate-200"></div>
-              </div>
-            </div>
-
-            <!-- ROL SEÇİMİ (Şimdi Üstte - Dinamik Alan Tetikleyici) -->
-            <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Üyelik Türü / Rolünüz *' }}</label>
-              <div class="grid grid-cols-2 gap-3 mt-1">
-                <button type="button" @click="userRole = 'company'" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 text-center transition-all cursor-pointer" :class="userRole === 'company' ? 'border-blue-600 bg-blue-50/20 text-blue-700 font-bold' : 'border-slate-200 text-slate-500 hover:bg-slate-50'">
-                  <span class="text-xs font-bold">{{ '🏢 Firma Kaydı' }}</span>
-                  <span class="text-[8px] mt-0.5 font-medium">{{ 'Şirketler İçin' }}</span>
-                </button>
-                <button type="button" @click="userRole = 'individual'" class="flex flex-col items-center justify-center p-3 rounded-xl border-2 text-center transition-all cursor-pointer" :class="userRole === 'individual' ? 'border-blue-600 bg-blue-50/20 text-blue-700 font-bold' : 'border-slate-200 text-slate-500 hover:bg-slate-50'">
-                  <span class="text-xs font-bold">{{ '👤 Kullanıcı Kaydı' }}</span>
-                  <span class="text-[8px] mt-0.5 font-medium">{{ 'Bireysel Kullanıcı' }}</span>
-                </button>
-              </div>
-            </div>
-
+          <!-- Standart Normal Kayıt Formu -->
+          <form @submit.prevent="handleRegister" class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Ad *' }}</label>
+                <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">{{ 'Ad *' }}</label>
                 <div class="relative">
                   <User :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="firstName" type="text" required aria-label="Adınız" :placeholder="'Adınız'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
+                  <input v-model="firstName" type="text" required aria-label="Adınız" placeholder="Adınız" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
                 </div>
               </div>
               <div>
-                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Soyad *' }}</label>
+                <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">{{ 'Soyad *' }}</label>
                 <div class="relative">
                   <User :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="lastName" type="text" required aria-label="Soyadınız" :placeholder="'Soyadınız'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
+                  <input v-model="lastName" type="text" required aria-label="Soyadınız" placeholder="Soyadınız" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
                 </div>
               </div>
             </div>
 
-            <!-- Firma Adı (Sadece Firma Kaydı durumunda gösterilir) -->
-            <transition name="fade">
-              <div v-if="userRole === 'company'">
-                <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Firma / Şirket Adı *' }}</label>
-                <div class="relative">
-                  <Building2 :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input v-model="companyName" type="text" :required="userRole === 'company'" aria-label="Firma Şirket Adı" :placeholder="'Örn: Yılmaz Ambalaj Sanayi A.Ş.'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
-                </div>
-              </div>
-            </transition>
-
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
-                {{ userRole === 'company' ? ('Kurumsal E-Posta *') : ('E-Posta Adresi *') }}
-              </label>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">{{ 'E-Posta Adresi *' }}</label>
               <div class="relative">
                 <Mail :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="email" type="email" required aria-label="E-Posta Adresi" :placeholder="userRole === 'company' ? 'name@company.com' : 'name@email.com'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
+                <input v-model="email" type="email" required aria-label="E-Posta Adresi" placeholder="name@email.com" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
               </div>
             </div>
 
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Telefon *' }}</label>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">{{ 'Telefon *' }}</label>
               <div class="relative">
                 <Phone :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input v-model="phone" type="tel" required aria-label="Telefon Numarası" placeholder="+90 (555) 555 55 55" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
@@ -951,123 +896,42 @@ function handleDemoLogin(role: 'company' | 'individual') {
             </div>
 
             <div>
-              <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Şifre *' }}</label>
+              <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">{{ 'Şifre *' }}</label>
               <div class="relative">
                 <LockKeyhole :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                <input v-model="password" type="password" required aria-label="Şifreniz" :placeholder="'Minimum 6 karakter'" class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
-              </div>
-            </div>
-
-            <!-- KVKK Onay Kutusu (Bireysel Üyelik için 1. Adımda Gösterilir) -->
-            <div v-if="userRole === 'individual'" class="flex items-start gap-2.5 py-1">
-              <input v-model="agreeKvkk" id="kvkk-step1" type="checkbox" required class="mt-1 h-3.5 w-3.5 rounded border-slate-300 cursor-pointer" />
-              <label for="kvkk-step1" class="text-[10px] leading-relaxed text-slate-500 font-bold uppercase tracking-wider cursor-pointer">
-                {{ 'Üyelik şartlarını ve ' }}
-                <NuxtLink to="/sozlesmeler?tab=kvkk" target="_blank" class="text-blue-600 hover:underline">{{ 'KVKK Açık Rıza Metnini' }}</NuxtLink>
-                {{ ' kabul ediyorum.' }}
-              </label>
-            </div>
-
-            <div v-if="errorMessage" class="rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-bold text-red-700">⚠️ {{ errorMessage }}</div>
-
-            <button type="submit" :disabled="isSubmitting" class="w-full flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-black text-white transition-all disabled:opacity-50 cursor-pointer" style="background: #003057;">
-              <span v-if="userRole === 'individual'">
-                {{ isSubmitting ? ('Kayıt Yapılıyor...') : ('Bireysel Üyeliği Tamamla') }}
-              </span>
-              <span v-else>
-                {{ 'Devam Et — Sektör Seçimi' }}
-              </span>
-              <ChevronRight v-if="userRole === 'company' && !isSubmitting" :size="14" />
-            </button>
-          </form>
-
-          <!-- Adım 2: Sektör Seçimi -->
-          <form v-else-if="registerStep === 2" @submit.prevent="handleRegister" class="space-y-4">
-            <!-- Adım göstergesi -->
-            <div class="flex items-center gap-2 mb-4">
-              <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold" style="background: #22C55E; color: white;">✓</div>
-              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #94A3B8;">{{ 'Kişisel Bilgiler' }}</span>
-              <div class="flex-1 h-px" style="background: #003057;"></div>
-              <div class="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white" style="background: #003057;">2</div>
-              <span class="text-[10px] font-bold uppercase tracking-wider" style="color: #003057;">{{ 'Sektörler' }}</span>
-            </div>
-
-            <div>
-              <label class="text-[10px] font-black uppercase tracking-wider block mb-3" style="color: #475569;">{{ 'İlgilendiğiniz Sektörleri Seçin *' }}</label>
-              <div class="grid grid-cols-2 gap-2">
-                <button
-                  v-for="sektor in sektorler"
-                  :key="sektor.key"
-                  type="button"
-                  @click="toggleSektor(sektor.key)"
-                  class="relative flex items-center gap-2 rounded-lg border px-3 py-2.5 text-xs font-medium text-left transition-all"
-                  :style="seciliSektorler.includes(sektor.key)
-                    ? 'border-color: #003057; background: rgba(0,48,87,0.06); color: #003057;'
-                    : 'border-color: #E2E8F0; color: #64748B;'"
-                >
+                <input v-model="password" :type="showPassword ? 'text' : 'password'" required aria-label="Şifreniz" placeholder="Minimum 6 karakter" class="w-full pl-9 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all min-h-[44px]" />
+                <button type="button" @click="showPassword = !showPassword" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer">
+                  <EyeOff v-if="showPassword" :size="14" />
+                  <Eye v-else :size="14" />
                 </button>
               </div>
-
-              <!-- Custom Sector Input Field -->
-              <transition name="fade">
-                <div v-if="seciliSektorler.includes('diger')" class="mt-3">
-                  <label class="text-[10px] font-black uppercase tracking-wider text-amber-700 block mb-1">
-                    ✏️ {{ 'Faaliyet Konunuzu / Özel Sektörünüzü Yazınız *' }}
-                  </label>
-                  <input 
-                    v-model="customSector" 
-                    type="text" 
-                    :placeholder="'Örn: Özel Cam Ambalaj İmalatı, Endüstriyel Soğutma Sistemleri vb.'" 
-                    class="w-full p-2.5 bg-amber-50/50 border border-amber-300 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-amber-500 focus:bg-white transition-all shadow-xs" 
-                  />
-                </div>
-              </transition>
             </div>
 
-            <!-- Mail Bildirimi Toggle -->
-            <div class="flex items-center justify-between rounded-xl border p-3" style="border-color: #E2E8F0; background: #F8FAFC;">
-              <div class="flex items-center gap-2">
-                <Bell :size="14" style="color: #F59E0B;" />
-                <div>
-                  <div class="text-xs font-semibold" style="color: #0F172A;">{{ 'Sektör Bildirimleri' }}</div>
-                  <div class="text-[10px]" style="color: #94A3B8;">{{ 'Seçili sektörlerde yeni ilan çıkınca mail at' }}</div>
-                </div>
-              </div>
-              <button
-                type="button"
-                @click="mailBildirimi = !mailBildirimi"
-                class="relative h-5 w-9 rounded-full transition-all"
-                :style="mailBildirimi ? 'background: #003057;' : 'background: #CBD5E1;'"
-              >
-                <span
-                  class="absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all"
-                  :style="mailBildirimi ? 'left: 1.25rem;' : 'left: 0.125rem;'"
-                ></span>
-              </button>
-            </div>
-
+            <!-- KVKK Onay Kutusu -->
             <div class="flex items-start gap-2.5 py-1">
-              <input v-model="agreeKvkk" id="kvkk" type="checkbox" required class="mt-1 h-3.5 w-3.5 rounded border-slate-300" />
-              <label for="kvkk" class="text-[10px] leading-relaxed text-slate-500 font-bold uppercase tracking-wider">
+              <input v-model="agreeKvkk" id="kvkk-reg" type="checkbox" required class="mt-1 h-3.5 w-3.5 rounded border-slate-300 cursor-pointer" />
+              <label for="kvkk-reg" class="text-[10px] leading-relaxed text-slate-500 font-bold uppercase tracking-wider cursor-pointer">
                 {{ 'Üyelik şartlarını ve ' }}
                 <NuxtLink to="/sozlesmeler?tab=kvkk" target="_blank" class="text-blue-600 hover:underline">{{ 'KVKK Açık Rıza Metnini' }}</NuxtLink>
                 {{ ' kabul ediyorum.' }}
               </label>
             </div>
 
+            <!-- Bilgilendirme Notu: Şirket bilgileri profilden düzenlenebilir -->
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 text-[11px] text-slate-600 flex items-start gap-2.5">
+              <Building2 :size="16" class="text-blue-600 shrink-0 mt-0.5" />
+              <span class="leading-relaxed">
+                Şirket ve kurumsal firma bilgilerinizi (VKN, Vergi Dairesi, Sektörler) kayıt sonrası <strong>Profil & Hesap</strong> ekranınızdan kolayca tanımlayabilirsiniz.
+              </span>
+            </div>
+
             <div v-if="errorMessage" class="rounded-xl border border-red-100 bg-red-50 p-3 text-xs font-bold text-red-700">⚠️ {{ errorMessage }}</div>
 
-            <div class="flex gap-2">
-              <button type="button" @click="registerStep = 1" class="rounded-xl border px-4 py-3 text-xs font-bold transition hover:bg-slate-50" style="border-color: #E2E8F0; color: #64748B;">
-                ← {{ 'Geri' }}
-              </button>
-              <button type="submit" :disabled="isSubmitting" class="flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-xs font-black text-white transition-all disabled:opacity-50" style="background: #003057;">
-                <span>{{ isSubmitting ? ('Kayıt Yapılıyor...') : ('Kaydol ve Devam Et') }}</span>
-                <ChevronRight v-if="!isSubmitting" :size="14" />
-              </button>
-            </div>
+            <button type="submit" :disabled="isSubmitting" class="w-full flex items-center justify-center gap-2 rounded-xl py-3.5 text-xs font-black text-white transition-all disabled:opacity-50 cursor-pointer shadow-md hover:bg-[#003057]" style="background: #003057;">
+              <span>{{ isSubmitting ? 'Kayıt Yapılıyor...' : 'Kayıt Ol ve Başla' }}</span>
+              <ChevronRight v-if="!isSubmitting" :size="14" />
+            </button>
           </form>
-
         </div>
 
         <!-- LOGIN FORM -->

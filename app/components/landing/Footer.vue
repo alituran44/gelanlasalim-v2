@@ -166,10 +166,10 @@ const legalLinks = [
             <a href="https://www.linkedin.com/company/ihaleciburada" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-blue-600 hover:border-blue-600 transition-all shadow-xs" title="LinkedIn">
               <Linkedin :size="14" />
             </a>
-            <a href="https://www.instagram.com/ihaleciburada" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-pink-600 hover:border-pink-600 transition-all shadow-xs" title="Instagram">
+            <a href="https://www.instagram.com/ihaleciburada/" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-pink-600 hover:border-pink-600 transition-all shadow-xs" title="Instagram">
               <Instagram :size="14" />
             </a>
-            <a href="https://www.facebook.com/ihaleciburada" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-blue-700 hover:border-blue-700 transition-all shadow-xs" title="Facebook">
+            <a href="https://www.facebook.com/profile.php?id=61594462852750" target="_blank" rel="noopener noreferrer" class="h-8 w-8 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-slate-400 hover:text-white hover:bg-blue-700 hover:border-blue-700 transition-all shadow-xs" title="Facebook">
               <Facebook :size="14" />
             </a>
           </div>
