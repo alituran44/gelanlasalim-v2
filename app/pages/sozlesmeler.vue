@@ -572,10 +572,26 @@ function printDocument() {
               </div>
             </div>
 
+            <!-- Hızlı Belge Gezintisi (Quick Nav Pills) -->
+            <div class="flex flex-wrap items-center gap-2 pt-1 pb-1">
+              <a href="#kvkk-aydinlatma" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-[11px] font-bold transition flex items-center gap-1.5">
+                <Shield :size="12" class="text-blue-700" />
+                <span>1. KVKK Aydınlatma Metni (8 Madde)</span>
+              </a>
+              <a href="#acik-riza" class="px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-900 border border-purple-200 text-[11px] font-bold transition flex items-center gap-1.5">
+                <ShieldCheck :size="12" class="text-purple-700" />
+                <span>2. Açık Rıza Tercihleri (5 Madde)</span>
+              </a>
+              <a href="#ticari-sir" class="px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-[11px] font-bold transition flex items-center gap-1.5">
+                <Scale :size="12" class="text-blue-400" />
+                <span>3. B2B Ticari Sırlar & Güvenlik</span>
+              </a>
+            </div>
+
             <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed border-t border-slate-100 pt-4">
               
               <!-- 1. Kapsam ve veri sorumlusu -->
-              <section class="space-y-2">
+              <section id="kvkk-aydinlatma" class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">1. KAPSAM VE VERİ SORUMLUSU</h3>
                 <p><strong>1.1.</strong> Bu metin, İhaleciBurada hesabı açan gerçek kişiler ile şirket hesabındaki temsilci ve yetkili kullanıcıların üyelik ve platform işlemlerine ilişkin kişisel verilerini konu alır. Veri sorumlusu: <strong>Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)</strong>; adres: Çanakkale, Türkiye (Tebligat Adresi: İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye); VKN: 9560161511; Çanakkale Vergi Dairesi; telefon: 0850 840 86 95; başvuru kanalları: <strong>ihalecib@gmail.com</strong> ve <strong>hasanhuseyin.yildirim.17@hs01.kep.tr</strong>. İhaleciBurada marka ve platform adı tek başına tüzel kişi kimliği değildir.</p>
                 <p><strong>1.2.</strong> Şirket bilgileri, bir gerçek kişiyi belirlediği veya belirlenebilir kıldığı ölçüde kişisel veridir. Şirket adına işlem yapan kişinin verisi, sırf şirket sözleşmenin tarafı olduğu için sözleşmenin ifası şartına dayanılarak işlenemez. Aşağıdaki faaliyetler, ilgili kişinin konumu ve gerçekten yürütülen işlemle sınırlıdır.</p>
@@ -639,12 +655,81 @@ function printDocument() {
               </section>
 
               <!-- 9. B2B Ticari Sırların Korunması ve Kriptografik Güvenlik Standartları -->
-              <section class="space-y-2 bg-slate-900 text-white p-5 rounded-2xl border border-slate-800">
+              <section id="ticari-sir" class="space-y-2 bg-slate-900 text-white p-5 rounded-2xl border border-slate-800">
                 <h3 class="font-bold text-blue-400 text-sm">9. B2B TİCARİ SIRLARIN KORUNMASI VE KRİPTOGRAFİK GÜVENLİK STANDARTLARI</h3>
                 <p class="text-slate-300 text-xs"><strong>9.1. Kapalı Zarf ve Canlı İhale Anonimliği:</strong> Canlı eksiltme süresince yarışan tedarikçilerin ticari unvanları sistem tarafından otomatik olarak maskelenir (Firma-1, Firma-2 vb.). Hiçbir katılımcı, diğer rakip firmaların kimliğini veya birim maliyet dökümünü canlı ekranda göremez. İhale fiyatları ve satın alma şartnameleri asla üçüncü şahıslara veya reklam ağlarına satılamaz, devredilemez.</p>
                 <p class="text-slate-300 text-xs"><strong>9.2. Kriptografik Güvenlik (TLS 1.3 & AES-256):</strong> Tüm web trafiği ve API veri iletimi modern TLS 1.3 şifreleme protokolleri ile güvence altına alınmıştır. Durağan veritabanı kayıtları AES-256 algoritmasıyla şifrelenerek Türkiye sınırları içerisindeki ISO 27001 sertifikalı Tier-3 veri merkezlerinde saklanmaktadır.</p>
                 <p class="text-slate-300 text-xs"><strong>9.3. Şartname, Telif ve Uyar-Kaldır:</strong> Sisteme yüklenen teknik şartname, CAD çizimleri veya belgelerden doğan fikri ve sınai mülkiyet hakları sahiplerine aittir. Hak ihlali iddialarında <strong>ihalecib@gmail.com</strong> adresine noter onaylı delillerle başvurulduğunda yasal uyar-kaldır prosedürü derhal işletilir.</p>
               </section>
+
+              <!-- ========================================================================= -->
+              <!-- İHALECİBURADA AÇIK RIZA TERCİHLERİ BİLGİLENDİRMESİ (5 BÖLÜM) -->
+              <!-- ========================================================================= -->
+              <div id="acik-riza" class="pt-8 border-t-2 border-slate-200 mt-10 space-y-6">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="px-3 py-1 bg-purple-50 text-purple-900 font-mono text-xs font-bold rounded-lg border border-purple-200">6698 SAYILI KVKK M. 5/1 UYUMLU</span>
+                  <span class="px-3 py-1 bg-indigo-50 text-indigo-800 font-mono text-xs font-bold rounded-lg border border-indigo-200">İSTEĞE BAĞLI TERCİHLER ÇERÇEVESİ</span>
+                  <span class="text-xs text-slate-400 font-mono">Belge Sürümü: TR-2026-09-10-04-R1</span>
+                </div>
+
+                <h2 class="text-xl sm:text-2xl font-black tracking-tight text-slate-900">
+                  İhaleciBurada Açık Rıza Tercihleri Bilgilendirmesi
+                </h2>
+
+                <div class="p-4 rounded-2xl bg-purple-50/50 border border-purple-200 text-xs text-purple-950 leading-relaxed font-medium space-y-2">
+                  <p>
+                    Bu belge, aşağıda ayrılan faaliyetler ve tercihlerin kapsamı için yol gösterir. İlgili faaliyetin kendi veri, amaç, alıcı ve hukuki sebep açıklamasıyla birlikte okunur; yalnız okumak veya metni açmak rıza beyanı değildir.
+                  </p>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-purple-200/60 text-[11px] text-slate-700">
+                    <div><strong>Veri Sorumlusu:</strong> Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)</div>
+                    <div><strong>Vergi Dairesi / VKN:</strong> Çanakkale V.D. / 9560161511</div>
+                    <div><strong>Tebligat Adresi:</strong> İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</div>
+                    <div><strong>Kurumsal İletişim:</strong> 0850 840 86 95 | ihalecib@gmail.com</div>
+                  </div>
+                </div>
+
+                <div class="space-y-6 text-xs text-slate-700 font-medium leading-relaxed">
+                  <!-- 1. Bilgilendirme ile rızanın ayrılması -->
+                  <section class="space-y-2">
+                    <h3 class="font-bold text-slate-900 text-sm">1. BİLGİLENDİRME İLE RIZANIN AYRILMASI</h3>
+                    <p><strong>1.1.</strong> İhaleciBurada platformunu işleten veri sorumlusu <strong>Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)</strong>, adresi <strong>İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</strong> (VKN: 9560161511, Çanakkale Vergi Dairesi, Tel: 0850 840 86 95) ve başvuru kanalları <strong>ihalecib@gmail.com</strong> ve <strong>hasanhuseyin.yildirim.17@hs01.kep.tr</strong> üzerinden tanımlanır. Kişisel veriler, kimliği belirli veya belirlenebilir gerçek kişiye ilişkin bilgilerdir; şirket bilgileri de bu ölçüde kapsama girer.</p>
+                    <p><strong>1.2.</strong> KVKK Aydınlatma Metni kişisel veri işlemenin açıklamasıdır; bu üst metin isteğe bağlı amaçlar arasındaki farkları açıklar. İkisini okumak, metni açmak, siteyi kullanmak veya sessiz kalmak rıza değildir. Aydınlatmanın yapıldığına ilişkin geri bildirim, rıza beyanıyla aynı işlem sayılamaz.</p>
+                    <p><strong>1.3.</strong> Açık rıza belirli, bilgilendirmeye dayalı, özgür ve olumlu bir seçim olmalıdır. Bağımsız amaçlar toplu ve belirsiz bir izin altında birleştirilemez. Rızadan bağımsız geçerli şartlara dayanan temel üyelik ve talep edilmiş hizmetler için ayrıca isteğe bağlı pazarlama veya analiz rızası zorunlu tutulamaz.</p>
+                  </section>
+
+                  <!-- 2. Dijital varlıklar, profil ve ileri analiz -->
+                  <section class="space-y-2 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <h3 class="font-bold text-slate-900 text-sm">2. DİJİTAL VARLIKLAR, PROFİL VE İLERİ ANALİZ</h3>
+                    <p><strong>2.1.</strong> Dijital Varlıklar ve Görsel İçerik Bilgilendirmesi, firma profilindeki tanıtım alanlarına sağladığınız görsel, tanıtım videosu, hakkında/biyografi ve bağlantılarda yer alan kişisel verilerin alınmasını, saklanmasını ve profilin erişim kapsamına göre gösterilmesini açıklar. Bu isteğe bağlı kişisel tanıtım için 5/1 kapsamında ayrı açık rıza esas alınır. Profil yayını tercihi İhaleciBurada’nın ayrı reklam kampanyası veya sosyal medya yayınına, içerikteki başka kişilerin adına rıza vermeye ya da bütün altyapı aktarımlarına izin değildir.</p>
+                    <p><strong>2.2.</strong> Firma Değerlendirmeleri ve Puan Bilgilendirmesi, ticaret yapan karşı firmanın uygun ihale işlemi veya tamamlanmış satın alma siparişi hakkında girdiği puan ve yorumları, bunlardan hesaplanan ortalamayı ve gösterim kapsamını açıklar. Bu faaliyet, gezinme veya ihale davranışınızdan ayrı bir kişisel profil/güvenilirlik skoru üretilmesiyle aynı değildir. Firma değerlendirmesine ilişkin hukuki sebepler o metinde ayrılmıştır; kayıt veya ayarlardaki “profil skoru” tercihi tüm firma yorumlarına verilmiş genel rıza sayılamaz. Ayrı kişisel analiz amacı için yeni, somut bilgilendirme ve gerekiyorsa ayrı seçim gerekir.</p>
+                    <p><strong>2.3.</strong> Kullanım ve performans ölçümü, Analitik Tercihi ve Çerez Politikasında açıklanan ayrı faaliyettir; dijital tanıtım veya firma değerlendirmesi seçiminin içine eklenmez. “Diğer veri” başlığı altında bu belgelerde tanımlanmamış ek bir veri kategorisi, amaç veya alıcı için izin alınmaz. Arama, teknik şartname veya işlem içeriği, başka bir amaç için edinilmiş olması nedeniyle kişisel hedefleme veya yeni analizde kullanılamaz; böyle bir faaliyet ayrı hukuki şart ve önceden somut bilgilendirme gerektirir.</p>
+                  </section>
+
+                  <!-- 3. İletişim, çerez ve aktarım -->
+                  <section class="space-y-2">
+                    <h3 class="font-bold text-slate-900 text-sm">3. İLETİŞİM, ÇEREZ VE AKTARIM</h3>
+                    <p><strong>3.1.</strong> Ticari İletişim Amacı metni, seçtiğiniz e-posta adresine İhaleciBurada’nın kendi hizmetleriyle ilgili bülten, kampanya, genel ihale fırsatı ve tanıtım güncellemesi gönderilmesi için ad-soyad ve e-posta adresinizin kullanımını açıklar. SMS veya WhatsApp pazarlaması bu seçime dahil değildir. KVKK kapsamındaki kişisel veri işleme tercihi ile Ticari Elektronik İleti Onayı metnindeki 6563 sayılı Kanun kapsamındaki ileti onayı ve ret düzeni ayrıdır. Hesap güvenliği ve talep edilmiş işlemler için gerekli bildirimler pazarlama sayılmaz; bu mesajlara tanıtım eklenerek ret tercihi aşılamaz.</p>
+                    <p><strong>3.2.</strong> İşlevsel, analitik ve pazarlama çerez tercihleri ilgili çerez bildirimleriyle birlikte değerlendirilir; ticari ileti tercihiyle aynı işlem değildir. Gerekli olmayan teknoloji için rıza gerekiyorsa geçerli rıza öncesinde çalıştırılamaz. Bu üst metin belirli bir etiketin gerçekten engellendiğini veya tarayıcı tercihinin tüm hesap ve cihazlarla eşzamanlandığını doğrulamaz.</p>
+                    <p><strong>3.3.</strong> Yurt dışı aktarım için Yurt Dışı Aktarım Bilgilendirmesinde açıklanan ayrı Kanun'un 9. maddesi koşulları uygulanır. Yalnız bir açık rıza kutusu, düzenli bulut altyapısı aktarımını hukuka uygun hâle getirmez. Alıcı, ülke, veri, amaç ve gerçek mekanizma bilinmeden sağlayıcı listesi, standart sözleşme veya ISO sertifikası varmış gibi beyanda bulunulamaz.</p>
+                  </section>
+
+                  <!-- 4. Seçimin kapsamı ve geri alma -->
+                  <section class="space-y-2 bg-purple-50/50 p-4 rounded-xl border border-purple-200">
+                    <h3 class="font-bold text-purple-950 text-sm">4. SEÇİMİN KAPSAMI VE GERİ ALMA</h3>
+                    <p><strong>4.1.</strong> Bir ekranda birden çok amaç birlikte gösteriliyorsa hangi seçimin hangi işlemlere karşılık geldiği anlaşılır olmalı ve bağımsız amaçlar bakımından özgür seçim sağlanmalıdır. Bağımsız amaçların aynı ekranda sunulması, her amaç için ayrı ve özgür tercih sağlandığının tek başına kanıtı değildir. Her amaç için tamamlanmış bilgilendirme olmadan genel bir “tümünü kabul” beyanı eksikliği gidermez.</p>
+                    <p><strong>4.2.</strong> Verdiğiniz rızayı gerekçe göstermeden dilediğiniz an geri alabilirsiniz; geri alma veri sorumlusuna ulaşmasıyla ileriye etkili olur. Sunulan tercih/hesap araçları veya belirtilen başvuru kanalları (<strong>ihalecib@gmail.com</strong>) kullanılabilir. Belirli bir tek-tık yolunun bütün sağlayıcılarda anında durdurma ve silme yaptığı garanti edilmez; bu sınır geri almanın hukuki etkisini veya veri sorumlusunun gereğini yapma yükümlülüğünü kaldırmaz.</p>
+                    <p><strong>4.3.</strong> Geri alma, geçmişte hukuka uygun yapılmış işlemleri geriye dönük hukuka aykırı kılmaz. Ancak başka geçerli işleme şartı bulunmayan faaliyet devam ettirilemez; gerekli olmayan veri süresiz saklanamaz. Aynı isteğe bağlı faaliyeti sürdürmek için geri almadan sonra hukuki sebep değiştirilerek rızanın geri alınması etkisizleştirilemez. Amaç bazlı saklama ve silme kuralları ayrıca açıklanmalı; üyelik sonu, rıza geri alma ve gerekli hukuki kanıtın muhafazası birbirine karıştırılmamalıdır.</p>
+                  </section>
+
+                  <!-- 5. Haklar ve metnin sınırları -->
+                  <section class="space-y-2 bg-emerald-50/50 p-4 rounded-xl border border-emerald-200">
+                    <h3 class="font-bold text-emerald-950 text-sm">5. HAKLAR VE METNİN SINIRLARI</h3>
+                    <p><strong>5.1.</strong> Kanun'un 11. maddesi kapsamındaki haklarınızı KVKK Aydınlatma Metninde belirtilen başvuru kanallarıyla (<strong>ihalecib@gmail.com</strong>, <strong>hasanhuseyin.yildirim.17@hs01.kep.tr</strong> veya <strong>İsmetpaşa Mah. Büyük Hamam Sok. Taşöz Apt. No:52/1 Çanakkale, Türkiye</strong>) kullanabilirsiniz. Form kullanmak veya müşteriye ait KEP adresi sağlamak zorunlu değildir. İşlemenin eksiksiz açıklandığını kabul veya taahhüt etmeniz haklarınızın şartı değildir; bilgilendirme yükümlülüğü veri sorumlusunda kalır.</p>
+                    <p><strong>5.2.</strong> Bu tercihler yalnız kişisel verilerin belirtilen isteğe bağlı amaçlarla işlenmesine ilişkindir. Üyelik ve danışmanlık hizmetinin kapsamı, bedeli, imzalanması ve sona ermesi <NuxtLink to="/sozlesmeler?tab=kullanim" class="text-blue-700 underline font-bold">Kullanıcı Sözleşmesinin 2.3 ve 4. bölümleri</NuxtLink> ile taraf olduğunuz ayrı hizmet sözleşmesine tabidir. Bir veri işleme tercihi hizmet sözleşmesi imzası veya ödeme talimatı yerine geçmez.</p>
+                    <p><strong>5.3.</strong> Bu üst metnin bir cümlesi bütün amaçları kabul ettiğiniz anlamına gelmez; ayrı ve geçerli seçiminizin gerçek kapsamı esastır. Yeni amaç için gereken bildirim ve rıza ayrıca sağlanır. Önceki sürüm ve gerçek seçim kayıtları korunur; geçmişte başka bir metin görülmüş veya kabul edilmiş gibi yeniden yazılamaz.</p>
+                  </section>
+                </div>
+              </div>
 
             </div>
           </article>
