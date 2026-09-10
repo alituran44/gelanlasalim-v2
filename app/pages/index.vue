@@ -84,6 +84,7 @@ const activeTimeTab = ref<'guncel' | 'gecmis' | 'sonuc' | 'detayli'>('guncel')
 const viewLayout = ref<'list' | 'grid'>('grid') // 'list' = Sahibinden Liste Görünümü, 'grid' = Vitrin Görünümü
 const viewMode = ref<'gelismis' | 'basit'>('gelismis')
 const readMode = ref<'goster' | 'gizle'>('goster')
+const showMobileFilters = ref(false)
 
 // ==================== ARAMA VE FİLTRE DURUMLARI ====================
 const selectedCategory = ref<string>('Tümü')
@@ -1727,10 +1728,31 @@ onMounted(() => {
     <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-6 py-4">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
 
+        <!-- Mobil Filtre Aç / Kapat Butonu (lg:hidden) -->
+        <div class="lg:hidden w-full col-span-1">
+          <button 
+            type="button"
+            @click="showMobileFilters = !showMobileFilters" 
+            class="w-full py-2.5 px-4 bg-white border border-slate-300 rounded-xl font-bold text-xs text-slate-800 flex items-center justify-between shadow-2xs cursor-pointer hover:bg-slate-50 transition"
+          >
+            <span class="flex items-center gap-2">
+              <SlidersHorizontal :size="14" class="text-[#0084B4]" />
+              <span>Filtreler & Kategoriler</span>
+              <span v-if="selectedCategory !== 'Tümü' || selectedCity !== 'Tümü' || selectedAuthority !== 'Tümü' || selectedSector !== 'Tümü' || selectedCompany !== 'Tümü' || filterType !== 'Tümü' || filterKeyword" class="px-2 py-0.5 rounded-full bg-[#0084B4] text-white text-[10px] font-black">
+                Aktif Filtre
+              </span>
+            </span>
+            <div class="flex items-center gap-1 text-[11px] text-slate-500 font-semibold">
+              <span>{{ showMobileFilters ? 'Gizle' : 'Göster' }}</span>
+              <ChevronDown :size="14" class="transition-transform duration-200" :class="showMobileFilters ? 'rotate-180 text-[#0084B4]' : ''" />
+            </div>
+          </button>
+        </div>
+
         <!-- ========================================================= -->
         <!-- ⬅️ SOL SÜTUN: TÜM DİZİNLER (KATEGORİLER / ŞEHİRLER / İDARELER / SEKTÖRLER / FİRMALAR) -->
         <!-- ========================================================= -->
-        <aside class="lg:col-span-4 xl:col-span-3 space-y-3.5">
+        <aside :class="showMobileFilters ? 'block' : 'hidden lg:block'" class="lg:col-span-4 xl:col-span-3 space-y-3.5">
           
           <!-- Sol Menü Ana Kutusu -->
           <div class="bg-white border border-slate-300 rounded-2xl p-3.5 shadow-2xs space-y-3">
@@ -1947,303 +1969,7 @@ onMounted(() => {
                     </button>
                   </div>
                 </div>
-              
-    <!-- ========================================================================= -->
-    <!-- 📑 RESMİ ŞARTNAME PDF AÇICI & DOKÜMAN GÖRÜNTÜLEYİCİ MODAL -->
-    <!-- ========================================================================= -->
-    <div v-if="showPdfViewerModal && pdfTenderTarget" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-fadeIn">
-      <div class="bg-slate-900 rounded-3xl max-w-4xl w-full max-h-[95vh] flex flex-col shadow-2xl border border-slate-700 overflow-hidden text-left">
-        
-        <!-- PDF Toolbar Header -->
-        <div class="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 text-white">
-          <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-md">
-              PDF
-            </div>
-            <div>
-              <div class="flex items-center gap-2">
-                <span class="text-sm font-black text-white truncate max-w-xs sm:max-w-md">
-                  {{ pdfDocTarget?.name || ('Şartname_' + pdfTenderTarget.id + '.pdf') }}
-                </span>
-                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-black border border-emerald-500/30">
-                  ✓ e-İmzalı Resmi Doküman
-                </span>
-              </div>
-              <div class="text-[11px] text-slate-400 font-mono">
-                İKN: #{{ pdfTenderTarget.id }} · Zaman Damgası: {{ new Date().toLocaleDateString('tr-TR') }}
-              </div>
-            </div>
-          </div>
-
-          <!-- Toolbar Buttons -->
-          <div class="flex items-center gap-2">
-            <button 
-              type="button" 
-              @click="printPdfDocument" 
-              class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border border-slate-700"
-              title="Yazdır"
-            >
-              <Printer :size="13" />
-              <span class="hidden sm:inline">Yazdır</span>
-            </button>
-            <button 
-              type="button" 
-              @click="downloadPdfDocument(pdfTenderTarget)" 
-              class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-md shadow-blue-600/30"
-            >
-              <Download :size="13" />
-              <span>İndir</span>
-            </button>
-            <button 
-              type="button" 
-              @click="showPdfViewerModal = false" 
-              class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition cursor-pointer"
-            >
-              <X :size="16" />
-            </button>
-          </div>
-        </div>
-
-        <!-- PDF Page Sheet Viewer Area (A4 Paper Aesthetic) -->
-        <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-800 flex justify-center custom-scrollbar">
-          <div id="printable-pdf-spec" class="bg-white text-slate-900 rounded-lg shadow-2xl p-6 sm:p-12 max-w-2xl w-full space-y-6 text-left border border-slate-200 font-sans min-h-[750px] relative">
-            
-            <!-- Official Letterhead Header -->
-            <div class="border-b-2 border-slate-900 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div class="flex items-center gap-3">
-                <div class="w-12 h-12 rounded-xl bg-[#0F223D] text-white flex items-center justify-center font-black text-lg shrink-0">
-                  İB
-                </div>
-                <div>
-                  <div class="text-[10px] font-black uppercase text-blue-900 tracking-wider">T.C. ELEKTRONİK TİCARET VE B2B İHALE SİSTEMİ</div>
-                  <div class="text-base font-black text-slate-900 tracking-tight">İHALECİBURADA RESMİ İHALE ŞARTNAMESİ</div>
-                  <div class="text-[10px] text-slate-500">GİB VKN: 9560161511</div>
-                </div>
-              </div>
-              <div class="text-right sm:border-l sm:pl-4 border-slate-200">
-                <div class="text-[10px] font-mono font-bold text-slate-400">İHALE KAYIT NO (İKN)</div>
-                <div class="text-sm font-mono font-black text-blue-900">#{{ pdfTenderTarget.id }}</div>
-                <div class="text-[10px] text-emerald-600 font-bold">● Dijital Mühürlü</div>
-              </div>
-            </div>
-
-            <!-- Document Info Table -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs">
-              <div>
-                <span class="text-[10px] font-black text-slate-400 uppercase block">İhaleyi Açan Kurum</span>
-                <span class="font-bold text-slate-800">{{ pdfTenderTarget.ownerCompany || pdfTenderTarget.authority || 'Kurumsal Masası' }}</span>
-              </div>
-              <div>
-                <span class="text-[10px] font-black text-slate-400 uppercase block">Kategori & Sektör</span>
-                <span class="font-bold text-slate-800">{{ pdfTenderTarget.kategori || 'Genel Satın Alma' }}</span>
-              </div>
-              <div>
-                <span class="text-[10px] font-black text-slate-400 uppercase block">Hedef / Yaklaşık Bütçe</span>
-                <span class="font-mono font-black text-emerald-700">{{ formatTenderBudget(pdfTenderTarget.butce) }}</span>
-              </div>
-              <div>
-                <span class="text-[10px] font-black text-slate-400 uppercase block">Teslimat / Uygulama İli</span>
-                <span class="font-bold text-slate-800">{{ pdfTenderTarget.city || 'Balıkesir' }}</span>
-              </div>
-              <div>
-                <span class="text-[10px] font-black text-slate-400 uppercase block">İhale Usulü</span>
-                <span class="font-bold text-slate-800">{{ pdfTenderTarget.tur || 'Açık Eksiltmeli İhale' }}</span>
-              </div>
-              <div>
-                <span class="text-[10px] font-black text-slate-400 uppercase block">Kalan Süre / Son Tarih</span>
-                <span class="font-bold text-amber-700">{{ pdfTenderTarget.sure || '7 gün' }}</span>
-              </div>
-            </div>
-
-            <!-- Content Sections -->
-            <div class="space-y-4 text-xs text-slate-700 leading-relaxed">
-              <div class="space-y-1.5">
-                <h3 class="font-black text-slate-900 text-sm border-b pb-1 border-slate-200 flex items-center gap-1.5">
-                  <span>1. İHALENİN KONUSU VE TEKNİK İSTERLER</span>
-                </h3>
-                <p class="p-3 rounded-lg bg-slate-50 border border-slate-100 font-serif leading-relaxed text-slate-800 whitespace-pre-line">
-                  {{ pdfTenderTarget.aciklama || pdfTenderTarget.baslik }}
-                </p>
-              </div>
-
-              <div class="space-y-1.5">
-                <h3 class="font-black text-slate-900 text-sm border-b pb-1 border-slate-200">
-                  2. İDARİ ŞARTLAR VE TESLİMAT KOŞULLARI
-                </h3>
-                <ul class="list-disc pl-5 space-y-1 text-slate-600">
-                  <li>Teslimat adresi: <strong>{{ pdfTenderTarget.teslimatAdresi || (pdfTenderTarget.city + ' Merkez / Depo Teslimat') }}</strong> olarak belirlenmiştir.</li>
-                  <li>İstekliler şartnamede belirtilen teknik standartlara ve TSE/ISO belgelerine uygun teklif vermelidir.</li>
-                  <li>Hakediş ödemeleri BDDK/TCMB onaylı <strong>Escrow Güvenli Havuz</strong> hesabında bloke edilecek olup, irsaliye ve muayene kabul onayından sonra yükleniciye aktarılacaktır.</li>
-                </ul>
-              </div>
-
-              <div class="space-y-1.5">
-                <h3 class="font-black text-slate-900 text-sm border-b pb-1 border-slate-200">
-                  3. EKLİ BELGELER VE ŞARTNAME DOSYALARI
-                </h3>
-                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
-                  <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 rounded bg-red-100 text-red-700 font-black text-[10px]">PDF</span>
-                    <span class="font-bold text-slate-800">{{ pdfDocTarget?.name || ('Şartname_' + pdfTenderTarget.id + '.pdf') }}</span>
-                    <span class="text-slate-400">({{ pdfDocTarget?.size || '0.08 MB' }})</span>
-                  </div>
-                  <span class="text-emerald-700 font-bold text-[11px]">✓ Aslı Doğrulandı</span>
-                </div>
-              </div>
-            </div>
-
-            <!-- Stamp & Verification Footer -->
-            <div class="pt-6 border-t-2 border-slate-200 flex items-end justify-between text-[10px] text-slate-500">
-              <div>
-                <div>6098 s. TBK ve 6102 s. TTK kapsamında düzenlenmiştir.</div>
-                <div>Zaman Damgası: {{ new Date().toISOString() }}</div>
-                <div class="font-mono text-slate-400">Hash: SHA-256-{{ pdfTenderTarget.id }}-CERT-VALID</div>
-              </div>
-              <div class="text-center p-3 rounded-xl border border-blue-200 bg-blue-50/50">
-                <div class="w-8 h-8 rounded-full bg-blue-900 text-white flex items-center justify-center font-black mx-auto mb-1">
-                  ✓
-                </div>
-                <div class="font-black text-blue-950 text-[10px]">İhaleciBurada</div>
-                <div class="text-[8px] text-blue-700 font-bold">DİJİTAL MÜHÜR VE ONAY</div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-    <!-- 🏢 FİRMA PROFİLİ, PUANLARI VE İTİBAR MODALI (KULLANICI TALEBİ) -->
-    <div 
-      v-if="showCompanyProfileModal && selectedCompanyProfile" 
-      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn text-left"
-      @click.self="showCompanyProfileModal = false"
-    >
-      <div class="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl space-y-6 border border-slate-100 max-h-[90vh] overflow-y-auto animate-scaleUp">
-        
-        <!-- Başlık & Kapat -->
-        <div class="flex items-start justify-between border-b pb-4 border-slate-100">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 rounded-2xl bg-blue-900 text-white font-black text-lg flex items-center justify-center shadow-sm">
-              {{ selectedCompanyProfile.name.charAt(0) }}
-            </div>
-            <div>
-              <div class="flex items-center gap-2 flex-wrap">
-                <h3 class="text-base font-black text-slate-900">{{ selectedCompanyProfile.name }}</h3>
-                <span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-black border border-blue-200">
-                  ✓ Doğrulanmış Kurumsal Firma
-                </span>
-              </div>
-              <p class="text-xs text-slate-500 font-medium">
-                {{ selectedCompanyProfile.sector }} · {{ selectedCompanyProfile.city }}
-              </p>
-            </div>
-          </div>
-          <button 
-            type="button" 
-            @click="showCompanyProfileModal = false" 
-            class="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
-          >
-            <X :size="18" />
-          </button>
-        </div>
-
-        <!-- İtibar & Puan İstatistikleri -->
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <div class="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-center space-y-1">
-            <span class="text-[10px] font-black text-amber-800 uppercase block">Firma Puanı</span>
-            <div class="flex items-center justify-center gap-1 text-base font-black text-amber-900">
-              <Star :size="16" class="text-amber-500" fill="#F59E0B" />
-              <span>{{ selectedCompanyProfile.rating }} / 5.0</span>
-            </div>
-            <span class="text-[9px] text-amber-700 font-bold block">({{ selectedCompanyProfile.reviewCount }} Değerlendirme)</span>
-          </div>
-
-          <div class="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-center space-y-1">
-            <span class="text-[10px] font-black text-emerald-800 uppercase block">Zamanında Teslim</span>
-            <div class="text-base font-black text-emerald-900">{{ selectedCompanyProfile.onTimeDelivery }}</div>
-            <span class="text-[9px] text-emerald-700 font-bold block">Gecikmesiz Sevkiyat</span>
-          </div>
-
-          <div class="p-3.5 rounded-2xl bg-blue-50/80 border border-blue-200 text-center space-y-1">
-            <span class="text-[10px] font-black text-blue-800 uppercase block">Şartname Uyumu</span>
-            <div class="text-base font-black text-blue-900">{{ selectedCompanyProfile.specCompliance }}</div>
-            <span class="text-[9px] text-blue-700 font-bold block">Sıfır Hata</span>
-          </div>
-
-          <div class="p-3.5 rounded-2xl bg-purple-50/80 border border-purple-200 text-center space-y-1">
-            <span class="text-[10px] font-black text-purple-800 uppercase block">Tamamlanan İhale</span>
-            <div class="text-base font-black text-purple-900">{{ selectedCompanyProfile.completedTenders }} Adet</div>
-            <span class="text-[9px] text-purple-700 font-bold block">Escrow Tamamlandı</span>
-          </div>
-        </div>
-
-        <!-- Doğrulanmış Kurumsal Bilgiler -->
-        <div class="space-y-2.5">
-          <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-            <ShieldCheck :size="15" class="text-emerald-600" />
-            <span>Doğrulanmış Resmi Kurumsal Bilgiler:</span>
-          </h4>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-0.5">
-              <span class="text-[10px] font-bold text-slate-400 block">Vergi Dairesi / No:</span>
-              <strong class="text-slate-800 font-mono">{{ selectedCompanyProfile.taxOffice }}</strong>
-            </div>
-            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-0.5">
-              <span class="text-[10px] font-bold text-slate-400 block">MERSİS Numarası:</span>
-              <strong class="text-slate-800 font-mono">{{ selectedCompanyProfile.mersis }}</strong>
-            </div>
-            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-0.5 sm:col-span-2">
-              <span class="text-[10px] font-bold text-slate-400 block">Kayıtlı Merkez / Depo Adresi:</span>
-              <strong class="text-slate-800">{{ selectedCompanyProfile.address }}</strong>
-            </div>
-          </div>
-        </div>
-
-        <!-- Müşteri Değerlendirmeleri ve Yorumları -->
-        <div class="space-y-2.5">
-          <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
-            <Star :size="14" class="text-amber-500" fill="#F59E0B" />
-            <span>Platform Üzerindeki Gerçek Alıcı Yorumları:</span>
-          </h4>
-          <div class="space-y-2 text-xs">
-            <div v-for="(rev, rIdx) in selectedCompanyProfile.reviews" :key="rIdx" class="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
-              <div class="flex items-center justify-between">
-                <span class="font-black text-slate-800">{{ rev.name }}</span>
-                <div class="flex text-amber-500"><Star v-for="s in rev.rating" :key="s" :size="11" fill="#F59E0B" /></div>
-              </div>
-              <p class="text-slate-600 text-[11px] leading-relaxed">"{{ rev.text }}"</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Aksiyon Butonları -->
-        <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
-          <button 
-            type="button" 
-            @click="showCompanyProfileModal = false" 
-            class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition cursor-pointer text-xs"
-          >
-            Kapat
-          </button>
-          <NuxtLink 
-            to="/panel/mesajlar" 
-            class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md transition flex items-center gap-1.5"
-          >
-            <MessageSquare :size="13" />
-            <span>Firma ile İletişime Geç</span>
-          </NuxtLink>
-        </div>
-
-      </div>
-    </div>
-  <DeepSeekAssistantModal 
-      :isOpen="showDeepSeekModal" 
-      :tender="selectedTenderForDeepSeek" 
-      @close="showDeepSeekModal = false"
-      @applySuggestedBid="(price) => { showDeepSeekModal = false; if (selectedTenderForDeepSeek) openQuickBid(selectedTenderForDeepSeek); }"
-    />
-  </div>
-</template>
+              </template>
 
               <!-- 2. ŞEHİRLER LİSTESİ (81 İL) -->
               <template v-else-if="activeLeftTab === 'sehirler'">
@@ -3728,6 +3454,305 @@ onMounted(() => {
 
       </div>
     </div>
+
+    <!-- ========================================================================= -->
+    <!-- 📑 RESMİ ŞARTNAME PDF AÇICI & DOKÜMAN GÖRÜNTÜLEYİCİ MODAL -->
+    <!-- ========================================================================= -->
+    <div v-if="showPdfViewerModal && pdfTenderTarget" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-fadeIn">
+      <div class="bg-slate-900 rounded-3xl max-w-4xl w-full max-h-[95vh] flex flex-col shadow-2xl border border-slate-700 overflow-hidden text-left">
+        
+        <!-- PDF Toolbar Header -->
+        <div class="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 text-white">
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center font-black text-xs shrink-0 shadow-md">
+              PDF
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-black text-white truncate max-w-xs sm:max-w-md">
+                  {{ pdfDocTarget?.name || ('Şartname_' + pdfTenderTarget.id + '.pdf') }}
+                </span>
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-black border border-emerald-500/30">
+                  ✓ e-İmzalı Resmi Doküman
+                </span>
+              </div>
+              <div class="text-[11px] text-slate-400 font-mono">
+                İKN: #{{ pdfTenderTarget.id }} · Zaman Damgası: {{ new Date().toLocaleDateString('tr-TR') }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Toolbar Buttons -->
+          <div class="flex items-center gap-2">
+            <button 
+              type="button" 
+              @click="printPdfDocument" 
+              class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer border border-slate-700"
+              title="Yazdır"
+            >
+              <Printer :size="13" />
+              <span class="hidden sm:inline">Yazdır</span>
+            </button>
+            <button 
+              type="button" 
+              @click="downloadPdfDocument(pdfTenderTarget)" 
+              class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-md shadow-blue-600/30"
+            >
+              <Download :size="13" />
+              <span>İndir</span>
+            </button>
+            <button 
+              type="button" 
+              @click="showPdfViewerModal = false" 
+              class="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white transition cursor-pointer"
+            >
+              <X :size="16" />
+            </button>
+          </div>
+        </div>
+
+        <!-- PDF Page Sheet Viewer Area (A4 Paper Aesthetic) -->
+        <div class="flex-1 overflow-y-auto p-4 sm:p-8 bg-slate-800 flex justify-center custom-scrollbar">
+          <div id="printable-pdf-spec" class="bg-white text-slate-900 rounded-lg shadow-2xl p-6 sm:p-12 max-w-2xl w-full space-y-6 text-left border border-slate-200 font-sans min-h-[750px] relative">
+            
+            <!-- Official Letterhead Header -->
+            <div class="border-b-2 border-slate-900 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-xl bg-[#0F223D] text-white flex items-center justify-center font-black text-lg shrink-0">
+                  İB
+                </div>
+                <div>
+                  <div class="text-[10px] font-black uppercase text-blue-900 tracking-wider">T.C. ELEKTRONİK TİCARET VE B2B İHALE SİSTEMİ</div>
+                  <div class="text-base font-black text-slate-900 tracking-tight">İHALECİBURADA RESMİ İHALE ŞARTNAMESİ</div>
+                  <div class="text-[10px] text-slate-500">GİB VKN: 9560161511</div>
+                </div>
+              </div>
+              <div class="text-right sm:border-l sm:pl-4 border-slate-200">
+                <div class="text-[10px] font-mono font-bold text-slate-400">İHALE KAYIT NO (İKN)</div>
+                <div class="text-sm font-mono font-black text-blue-900">#{{ pdfTenderTarget.id }}</div>
+                <div class="text-[10px] text-emerald-600 font-bold">● Dijital Mühürlü</div>
+              </div>
+            </div>
+
+            <!-- Document Info Table -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+              <div>
+                <span class="text-[10px] font-black text-slate-400 uppercase block">İhaleyi Açan Kurum</span>
+                <span class="font-bold text-slate-800">{{ pdfTenderTarget.ownerCompany || pdfTenderTarget.authority || 'Kurumsal Masası' }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-black text-slate-400 uppercase block">Kategori & Sektör</span>
+                <span class="font-bold text-slate-800">{{ pdfTenderTarget.kategori || 'Genel Satın Alma' }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-black text-slate-400 uppercase block">Hedef / Yaklaşık Bütçe</span>
+                <span class="font-mono font-black text-emerald-700">{{ formatTenderBudget(pdfTenderTarget.butce) }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-black text-slate-400 uppercase block">Teslimat / Uygulama İli</span>
+                <span class="font-bold text-slate-800">{{ pdfTenderTarget.city || 'Balıkesir' }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-black text-slate-400 uppercase block">İhale Usulü</span>
+                <span class="font-bold text-slate-800">{{ pdfTenderTarget.tur || 'Açık Eksiltmeli İhale' }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] font-black text-slate-400 uppercase block">Kalan Süre / Son Tarih</span>
+                <span class="font-bold text-amber-700">{{ pdfTenderTarget.sure || '7 gün' }}</span>
+              </div>
+            </div>
+
+            <!-- Content Sections -->
+            <div class="space-y-4 text-xs text-slate-700 leading-relaxed">
+              <div class="space-y-1.5">
+                <h3 class="font-black text-slate-900 text-sm border-b pb-1 border-slate-200 flex items-center gap-1.5">
+                  <span>1. İHALENİN KONUSU VE TEKNİK İSTERLER</span>
+                </h3>
+                <p class="p-3 rounded-lg bg-slate-50 border border-slate-100 font-serif leading-relaxed text-slate-800 whitespace-pre-line">
+                  {{ pdfTenderTarget.aciklama || pdfTenderTarget.baslik }}
+                </p>
+              </div>
+
+              <div class="space-y-1.5">
+                <h3 class="font-black text-slate-900 text-sm border-b pb-1 border-slate-200">
+                  2. İDARİ ŞARTLAR VE TESLİMAT KOŞULLARI
+                </h3>
+                <ul class="list-disc pl-5 space-y-1 text-slate-600">
+                  <li>Teslimat adresi: <strong>{{ pdfTenderTarget.teslimatAdresi || (pdfTenderTarget.city + ' Merkez / Depo Teslimat') }}</strong> olarak belirlenmiştir.</li>
+                  <li>İstekliler şartnamede belirtilen teknik standartlara ve TSE/ISO belgelerine uygun teklif vermelidir.</li>
+                  <li>Hakediş ödemeleri BDDK/TCMB onaylı <strong>Escrow Güvenli Havuz</strong> hesabında bloke edilecek olup, irsaliye ve muayene kabul onayından sonra yükleniciye aktarılacaktır.</li>
+                </ul>
+              </div>
+
+              <div class="space-y-1.5">
+                <h3 class="font-black text-slate-900 text-sm border-b pb-1 border-slate-200">
+                  3. EKLİ BELGELER VE ŞARTNAME DOSYALARI
+                </h3>
+                <div class="p-3 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 rounded bg-red-100 text-red-700 font-black text-[10px]">PDF</span>
+                    <span class="font-bold text-slate-800">{{ pdfDocTarget?.name || ('Şartname_' + pdfTenderTarget.id + '.pdf') }}</span>
+                    <span class="text-slate-400">({{ pdfDocTarget?.size || '0.08 MB' }})</span>
+                  </div>
+                  <span class="text-emerald-700 font-bold text-[11px]">✓ Aslı Doğrulandı</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stamp & Verification Footer -->
+            <div class="pt-6 border-t-2 border-slate-200 flex items-end justify-between text-[10px] text-slate-500">
+              <div>
+                <div>6098 s. TBK ve 6102 s. TTK kapsamında düzenlenmiştir.</div>
+                <div>Zaman Damgası: {{ new Date().toISOString() }}</div>
+                <div class="font-mono text-slate-400">Hash: SHA-256-{{ pdfTenderTarget.id }}-CERT-VALID</div>
+              </div>
+              <div class="text-center p-3 rounded-xl border border-blue-200 bg-blue-50/50">
+                <div class="w-8 h-8 rounded-full bg-blue-900 text-white flex items-center justify-center font-black mx-auto mb-1">
+                  ✓
+                </div>
+                <div class="font-black text-blue-950 text-[10px]">İhaleciBurada</div>
+                <div class="text-[8px] text-blue-700 font-bold">DİJİTAL MÜHÜR VE ONAY</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 🏢 FİRMA PROFİLİ, PUANLARI VE İTİBAR MODALI (KULLANICI TALEBİ) -->
+    <div 
+      v-if="showCompanyProfileModal && selectedCompanyProfile" 
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-fadeIn text-left"
+      @click.self="showCompanyProfileModal = false"
+    >
+      <div class="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl space-y-6 border border-slate-100 max-h-[90vh] overflow-y-auto animate-scaleUp">
+        
+        <!-- Başlık & Kapat -->
+        <div class="flex items-start justify-between border-b pb-4 border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-12 h-12 rounded-2xl bg-blue-900 text-white font-black text-lg flex items-center justify-center shadow-sm">
+              {{ selectedCompanyProfile.name.charAt(0) }}
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <h3 class="text-base font-black text-slate-900">{{ selectedCompanyProfile.name }}</h3>
+                <span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 text-[10px] font-black border border-blue-200">
+                  ✓ Doğrulanmış Kurumsal Firma
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 font-medium">
+                {{ selectedCompanyProfile.sector }} · {{ selectedCompanyProfile.city }}
+              </p>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            @click="showCompanyProfileModal = false" 
+            class="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition cursor-pointer"
+          >
+            <X :size="18" />
+          </button>
+        </div>
+
+        <!-- İtibar & Puan İstatistikleri -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+          <div class="p-3.5 rounded-2xl bg-amber-50/80 border border-amber-200 text-center space-y-1">
+            <span class="text-[10px] font-black text-amber-800 uppercase block">Firma Puanı</span>
+            <div class="flex items-center justify-center gap-1 text-base font-black text-amber-900">
+              <Star :size="16" class="text-amber-500" fill="#F59E0B" />
+              <span>{{ selectedCompanyProfile.rating }} / 5.0</span>
+            </div>
+            <span class="text-[9px] text-amber-700 font-bold block">({{ selectedCompanyProfile.reviewCount }} Değerlendirme)</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-center space-y-1">
+            <span class="text-[10px] font-black text-emerald-800 uppercase block">Zamanında Teslim</span>
+            <div class="text-base font-black text-emerald-900">{{ selectedCompanyProfile.onTimeDelivery }}</div>
+            <span class="text-[9px] text-emerald-700 font-bold block">Gecikmesiz Sevkiyat</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-blue-50/80 border border-blue-200 text-center space-y-1">
+            <span class="text-[10px] font-black text-blue-800 uppercase block">Şartname Uyumu</span>
+            <div class="text-base font-black text-blue-900">{{ selectedCompanyProfile.specCompliance }}</div>
+            <span class="text-[9px] text-blue-700 font-bold block">Sıfır Hata</span>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-purple-50/80 border border-purple-200 text-center space-y-1">
+            <span class="text-[10px] font-black text-purple-800 uppercase block">Tamamlanan İhale</span>
+            <div class="text-base font-black text-purple-900">{{ selectedCompanyProfile.completedTenders }} Adet</div>
+            <span class="text-[9px] text-purple-700 font-bold block">Escrow Tamamlandı</span>
+          </div>
+        </div>
+
+        <!-- Doğrulanmış Kurumsal Bilgiler -->
+        <div class="space-y-2.5">
+          <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+            <ShieldCheck :size="15" class="text-emerald-600" />
+            <span>Doğrulanmış Resmi Kurumsal Bilgiler:</span>
+          </h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-0.5">
+              <span class="text-[10px] font-bold text-slate-400 block">Vergi Dairesi / No:</span>
+              <strong class="text-slate-800 font-mono">{{ selectedCompanyProfile.taxOffice }}</strong>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-0.5">
+              <span class="text-[10px] font-bold text-slate-400 block">MERSİS Numarası:</span>
+              <strong class="text-slate-800 font-mono">{{ selectedCompanyProfile.mersis }}</strong>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 space-y-0.5 sm:col-span-2">
+              <span class="text-[10px] font-bold text-slate-400 block">Kayıtlı Merkez / Depo Adresi:</span>
+              <strong class="text-slate-800">{{ selectedCompanyProfile.address }}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Müşteri Değerlendirmeleri ve Yorumları -->
+        <div class="space-y-2.5">
+          <h4 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+            <Star :size="14" class="text-amber-500" fill="#F59E0B" />
+            <span>Platform Üzerindeki Gerçek Alıcı Yorumları:</span>
+          </h4>
+          <div class="space-y-2 text-xs">
+            <div v-for="(rev, rIdx) in selectedCompanyProfile.reviews" :key="rIdx" class="p-3 rounded-xl bg-slate-50 border border-slate-100 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="font-black text-slate-800">{{ rev.name }}</span>
+                <div class="flex text-amber-500"><Star v-for="s in rev.rating" :key="s" :size="11" fill="#F59E0B" /></div>
+              </div>
+              <p class="text-slate-600 text-[11px] leading-relaxed">"{{ rev.text }}"</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Aksiyon Butonları -->
+        <div class="flex items-center justify-end gap-2 pt-4 border-t border-slate-100">
+          <button 
+            type="button" 
+            @click="showCompanyProfileModal = false" 
+            class="px-5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition cursor-pointer text-xs"
+          >
+            Kapat
+          </button>
+          <NuxtLink 
+            to="/panel/mesajlar" 
+            class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md transition flex items-center gap-1.5"
+          >
+            <MessageSquare :size="13" />
+            <span>Firma ile İletişime Geç</span>
+          </NuxtLink>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DeepSeek AI Asistan Modalı -->
+    <DeepSeekAssistantModal 
+      :isOpen="showDeepSeekModal" 
+      :tender="selectedTenderForDeepSeek" 
+      @close="showDeepSeekModal = false"
+      @applySuggestedBid="(price) => { showDeepSeekModal = false; if (selectedTenderForDeepSeek) openQuickBid(selectedTenderForDeepSeek); }"
+    />
 
   </div>
 </template>
