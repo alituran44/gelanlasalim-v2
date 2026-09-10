@@ -364,7 +364,7 @@ function handleRegister() {
     return
   }
   if (!email.value.trim()) {
-    errorMessage.value = 'Lütfen kurumsal e-posta adresinizi giriniz.'
+    errorMessage.value = 'Lütfen geçerli bir e-posta adresi giriniz.'
     return
   }
   if (!phone.value.trim()) {
@@ -936,17 +936,17 @@ function handleDemoLogin(role: 'company' | 'individual') {
               </div>
             </div>
 
-            <!-- Kurumsal e-posta -->
+            <!-- E-posta -->
             <div>
               <div class="flex items-center justify-between mb-1.5">
-                <label class="text-xs font-semibold text-slate-800">{{ 'Kurumsal e-posta' }}</label>
+                <label class="text-xs font-semibold text-slate-800">{{ 'E-posta' }}</label>
                 <span class="text-[11px] text-slate-400 font-normal">{{ 'Zorunlu' }}</span>
               </div>
               <input
                 v-model="email"
                 type="email"
                 required
-                placeholder="ad.soyad@firma.com.tr"
+                placeholder="ornek@sirket.com veya ad@gmail.com"
                 class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 placeholder-slate-400 outline-none focus:border-[#0e3a8c] focus:ring-1 focus:ring-[#0e3a8c] transition-all min-h-[42px]"
               />
             </div>

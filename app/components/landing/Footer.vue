@@ -93,7 +93,7 @@ const legalLinks = [
             <input 
               v-model="subscriberEmail" 
               type="email" 
-              placeholder="Kurumsal e-posta adresiniz..." 
+              placeholder="E-posta adresiniz..." 
               class="flex-1 rounded-xl bg-slate-900/90 border border-slate-700 px-4 py-3 text-xs text-white placeholder-slate-400 focus:border-blue-400 focus:outline-none" 
               required
             />

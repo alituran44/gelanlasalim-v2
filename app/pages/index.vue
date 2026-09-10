@@ -208,7 +208,7 @@ async function submitLeadRequest() {
     return
   }
   if (!leadForm.value.email.trim() || !leadForm.value.email.includes('@')) {
-    leadFormError.value = 'Lütfen geçerli bir kurumsal e-posta adresi girin.'
+    leadFormError.value = 'Lütfen geçerli bir e-posta adresi girin.'
     return
   }
   if (!leadForm.value.phone.trim() || leadForm.value.phone.length < 10) {
@@ -2915,7 +2915,7 @@ onMounted(() => {
                       <input 
                         v-model="leadForm.email"
                         type="email" 
-                        placeholder="ornek@sirket.com.tr"
+                        placeholder="ornek@firma.com veya ad@gmail.com"
                         class="w-full px-3.5 py-2.5 rounded-xl bg-[#121826] border border-slate-700 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-blue-500 transition"
                       />
                     </div>
