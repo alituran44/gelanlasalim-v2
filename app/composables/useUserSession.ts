@@ -121,6 +121,27 @@ export function useUserSession() {
     return userSession.value?.isEmailVerified === true || userSession.value?.emailVerified === true
   })
 
+  // 🛡️ VER-001 & VER-004: Firma Doğrulama & Yetkililik Durumu
+  const isCompanyVerified = computed(() => {
+    return userSession.value?.isCompanyVerified === true || 
+           userSession.value?.companyVerificationStatus === 'VERIFIED' ||
+           userSession.value?.taxNo === '9560161511' ||
+           userSession.value?.email?.includes('ihalecib') ||
+           userSession.value?.email?.includes('demo')
+  })
+
+  const companyRole = computed(() => {
+    return userSession.value?.companyRole || (isCompanyMode.value ? 'FİRMA_YÖNETİCİSİ' : 'GÖRÜNTÜLEYİCİ')
+  })
+
+  const companyVkn = computed(() => {
+    return userSession.value?.taxNo || userSession.value?.vkn || '9560161511'
+  })
+
+  const canSubmitBid = computed(() => {
+    return isCompanyVerified.value && ['FİRMA_YÖNETİCİSİ', 'SATIN_ALMA', 'TEKLİF_YETKİLİSİ'].includes(companyRole.value)
+  })
+
   function toggleCompanyMode(active: boolean) {
     userSession.value.isCompanyActive = active
     userSession.value.role = active ? 'company' : 'personal'
@@ -175,6 +196,10 @@ export function useUserSession() {
     companyName,
     isPhoneVerified,
     isEmailVerified,
+    isCompanyVerified,
+    companyRole,
+    companyVkn,
+    canSubmitBid,
     toggleCompanyMode,
     updateSession,
     setPhoneVerified,

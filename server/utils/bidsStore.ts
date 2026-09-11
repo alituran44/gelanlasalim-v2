@@ -1,6 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import type { TenderItem } from './tendersStore'
+import { canUserSubmitBid } from './companyVerificationStore'
 
 export interface BidItem {
   id: string
@@ -22,6 +23,13 @@ export interface BidItem {
   createdAt?: string
   pazarlikGecmisi?: any[]
   isMine?: boolean
+  vkn?: string
+  specVersionAccepted?: number // 🛡️ VER-010
+  specAcceptedAt?: string // 🛡️ VER-010
+  specAcceptedByUser?: string // 🛡️ VER-010
+  specAcceptedByCompany?: string // 🛡️ VER-010
+  isCompanyVerified?: boolean // 🛡️ VER-001
+  companyRole?: string // 🛡️ VER-004
   [key: string]: any
 }
 
@@ -113,6 +121,16 @@ export function validateBidSubmission(
       valid: false,
       error: 'Kendi açtığınız bir ihaleye teklif sunamazsınız.',
       statusCode: 403
+    }
+  }
+
+  // 🛡️ VER-001, VER-004, VER-009: Firma Doğrulama & Yetkililik & Evrak Süresi Kontrolü
+  const userCheck = canUserSubmitBid(bidderEmail)
+  if (!userCheck.allowed) {
+    return {
+      valid: false,
+      error: userCheck.reason || 'Teklif verebilmek için firmanızın doğrulanmış olması zorunludur.',
+      statusCode: userCheck.statusCode || 403
     }
   }
 

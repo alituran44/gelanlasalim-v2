@@ -52,6 +52,7 @@ const route = useRoute()
 const { cmsData, saveCmsData, fetchServerTenders } = useCmsData()
 const { checkAccountCompleteness } = useDeepSeekAgent()
 const { sendSms } = useNetGsm()
+const { userSession, canSubmitBid, isCompanyVerified, companyRole, companyVkn } = useUserSession()
 
 const activeTab = ref<'guncel' | 'gecmis' | 'sonuc' | 'detayli'>('guncel')
 const viewMode = ref<'gelismis' | 'basit'>('gelismis')
@@ -250,7 +251,6 @@ function openDeepSeekAnalysis(tender: any) {
 }
 const selectedTenderForBid = ref<any>(null)
 const selectedCompanyForProfile = ref<any>(null)
-const userSession = ref<any>({})
 
 const bidForm = ref({
   fiyat: '',
@@ -518,6 +518,11 @@ async function submitBid() {
   if (isMyOwnTender(selectedTenderForBid.value)) {
     alert('🚫 Kendi ilanınıza teklif veremezsiniz.')
     showBidModal.value = false
+    return
+  }
+  // 🛡️ VER-001 & VER-004: Firma Doğrulama & Yetki Kontrolü
+  if (!canSubmitBid.value) {
+    alert('⛔ TEKLİF VERME ENGELİ (Kural VER-001 & VER-004):\n\nTeklif verebilmek için firmanızın VKN doğrulaması yapılmış ve firma içi rolünüzün "Teklif Yetkilisi", "Satın Alma" veya "Firma Yöneticisi" olması zorunludur.\n\nLütfen Ekip & Yetki Merkezi üzerinden firmanızı doğrulayınız.')
     return
   }
   if (!bidForm.value.fiyat) {

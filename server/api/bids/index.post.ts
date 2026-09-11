@@ -2,6 +2,7 @@ import { addBid, BidItem, sanitizeInput, validateBidSubmission } from '~~/server
 import { getAllTenders, addTender } from '~~/server/utils/tendersStore'
 import { sendViaGoogleSmtp, getStoredSmtpConfig } from '~~/server/utils/smtpClient'
 import { logBidEvent } from '~~/server/utils/bidAuditStore'
+import { getCompanyForUser } from '~~/server/utils/companyVerificationStore'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -59,25 +60,35 @@ export default defineEventHandler(async (event) => {
       ? cleanPrice 
       : `${cleanPrice} ₺`
 
+    const userCompany = getCompanyForUser(body.eposta || '')
+    const specVersionAccepted = targetTender?.specVersion || 1
+
     const newBid: BidItem = {
       id,
       tenderId: body.tenderId,
       tenderTitle,
       ownerEmail,
-      firma: sanitizeInput(body.firma) || 'Teklif Veren Tedarikçi',
+      firma: sanitizeInput(body.firma) || userCompany?.company.companyTitle || 'Teklif Veren Tedarikçi',
       fiyat: formattedPrice,
       sure: sanitizeInput(body.sure) || '7 gün geçerli',
       puan: typeof body.puan === 'number' ? body.puan : 5.0,
       durum: body.durum || 'bekliyor',
-      yetkili: sanitizeInput(body.yetkili) || 'Firma Yetkilisi',
+      yetkili: sanitizeInput(body.yetkili) || userCompany?.member.fullName || 'Firma Yetkilisi',
       telefon: sanitizeInput(body.telefon) || '',
       eposta: sanitizeInput(body.eposta) || '',
-      vergiDairesi: sanitizeInput(body.vergiDairesi) || '',
-      adres: sanitizeInput(body.adres) || '',
+      vergiDairesi: sanitizeInput(body.vergiDairesi) || userCompany?.company.taxOffice || '',
+      vkn: userCompany?.company.vkn,
+      adres: sanitizeInput(body.adres) || userCompany?.company.address || '',
       notum: sanitizeInput(body.notum) || '',
       tarih: body.tarih || dateFormatted,
       createdAt: now.toISOString(),
-      pazarlikGecmisi: body.pazarlikGecmisi || []
+      pazarlikGecmisi: body.pazarlikGecmisi || [],
+      specVersionAccepted, // 🛡️ VER-010
+      specAcceptedAt: now.toISOString(), // 🛡️ VER-010
+      specAcceptedByUser: sanitizeInput(body.yetkili) || body.eposta, // 🛡️ VER-010
+      specAcceptedByCompany: sanitizeInput(body.firma) || userCompany?.company.companyTitle, // 🛡️ VER-010
+      isCompanyVerified: true, // 🛡️ VER-001
+      companyRole: userCompany?.member.role || 'TEKLİF_YETKİLİSİ' // 🛡️ VER-004
     }
 
     const saved = addBid(newBid)

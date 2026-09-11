@@ -69,10 +69,13 @@ import DeepSeekAiBadge from '~/components/ai/DeepSeekAiBadge.vue'
 import { useCmsData } from '~/composables/useCmsData'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
 import { useNetGsm } from '~/composables/useNetGsm'
+import { useUserSession } from '~/composables/useUserSession'
 
 definePageMeta({
   layout: 'public'
 })
+
+const { userSession, canSubmitBid, isCompanyVerified, companyRole, companyVkn } = useUserSession()
 
 useSeoMeta({
   title: 'İhaleciBurada.com — Türkiye’nin En Kapsamlı İhale ve Satın Alma Portalı',
@@ -142,7 +145,6 @@ const { data: serverBidsData, refresh: refreshServerBids } = useAsyncData('landi
 
 // Firma Profil Modalı (Dışarıdan Görünüm & Düzenle Yetkisi)
 const selectedCompanyProfileModal = ref<any>(null)
-const userSession = ref<any>({})
 
 const { cmsData, saveCmsData } = useCmsData()
 const { checkAccountCompleteness } = useDeepSeekAgent()
@@ -1616,6 +1618,12 @@ async function submitQuickOffer() {
   if (tender.durum === 'closed' || (tender.endDate && new Date(tender.endDate) < new Date())) {
     alert('🚫 Bu ihalenin süresi dolduğu için yeni teklif kabul edilmemektedir.')
     showQuickBidModal.value = false
+    return
+  }
+
+  // 🛡️ VER-001 & VER-004: Firma Doğrulama & Yetki Kontrolü
+  if (!canSubmitBid.value) {
+    alert('⛔ TEKLİF VERME ENGELİ (Kural VER-001 & VER-004):\n\nTeklif verebilmek için firmanızın VKN doğrulaması yapılmış ve firma içi yetkinizin "Teklif Yetkilisi", "Satın Alma" veya "Firma Yöneticisi" olması zorunludur.\n\nLütfen Profil > Ekip & Yetki Merkezi üzerinden firmanızı doğrulayınız.')
     return
   }
 
