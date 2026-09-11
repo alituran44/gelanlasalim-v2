@@ -31,11 +31,13 @@ import {
   MessageSquare,
   Phone,
   Mail,
-  ExternalLink
+  ExternalLink,
+  Megaphone
 } from 'lucide-vue-next'
 import { useCmsData, DEFAULT_CMS_DATA } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
 import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_TYPES, TENDER_METHODS } from '~/utils/taxonomy'
+import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
 
 definePageMeta({
   layout: "public"
@@ -235,10 +237,18 @@ const selectedSort = ref<'otomatik' | 'views' | 'sozlesme' | 'sehir'>('otomatik'
 const currentPage = ref(1)
 
 const selectedTenderForDetail = ref<any>(null)
-const detailActiveTab = ref<'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'firmalar' | 'sonuc' | 'gecmis'>('ilan')
+const detailActiveTab = ref<'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'firmalar' | 'sonuc' | 'gecmis' | 'sorular'>('ilan')
 const showSpecModal = ref(false)
 const selectedSpecTender = ref<any>(null)
 const specActiveTab = ref<'malzeme' | 'idari' | 'teknik'>('malzeme')
+
+const showTenderQuestionsModal = ref(false)
+const selectedTenderForQuestions = ref<any>(null)
+
+function openQuestionsModal(tender: any) {
+  selectedTenderForQuestions.value = tender
+  showTenderQuestionsModal.value = true
+}
 
 const showBidModal = ref(false)
 const isSubmittingBid = ref(false)
@@ -369,7 +379,7 @@ const filteredTenders = computed(() => {
   return list
 })
 
-function openModalWithTab(tender: any, tab: 'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'firmalar' | 'sonuc' | 'gecmis') {
+function openModalWithTab(tender: any, tab: 'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'firmalar' | 'sonuc' | 'gecmis' | 'sorular') {
   selectedTenderForDetail.value = tender
   detailActiveTab.value = tab
 }
@@ -1428,6 +1438,15 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             <RotateCcw :size="13" />
             <span>⏱️ Benzer İhale Geçmişi</span>
           </button>
+          <button
+            type="button"
+            @click="detailActiveTab = 'sorular'"
+            class="px-3.5 py-2 rounded-xl transition cursor-pointer flex items-center gap-1.5"
+            :class="detailActiveTab === 'sorular' ? 'bg-[#0F223D] text-white shadow-xs' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'"
+          >
+            <MessageSquare :size="13" />
+            <span>💬 Soru-Cevap & Zeyilnameler (COM-005)</span>
+          </button>
         </div>
 
         <!-- Tab 1: İhale İlanı -->
@@ -1689,6 +1708,34 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
                 <span class="font-black text-sm text-blue-600">Ortalama 4.2 Gün</span>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Tab 8: Soru-Cevap & Zeyilnameler (Kural COM-005 & COM-006) -->
+        <div v-if="detailActiveTab === 'sorular'" class="space-y-4 text-xs text-slate-700">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+            <div>
+              <h4 class="font-black text-slate-900 text-sm">Resmî Şartname Soru-Cevap & Bağlayıcı Zeyilnameler</h4>
+              <p class="text-[11px] text-slate-500 mt-0.5">Şartname açıklamaları ve tüm katılımcılara açık zeyilname duyuruları (Kural COM-005 & COM-006)</p>
+            </div>
+            <button
+              type="button"
+              @click="openQuestionsModal(selectedTenderForDetail)"
+              class="px-4 py-2 rounded-xl bg-[#0F223D] hover:bg-[#1A365D] text-white font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs shrink-0"
+            >
+              <MessageSquare :size="13" />
+              <span>Soru İlet & Soru Masasını Aç</span>
+            </button>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-amber-50/70 border border-amber-300 text-amber-950 space-y-1.5">
+            <span class="font-black text-xs flex items-center gap-1.5 text-amber-900">
+              <Megaphone :size="14" class="text-amber-700" />
+              <span>Genel Zeyilname (Addendum) Güvencesi (Kural COM-006)</span>
+            </span>
+            <p class="text-[11px] leading-relaxed text-amber-900">
+              İhale sahibi tarafından ihale şartlarını veya teknik koşulları açıklayan yanıtlar sistem tarafından tüm katılımcılara eşit bilgi sağlamak amacıyla Genel Zeyilname olarak yayınlanır ve anlık kritik sistem bildirimi ile iletilir.
+            </p>
           </div>
         </div>
 
@@ -2195,6 +2242,14 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
       :tender="selectedTenderForDeepSeek" 
       @close="showDeepSeekModal = false"
       @applySuggestedBid="(price) => { showDeepSeekModal = false; if (selectedTenderForDeepSeek) openBidModal(selectedTenderForDeepSeek); }"
+    />
+
+    <!-- 💬 COM-005 & COM-006: Soru-Cevap & Zeyilname Modalı -->
+    <TenderQuestionsModal
+      :is-open="showTenderQuestionsModal"
+      :tender="selectedTenderForQuestions"
+      :is-owner="isMyOwnTender(selectedTenderForQuestions)"
+      @close="showTenderQuestionsModal = false"
     />
   </div>
 </template>

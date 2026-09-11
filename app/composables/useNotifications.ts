@@ -63,18 +63,40 @@ function saveToStorage() {
   }
 }
 
+const serverNotifications = ref<any[]>([])
+
+async function fetchServerNotifications() {
+  if (typeof window === 'undefined') return
+  try {
+    let email = 'ihalecib@gmail.com'
+    try {
+      const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+      if (session?.email) email = session.email
+    } catch {}
+    
+    const res: any = await $fetch(`/api/notifications?email=${encodeURIComponent(email)}`)
+    if (res?.notifications && Array.isArray(res.notifications)) {
+      serverNotifications.value = res.notifications
+    }
+  } catch (e) {
+    // COM-010: Notification network errors do not break application
+    console.warn('[Notifications] Server sync skipped:', e)
+  }
+}
+
 export function useNotifications() {
   const { cmsData } = useCmsData()
 
   if (typeof window !== 'undefined' && !isInitialized.value) {
     isInitialized.value = true
     loadFromStorage()
+    fetchServerNotifications()
     window.addEventListener('storage', loadFromStorage)
     window.addEventListener('notifications-updated', loadFromStorage)
   }
 
   const notifications = computed<NotificationItem[]>(() => {
-    const list: Array<Omit<NotificationItem, 'read' | 'unread'>> = []
+    const list: Array<any> = []
 
     let userSession: any = {}
     let myTenders: any[] = []
@@ -92,6 +114,26 @@ export function useNotifications() {
     const isCompany = userSession?.isCompanyActive === true || userSession?.role === 'company'
     const compName = isCompany ? (userSession?.companyName || userSession?.company || 'Kurumsal Firma') : userName
 
+    // 0. Server-Side Notifications (COM-001, COM-003, COM-008, COM-009)
+    serverNotifications.value.forEach(sn => {
+      const isCritical = sn.category === 'CRITICAL'
+      list.push({
+        id: sn.id,
+        type: isCritical ? 'warning' : 'info',
+        title: sn.title,
+        desc: sn.message,
+        time: sn.createdAt ? new Date(sn.createdAt).toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Bugün',
+        link: sn.actionUrl || '/panel/bildirimler',
+        to: sn.actionUrl || '/panel/bildirimler',
+        category: sn.category,
+        isMandatory: sn.isMandatory || isCritical, // COM-003
+        channels: sn.channels || ['IN_APP'],
+        deliveryStatus: sn.deliveryStatus || 'DELIVERED',
+        readAt: sn.readAt,
+        serverStored: true
+      })
+    })
+
     // 1. Kendi açtığı ihalelere gelen teklif bildirimleri
     const receivedGroups = cmsData.value?.dashboard?.receivedBids || []
     receivedGroups.forEach((group: any) => {
@@ -105,7 +147,9 @@ export function useNotifications() {
           time: tkf.tarih || 'Bugün',
           link: '/panel/gelen-teklifler',
           to: '/panel/gelen-teklifler',
-          category: 'bid'
+          category: 'bid',
+          isMandatory: false,
+          channels: ['IN_APP', 'EMAIL']
         })
       })
     })
@@ -121,7 +165,9 @@ export function useNotifications() {
         time: sb.submittedAt || 'Bugün',
         link: '/panel/yaptigim-teklifler',
         to: '/panel/yaptigim-teklifler',
-        category: 'submitted'
+        category: 'submitted',
+        isMandatory: false,
+        channels: ['IN_APP']
       })
     })
 
@@ -136,7 +182,9 @@ export function useNotifications() {
         time: tender.olusturma || 'Bugün',
         link: '/panel/ilanlarim',
         to: '/panel/ilanlarim',
-        category: 'tender'
+        category: 'tender',
+        isMandatory: false,
+        channels: ['IN_APP', 'EMAIL']
       })
     })
 
@@ -149,7 +197,9 @@ export function useNotifications() {
       time: 'Sürekli Aktif',
       link: '/panel/siparis-teslimat',
       to: '/panel/siparis-teslimat',
-      category: 'escrow'
+      category: 'escrow',
+      isMandatory: true, // COM-003
+      channels: ['IN_APP']
     })
 
     if (isCompany) {
@@ -161,7 +211,9 @@ export function useNotifications() {
         time: 'Bu Hafta',
         link: '/panel/ayarlar?tab=sirket',
         to: '/panel/ayarlar?tab=sirket',
-        category: 'kyc'
+        category: 'kyc',
+        isMandatory: true,
+        channels: ['IN_APP']
       })
     } else {
       list.push({
@@ -172,15 +224,17 @@ export function useNotifications() {
         time: 'Şimdi',
         link: '/panel/ayarlar?tab=kisisel',
         to: '/panel/ayarlar?tab=kisisel',
-        category: 'system'
+        category: 'system',
+        isMandatory: false,
+        channels: ['IN_APP']
       })
     }
 
-    // Filter out deleted notifications and map read/unread status
+    // Filter out deleted notifications (except mandatory ones) and map read/unread status
     return list
-      .filter(item => !deletedNotifIds.value.includes(item.id))
+      .filter(item => item.isMandatory || !deletedNotifIds.value.includes(item.id))
       .map(item => {
-        const isRead = readNotifIds.value.includes(item.id)
+        const isRead = item.readAt ? true : readNotifIds.value.includes(item.id)
         return {
           ...item,
           read: isRead,
@@ -193,23 +247,50 @@ export function useNotifications() {
     return notifications.value.filter(n => n.unread).length
   })
 
-  function markAsRead(id: string) {
+  async function markAsRead(id: string) {
     if (!readNotifIds.value.includes(id)) {
       readNotifIds.value.push(id)
       saveToStorage()
     }
+    try {
+      let email = 'ihalecib@gmail.com'
+      try {
+        const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+        if (session?.email) email = session.email
+      } catch {}
+      await $fetch('/api/notifications/read', {
+        method: 'PATCH',
+        body: { id, email }
+      })
+    } catch {}
   }
 
-  function markAllAsRead() {
+  async function markAllAsRead() {
     notifications.value.forEach(n => {
       if (!readNotifIds.value.includes(n.id)) {
         readNotifIds.value.push(n.id)
       }
     })
     saveToStorage()
+    try {
+      let email = 'ihalecib@gmail.com'
+      try {
+        const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+        if (session?.email) email = session.email
+      } catch {}
+      await $fetch('/api/notifications/read', {
+        method: 'PATCH',
+        body: { all: true, email }
+      })
+    } catch {}
   }
 
   function deleteNotification(id: string) {
+    const target = notifications.value.find(n => n.id === id)
+    if (target?.isMandatory || target?.category === 'CRITICAL') {
+      alert('🛡️ Kural COM-003 Uyarınca:\n\nKritik ihale ve güvenlik bildirimleri sistem kayıt bütünlüğü gereğince tamamen kapatılamaz ve silinemez.')
+      return
+    }
     if (!deletedNotifIds.value.includes(id)) {
       deletedNotifIds.value.push(id)
       saveToStorage()
@@ -227,6 +308,7 @@ export function useNotifications() {
     readNotifIds,
     deletedNotifIds,
     notificationSettings,
+    fetchServerNotifications,
     markAsRead,
     markAllAsRead,
     deleteNotification,

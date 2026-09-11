@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
-import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight, Lock, Clock, CheckCircle2, AlertCircle, Trash2, X, ShieldAlert } from 'lucide-vue-next'
+import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight, Lock, Clock, CheckCircle2, AlertCircle, Trash2, X, ShieldAlert, HelpCircle } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale } from '~/composables/useLocale'
+import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
 
 definePageMeta({
   layout: "dashboard"
@@ -347,6 +348,14 @@ function cancelTenderAgreement(tender: any) {
   alert(`🔄 MUTABAKAT İPTAL EDİLDİ\n\n"${tender.baslik}" ihalesi tekrar teklif toplamaya açılmıştır.`)
 }
 
+const showQuestionsModal = ref(false)
+const selectedTenderForQuestions = ref<any>(null)
+
+function openQuestionsModal(tender: any) {
+  selectedTenderForQuestions.value = tender
+  showQuestionsModal.value = true
+}
+
 const periods = computed(() => {
   if (locale.value === 'en') {
     return [
@@ -586,6 +595,18 @@ const statusTabs = computed(() => {
             <Trash2 :size="13" class="text-white" />
             <span>İptal / Kapat</span>
           </button>
+
+          <!-- 💬 COM-005 & COM-006: Soru-Cevap & Zeyilname Butonu -->
+          <button 
+            type="button" 
+            @click.stop="openQuestionsModal(tender)" 
+            class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition shadow-2xs flex items-center gap-1.5 cursor-pointer"
+            title="Gelen Soruları İncele, Yanıtla veya Genel Zeyilname Olarak Duyur (Kural COM-005, COM-006)"
+          >
+            <HelpCircle :size="13" class="text-blue-600" />
+            <span>Sorular & Zeyilname</span>
+          </button>
+
           <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
             {{ tender.teklifSayisi }} {{ 'Teklif Alındı' }}
           </span>
@@ -728,6 +749,15 @@ const statusTabs = computed(() => {
         </div>
       </div>
     </div>
+
+    <!-- 💬 COM-005 & COM-006: RESMÎ SORU-CEVAP VE ZEYİLNAME MODALI -->
+    <TenderQuestionsModal 
+      :is-open="showQuestionsModal" 
+      :tender="selectedTenderForQuestions" 
+      :is-owner="true" 
+      @close="showQuestionsModal = false" 
+      @answered="reloadTenders"
+    />
 
   </div>
 </template>
