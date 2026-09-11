@@ -1,4 +1,12 @@
 <script setup lang="ts">
+useSeoMeta({
+  title: 'Kurumsal Üyelik & Giriş Yap - İhaleciBurada B2B İhale Portalı',
+  description: 'İhaleciBurada kurumsal satın alma ve ihale portalına ücretsiz kaydolun veya giriş yapın. Doğrulanmış tedarikçilerle canlı eksiltmeli ihalelere katılın.',
+  ogTitle: 'Kurumsal Üyelik & Giriş Yap - İhaleciBurada B2B İhale Portalı',
+  ogDescription: 'İhaleciBurada kurumsal satın alma ve ihale portalına ücretsiz kaydolun veya giriş yapın.',
+  ogType: 'website'
+})
+
 function sanitizeText(str: string): string {
   if (!str) return ''
   return String(str).replace(/[<>]/g, '').trim()

@@ -22,7 +22,7 @@ export default defineNuxtConfig({
 
     // Public keys (client & server)
     public: {
-      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://www.ihaleciburada.com',
+      siteUrl: process.env.NUXT_PUBLIC_SITE_URL || 'https://ihaleciburada.com',
       gaId: process.env.NUXT_PUBLIC_GA_ID || '', // Google Analytics 4 ID (e.g. G-XXXXXXXXXX)
       googleSiteVerification: process.env.NUXT_PUBLIC_GOOGLE_SITE_VERIFICATION || '',
     }
@@ -108,7 +108,6 @@ export default defineNuxtConfig({
         { name: 'twitter:image', content: 'https://ihaleciburada.com/auth_skyscraper_bg.jpg' }
       ],
       link: [
-        { rel: 'canonical', href: 'https://ihaleciburada.com' },
         { rel: 'icon', type: 'image/png', href: '/logo.png' }
       ],
       script: [

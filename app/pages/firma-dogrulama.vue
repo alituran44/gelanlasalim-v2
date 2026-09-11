@@ -18,6 +18,11 @@ definePageMeta({
   layout: 'public' // Header & Footer matching public pages
 })
 
+useSeoMeta({
+  title: 'Kurumsal Tedarikçi Doğrulama & KYC Onayı | İhaleciBurada',
+  description: 'Vergi levhası, ticaret sicil ve MERSİS bilgileriyle kurumsal tedarikçi doğrulaması yapın, B2B ihalelerde güven rozeti kazanın.'
+})
+
 const router = useRouter()
 
 // Wizard Steps: 1: Şirket Bilgileri, 2: Kişisel Bilgiler, 3: Özet & Beyan, 4: Bildirim Tercihleri

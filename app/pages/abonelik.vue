@@ -28,6 +28,11 @@ definePageMeta({
   layout: 'public'
 })
 
+useSeoMeta({
+  title: 'Kurumsal Üyelik & İhale Paketleri | İhaleciBurada',
+  description: 'Türkiye geneli B2B satın alma ihalelerine katılın, sınırsız teklif verin ve doğrulanmış kurumsal tedarikçi rozeti kazanın.'
+})
+
 const router = useRouter()
 
 // Region Selector: domestic (Türkiye / TRY ₺) vs international (Global / USD $ - EUR €)

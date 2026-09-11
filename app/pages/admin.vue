@@ -79,9 +79,15 @@ import { useCmsData } from '~/composables/useCmsData'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
 import { useNetGsm } from '~/composables/useNetGsm'
 
-// Page config
 definePageMeta({
   layout: false // Custom full screen admin dashboard
+})
+
+useHead({
+  title: 'Yönetim Paneli | İhaleciBurada',
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
 })
 
 const router = useRouter()

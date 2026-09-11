@@ -1,7 +1,23 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import { useAppTheme } from '~/composables/useAppTheme'
 import { detectLocale } from '~/composables/useLocale'
+
+const route = useRoute()
+
+// ==================== DİNAMİK STANDART URL (CANONICAL) SİSTEMİ ====================
+useHead(() => {
+  const cleanPath = route.path === '/' ? '' : route.path.replace(/\/$/, '')
+  return {
+    link: [
+      {
+        rel: 'canonical',
+        href: `https://ihaleciburada.com${cleanPath}`
+      }
+    ]
+  }
+})
 
 const { initTheme } = useAppTheme()
 

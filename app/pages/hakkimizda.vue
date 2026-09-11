@@ -20,6 +20,11 @@ import PaymentBadges from '~/components/common/PaymentBadges.vue'
 definePageMeta({
   layout: 'public'
 })
+
+useSeoMeta({
+  title: 'Hakkımızda — B2B İhale ve Satın Alma Ekosistemi | İhaleciBurada',
+  description: 'UK Elektrik Malzemeleri San. Tic. Ltd. Şti. güvencesiyle Türkiye genelinde şeffaf, güvenilir ve rekabetçi B2B dijital satın alma platformu.'
+})
 </script>
 
 <template>

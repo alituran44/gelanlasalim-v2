@@ -27,6 +27,12 @@ const router = useRouter()
 const route = useRoute()
 const isTopTekliflerOpen = ref(false)
 
+useHead({
+  meta: [
+    { name: 'robots', content: 'noindex, nofollow' }
+  ]
+})
+
 onMounted(() => {
   detectLocale()
   if (typeof window !== 'undefined') {

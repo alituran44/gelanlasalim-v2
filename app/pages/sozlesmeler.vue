@@ -18,6 +18,11 @@ definePageMeta({
   layout: 'public'
 })
 
+useSeoMeta({
+  title: 'Yasal Sözleşmeler, KVKK & Escrow Güvenlik Şartları | İhaleciBurada',
+  description: 'İhaleciBurada kullanıcı sözleşmesi, platform aracılık sözleşmesi, KVKK aydınlatma metni, Paynkolay Escrow havuz kuralları ve gizlilik politikası.'
+})
+
 const route = useRoute()
 const router = useRouter()
 

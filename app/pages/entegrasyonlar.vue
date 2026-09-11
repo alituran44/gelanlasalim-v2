@@ -21,6 +21,11 @@ definePageMeta({
   layout: 'public'
 })
 
+useSeoMeta({
+  title: 'Kurumsal ERP & Sistem Entegrasyonları (SAP, Logo, Dynamics) | İhaleciBurada',
+  description: 'SAP S/4HANA, Logo Tiger, Netsis, Microsoft Dynamics 365 ve REST API ile İhaleciBurada B2B ihale ve satın alma süreçlerinizi entegre edin.'
+})
+
 const route = useRoute()
 const activeTab = ref<'sap' | 'logo' | 'dynamics' | 'api'>('sap')
 

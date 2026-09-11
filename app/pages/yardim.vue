@@ -7,6 +7,14 @@ definePageMeta({
   layout: "public"
 })
 
+useSeoMeta({
+  title: 'Yardım Merkezi & Sıkça Sorulan Sorular (SSS) - İhaleciBurada',
+  description: 'İhaleciBurada B2B ihale platformu kullanım kılavuzu, canlı eksiltme kuralları, Paynkolay Escrow ödeme güvencesi, faturalandırma ve üyelik rehberi.',
+  ogTitle: 'Yardım Merkezi & Sıkça Sorulan Sorular (SSS) - İhaleciBurada',
+  ogDescription: 'İhaleciBurada B2B ihale platformu kullanım kılavuzu, canlı eksiltme kuralları ve ödeme güvencesi rehberi.',
+  ogType: 'website'
+})
+
 const searchQuery = ref('')
 const openFaq = ref<number | null>(0)
 const showVideoModal = ref(false)
