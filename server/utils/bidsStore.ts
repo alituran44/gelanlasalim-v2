@@ -203,6 +203,11 @@ export function clearAllBids(): void {
   trySaveBidsToDisk([])
 }
 
+export function saveBids(list: BidItem[]): void {
+  globalThis.__SHARED_BIDS__ = list
+  trySaveBidsToDisk(list)
+}
+
 export function addBid(bid: BidItem): BidItem {
   const list = getAllBids()
   const existingIdx = list.findIndex(b => b.id === bid.id)

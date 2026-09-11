@@ -28,7 +28,10 @@ import {
   FileCheck,
   Download,
   ExternalLink,
-  FileSpreadsheet
+  FileSpreadsheet,
+  BadgeCheck,
+  ShieldCheck,
+  Printer
 } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
 import { useCmsData } from '~/composables/useCmsData'
@@ -141,6 +144,16 @@ const reviewRating = ref(5)
 const reviewComment = ref('')
 const reviewTags = ref<string[]>([])
 
+const isSupplierProfileModalOpen = ref(false)
+const selectedSupplierForProfile = ref<any>(null)
+const selectedIlanForProfile = ref<any>(null)
+
+function openSupplierProfileModal(teklif: any, ilan: any) {
+  selectedSupplierForProfile.value = teklif
+  selectedIlanForProfile.value = ilan
+  isSupplierProfileModalOpen.value = true
+}
+
 // Open Document Viewer Modal
 function openDocModal(teklif: any) {
   selectedTeklifForDocs.value = teklif
@@ -213,109 +226,191 @@ async function submitCounterOffer() {
   alert(`💬 PAZARLIK TEKLİFİNİZ İLETİLDİ!\n\n${teklif.firma} firmasına ${formattedPrice} tutarındaki karşı teklifiniz başarıyla gönderilmiştir.`)
 }
 
-// Accept Offer & Close Tender (Single Award Rule)
-async function acceptTeklif(teklif: any, ilan: any) {
-  // Hard check: If another bid is already accepted, strictly block!
+// ----------------------------------------------------
+// 🛡️ MODÜL 4: AWD-001 ~ AWD-013 KAZANAN SEÇİMİ, GEREKÇELİ RET VE TUTANAK
+// ----------------------------------------------------
+const showAwardModal = ref(false)
+const selectedTeklifForAward = ref<any>(null)
+const selectedIlanForAward = ref<any>(null)
+const isSubmittingAward = ref(false)
+const awardForm = ref({
+  isFinal: true,
+  evaluationType: 'BEST_PRICE' as 'BEST_PRICE' | 'COMMERCIAL_REASON' | 'TECHNICAL_MERIT',
+  awardReasonCode: 'BEST_VALID_PRICE' as any,
+  awardReasonNote: ''
+})
+
+const showRejectModal = ref(false)
+const selectedTeklifForReject = ref<any>(null)
+const selectedIlanForReject = ref<any>(null)
+const isSubmittingReject = ref(false)
+const rejectForm = ref({
+  reasonCode: 'TEKNIK_YETERSIZLIK' as any,
+  reasonNote: ''
+})
+
+const showTutanakModal = ref(false)
+const currentTutanak = ref<any>(null)
+const isLoadingTutanak = ref(false)
+
+function openAwardModal(teklif: any, ilan: any) {
+  // Hard check: If another bid is already accepted
   const existingAccepted = ilan.teklifler?.find((t: any) => t.durum === 'onaylandi')
   if (existingAccepted && existingAccepted.id !== teklif.id) {
-    alert(`⚠️ GEÇERSİZ İŞLEM: "${ilan.baslik}" ihalesinde zaten "${existingAccepted.firma}" firması ile mutabakat sağlanmıştır!\n\nBir ihaleye birden fazla onay verilemez. Farklı bir teklifi onaylamak istiyorsanız önce mevcut mutabakatı iptal etmeniz gerekir.`)
+    alert(`⚠️ GEÇERSİZ İŞLEM: "${ilan.baslik}" ihalesinde zaten "${existingAccepted.firma}" firması ile mutabakat sağlanmıştır!\n\nBir ihaleye birden fazla onay verilemez.`)
     return
   }
 
-  const confirmAccept = confirm(`🎉 "${teklif.firma}" firmasının ${teklif.fiyat} tutarındaki teklifini onaylayıp mutabakat sağlamak istiyor musunuz?\n\nBu işlem sonucunda ihale sonuçlanacak, yeni tekliflere kapatılacak ve diğer teklifler elenecektir.`)
-  if (!confirmAccept) return
+  selectedTeklifForAward.value = teklif
+  selectedIlanForAward.value = ilan
 
-  // 1. Mark winning bid as 'onaylandi'
-  teklif.durum = 'onaylandi'
+  // Determine if this is the lowest bid (for eksiltme)
+  const isReduction = (ilan.tur || ilan.ihaleYonu || '').includes('eksiltme') || !ilan.tur?.includes('artirma')
+  const myPriceNum = parseInt(String(teklif.fiyat).replace(/\D/g, ''), 10) || 0
+  let isLowest = true
 
-  // 2. Mark all other bids in this tender as 'elendi'
-  ilan.teklifler.forEach((otherBid: any) => {
-    if (otherBid.id !== teklif.id) {
-      otherBid.durum = 'elendi'
-    }
-  })
-
-  // 3. Mark the parent tender as 'closed'
-  const tenderInStore = (cmsData.value.dashboard.tenders || []).find((t: any) => t.id === ilan.id || t.baslik === ilan.baslik)
-  if (tenderInStore) {
-    tenderInStore.durum = 'closed'
-    tenderInStore.sure = 'Sonuçlandı (Mutabakat Sağlandı)'
-  }
-
-  // 4. Update matching submittedBid for supplier view
-  let userSession: any = {}
-  if (typeof window !== 'undefined') {
-    try {
-      userSession = JSON.parse(localStorage.getItem('userSession') || '{}')
-    } catch (e) {}
-  }
-  const buyerCompanyName = userSession.companyName || userSession.company || 'Kurumsal Alıcı Masası'
-
-  const matchingSubmitted = (cmsData.value.dashboard.submittedBids || []).find((b: any) => b.id === teklif.id)
-  if (matchingSubmitted) {
-    matchingSubmitted.durum = 'onaylandi'
-    matchingSubmitted.yetkili = userSession.name || 'Alıcı Yetkilisi'
-    matchingSubmitted.telefon = userSession.phone || '0850 840 86 95'
-    matchingSubmitted.eposta = userSession.email || 'ihalecib@gmail.com'
-    matchingSubmitted.vergiDairesi = userSession.taxOffice ? `${userSession.taxOffice} / ${userSession.taxNo || ''}` : 'Çanakkale V.D. / 9560161511'
-    matchingSubmitted.adres = userSession.address || 'İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale'
-  }
-
-  // 5. Automatically create Escrow Order in dashboard.escrowOrders if not existing
-  if (!cmsData.value.dashboard.escrowOrders) {
-    cmsData.value.dashboard.escrowOrders = []
-  }
-  const numAmount = parseInt((teklif.fiyat || '').replace(/[^0-9]/g, '')) || 100000
-  const payoutVal = Math.round(numAmount * 0.97).toLocaleString('tr-TR') + ' ₺'
-  const commVal = Math.round(numAmount * 0.03).toLocaleString('tr-TR') + ' ₺'
-
-  const existingEscrow = cmsData.value.dashboard.escrowOrders.find((o: any) => o.id === ilan.id || o.tenderTitle === ilan.baslik)
-  if (!existingEscrow) {
-    cmsData.value.dashboard.escrowOrders.unshift({
-      id: 'ESC-' + Math.floor(1000 + Math.random() * 9000),
-      orderCode: 'SIP-2026-' + Math.floor(1000 + Math.random() * 9000),
-      tenderId: ilan.id,
-      tenderTitle: ilan.baslik,
-      buyerFirm: buyerCompanyName,
-      supplierFirm: teklif.firma,
-      totalAmount: teklif.fiyat,
-      numericAmount: numAmount,
-      payoutAmount: payoutVal,
-      commissionAmount: commVal,
-      commissionRate: 3,
-      status: 'HAVUZDA_BLOKE',
-      shippingCompany: 'Lojistik / Ambar',
-      trackingCode: '',
-      notes: 'İhale başarıyla sonuçlandı. Güvenli havuz ödemesi bloke edildi.',
-      paymentMethod: 'Paynkolay 3D Güvenli Havuz',
-      createdAt: 'Bugün',
-      updatedAt: 'Şimdi',
-      history: [
-        {
-          title: 'İhale Mutabakatı Sağlandı & Havuz Açıldı',
-          date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-          by: 'Alıcı Firma Onayı'
+  if (ilan.teklifler && ilan.teklifler.length > 1) {
+    for (const other of ilan.teklifler) {
+      if (other.id !== teklif.id) {
+        const otherPrice = parseInt(String(other.fiyat).replace(/\D/g, ''), 10) || 0
+        if (isReduction && otherPrice > 0 && otherPrice < myPriceNum) {
+          isLowest = false
+          break
         }
-      ]
-    })
+      }
+    }
   }
 
-  saveCmsData(cmsData.value)
+  awardForm.value = {
+    isFinal: true,
+    evaluationType: isLowest ? 'BEST_PRICE' : 'COMMERCIAL_REASON',
+    awardReasonCode: isLowest ? 'BEST_VALID_PRICE' : 'FASTEST_DELIVERY',
+    awardReasonNote: isLowest ? 'Şartnameye tam uygun en düşük geçerli teklif.' : ''
+  }
 
-  // 6. Send NetGSM SMS
-  await sendSms({
-    recipientPhone: teklif.telefon || '+90 532 555 01 23',
-    recipientName: teklif.firma,
-    templateName: 'İhale Onay ve Anlaşma',
-    messageBody: `TEBRİKLER! "${ilan.baslik}" ihalesinde teklifiniz onaylanmıştır. Alıcı irtibat ve sözleşme detayları panelinize açılmıştır.`
-  })
+  showAwardModal.value = true
+}
 
-  alert(`🎉 TEBRİKLER! MUTABAKAT SAĞLANDI!\n\n${teklif.firma} firması ile ${teklif.fiyat} bedel üzerinden anlaşma sağlandı. İhale teklif alımına kapatılmıştır. Karşılıklı kurumsal iletişim ve vergi bilgileri açılmıştır.`)
+async function submitAward() {
+  if (!selectedTeklifForAward.value || !selectedIlanForAward.value) return
+  const teklif = selectedTeklifForAward.value
+  const ilan = selectedIlanForAward.value
+
+  if (awardForm.value.evaluationType !== 'BEST_PRICE' && !awardForm.value.awardReasonNote.trim()) {
+    alert('En düşük fiyat dışındaki bir teklifi kazanan seçerken gerekçe açıklaması yazılması zorunludur (Kural AWD-003).')
+    return
+  }
+
+  isSubmittingAward.value = true
+  try {
+    const res: any = await $fetch(`/api/tenders/${ilan.id}/award`, {
+      method: 'POST',
+      body: {
+        bidId: teklif.id,
+        winnerCompany: teklif.firma,
+        amount: teklif.fiyat,
+        evaluationType: awardForm.value.evaluationType,
+        awardReasonCode: awardForm.value.awardReasonCode,
+        awardReasonNote: awardForm.value.awardReasonNote,
+        evaluatedBy: userSession.value?.name || 'Hasan Hüseyin Yıldırım (Yetkili)',
+        isFinal: awardForm.value.isFinal
+      }
+    })
+
+    // Local state update
+    teklif.durum = 'onaylandi'
+    ilan.teklifler.forEach((otherBid: any) => {
+      if (otherBid.id !== teklif.id) {
+        otherBid.durum = 'elendi'
+      }
+    })
+
+    const tenderInStore = (cmsData.value.dashboard.tenders || []).find((t: any) => t.id === ilan.id || t.baslik === ilan.baslik)
+    if (tenderInStore) {
+      tenderInStore.durum = awardForm.value.isFinal ? 'closed' : 'degerlendirmede'
+      tenderInStore.statusCode = awardForm.value.isFinal ? 'FINALIZED' : 'PROVISIONAL_RESULT'
+      tenderInStore.sure = awardForm.value.isFinal ? 'Sonuçlandı (Mutabakat Sağlandı)' : 'Geçici Sonuç Belirlendi'
+    }
+
+    saveCmsData(cmsData.value)
+
+    showAwardModal.value = false
+    alert(`🎉 İHALE SONUÇLANDIRILDI (Kural AWD-001 ~ AWD-010)!\n\n"${teklif.firma}" kazanan olarak belirlendi.\nTutanak No: ${res.tutanakNo}\n\nResmi İhale Sonuç Tutanağını "Tutanak Görüntüle" butonundan inceleyebilir ve yazdırabilirsiniz.`)
+  } catch (e: any) {
+    alert('Sonuçlandırma hatası: ' + (e.data?.message || e.message))
+  } finally {
+    isSubmittingAward.value = false
+  }
+}
+
+function openRejectModal(teklif: any, ilan: any) {
+  selectedTeklifForReject.value = teklif
+  selectedIlanForReject.value = ilan
+  rejectForm.value = {
+    reasonCode: 'TEKNIK_YETERSIZLIK',
+    reasonNote: ''
+  }
+  showRejectModal.value = true
+}
+
+async function submitReject() {
+  if (!selectedTeklifForReject.value || !selectedIlanForReject.value) return
+  const teklif = selectedTeklifForReject.value
+  const ilan = selectedIlanForReject.value
+
+  isSubmittingReject.value = true
+  try {
+    await $fetch(`/api/tenders/${ilan.id}/reject-bid`, {
+      method: 'PATCH',
+      body: {
+        bidId: teklif.id,
+        reasonCode: rejectForm.value.reasonCode,
+        reasonNote: rejectForm.value.reasonNote,
+        rejectedBy: userSession.value?.name || 'Değerlendirme Yetkilisi'
+      }
+    })
+
+    teklif.durum = 'reddedildi'
+    teklif.rejectionReason = rejectForm.value.reasonCode
+    teklif.rejectionNote = rejectForm.value.reasonNote
+
+    const matchingSubmitted = (cmsData.value.dashboard.submittedBids || []).find((b: any) => b.id === teklif.id)
+    if (matchingSubmitted) {
+      matchingSubmitted.durum = 'reddedildi'
+    }
+
+    saveCmsData(cmsData.value)
+    showRejectModal.value = false
+    alert(`⛔ TEKLİF GEREKÇELİ ELENDİ (Kural AWD-002)!\n\n${teklif.firma} firmasının teklifi "${rejectForm.value.reasonCode}" gerekçesiyle reddedildi. Kayıt denetim izinde saklanmaktadır.`)
+  } catch (e: any) {
+    alert('Ret işlemi başarısız: ' + (e.data?.message || e.message))
+  } finally {
+    isSubmittingReject.value = false
+  }
+}
+
+async function openTutanakModal(ilan: any) {
+  isLoadingTutanak.value = true
+  showTutanakModal.value = true
+  try {
+    const res: any = await $fetch(`/api/tenders/${ilan.id}/tutanak`)
+    if (res?.tutanak) {
+      currentTutanak.value = res.tutanak
+    }
+  } catch (e: any) {
+    alert('Tutanak yüklenemedi: ' + (e.data?.message || e.message))
+  } finally {
+    isLoadingTutanak.value = false
+  }
+}
+
+function printTutanak() {
+  window.print()
 }
 
 // Cancel Agreement & Re-open Tender
 function cancelTeklifAgreement(ilan: any) {
-  const confirmCancel = confirm(`⚠️ "${ilan.baslik}" ihalesindeki mutabakatı iptal edip ihaleyi tekrar teklif alımına açmak istiyor musunuz?\n\nBu işlem sonrasında tedarikçiler yeniden teklif verebilecek ve elenen teklifler aktif hale gelecektir.`)
+  const confirmCancel = confirm(`⚠️ "${ilan.baslik}" ihalesindeki mutabakatı iptal edip ihaleyi tekrar teklif alımına açmak istiyor musunuz?\n\nBu işlem sonrasında tedarikçiler yeniden teklif verebilecek ve elenen teklifler aktif hale gelecektir. (Kural AWD-008, AWD-009)`)
   if (!confirmCancel) return
 
   // 1. Reset bids in this ilan
@@ -327,7 +422,9 @@ function cancelTeklifAgreement(ilan: any) {
   const tenderInStore = (cmsData.value.dashboard.tenders || []).find((t: any) => t.id === ilan.id || t.baslik === ilan.baslik)
   if (tenderInStore) {
     tenderInStore.durum = 'active'
+    tenderInStore.statusCode = 'LIVE'
     tenderInStore.sure = '7 gün'
+    tenderInStore.activeAward = undefined
   }
 
   // 3. Reset submitted bids
@@ -340,21 +437,6 @@ function cancelTeklifAgreement(ilan: any) {
 
   saveCmsData(cmsData.value)
   alert(`🔄 İHALE MUTABAKATI İPTAL EDİLDİ\n\n"${ilan.baslik}" ihalesi yeniden teklif toplamaya açılmıştır. Tüm tedarikçiler tekrar teklif sunabilir.`)
-}
-
-// Reject Bid
-function rejectTeklif(teklif: any) {
-  const confirmReject = confirm(`${teklif.firma} firmasının teklifini reddetmek istiyor musunuz?`)
-  if (!confirmReject) return
-
-  teklif.durum = 'reddedildi'
-  const matchingSubmitted = (cmsData.value.dashboard.submittedBids || []).find((b: any) => b.id === teklif.id)
-  if (matchingSubmitted) {
-    matchingSubmitted.durum = 'reddedildi'
-  }
-
-  saveCmsData(cmsData.value)
-  alert(`${teklif.firma} firmasının teklifi reddedildi. Tedarikçi dilerse revize yeni bir teklif iletebilir.`)
 }
 
 // Open Dispute Modal
@@ -508,12 +590,21 @@ function submitReview() {
               <span>🔒 BU İHALEDE MUTABAKAT SAĞLANMIŞTIR — İhale yeni teklif alımına kapatılmıştır.</span>
             </div>
             <div class="flex flex-wrap items-center gap-2.5">
+              <button
+                type="button"
+                @click="openTutanakModal(ilan)"
+                class="px-3.5 py-1.5 rounded-xl bg-[#003057] hover:bg-[#002240] text-white text-xs font-black transition flex items-center gap-1.5 shadow-xs cursor-pointer"
+                title="Resmi İhale Sonuç Tutanağını İncele ve Yazdır (Kural AWD-010)"
+              >
+                <FileText :size="13" />
+                <span>Resmi Sonuç Tutanağı</span>
+              </button>
               <NuxtLink
                 to="/panel/siparis-teslimat"
                 class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-[#0052FF] to-[#00C2FF] text-white text-xs font-black transition flex items-center gap-1.5 shadow-xs hover:opacity-95"
               >
                 <CreditCard :size="13" />
-                <span>💳 Güvenli Havuz Ödemesi & Sipariş Takibi</span>
+                <span>Güvenli Havuz Ödemesi & Sipariş Takibi</span>
               </NuxtLink>
               <button
                 type="button"
@@ -646,29 +737,41 @@ function submitReview() {
                     <button
                       type="button"
                       @click="openNegotiation(teklif, ilan)"
-                      class="rounded-xl px-3.5 py-2 text-xs font-black bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition cursor-pointer shadow-2xs flex items-center gap-1"
+                      class="rounded-xl px-3.5 py-2 text-xs font-black bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 transition cursor-pointer shadow-2xs flex items-center gap-1.5"
                     >
-                      <span>💬 Karşı Teklif</span>
+                      <MessageSquare :size="13" class="text-amber-600" />
+                      <span>Pazarlık</span>
                     </button>
                     <button
                       type="button"
-                      @click="acceptTeklif(teklif, ilan)"
-                      class="rounded-xl px-4 py-2 text-xs font-black text-white transition cursor-pointer hover:bg-[#188c3d] bg-[#1EAE4C] shadow-md shadow-[#1EAE4C]/20 flex items-center gap-1"
+                      @click="openAwardModal(teklif, ilan)"
+                      class="rounded-xl px-4 py-2 text-xs font-black text-white transition cursor-pointer hover:bg-[#188c3d] bg-[#1EAE4C] shadow-md shadow-[#1EAE4C]/20 flex items-center gap-1.5"
                     >
-                      <span>✓ Onayla</span>
+                      <Award :size="14" />
+                      <span>Kazananı Belirle</span>
                     </button>
                     <button
                       type="button"
-                      @click="rejectTeklif(teklif)"
-                      class="rounded-xl px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition border border-red-200 cursor-pointer flex items-center gap-1"
-                      title="Teklifi Reddet"
+                      @click="openRejectModal(teklif, ilan)"
+                      class="rounded-xl px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition border border-red-200 cursor-pointer flex items-center gap-1.5"
+                      title="Teklifi Gerekçeli Reddet (AWD-002)"
                     >
-                      <span>✕ Reddet</span>
+                      <XCircle :size="13" />
+                      <span>Gerekçeli Red</span>
                     </button>
                   </div>
 
                   <!-- Anlaşıldıysa Değerlendirme & İptal Butonları -->
                   <div v-else-if="teklif.durum === 'onaylandi'" class="flex items-center gap-2">
+                    <button
+                      type="button"
+                      @click="openTutanakModal(ilan)"
+                      class="rounded-xl px-3.5 py-2 text-xs font-black bg-[#003057] hover:bg-[#002240] text-white transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                      title="Resmi İhale Sonuç Tutanağını Görüntüle ve Yazdır (AWD-010)"
+                    >
+                      <FileText :size="13" />
+                      <span>Resmi Tutanak</span>
+                    </button>
                     <button
                       type="button"
                       @click="openDocModal(teklif)"
@@ -689,10 +792,11 @@ function submitReview() {
                     <button
                       type="button"
                       @click="cancelTeklifAgreement(ilan)"
-                      class="rounded-xl px-3 py-2 text-xs font-black bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition cursor-pointer"
+                      class="rounded-xl px-3 py-2 text-xs font-black bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 transition cursor-pointer flex items-center gap-1"
                       title="Mutabakatı iptal et ve ihaleyi tekrar aç"
                     >
-                      ⚠️ Mutabakatı İptal Et
+                      <RotateCcw :size="13" />
+                      <span>Mutabakatı İptal Et</span>
                     </button>
                   </div>
 
@@ -1211,16 +1315,437 @@ function submitReview() {
             <button 
               v-if="selectedIlanForProfile && !selectedIlanForProfile.teklifler?.some((t: any) => t.durum === 'onaylandi')"
               type="button" 
-              @click="isSupplierProfileModalOpen = false; acceptTeklif(selectedSupplierForProfile, selectedIlanForProfile)" 
+              @click="isSupplierProfileModalOpen = false; openAwardModal(selectedSupplierForProfile, selectedIlanForProfile)" 
               class="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs shadow-md shadow-emerald-600/20 transition cursor-pointer flex items-center justify-center gap-1.5"
             >
-              <CheckCircle2 :size="14" />
-              <span>✓ Teklifi Güvenle Onayla</span>
+              <Award :size="14" />
+              <span>Kazanan Olarak Belirle</span>
             </button>
           </div>
         </div>
 
       </div>
     </div>
+
+    <!-- ========================================================================= -->
+    <!-- 🛡️ MODÜL 4: AWD-001 ~ AWD-007 KAZANAN BELİRLEME & GEREKÇELİ KARAR MODALI -->
+    <!-- ========================================================================= -->
+    <div v-if="showAwardModal && selectedTeklifForAward" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div class="w-full max-w-xl rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden text-left p-6 sm:p-8 space-y-5 max-h-[90vh] overflow-y-auto">
+        
+        <!-- Modal Başlık -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3.5">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-600 font-black">
+              <Award :size="20" />
+            </div>
+            <div>
+              <span class="text-[10px] font-black text-emerald-700 uppercase tracking-wider block">KURAL AWD-001 ~ AWD-007</span>
+              <h3 class="text-base font-black text-slate-900">İhale Sonuçlandırma & Kazanan Kararı</h3>
+            </div>
+          </div>
+          <button @click="showAwardModal = false" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 cursor-pointer">
+            <X :size="18" />
+          </button>
+        </div>
+
+        <!-- Teklif Özeti -->
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2 text-xs">
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500 font-medium">İhale:</span>
+            <span class="font-bold text-slate-900">{{ selectedIlanForAward?.baslik }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500 font-medium">Aday Kazanan Tedarikçi:</span>
+            <span class="font-black text-slate-900">{{ selectedTeklifForAward.firma }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500 font-medium">Kararlaştırılan Tutar:</span>
+            <span class="font-black text-emerald-700 font-mono text-base">{{ selectedTeklifForAward.fiyat }}</span>
+          </div>
+          <div class="flex justify-between items-center">
+            <span class="text-slate-500 font-medium">Teslimat Süresi:</span>
+            <span class="font-bold text-slate-700">{{ selectedTeklifForAward.sure }}</span>
+          </div>
+        </div>
+
+        <!-- Form Alanları -->
+        <div class="space-y-4 text-xs">
+          
+          <!-- Değerlendirme Kriteri -->
+          <div>
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-600 block mb-1.5">
+              DEĞERLENDİRME KRİTERİ & SEÇİM ESASI (AWD-001) *
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-2">
+              <button
+                type="button"
+                @click="awardForm.evaluationType = 'BEST_PRICE'"
+                class="p-3 rounded-xl border text-left transition cursor-pointer"
+                :class="awardForm.evaluationType === 'BEST_PRICE' ? 'border-emerald-500 bg-emerald-50/70 text-emerald-950 font-black ring-1 ring-emerald-500' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'"
+              >
+                <div class="text-[11px]">En Düşük Fiyat</div>
+                <div class="text-[9px] text-slate-500 mt-0.5">Şartnameye uygun en uygun fiyat</div>
+              </button>
+
+              <button
+                type="button"
+                @click="awardForm.evaluationType = 'COMMERCIAL_REASON'"
+                class="p-3 rounded-xl border text-left transition cursor-pointer"
+                :class="awardForm.evaluationType === 'COMMERCIAL_REASON' ? 'border-emerald-500 bg-emerald-50/70 text-emerald-950 font-black ring-1 ring-emerald-500' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'"
+              >
+                <div class="text-[11px]">Ticari / Lojistik</div>
+                <div class="text-[9px] text-slate-500 mt-0.5">Teslim hızı & lokasyon avantajı</div>
+              </button>
+
+              <button
+                type="button"
+                @click="awardForm.evaluationType = 'TECHNICAL_MERIT'"
+                class="p-3 rounded-xl border text-left transition cursor-pointer"
+                :class="awardForm.evaluationType === 'TECHNICAL_MERIT' ? 'border-emerald-500 bg-emerald-50/70 text-emerald-950 font-black ring-1 ring-emerald-500' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'"
+              >
+                <div class="text-[11px]">Teknik Nitelik</div>
+                <div class="text-[9px] text-slate-500 mt-0.5">Kalite, sertifika & referans</div>
+              </button>
+            </div>
+          </div>
+
+          <!-- Gerekçe Kodu (En Düşük Fiyat Dışındaysa veya Her Durumda) -->
+          <div v-if="awardForm.evaluationType !== 'BEST_PRICE'">
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-600 block mb-1">
+              GEREKÇE KODU (KURAL AWD-003 ZORUNLU) *
+            </label>
+            <select
+              v-model="awardForm.awardReasonCode"
+              class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-emerald-500"
+            >
+              <option value="FASTEST_DELIVERY">FASTEST_DELIVERY — En Hızlı Teslimat & Acil İş Planı</option>
+              <option value="BEST_WARRANTY">BEST_WARRANTY — En Kapsamlı Garanti ve Bakım Hizmeti</option>
+              <option value="HIGH_QUALITY_SPEC">HIGH_QUALITY_SPEC — Üst Seviye Teknik Şartname Uyumu</option>
+              <option value="PAST_PERFORMANCE">PAST_PERFORMANCE — Geçmiş Başarılı Tedarik Performansı</option>
+              <option value="OTHER">OTHER — Diğer Belgeli Ticari / Teknik Neden</option>
+            </select>
+          </div>
+
+          <!-- Gerekçe Açıklaması -->
+          <div>
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-600 block mb-1">
+              KARAR VE DEĞERLENDİRME AÇIKLAMASI {{ awardForm.evaluationType !== 'BEST_PRICE' ? '(ZORUNLU - AWD-003)' : '(İSTEĞE BAĞLI)' }}
+            </label>
+            <textarea
+              v-model="awardForm.awardReasonNote"
+              rows="3"
+              placeholder="Karar gerekçesini ve seçim kriterlerinizi tutanakta yer alacak şekilde özetleyiniz..."
+              class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-emerald-500 resize-none"
+            ></textarea>
+          </div>
+
+          <!-- İki Aşamalı Sonuçlandırma Seçeneği (AWD-007) -->
+          <div class="p-3.5 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-2">
+            <span class="text-[10px] font-black text-blue-900 uppercase tracking-wider block">SONUÇLANDIRMA AŞAMASI (AWD-007)</span>
+            <div class="space-y-1.5">
+              <label class="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="radio"
+                  :value="true"
+                  v-model="awardForm.isFinal"
+                  class="mt-0.5 text-blue-600 focus:ring-blue-500"
+                />
+                <div>
+                  <span class="font-black text-slate-900 text-xs">Kesin Sonuç & Doğrudan Mutabakat (FINALIZED)</span>
+                  <p class="text-[10px] text-slate-500">İhale kapatılır, resmi sonuç tutanağı oluşturulur, diğer teklifler elenir ve sipariş-teslimat süreci başlar.</p>
+                </div>
+              </label>
+
+              <label class="flex items-start gap-2.5 cursor-pointer pt-1 border-t border-blue-100">
+                <input
+                  type="radio"
+                  :value="false"
+                  v-model="awardForm.isFinal"
+                  class="mt-0.5 text-blue-600 focus:ring-blue-500"
+                />
+                <div>
+                  <span class="font-black text-slate-900 text-xs">Geçici Sonuç Bildirimi (PROVISIONAL_RESULT)</span>
+                  <p class="text-[10px] text-slate-500">Aday kazanan belirlenir ancak ihale kesinleştirilmeden önce şirket içi yönetim onayına veya itiraz sürecine tabi tutulur.</p>
+                </div>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Butonlar -->
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button
+            type="button"
+            @click="showAwardModal = false"
+            class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition cursor-pointer"
+          >
+            Vazgeç
+          </button>
+          <button
+            type="button"
+            :disabled="isSubmittingAward"
+            @click="submitAward"
+            class="px-5 py-2.5 rounded-xl bg-[#1EAE4C] hover:bg-[#188c3d] text-white font-black text-xs shadow-md transition cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+          >
+            <CheckCircle2 :size="14" />
+            <span>{{ isSubmittingAward ? 'Kaydediliyor...' : 'Kararı Onayla & Tutanak Üret' }}</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 🛑 MODÜL 4: AWD-002 GEREKÇELİ TEKLİF RET / ELEME MODALI -->
+    <!-- ========================================================================= -->
+    <div v-if="showRejectModal && selectedTeklifForReject" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div class="w-full max-w-lg rounded-3xl bg-white border border-slate-200 shadow-2xl p-6 sm:p-8 space-y-5 text-left">
+        
+        <!-- Modal Başlık -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 font-black">
+              <XCircle :size="20" />
+            </div>
+            <div>
+              <span class="text-[10px] font-black text-red-700 uppercase tracking-wider block">KURAL AWD-002</span>
+              <h3 class="text-base font-black text-slate-900">Teklifi Gerekçeli Reddet</h3>
+            </div>
+          </div>
+          <button @click="showRejectModal = false" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 cursor-pointer">
+            <X :size="18" />
+          </button>
+        </div>
+
+        <div class="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-xs text-amber-900 space-y-1">
+          <div class="font-black flex items-center gap-1.5">
+            <AlertTriangle :size="14" class="text-amber-600" />
+            <span>Denetim İzi Uyarısı (VUK 595 & AWD-002):</span>
+          </div>
+          <p class="text-[11px] text-amber-800">
+            Teklifler sistemden tamamen silinmez. Gerekçeli ret kararı ve açıklamanız zaman damgasıyla kayıt altına alınır ve tedarikçiye resmi bildirim olarak iletilir.
+          </p>
+        </div>
+
+        <div class="space-y-3 text-xs">
+          <div>
+            <span class="text-slate-500 font-medium">Reddedilecek Teklif Sahibi:</span>
+            <strong class="text-slate-900 block mt-0.5">{{ selectedTeklifForReject.firma }} ({{ selectedTeklifForReject.fiyat }})</strong>
+          </div>
+
+          <div>
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-600 block mb-1">
+              STANDART RET GEREKÇESİ (AWD-002) *
+            </label>
+            <select
+              v-model="rejectForm.reasonCode"
+              class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-red-500"
+            >
+              <option value="TEKNIK_YETERSIZLIK">Teknik Şartname Maddelerine Uyumsuzluk</option>
+              <option value="EVRAK_EKSIKLIGI">Zorunlu Yeterlilik / Ruhsat Evraklarında Eksiklik</option>
+              <option value="ASIRI_DUSUK_ACIKLAMASIZ">Aşırı Düşük Teklif Analiz Açıklaması Sunulmadı</option>
+              <option value="SARTNAME_AYKIRILIGI">İhale İdari ve Hukuki Koşullarına Aykırılık</option>
+              <option value="DIGER">Diğer Ticari / Operasyonel Neden</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-600 block mb-1">
+              DETAYLI RET GEREKÇESİ NOTU
+            </label>
+            <textarea
+              v-model="rejectForm.reasonNote"
+              rows="3"
+              placeholder="Tedarikçinin incelemesi için gerekçeyi detaylandırınız..."
+              class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-red-500 resize-none"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+          <button
+            type="button"
+            @click="showRejectModal = false"
+            class="px-4 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-bold text-xs hover:bg-slate-50 transition cursor-pointer"
+          >
+            Vazgeç
+          </button>
+          <button
+            type="button"
+            :disabled="isSubmittingReject"
+            @click="submitReject"
+            class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs shadow-md transition cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+          >
+            <XCircle :size="14" />
+            <span>{{ isSubmittingReject ? 'İşleniyor...' : 'Gerekçeli Ret Kararını Kaydet' }}</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 📄 MODÜL 4: AWD-010 RESMİ İHALE SONUÇ TUTANAĞI MODALI (YAZDIRILABİLİR)     -->
+    <!-- ========================================================================= -->
+    <div v-if="showTutanakModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+      <div class="w-full max-w-3xl rounded-3xl bg-white border border-slate-200 shadow-2xl overflow-hidden text-left p-6 sm:p-8 space-y-6 max-h-[92vh] overflow-y-auto">
+        
+        <!-- Üst Bar & Eylemler -->
+        <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-[#003057] text-white flex items-center justify-center font-black">
+              <FileText :size="20" />
+            </div>
+            <div>
+              <span class="text-[10px] font-black text-blue-700 uppercase tracking-wider block">KURAL AWD-010</span>
+              <h3 class="text-base font-black text-slate-900">Resmi İhale Sonuç Tutanağı</h3>
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <button
+              type="button"
+              @click="printTutanak"
+              class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
+              title="Tutanağı Yazdır veya PDF olarak kaydet"
+            >
+              <Printer :size="14" />
+              <span>Yazdır / PDF</span>
+            </button>
+            <button @click="showTutanakModal = false" class="p-2 rounded-xl text-slate-400 hover:text-slate-700 cursor-pointer">
+              <X :size="18" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Yükleniyor Durumu -->
+        <div v-if="isLoadingTutanak" class="py-12 text-center text-slate-400 text-xs font-bold">
+          Resmi tutanak verileri ve denetim kayıtları yükleniyor...
+        </div>
+
+        <!-- Tutanak Belgesi İçeriği (Print Friendly) -->
+        <div v-else-if="currentTutanak" class="space-y-5 print:p-0">
+          
+          <!-- Kurumsal Belge Anteti -->
+          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div>
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">İHALE DÜZENLEYEN KURUM</span>
+              <strong class="text-sm font-black text-slate-900 block">{{ currentTutanak.ihaleSahibi?.unvan || 'Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)' }}</strong>
+              <span class="text-slate-500 font-mono text-[11px] block mt-0.5">VKN: {{ currentTutanak.ihaleSahibi?.vkn || '9560161511' }} • {{ currentTutanak.ihaleSahibi?.vergiDairesi || 'Çanakkale V.D.' }}</span>
+              <span class="text-slate-400 text-[10px] block">KEP: {{ currentTutanak.ihaleSahibi?.kep || 'hasanhuseyin.yildirim.17@hs01.kep.tr' }}</span>
+            </div>
+            <div class="text-right sm:border-l sm:pl-4 border-slate-200 shrink-0">
+              <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">TUTANAK NUMARASI</span>
+              <strong class="font-mono text-sm font-black text-blue-900 block">{{ currentTutanak.tutanakNo }}</strong>
+              <span class="text-slate-500 text-[11px] block mt-0.5">Tarih: {{ currentTutanak.tarih }}</span>
+              <span class="inline-block mt-1 px-2 py-0.5 rounded text-[10px] font-black" :class="currentTutanak.kararStatüsü?.includes('KESİN') ? 'bg-emerald-100 text-emerald-800' : 'bg-blue-100 text-blue-800'">
+                {{ currentTutanak.kararStatüsü }}
+              </span>
+            </div>
+          </div>
+
+          <!-- İhale ve Kazanan Bilgileri -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+            <div class="p-3.5 rounded-xl border border-slate-200 bg-white space-y-1.5">
+              <span class="text-[10px] font-black text-slate-400 uppercase block">İhale Detayı</span>
+              <div class="font-black text-slate-900 text-sm">{{ currentTutanak.ihaleBasligi }}</div>
+              <div class="text-slate-500 font-mono text-[11px]">İhale ID: {{ currentTutanak.ihaleId }}</div>
+              <div class="text-slate-500">Kategori: {{ currentTutanak.kategori }}</div>
+            </div>
+
+            <div class="p-3.5 rounded-xl border border-emerald-200 bg-emerald-50/50 space-y-1.5">
+              <span class="text-[10px] font-black text-emerald-800 uppercase block">Kazanan Teklif Sahibi (AWD-001)</span>
+              <div class="font-black text-emerald-950 text-sm">{{ currentTutanak.kazanan?.firma }}</div>
+              <div class="font-mono font-black text-emerald-700 text-base">{{ currentTutanak.kazanan?.tutar }}</div>
+              <div class="text-emerald-800 text-[11px]">Değerlendiren: {{ currentTutanak.kazanan?.degerlendiren }}</div>
+            </div>
+          </div>
+
+          <!-- Karar Gerekçesi (AWD-003) -->
+          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50 space-y-1.5 text-xs">
+            <span class="text-[10px] font-black text-slate-500 uppercase tracking-wider block">KAZANAN SEÇİM GEREKÇESİ (KURAL AWD-003)</span>
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs font-black px-2 py-0.5 rounded bg-blue-100 text-blue-800">{{ currentTutanak.gerekce?.kod }}</span>
+              <span class="font-bold text-slate-800">{{ currentTutanak.gerekce?.degerlendirmeTuru }}</span>
+            </div>
+            <p class="text-slate-600 text-xs leading-relaxed pt-1">
+              {{ currentTutanak.gerekce?.aciklama }}
+            </p>
+          </div>
+
+          <!-- Katılımcılar ve Teklifler Dağılım Cetveli -->
+          <div class="space-y-2">
+            <span class="text-[10px] font-black text-slate-600 uppercase tracking-wider block">KATILIMCI TEKLİF CETVELİ & ELENME DURUMU</span>
+            <div class="border border-slate-200 rounded-xl overflow-hidden text-xs">
+              <table class="w-full text-left">
+                <thead class="bg-slate-100 text-slate-700 font-black border-b border-slate-200 text-[11px]">
+                  <tr>
+                    <th class="p-2.5">Sıra</th>
+                    <th class="p-2.5">Firma / Teklif Veren</th>
+                    <th class="p-2.5">Teklif Tutarı</th>
+                    <th class="p-2.5">Durum</th>
+                    <th class="p-2.5">Gerekçe / Not</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr
+                    v-for="(kat, idx) in currentTutanak.katilimcilar"
+                    :key="kat.bidId"
+                    :class="kat.durum === 'KAZANDI' ? 'bg-emerald-50/70 font-bold' : ''"
+                  >
+                    <td class="p-2.5 text-slate-400 font-mono">{{ idx + 1 }}</td>
+                    <td class="p-2.5 text-slate-900 font-bold">{{ kat.firma }}</td>
+                    <td class="p-2.5 font-mono text-slate-800">{{ kat.tutar }}</td>
+                    <td class="p-2.5">
+                      <span
+                        class="px-2 py-0.5 rounded text-[10px] font-black"
+                        :class="kat.durum === 'KAZANDI' ? 'bg-emerald-600 text-white' : (kat.durum === 'REDDEDİLDİ' ? 'bg-red-100 text-red-800' : 'bg-slate-100 text-slate-600')"
+                      >
+                        {{ kat.durum }}
+                      </span>
+                    </td>
+                    <td class="p-2.5 text-slate-500 text-[11px]">{{ kat.not || '-' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Güvenlik Mührü ve Yasal Dipnot (AWD-010 & 5070 Sayılı Kanun) -->
+          <div class="p-4 rounded-2xl bg-slate-900 text-white space-y-2 text-xs">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <ShieldCheck :size="16" class="text-emerald-400" />
+                <span class="font-black text-xs uppercase tracking-wider text-emerald-400">5070 Sayılı Elektronik İmza Kanunu Uyarınca Mühürlenmiştir</span>
+              </div>
+              <span class="text-[10px] text-slate-400 font-mono">VUK 595 UYUMLU</span>
+            </div>
+            <div class="font-mono text-[10px] text-slate-300 break-all">
+              DİJİTAL HASH: {{ currentTutanak.guvenlikMuhru?.dijitalHash }}
+            </div>
+            <div class="flex items-center justify-between text-[10px] text-slate-400 pt-1 border-t border-slate-800">
+              <span>Zaman Damgası: {{ currentTutanak.guvenlikMuhru?.zamanDamgasi }}</span>
+              <span>Doğrulama: {{ currentTutanak.guvenlikMuhru?.dogrulamaSunucusu }}</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Alt Bar -->
+        <div class="flex items-center justify-between pt-3 border-t border-slate-100">
+          <span class="text-[10px] text-slate-400">Bu belge İhaleciBurada B2B E-İhale ve Tedarik Sistemi tarafından resmi olarak üretilmiştir.</span>
+          <button
+            type="button"
+            @click="showTutanakModal = false"
+            class="px-5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition cursor-pointer shadow-sm"
+          >
+            Kapat
+          </button>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </template>

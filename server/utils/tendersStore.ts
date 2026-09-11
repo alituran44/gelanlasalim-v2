@@ -275,6 +275,11 @@ export function removeTender(id: string): boolean {
   return list.length < initialLen
 }
 
+export function saveTenders(list: TenderItem[]): void {
+  globalThis.__SHARED_TENDERS__ = list
+  trySaveToDisk(list)
+}
+
 export function clearAllTenders(): void {
   globalThis.__SHARED_TENDERS__ = []
   trySaveToDisk([])

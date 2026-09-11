@@ -132,6 +132,27 @@ export function addGibLog(item: Partial<GibAuditLogItem>): GibAuditLogItem {
   return fullItem
 }
 
+export function logGibAudit(eventData: {
+  event_type?: string
+  tax_number?: string
+  user_id?: string
+  tender_id?: string
+  ip_address?: string
+  status_code?: number
+  request_payload?: string
+  response_payload?: string
+  [key: string]: any
+}): GibAuditLogItem {
+  return addGibLog({
+    action: (eventData.event_type === 'TENDER_AWARDED' ? 'IHALE_MUTABAKAT' : (eventData.event_type === 'TENDER_CANCELLED' ? 'IHALE_IPTAL' : 'IHALE_GUNCELLENDI')) as any,
+    actionLabel: eventData.event_type || 'GİB Denetim Kaydı',
+    tenderId: eventData.tender_id,
+    taxId: eventData.tax_number || '9560161511',
+    ownerEmail: eventData.user_id || 'ihalecib@gmail.com',
+    ipAddress: eventData.ip_address || '127.0.0.1'
+  })
+}
+
 export function getGibLogsByPeriod(period?: string): GibAuditLogItem[] {
   const all = getAllGibLogs()
   if (!period || period === 'all' || period === 'Tümü') {
