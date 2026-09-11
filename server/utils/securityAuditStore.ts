@@ -15,6 +15,7 @@ export type SecurityEventType =
   | 'MFA_REQUESTED'
   | 'MFA_VERIFIED'
   | 'MFA_FAILED'
+  | 'EXPORT_SENSITIVE_DATA' // 🛡️ REP-013: Hassas veri dışa aktarma denetim kaydı
 
 export type SecuritySeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
 
@@ -138,6 +139,8 @@ export function logSecurityEvent(
   appendToDisk(eventItem)
   return eventItem
 }
+
+export const recordSecurityEvent = logSecurityEvent
 
 /**
  * 🛡️ SEC-014: IP & Cihaz Bazlı Danışıklı Teklif (Collusion) Sinyal Tespiti
