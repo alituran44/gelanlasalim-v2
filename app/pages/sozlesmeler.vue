@@ -10,7 +10,13 @@ import {
   Scale, 
   Gavel, 
   Cookie as CookieIcon, 
-  ShieldCheck 
+  ShieldCheck,
+  CheckCircle2,
+  AlertCircle,
+  Check,
+  BookOpen,
+  Layers,
+  ShieldAlert
 } from 'lucide-vue-next'
 import { detectLocale } from '~/composables/useLocale'
 
@@ -33,9 +39,15 @@ export type TabKey =
   | 'mesafeli-satis'
   | 'ihale-kurallari'
   | 'cerezler'
+  | 'envanter'
+  | 'rozet-garanti'
+  | 'yaptirim-itiraz'
   | 'hakkimizda'
 
 const activeTab = ref<TabKey>('kullanim')
+const isAccepting = ref(false)
+const userAcceptances = ref<any[]>([])
+const userSession = ref<any>({})
 
 function normalizeTab(rawTab: string | undefined): TabKey {
   if (!rawTab) return 'kullanim'
@@ -46,8 +58,77 @@ function normalizeTab(rawTab: string | undefined): TabKey {
   if (t === 'mesafeli-satis' || t === 'on-bilgilendirme' || t === 'iptal-iade' || t === 'teslimat') return 'mesafeli-satis'
   if (t === 'ihale-kurallari' || t === 'escrow') return 'ihale-kurallari'
   if (t === 'cerezler' || t === 'cookies') return 'cerezler'
+  if (t === 'envanter' || t === 'veri-envanteri' || t === 'saklama') return 'envanter'
+  if (t === 'rozet-garanti' || t === 'rozetler' || t === 'garanti') return 'rozet-garanti'
+  if (t === 'yaptirim-itiraz' || t === 'yaptirim' || t === 'itiraz') return 'yaptirim-itiraz'
   if (t === 'hakkimizda' || t === 'kariyer' || t === 'is-ortakligi' || t === 'blog' || t === 'basin') return 'hakkimizda'
   return 'kullanim'
+}
+
+const tabMetaMap: Record<string, { code: string; title: string; version: string }> = {
+  'kullanim': { code: 'TERMS_OF_USE', title: 'Platform Kullanıcı Sözleşmesi', version: '2.1' },
+  'aracilik': { code: 'INTERMEDIARY_FRAMEWORK', title: 'Platform Aracılık Sözleşmesi (6563 SK Md. 9)', version: '2.0' },
+  'gizlilik': { code: 'KVKK_DISCLOSURE', title: 'Gizlilik Politikası & KVKK Aydınlatma Metni', version: '2.0' },
+  'mesafeli-satis': { code: 'TERMS_OF_USE', title: 'Mesafeli Satış & Abonelik Sözleşmesi', version: '2.1' },
+  'ihale-kurallari': { code: 'AUCTION_RULES', title: 'İhale Katılım, Teklif ve İptal Kuralları', version: '2.0' },
+  'cerezler': { code: 'TERMS_OF_USE', title: 'Çerez (Cookie) Politikası', version: '2.1' },
+  'envanter': { code: 'DATA_RETENTION_POLICY', title: 'Kişisel Veri Envanteri & Saklama Süreleri (LEG-005, LEG-007)', version: '1.2' },
+  'rozet-garanti': { code: 'VERIFICATION_POLICY', title: 'Firma Doğrulama Rozetleri ve Garanti Sınırları (LEG-003)', version: '1.5' },
+  'yaptirim-itiraz': { code: 'DISPUTE_RESOLUTION', title: 'Platform Yaptırımları & Alternatif İtiraz Masası (LEG-009, LEG-010)', version: '1.0' },
+  'hakkimizda': { code: 'TERMS_OF_USE', title: 'Hakkımızda & Resmî Künye (ETBİS)', version: '2.1' }
+}
+
+const currentDocMeta = computed(() => tabMetaMap[activeTab.value] || tabMetaMap['kullanim'])
+const currentDocCode = computed(() => currentDocMeta.value.code)
+const currentDocTitle = computed(() => currentDocMeta.value.title)
+const currentDocVersion = computed(() => currentDocMeta.value.version)
+
+const isCurrentDocAccepted = computed(() => {
+  const target = userAcceptances.value.find((d: any) => d.code === currentDocCode.value)
+  return target?.isAccepted === true
+})
+
+async function fetchUserAcceptances() {
+  if (typeof window === 'undefined') return
+  try {
+    const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    userSession.value = session
+    if (session?.email) {
+      const res: any = await $fetch(`/api/legal/acceptances?email=${encodeURIComponent(session.email)}`)
+      if (res?.success && res.documents) {
+        userAcceptances.value = res.documents
+      }
+    }
+  } catch {}
+}
+
+async function handleAcceptDocument(docCode: string, docTitle: string, version: string) {
+  if (isAccepting.value) return
+  isAccepting.value = true
+  try {
+    const email = userSession.value?.email || 'ihalecib@gmail.com'
+    const vkn = userSession.value?.companyVkn || '9560161511'
+    const res: any = await $fetch('/api/legal/acceptances', {
+      method: 'POST',
+      body: {
+        userEmail: email,
+        companyVkn: vkn,
+        documentCode: docCode,
+        documentVersion: version,
+        channel: 'WEB',
+        isExplicitConsent: true,
+        isCommercialCommConsent: true
+      }
+    })
+    if (res?.success) {
+      alert(`🛡️ SÖZLEŞME ONAYLANDI (Kural LEG-004 & LEG-006)\n\n"${docTitle}" (v${version}) kabulünüz IP adresiniz ve sunucu zaman damgası ile sisteme tescil edilmiştir.`)
+      await fetchUserAcceptances()
+    }
+  } catch (err: any) {
+    alert(err?.data?.message || 'Sözleşme onaylanırken bir hata oluştu.')
+  } finally {
+    isAccepting.value = false
+  }
 }
 
 onMounted(() => {
@@ -55,6 +136,7 @@ onMounted(() => {
   if (route.query.tab) {
     activeTab.value = normalizeTab(route.query.tab as string)
   }
+  fetchUserAcceptances()
 })
 
 watch(() => route.query.tab, (newTab) => {
@@ -236,6 +318,36 @@ function printDocument() {
               <CookieIcon :size="15" />
               <span>6. Çerez (Cookie) Politikası</span>
             </button>
+
+            <!-- 🛡️ LEG-005 & LEG-007 -->
+            <button 
+              @click="setTab('envanter')"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'envanter' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
+            >
+              <Layers :size="15" />
+              <span>7. Veri Envanteri & Saklama Süreleri (LEG-005)</span>
+            </button>
+
+            <!-- 🛡️ LEG-003 -->
+            <button 
+              @click="setTab('rozet-garanti')"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'rozet-garanti' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
+            >
+              <ShieldCheck :size="15" />
+              <span>8. Doğrulama Rozetleri ve Garanti Sınırları (LEG-003)</span>
+            </button>
+
+            <!-- 🛡️ LEG-009 & LEG-010 -->
+            <button 
+              @click="setTab('yaptirim-itiraz')"
+              class="w-full flex items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'yaptirim-itiraz' ? 'bg-blue-900 text-white shadow-sm' : 'text-slate-700 hover:bg-slate-100'"
+            >
+              <ShieldAlert :size="15" />
+              <span>9. Yaptırımlar & İtiraz Masası (LEG-009, 010)</span>
+            </button>
           </div>
 
           <!-- Corporate Info Group (1 About Tab) -->
@@ -257,13 +369,43 @@ function printDocument() {
         <main class="lg:col-span-8 bg-white rounded-3xl border border-slate-200 p-8 shadow-xs min-h-[600px] text-slate-800">
           
           <!-- Document Header Tag -->
-          <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+          <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
             <span class="text-[10px] font-black uppercase tracking-widest text-blue-600 bg-blue-50 px-2.5 py-1 rounded-md border border-blue-100">
-              RESMİ HUKUKİ METİN · YÜRÜRLÜK TARİHİ: 2026.08
+              RESMİ HUKUKİ METİN · SÜRÜM: v{{ currentDocVersion }} · 2026.09
             </span>
             <span class="text-[11px] font-mono font-bold text-slate-400">
-              VKN: 9560161511
+              VKN: 9560161511 (Hasan Hüseyin Yıldırım)
             </span>
+          </div>
+
+          <!-- 🛡️ LEG-004: Zaman Damgalı Sözleşme Onay Şeridi -->
+          <div v-if="userSession?.email" class="mb-6 p-4 rounded-2xl border flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs" :class="isCurrentDocAccepted ? 'bg-emerald-50/80 border-emerald-300 text-emerald-950' : 'bg-amber-50/80 border-amber-300 text-amber-950'">
+            <div class="flex items-center gap-2.5">
+              <CheckCircle2 v-if="isCurrentDocAccepted" :size="20" class="text-emerald-600 shrink-0" />
+              <AlertCircle v-else :size="20" class="text-amber-600 shrink-0" />
+              <div>
+                <span class="text-[10px] font-black uppercase tracking-wider block" :class="isCurrentDocAccepted ? 'text-emerald-700' : 'text-amber-700'">
+                  {{ isCurrentDocAccepted ? 'KABUL DURUMU: ZAMAN DAMGASIYLA ONAYLANDI (KURAL LEG-004)' : 'KABUL DURUMU: ONAY BEKLİYOR (KURAL LEG-004)' }}
+                </span>
+                <p class="text-xs font-bold mt-0.5">{{ currentDocTitle }} — v{{ currentDocVersion }}</p>
+                <p class="text-[10px] text-slate-500 font-medium">Hesap: {{ userSession?.email }} · IP & Audit Kayıtlı</p>
+              </div>
+            </div>
+
+            <button
+              v-if="!isCurrentDocAccepted"
+              type="button"
+              @click="handleAcceptDocument(currentDocCode, currentDocTitle, currentDocVersion)"
+              :disabled="isAccepting"
+              class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-black text-xs transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs shrink-0"
+            >
+              <Check :size="13" />
+              <span>{{ isAccepting ? 'Onaylanıyor...' : 'Zaman Damgasıyla Onayla (LEG-004)' }}</span>
+            </button>
+            <div v-else class="flex items-center gap-1.5 text-[11px] font-mono font-bold text-emerald-800 bg-white px-3 py-1.5 rounded-xl border border-emerald-200 shrink-0">
+              <Check :size="13" class="text-emerald-600" />
+              <span>Kabul Tescil Edildi</span>
+            </div>
           </div>
 
           <!-- 1. KULLANIM ŞARTLARI VE KULLANICI SÖZLEŞMESİ -->
@@ -997,6 +1139,197 @@ function printDocument() {
                   <span class="text-[10px] font-black uppercase text-slate-700 tracking-wider">DEĞERLERİMİZ</span>
                   <h4 class="text-xs font-black text-slate-900">Güven, Hız & Tarafsızlık</h4>
                   <p class="text-[11px] text-slate-600">TCMB uyumlu Escrow koruması, doğrulanmış KYC firmaları ve sıfır komisyonlu alıcı desteği.</p>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- ========================================================================= -->
+          <!-- 7. KİŞİSEL VERİ ENVANTERİ & SAKLAMA SÜRELERİ (LEG-005, LEG-007, LEG-008) -->
+          <!-- ========================================================================= -->
+          <article v-if="activeTab === 'envanter'" class="space-y-6">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-3 py-1 bg-blue-50 text-blue-900 font-mono text-xs font-bold rounded-lg border border-blue-200">6698 SK KVKK & VUK 253</span>
+              <span class="px-3 py-1 bg-purple-50 text-purple-900 font-mono text-xs font-bold rounded-lg border border-purple-200">KURAL LEG-005 / LEG-007</span>
+              <span class="text-xs text-slate-400 font-mono">Belge Sürümü: v1.2</span>
+            </div>
+
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Kişisel Veri Envanteri, İşleme Amaçları ve Saklama Süreleri</h1>
+            
+            <p class="text-xs text-slate-600 font-medium leading-relaxed bg-slate-50 p-4 rounded-xl border border-slate-200">
+              Bu envanter, 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) Madde 10 uyarınca veri sorumlusu Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi) tarafından işlenen kişisel verilerin kategorilerini, işleme amaçlarını, hukuki sebeplerini ve saklama/imha sürelerini şeffaf biçimde belgeler.
+            </p>
+
+            <div class="space-y-4">
+              <div class="overflow-x-auto rounded-2xl border border-slate-200">
+                <table class="w-full text-left text-xs border-collapse">
+                  <thead>
+                    <tr class="bg-slate-100 text-slate-700 font-black border-b border-slate-200">
+                      <th class="p-3">Veri Kategorisi</th>
+                      <th class="p-3">İşlenen Veriler</th>
+                      <th class="p-3">İşleme Amacı</th>
+                      <th class="p-3">Hukuki Dayanak (KVKK)</th>
+                      <th class="p-3">Saklama Süresi & İmha (LEG-007)</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 text-slate-700">
+                    <tr class="hover:bg-slate-50/80">
+                      <td class="p-3 font-bold text-slate-900">Kimlik Bilgisi</td>
+                      <td class="p-3 text-[11px]">Ad, Soyad, T.C. Kimlik No, İmza Sirküleri Temsilci Bilgisi</td>
+                      <td class="p-3 text-[11px]">Üyelik sözleşmesi, yetkili temsilci doğrulama (USR-001/002), yasal yükümlülük</td>
+                      <td class="p-3 font-mono text-[10px]">Md. 5/2 (c) Sözleşme & (ç) Hukuki Yükümlülük</td>
+                      <td class="p-3 text-[11px] font-bold text-slate-800">10 Yıl (TTK 82 / TBK 146) · Güvenli Silme</td>
+                    </tr>
+                    <tr class="hover:bg-slate-50/80">
+                      <td class="p-3 font-bold text-slate-900">İletişim Bilgisi</td>
+                      <td class="p-3 text-[11px]">E-posta, Cep Telefonu, KEP Adresi, Şirket Adresi</td>
+                      <td class="p-3 text-[11px]">Kritik ihale bildirimleri (COM-001), MFA OTP kodları (SEC-009), tebligat</td>
+                      <td class="p-3 font-mono text-[10px]">Md. 5/2 (c) Sözleşme (Pazarlama için Md. 5/1 Açık Rıza)</td>
+                      <td class="p-3 text-[11px] font-bold text-slate-800">Sözleşme + 3 Yıl (İYS Mevzuatı) · Silme</td>
+                    </tr>
+                    <tr class="hover:bg-slate-50/80">
+                      <td class="p-3 font-bold text-slate-900">İşlem Güvenliği & Trafik</td>
+                      <td class="p-3 text-[11px]">IP Adresi, Port, User-Agent, Oturum Damgaları, Audit Logu</td>
+                      <td class="p-3 text-[11px]">5651 SK trafik logu, danışıklı teklif tespiti (SEC-014), sistem güvenliği</td>
+                      <td class="p-3 font-mono text-[10px]">Md. 5/2 (ç) Kanuni Yükümlülük & (f) Meşru Menfaat</td>
+                      <td class="p-3 text-[11px] font-bold text-slate-800">2 Yıl (5651 Sayılı Kanun) · Anonimleştirme</td>
+                    </tr>
+                    <tr class="hover:bg-slate-50/80">
+                      <td class="p-3 font-bold text-slate-900">Teklif & Finansal İşlem</td>
+                      <td class="p-3 text-[11px]">Teklif Tutarı, Banka IBAN, Sonuç Tutanağı, Escrow Bloke İzi</td>
+                      <td class="p-3 text-[11px]">Resmî İhale Sonuç Tutanağı (AWD-010), vergi denetimi, mutabakat</td>
+                      <td class="p-3 font-mono text-[10px]">Md. 5/2 (a) Kanunlarda Öngörülme & (c) Sözleşme</td>
+                      <td class="p-3 text-[11px] font-bold text-slate-800">10 Yıl (VUK 253 & TTK 82) · Anonimleştirme</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- 🛡️ LEG-008: Yurt Dışı Veri Aktarımı Beyanı -->
+              <div class="p-4 rounded-2xl bg-slate-900 text-white space-y-2 border border-slate-800">
+                <div class="flex items-center gap-2">
+                  <ShieldCheck class="text-blue-400" :size="18" />
+                  <h4 class="font-black text-xs text-blue-300 uppercase tracking-wider">Yurt Dışı Veri Aktarımı Değerlendirmesi (Kural LEG-008)</h4>
+                </div>
+                <p class="text-xs text-slate-300 leading-relaxed">
+                  İhaleciBurada platformu veritabanı, yedekleme ve uygulama sunucuları münhasıran <strong>Türkiye Cumhuriyeti sınırları içerisindeki yerel veri merkezlerinde</strong> barındırılmaktadır. 6698 sayılı KVKK Madde 9 kapsamında kullanıcıların ticari veya kişisel verileri yurt dışına aktarılmaz. Yurt dışı altyapı servisleri (analitik vb.) kullanılması halinde açık rıza veya yeterlilik taahhüdü mekanizmaları ayrıca işletilir.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <!-- ========================================================================= -->
+          <!-- 8. FİRMA DOĞRULAMA ROZETLERİ VE GARANTİ SINIRLARI (LEG-003) -->
+          <!-- ========================================================================= -->
+          <article v-if="activeTab === 'rozet-garanti'" class="space-y-6">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-3 py-1 bg-amber-50 text-amber-900 font-mono text-xs font-bold rounded-lg border border-amber-200">KURAL LEG-003 & VER-001</span>
+              <span class="px-3 py-1 bg-slate-100 text-slate-800 font-mono text-xs font-bold rounded-lg border border-slate-200">ROZET KAPSAMI VE SINAİ BEYAN</span>
+              <span class="text-xs text-slate-400 font-mono">Belge Sürümü: v1.5</span>
+            </div>
+
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Firma Doğrulama Rozetleri ve Garanti Sınırları Politikası</h1>
+
+            <!-- Yasal Garanti Sınırı Uyarısı -->
+            <div class="p-5 rounded-2xl bg-amber-50 border-2 border-amber-300 text-amber-950 space-y-2">
+              <div class="flex items-center gap-2 font-black text-sm text-amber-900">
+                <AlertCircle :size="18" class="text-amber-700" />
+                <span>ÖNEMLİ YASAL UYARI VE GARANTİ SINIRLARI (KURAL LEG-003)</span>
+              </div>
+              <p class="text-xs leading-relaxed text-amber-900">
+                İhaleciBurada platformunda bir firmanın profilinde yer alan <strong>"Onaylı Firma", "Doğrulanmış B2B Üye" veya "Kurumsal Doğrulandı"</strong> rozetleri; yalnızca o işletmenin resmî vergi levhası, ticaret sicil kaydı ve yetkili kullanıcı belgelerinin şeklen incelendiğini ifade eder. 
+                <br><br>
+                <strong>BU ROZETLER ASLA;</strong> firmanın ödeme gücünü, finansal likiditesini, mal veya hizmetin kalitesini, ayıpsız teslimatını veya taahhüt edilen işi kusursuz tamamlayacağını <strong>GARANTİ ETMEZ</strong>. Platform, 6563 sayılı Kanun gereği taraflar arasındaki ticari ifanın garantörü veya kefili değildir.
+              </p>
+            </div>
+
+            <!-- 3 Rozetin Açık Tanımı -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="p-4 rounded-2xl bg-white border border-slate-200 space-y-2">
+                <div class="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">1</div>
+                <h4 class="font-bold text-xs text-slate-900">Ticari Kayıt Doğrulandı</h4>
+                <p class="text-[11px] text-slate-600 leading-relaxed">
+                  GİB vergi kimlik numarası (VKN), vergi levhası ve ticaret sicil gazetesi kaydı doğrulanmıştır. Aktif vergi mükellefiyeti teyit edilmiştir.
+                </p>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-white border border-slate-200 space-y-2">
+                <div class="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-bold">2</div>
+                <h4 class="font-bold text-xs text-slate-900">Yetkili Temsil Doğrulandı</h4>
+                <p class="text-[11px] text-slate-600 leading-relaxed">
+                  Hesabı oluşturan kullanıcının şirket imza sirkülerinde münferit/müşterek yetkili olduğu veya kurumsal KEP/e-posta ile yetkilendirildiği kontrol edilmiştir.
+                </p>
+              </div>
+
+              <div class="p-4 rounded-2xl bg-white border border-slate-200 space-y-2">
+                <div class="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">3</div>
+                <h4 class="font-bold text-xs text-slate-900">İletişim & Konum Doğrulandı</h4>
+                <p class="text-[11px] text-slate-600 leading-relaxed">
+                  Yetkili cep telefonu SMS OTP ile ve kurumsal KEP adresi çift taraflı doğrulanmıştır.
+                </p>
+              </div>
+            </div>
+          </article>
+
+          <!-- ========================================================================= -->
+          <!-- 9. PLATFORM YAPTIRIMLARI VE İTİRAZ MASASI (LEG-009, LEG-010) -->
+          <!-- ========================================================================= -->
+          <article v-if="activeTab === 'yaptirim-itiraz'" class="space-y-6">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="px-3 py-1 bg-red-50 text-red-900 font-mono text-xs font-bold rounded-lg border border-red-200">KURAL LEG-009 & LEG-010</span>
+              <span class="px-3 py-1 bg-slate-100 text-slate-800 font-mono text-xs font-bold rounded-lg border border-slate-200">DENETİM İZİ & YARGI YOLU BEYANI</span>
+              <span class="text-xs text-slate-400 font-mono">Belge Sürümü: v1.0</span>
+            </div>
+
+            <h1 class="text-2xl font-black text-slate-900 tracking-tight">Platform Yaptırımları ve Alternatif İtiraz Masası Bildirimi</h1>
+
+            <!-- 🛡️ LEG-010: Yargı Yolunun Yerine Geçmeme Beyanı -->
+            <div class="p-5 rounded-2xl bg-blue-50 border-2 border-blue-300 text-blue-950 space-y-2">
+              <div class="flex items-center gap-2 font-black text-sm text-blue-900">
+                <Scale :size="18" class="text-blue-700" />
+                <span>HUKUKİ ÇÖZÜM YOLUNUN YERİNE GEÇMEME BEYANI (KURAL LEG-010)</span>
+              </div>
+              <p class="text-xs leading-relaxed text-blue-900">
+                İhaleciBurada bünyesindeki itiraz, inceleme, şikâyet veya hakemlik masası; Türkiye Cumhuriyeti Mahkemeleri, İcra Daireleri veya 6325 sayılı Hukuk Uyuşmazlıklarında Arabuluculuk Kanunu kapsamında yürütülen resmî uyuşmazlık çözüm yollarının <strong>YERİNE GEÇMEZ</strong>. Platform içi inceleme talebinde bulunmak, tarafların yasal yargı veya arabuluculuk mercilerine başvurma hakkını ortadan kaldırmaz veya zamanaşımı sürelerini durdurmaz.
+              </p>
+            </div>
+
+            <!-- 4 Kademeli Yaptırım Tablosu (LEG-009) -->
+            <div class="space-y-3">
+              <h3 class="font-bold text-sm text-slate-900">Platform İçi Yaptırım Kataloğu (Kural LEG-009)</h3>
+              <p class="text-xs text-slate-500">Tüm yaptırımlar önceden tanımlı, gerekçeli ve silinemez güvenlik denetim izine tabidir.</p>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5">
+                  <span class="px-2 py-0.5 rounded-md bg-amber-100 text-amber-800 font-mono text-[10px] font-black">SEVİYE 1 · UYARI</span>
+                  <h4 class="font-bold text-xs text-slate-900">Yazılı Uyarı ve İhtar (SANCT-01)</h4>
+                  <p class="text-[11px] text-slate-600 leading-relaxed">
+                    Hafif şartname ihlali veya sisteme eksik bilgi girişi teşebbüsü. 5 iş günü içinde destek masasına itiraz edilebilir.
+                  </p>
+                </div>
+
+                <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5">
+                  <span class="px-2 py-0.5 rounded-md bg-orange-100 text-orange-800 font-mono text-[10px] font-black">SEVİYE 2 · GEÇİCİ ASKI</span>
+                  <h4 class="font-bold text-xs text-slate-900">Geçici Hesap Askısı (15-90 Gün) (SANCT-02)</h4>
+                  <p class="text-[11px] text-slate-600 leading-relaxed">
+                    Mücbir sebep belgesi sunmaksızın kazandığı ihaleden vazgeçme veya temerrüt. Gerekçeli savunma ile itiraz komisyonuna başvuru mümkündür.
+                  </p>
+                </div>
+
+                <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5">
+                  <span class="px-2 py-0.5 rounded-md bg-red-100 text-red-800 font-mono text-[10px] font-black">SEVİYE 3 · İPTAL</span>
+                  <h4 class="font-bold text-xs text-slate-900">Teklifin Re'sen İptali (SANCT-03)</h4>
+                  <p class="text-[11px] text-slate-600 leading-relaxed">
+                    Danışıklı teklif verme (SEC-014) veya aynı IP/cihazdan manipülatif teklif şüphesi. Şüpheli teklif dondurulur ve incelemeye alınır.
+                  </p>
+                </div>
+
+                <div class="p-4 rounded-2xl border border-slate-200 bg-white space-y-1.5">
+                  <span class="px-2 py-0.5 rounded-md bg-slate-900 text-white font-mono text-[10px] font-black">SEVİYE 4 · SÜREKLİ MEN</span>
+                  <h4 class="font-bold text-xs text-slate-900">Kalıcı Men & Kara Liste (SANCT-04)</h4>
+                  <p class="text-[11px] text-slate-600 leading-relaxed">
+                    Sahte vergi levhası, yetkisiz kimlik kullanımı veya organize ihale manipülasyonu. Savcılık suç duyurusu ve kalıcı erişim engeli uygulanır.
+                  </p>
                 </div>
               </div>
             </div>
