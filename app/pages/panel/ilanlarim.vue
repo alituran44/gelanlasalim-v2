@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
-import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight, Lock, Clock, CheckCircle2, AlertCircle, Trash2 } from 'lucide-vue-next'
+import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight, Lock, Clock, CheckCircle2, AlertCircle, Trash2, X, ShieldAlert } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale } from '~/composables/useLocale'
 
@@ -131,21 +131,133 @@ const filteredTenders = computed(() => {
   })
 })
 
-function republishTender(tender: any) {
-  tender.durum = 'active'
-  tender.sure = '30 gün'
-  
-  // Also reset receivedBids if closed
-  const receivedGroup = (cmsData.value.dashboard.receivedBids || []).find((g: any) => g.id === tender.id || g.baslik === tender.baslik)
-  if (receivedGroup) {
-    receivedGroup.bitis = '30 gün'
-    receivedGroup.teklifler.forEach((t: any) => {
-      if (t.durum === 'elendi') t.durum = 'bekliyor'
-    })
+// 🛡️ 3.5 & AWD-005: Standart İptal ve Sonuçsuz Kapatma Neden Kodları (Reason Codes)
+const showCancelModal = ref(false)
+const tenderToCancel = ref<any>(null)
+const selectedReasonCode = ref<string>('NEED_CANCELLED')
+const cancelReasonNote = ref('')
+const isCancelling = ref(false)
+
+const REASON_CODES = [
+  { code: 'NEED_CANCELLED', label: 'İhtiyaç ortadan kalktı', category: 'CANCELLED' },
+  { code: 'SPECIFICATION_ERROR', label: 'Şartname / teknik kapsam hatalı', category: 'CANCELLED' },
+  { code: 'SCOPE_CHANGED', label: 'Miktar veya iş kapsamı değişti', category: 'CANCELLED' },
+  { code: 'BUSINESS_DECISION', label: 'Şirket yönetim kararı', category: 'CANCELLED' },
+  { code: 'SYSTEM_ISSUE', label: 'Teknik / sistemsel zorunluluk', category: 'CANCELLED' },
+  { code: 'NO_BIDS', label: 'Süre doldu, hiç teklif gelmedi', category: 'UNSUCCESSFUL' },
+  { code: 'INSUFFICIENT_BIDS', label: 'Yeterli rekabet/teklif sayısı oluşmadı', category: 'UNSUCCESSFUL' },
+  { code: 'ALL_TECHNICALLY_REJECTED', label: 'Tüm teklifler teknik olarak elendi', category: 'UNSUCCESSFUL' },
+  { code: 'ALL_COMMERCIALLY_REJECTED', label: 'Ticari şartlar uygun bulunmadı', category: 'UNSUCCESSFUL' },
+  { code: 'RESERVE_NOT_MET', label: 'Gizli hedef/rezerv fiyat sağlanamadı', category: 'UNSUCCESSFUL' },
+  { code: 'BUDGET_EXCEEDED', label: 'Sunulan fiyatlar bütçeyi aştı', category: 'UNSUCCESSFUL' },
+  { code: 'WINNER_WITHDREW', label: 'Kazanan firma vazgeçti', category: 'UNSUCCESSFUL' },
+  { code: 'OTHER', label: 'Diğer gerekçe (Açıklama zorunlu)', category: 'CANCELLED' }
+]
+
+function openCancelModal(tender: any) {
+  tenderToCancel.value = tender
+  selectedReasonCode.value = 'NEED_CANCELLED'
+  cancelReasonNote.value = ''
+  showCancelModal.value = true
+}
+
+async function confirmCancelTender() {
+  if (!tenderToCancel.value) return
+  if (selectedReasonCode.value === 'OTHER' && !cancelReasonNote.value.trim()) {
+    alert('Lütfen iptal gerekçenizi açıklayınız.')
+    return
   }
 
+  isCancelling.value = true
+  const tender = tenderToCancel.value
+  const foundReason = REASON_CODES.find(r => r.code === selectedReasonCode.value)
+  const targetStatusCode = foundReason?.category === 'UNSUCCESSFUL' ? 'UNSUCCESSFUL' : 'CANCELLED'
+
+  try {
+    // 1. Call server PATCH endpoint
+    await $fetch(`/api/tenders/${encodeURIComponent(tender.id)}`, {
+      method: 'PATCH',
+      body: {
+        statusCode: targetStatusCode,
+        reasonCode: selectedReasonCode.value,
+        reasonNote: cancelReasonNote.value || foundReason?.label
+      }
+    })
+
+    // 2. Update local tender
+    tender.durum = targetStatusCode.toLowerCase()
+    tender.statusCode = targetStatusCode
+    tender.reasonCode = selectedReasonCode.value
+    tender.reasonNote = cancelReasonNote.value || foundReason?.label
+    tender.sure = targetStatusCode === 'UNSUCCESSFUL' ? 'Sonuçsuz Kapandı' : 'İptal Edildi'
+
+    saveCmsData(cmsData.value)
+    reloadTenders()
+    showCancelModal.value = false
+    alert(`İhale başarıyla ${targetStatusCode === 'UNSUCCESSFUL' ? 'sonuçsuz olarak kapatıldı' : 'iptal edildi'}.\n\nStandart Gerekçe Kodu: ${selectedReasonCode.value} (${foundReason?.label})`)
+  } catch (err: any) {
+    console.error('Cancel tender error:', err)
+    alert(err?.data?.statusMessage || err?.message || 'İhale kapatılırken hata oluştu.')
+  } finally {
+    isCancelling.value = false
+  }
+}
+
+// 🛡️ TND-014: Yeniden yayınlama eski kaydın üzerine yazmaz; yeni revizyon kaydı oluşturur
+async function republishTender(tender: any) {
+  const newId = 'IHC-2026-' + Math.floor(100 + Math.random() * 900)
+  const now = new Date()
+  const dateFormatted = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`
+  const end30 = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+
+  const newTenderObj = {
+    ...tender,
+    id: newId,
+    parentTenderId: tender.id,
+    specVersion: (tender.specVersion || 1) + 1,
+    baslik: `${tender.baslik} (Revizyon ${(tender.specVersion || 1) + 1})`,
+    teklifSayisi: 0,
+    liderTeklif: '-',
+    durum: 'active',
+    statusCode: 'LIVE',
+    sure: '30 gün kaldı',
+    startDate: now.toISOString(),
+    endDate: end30,
+    olusturma: dateFormatted,
+    extensionCount: 0,
+    totalExtendedMinutes: 0,
+    antiSnipingActive: false,
+    reasonCode: undefined,
+    reasonNote: undefined
+  }
+
+  // CMS state update
+  if (cmsData.value?.dashboard?.tenders) {
+    cmsData.value.dashboard.tenders.unshift(newTenderObj)
+  }
+  if (cmsData.value?.dashboard?.receivedBids) {
+    cmsData.value.dashboard.receivedBids.unshift({
+      id: newId,
+      baslik: newTenderObj.baslik,
+      kategori: newTenderObj.kategori,
+      bitis: '30 gün kaldı',
+      teklifler: []
+    })
+  }
   saveCmsData(cmsData.value)
-  alert(`🎉 İLAN YENİDEN YAYINLANDI!\n\n"${tender.baslik}" ihalesi 30 gün süreyle Pazar Yeri'nde yeniden yayına alınmıştır.`)
+
+  // Server API sync
+  try {
+    await $fetch('/api/tenders', {
+      method: 'POST',
+      body: newTenderObj
+    })
+  } catch (e) {
+    console.warn('Republish server sync warning:', e)
+  }
+
+  reloadTenders()
+  alert(`🎉 İLAN YENİDEN YAYINLANDI (Kural TND-014)!\n\n"${tender.baslik}" ihalesi denetim izi korunarak #${newId} koduyla yeni bir revizyon olarak yayına alındı. Eski ihale kaydı arşivde saklanmaktadır.`)
 }
 
 function deleteTender(tender: any) {
@@ -454,20 +566,25 @@ const statusTabs = computed(() => {
               <span v-if="tender.files?.length || tender.documents?.length" class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-bold border border-blue-200">
                 📄 {{ (tender.files || tender.documents)[0]?.name || 'Şartname (PDF)' }}
               </span>
+
+              <!-- 🛡️ Standart Reason Code Varsa Göster -->
+              <span v-if="tender.reasonCode" class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-50 text-red-700 font-bold border border-red-200 text-[9px]">
+                ⛔ Neden: {{ tender.reasonCode }}
+              </span>
             </div>
           </div>
         </div>
 
         <div class="flex flex-wrap items-center gap-2.5 lg:justify-end border-t lg:border-t-0 pt-3 lg:pt-0">
-          <!-- 🗑️ Belirgin Kırmızı İhaleyi Sil Butonu -->
+          <!-- 🗑️ Standart Reason Code ile Kapatma / İptal Butonu -->
           <button 
             type="button" 
-            @click.stop="deleteTender(tender)" 
+            @click.stop="openCancelModal(tender)" 
             class="px-3.5 py-2 rounded-xl text-xs font-black text-white bg-red-600 hover:bg-red-700 active:bg-red-800 transition shadow-sm flex items-center gap-1.5 cursor-pointer"
-            title="İhaleyi ve Teklifleri Kalıcı Olarak Sil"
+            title="İhaleyi Standart Neden Koduyla İptal Et veya Sonuçsuz Kapat"
           >
             <Trash2 :size="13" class="text-white" />
-            <span>İhaleyi Sil</span>
+            <span>İptal / Kapat</span>
           </button>
           <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
             {{ tender.teklifSayisi }} {{ 'Teklif Alındı' }}
@@ -530,6 +647,85 @@ const statusTabs = computed(() => {
           <Plus :size="14" />
           <span>Yeni İhale Aç</span>
         </NuxtLink>
+      </div>
+    </div>
+
+    <!-- 🛡️ 3.5: STANDART İPTAL & SONUÇSUZ KAPATMA MODALI (REASON CODES) -->
+    <div v-if="showCancelModal && tenderToCancel" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 space-y-5 shadow-2xl animate-fadeIn text-left">
+        <div class="flex items-start justify-between gap-4 border-b pb-4 border-slate-100">
+          <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-xl bg-red-50 text-red-600 flex items-center justify-center shrink-0">
+              <ShieldAlert :size="20" />
+            </div>
+            <div>
+              <span class="text-[10px] font-black text-red-600 uppercase tracking-wider block">STANDART REASON CODE İŞLEMİ (3.5)</span>
+              <h3 class="text-base font-black text-slate-900 mt-0.5">{{ tenderToCancel.baslik }}</h3>
+            </div>
+          </div>
+          <button @click="showCancelModal = false" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl cursor-pointer">
+            <X :size="18" />
+          </button>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">
+              İPTAL / SONUÇSUZ KAPATMA NEDENİ (ZORUNLU) *
+            </label>
+            <select 
+              v-model="selectedReasonCode" 
+              class="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-white outline-none focus:border-red-500"
+            >
+              <optgroup label="İhaleyi İptal Et (CANCELLED)">
+                <option v-for="r in REASON_CODES.filter(x => x.category === 'CANCELLED')" :key="r.code" :value="r.code">
+                  {{ r.code }} — {{ r.label }}
+                </option>
+              </optgroup>
+              <optgroup label="Sonuçsuz Kapat (UNSUCCESSFUL)">
+                <option v-for="r in REASON_CODES.filter(x => x.category === 'UNSUCCESSFUL')" :key="r.code" :value="r.code">
+                  {{ r.code }} — {{ r.label }}
+                </option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">
+              AÇIKLAMA / GEREKÇE NOTU {{ selectedReasonCode === 'OTHER' ? '*' : '(OPSİYONEL)' }}
+            </label>
+            <textarea 
+              v-model="cancelReasonNote" 
+              rows="3" 
+              placeholder="İhalenin kapatılma gerekçesini, piyasa şartlarını veya yönetim kararını açıklayınız..." 
+              class="w-full p-3 rounded-xl border border-slate-200 text-xs outline-none focus:border-red-500"
+            ></textarea>
+          </div>
+
+          <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-900 leading-relaxed">
+            ℹ️ <strong>Denetim İzi Bildirimi (3.5 & AWD-005):</strong> İhaleniz silinmez; seçtiğiniz standart neden kodu ve zaman damgasıyla kurumsal arşivde saklanır. Katılımcı tedarikçilere kapatma bildirimi iletilir.
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-slate-100">
+          <button 
+            type="button" 
+            @click="showCancelModal = false" 
+            class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
+          >
+            Vazgeç
+          </button>
+          <button 
+            type="button" 
+            @click="confirmCancelTender" 
+            :disabled="isCancelling"
+            :class="isCancelling ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
+            class="px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-black text-xs transition shadow-md flex items-center gap-1.5"
+          >
+            <ShieldAlert :size="14" />
+            <span>{{ isCancelling ? 'İşleniyor...' : 'Gerekçeyle Kapat' }}</span>
+          </button>
+        </div>
       </div>
     </div>
 

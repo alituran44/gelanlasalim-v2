@@ -2,6 +2,55 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
+export type TenderStatus = 
+  | 'DRAFT' 
+  | 'APPROVAL_PENDING' 
+  | 'SCHEDULED' 
+  | 'LIVE' 
+  | 'SUSPENDED' 
+  | 'CLOSED' 
+  | 'EVALUATION' 
+  | 'PROVISIONAL_RESULT' 
+  | 'FINAL_APPROVAL_PENDING' 
+  | 'FINALIZED' 
+  | 'UNSUCCESSFUL' 
+  | 'CANCELLED'
+
+export type TenderReasonCode =
+  | 'NO_BIDS'
+  | 'INSUFFICIENT_BIDS'
+  | 'ALL_TECHNICALLY_REJECTED'
+  | 'ALL_COMMERCIALLY_REJECTED'
+  | 'RESERVE_NOT_MET'
+  | 'BUDGET_EXCEEDED'
+  | 'WINNER_WITHDREW'
+  | 'NEED_CANCELLED'
+  | 'SPECIFICATION_ERROR'
+  | 'SCOPE_CHANGED'
+  | 'SYSTEM_ISSUE'
+  | 'BUSINESS_DECISION'
+  | 'OTHER'
+
+export interface TenderItemSpec {
+  id: string
+  lotNo?: number
+  ad: string
+  miktar: number
+  birim: string
+  teknikAciklama?: string
+  kazananFirma?: string
+  kazananFiyat?: string
+}
+
+export interface TenderLot {
+  lotNo: number
+  baslik: string
+  aciklama?: string
+  kalemler: TenderItemSpec[]
+  kazananFirma?: string
+  kazananFiyat?: string
+}
+
 export interface TenderItem {
   id: string
   baslik: string
@@ -17,6 +66,30 @@ export interface TenderItem {
   butce?: string
   sure?: string
   durum?: string
+  statusCode?: TenderStatus
+  reasonCode?: TenderReasonCode
+  reasonNote?: string
+  awardMode?: 'ALL_OR_NOTHING' | 'LOT_BASED' | 'ITEM_BASED'
+  kalemler?: TenderItemSpec[]
+  lotlar?: TenderLot[]
+  currency?: 'TRY' | 'USD' | 'EUR'
+  vatType?: 'vat_included' | 'vat_excluded'
+  deliveryLocation?: string
+  deliveryDuration?: string
+  paymentTerms?: string
+  startPrice?: number
+  reservePrice?: number
+  minStep?: number
+  requiresParticipationApproval?: boolean
+  minBidsCount?: number
+  specVersion?: number
+  parentTenderId?: string
+  specHistory?: Array<{
+    version: number
+    changedAt: string
+    changedBy: string
+    changeNote: string
+  }>
   ihaleYonu?: string
   tur?: string
   usul?: string
@@ -32,7 +105,6 @@ export interface TenderItem {
   totalExtendedMinutes?: number
   antiSnipingActive?: boolean
   lastExtendedAt?: string
-  minStep?: number
   isBaseline?: boolean
   [key: string]: any
 }
@@ -206,4 +278,63 @@ export function removeTender(id: string): boolean {
 export function clearAllTenders(): void {
   globalThis.__SHARED_TENDERS__ = []
   trySaveToDisk([])
+}
+
+export function validateTenderStatusTransition(
+  current: TenderStatus | string | undefined,
+  target: TenderStatus
+): { allowed: boolean; error?: string } {
+  const normCurrent = (current || 'LIVE').toUpperCase() as TenderStatus
+  if (normCurrent === target) return { allowed: true }
+
+  const validTransitions: Record<TenderStatus, TenderStatus[]> = {
+    DRAFT: ['APPROVAL_PENDING', 'SCHEDULED', 'LIVE', 'CANCELLED'],
+    APPROVAL_PENDING: ['DRAFT', 'SCHEDULED', 'LIVE', 'CANCELLED'],
+    SCHEDULED: ['LIVE', 'CANCELLED'],
+    LIVE: ['CLOSED', 'SUSPENDED', 'CANCELLED', 'EVALUATION'],
+    SUSPENDED: ['LIVE', 'CANCELLED'],
+    CLOSED: ['EVALUATION', 'UNSUCCESSFUL', 'CANCELLED'],
+    EVALUATION: ['PROVISIONAL_RESULT', 'UNSUCCESSFUL', 'CANCELLED', 'FINALIZED'],
+    PROVISIONAL_RESULT: ['FINAL_APPROVAL_PENDING', 'FINALIZED', 'EVALUATION', 'UNSUCCESSFUL', 'CANCELLED'],
+    FINAL_APPROVAL_PENDING: ['FINALIZED', 'PROVISIONAL_RESULT', 'UNSUCCESSFUL', 'CANCELLED'],
+    FINALIZED: [], // Terminal
+    UNSUCCESSFUL: [], // Terminal
+    CANCELLED: [] // Terminal
+  }
+
+  const allowedTargets = validTransitions[normCurrent] || []
+  if (!allowedTargets.includes(target)) {
+    return {
+      allowed: false,
+      error: `Geçersiz statü geçişi: "${normCurrent}" durumundaki bir ihale "${target}" durumuna geçirilemez (PRD Bölüm 3.3).`
+    }
+  }
+
+  return { allowed: true }
+}
+
+export function updateTenderStatus(
+  id: string,
+  targetStatus: TenderStatus,
+  options?: { reasonCode?: TenderReasonCode; reasonNote?: string }
+): { success: boolean; tender?: TenderItem; error?: string } {
+  const list = getAllTenders()
+  const target = list.find(t => t.id === id)
+  if (!target) {
+    return { success: false, error: 'İhale bulunamadı.' }
+  }
+
+  const currentStatus = (target.statusCode || (target.durum === 'closed' ? 'CLOSED' : 'LIVE')) as TenderStatus
+  const check = validateTenderStatusTransition(currentStatus, targetStatus)
+  if (!check.allowed) {
+    return { success: false, error: check.error }
+  }
+
+  target.statusCode = targetStatus
+  target.durum = targetStatus.toLowerCase()
+  if (options?.reasonCode) target.reasonCode = options.reasonCode
+  if (options?.reasonNote) target.reasonNote = options.reasonNote
+
+  addTender(target)
+  return { success: true, tender: target }
 }

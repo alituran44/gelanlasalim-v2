@@ -27,7 +27,13 @@ const form = ref({
   maxButce: '',
   butce: '',
   kisiBasiFiyat: '',
-  currency: 'USD',
+  currency: 'TRY', // TND-005
+  vatType: 'vat_included', // TND-005
+  minStep: 1000, // TND-009
+  reservePrice: '', // TND-008
+  minBidsCount: 1, // TND-011
+  awardMode: 'ALL_OR_NOTHING', // TND-003, TND-004
+  kalemler: [] as Array<{ id: string; ad: string; miktar: number; birim: string; teknikAciklama?: string }>, // TND-002
   hedefKontenjan: 40,
   paketDahilHizmetler: [] as string[],
   aciklama: '',
@@ -38,6 +44,20 @@ const form = ref({
   images: [] as { url: string; name: string }[],
   files: [] as { name: string; size: string; progress: number; type: string }[]
 })
+
+function addKalem() {
+  form.value.kalemler.push({
+    id: 'KLM-' + (form.value.kalemler.length + 1),
+    ad: '',
+    miktar: 1,
+    birim: 'Adet',
+    teknikAciklama: ''
+  })
+}
+
+function removeKalem(index: number) {
+  form.value.kalemler.splice(index, 1)
+}
 
 function toggleFeature(feat: string) {
   const idx = form.value.paketDahilHizmetler.indexOf(feat)
@@ -563,12 +583,22 @@ async function handleSubmit() {
       sure: form.value.sure || '7 gün kaldı',
       teklifSayisi: 0,
       durum: 'active',
+      statusCode: 'LIVE',
       adminApproved: true,
       statusLabel: 'Canlı Yayında',
       butce: tenderDirection === 'sabit_paket' ? calculatedBudget : budgetVal,
       isSabitPaket: tenderDirection === 'sabit_paket',
       kisiBasiFiyat: form.value.kisiBasiFiyat || '1000',
-      currency: form.value.currency || 'USD',
+      currency: form.value.currency || 'TRY',
+      vatType: form.value.vatType || 'vat_included',
+      awardMode: form.value.awardMode || 'ALL_OR_NOTHING',
+      kalemler: form.value.kalemler.length > 0 
+        ? form.value.kalemler 
+        : [{ id: 'KLM-1', ad: form.value.baslik, miktar: 1, birim: 'Parti/Paket', teknikAciklama: form.value.aciklama }],
+      minStep: Number(form.value.minStep) || 1000,
+      reservePrice: form.value.reservePrice ? parseInt(String(form.value.reservePrice).replace(/\D/g, ''), 10) : undefined,
+      minBidsCount: Number(form.value.minBidsCount) || 1,
+      specVersion: 1,
       hedefKontenjan: form.value.hedefKontenjan || 40,
       mevcutKatilimci: 0,
       paketDahilHizmetler: form.value.paketDahilHizmetler || [],
@@ -1175,17 +1205,256 @@ function resetFormAndCreateNew() {
         </div>
       </div>
 
-      <!-- KART 3: TEKNİK AÇIKLAMALAR -->
-      <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
-        <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] mb-2">3. Teknik Açıklama & Kalem Detayları</h2>
-        
-        <!-- Teknik Açıklama -->
+      <!-- KART 3: TEKNİK AÇIKLAMALAR & KALEMLER & KURALLAR -->
+      <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-6 border-slate-200">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-xs font-black uppercase tracking-wider text-[#003057]">3. Kalem Listesi & İhale Kuralları</h2>
+            <p class="text-[11px] text-slate-500 mt-0.5">TND-001 ~ TND-014: Kalem bazlı/toplu ihale usulü, para birimi, rezerv fiyat ve teklif adımları.</p>
+          </div>
+          <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
+            Resmi Şartname Formatı
+          </span>
+        </div>
+
+        <!-- 3.1 SONUÇLANDIRMA MODELİ (TND-003, TND-004) -->
+        <div class="space-y-2">
+          <label class="block text-[11px] font-black text-slate-800 uppercase tracking-wider">
+            İHALE SONUÇLANDIRMA MODELİ *
+          </label>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div 
+              @click="form.awardMode = 'ALL_OR_NOTHING'"
+              class="p-3.5 rounded-xl border-2 cursor-pointer transition flex flex-col justify-between space-y-1.5 text-left"
+              :class="form.awardMode === 'ALL_OR_NOTHING' ? 'border-blue-600 bg-blue-50/40 ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-xs" :class="form.awardMode === 'ALL_OR_NOTHING' ? 'text-blue-900' : 'text-slate-800'">
+                  📦 Toplu Sonuçlandırma (Tek Kazanan)
+                </span>
+                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center text-[10px]" :class="form.awardMode === 'ALL_OR_NOTHING' ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300'">
+                  <span v-if="form.awardMode === 'ALL_OR_NOTHING'">✓</span>
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-snug">
+                Tedarikçi tüm kalemler için tek bir toplam teklif verir. İhale tek bir kazanana bütünüyle verilir.
+              </p>
+            </div>
+
+            <div 
+              @click="form.awardMode = 'ITEM_BASED'"
+              class="p-3.5 rounded-xl border-2 cursor-pointer transition flex flex-col justify-between space-y-1.5 text-left"
+              :class="form.awardMode === 'ITEM_BASED' ? 'border-indigo-600 bg-indigo-50/40 ring-2 ring-indigo-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-xs" :class="form.awardMode === 'ITEM_BASED' ? 'text-indigo-900' : 'text-slate-800'">
+                  🧩 Kalem Bazlı Kısmi Sonuçlandırma
+                </span>
+                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center text-[10px]" :class="form.awardMode === 'ITEM_BASED' ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-slate-300'">
+                  <span v-if="form.awardMode === 'ITEM_BASED'">✓</span>
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-snug">
+                Tedarikçiler bağımsız kalemlere ayrı fiyat verebilir. Her kalem en avantajlı farklı firmaya ihale edilebilir.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3.2 KALEMLER / MALZEME LİSTESİ (TND-002) -->
+        <div class="space-y-3 bg-slate-50/80 p-4 rounded-xl border border-slate-200">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-xs font-black uppercase tracking-wider text-slate-800">İhale Kalemleri / Malzeme Listesi</h3>
+              <p class="text-[10px] text-slate-500">Birden fazla ürün veya hizmet alıyorsanız kalem ekleyerek detaylandırın.</p>
+            </div>
+            <button 
+              type="button" 
+              @click="addKalem"
+              class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer"
+            >
+              <Plus :size="14" />
+              <span>Kalem Ekle</span>
+            </button>
+          </div>
+
+          <!-- Empty state -->
+          <div v-if="form.kalemler.length === 0" class="p-4 border border-dashed border-slate-300 rounded-lg text-center bg-white">
+            <p class="text-xs text-slate-500">Henüz özel kalem tanımlanmadı. İhale başlığı tek ana kalem olarak işleme alınacaktır.</p>
+            <button 
+              type="button" 
+              @click="addKalem" 
+              class="mt-2 text-xs font-bold text-blue-600 hover:text-blue-800 underline inline-flex items-center gap-1"
+            >
+              + İlk kalemi ekleyin (Örn: Mukavva Koli, Taşıma Hizmeti vb.)
+            </button>
+          </div>
+
+          <!-- Kalemler Listesi -->
+          <div v-else class="space-y-3">
+            <div 
+              v-for="(kalem, idx) in form.kalemler" 
+              :key="kalem.id || idx"
+              class="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5"
+            >
+              <div class="flex items-center justify-between">
+                <span class="text-[11px] font-black text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                  Kalem #{{ idx + 1 }}
+                </span>
+                <button 
+                  type="button" 
+                  @click="removeKalem(idx)"
+                  class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition cursor-pointer"
+                  title="Kalemi Sil"
+                >
+                  <Trash2 :size="14" />
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+                <div class="sm:col-span-6">
+                  <label class="block text-[10px] font-bold text-slate-600 mb-1">KALEM / MALZEME ADI *</label>
+                  <input 
+                    v-model="kalem.ad" 
+                    type="text" 
+                    placeholder="Örn: 60x40x40 Dopel Koli" 
+                    class="w-full rounded-lg border border-slate-300 p-2 text-xs outline-none focus:border-blue-600"
+                  />
+                </div>
+                <div class="sm:col-span-3">
+                  <label class="block text-[10px] font-bold text-slate-600 mb-1">MİKTAR *</label>
+                  <input 
+                    v-model.number="kalem.miktar" 
+                    type="number" 
+                    min="1" 
+                    class="w-full rounded-lg border border-slate-300 p-2 text-xs outline-none focus:border-blue-600 font-bold"
+                  />
+                </div>
+                <div class="sm:col-span-3">
+                  <label class="block text-[10px] font-bold text-slate-600 mb-1">BİRİM *</label>
+                  <select 
+                    v-model="kalem.birim" 
+                    class="w-full rounded-lg border border-slate-300 p-2 text-xs outline-none bg-white focus:border-blue-600"
+                  >
+                    <option value="Adet">Adet</option>
+                    <option value="Kg">Kg</option>
+                    <option value="Ton">Ton</option>
+                    <option value="Metre">Metre</option>
+                    <option value="m²">m²</option>
+                    <option value="Litre">Litre</option>
+                    <option value="Paket">Paket</option>
+                    <option value="Koli">Koli</option>
+                    <option value="Saat">Saat</option>
+                    <option value="Gün">Gün</option>
+                    <option value="Parti">Parti/Lot</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[10px] font-bold text-slate-600 mb-1">TEKNİK DETAY / ŞARTNAME NOTU (İsteğe Bağlı)</label>
+                <input 
+                  v-model="kalem.teknikAciklama" 
+                  type="text" 
+                  placeholder="Örn: Su geçirmez kaplama, Kraft renk, TS EN standartlı" 
+                  class="w-full rounded-lg border border-slate-300 p-2 text-xs outline-none focus:border-blue-600 text-slate-700"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3.3 PARA BİRİMİ, KDV, MİN ADIM, REZERV FİYAT, ASGARİ TEKLİF SAYISI -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
+          <!-- Para Birimi (TND-005) -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">
+              İHALE PARA BİRİMİ (TND-005)
+            </label>
+            <select 
+              v-model="form.currency" 
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs outline-none bg-white font-bold focus:border-blue-600"
+            >
+              <option value="TRY">₺ TRY (Türk Lirası)</option>
+              <option value="USD">$ USD (Amerikan Doları)</option>
+              <option value="EUR">€ EUR (Euro)</option>
+            </select>
+          </div>
+
+          <!-- KDV Durumu (TND-005) -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">
+              KDV ESASI (TND-005)
+            </label>
+            <select 
+              v-model="form.vatType" 
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs outline-none bg-white font-bold focus:border-blue-600"
+            >
+              <option value="vat_included">KDV DÂHİL</option>
+              <option value="vat_excluded">KDV HARİÇ (+%20 Standart)</option>
+            </select>
+          </div>
+
+          <!-- Minimum Teklif Adımı (TND-009) -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">
+              MİNİMUM TEKLİF ADIMI (TND-009)
+            </label>
+            <div class="relative">
+              <input 
+                v-model.number="form.minStep" 
+                type="number" 
+                min="100" 
+                step="100" 
+                placeholder="Örn: 1000" 
+                class="w-full rounded-xl border border-slate-300 p-2.5 text-xs outline-none font-bold focus:border-blue-600 pr-10"
+              />
+              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
+                {{ form.currency === 'TRY' ? '₺' : form.currency === 'USD' ? '$' : '€' }}
+              </span>
+            </div>
+            <p class="text-[9px] text-slate-500 mt-1">Eksiltme veya artırmada her yeni teklif en az bu tutar kadar farklı olmalıdır.</p>
+          </div>
+
+          <!-- Gizli Rezerv / Hedef Tavan Fiyat (TND-008) -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+              <span>GİZLİ REZERV FİYAT (TND-008)</span>
+              <span class="text-amber-600 font-bold lowercase text-[9px]">🔒 gizli / bağlayıcı</span>
+            </label>
+            <input 
+              v-model="form.reservePrice" 
+              type="text" 
+              placeholder="Örn: 120.000 (Boş bırakılabilir)" 
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs outline-none font-bold focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
+            />
+            <p class="text-[9px] text-amber-700 mt-1">Tedarikçilere asla gösterilmez. Bu tavanın üstündeki tekliflerle ihale zorunlu sonuçlandırılmaz.</p>
+          </div>
+
+          <!-- Asgari Geçerli Teklif Sayısı (TND-011) -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">
+              ASGARİ GEÇERLİ TEKLİF SAYISI (TND-011)
+            </label>
+            <select 
+              v-model.number="form.minBidsCount" 
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs outline-none bg-white font-bold focus:border-blue-600"
+            >
+              <option :value="1">En az 1 Geçerli Teklif (Standart)</option>
+              <option :value="2">En az 2 Geçerli Teklif (Rekabet Şartı)</option>
+              <option :value="3">En az 3 Geçerli Teklif (Geniş Rekabet Şartı)</option>
+            </select>
+            <p class="text-[9px] text-slate-500 mt-1">Teklif sayısı bu adede ulaşmazsa ihale yetersiz rekabet sebebiyle sonuçlandırılmaz.</p>
+          </div>
+        </div>
+
+        <!-- 3.4 GENEL ŞARTNAME & AÇIKLAMA METNİ -->
         <div>
-          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">TEKNİK ŞARTNAME & AÇIKLAMA</label>
+          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">GENEL ŞARTNAME & İHALE ÖZEL HÜKÜMLERİ</label>
           <textarea 
             v-model="form.aciklama" 
             rows="4" 
-            placeholder="İhale kalemlerinin net miktarlarını, kalite gereksinimlerini ve sevkiyat şartlarını buraya yazabilirsiniz..." 
+            placeholder="İhaleye ait teslimat süreleri, teknik şartnameler, kalite belgeleri (ISO, CE vb.) ve muayene kabul şartlarını buraya yazabilirsiniz..." 
             class="w-full rounded-lg border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
             style="border-color: #CBD5E1; color: #0F172A;"
           ></textarea>
