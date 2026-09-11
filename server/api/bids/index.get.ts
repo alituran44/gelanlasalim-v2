@@ -37,8 +37,8 @@ export default defineEventHandler((event) => {
     const isSealed = tender?.usul === 'Kapalı Zarf Usulü' || tender?.tur === 'kapali_zarf'
     const isTenderOpen = tender ? (tender.durum !== 'closed' && tender.durum !== 'mutabakat' && (!tender.endDate || new Date(tender.endDate).getTime() > Date.now())) : false
 
-    if (isSealed && isTenderOpen && !isMyBid && !isAdmin) {
-      // İhale kapanana kadar alıcı dahil fiyat ve şartname notu API'de gizlenir
+    if (isSealed && isTenderOpen && !isMyBid) {
+      // 🛡️ SEC-004: İhale kapanana kadar alıcı, satıcı ve destek personeli dahil fiyat ve şartname notu API'de gizlenir
       copy.fiyat = '***.*** ₺ (Kapalı Zarf - Gizli Teklif)'
       copy.notum = 'Gizli Şartname Notu (İhale Kapanışından Sonra Açılacaktır)'
       copy.telefon = '***'
@@ -53,6 +53,11 @@ export default defineEventHandler((event) => {
       copy.telefon = '***'
       copy.eposta = '***'
     }
+
+    // 3. 🛡️ SEC-015: IP / Cihaz Verileri Normal API Tüketicilerine Gösterilmez
+    delete (copy as any).ipAddress
+    delete (copy as any).userAgent
+    delete (copy as any).clientIp
 
     return copy
   })

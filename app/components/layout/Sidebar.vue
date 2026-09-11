@@ -74,6 +74,7 @@ const sidebarMenus = computed(() => {
       list.push({ title: "Üye Firmalar", icon: Building2, to: "/panel/firmalar" })
     }
     list.push(
+      { title: "Güvenlik & Denetim", icon: ShieldCheck, to: "/panel/guvenlik-denetim", badge: "SEC" },
       { title: "Mücbir Sebep & Fesih", icon: Scale, to: "/panel/mucbir-sebep" },
       { title: "Bildirimler", icon: Bell, to: "/panel/bildirimler" }
     )
@@ -90,6 +91,7 @@ const sidebarMenus = computed(() => {
       list.push({ title: "Verified Companies", icon: Building2, to: "/panel/firmalar" })
     }
     list.push(
+      { title: "Security & Audit", icon: ShieldCheck, to: "/panel/guvenlik-denetim", badge: "SEC" },
       { title: "Force Majeure & Disputes", icon: Scale, to: "/panel/mucbir-sebep" },
       { title: "Notifications", icon: Bell, to: "/panel/bildirimler" }
     )

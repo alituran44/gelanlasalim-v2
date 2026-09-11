@@ -3,6 +3,8 @@ import { getAllTenders, addTender } from '~~/server/utils/tendersStore'
 import { sendViaGoogleSmtp, getStoredSmtpConfig } from '~~/server/utils/smtpClient'
 import { logBidEvent } from '~~/server/utils/bidAuditStore'
 import { getCompanyForUser } from '~~/server/utils/companyVerificationStore'
+import { detectCollusionSignal, logSecurityEvent } from '~~/server/utils/securityAuditStore'
+import { getRequestHeader } from 'h3'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -92,6 +94,43 @@ export default defineEventHandler(async (event) => {
     }
 
     const saved = addBid(newBid)
+
+    // 🛡️ SEC-014: Olası Danışıklı Teklif (Collusion) Sinyal Tespiti
+    const fwd = getRequestHeader(event, 'x-forwarded-for')
+    const clientIp = (fwd ? fwd.split(',')[0].trim() : '') || event.node.req.socket.remoteAddress || '127.0.0.1'
+
+    if (newBid.vkn) {
+      const collusion = detectCollusionSignal(body.tenderId, newBid.vkn, body.eposta || '', clientIp)
+      if (collusion.isSuspicious) {
+        logSecurityEvent(event, {
+          eventType: 'COLLUSION_SIGNAL_DETECTED',
+          severity: 'HIGH',
+          actorEmail: body.eposta,
+          actorVkn: newBid.vkn,
+          targetResource: `/api/bids?tenderId=${body.tenderId}`,
+          actionTaken: 'FLAGGED_FOR_REVIEW',
+          details: {
+            message: collusion.message,
+            conflictingVkn: collusion.conflictingVkn,
+            clientIp
+          }
+        })
+      }
+    }
+
+    logSecurityEvent(event, {
+      eventType: 'CRITICAL_ACTION_LOGGED',
+      severity: 'LOW',
+      actorEmail: body.eposta,
+      actorVkn: newBid.vkn,
+      targetResource: `/api/bids?tenderId=${body.tenderId}`,
+      actionTaken: 'ALLOWED',
+      details: {
+        tenderId: body.tenderId,
+        bidId: saved.id,
+        amount: formattedPrice
+      }
+    })
 
     // 4. İlgili ihalenin teklif sayısını, lider teklifini ve Anti-Sniping kuralını güncelle
     let antiSnipingTriggered = false

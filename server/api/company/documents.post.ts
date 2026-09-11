@@ -1,14 +1,42 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { getCompanyByVkn, saveCompanies, getAllCompanies, CompanyDocument } from '~~/server/utils/companyVerificationStore'
+import { validateUploadedFile } from '~~/server/utils/fileValidation'
+import { resolveSession, sanitizePayload } from '~~/server/utils/authGuard'
+import { logSecurityEvent } from '~~/server/utils/securityAuditStore'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event) || {}
+  const rawBody = await readBody(event) || {}
+  const body = sanitizePayload(rawBody)
   const { vkn, type, title, fileUrl, validUntil, adminEmail } = body
 
   if (!vkn || !type || !title || !validUntil) {
     throw createError({
       statusCode: 400,
       statusMessage: 'VKN, belge türü, başlık ve son geçerlilik tarihi (validUntil) zorunludur. (Kural VER-008)'
+    })
+  }
+
+  // 🛡️ SEC-012: Dosya uzantısı, MIME tipi ve zararlı içerik kontrolü
+  validateUploadedFile(event, {
+    fileName: title.includes('.') ? title : `${title}.pdf`,
+    base64OrBuffer: fileUrl
+  })
+
+  // 🛡️ SEC-002: Tenant İzolasyonu
+  const session = resolveSession(event)
+  if (session.isAuthenticated && !session.isAdmin && session.companyVkn && session.companyVkn !== vkn) {
+    logSecurityEvent(event, {
+      eventType: 'IDOR_ATTEMPT',
+      severity: 'HIGH',
+      actorEmail: session.userEmail,
+      actorVkn: session.companyVkn,
+      targetResource: `/api/company/documents?vkn=${vkn}`,
+      actionTaken: 'BLOCKED_403',
+      details: { attemptedVkn: vkn, userVkn: session.companyVkn }
+    })
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Başka bir firmaya evrak yükleyemezsiniz (Kural SEC-002).'
     })
   }
 

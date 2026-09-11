@@ -10,8 +10,23 @@ export default defineEventHandler((event) => {
 
   const tenders = getAllTenders()
 
+  // 🛡️ SEC-002 & GEN-007: Özel ve Davetli İhalelerin Tenant İzolasyonu & Görünürlük Kontrolü
+  const visibleTenders = tenders.filter(t => {
+    const isOwner = Boolean(requesterEmail && (t.ownerEmail || '').trim().toLowerCase() === requesterEmail)
+    if (isOwner || isAdmin) return true
+
+    // Özel ve davetli ihaleler pazar yerinde yetkisiz kullanıcılara listelenmez
+    if (t.gorunurluk === 'ozel' || t.gorunurluk === 'davetli') {
+      const invitedList = (t.davetliFirmalar || t.allowedParticipants || []) as string[]
+      const isInvited = invitedList.some(inv => inv.trim().toLowerCase() === requesterEmail)
+      return isInvited
+    }
+
+    return true
+  })
+
   // 🛡️ TND-008 & SEC-001: Gizli rezerv/hedef fiyatı yetkisiz tedarikçilerden maskele
-  const sanitizedTenders = tenders.map(t => {
+  const sanitizedTenders = visibleTenders.map(t => {
     const copy = { ...t }
     const isOwner = Boolean(requesterEmail && (t.ownerEmail || '').trim().toLowerCase() === requesterEmail)
 
