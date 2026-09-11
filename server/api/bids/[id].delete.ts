@@ -1,4 +1,5 @@
-import { getAllBids, removeBid } from '~~/server/utils/bidsStore'
+import { getAllBids, removeBid, addBid } from '~~/server/utils/bidsStore'
+import { logBidEvent } from '~~/server/utils/bidAuditStore'
 
 export default defineEventHandler((event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -40,6 +41,42 @@ export default defineEventHandler((event) => {
     }
   }
 
+  const query = getQuery(event)
+  const cancelReason = (query.reason as string) || 'Kullanıcı tarafından geri çekilme / iptal talebi oluşturuldu.'
+
+  // 🛡️ BID-013: Doğrudan sessizce silme yerine durumunu 'iptal_talebi' olarak işaretle ve geçmişi koru
+  if (query.hardDelete !== 'true' || !isAdmin) {
+    targetBid.durum = 'iptal_talebi'
+    targetBid.iptalGerekcesi = cancelReason
+    targetBid.iptalTarihi = new Date().toISOString()
+
+    // Teklif kaydını güncelle
+    addBid(targetBid)
+
+    // 🛡️ BID-020: İptal talebi denetim kaydına alınır
+    logBidEvent(event, {
+      action: 'BID_CANCEL_REQUEST',
+      tenderId: targetBid.tenderId,
+      tenderTitle: targetBid.tenderTitle,
+      bidId: targetBid.id,
+      firma: targetBid.firma,
+      yetkili: targetBid.yetkili,
+      eposta: targetBid.eposta,
+      fiyat: targetBid.fiyat,
+      result: 'SUCCESS',
+      reason: cancelReason
+    })
+
+    return {
+      success: true,
+      removed: false,
+      status: 'iptal_talebi',
+      message: 'Kural BID-013 gereğince teklif sistemden sessizce silinmez; iptal talebi gerekçesiyle kayıt altına alındı.',
+      bid: targetBid
+    }
+  }
+
+  // Yalnızca süper admin hardDelete talebinde bulunursa fiziksel silme yap
   const ok = removeBid(id)
   return {
     success: ok,

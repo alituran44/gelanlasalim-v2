@@ -5,6 +5,7 @@ export default defineEventHandler((event) => {
   const tenders = getAllTenders()
   return {
     success: true,
+    serverTime: new Date().toISOString(),
     count: tenders.length,
     tenders
   }

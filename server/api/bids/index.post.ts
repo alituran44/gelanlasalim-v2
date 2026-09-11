@@ -1,6 +1,7 @@
 import { addBid, BidItem, sanitizeInput, validateBidSubmission } from '~~/server/utils/bidsStore'
 import { getAllTenders, addTender } from '~~/server/utils/tendersStore'
 import { sendViaGoogleSmtp, getStoredSmtpConfig } from '~~/server/utils/smtpClient'
+import { logBidEvent } from '~~/server/utils/bidAuditStore'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -26,6 +27,19 @@ export default defineEventHandler(async (event) => {
     })
 
     if (!validation.valid) {
+      // 🛡️ BID-019 & BID-020: Ret nedeni açıkça loglanır ve denetim kaydına alınır
+      logBidEvent(event, {
+        action: 'BID_REJECTED',
+        tenderId: body.tenderId,
+        tenderTitle: targetTender?.baslik || body.tenderTitle || 'Bilinmeyen İhale',
+        firma: sanitizeInput(body.firma) || 'Bilinmeyen Firma',
+        yetkili: sanitizeInput(body.yetkili),
+        eposta: sanitizeInput(body.eposta),
+        fiyat: String(body.fiyat),
+        result: 'REJECTED',
+        reason: validation.error
+      })
+
       throw createError({
         statusCode: validation.statusCode || 400,
         statusMessage: validation.error || 'Teklif kurallara uygun bulunmadı.'
@@ -68,12 +82,59 @@ export default defineEventHandler(async (event) => {
 
     const saved = addBid(newBid)
 
-    // 4. İlgili ihalenin teklif sayısını ve lider teklifini güncelle
+    // 4. İlgili ihalenin teklif sayısını, lider teklifini ve Anti-Sniping kuralını güncelle
+    let antiSnipingTriggered = false
+    let newEndDate: string | null = null
+
     if (targetTender) {
       targetTender.teklifSayisi = (targetTender.teklifSayisi || 0) + 1
       targetTender.liderTeklif = formattedPrice
+
+      // 🛡️ BID-009 & BID-010: Anti-Sniping Otomatik Süre Uzatma (Açık Eksiltme ve Açık Artırma)
+      const isSealed = targetTender.usul === 'Kapalı Zarf Usulü' || targetTender.tur === 'kapali_zarf'
+      if (!isSealed && targetTender.endDate) {
+        const endMs = new Date(targetTender.endDate).getTime()
+        const remainingMs = endMs - now.getTime()
+        const TWO_MINUTES_MS = 2 * 60 * 1000 // 120.000 ms
+
+        // Kapanışa son 2 dakika veya daha az kalmışsa ve ihale henüz bitmemişse
+        if (remainingMs > 0 && remainingMs <= TWO_MINUTES_MS) {
+          const currentExtensions = targetTender.extensionCount || 0
+          const MAX_EXTENSIONS = 15 // Maksimum 30 dakika (15 x 2 dk - BID-010)
+
+          if (currentExtensions < MAX_EXTENSIONS) {
+            targetTender.extensionCount = currentExtensions + 1
+            targetTender.totalExtendedMinutes = targetTender.extensionCount * 2
+            targetTender.lastExtendedAt = now.toISOString()
+            targetTender.antiSnipingActive = true
+
+            // Kapanış süresine +2 dakika ekle
+            const updatedEndMs = endMs + TWO_MINUTES_MS
+            targetTender.endDate = new Date(updatedEndMs).toISOString()
+            newEndDate = targetTender.endDate
+            antiSnipingTriggered = true
+
+            console.log(`[Anti-Sniping] Tender ${targetTender.id} extended by 2 minutes! (Extension #${targetTender.extensionCount}/${MAX_EXTENSIONS})`)
+          }
+        }
+      }
+
       addTender(targetTender)
     }
+
+    // 🛡️ BID-020: Teklif işleminde firma, kullanıcı, teklif, tutar, zaman, IP/oturum ve denetim kaydına alma
+    logBidEvent(event, {
+      action: 'BID_SUBMITTED',
+      tenderId: saved.tenderId,
+      tenderTitle: saved.tenderTitle,
+      bidId: saved.id,
+      firma: saved.firma,
+      yetkili: saved.yetkili,
+      eposta: saved.eposta,
+      fiyat: saved.fiyat,
+      result: 'SUCCESS',
+      antiSnipingTriggered
+    })
 
     // Otomatik E-Posta Bildirimleri: Teklif Verildiğinde ve Teklif Alındığında
     try {
@@ -120,12 +181,24 @@ export default defineEventHandler(async (event) => {
 
     return {
       success: true,
-      message: 'Teklif başarıyla sunucu havuzuna kaydedildi.',
+      message: antiSnipingTriggered 
+        ? 'Teklif kaydedildi. Son dakika teklifi nedeniyle ihale süresi kural gereğince otomatik 2 dakika uzatıldı (Anti-Sniping).' 
+        : 'Teklif başarıyla sunucu havuzuna kaydedildi.',
       bid: saved,
+      antiSniping: {
+        triggered: antiSnipingTriggered,
+        extensionCount: targetTender?.extensionCount || 0,
+        totalExtendedMinutes: targetTender?.totalExtendedMinutes || 0,
+        newEndDate
+      },
       updatedTender: targetTender ? {
         id: targetTender.id,
         teklifSayisi: targetTender.teklifSayisi,
-        liderTeklif: targetTender.liderTeklif
+        liderTeklif: targetTender.liderTeklif,
+        endDate: targetTender.endDate,
+        extensionCount: targetTender.extensionCount,
+        totalExtendedMinutes: targetTender.totalExtendedMinutes,
+        antiSnipingActive: targetTender.antiSnipingActive
       } : null
     }
   } catch (err: any) {

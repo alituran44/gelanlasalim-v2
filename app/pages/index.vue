@@ -130,6 +130,7 @@ const quickOfferDuration = ref('7 gün')
 const quickOfferFiles = ref<Array<{ name: string; size: string; type: string; url?: string }>>([])
 const quoteFileInputRef = ref<HTMLInputElement | null>(null)
 const isSubmittingQuickOffer = ref(false)
+const quickOfferTermsConfirmed = ref(false)
 
 // Shared server tenders & bids from REST API
 const { data: serverTendersData } = useAsyncData('landing-server-tenders', () => 
@@ -1557,6 +1558,7 @@ function openQuickBidModal(tender: any) {
   quickOfferNotes.value = ''
   quickOfferDuration.value = '7 gün'
   quickOfferFiles.value = []
+  quickOfferTermsConfirmed.value = false
   showQuickBidModal.value = true
 }
 
@@ -1622,6 +1624,12 @@ async function submitQuickOffer() {
     return
   }
 
+  // 🛡️ BID-012: İkinci Onay ve Şartname Taahhüt Kontrolü
+  if (!quickOfferTermsConfirmed.value) {
+    alert('Lütfen teklif şartname koşullarını ve bağlayıcı ticari taahhüdü onaylayınız (BID-012).')
+    return
+  }
+
   const rawClean = String(quickOfferPrice.value).replace(/[^0-9]/g, '')
   const numericPrice = parseInt(rawClean, 10)
   if (isNaN(numericPrice) || numericPrice <= 0) {
@@ -1672,7 +1680,7 @@ async function submitQuickOffer() {
 
   try {
     // 1. Sunucu API'sine kaydet (/api/bids)
-    await $fetch('/api/bids', {
+    const apiRes: any = await $fetch('/api/bids', {
       method: 'POST',
       body: {
         id: newBidId,
@@ -1689,6 +1697,14 @@ async function submitQuickOffer() {
         notum: quickOfferNotes.value || 'Şartname ve teknik kriterler uyarınca teklifimizdir.'
       }
     })
+
+    // 🛡️ BID-009 & BID-010: Anti-Sniping Tetiklendiyse ihale süresini güncelle
+    if (apiRes?.antiSniping?.triggered) {
+      tender.endDate = apiRes.antiSniping.newEndDate
+      tender.antiSnipingActive = true
+      tender.extensionCount = apiRes.antiSniping.extensionCount
+      tender.totalExtendedMinutes = apiRes.antiSniping.totalExtendedMinutes
+    }
 
     // Sunucu tekliflerini anında tazele
     await refreshServerBids()
@@ -1716,7 +1732,7 @@ async function submitQuickOffer() {
         notifications.unshift({
           id: Date.now(),
           title: 'Teklifiniz Başarıyla İletildi',
-          desc: `"${tender.baslik}" ihalesine ${fullPriceLabel} tutarındaki teklifiniz alıcıya sunuldu.`,
+          desc: `"${tender.baslik}" ihalesine ${fullPriceLabel} tutarındaki teklifiniz alıcıya sunuldu.${apiRes?.antiSniping?.triggered ? ' (Anti-Sniping devrede: +2 dk uzatıldı)' : ''}`,
           date: 'Şimdi',
           read: false,
           type: 'bid'
@@ -1774,7 +1790,10 @@ async function submitQuickOffer() {
     }
 
     showQuickBidModal.value = false
-    offerSuccessToastMsg.value = `"${tender.baslik}" ihalesine ${fullPriceLabel} tutarındaki teklifiniz başarıyla iletildi!`
+    const antiSnipingNotice = apiRes?.antiSniping?.triggered
+      ? ` (Anti-Sniping devrede: Son 2 dakikada teklif geldiği için ihale süresi +2 dk uzatıldı!)`
+      : ''
+    offerSuccessToastMsg.value = `"${tender.baslik}" ihalesine ${fullPriceLabel} tutarındaki teklifiniz başarıyla iletildi!${antiSnipingNotice}`
     showOfferSuccessToast.value = true
 
     setTimeout(() => {
@@ -3938,6 +3957,27 @@ onMounted(() => {
             </p>
           </div>
 
+          <!-- 🛡️ BID-012: İkinci Onay & Şartname Taahhüt Kutusu -->
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-1.5 text-left">
+            <div class="flex items-center justify-between text-[11px] font-black text-slate-800 uppercase tracking-wider">
+              <span class="flex items-center gap-1.5">
+                <ShieldCheck :size="14" class="text-blue-600" />
+                <span>Teklif Özeti & İkinci Onay (BID-012)</span>
+              </span>
+              <span class="text-slate-500 font-mono text-[10px]">{{ quickOfferDuration || '7 gün' }} teslimat</span>
+            </div>
+            <label class="flex items-start gap-2 pt-1 cursor-pointer select-none">
+              <input 
+                v-model="quickOfferTermsConfirmed" 
+                type="checkbox" 
+                class="mt-0.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer h-3.5 w-3.5" 
+              />
+              <span class="text-[10px] text-slate-600 leading-tight">
+                Teklifimin bağlayıcı ticari taahhüt olduğunu, ihale şartnamesini eksiksiz kabul ettiğimi ve teslimatı onayladığımı beyan ederim.
+              </span>
+            </label>
+          </div>
+
           <!-- Aksiyonlar -->
           <div class="flex items-center gap-2 pt-2">
             <button 
@@ -3950,12 +3990,12 @@ onMounted(() => {
             <button 
               type="button" 
               @click.prevent="submitQuickOffer" 
-              :disabled="isSubmittingQuickOffer"
-              :class="isSubmittingQuickOffer ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
+              :disabled="isSubmittingQuickOffer || !quickOfferTermsConfirmed"
+              :class="isSubmittingQuickOffer || !quickOfferTermsConfirmed ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
               class="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2"
             >
               <Send :size="14" />
-              <span>{{ isSubmittingQuickOffer ? 'İletiliyor...' : 'Teklifi Gönder' }}</span>
+              <span>{{ isSubmittingQuickOffer ? 'İletiliyor...' : 'Teklifi Onayla & Gönder' }}</span>
             </button>
           </div>
         </form>

@@ -28,6 +28,11 @@ export interface TenderItem {
   olusturma?: string
   startDate?: string
   endDate?: string
+  extensionCount?: number
+  totalExtendedMinutes?: number
+  antiSnipingActive?: boolean
+  lastExtendedAt?: string
+  minStep?: number
   isBaseline?: boolean
   [key: string]: any
 }

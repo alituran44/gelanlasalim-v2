@@ -256,7 +256,8 @@ const bidForm = ref({
   fiyat: '',
   sure: '7 gün',
   notum: '',
-  firmaAdi: userSession.value?.companyName || 'Kurumsal Tedarikçi'
+  firmaAdi: userSession.value?.companyName || 'Kurumsal Tedarikçi',
+  termsConfirmed: false
 })
 
 onMounted(async () => {
@@ -505,6 +506,7 @@ function openBidModal(tender: any) {
   selectedTenderForBid.value = tender
   bidForm.value.fiyat = ''
   bidForm.value.notum = ''
+  bidForm.value.termsConfirmed = false
   if (userSession.value.companyName || userSession.value.company) {
     bidForm.value.firmaAdi = userSession.value.companyName || userSession.value.company
   }
@@ -520,6 +522,11 @@ async function submitBid() {
   }
   if (!bidForm.value.fiyat) {
     alert('Lütfen teklif fiyatınızı giriniz.')
+    return
+  }
+  // 🛡️ BID-012: İkinci Onay ve Şartname Taahhüt Kontrolü
+  if (!bidForm.value.termsConfirmed) {
+    alert('Lütfen şartname koşullarını ve bağlayıcı teklif taahhüdünü onaylayınız (BID-012).')
     return
   }
 
@@ -589,8 +596,9 @@ async function submitBid() {
     saveCmsData(cmsData.value)
 
     // Sync with shared server API for cross-device visibility
+    let apiRes: any = null
     try {
-      await $fetch('/api/bids', {
+      apiRes = await $fetch('/api/bids', {
         method: 'POST',
         body: {
           id: newBidId,
@@ -608,8 +616,18 @@ async function submitBid() {
           notum: bidForm.value.notum
         }
       })
+
+      // 🛡️ BID-009 & BID-010: Anti-Sniping tetiklendiyse ihale süresini güncelle
+      if (apiRes?.antiSniping?.triggered) {
+        tender.endDate = apiRes.antiSniping.newEndDate
+        tender.antiSnipingActive = true
+        tender.extensionCount = apiRes.antiSniping.extensionCount
+        tender.totalExtendedMinutes = apiRes.antiSniping.totalExtendedMinutes
+        saveCmsData(cmsData.value)
+      }
     } catch (apiErr) {
       console.warn('Bid API sync warning:', apiErr)
+      throw apiErr
     }
 
     if (typeof window !== 'undefined') {
@@ -622,7 +640,7 @@ async function submitBid() {
         notifications.unshift({
           id: Date.now(),
           title: 'Teklifiniz Başarıyla İletildi',
-          desc: `"${tender.baslik}" ihalesine ${formattedPrice} tutarındaki teklifiniz alıcı firmaya sunuldu.`,
+          desc: `"${tender.baslik}" ihalesine ${formattedPrice} tutarındaki teklifiniz alıcı firmaya sunuldu.${apiRes?.antiSniping?.triggered ? ' (Anti-Sniping devrede: +2 dk uzatıldı)' : ''}`,
           date: 'Şimdi',
           read: false,
           type: 'bid'
@@ -639,7 +657,10 @@ async function submitBid() {
     })
 
     showBidModal.value = false
-    alert(`🎉 TEKLİFİNİZ BAŞARIYLA İLETİLDİ!\n\n"${tender.baslik}" ihalesine ${formattedPrice} tutarındaki teklifiniz kapalı zarf usulü ile alıcıya sunuldu. NetGSM SMS bilgilendirmesi yapıldı.`)
+    const antiSnipingMsg = apiRes?.antiSniping?.triggered 
+      ? `\n\n⏰ ANTİ-SNİPİNG KURALI ÇALIŞTI:\nSon 2 dakikada rekabetçi teklif geldiği için ihale süresi otomatik olarak +2 DAKİKA uzatıldı! (Toplam uzatma: ${apiRes.antiSniping.totalExtendedMinutes} dk)`
+      : ''
+    alert(`🎉 TEKLİFİNİZ BAŞARIYLA İLETİLDİ!\n\n"${tender.baslik}" ihalesine ${formattedPrice} tutarındaki teklifiniz kurallara uygun biçimde sisteme işlendi.${antiSnipingMsg}\n\nNetGSM SMS ve E-Posta bilgilendirmesi tamamlandı.`)
   } catch (err: any) {
     console.error('Bid submit error:', err)
     alert(err?.data?.statusMessage || err?.message || 'Teklif iletilirken bir hata oluştu.')
@@ -1784,6 +1805,36 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
               * Sektör ayrımı yapılmaksızın tüm işlemlerde sabit %4'tür. Bu oran yalnızca ihale kazanılıp teslimat onaylandığında hakedişten tahsil edilir. İhaleyi kazanamazsanız hiçbir ücret alınmaz. Platform 6563 SK gereğince bağımsız Aracı Hizmet Sağlayıcıdır.
             </p>
           </div>
+          <!-- 🛡️ BID-012: Teklif ve Ticari Taahhüt Özeti & İkinci Onay -->
+          <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-left">
+            <div class="flex items-center justify-between text-[11px] font-black text-slate-800 uppercase tracking-wider">
+              <span class="flex items-center gap-1.5">
+                <CheckCircle2 :size="14" class="text-blue-600" />
+                <span>Teklif ve Ticari Taahhüt Özeti (BID-012)</span>
+              </span>
+              <span class="text-slate-500 font-mono text-[10px]">{{ bidForm.sure || '7 gün' }} teslimat</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-[11px] bg-white p-2 rounded-lg border border-slate-100">
+              <div>
+                <span class="text-slate-400 block text-[9px] font-bold">NET TEKLİF:</span>
+                <span class="font-black text-slate-900 font-mono">{{ bidForm.fiyat || '0 ₺' }}</span>
+              </div>
+              <div>
+                <span class="text-slate-400 block text-[9px] font-bold">KOMİSYON (%4):</span>
+                <span class="font-bold text-emerald-700">Başarı halinde</span>
+              </div>
+            </div>
+            <label class="flex items-start gap-2 pt-1 cursor-pointer select-none">
+              <input 
+                v-model="bidForm.termsConfirmed" 
+                type="checkbox" 
+                class="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer h-3.5 w-3.5" 
+              />
+              <span class="text-[10px] text-slate-600 leading-tight">
+                Teklifimin bağlayıcı ticari taahhüt olduğunu, ihale şartnamesini eksiksiz kabul ettiğimi ve taahhüt edilen sürede ifayı onaylıyorum.
+              </span>
+            </label>
+          </div>
         </div>
 
         <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
@@ -1795,12 +1846,12 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
           </button>
           <button
             @click="submitBid"
-            :disabled="isSubmittingBid"
-            :class="isSubmittingBid ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
+            :disabled="isSubmittingBid || !bidForm.termsConfirmed"
+            :class="isSubmittingBid || !bidForm.termsConfirmed ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
             class="px-6 py-2.5 rounded-xl bg-[#0052FF] hover:bg-blue-600 text-white font-black text-xs transition shadow-lg flex items-center gap-1.5"
           >
             <Send :size="13" />
-            <span>{{ isSubmittingBid ? 'İletiliyor...' : 'Teklifi Gönder & NetGSM SMS İlet' }}</span>
+            <span>{{ isSubmittingBid ? 'İletiliyor...' : 'Teklifi Onayla & Gönder' }}</span>
           </button>
         </div>
       </div>

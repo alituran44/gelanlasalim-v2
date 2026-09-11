@@ -127,6 +127,48 @@ export function validateBidSubmission(
     }
   }
 
+  // 🛡️ BID-007 & BID-008: Açık İhalede Eşit Fiyat / Min Adım Kuralları
+  const isSealed = tender.usul === 'Kapalı Zarf Usulü' || tender.tur === 'kapali_zarf'
+  if (!isSealed && tender.liderTeklif) {
+    const leaderNum = parseInt(String(tender.liderTeklif).replace(/\D/g, ''), 10)
+    if (!isNaN(leaderNum) && leaderNum > 0) {
+      const isAuction = tender.usul === 'Açık Artırma' || tender.ihaleYonu === 'artirma'
+      if (isAuction) {
+        // Açık artırmada teklif liderden YÜKSEK olmalı
+        if (priceNum <= leaderNum) {
+          return {
+            valid: false,
+            error: `Açık artırma kuralı gereğince yeni teklif güncel lider tekliften (${tender.liderTeklif}) daha yüksek olmalıdır. Eşit veya daha düşük teklif verilemez (BID-007).`,
+            statusCode: 400
+          }
+        }
+        if (tender.minStep && tender.minStep > 0 && priceNum - leaderNum < tender.minStep) {
+          return {
+            valid: false,
+            error: `Teklif artış tutarı minimum teklif adımından (${tender.minStep.toLocaleString('tr-TR')} ₺) az olamaz.`,
+            statusCode: 400
+          }
+        }
+      } else {
+        // Açık eksiltmede (ters ihale) teklif liderden DÜŞÜK olmalı
+        if (priceNum >= leaderNum) {
+          return {
+            valid: false,
+            error: `Açık eksiltme kuralı gereğince yeni teklif güncel lider tekliften (${tender.liderTeklif}) daha düşük olmalıdır. Eşit veya daha yüksek teklif verilemez (BID-007).`,
+            statusCode: 400
+          }
+        }
+        if (tender.minStep && tender.minStep > 0 && leaderNum - priceNum < tender.minStep) {
+          return {
+            valid: false,
+            error: `Teklif düşüş tutarı minimum teklif adımından (${tender.minStep.toLocaleString('tr-TR')} ₺) az olamaz.`,
+            statusCode: 400
+          }
+        }
+      }
+    }
+  }
+
   return { valid: true }
 }
 
