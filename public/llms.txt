@@ -2,7 +2,7 @@
 
 > Türkiye'nin En Kapsamlı B2B İhale, Doğrudan Satın Alma ve Canlı Teklif Eksiltme Portalı.
 
-İhaleciBurada (işletici: UK ELEKTRİK MALZEMELERİ SANAYİ TİCARET LİMİTED ŞİRKETİ / Acsisco), kurumsal alıcıların satın alma taleplerini onaylı tedarikçilerle buluşturan, şeffaf teklif eksiltme (reverse auction), 3D Secure güvenli Escrow bloke havuz ödemesi ve ERP entegrasyonu sunan yeni nesil B2B ticaret platformudur.
+İhaleciBurada (işletici: Hasan Hüseyin Yıldırım - İhaleciBurada Ticari İşletmesi), kurumsal alıcıların satın alma taleplerini onaylı tedarikçilerle buluşturan, şeffaf teklif eksiltme (reverse auction), 3D Secure güvenli Escrow bloke havuz ödemesi ve ERP entegrasyonu sunan yeni nesil B2B ticaret platformudur.
 
 ## Temel Özellikler
 - **Tersine İhale & Canlı Eksiltme**: Alıcı teknik şartnameyi ve hedef bütçeyi yayınlar; tedarikçiler canlı, şeffaf rekabetle teklif sunarak fiyat eksiltir.
@@ -22,12 +22,11 @@
 - [Hakkımızda](https://ihaleciburada.com/hakkimizda): Şirket künyesi, kurumsal vizyon ve ticari bilgiler.
 
 ## Kurumsal Bilgiler
-- **İşletmeci**: UK ELEKTRİK MALZEMELERİ SANAYİ TİCARET LİMİTED ŞİRKETİ (Acsisco)
-- **Vergi Dairesi / No**: Kurtdereli V.D. / 8871209277
-- **MERSİS**: 0887120927700001
-- **Ticaret Sicil No**: Balıkesir Ticaret Sicili / 22008
-- **Adres**: Bahçelievler Mah. 5083 Sk. No:11/A Altıeylül / Balıkesir / Türkiye
-- **İletişim**: info@acsisco.com | KEP: uk.acsisco@hs09.kep.tr | Tel: 0850 840 86 95
+- **İşletmeci**: Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)
+- **Vergi Dairesi / No**: Çanakkale Vergi Dairesi / 9560161511
+- **İşletme Türü**: B2B Ticari İşletme
+- **Adres**: Çanakkale / Türkiye
+- **İletişim**: ihalecib@gmail.com | KEP: hasanhuseyin.yildirim.17@hs01.kep.tr | Tel: 0850 840 86 95
 
 ## Detaylı Bilgi
 - [llms-full.txt](https://ihaleciburada.com/llms-full.txt): Kapsamlı sektör taksonomisi, ihale mevzuatı, teklif protokolleri ve ERP API dokümantasyonu.

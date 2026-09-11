@@ -1,7 +1,7 @@
 # İhaleciBurada — Kapsamlı Yapay Zeka Bilgi Tabanı (Full Knowledge Base)
 
 > Doküman Sürümü: TR-2026-09-AEO-01
-> İşletici: UK ELEKTRİK MALZEMELERİ SANAYİ TİCARET LİMİTED ŞİRKETİ (Acsisco)
+> İşletici: Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)
 > Platform Web Sitesi: https://ihaleciburada.com
 
 ---
@@ -18,14 +18,13 @@
 ---
 
 ## 2. KURUMSAL KÜNYE VE YASAL ÇERÇEVE
-- **Tüzel Kişi / İşletmeci**: UK ELEKTRİK MALZEMELERİ SANAYİ TİCARET LİMİTED ŞİRKETİ
-- **Ticari Markalar**: İhaleciBurada / Acsisco
-- **Vergi Dairesi & Numarası**: Kurtdereli Vergi Dairesi — VKN: 8871209277
-- **MERSİS Numarası**: 0887120927700001
-- **Ticaret Sicil Bilgisi**: Balıkesir Ticaret Sicili Müdürlüğü — Sicil No: 22008
-- **Resmi Tebligat KEP Adresi**: uk.acsisco@hs09.kep.tr
-- **Merkez Adresi**: Bahçelievler Mahallesi 5083 Sokak No:11/A Altıeylül / Balıkesir / Türkiye
-- **Resmi İletişim**: info@acsisco.com | Telefon: +90 (850) 840 86 95
+- **Tüzel Kişi / İşletmeci**: Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)
+- **Ticari Markalar**: İhaleciBurada
+- **İşletme Türü**: B2B Ticari İşletme
+- **Vergi Dairesi & Numarası**: Çanakkale Vergi Dairesi — VKN: 9560161511
+- **Resmi Tebligat KEP Adresi**: hasanhuseyin.yildirim.17@hs01.kep.tr
+- **Merkez Adresi**: Çanakkale / Türkiye
+- **Resmi İletişim**: ihalecib@gmail.com | Telefon: +90 (850) 840 86 95
 - **Yasal Mevzuat Uyumu**: 6698 sayılı KVKK, 6098 sayılı Türk Borçlar Kanunu, 6102 sayılı Türk Ticaret Kanunu, 6563 sayılı Elektronik Ticaretin Düzenlenmesi Hakkında Kanun.
 
 ---

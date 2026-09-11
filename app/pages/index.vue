@@ -205,8 +205,8 @@ useHead({
             '@type': 'Organization',
             '@id': 'https://ihaleciburada.com/#organization',
             'name': 'İhaleciBurada',
-            'legalName': 'UK ELEKTRİK MALZEMELERİ SANAYİ TİCARET LİMİTED ŞİRKETİ',
-            'alternateName': ['Acsisco', 'ihaleciburada.com', 'İhaleci Burada B2B'],
+            'legalName': 'Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)',
+            'alternateName': ['ihaleciburada.com', 'İhaleci Burada B2B', 'İhaleciBurada Ticari İşletmesi'],
             'url': 'https://ihaleciburada.com',
             'logo': {
               '@type': 'ImageObject',
@@ -216,21 +216,21 @@ useHead({
             'description': "Türkiye'nin en kapsamlı B2B tersine ihale, doğrudan satın alma, şeffaf eksiltme ve Escrow güvenli havuz ticaret platformu.",
             'address': {
               '@type': 'PostalAddress',
-              'streetAddress': 'Bahçelievler Mahallesi 5083 Sokak No:11/A',
-              'addressLocality': 'Altıeylül',
-              'addressRegion': 'Balıkesir',
-              'postalCode': '10050',
+              'streetAddress': 'Merkez',
+              'addressLocality': 'Merkez',
+              'addressRegion': 'Çanakkale',
+              'postalCode': '17100',
               'addressCountry': 'TR'
             },
             'contactPoint': {
               '@type': 'ContactPoint',
               'telephone': '+90-850-840-86-95',
               'contactType': 'customer service',
-              'email': 'info@acsisco.com',
+              'email': 'ihalecib@gmail.com',
               'availableLanguage': ['tr', 'en']
             },
-            'taxID': '8871209277',
-            'vatID': 'TR8871209277',
+            'taxID': '9560161511',
+            'vatID': 'TR9560161511',
             'sameAs': [
               'https://twitter.com/ihaleciburada',
               'https://www.linkedin.com/company/ihaleciburada'
