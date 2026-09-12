@@ -37,7 +37,8 @@ import {
   Truck,
   MessageSquare,
   ChevronRight,
-  X 
+  X,
+  Trash2
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'

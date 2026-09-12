@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { locale } from '~/composables/useLocale'
-import { AlertCircle, Calendar, UploadCloud, FileText, FileSpreadsheet, FileCode, X, Camera, Eye, Trash2, Plus, ShieldAlert, FileCheck, CheckCircle2, FilePlus2, ArrowLeft, Pencil } from 'lucide-vue-next'
+import { AlertCircle, Calendar, UploadCloud, FileText, FileSpreadsheet, FileCode, X, Camera, Eye, Trash2, Plus, ShieldAlert, FileCheck, CheckCircle2, FilePlus2, ArrowLeft, Pencil, CreditCard, MapPin } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'

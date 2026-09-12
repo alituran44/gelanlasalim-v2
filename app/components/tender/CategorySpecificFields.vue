@@ -81,7 +81,20 @@ watch(
 
 // Active sector definition object
 const currentSector = computed<SectorDefinition>(() => {
-  return SECTOR_DEFINITIONS[activeSectorKey.value] || SECTOR_DEFINITIONS.insaat_yapi
+  return SECTOR_DEFINITIONS[activeSectorKey.value] || SECTOR_DEFINITIONS.insaat_yapi || SECTOR_DEFINITIONS.insaat_altyapi
+})
+
+// Unique list of sector definitions for manual selection dropdown
+const availableSectors = computed(() => {
+  const seen = new Set<string>()
+  const list: SectorDefinition[] = []
+  for (const s of Object.values(SECTOR_DEFINITIONS)) {
+    if (s && s.key && !seen.has(s.key)) {
+      seen.add(s.key)
+      list.push(s)
+    }
+  }
+  return list
 })
 
 // Grouped fields
@@ -170,7 +183,7 @@ onMounted(() => {
             @change="handleSectorSelect(($event.target as HTMLSelectElement).value)"
             class="text-xs font-bold py-2 px-3 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer"
           >
-            <option v-for="s in Object.values(SECTOR_DEFINITIONS)" :key="s.key" :value="s.key">
+            <option v-for="s in availableSectors" :key="s.key" :value="s.key">
               {{ s.badgeText }}
             </option>
           </select>

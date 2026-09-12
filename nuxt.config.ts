@@ -34,6 +34,7 @@ export default defineNuxtConfig({
     compressPublicAssets: true, // Gzip (.gz) ve Brotli (.br) otomatik sıkıştırma
     prerender: {
       crawlLinks: true,
+      failOnError: false
     },
     routeRules: {
       // Statik JS/CSS varlıkları için 1 yıllık değişmez önbellek (Caching) & CORS serbestisi

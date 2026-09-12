@@ -1,0 +1,166 @@
+{
+  "insaat_altyapi": {
+    "key": "insaat_altyapi",
+    "name": "İnşaat, Altyapı & Yapım İşi İhalesi",
+    "icon": "HardHat",
+    "badgeText": "🏗️ İnşaat & Altyapı Şartnamesi",
+    "description": "Bina yapımı, yol, köprü, kazı-dolgu, çelik konstrüksiyon ve yıkım ihaleleri için ÇŞB yetki belgesi, şantiye şefi ve hakediş kriterleri.",
+    "groups": {
+      "teknik": {
+        "title": "1. Yapım Alanı & Metrik Büyüklükler",
+        "desc": "İnşaat alanı, beton sınıfı ve donatı tonajı"
+      },
+      "mevzuat": {
+        "title": "2. Müteahhitlik Lisansı & Ruhsat Şartları",
+        "desc": "ÇŞB yetki belgesi grubu ve yapı denetim gereksinimleri"
+      },
+      "ticari": {
+        "title": "3. Hakediş, Teminat & Garanti Modeli",
+        "desc": "Aylık hakediş ve kesin teminat oranı"
+      }
+    },
+    "fields": [
+      {
+        "id": "toplamInsaatAlani",
+        "label": "Toplam İnşaat / Kazı Alanı",
+        "type": "number",
+        "unit": "m²",
+        "placeholder": "Örn: 4500",
+        "group": "teknik",
+        "required": true,
+        "defaultValue": 4500
+      },
+      {
+        "id": "projeTuru",
+        "label": "Yapım / İhale Türü",
+        "type": "select",
+        "group": "teknik",
+        "options": [
+          "Bina Yapımı & Taahhüt",
+          "Yol, Köprü & Viyadük",
+          "Hafriyat, Kazı & Dolgu",
+          "Çelik Konstrüksiyon Fabrika",
+          "Prefabrik Şantiye Yapıları",
+          "Tadilat & Güçlendirme"
+        ],
+        "defaultValue": "Bina Yapımı & Taahhüt"
+      },
+      {
+        "id": "betonSinifi",
+        "label": "Asgari Beton Sınıfı",
+        "type": "select",
+        "group": "teknik",
+        "options": [
+          "C25/30",
+          "C30/37",
+          "C35/45",
+          "C40/50",
+          "BS 25"
+        ],
+        "defaultValue": "C30/37"
+      },
+      {
+        "id": "demirTonaji",
+        "label": "Tahmini Donatı Demir Tonajı",
+        "type": "number",
+        "unit": "Ton",
+        "placeholder": "Örn: 220",
+        "group": "teknik",
+        "defaultValue": 220
+      },
+      {
+        "id": "muteahhitlikBelgeGrubu",
+        "label": "ÇŞB Müteahhitlik Yetki Belgesi Grubu",
+        "type": "select",
+        "group": "mevzuat",
+        "options": [
+          "A Grubu (Sınırsız)",
+          "B Grubu",
+          "C Grubu",
+          "D Grubu",
+          "E Grubu",
+          "F Grubu",
+          "G Grubu",
+          "H Grubu"
+        ],
+        "defaultValue": "C Grubu"
+      },
+      {
+        "id": "imarVeRuhsatDurumu",
+        "label": "İmar & Yapı Ruhsatı Durumu",
+        "type": "select",
+        "group": "mevzuat",
+        "options": [
+          "Yapı Ruhsatı Alınmış (İnşaata Hazır)",
+          "Ruhsat Başvurusu Aşamasında",
+          "İmar Çapı ve Aplikasyon Mevcut"
+        ],
+        "defaultValue": "Yapı Ruhsatı Alınmış (İnşaata Hazır)"
+      },
+      {
+        "id": "santiyeSefiVeIsgSarti",
+        "label": "Tam Zamanlı Şantiye Şefi & İSG Uzmanı Şartı",
+        "type": "boolean",
+        "group": "mevzuat",
+        "defaultValue": true
+      },
+      {
+        "id": "teminatOrani",
+        "label": "Kesin Teminat Mektubu Oranı",
+        "type": "number",
+        "unit": "%",
+        "placeholder": "Örn: 6",
+        "group": "ticari",
+        "defaultValue": 6
+      },
+      {
+        "id": "hakedisPeriyodu",
+        "label": "Hakediş & Ödeme Modeli",
+        "type": "select",
+        "group": "ticari",
+        "options": [
+          "Aylık İlerleme Hakedişi (Yeşil Defter)",
+          "Aşama Bazlı Hakediş (Subasman, Kaba, İnce)",
+          "Anahtar Teslim Götürü Bedel"
+        ],
+        "defaultValue": "Aylık İlerleme Hakedişi (Yeşil Defter)"
+      },
+      {
+        "id": "kusurSorumlulukSuresi",
+        "label": "Kusur Sorumluluk & Garanti Süresi",
+        "type": "select",
+        "group": "ticari",
+        "options": [
+          "12 Ay",
+          "24 Ay",
+          "36 Ay",
+          "60 Ay"
+        ],
+        "defaultValue": "24 Ay"
+      }
+    ],
+    "quickPresets": [
+      {
+        "label": "4.500 m² Fabrika Binası Yapımı",
+        "values": {
+          "toplamInsaatAlani": 4500,
+          "projeTuru": "Çelik Konstrüksiyon Fabrika",
+          "betonSinifi": "C30/37",
+          "demirTonaji": 180,
+          "muteahhitlikBelgeGrubu": "C Grubu",
+          "teminatOrani": 6,
+          "kusurSorumlulukSuresi": "24 Ay"
+        }
+      },
+      {
+        "label": "20.000 m³ Kazı ve Hafriyat",
+        "values": {
+          "toplamInsaatAlani": 20000,
+          "projeTuru": "Hafriyat, Kazı & Dolgu",
+          "muteahhitlikBelgeGrubu": "E Grubu",
+          "teminatOrani": 5
+        }
+      }
+    ]
+  }
+}

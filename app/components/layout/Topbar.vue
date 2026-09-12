@@ -17,7 +17,8 @@ import {
   CheckCircle2,
   BellOff,
   LogOut,
-  Building2
+  Building2,
+  ShieldCheck
 } from "lucide-vue-next"
 import { locale, detectLocale, setLocale } from '~/composables/useLocale'
 import { useCmsData } from '~/composables/useCmsData'

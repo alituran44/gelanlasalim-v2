@@ -19,7 +19,8 @@ import {
   ArrowLeft,
   ChevronDown,
   Inbox,
-  Server
+  Server,
+  Plus
 } from "lucide-vue-next"
 
 import { locale, detectLocale } from '~/composables/useLocale'

@@ -16,7 +16,8 @@ import {
   AlertCircle,
   Play,
   BookOpen,
-  Sparkles
+  Sparkles,
+  CheckCircle2
 } from 'lucide-vue-next'
 import VideoGuideModal from '~/components/common/VideoGuideModal.vue'
 
