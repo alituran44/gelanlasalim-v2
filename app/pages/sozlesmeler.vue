@@ -962,10 +962,12 @@ function printDocument() {
                 <p>2.2. <strong>Paketler ve Toplam Fiyat (Tüm Vergiler Dahil):</strong></p>
                 <ul class="list-disc pl-5 space-y-1 text-slate-600">
                   <li><strong>1 Ay Lansman Deneme Paketi:</strong> 0,00 ₺ (Ücretsiz)</li>
-                  <li><strong>1 Aylık Standart Paket:</strong> 900,00 ₺ (%20 KDV Dahil)</li>
-                  <li><strong>3 Aylık Çeyrek Paket:</strong> 1.800,00 ₺ (%20 KDV Dahil)</li>
-                  <li><strong>6 Aylık Yarı Yıl Paketi:</strong> 2.700,00 ₺ (%20 KDV Dahil)</li>
-                  <li><strong>9 Aylık Kurumsal Avantaj Paketi:</strong> 3.600,00 ₺ (%20 KDV Dahil)</li>
+                  <li><strong>1 Aylık Standart İhale Paketi:</strong> 900,00 ₺ (%20 KDV Dahil)</li>
+                  <li><strong>3 Aylık Pro Avantaj Paketi:</strong> 1.800,00 ₺ (%20 KDV Dahil)</li>
+                  <li><strong>6 Aylık Kurumsal Plan:</strong> 2.700,00 ₺ (%20 KDV Dahil)</li>
+                  <li><strong>12 Aylık Yıllık Lisans Paketi:</strong> 3.600,00 ₺ (%20 KDV Dahil)</li>
+                  <li><strong>Kurumsal Pro Tedarikçi Paketi:</strong> 1.800,00 ₺ / Ay (Yıllık Peşin: 18.000,00 ₺ - %2.5 Başarı Komisyonu)</li>
+                  <li><strong>Kurumsal Enterprise Paketi:</strong> 4.500,00 ₺ / Ay (Yıllık Peşin: 45.000,00 ₺ - %1.5 Başarı Komisyonu)</li>
                 </ul>
                 <p>2.3. Satın alınan dijital pakete ilişkin bedel, seçilen ödeme kanalına göre (Kredi Kartı 3D Secure / Havale-EFT) peşin olarak tahsil edilir.</p>
               </section>

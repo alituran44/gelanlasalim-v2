@@ -30,10 +30,10 @@ export const DEFAULT_CMS_DATA = {
     vatNotice: 'Fiyatlara %20 KDV dahildir.',
     disclaimer: 'Bu hizmet Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi) tarafından yürütülmektedir.',
     packages: [
-      { id: '1_month', name: 'Üyelik Başvurusu - 1 Ay', price: 900, months: 1, monthlyPrice: 900, badge: 'KURUMSAL KULLANIM' },
-      { id: '3_months', name: 'Üyelik Başvurusu - 3 Ay', price: 1800, months: 3, monthlyPrice: 600, badge: 'EN ÇOK TERCİH EDİLEN POPÜLER PLAN', popular: true },
-      { id: '6_months', name: 'Üyelik Başvurusu - 6 Ay', price: 2700, months: 6, monthlyPrice: 450, badge: 'KURUMSAL KULLANIM' },
-      { id: '9_months', name: 'Üyelik Başvurusu - 9 Ay', price: 3600, months: 9, monthlyPrice: 400, badge: 'YILLIK AVANTAJ' }
+      { id: '1_month', name: 'Standart İhale Paketi - 1 Ay', price: 900, months: 1, monthlyPrice: 900, badge: 'KURUMSAL KULLANIM' },
+      { id: '3_months', name: 'Pro Avantaj Paketi - 3 Ay', price: 1800, months: 3, monthlyPrice: 600, badge: 'EN ÇOK TERCİH EDİLEN POPÜLER PLAN', popular: true },
+      { id: '6_months', name: 'Kurumsal Plan - 6 Ay', price: 2700, months: 6, monthlyPrice: 450, badge: 'KURUMSAL KULLANIM' },
+      { id: '12_months', name: 'Yıllık Lisans Paketi - 12 Ay', price: 3600, months: 12, monthlyPrice: 300, badge: 'YILLIK AVANTAJ' }
     ],
     features: [
       [

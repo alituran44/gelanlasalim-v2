@@ -474,11 +474,65 @@ function showToast(message: string, type: 'success' | 'error' | 'warning' = 'suc
 
 // Membership & Pricing State
 const membershipPricingRegion = ref<'domestic' | 'international'>('domestic')
+const membershipPackageCategory = ref<'corporate' | 'duration'>('corporate')
+const membershipCorporateCycle = ref<'monthly' | 'annual'>('monthly')
+
+const membershipCorporateTiers = [
+  {
+    id: 'standart-kurumsal',
+    name: 'Standart Üretici / Tedarikçi',
+    badge: '%4 Komisyon',
+    commissionRate: 4.0,
+    monthlyPrice: 0,
+    annualPrice: 0,
+    features: [
+      'Alıcı firmalar için %0 komisyonla sınırsız ihale açma',
+      'Tüm açık B2B ihalelere katılabilme ve teklif verme',
+      'Standart %4.0 başarı/escrow komisyonu',
+      'Temel e-posta bildirimleri',
+      'Resmi İhale Sonuç Tutanağı erişimi'
+    ],
+    isPopular: false
+  },
+  {
+    id: 'kurumsal-pro',
+    name: 'Kurumsal Pro Tedarikçi',
+    badge: '%2.5 Komisyon',
+    commissionRate: 2.5,
+    monthlyPrice: 1800,
+    annualPrice: 18000,
+    features: [
+      'İndirimli %2.5 platform başarı komisyonu (%37.5 tasarruf)',
+      'Doğrulanmış B2B Rozeti (Mavi Kalkan)',
+      'Yeni açılan ihalelerde 15 dakika öncelikli SMS/E-posta alarmı',
+      'Sınırsız teklif revizyonu ve detaylı rakip analiz özeti',
+      '7/24 Öncelikli telefon & KEP destek hattı'
+    ],
+    isPopular: true
+  },
+  {
+    id: 'kurumsal-enterprise',
+    name: 'Kurumsal Enterprise',
+    badge: '%1.5 Komisyon',
+    commissionRate: 1.5,
+    monthlyPrice: 4500,
+    annualPrice: 45000,
+    features: [
+      'Özel indirimli %1.5 platform başarı komisyonu (%62.5 tasarruf)',
+      'Kurumsal Alt Kullanıcı & Ekip Yetki Yönetimi (Limitsiz)',
+      'SAP / Logo / Netsis / Mikro ERP REST API Entegrasyonu',
+      'Özel Müşteri Başarı Yöneticisi (Account Manager)',
+      'Özel davetli kapalı ihalelere otomatik doğrudan davet',
+      'Gelişmiş Likidite ve Fiyat Hareketi Analitik Raporu'
+    ],
+    isPopular: false
+  }
+]
 
 const membershipPricingDomestic = [
   {
     id: '1-ay-tr',
-    name: 'ÜYELİK BAŞVURUSU - 1 AY',
+    name: 'STANDART İHALE PAKETİ - 1 AY',
     badge: 'KURUMSAL KULLANIM',
     price: 900,
     monthly: '₺900,00 / ay',
@@ -488,33 +542,33 @@ const membershipPricingDomestic = [
   },
   {
     id: '3-ay-tr',
-    name: 'ÜYELİK BAŞVURUSU - 3 AY',
+    name: 'PRO AVANTAJ PAKETİ - 3 AY',
     badge: '⚡ EN ÇOK TERCİH EDİLEN POPÜLER PLAN',
     price: 1800,
     monthly: '₺600,00 / ay',
-    desc: '3 Aylık Popüler Pakette Net %33 Tasarruf Avantajı',
+    desc: '3 Aylık Popüler Pakette Net %33 Tasarruf Avantajı (%20 KDV Dahil)',
     isPopular: true,
     duration: '3 Ay'
   },
   {
     id: '6-ay-tr',
-    name: 'ÜYELİK BAŞVURUSU - 6 AY',
+    name: 'KURUMSAL PLAN - 6 AY',
     badge: 'KURUMSAL KULLANIM',
     price: 2700,
     monthly: '₺450,00 / ay',
-    desc: '6 Aylık Kurumsal Pakette Net %50 Tasarruf Avantajı',
+    desc: '6 Aylık Kurumsal Pakette Net %50 Tasarruf Avantajı (%20 KDV Dahil)',
     isPopular: false,
     duration: '6 Ay'
   },
   {
-    id: '9-ay-tr',
-    name: 'ÜYELİK BAŞVURUSU - 9 AY',
+    id: '12-ay-tr',
+    name: 'YILLIK LİSANS PAKETİ - 12 AY',
     badge: 'YILLIK AVANTAJ',
     price: 3600,
-    monthly: '₺400,00 / ay',
-    desc: '9 Aylık Avantaj Paketinde Net %55 Tasarruf',
+    monthly: '₺300,00 / ay',
+    desc: '12 Aylık Yıllık Avantaj Paketinde Net %67 Tasarruf (%20 KDV Dahil)',
     isPopular: false,
-    duration: '9 Ay'
+    duration: '12 Ay'
   }
 ]
 
@@ -3111,44 +3165,170 @@ function saveProfile() {
             </div>
           </div>
 
-          <!-- Domestic Packages (TRY ₺) - 4 Cards Grid (Photo 2) -->
-          <div v-if="membershipPricingRegion === 'domestic'" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-            <div
-              v-for="pkg in membershipPricingDomestic"
-              :key="pkg.id"
-              class="rounded-3xl border bg-white p-6 shadow-sm flex flex-col justify-between transition-all hover:shadow-xl relative overflow-hidden"
-              :class="pkg.isPopular ? 'border-amber-400 ring-2 ring-amber-400/20' : 'border-slate-200/80'"
-            >
-              <!-- Badge banner -->
-              <div
-                class="text-[9px] font-black uppercase tracking-wider py-1.5 px-3 rounded-lg text-center mb-4"
-                :class="pkg.isPopular ? 'bg-amber-400 text-slate-950 font-black' : 'bg-[#0F223D] text-white'"
-              >
-                {{ pkg.badge }}
-              </div>
-
-              <div class="space-y-4">
-                <h3 class="text-xs font-black text-slate-800 tracking-wider text-center uppercase">{{ pkg.name }}</h3>
-                
-                <div class="text-center py-3 border-y border-slate-100">
-                  <div class="text-4xl font-black text-slate-900 font-mono tracking-tight">₺{{ pkg.price.toLocaleString('tr-TR') }}</div>
-                  <div class="text-xs font-bold text-slate-400 mt-1">{{ pkg.monthly }}</div>
-                </div>
-
-                <p class="text-[11px] text-slate-500 leading-relaxed text-center min-h-[36px]">
-                  {{ pkg.desc }}
+          <!-- Category Switcher for Domestic: Kurumsal Tedarikçi vs Dönemsel İhale Paketleri -->
+          <div v-if="membershipPricingRegion === 'domestic'" class="space-y-6">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+              <div>
+                <h3 class="text-sm font-black text-slate-800 flex items-center gap-2">
+                  <Award v-if="membershipPackageCategory === 'corporate'" class="text-emerald-600" :size="18" />
+                  <Clock v-else class="text-blue-600" :size="18" />
+                  <span>{{ membershipPackageCategory === 'corporate' ? 'Kurumsal Üyelik & Tedarikçi Paketleri' : 'Dönemsel İhale ve Eksiltme Paketleri' }}</span>
+                </h3>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  {{ membershipPackageCategory === 'corporate' ? 'İndirimli platform komisyonu (%2.5 / %1.5) ve öncelikli destek imkanları' : '1 aydan 12 aya kadar esnek B2B ihale ve satın alma erişim paketleri' }}
                 </p>
               </div>
 
-              <div class="pt-6">
-                <NuxtLink
-                  :to="`/abonelik?plan=${pkg.id}`"
-                  class="w-full py-3.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer"
-                  :class="pkg.isPopular ? 'bg-amber-400 hover:bg-amber-500 text-slate-950' : 'bg-[#0F223D] hover:bg-[#0052FF] text-white'"
+              <div class="inline-flex rounded-2xl border border-slate-200/90 bg-white p-1 shadow-xs">
+                <button
+                  type="button"
+                  @click="membershipPackageCategory = 'corporate'"
+                  class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black transition-all cursor-pointer"
+                  :class="membershipPackageCategory === 'corporate' ? 'bg-[#0F223D] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
                 >
-                  <span>HEMEN ABONE OL</span>
-                  <ArrowRight :size="14" />
-                </NuxtLink>
+                  <Award :size="14" class="text-emerald-400" />
+                  <span>Kurumsal Paketler</span>
+                </button>
+                <button
+                  type="button"
+                  @click="membershipPackageCategory = 'duration'"
+                  class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black transition-all cursor-pointer"
+                  :class="membershipPackageCategory === 'duration' ? 'bg-[#0F223D] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+                >
+                  <Clock :size="14" class="text-blue-400" />
+                  <span>Süreli Paketler (1-12 Ay)</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Corporate Tiers Grid (Photo 1) -->
+            <div v-if="membershipPackageCategory === 'corporate'" class="space-y-6">
+              <!-- Billing cycle toggle for corporate -->
+              <div class="flex justify-center">
+                <div class="inline-flex rounded-xl bg-slate-100 p-1 text-xs font-bold items-center gap-1 border border-slate-200">
+                  <button
+                    type="button"
+                    @click="membershipCorporateCycle = 'monthly'"
+                    class="px-4 py-1.5 rounded-lg transition"
+                    :class="membershipCorporateCycle === 'monthly' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900'"
+                  >
+                    Aylık Ödeme
+                  </button>
+                  <button
+                    type="button"
+                    @click="membershipCorporateCycle = 'annual'"
+                    class="px-4 py-1.5 rounded-lg transition flex items-center gap-1"
+                    :class="membershipCorporateCycle === 'annual' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900'"
+                  >
+                    <span>Yıllık Peşin (12 Ay)</span>
+                    <span class="text-[10px] font-black text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-md">%17 Ek İndirim</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                <div 
+                  v-for="tier in membershipCorporateTiers" 
+                  :key="tier.id"
+                  class="rounded-3xl p-6 border transition-all flex flex-col justify-between shadow-sm hover:shadow-xl relative"
+                  :class="tier.isPopular 
+                    ? 'border-emerald-500/60 bg-[#0B132B] text-white ring-2 ring-emerald-500/20' 
+                    : 'border-slate-800 bg-[#0F172A] text-white'"
+                >
+                  <div v-if="tier.isPopular" class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-md">
+                    En Popüler Kurumsal Plan
+                  </div>
+
+                  <div>
+                    <div class="flex items-center justify-between mb-3">
+                      <h4 class="text-sm font-black text-white">{{ tier.name }}</h4>
+                      <span class="text-xs font-mono font-bold px-2.5 py-0.5 rounded-lg bg-slate-800 text-emerald-400 border border-slate-700">
+                        {{ tier.badge }}
+                      </span>
+                    </div>
+
+                    <div class="my-4 py-3 border-y border-slate-800">
+                      <div class="text-3xl font-black text-white font-mono">
+                        <template v-if="tier.monthlyPrice === 0">Ücretsiz</template>
+                        <template v-else-if="membershipCorporateCycle === 'annual'">
+                          {{ tier.annualPrice.toLocaleString('tr-TR') }} ₺
+                          <span class="text-xs text-slate-400 font-normal">/ yıl</span>
+                        </template>
+                        <template v-else>
+                          {{ tier.monthlyPrice.toLocaleString('tr-TR') }} ₺
+                          <span class="text-xs text-slate-400 font-normal">/ ay</span>
+                        </template>
+                      </div>
+                      <div v-if="tier.annualPrice > 0" class="text-xs text-emerald-400 font-medium mt-1">
+                        <template v-if="membershipCorporateCycle === 'annual'">
+                          Aylık maliyet: {{ Math.round(tier.annualPrice / 12).toLocaleString('tr-TR') }} ₺ (%17 tasarruf)
+                        </template>
+                        <template v-else>
+                          Yıllık peşin: {{ tier.annualPrice.toLocaleString('tr-TR') }} ₺ (%17 ek indirim)
+                        </template>
+                      </div>
+                    </div>
+
+                    <div class="space-y-2.5 pt-2 text-xs">
+                      <div v-for="(feat, idx) in tier.features" :key="idx" class="flex items-start gap-2 text-slate-300">
+                        <CheckCircle2 :size="15" class="text-emerald-400 shrink-0 mt-0.5" />
+                        <span class="leading-relaxed">{{ feat }}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="pt-6 mt-6 border-t border-slate-800">
+                    <NuxtLink
+                      :to="`/abonelik?plan=${tier.id}&cycle=${membershipCorporateCycle}`"
+                      class="w-full py-3 px-4 rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                      :class="tier.isPopular ? 'bg-[#1EAE4C] hover:bg-[#188C3D] text-white shadow-lg' : 'bg-slate-800 hover:bg-slate-700 text-white'"
+                    >
+                      <span>{{ tier.monthlyPrice === 0 ? 'Mevcut Planınız' : 'Bu Pakete Geç' }}</span>
+                      <ArrowRight :size="14" />
+                    </NuxtLink>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Duration Packages (Photo 2 with 12-Month) -->
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+              <div
+                v-for="pkg in membershipPricingDomestic"
+                :key="pkg.id"
+                class="rounded-3xl border bg-white p-6 shadow-sm flex flex-col justify-between transition-all hover:shadow-xl relative overflow-hidden"
+                :class="pkg.isPopular ? 'border-amber-400 ring-2 ring-amber-400/20' : 'border-slate-200/80'"
+              >
+                <div
+                  class="text-[9px] font-black uppercase tracking-wider py-1.5 px-3 rounded-lg text-center mb-4"
+                  :class="pkg.isPopular ? 'bg-amber-400 text-slate-950 font-black' : 'bg-[#0F223D] text-white'"
+                >
+                  {{ pkg.badge }}
+                </div>
+
+                <div class="space-y-4">
+                  <h3 class="text-xs font-black text-slate-800 tracking-wider text-center uppercase">{{ pkg.name }}</h3>
+                  
+                  <div class="text-center py-3 border-y border-slate-100">
+                    <div class="text-4xl font-black text-slate-900 font-mono tracking-tight">₺{{ pkg.price.toLocaleString('tr-TR') }}</div>
+                    <div class="text-xs font-bold text-slate-400 mt-1">{{ pkg.monthly }}</div>
+                  </div>
+
+                  <p class="text-[11px] text-slate-500 leading-relaxed text-center min-h-[36px]">
+                    {{ pkg.desc }}
+                  </p>
+                </div>
+
+                <div class="pt-6">
+                  <NuxtLink
+                    :to="`/abonelik?plan=${pkg.id}`"
+                    class="w-full py-3.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer"
+                    :class="pkg.isPopular ? 'bg-amber-400 hover:bg-amber-500 text-slate-950' : 'bg-[#0F223D] hover:bg-[#0052FF] text-white'"
+                  >
+                    <span>HEMEN ABONE OL</span>
+                    <ArrowRight :size="14" />
+                  </NuxtLink>
+                </div>
               </div>
             </div>
           </div>
