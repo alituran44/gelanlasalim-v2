@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { locale } from '~/composables/useLocale'
-import { AlertCircle, Calendar, UploadCloud, FileText, FileSpreadsheet, FileCode, X, Camera, Eye, Trash2, Plus, ShieldAlert, FileCheck, CheckCircle2, FilePlus2, ArrowLeft } from 'lucide-vue-next'
+import { AlertCircle, Calendar, UploadCloud, FileText, FileSpreadsheet, FileCode, X, Camera, Eye, Trash2, Plus, ShieldAlert, FileCheck, CheckCircle2, FilePlus2, ArrowLeft, Pencil } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
@@ -11,8 +11,13 @@ import { usePublicApis } from '~/composables/usePublicApis'
 definePageMeta({ layout: 'dashboard' })
 
 const router = useRouter()
+const route = useRoute()
 const { cmsData, saveCmsData } = useCmsData()
 const { fetchTrHolidays, trPublicHolidays } = usePublicApis()
+
+const editingTenderId = ref<string | null>(null)
+const isEditMode = computed(() => Boolean(editingTenderId.value))
+const existingTender = ref<any>(null)
 
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const imageInputRef = ref<HTMLInputElement | null>(null)
@@ -269,8 +274,94 @@ const invoiceTypes = [
 
 const hasDraft = ref(false)
 
-onMounted(() => {
-  if (typeof window !== 'undefined') {
+async function loadTenderForEdit(tenderId: string) {
+  try {
+    let tender: any = null
+    // 1. Check local storage
+    if (typeof window !== 'undefined') {
+      try {
+        const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+        tender = myTenders.find((t: any) => t.id === tenderId)
+      } catch (e) {}
+    }
+    // 2. Check cmsData
+    if (!tender && cmsData.value?.dashboard?.tenders) {
+      tender = cmsData.value.dashboard.tenders.find((t: any) => t.id === tenderId)
+    }
+    // 3. Fetch from server API
+    if (!tender) {
+      try {
+        const res = await $fetch<{ success: boolean; tenders: any[] }>('/api/tenders')
+        if (res && res.tenders) {
+          tender = res.tenders.find((t: any) => t.id === tenderId)
+        }
+      } catch (e) {}
+    }
+
+    if (!tender) {
+      alert(`⚠️ #${tenderId} numaralı ihale bulunamadı.`)
+      return
+    }
+
+    existingTender.value = tender
+    form.value.baslik = tender.baslik || ''
+    form.value.ihaleYonu = tender.ihaleYonu || (tender.tur?.includes('Eksiltme') ? 'eksiltme' : (tender.tur?.includes('Artırma') ? 'artirma' : (tender.tur?.includes('Paket') ? 'sabit_paket' : 'kapali_zarf')))
+    
+    // Category mapping
+    if (tender.mainCategory) {
+      form.value.kategori = tender.mainCategory
+      selectedSubcategory.value = tender.subCategory || ''
+    } else if (tender.kategori && tender.kategori.includes('/')) {
+      const parts = tender.kategori.split('/')
+      form.value.kategori = parts[0].trim()
+      selectedSubcategory.value = parts[1].trim()
+    } else if (tender.kategori) {
+      form.value.kategori = tender.kategori
+      selectedSubcategory.value = tender.subCategory || ''
+    }
+
+    form.value.sure = tender.sure || '7 gün'
+    form.value.butce = tender.butce || ''
+    if (tender.butce && !tender.butce.includes('Teklif Usulü')) {
+      isBudgetUnspecified.value = false
+    }
+    form.value.sehir = tender.city || 'Balıkesir'
+    form.value.teslimatAdresi = tender.teslimatAdresi || ''
+    form.value.aciklama = tender.aciklama || ''
+    if (tender.odemeYontemi) form.value.odemeYontemi = tender.odemeYontemi
+    if (tender.faturaTuru) form.value.faturaTuru = tender.faturaTuru
+    if (tender.currency) form.value.currency = tender.currency
+    if (tender.vatType) form.value.vatType = tender.vatType
+    if (tender.minStep) form.value.minStep = tender.minStep
+    if (tender.reservePrice) form.value.reservePrice = String(tender.reservePrice)
+    if (tender.minBidsCount) form.value.minBidsCount = tender.minBidsCount
+    if (tender.awardMode) form.value.awardMode = tender.awardMode
+    if (tender.kisiBasiFiyat) form.value.kisiBasiFiyat = tender.kisiBasiFiyat
+    if (tender.hedefKontenjan) form.value.hedefKontenjan = tender.hedefKontenjan
+    if (Array.isArray(tender.paketDahilHizmetler)) form.value.paketDahilHizmetler = [...tender.paketDahilHizmetler]
+    
+    if (Array.isArray(tender.kalemler) && tender.kalemler.length > 0) {
+      form.value.kalemler = JSON.parse(JSON.stringify(tender.kalemler))
+    }
+    if (Array.isArray(tender.images) && tender.images.length > 0) {
+      form.value.images = JSON.parse(JSON.stringify(tender.images))
+    } else if (tender.image) {
+      form.value.images = [{ url: tender.image, name: 'Kapak Görseli' }]
+    }
+    if (Array.isArray(tender.files) && tender.files.length > 0) {
+      form.value.files = JSON.parse(JSON.stringify(tender.files))
+    }
+  } catch (err) {
+    console.error('Failed to load tender for editing:', err)
+  }
+}
+
+onMounted(async () => {
+  const editId = route.query.edit as string | undefined
+  if (editId) {
+    editingTenderId.value = editId
+    await loadTenderForEdit(editId)
+  } else if (typeof window !== 'undefined') {
     const saved = localStorage.getItem('tenderDraft')
     if (saved) {
       try {
@@ -505,7 +596,7 @@ async function handleSubmit() {
         ? 'Açık Artırma (Fiyat Artırımlı)' 
         : (ihaleYonuVal === 'kapali_zarf' ? 'Kapalı Zarf Usulü' : 'Açık Eksiltme (Fiyat Azaltımlı)'))
 
-    const newId = 'IHC-2026-' + Math.floor(100 + Math.random() * 900)
+    const newId = isEditMode.value ? editingTenderId.value! : ('IHC-2026-' + Math.floor(100 + Math.random() * 900))
     createdId.value = newId
 
     const subCat = selectedSubcategory.value || 'Genel Satın Alma'
@@ -569,6 +660,7 @@ async function handleSubmit() {
       return
     }
     const tenderObject = {
+      ...(existingTender.value || {}),
       aiApproved: aiInspection.status === 'approved',
       aiScore: aiInspection.score,
       aiReport: aiInspection,
@@ -581,9 +673,9 @@ async function handleSubmit() {
       tur: tenderTur,
       rekabetTuru: tenderTur,
       sure: form.value.sure || '7 gün kaldı',
-      teklifSayisi: 0,
-      durum: 'active',
-      statusCode: 'LIVE',
+      teklifSayisi: isEditMode.value ? (existingTender.value?.teklifSayisi || 0) : 0,
+      durum: isEditMode.value ? (existingTender.value?.durum || 'active') : 'active',
+      statusCode: isEditMode.value ? (existingTender.value?.statusCode || 'LIVE') : 'LIVE',
       adminApproved: true,
       statusLabel: 'Canlı Yayında',
       butce: tenderDirection === 'sabit_paket' ? calculatedBudget : budgetVal,
@@ -598,24 +690,24 @@ async function handleSubmit() {
       minStep: Number(form.value.minStep) || 1000,
       reservePrice: form.value.reservePrice ? parseInt(String(form.value.reservePrice).replace(/\D/g, ''), 10) : undefined,
       minBidsCount: Number(form.value.minBidsCount) || 1,
-      specVersion: 1,
+      specVersion: isEditMode.value ? (Number(existingTender.value?.specVersion || 1) + 1) : 1,
       hedefKontenjan: form.value.hedefKontenjan || 40,
-      mevcutKatilimci: 0,
+      mevcutKatilimci: isEditMode.value ? (existingTender.value?.mevcutKatilimci || 0) : 0,
       paketDahilHizmetler: form.value.paketDahilHizmetler || [],
       city: deliveryCity,
       teslimatAdresi: deliveryAddress,
       odemeYontemi: form.value.odemeYontemi || '🛡️ İhaleciBurada Güvenli Emanet Havuz (Escrow - Mal Kabul Onaylı)',
       faturaTuru: form.value.faturaTuru || '🏢 Kurumsal E-Fatura (%20 KDV)',
       image: primaryImg,
-      images: [primaryImg],
+      images: form.value.images?.length ? form.value.images : [primaryImg],
       files: (form.value.files || []).map(f => ({ name: f.name, size: f.size, type: f.type, progress: 100 })),
       documents: (form.value.files || []).map(f => ({ name: f.name, size: f.size, type: f.type, progress: 100 })),
       aciklama: form.value.aciklama || form.value.baslik,
-      ownerEmail,
-      ownerName,
-      ownerCompany,
+      ownerEmail: existingTender.value?.ownerEmail || ownerEmail,
+      ownerName: existingTender.value?.ownerName || ownerName,
+      ownerCompany: existingTender.value?.ownerCompany || ownerCompany,
       isMine: false,
-      olusturma: 'Bugün'
+      olusturma: existingTender.value?.olusturma || 'Bugün'
     }
 
     // 4. Update CMS Data in memory & storage
@@ -624,15 +716,29 @@ async function handleSubmit() {
     if (!Array.isArray(cmsData.value.dashboard.tenders)) cmsData.value.dashboard.tenders = []
     if (!Array.isArray(cmsData.value.dashboard.receivedBids)) cmsData.value.dashboard.receivedBids = []
 
-    cmsData.value.dashboard.tenders.unshift(tenderObject)
-    cmsData.value.dashboard.receivedBids.unshift({
-      id: newId,
-      baslik: form.value.baslik,
-      kategori: combinedCategory,
-      bitis: form.value.sure || '7 gün kaldı',
-      image: primaryImg,
-      teklifler: []
-    })
+    if (isEditMode.value) {
+      const idx = cmsData.value.dashboard.tenders.findIndex((t: any) => t.id === newId)
+      if (idx >= 0) {
+        cmsData.value.dashboard.tenders[idx] = tenderObject
+      } else {
+        cmsData.value.dashboard.tenders.unshift(tenderObject)
+      }
+      const gIdx = cmsData.value.dashboard.receivedBids.findIndex((g: any) => g.id === newId)
+      if (gIdx >= 0) {
+        cmsData.value.dashboard.receivedBids[gIdx].baslik = form.value.baslik
+        cmsData.value.dashboard.receivedBids[gIdx].kategori = combinedCategory
+      }
+    } else {
+      cmsData.value.dashboard.tenders.unshift(tenderObject)
+      cmsData.value.dashboard.receivedBids.unshift({
+        id: newId,
+        baslik: form.value.baslik,
+        kategori: combinedCategory,
+        bitis: form.value.sure || '7 gün kaldı',
+        image: primaryImg,
+        teklifler: []
+      })
+    }
 
     try {
       saveCmsData(cmsData.value)
@@ -642,10 +748,20 @@ async function handleSubmit() {
 
     // 4b. Sync with shared server API for cross-device visibility
     try {
-      await $fetch('/api/tenders', {
-        method: 'POST',
-        body: tenderObject
-      })
+      if (isEditMode.value) {
+        await $fetch(`/api/tenders/${encodeURIComponent(newId)}`, {
+          method: 'PUT',
+          headers: {
+            'x-user-email': ownerEmail
+          },
+          body: tenderObject
+        })
+      } else {
+        await $fetch('/api/tenders', {
+          method: 'POST',
+          body: tenderObject
+        })
+      }
     } catch (apiErr) {
       console.warn('API sync warning:', apiErr)
     }
@@ -657,8 +773,8 @@ async function handleSubmit() {
         body: {
           tenderId: newId,
           tenderTitle: form.value.baslik,
-          action: 'IHALE_ACILDI',
-          actionLabel: 'Yeni İhale İlanı Oluşturuldu',
+          action: isEditMode.value ? 'IHALE_GUNCELLENDI' : 'IHALE_ACILDI',
+          actionLabel: isEditMode.value ? 'İhale Bilgileri Güncellendi' : 'Yeni İhale İlanı Oluşturuldu',
           category: combinedCategory,
           budget: budgetVal,
           direction: turLabel,
@@ -681,7 +797,16 @@ async function handleSubmit() {
     if (typeof window !== 'undefined') {
       try {
         const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
-        myTenders.unshift(tenderObject)
+        if (isEditMode.value) {
+          const idx = myTenders.findIndex((t: any) => t.id === newId)
+          if (idx >= 0) {
+            myTenders[idx] = tenderObject
+          } else {
+            myTenders.unshift(tenderObject)
+          }
+        } else {
+          myTenders.unshift(tenderObject)
+        }
         localStorage.setItem('myTenders', JSON.stringify(myTenders.slice(0, 20)))
         localStorage.setItem('recentTenderCreated', JSON.stringify({ id: newId, baslik: tenderObject.baslik }))
         localStorage.removeItem('tenderDraft')
@@ -769,13 +894,27 @@ function resetFormAndCreateNew() {
       </button>
     </div>
 
+    <!-- Düzenleme Modu Bilgi Rozeti -->
+    <div v-if="isEditMode" class="mb-5 rounded-2xl bg-blue-50 border border-blue-200 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-bold text-blue-900 shadow-xs animate-fadeIn">
+      <div class="flex items-center gap-2">
+        <Pencil class="text-blue-600 shrink-0" :size="18" />
+        <span>Düzenleme Modu: <strong>#{{ editingTenderId }}</strong> numaralı ihalenin bilgilerini düzenliyorsunuz.</span>
+      </div>
+      <NuxtLink to="/panel/ilanlarim" class="px-3 py-1.5 rounded-lg bg-white border border-blue-300 text-blue-800 hover:bg-blue-100 font-bold text-xs transition">
+        Vazgeç ve İhalelerime Dön
+      </NuxtLink>
+    </div>
+
     <!-- Başlık -->
     <div class="mb-6">
       <h1 class="text-xl font-bold flex items-center gap-2" style="color: #0F172A;">
-        <FilePlus2 class="text-blue-600" :size="22" />
-        {{ 'Yeni İhale Talebi Oluştur' }}
+        <FilePlus2 v-if="!isEditMode" class="text-blue-600" :size="22" />
+        <Pencil v-else class="text-blue-600" :size="22" />
+        {{ isEditMode ? 'İhale Bilgilerini Düzenle' : 'Yeni İhale Talebi Oluştur' }}
       </h1>
-      <p class="text-sm mt-0.5" style="color: #64748B;">Satın alma talebiniz için tedarikçilerden rekabetçi canlı teklifler toplayın</p>
+      <p class="text-sm mt-0.5" style="color: #64748B;">
+        {{ isEditMode ? `#${editingTenderId} numaralı ihalenin şartname, bütçe ve kalem detaylarını güncelleyerek kaydedebilirsiniz.` : 'Satın alma talebiniz için tedarikçilerden rekabetçi canlı teklifler toplayın' }}
+      </p>
     </div>
 
 
@@ -788,7 +927,7 @@ function resetFormAndCreateNew() {
       
       <div class="space-y-1">
         <span class="px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-black uppercase tracking-wider inline-block">
-          ✓ İhale İlanınız Başarıyla Oluşturuldu ve Gönderildi
+          {{ isEditMode ? '✓ İhale Bilgileriniz Başarıyla Güncellendi' : '✓ İhale İlanınız Başarıyla Oluşturuldu ve Gönderildi' }}
         </span>
         <h2 class="text-xl sm:text-2xl font-black text-slate-900 mt-2">{{ submittedTenderSummary?.baslik }}</h2>
         <p class="text-xs text-slate-500">İhale Referans No: <strong class="font-mono text-blue-700 font-black">{{ createdId }}</strong></p>
@@ -1638,8 +1777,9 @@ function resetFormAndCreateNew() {
           :disabled="isSubmittingTender"
           class="w-full flex items-center justify-center gap-2 rounded-2xl bg-[#0F223D] hover:bg-[#003057] active:bg-[#061220] text-white font-black text-sm py-4 transition-all shadow-xl cursor-pointer hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50"
         >
-          <FilePlus2 :size="18" class="text-emerald-400" />
-          <span>{{ isSubmittingTender ? 'İhale Oluşturuluyor...' : 'İhaleyi Oluştur ve Admin Onayına Gönder' }}</span>
+          <FilePlus2 v-if="!isEditMode" :size="18" class="text-emerald-400" />
+          <Pencil v-else :size="18" class="text-blue-400" />
+          <span>{{ isSubmittingTender ? (isEditMode ? 'İhale Güncelleniyor...' : 'İhale Oluşturuluyor...') : (isEditMode ? 'İhale Bilgilerini Güncelle ve Kaydet' : 'İhaleyi Oluştur ve Admin Onayına Gönder') }}</span>
         </button>
       </div>
 

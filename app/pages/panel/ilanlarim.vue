@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
-import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight, Lock, Clock, CheckCircle2, AlertCircle, Trash2, X, ShieldAlert, HelpCircle } from 'lucide-vue-next'
+import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight, Lock, Clock, CheckCircle2, AlertCircle, Trash2, X, ShieldAlert, HelpCircle, Pencil, Ban } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale } from '~/composables/useLocale'
 import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
@@ -261,10 +261,215 @@ async function republishTender(tender: any) {
   alert(`🎉 İLAN YENİDEN YAYINLANDI (Kural TND-014)!\n\n"${tender.baslik}" ihalesi denetim izi korunarak #${newId} koduyla yeni bir revizyon olarak yayına alındı. Eski ihale kaydı arşivde saklanmaktadır.`)
 }
 
-function deleteTender(tender: any) {
+const EDIT_CATEGORIES = [
+  'Organizasyon ve Etkinlik',
+  'İnşaat ve Yapı',
+  'Gayrimenkul',
+  'Araç ve İş Makineleri',
+  'Sanayi ve Makine',
+  'Bilgisayar ve Teknoloji',
+  'Elektronik',
+  'Mobilya ve Ofis',
+  'Sağlık ve Medikal',
+  'Eğitim',
+  'Gıda ve Catering',
+  'Tekstil ve Giyim',
+  'Tarım ve Hayvancılık',
+  'Enerji',
+  'Çevre ve Geri Dönüşüm',
+  'Lojistik ve Taşımacılık',
+  'Güvenlik Sistemleri',
+  'Temizlik Hizmetleri',
+  'Turizm ve Konaklama',
+  'Reklam ve Medya',
+  'Ambalaj ve Baskı',
+  'Telekomünikasyon',
+  'Danışmanlık',
+  'Diğer'
+]
+
+const CITIES_LIST = [
+  'Adana', 'Ankara', 'Antalya', 'Aydın', 'Balıkesir', 'Bursa', 'Çanakkale', 'Denizli', 'Diyarbakır',
+  'Erzurum', 'Eskişehir', 'Gaziantep', 'Hatay', 'İstanbul', 'İzmir', 'Kahramanmaraş', 'Kayseri',
+  'Kocaeli', 'Konya', 'Malatya', 'Manisa', 'Mardin', 'Mersin', 'Muğla', 'Sakarya', 'Samsun',
+  'Şanlıurfa', 'Tekirdağ', 'Trabzon', 'Van'
+]
+
+// ✏️ İhale Düzenleme (Edit) State ve Fonksiyonları
+const showEditModal = ref(false)
+const editingTender = ref<any>(null)
+const isSavingEdit = ref(false)
+const editForm = ref({
+  id: '',
+  baslik: '',
+  kategori: 'İnşaat ve Yapı',
+  subCategory: '',
+  ihaleYonu: 'kapali_zarf',
+  butce: '',
+  sure: '7 gün',
+  city: 'Balıkesir',
+  teslimatAdresi: '',
+  aciklama: '',
+  kalemler: [] as Array<{ id: string; ad: string; miktar: number; birim: string; teknikAciklama?: string }>
+})
+
+function openEditModal(tender: any) {
+  if (!tender) return
+  editingTender.value = tender
+  
+  let mainCat = tender.mainCategory || tender.kategori || 'İnşaat ve Yapı'
+  let subCat = tender.subCategory || ''
+  if (mainCat.includes('/')) {
+    const parts = mainCat.split('/')
+    mainCat = parts[0].trim()
+    subCat = parts[1].trim()
+  }
+
+  editForm.value = {
+    id: tender.id,
+    baslik: tender.baslik || '',
+    kategori: mainCat,
+    subCategory: subCat,
+    ihaleYonu: tender.ihaleYonu || (tender.tur?.includes('Eksiltme') ? 'eksiltme' : (tender.tur?.includes('Artırma') ? 'artirma' : (tender.tur?.includes('Paket') ? 'sabit_paket' : 'kapali_zarf'))),
+    butce: tender.butce || '',
+    sure: tender.sure || '7 gün',
+    city: tender.city || 'Balıkesir',
+    teslimatAdresi: tender.teslimatAdresi || '',
+    aciklama: tender.aciklama || '',
+    kalemler: Array.isArray(tender.kalemler) && tender.kalemler.length > 0
+      ? JSON.parse(JSON.stringify(tender.kalemler))
+      : [{ id: 'KLM-1', ad: tender.baslik || 'Satın Alma Kalemi', miktar: 1, birim: 'Adet', teknikAciklama: '' }]
+  }
+  showEditModal.value = true
+}
+
+function addEditKalem() {
+  editForm.value.kalemler.push({
+    id: 'KLM-' + (editForm.value.kalemler.length + 1),
+    ad: '',
+    miktar: 1,
+    birim: 'Adet',
+    teknikAciklama: ''
+  })
+}
+
+function removeEditKalem(idx: number) {
+  if (editForm.value.kalemler.length <= 1) {
+    alert('En az bir malzeme veya hizmet kalemi bulunmalıdır.')
+    return
+  }
+  editForm.value.kalemler.splice(idx, 1)
+}
+
+async function saveTenderEdit() {
+  if (!editForm.value.baslik.trim()) {
+    alert('Lütfen ihale başlığını giriniz.')
+    return
+  }
+
+  isSavingEdit.value = true
+  const tenderId = editForm.value.id
+  const combinedCategory = editForm.value.subCategory 
+    ? `${editForm.value.kategori} / ${editForm.value.subCategory}`
+    : editForm.value.kategori
+
+  const ihaleYonuVal = editForm.value.ihaleYonu || 'kapali_zarf'
+  let tenderTur = 'Doğrudan Teklif Alma (Kapalı Zarf)'
+  if (ihaleYonuVal === 'sabit_paket') tenderTur = 'Sabit Fiyatlı Paket & Kontenjan Toplama'
+  else if (ihaleYonuVal === 'eksiltme') tenderTur = 'Açık Eksiltme (Fiyat Azaltımlı / Alım)'
+  else if (ihaleYonuVal === 'artirma') tenderTur = 'Açık Artırma (Fiyat Artırımlı / Satış)'
+
+  const updatedFields: any = {
+    baslik: editForm.value.baslik,
+    kategori: combinedCategory,
+    mainCategory: editForm.value.kategori,
+    subCategory: editForm.value.subCategory,
+    ihaleYonu: ihaleYonuVal,
+    tur: tenderTur,
+    rekabetTuru: tenderTur,
+    butce: editForm.value.butce,
+    sure: editForm.value.sure,
+    city: editForm.value.city,
+    teslimatAdresi: editForm.value.teslimatAdresi,
+    aciklama: editForm.value.aciklama,
+    kalemler: editForm.value.kalemler
+  }
+
+  try {
+    // 1. Call server PUT endpoint
+    await $fetch(`/api/tenders/${encodeURIComponent(tenderId)}`, {
+      method: 'PUT',
+      headers: {
+        'x-user-email': userSession.value?.email || ''
+      },
+      body: updatedFields
+    })
+
+    // 2. Update localStorage 'myTenders'
+    if (typeof window !== 'undefined') {
+      try {
+        const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+        const idx = myTenders.findIndex((t: any) => t.id === tenderId)
+        if (idx >= 0) {
+          myTenders[idx] = { ...myTenders[idx], ...updatedFields }
+          localStorage.setItem('myTenders', JSON.stringify(myTenders))
+        }
+        window.dispatchEvent(new Event('storage'))
+      } catch (e) {}
+    }
+
+    // 3. Update cmsData
+    if (cmsData.value?.dashboard?.tenders) {
+      const idx = cmsData.value.dashboard.tenders.findIndex((t: any) => t.id === tenderId)
+      if (idx >= 0) {
+        cmsData.value.dashboard.tenders[idx] = { ...cmsData.value.dashboard.tenders[idx], ...updatedFields }
+        saveCmsData(cmsData.value)
+      }
+    }
+
+    // 4. Update receivedBids
+    if (cmsData.value?.dashboard?.receivedBids) {
+      const g = cmsData.value.dashboard.receivedBids.find((x: any) => x.id === tenderId)
+      if (g) {
+        g.baslik = editForm.value.baslik
+        g.kategori = combinedCategory
+        saveCmsData(cmsData.value)
+      }
+    }
+
+    // 5. Update local state
+    const localItem = localTendersState.value.find(t => t.id === tenderId)
+    if (localItem) {
+      Object.assign(localItem, updatedFields)
+    }
+
+    reloadTenders()
+    showEditModal.value = false
+    alert(`✅ İhale Başarıyla Güncellendi!\n\n"${editForm.value.baslik}" (#${tenderId}) ihale bilgileri güncellendi.`)
+  } catch (err: any) {
+    console.error('Update tender error:', err)
+    alert(err?.data?.statusMessage || err?.message || 'İhale güncellenirken bir hata oluştu.')
+  } finally {
+    isSavingEdit.value = false
+  }
+}
+
+// 🗑️ İhale Kalıcı Silme (Delete)
+async function deleteTender(tender: any) {
   if (!tender || !tender.id) return
-  const confirmDelete = confirm(`⚠️ DİKKAT: "${tender.baslik}" (#${tender.id}) ihalesini ve buna bağlı tüm teklif kayıtlarını silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.`)
+  const confirmDelete = confirm(`⚠️ DİKKAT: "${tender.baslik}" (#${tender.id}) ihalesini ve buna bağlı tüm teklif kayıtlarını kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.`)
   if (!confirmDelete) return
+
+  try {
+    await $fetch('/api/tenders/' + encodeURIComponent(tender.id), {
+      method: 'DELETE',
+      headers: {
+        'x-user-email': userSession.value?.email || ''
+      }
+    })
+  } catch (err: any) {
+    console.warn('Server delete call error:', err)
+  }
 
   // 1. Remove from localStorage 'myTenders'
   if (typeof window !== 'undefined') {
@@ -274,7 +479,7 @@ function deleteTender(tender: any) {
       )
       localStorage.setItem('myTenders', JSON.stringify(myTenders))
 
-      // Also clean up mySubmittedBids and myBids referencing this deleted tender
+      // Clean up related bids
       const mySubmittedBids = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]').filter(
         (b: any) => b.tenderId !== tender.id && b.tenderTitle !== tender.baslik && b.ilanBaslik !== tender.baslik
       )
@@ -289,12 +494,7 @@ function deleteTender(tender: any) {
     } catch (e) {}
   }
 
-  // 2. Remove from cmsData dashboard tenders & server API
-  try {
-    if (tender.id) {
-      $fetch('/api/tenders/' + encodeURIComponent(tender.id), { method: 'DELETE' }).catch(() => {})
-    }
-  } catch (e) {}
+  // 2. Remove from cmsData dashboard tenders
   if (cmsData.value?.dashboard?.tenders) {
     cmsData.value.dashboard.tenders = cmsData.value.dashboard.tenders.filter(
       (t: any) => t.id !== tender.id && t.baslik !== tender.baslik
@@ -322,7 +522,7 @@ function deleteTender(tender: any) {
 
   saveCmsData(cmsData.value)
   reloadTenders()
-  alert(`🗑️ İhale Başarıyla Silindi!\n\n"${tender.baslik}" ihalesi ve buna bağlı tüm teklifler sistemden kaldırılmıştır.`)
+  alert(`🗑️ İhale Başarıyla Silindi!\n\n"${tender.baslik}" (#${tender.id}) ihalesi ve buna bağlı tüm teklifler sistemden kaldırılmıştır.`)
 }
 
 function cancelTenderAgreement(tender: any) {
@@ -584,31 +784,54 @@ const statusTabs = computed(() => {
           </div>
         </div>
 
-        <div class="flex flex-wrap items-center gap-2.5 lg:justify-end border-t lg:border-t-0 pt-3 lg:pt-0">
-          <!-- 🗑️ Standart Reason Code ile Kapatma / İptal Butonu -->
+        <div class="flex flex-wrap items-center gap-2 lg:justify-end border-t lg:border-t-0 pt-3 lg:pt-0">
+          <!-- ✏️ Düzenle Butonu -->
           <button 
             type="button" 
+            @click.stop="openEditModal(tender)" 
+            class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-blue-50 hover:text-blue-700 hover:border-blue-300 border border-slate-200 transition shadow-2xs flex items-center gap-1.5 cursor-pointer"
+            title="İhale Bilgilerini Düzenle"
+          >
+            <Pencil :size="13" class="text-blue-600" />
+            <span>Düzenle</span>
+          </button>
+
+          <!-- 🗑️ Kalıcı Olarak Sil Butonu -->
+          <button 
+            type="button" 
+            @click.stop="deleteTender(tender)" 
+            class="px-3 py-2 rounded-xl text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 hover:border-red-300 border border-red-200 transition shadow-2xs flex items-center gap-1.5 cursor-pointer"
+            title="İhaleyi Kalıcı Olarak Sil"
+          >
+            <Trash2 :size="13" class="text-red-600" />
+            <span>Sil</span>
+          </button>
+
+          <!-- 🚫 Standart Reason Code ile Kapatma / İptal Butonu (Yalnızca aktif ihalelerde) -->
+          <button 
+            v-if="tender.durum !== 'closed' && tender.durum !== 'cancelled' && !tender.sure?.includes('Sonuçlandı') && !tender.sure?.includes('Mutabakat')"
+            type="button" 
             @click.stop="openCancelModal(tender)" 
-            class="px-3.5 py-2 rounded-xl text-xs font-black text-white bg-red-600 hover:bg-red-700 active:bg-red-800 transition shadow-sm flex items-center gap-1.5 cursor-pointer"
+            class="px-3 py-2 rounded-xl text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 hover:text-slate-800 transition flex items-center gap-1.5 cursor-pointer"
             title="İhaleyi Standart Neden Koduyla İptal Et veya Sonuçsuz Kapat"
           >
-            <Trash2 :size="13" class="text-white" />
-            <span>İptal / Kapat</span>
+            <Ban :size="13" class="text-slate-500" />
+            <span>İptal Et</span>
           </button>
 
           <!-- 💬 COM-005 & COM-006: Soru-Cevap & Zeyilname Butonu -->
           <button 
             type="button" 
             @click.stop="openQuestionsModal(tender)" 
-            class="px-3.5 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition shadow-2xs flex items-center gap-1.5 cursor-pointer"
+            class="px-3 py-2 rounded-xl text-xs font-bold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 transition shadow-2xs flex items-center gap-1.5 cursor-pointer"
             title="Gelen Soruları İncele, Yanıtla veya Genel Zeyilname Olarak Duyur (Kural COM-005, COM-006)"
           >
             <HelpCircle :size="13" class="text-blue-600" />
-            <span>Sorular & Zeyilname</span>
+            <span>Sorular</span>
           </button>
 
           <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
-            {{ tender.teklifSayisi }} {{ 'Teklif Alındı' }}
+            {{ tender.teklifSayisi || 0 }} {{ 'Teklif Alındı' }}
           </span>
 
           <!-- Eğer Mutabakat Sağlandıysa: İptal Butonu -->
@@ -747,6 +970,253 @@ const statusTabs = computed(() => {
             <span>{{ isCancelling ? 'İşleniyor...' : 'Gerekçeyle Kapat' }}</span>
           </button>
         </div>
+      </div>
+    </div>
+
+    <!-- ✏️ İHALE DÜZENLEME MODALI -->
+    <div v-if="showEditModal && editingTender" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+      <div class="bg-white rounded-3xl max-w-2xl w-full p-6 sm:p-8 space-y-5 shadow-2xl animate-fadeIn text-left my-8 max-h-[90vh] overflow-y-auto">
+        
+        <!-- Modal Başlık -->
+        <div class="flex items-start justify-between gap-4 border-b pb-4 border-slate-100">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100">
+              <Pencil :size="20" />
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="text-[10px] font-black text-blue-600 uppercase tracking-wider">İHALE DÜZENLEME</span>
+                <span class="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-slate-100 text-slate-700">#{{ editForm.id }}</span>
+              </div>
+              <h3 class="text-base font-black text-slate-900 mt-0.5">İhale Bilgilerini Düzenle</h3>
+            </div>
+          </div>
+          <button @click="showEditModal = false" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl cursor-pointer">
+            <X :size="18" />
+          </button>
+        </div>
+
+        <!-- Sihirbazda Aç Banner -->
+        <div class="p-3 bg-blue-50/60 border border-blue-100 rounded-2xl flex items-center justify-between gap-3 text-xs">
+          <span class="text-slate-600 font-medium">Şartname dosyaları ve görselleri detaylı düzenlemek için sihirbazı kullanabilirsiniz:</span>
+          <NuxtLink 
+            :to="'/panel/ihale-olustur?edit=' + encodeURIComponent(editForm.id)"
+            class="shrink-0 px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition shadow-2xs"
+          >
+            Tam Sihirbazda Aç
+          </NuxtLink>
+        </div>
+
+        <!-- Form Alanları -->
+        <form @submit.prevent="saveTenderEdit" class="space-y-4">
+          
+          <!-- İhale Başlığı -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">
+              İHALE BAŞLIĞI *
+            </label>
+            <input 
+              v-model="editForm.baslik"
+              type="text"
+              required
+              placeholder="Örn: 500 Ton İnşaat Demiri Tedarik İhalesi"
+              class="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 outline-none focus:border-blue-600 transition"
+            />
+          </div>
+
+          <!-- Kategori & Alt Kategori -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">
+                SEKTÖREL KATEGORİ *
+              </label>
+              <select 
+                v-model="editForm.kategori"
+                class="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-white outline-none focus:border-blue-600"
+              >
+                <option v-for="cat in EDIT_CATEGORIES" :key="cat" :value="cat">{{ cat }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">
+                ALT KATEGORİ / DETAY
+              </label>
+              <input 
+                v-model="editForm.subCategory"
+                type="text"
+                placeholder="Örn: Donatı Demiri, Hazır Beton..."
+                class="w-full p-3 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 outline-none focus:border-blue-600 transition"
+              />
+            </div>
+          </div>
+
+          <!-- İhale Yönü, Bütçe & Süre -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">
+                İHALE USULÜ *
+              </label>
+              <select 
+                v-model="editForm.ihaleYonu"
+                class="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-white outline-none focus:border-blue-600"
+              >
+                <option value="kapali_zarf">Kapalı Zarf Usulü</option>
+                <option value="eksiltme">Açık Eksiltme (Alım)</option>
+                <option value="artirma">Açık Artırma (Satış)</option>
+                <option value="sabit_paket">Sabit Fiyatlı Paket</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">
+                BÜTÇE / HEDEF FİYAT
+              </label>
+              <input 
+                v-model="editForm.butce"
+                type="text"
+                placeholder="Örn: 150.000 ₺ veya Teklif Usulü"
+                class="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 outline-none focus:border-blue-600 transition"
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">
+                İHALE SÜRESİ
+              </label>
+              <select 
+                v-model="editForm.sure"
+                class="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-white outline-none focus:border-blue-600"
+              >
+                <option value="3 gün">3 Gün</option>
+                <option value="5 gün">5 Gün</option>
+                <option value="7 gün">7 Gün</option>
+                <option value="10 gün">10 Gün</option>
+                <option value="15 gün">15 Gün</option>
+                <option value="30 gün">30 Gün</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Konum & Adres -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">
+                TESLİMAT ŞEHRİ *
+              </label>
+              <select 
+                v-model="editForm.city"
+                class="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-white outline-none focus:border-blue-600"
+              >
+                <option v-for="c in CITIES_LIST" :key="c" :value="c">{{ c }}</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">
+                TESLİMAT ADRESİ / SAHA
+              </label>
+              <input 
+                v-model="editForm.teslimatAdresi"
+                type="text"
+                placeholder="Merkez Depo / Şantiye Teslim..."
+                class="w-full p-3 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 outline-none focus:border-blue-600 transition"
+              />
+            </div>
+          </div>
+
+          <!-- Açıklama -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">
+              ŞARTNAME & İHALE AÇIKLAMASI
+            </label>
+            <textarea 
+              v-model="editForm.aciklama"
+              rows="3"
+              placeholder="Teknik şartname gereksinimleri, malzeme kalite standartları ve teslimat koşulları..."
+              class="w-full p-3 rounded-xl border border-slate-200 text-xs text-slate-800 outline-none focus:border-blue-600"
+            ></textarea>
+          </div>
+
+          <!-- Kalemler Listesi -->
+          <div class="space-y-2 pt-2 border-t border-slate-100">
+            <div class="flex items-center justify-between">
+              <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider">
+                MALZEME / HİZMET KALEMLERİ ({{ editForm.kalemler.length }})
+              </label>
+              <button 
+                type="button"
+                @click="addEditKalem"
+                class="px-2.5 py-1 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold text-[10px] transition flex items-center gap-1 cursor-pointer"
+              >
+                <Plus :size="11" />
+                <span>Kalem Ekle</span>
+              </button>
+            </div>
+
+            <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+              <div 
+                v-for="(kalem, kIdx) in editForm.kalemler" 
+                :key="kalem.id || kIdx"
+                class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-1 sm:grid-cols-12 gap-2 items-center text-xs"
+              >
+                <div class="sm:col-span-5">
+                  <input 
+                    v-model="kalem.ad" 
+                    type="text" 
+                    placeholder="Kalem Adı / Özelliği" 
+                    class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-medium outline-none focus:border-blue-600"
+                  />
+                </div>
+                <div class="sm:col-span-3">
+                  <input 
+                    v-model.number="kalem.miktar" 
+                    type="number" 
+                    min="1" 
+                    placeholder="Miktar" 
+                    class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-medium outline-none focus:border-blue-600"
+                  />
+                </div>
+                <div class="sm:col-span-3">
+                  <input 
+                    v-model="kalem.birim" 
+                    type="text" 
+                    placeholder="Birim (Adet, Ton..)" 
+                    class="w-full p-2 bg-white border border-slate-200 rounded-lg text-xs font-medium outline-none focus:border-blue-600"
+                  />
+                </div>
+                <div class="sm:col-span-1 flex justify-end">
+                  <button 
+                    type="button" 
+                    @click="removeEditKalem(kIdx)"
+                    class="p-2 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition cursor-pointer"
+                    title="Kalemi Sil"
+                  >
+                    <Trash2 :size="13" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Butonlar -->
+          <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+            <button 
+              type="button" 
+              @click="showEditModal = false" 
+              class="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
+            >
+              Vazgeç
+            </button>
+            <button 
+              type="submit" 
+              :disabled="isSavingEdit"
+              :class="isSavingEdit ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'"
+              class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-black text-xs transition shadow-md flex items-center gap-1.5"
+            >
+              <CheckCircle2 :size="14" />
+              <span>{{ isSavingEdit ? 'Kaydediliyor...' : 'Değişiklikleri Kaydet' }}</span>
+            </button>
+          </div>
+
+        </form>
+
       </div>
     </div>
 
