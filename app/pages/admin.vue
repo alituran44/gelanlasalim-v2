@@ -78,6 +78,7 @@ import {
 import { useCmsData } from '~/composables/useCmsData'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
 import { useNetGsm } from '~/composables/useNetGsm'
+import SystemManagementView from '~/components/admin/SystemManagementView.vue'
 
 definePageMeta({
   layout: false // Custom full screen admin dashboard
@@ -180,6 +181,7 @@ export type AdminTab =
   | 'categories'
   | 'promo_codes'
   | 'audit_logs'
+  | 'system_ops'
   | 'site_settings'
   | 'support_ai' 
   | 'netgsm_sms'
@@ -1067,7 +1069,12 @@ onMounted(() => {
     }
 
     if (route.query.tab) {
-      activeTab.value = String(route.query.tab)
+      const qTab = String(route.query.tab)
+      if (qTab === 'sistem' || qTab === 'system' || qTab === 'uat' || qTab === 'system_ops') {
+        activeTab.value = 'system_ops'
+      } else {
+        activeTab.value = qTab as AdminTab
+      }
     }
 
     syncLiveState()
@@ -2114,6 +2121,18 @@ function removeSubmittedBid(index: number) {
               </span>
             </button>
 
+            <button 
+              @click="activeTab = 'system_ops'" 
+              class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'system_ops' ? 'bg-purple-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
+            >
+              <span class="flex items-center gap-2"><Server :size="14" /> Sistem & UAT (Ops)</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-black border"
+                :class="activeTab === 'system_ops' ? 'bg-white/20 text-white border-white/30' : 'bg-purple-500/20 text-purple-400 border-purple-500/30'">
+                SEC-020
+              </span>
+            </button>
+
             <!-- GROUP: İHALE & OPERASYON -->
             <div class="text-[9px] font-black text-rose-600 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
               <Zap :size="10" /> İHALE & OPERASYON
@@ -2332,6 +2351,7 @@ function removeSubmittedBid(index: number) {
               <span v-else-if="activeTab === 'categories'">🏷️ B2B Sektör & Kategori Yönetimi</span>
               <span v-else-if="activeTab === 'promo_codes'">🎟️ Kupon & Lansman Promosyon Kodları</span>
               <span v-else-if="activeTab === 'audit_logs'">🔒 Sistem Denetim İzi & Güvenlik Günlüğü</span>
+              <span v-else-if="activeTab === 'system_ops'">🛡️ Canlıya Geçiş, Sistem Yönetimi & Güvenlik Matrisi (SEC-020)</span>
               <span v-else-if="activeTab === 'site_settings'">⚙️ Site Genel Ayarları, SEO & Bakım Modu</span>
               <span v-else-if="activeTab === 'support_ai'">💬 WhatsApp & Yapay Zeka Canlı Asistan</span>
               <span v-else-if="activeTab === 'crm_leads'">👥 CRM Müşteri / Aday Yönetim Merkezi</span>
@@ -4242,6 +4262,13 @@ function removeSubmittedBid(index: number) {
               </div>
             </div>
 
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB: SİSTEM YÖNETİMİ, UAT & GÜVENLİK MATRİSİ (SEC-016 - SEC-020) -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'system_ops'" class="space-y-6 text-left">
+            <SystemManagementView />
           </div>
 
           <!-- ========================================================================= -->
