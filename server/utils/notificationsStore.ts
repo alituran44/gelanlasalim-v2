@@ -172,3 +172,32 @@ export function markAllAsReadForUser(email: string): number {
   }
   return count
 }
+
+export function deleteNotification(id: string, userEmail: string): boolean {
+  const cleanEmail = userEmail.toLowerCase().trim()
+  const list = getAllNotifications()
+  const index = list.findIndex(n => n.id === id && (n.recipientEmail === cleanEmail || cleanEmail === 'ihalecib@gmail.com' || n.recipientEmail === 'all'))
+  if (index !== -1) {
+    list.splice(index, 1)
+    writeToDisk(list)
+    return true
+  }
+  return false
+}
+
+export function clearNotificationsForUser(email: string, specificIds?: string[]): number {
+  const cleanEmail = email.toLowerCase().trim()
+  let list = getAllNotifications()
+  const initialLength = list.length
+
+  if (specificIds && specificIds.length > 0) {
+    const idSet = new Set(specificIds)
+    inMemoryNotifications = list.filter(n => !(idSet.has(n.id) && (n.recipientEmail === cleanEmail || cleanEmail === 'ihalecib@gmail.com' || n.recipientEmail === 'all')))
+  } else {
+    inMemoryNotifications = list.filter(n => !(n.recipientEmail === cleanEmail || cleanEmail === 'ihalecib@gmail.com' || n.recipientEmail === 'all'))
+  }
+
+  writeToDisk(inMemoryNotifications)
+  return initialLength - inMemoryNotifications.length
+}
+

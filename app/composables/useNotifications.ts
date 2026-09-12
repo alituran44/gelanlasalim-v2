@@ -230,9 +230,9 @@ export function useNotifications() {
       })
     }
 
-    // Filter out deleted notifications (except mandatory ones) and map read/unread status
+    // Filter out deleted notifications and map read/unread status
     return list
-      .filter(item => item.isMandatory || !deletedNotifIds.value.includes(item.id))
+      .filter(item => !deletedNotifIds.value.includes(item.id))
       .map(item => {
         const isRead = item.readAt ? true : readNotifIds.value.includes(item.id)
         return {
@@ -285,16 +285,47 @@ export function useNotifications() {
     } catch {}
   }
 
-  function deleteNotification(id: string) {
-    const target = notifications.value.find(n => n.id === id)
-    if (target?.isMandatory || target?.category === 'CRITICAL') {
-      alert('🛡️ Kural COM-003 Uyarınca:\n\nKritik ihale ve güvenlik bildirimleri sistem kayıt bütünlüğü gereğince tamamen kapatılamaz ve silinemez.')
-      return
-    }
+  async function deleteNotification(id: string) {
     if (!deletedNotifIds.value.includes(id)) {
       deletedNotifIds.value.push(id)
       saveToStorage()
     }
+    try {
+      let email = 'ihalecib@gmail.com'
+      try {
+        const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+        if (session?.email) email = session.email
+      } catch {}
+      await $fetch('/api/notifications', {
+        method: 'DELETE',
+        body: { id, email }
+      })
+    } catch {}
+  }
+
+  async function clearAllNotifications(targetIds?: string[]) {
+    const idsToDelete = targetIds && targetIds.length > 0
+      ? targetIds
+      : notifications.value.map(n => n.id)
+
+    idsToDelete.forEach(id => {
+      if (!deletedNotifIds.value.includes(id)) {
+        deletedNotifIds.value.push(id)
+      }
+    })
+    saveToStorage()
+
+    try {
+      let email = 'ihalecib@gmail.com'
+      try {
+        const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+        if (session?.email) email = session.email
+      } catch {}
+      await $fetch('/api/notifications', {
+        method: 'DELETE',
+        body: { all: true, email, ids: idsToDelete }
+      })
+    } catch {}
   }
 
   function updateNotificationSettings(newSettings: Partial<typeof defaultNotificationSettings>) {
@@ -312,6 +343,7 @@ export function useNotifications() {
     markAsRead,
     markAllAsRead,
     deleteNotification,
+    clearAllNotifications,
     updateNotificationSettings
   }
 }

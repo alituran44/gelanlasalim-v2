@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { Bell, CheckCircle2, AlertCircle, Info, Trash2, ShieldAlert, Settings, Building2, Send, Clock, Sparkles, ChevronRight, Lock, Check } from 'lucide-vue-next'
+import { Bell, CheckCircle2, AlertCircle, Info, Trash2, ShieldAlert, Settings, Building2, Send, Clock, Sparkles, ChevronRight, Check } from 'lucide-vue-next'
 import { useNotifications } from '~/composables/useNotifications'
 
 definePageMeta({ layout: 'dashboard' })
 
-const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification } = useNotifications()
+const { notifications, unreadCount, markAsRead, markAllAsRead, deleteNotification, clearAllNotifications } = useNotifications()
 
 const selectedFilter = ref<'all' | 'CRITICAL' | 'bid' | 'escrow'>('all')
 
@@ -25,6 +25,12 @@ const filteredNotifications = computed(() => {
 
 function markAllRead() {
   markAllAsRead()
+}
+
+function clearAll() {
+  if (confirm('Tüm bildirimleri silmek istediğinize emin misiniz?')) {
+    clearAllNotifications()
+  }
 }
 </script>
 
@@ -57,6 +63,16 @@ function markAllRead() {
           class="text-xs font-bold text-blue-600 hover:text-blue-800 transition bg-blue-50 hover:bg-blue-100/80 px-3.5 py-2 rounded-xl cursor-pointer"
         >
           Tümünü Okundu İşaretle
+        </button>
+
+        <button 
+          v-if="notifications.length > 0"
+          @click="clearAll"
+          class="text-xs font-bold text-rose-600 hover:text-rose-800 transition bg-rose-50 hover:bg-rose-100/80 px-3.5 py-2 rounded-xl flex items-center gap-1.5 cursor-pointer"
+          title="Tüm bildirimleri sil"
+        >
+          <Trash2 :size="13" />
+          <span>Tümünü Sil</span>
         </button>
       </div>
     </div>
@@ -96,7 +112,7 @@ function markAllRead() {
         :class="selectedFilter === 'CRITICAL' ? 'bg-red-600 text-white shadow-2xs' : 'bg-white text-red-600 border border-red-200 hover:bg-red-50'"
       >
         <ShieldAlert :size="13" />
-        <span>Kritik (Kapatılamaz - COM-003)</span>
+        <span>Kritik Bildirimler</span>
       </button>
       <button 
         @click="selectedFilter = 'bid'"
@@ -150,7 +166,7 @@ function markAllRead() {
                   v-if="notif.category === 'CRITICAL' || notif.isMandatory"
                   class="px-2 py-0.5 rounded-md bg-red-100 text-red-800 text-[10px] font-black border border-red-200"
                 >
-                  KRİTİK (Kapatılamaz - COM-003)
+                  KRİTİK BİLDİRİM
                 </span>
                 <span 
                   v-else
@@ -200,22 +216,14 @@ function markAllRead() {
           </div>
         </div>
 
-        <!-- Sil Butonu veya Kilit Rozeti (COM-003) -->
+        <!-- Sil Butonu -->
         <div class="shrink-0 self-start sm:self-center">
-          <div 
-            v-if="notif.isMandatory || notif.category === 'CRITICAL'" 
-            class="text-slate-400 p-1.5 rounded-lg bg-slate-50 border border-slate-200" 
-            title="Kural COM-003: Kritik sistem bildirimleri kapatılamaz ve silinemez."
-          >
-            <Lock :size="14" class="text-slate-400" />
-          </div>
           <button 
-            v-else
             @click="deleteNotification(notif.id)"
-            class="text-slate-400 hover:text-red-500 transition p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"
+            class="text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition p-2 rounded-xl border border-transparent hover:border-rose-100 cursor-pointer flex items-center justify-center group/del"
             title="Bildirimi Sil"
           >
-            <Trash2 :size="14" />
+            <Trash2 :size="15" class="transition group-hover/del:scale-110" />
           </button>
         </div>
 
