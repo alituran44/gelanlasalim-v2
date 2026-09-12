@@ -40,7 +40,7 @@ import { useUserSession } from '~/composables/useUserSession'
 const route = useRoute()
 const router = useRouter()
 
-const { userSession, isCompanyMode, userName, companyName, toggleCompanyMode, logout: sessionLogout } = useUserSession()
+const { userSession, isCompanyMode, userName, companyName, toggleCompanyMode, logout: sessionLogout, isAdmin } = useUserSession()
 const isTekliflerOpen = ref(true)
 
 watchEffect(() => {
@@ -170,6 +170,51 @@ const activePath = computed(() => route.path)
       </div>
     </div>
 
+    <!-- 👑 SÜPER ADMİN KONTROL MERKEZİ (24 Modül & Tüm Ayarlar) -->
+    <div v-if="isAdmin" class="mx-3 mb-3 p-2.5 rounded-xl text-left shadow-lg border border-amber-500/40 bg-gradient-to-br from-amber-500/20 via-slate-900 to-amber-950/40">
+      <div class="flex items-center justify-between mb-1.5 pb-1 border-b border-amber-500/25">
+        <div class="flex items-center gap-1.5">
+          <span class="text-sm">👑</span>
+          <span class="text-[11px] font-black text-amber-300 tracking-wider">SÜPER ADMİN</span>
+        </div>
+        <span class="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/25 text-amber-200 font-bold border border-amber-500/40">
+          24 Ayar Modülü
+        </span>
+      </div>
+      <p class="text-[10px] text-slate-300 leading-tight mb-2">
+        Platformun tüm genel ayarları, komisyon oranları ve firma onayları.
+      </p>
+      <NuxtLink
+        to="/admin"
+        class="w-full flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 text-[11px] font-black transition shadow cursor-pointer"
+      >
+        <Sliders :size="13" />
+        <span>Süper Admin Paneli</span>
+      </NuxtLink>
+      
+      <!-- Hızlı Erişim Ayarları -->
+      <div class="mt-2 pt-1.5 border-t border-white/10 grid grid-cols-2 gap-1 text-[10px]">
+        <NuxtLink to="/admin?tab=site_settings" class="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-amber-200 transition flex items-center gap-1 truncate">
+          ⚙️ Site Ayarları
+        </NuxtLink>
+        <NuxtLink to="/admin?tab=kyc_desk" class="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-amber-200 transition flex items-center gap-1 truncate">
+          🏢 KYC & Firma
+        </NuxtLink>
+        <NuxtLink to="/admin?tab=db_tenders" class="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-amber-200 transition flex items-center gap-1 truncate">
+          📋 İhale Onay
+        </NuxtLink>
+        <NuxtLink to="/admin?tab=commission_rates" class="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-amber-200 transition flex items-center gap-1 truncate">
+          💰 Komisyonlar
+        </NuxtLink>
+        <NuxtLink to="/admin?tab=categories" class="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-amber-200 transition flex items-center gap-1 truncate">
+          🗂️ Sektörler
+        </NuxtLink>
+        <NuxtLink to="/admin?tab=system_ops" class="p-1 rounded bg-white/5 hover:bg-white/10 text-slate-300 hover:text-amber-200 transition flex items-center gap-1 truncate">
+          🖥️ Sistem (Ops)
+        </NuxtLink>
+      </div>
+    </div>
+
     <!-- Yeni İhale Oluştur Butonu -->
     <div class="px-3 mb-3">
       <NuxtLink
@@ -286,6 +331,17 @@ const activePath = computed(() => route.path)
 
       </template>
     </nav>
+
+    <!-- Süper Admin Girişi Butonu (Admin Değilse) -->
+    <div v-if="!isAdmin" class="px-3 mb-1">
+      <NuxtLink
+        to="/admin"
+        class="flex items-center gap-2 rounded-lg px-3 py-1.5 text-[11px] font-bold text-amber-300/80 hover:text-amber-200 hover:bg-amber-500/10 transition border border-amber-500/20"
+      >
+        <span>👑</span>
+        <span>Süper Admin Paneli</span>
+      </NuxtLink>
+    </div>
 
     <!-- Yardım Merkezi Butonu -->
     <div class="px-3 mb-2 border-t pt-2" style="border-color: rgba(255,255,255,0.08);">

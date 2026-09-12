@@ -48,7 +48,8 @@ const {
   userName, 
   companyName: sessionCompanyName,
   isLoggedIn,
-  toggleCompanyMode 
+  toggleCompanyMode,
+  isAdmin 
 } = useUserSession()
 
 const displayName = computed(() => {
@@ -210,6 +211,49 @@ watch(() => userSession.value, () => {
 
 <template>
   <div class="p-4 sm:p-6 max-w-7xl mx-auto space-y-6 text-left">
+    <!-- 👑 SÜPER ADMİN MODU AKTİF UYARI VE GEÇİŞ BANNERI -->
+    <div v-if="isAdmin" class="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/15 via-slate-900 to-amber-900/25 border-2 border-amber-500/50 shadow-xl flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 text-left">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <span class="text-xl">👑</span>
+          <span class="text-xs font-black uppercase tracking-wider text-amber-300 bg-amber-500/20 px-2.5 py-0.5 rounded-full border border-amber-500/40">
+            SÜPER ADMİN MODU AKTİF
+          </span>
+          <span class="text-xs text-amber-200/70 font-mono font-bold">24 Modül & Tüm Platform Ayarları</span>
+        </div>
+        <h2 class="text-base sm:text-lg font-black text-white">
+          Tüm Sistem, Komisyon, KYC ve Site Ayarlarını Yönetmek İçin Süper Admin Paneli Hazır
+        </h2>
+        <p class="text-xs text-slate-300 max-w-2xl leading-relaxed">
+          Şu anda standart kullanıcı / firma panelindesiniz. Platformun 24 farklı yönetim modülünü (komisyonlar, firma evrak onayları, ihale denetimleri, SMS/e-posta ayarları) kullanmak için doğrudan Süper Admin Paneli'ne geçiş yapabilirsiniz.
+        </p>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2 shrink-0">
+        <NuxtLink
+          to="/admin"
+          class="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-300 hover:to-amber-500 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/20 flex items-center gap-2 cursor-pointer"
+        >
+          <span>🚀</span>
+          <span>Süper Admin Paneline Git</span>
+        </NuxtLink>
+        <NuxtLink
+          to="/admin?tab=site_settings"
+          class="px-3.5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-200 text-xs font-bold transition border border-amber-500/30 flex items-center gap-1.5"
+        >
+          <span>⚙️</span>
+          <span>Site Ayarları</span>
+        </NuxtLink>
+        <NuxtLink
+          to="/admin?tab=commission_rates"
+          class="px-3.5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-200 text-xs font-bold transition border border-amber-500/30 flex items-center gap-1.5"
+        >
+          <span>💰</span>
+          <span>Komisyonlar</span>
+        </NuxtLink>
+      </div>
+    </div>
+
     <!-- ========================================================================= -->
     <!-- 🏢 1. ÜST HOŞ GELDİNİZ VE KURUMSAL AKSİYON KARTI -->
     <!-- ========================================================================= -->

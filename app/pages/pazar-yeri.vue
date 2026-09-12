@@ -38,6 +38,7 @@ import { useCmsData, DEFAULT_CMS_DATA } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
 import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_TYPES, TENDER_METHODS } from '~/utils/taxonomy'
 import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
+import { formatSectorSummaryBadges, resolveSectorKey, SECTOR_DEFINITIONS } from '~/utils/categoryFieldsSchema'
 
 definePageMeta({
   layout: "public"
@@ -241,6 +242,44 @@ const detailActiveTab = ref<'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'firmala
 const showSpecModal = ref(false)
 const selectedSpecTender = ref<any>(null)
 const specActiveTab = ref<'malzeme' | 'idari' | 'teknik'>('malzeme')
+
+function getTenderSectorBadges(tender: any) {
+  if (!tender || !tender.categorySpecificData) return []
+  return formatSectorSummaryBadges(tender.categorySpecificData, tender.categorySpecificData._sectorKey || '')
+}
+
+function getTenderSectorDetails(tender: any) {
+  if (!tender || !tender.categorySpecificData || Object.keys(tender.categorySpecificData).length === 0) return null
+  const data = tender.categorySpecificData
+  const sectorKey = data._sectorKey || resolveSectorKey(tender.kategori, tender.subCategory)
+  const def = SECTOR_DEFINITIONS[sectorKey]
+  if (!def) return null
+
+  const groups: Array<{ title: string; desc: string; fields: Array<{ label: string; value: any; unit?: string }> }> = []
+  const groupKeys: Array<'teknik' | 'mevzuat' | 'ticari'> = ['teknik', 'mevzuat', 'ticari']
+  
+  groupKeys.forEach(gKey => {
+    const groupDef = def.groups[gKey]
+    const gFields = def.fields.filter(f => f.group === gKey && data[f.id] !== undefined && data[f.id] !== '' && data[f.id] !== null)
+    if (gFields.length > 0) {
+      groups.push({
+        title: groupDef.title,
+        desc: groupDef.desc,
+        fields: gFields.map(f => ({
+          label: f.label,
+          value: typeof data[f.id] === 'boolean' ? (data[f.id] ? 'Evet (Zorunlu / Sağlanmalı)' : 'Hayır (Gerekli Değil)') : data[f.id],
+          unit: f.unit
+        }))
+      })
+    }
+  })
+
+  return {
+    sectorName: def.name,
+    badgeText: def.badgeText,
+    groups
+  }
+}
 
 const showTenderQuestionsModal = ref(false)
 const selectedTenderForQuestions = ref<any>(null)
@@ -1186,6 +1225,18 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             <span class="px-2 py-0.2 rounded bg-blue-50 text-blue-700 text-[10px] font-bold">🏷️ {{ tender.tur || 'Doğrudan temin' }}</span>
           </div>
 
+          <!-- Sektörel Şartname Rozetleri (İnşaat, Akaryakıt, Arsa vb.) -->
+          <div v-if="getTenderSectorBadges(tender).length > 0" class="flex flex-wrap items-center gap-1.5 pt-1">
+            <span 
+              v-for="b in getTenderSectorBadges(tender)" 
+              :key="b.label"
+              class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1"
+            >
+              <span class="text-slate-500 font-normal">{{ b.label }}:</span>
+              <span class="text-slate-900 font-semibold">{{ b.value }}</span>
+            </span>
+          </div>
+
           <!-- Row 5: 7 EKAP Sub-tabs / Action Buttons (Görsel 1 ile birebir) -->
           <div class="flex flex-wrap items-center justify-between gap-1.5 pt-2 border-t border-slate-200">
             <div class="flex flex-wrap items-center gap-1.5">
@@ -1464,6 +1515,45 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
               </button>
             </div>
             <p>{{ selectedTenderForDetail.aciklama || 'Bu ihale şartnamesinde yer alan teknik kriterler, teslimat takvimi ve kalite standartları uyarınca mal / hizmet alımı yapılacaktır.' }}</p>
+          </div>
+
+          <!-- 📐 Sektöre Özgü Teknik ve Mevzuat Şartnamesi Parametreleri -->
+          <div v-if="getTenderSectorDetails(selectedTenderForDetail)" class="p-4 rounded-2xl bg-white border border-slate-200 shadow-2xs space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-200">
+                  {{ getTenderSectorDetails(selectedTenderForDetail)?.badgeText }}
+                </span>
+                <h4 class="font-black text-slate-900 text-sm">Sektörel & Teknik Şartname Kriterleri</h4>
+              </div>
+              <span class="text-[11px] text-slate-400 font-medium">Bu parametreler alıcı tarafından teknik şartnameye bağlanmıştır</span>
+            </div>
+
+            <div class="space-y-3">
+              <div 
+                v-for="group in getTenderSectorDetails(selectedTenderForDetail)?.groups" 
+                :key="group.title" 
+                class="rounded-xl border border-slate-100 bg-slate-50/70 p-3.5 space-y-2.5"
+              >
+                <div class="flex items-center justify-between">
+                  <h5 class="font-black text-slate-800 text-xs">{{ group.title }}</h5>
+                  <span class="text-[10px] text-slate-400">{{ group.desc }}</span>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5">
+                  <div 
+                    v-for="f in group.fields" 
+                    :key="f.label" 
+                    class="p-2.5 rounded-lg bg-white border border-slate-200 space-y-0.5"
+                  >
+                    <span class="text-[10px] font-bold text-slate-400 block uppercase tracking-wider">{{ f.label }}</span>
+                    <span class="text-xs font-black text-slate-900">
+                      {{ f.value }} <span v-if="f.unit" class="text-[10px] text-slate-500 font-normal">({{ f.unit }})</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">

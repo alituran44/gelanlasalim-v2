@@ -4,6 +4,8 @@ import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight, Lock,
 import { useCmsData } from '~/composables/useCmsData'
 import { locale } from '~/composables/useLocale'
 import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
+import CategorySpecificFields from '~/components/tender/CategorySpecificFields.vue'
+import { formatSectorSummaryBadges } from '~/utils/categoryFieldsSchema'
 
 definePageMeta({
   layout: "dashboard"
@@ -73,6 +75,11 @@ function getTenderDirectionBadge(tender: any) {
     return { label: '📈 Açık Artırma (Fiyat Artırımlı)', class: 'bg-blue-100 text-blue-900 border-blue-300 font-bold' }
   }
   return { label: '📉 Açık Eksiltme (Fiyat Azaltımlı)', class: 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold' }
+}
+
+function getTenderSectorBadges(tender: any) {
+  if (!tender || !tender.categorySpecificData) return []
+  return formatSectorSummaryBadges(tender.categorySpecificData, tender.categorySpecificData._sectorKey || '')
 }
 
 const userSession = ref<any>({})
@@ -310,6 +317,7 @@ const editForm = ref({
   city: 'Balıkesir',
   teslimatAdresi: '',
   aciklama: '',
+  categorySpecificData: {} as Record<string, any>,
   kalemler: [] as Array<{ id: string; ad: string; miktar: number; birim: string; teknikAciklama?: string }>
 })
 
@@ -336,6 +344,7 @@ function openEditModal(tender: any) {
     city: tender.city || 'Balıkesir',
     teslimatAdresi: tender.teslimatAdresi || '',
     aciklama: tender.aciklama || '',
+    categorySpecificData: tender.categorySpecificData ? JSON.parse(JSON.stringify(tender.categorySpecificData)) : {},
     kalemler: Array.isArray(tender.kalemler) && tender.kalemler.length > 0
       ? JSON.parse(JSON.stringify(tender.kalemler))
       : [{ id: 'KLM-1', ad: tender.baslik || 'Satın Alma Kalemi', miktar: 1, birim: 'Adet', teknikAciklama: '' }]
@@ -392,6 +401,7 @@ async function saveTenderEdit() {
     city: editForm.value.city,
     teslimatAdresi: editForm.value.teslimatAdresi,
     aciklama: editForm.value.aciklama,
+    categorySpecificData: editForm.value.categorySpecificData || {},
     kalemler: editForm.value.kalemler
   }
 
@@ -781,6 +791,18 @@ const statusTabs = computed(() => {
                 ⛔ Neden: {{ tender.reasonCode }}
               </span>
             </div>
+
+            <!-- 🏷️ Sektöre Özgü Teknik / Şartname Kriter Rozetleri (İnşaat, Akaryakıt, Arsa vb.) -->
+            <div v-if="getTenderSectorBadges(tender).length > 0" class="flex flex-wrap items-center gap-1.5 mt-2">
+              <span 
+                v-for="badge in getTenderSectorBadges(tender)" 
+                :key="badge.label" 
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200"
+              >
+                <span class="text-slate-400 font-normal">{{ badge.label }}:</span>
+                <span class="text-slate-900 font-semibold">{{ badge.value }}</span>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -1132,6 +1154,15 @@ const statusTabs = computed(() => {
               placeholder="Teknik şartname gereksinimleri, malzeme kalite standartları ve teslimat koşulları..."
               class="w-full p-3 rounded-xl border border-slate-200 text-xs text-slate-800 outline-none focus:border-blue-600"
             ></textarea>
+          </div>
+
+          <!-- 📐 Sektöre Özel Teknik ve Mevzuat Parametreleri (İnşaat, Akaryakıt, Arsa vb.) -->
+          <div class="pt-2 border-t border-slate-100">
+            <CategorySpecificFields 
+              v-model="editForm.categorySpecificData"
+              :category="editForm.kategori"
+              :sub-category="editForm.subCategory"
+            />
           </div>
 
           <!-- Kalemler Listesi -->

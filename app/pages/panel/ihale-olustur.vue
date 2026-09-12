@@ -7,6 +7,8 @@ import { useCmsData } from '~/composables/useCmsData'
 import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
 import { usePublicApis } from '~/composables/usePublicApis'
+import CategorySpecificFields from '~/components/tender/CategorySpecificFields.vue'
+import { resolveSectorKey } from '~/utils/categoryFieldsSchema'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -18,6 +20,14 @@ const { fetchTrHolidays, trPublicHolidays } = usePublicApis()
 const editingTenderId = ref<string | null>(null)
 const isEditMode = computed(() => Boolean(editingTenderId.value))
 const existingTender = ref<any>(null)
+
+// Sektöre Özgü Dinamik Şartname Parametreleri
+const categorySpecificData = ref<Record<string, any>>({})
+const currentSectorKey = ref<string>('insaat_yapi')
+
+function handleSectorChanged(key: string) {
+  currentSectorKey.value = key
+}
 
 const fileInputRef = ref<HTMLInputElement | null>(null)
 const imageInputRef = ref<HTMLInputElement | null>(null)
@@ -350,6 +360,12 @@ async function loadTenderForEdit(tenderId: string) {
     }
     if (Array.isArray(tender.files) && tender.files.length > 0) {
       form.value.files = JSON.parse(JSON.stringify(tender.files))
+    }
+    if (tender.categorySpecificData || tender.customFields) {
+      categorySpecificData.value = JSON.parse(JSON.stringify(tender.categorySpecificData || tender.customFields))
+    }
+    if (tender.sectorKey) {
+      currentSectorKey.value = tender.sectorKey
     }
   } catch (err) {
     console.error('Failed to load tender for editing:', err)
@@ -703,6 +719,9 @@ async function handleSubmit() {
       files: (form.value.files || []).map(f => ({ name: f.name, size: f.size, type: f.type, progress: 100 })),
       documents: (form.value.files || []).map(f => ({ name: f.name, size: f.size, type: f.type, progress: 100 })),
       aciklama: form.value.aciklama || form.value.baslik,
+      categorySpecificData: categorySpecificData.value,
+      customFields: categorySpecificData.value,
+      sectorKey: currentSectorKey.value || resolveSectorKey(form.value.kategori, selectedSubcategory.value),
       ownerEmail: existingTender.value?.ownerEmail || ownerEmail,
       ownerName: existingTender.value?.ownerName || ownerName,
       ownerCompany: existingTender.value?.ownerCompany || ownerCompany,
@@ -1281,6 +1300,14 @@ function resetFormAndCreateNew() {
           </div>
         </div>
       </div>
+
+      <!-- SEKTÖRE ÖZGÜ DİNAMİK İHALE VE ŞARTNAME PARAMETRELERİ -->
+      <CategorySpecificFields
+        v-model="categorySpecificData"
+        :category="form.kategori"
+        :sub-category="selectedSubcategory"
+        @sector-changed="handleSectorChanged"
+      />
 
       <!-- KART 2: LOJİSTİK VE ÖDEME ŞARTLARI -->
       <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">

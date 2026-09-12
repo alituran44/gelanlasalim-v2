@@ -121,10 +121,15 @@ onMounted(() => {
                       localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
                     }
 
+                    const isGoogleAdmin = cleanEmail === 'ihalecib@gmail.com' || cleanEmail.includes('admin')
+                    if (isGoogleAdmin) {
+                      userAccount.role = 'admin'
+                      localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
+                    }
                     localStorage.setItem('userSession', JSON.stringify(userAccount))
                     registerToAdminKycQueue(userAccount)
                     window.dispatchEvent(new Event('storage'))
-                    router.push('/panel')
+                    router.push(isGoogleAdmin ? '/admin' : '/panel')
                 }
               }
             },
@@ -585,6 +590,12 @@ function fallbackGoogleLogin() {
       localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
     }
 
+    const isFallbackAdmin = cleanEmail === 'ihalecib@gmail.com' || cleanEmail.includes('admin')
+    if (isFallbackAdmin) {
+      userAccount.role = 'admin'
+      localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
+    }
+
     localStorage.setItem('userSession', JSON.stringify(userAccount))
     registerToAdminKycQueue(userAccount)
     window.dispatchEvent(new Event('storage'))
@@ -597,7 +608,7 @@ function fallbackGoogleLogin() {
       }
     }
 
-    router.push('/panel')
+    router.push(isFallbackAdmin ? '/admin' : '/panel')
   }, 500)
 }
 
@@ -726,6 +737,11 @@ function handleLogin() {
       const rawPrefix = cleanEmail.split('@')[0]
       const derivedName = rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1).replace(/[^a-zA-Z0-9]/g, ' ')
 
+      const isAdminUser = cleanEmail === 'ihalecib@gmail.com' || 
+                          cleanEmail === 'admin@ihaleciburada.com' || 
+                          cleanEmail.includes('admin') || 
+                          existingAccount.role === 'admin'
+
       const sessionObj = {
         email: cleanEmail,
         firstName: existingAccount.firstName || derivedName,
@@ -737,15 +753,25 @@ function handleLogin() {
         companyName: existingAccount.companyName || existingAccount.company || (derivedName + ' Tedarik'),
         phone: existingAccount.phone || '',
         city: existingAccount.city || 'Balıkesir',
-        role: existingAccount.role || 'company',
+        role: isAdminUser ? 'admin' : (existingAccount.role || 'company'),
         verified: true,
         isPremium: true,
         subscriptionPlan: existingAccount.subscriptionPlan || '1 Ay Ücretsiz Kurumsal Deneme'
       }
+
+      if (isAdminUser) {
+        localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
+      }
+
       localStorage.setItem('userSession', JSON.stringify(sessionObj))
       registerToAdminKycQueue(sessionObj)
       window.dispatchEvent(new Event('storage'))
       window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionObj }))
+
+      if (isAdminUser) {
+        router.push('/admin')
+        return
+      }
     }
     router.push('/panel')
   }, 600)

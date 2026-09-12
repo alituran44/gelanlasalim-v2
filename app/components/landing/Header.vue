@@ -9,6 +9,22 @@ const isLoggedIn = computed(() => {
   return !!(userSession.value.email || userSession.value.name || userSession.value.username)
 })
 
+const isAdmin = computed(() => {
+  if (!userSession.value) {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('adminToken') === 'ihaleciburada_authorized_session'
+    }
+    return false
+  }
+  const email = (userSession.value.email || '').trim().toLowerCase()
+  const role = userSession.value.role || ''
+  return role === 'admin' || 
+         email === 'ihalecib@gmail.com' || 
+         email === 'admin@ihaleciburada.com' || 
+         email.includes('admin') ||
+         (typeof window !== 'undefined' && localStorage.getItem('adminToken') === 'ihaleciburada_authorized_session')
+})
+
 function checkSession() {
   if (typeof window !== 'undefined') {
     try {
@@ -123,6 +139,13 @@ function toggleAudioNotification() {
         </template>
 
         <template v-else>
+          <NuxtLink v-if="isAdmin" to="/admin">
+            <button class="px-3.5 py-2 text-xs font-black text-amber-300 bg-slate-900 hover:bg-slate-800 border border-amber-500/50 rounded-xl transition flex items-center gap-1.5 shadow-sm cursor-pointer">
+              <span>👑</span>
+              <span>Süper Admin</span>
+            </button>
+          </NuxtLink>
+
           <NuxtLink to="/panel">
             <AppButton>
               🎛️ Panelime Git

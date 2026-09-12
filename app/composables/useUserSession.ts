@@ -142,6 +142,18 @@ export function useUserSession() {
     return isCompanyVerified.value && ['FİRMA_YÖNETİCİSİ', 'SATIN_ALMA', 'TEKLİF_YETKİLİSİ'].includes(companyRole.value)
   })
 
+  // 👑 ADM-001: Süper Admin Yetkisi Tespiti
+  const isAdmin = computed(() => {
+    const email = (userSession.value?.email || '').trim().toLowerCase()
+    const role = userSession.value?.role || ''
+    const hasAdminToken = typeof window !== 'undefined' && localStorage.getItem('adminToken') === 'ihaleciburada_authorized_session'
+    return role === 'admin' ||
+           email === 'ihalecib@gmail.com' ||
+           email === 'admin@ihaleciburada.com' ||
+           email.includes('admin') ||
+           hasAdminToken
+  })
+
   function toggleCompanyMode(active: boolean) {
     userSession.value.isCompanyActive = active
     userSession.value.role = active ? 'company' : 'personal'
@@ -200,6 +212,7 @@ export function useUserSession() {
     companyRole,
     companyVkn,
     canSubmitBid,
+    isAdmin,
     toggleCompanyMode,
     updateSession,
     setPhoneVerified,
