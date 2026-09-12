@@ -1594,115 +1594,31 @@ function saveProfile() {
                 </div>
               </div>
 
-              <!-- Overall Score Pill (Yalnızca Firma Modunda Görünür) -->
-              <div v-if="isCompanyMode" class="bg-white/10 p-4 rounded-2xl border border-white/15 text-center min-w-[200px]">
-                <span class="text-[9px] font-black text-amber-300 uppercase tracking-widest block">GENEL VERİLEN PUAN</span>
-                <div class="text-2xl font-black text-white font-mono flex items-center justify-center gap-1.5 mt-1">
-                  <Star :size="18" class="text-amber-400 fill-amber-400" />
-                  <span>4.9</span>
-                  <span class="text-xs text-slate-400 font-normal">/ 5.0</span>
-                </div>
-                <div class="text-[9px] font-bold text-amber-400 mt-1">⭐⭐⭐⭐⭐ (28 Onaylı Yorum)</div>
-              </div>
-              <!-- Kişisel Mod Statü Rozeti -->
-              <div v-else class="bg-white/10 p-4 rounded-2xl border border-white/15 text-center min-w-[200px]">
+              <!-- Kişisel Hesap Statü Rozeti -->
+              <div class="bg-white/10 p-4 rounded-2xl border border-white/15 text-center min-w-[200px]">
                 <span class="text-[9px] font-black text-sky-300 uppercase tracking-widest block">HESAP STATÜSÜ</span>
                 <div class="text-base font-black text-white flex items-center justify-center gap-1.5 mt-1">
                   <User :size="16" class="text-sky-400" />
                   <span>Kişisel Hesap</span>
                 </div>
-                <div class="text-[9px] font-bold text-slate-300 mt-1">👤 Bireysel Profil Aktif</div>
-              </div>
-            </div>
-
-            <!-- Kıstas & Seviye Çizelgesi (Yalnızca Firma Modunda) -->
-            <div v-if="isCompanyMode" class="p-4 rounded-2xl bg-white/10 border border-white/15 space-y-3">
-              <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-white font-bold gap-2">
-                <span class="flex items-center gap-1.5 text-amber-300 uppercase text-[10px] font-black tracking-wider">
-                  <Award :size="14" class="text-amber-400" />
-                  PLATFORM KISTAS VE SEVİYE ÇİZELGESİ
-                </span>
-                <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black">
-                  🌟 SEVİYE ÜSTÜ (SÜPER TEDARİKÇİ)
-                </span>
-              </div>
-
-              <!-- Level Progress Bar -->
-              <div class="space-y-1.5">
-                <div class="w-full bg-slate-900/60 rounded-full h-3.5 p-0.5 border border-white/10 relative overflow-hidden">
-                  <div class="bg-gradient-to-r from-amber-500 via-yellow-400 to-emerald-400 h-full rounded-full w-[88%] transition-all duration-500 shadow-sm"></div>
-                </div>
-                <div class="flex justify-between text-[9px] font-bold text-slate-300">
-                  <span>Düşük Düzey (%0 - %40)</span>
-                  <span>Ortalama Seviye (%40 - %70)</span>
-                  <span class="text-amber-300 font-black">Seviye Üstü (%70 - %95) 🔥</span>
-                  <span>Mükemmel (%95 - %100)</span>
-                </div>
-              </div>
-
-              <!-- Score Matrix breakdown grid -->
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                <div class="bg-slate-900/50 p-2.5 rounded-xl border border-white/10 text-center">
-                  <span class="text-[8px] font-black uppercase text-slate-400 block">TESLİMAT HIZI</span>
-                  <span class="text-xs font-black text-emerald-400 font-mono block mt-0.5">%98 (Seviye Üstü)</span>
-                </div>
-                <div class="bg-slate-900/50 p-2.5 rounded-xl border border-white/10 text-center">
-                  <span class="text-[8px] font-black uppercase text-slate-400 block">ŞARTNAME UYUM</span>
-                  <span class="text-xs font-black text-blue-400 font-mono block mt-0.5">%100 (Mükemmel)</span>
-                </div>
-                <div class="bg-slate-900/50 p-2.5 rounded-xl border border-white/10 text-center">
-                  <span class="text-[8px] font-black uppercase text-slate-400 block">FİYAT REKABETİ</span>
-                  <span class="text-xs font-black text-amber-400 font-mono block mt-0.5">%96 (Seviye Üstü)</span>
-                </div>
-                <div class="bg-slate-900/50 p-2.5 rounded-xl border border-white/10 text-center">
-                  <span class="text-[8px] font-black uppercase text-slate-400 block">GÜVENİLİRLİK</span>
-                  <span class="text-xs font-black text-emerald-400 font-mono block mt-0.5">%99 (Mükemmel)</span>
+                <div class="text-[9px] font-bold text-slate-300 mt-1">
+                  <span v-if="isCompanyMode" class="text-amber-300 flex items-center justify-center gap-1">
+                    <Building2 :size="11" /> {{ companyForm.name || 'Kurumsal Firma Yetkilisi' }}
+                  </span>
+                  <span v-else>👤 Bireysel Profil Aktif</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- Kurumsal Profil Durumu (Firma Modu Aktifse) -->
-          <div v-if="isCompanyMode" class="rounded-2xl border bg-white p-6 shadow-sm grid grid-cols-1 md:grid-cols-5 gap-6" style="border-color: #E2E8F0;">
-            <div class="md:col-span-2 flex flex-col items-center justify-center text-center gap-3">
-              <div class="relative h-24 w-24 flex items-center justify-center">
-                <svg class="absolute transform -rotate-90 w-full h-full">
-                  <circle cx="48" cy="48" r="40" stroke="#F1F5F9" stroke-width="8" fill="transparent" />
-                  <circle cx="48" cy="48" r="40" stroke="#10B981" stroke-width="8" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="12.5" />
-                </svg>
-                <span class="text-base font-black text-emerald-700 font-mono">%95</span>
-              </div>
-              <div>
-                <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">PROFİL KALİTE SKORU</span>
-                <span class="text-xs font-bold text-emerald-700 block mt-0.5">✓ Onaylı & Güvenilir Kurumsal</span>
-              </div>
-            </div>
-
-            <div class="md:col-span-3 space-y-3">
-              <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">KURUMSAL PROFİL DURUMU</span>
-              <div class="space-y-2 text-[10px] font-bold">
-                <div class="text-emerald-600 flex items-center gap-2"><CheckCircle2 :size="12" /> Kurumsal firma yetkili bilgileri tanımlı</div>
-                <div :class="companyForm.sectors ? 'text-emerald-600' : 'text-slate-600'" class="flex items-center gap-2">
-                  <CheckCircle2 :size="12" /> Faaliyet sektörleri seçildi ({{ (companyForm.sectors || '').split(',').filter(Boolean).length }} Sektör)
-                </div>
-                <div :class="companyForm.description ? 'text-emerald-600' : 'text-slate-600'" class="flex items-center gap-2">
-                  <CheckCircle2 :size="12" /> Şirket faaliyet tanıtımı & açıklaması tamamlandı
-                </div>
-                <div :class="companyForm.taxNo ? 'text-emerald-600' : 'text-slate-600'" class="flex items-center gap-2">
-                  <CheckCircle2 :size="12" /> Vergi Dairesi ve VKN / MERSİS yasal kaydı girildi
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Kişisel Hesap Durumu (Bireysel Moddaysa) -->
-          <div v-else class="rounded-2xl border bg-white p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6" style="border-color: #E2E8F0;">
+          <!-- Kişisel Hesap Güvenliği & Doğrulama Kartı -->
+          <div class="rounded-2xl border bg-white p-6 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6" style="border-color: #E2E8F0;">
             <div class="flex items-center gap-4">
               <div class="w-14 h-14 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 shrink-0">
                 <ShieldCheck :size="28" />
               </div>
               <div class="space-y-1">
-                <span class="text-[10px] font-black text-blue-600 uppercase tracking-wider block">KİŞİSEL PROFİL GÜVENLİĞİ</span>
+                <span class="text-[10px] font-black text-blue-600 uppercase tracking-wider block">KİŞİSEL HESAP GÜVENLİĞİ</span>
                 <h4 class="text-sm font-black text-slate-900">Bireysel Kullanıcı Profili Doğrulandı</h4>
                 <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500 font-medium">
                   <span class="flex items-center gap-1 text-emerald-600 font-bold"><CheckCircle2 :size="13" /> e-Devlet Doğrulaması</span>
@@ -1711,7 +1627,18 @@ function saveProfile() {
                 </div>
               </div>
             </div>
+            <div v-if="isCompanyMode" class="flex items-center gap-2 shrink-0">
+              <button
+                type="button"
+                @click="router.push('/panel/ayarlar?tab=sirket')"
+                class="px-4 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs transition cursor-pointer flex items-center gap-2 border border-slate-200"
+              >
+                <Building2 :size="15" class="text-blue-600" />
+                <span>🏢 Şirket & Firma Bilgilerine Geç</span>
+              </button>
+            </div>
             <button
+              v-else
               type="button"
               @click="toggleCompanyMode"
               class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-black text-xs shadow-md shadow-blue-600/20 transition-all cursor-pointer flex items-center gap-2 shrink-0"
@@ -1723,7 +1650,10 @@ function saveProfile() {
 
           <!-- Kişisel Bilgiler Form -->
           <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2"><User :size="14" class="text-blue-600" /> Kişisel Yetkili Bilgileri</h3>
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+              <User :size="14" class="text-blue-600" />
+              Kişisel Profil Bilgileri
+            </h3>
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
@@ -1731,12 +1661,12 @@ function saveProfile() {
                 <input v-model="profileForm.username" type="text" placeholder="Adınız ve Soyadınız" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-bold text-slate-900 focus:border-blue-500" style="border-color: #CBD5E1;" />
               </div>
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Yetkili İsim</label>
-                <input v-model="profileForm.name" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Ad</label>
+                <input v-model="profileForm.name" type="text" placeholder="Adınız" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-medium text-slate-800" style="border-color: #E2E8F0;" />
               </div>
               <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase mb-1">Yetkili Soyisim</label>
-                <input v-model="profileForm.surname" type="text" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Soyad</label>
+                <input v-model="profileForm.surname" type="text" placeholder="Soyadınız" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-medium text-slate-800" style="border-color: #E2E8F0;" />
               </div>
               <div>
                 <div class="flex items-center justify-between mb-1">
@@ -1757,7 +1687,7 @@ function saveProfile() {
               </div>
               <div>
                 <div class="flex items-center justify-between mb-1">
-                  <label class="block text-[10px] font-black text-slate-500 uppercase">Yetkili Telefon</label>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase">Cep Telefonu</label>
                   <span v-if="isPhoneVerified" class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-1 border border-emerald-200">
                     <CheckCircle2 :size="10" /> Doğrulandı
                   </span>
@@ -1772,237 +1702,9 @@ function saveProfile() {
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
-
-          <!-- Firma Modu Aktivasyon Kartı (Kişisel Moddaysa Gösterilir) -->
-          <div v-if="!isCompanyMode" class="rounded-2xl border border-blue-200 bg-gradient-to-r from-blue-50/80 to-indigo-50/40 p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-            <div class="space-y-1">
-              <div class="flex items-center gap-2">
-                <span class="px-2 py-0.5 rounded-md bg-blue-600 text-white text-[10px] font-black uppercase tracking-wider">Kişisel Mod Aktif</span>
-                <h4 class="text-sm font-black text-slate-800">Kurumsal Firma Özelliklerine İhtiyacınız Var mı?</h4>
-              </div>
-              <p class="text-xs text-slate-600 max-w-xl">Bireysel kullanıcı olarak ihalelere katılabilir ve teklif verebilirsiniz. Şirket unvanı, VKN/vergi dairesi ve kurumsal logo tanımlamak için sol menüden veya aşağıdaki butondan Firma Modunu aktif edebilirsiniz.</p>
-            </div>
-            <button 
-              type="button" 
-              @click="toggleCompanyMode(true); router.push('/panel/ayarlar?tab=sirket')" 
-              class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition flex items-center gap-2 shrink-0 cursor-pointer"
-            >
-              <Building2 :size="15" />
-              <span>+ Firma Modunu Aktif Et</span>
-            </button>
-          </div>
-
-          <!-- 🏢 ŞİRKET TANITIMI, SEKTÖRLER VE KURUMSAL BİLGİLER FORMU (Sadece Firma Modu Aktifse) -->
-          <div v-if="isCompanyMode" class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
-            <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
-              <h3 class="text-xs font-black uppercase tracking-wider text-slate-800 flex items-center gap-2">
-                <Building2 :size="15" class="text-emerald-600" />
-                Şirket Bilgileri, Sektör ve Kurumsal Tanıtım
-              </h3>
-              <span class="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-black">
-                ✓ Doğrulanmış Kurumsal Üye
-              </span>
-            </div>
-
-            <!-- Şirket Adı ve Yasal Unvan -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Şirket / Ticari Firma Adı</label>
-                <input v-model="companyForm.name" type="text" placeholder="Örn: ABC Tedarik Sanayi Ltd. Şti." class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-bold text-slate-800" style="border-color: #E2E8F0;" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Resmi Yasal Unvan (Fatura)</label>
-                <input v-model="companyForm.legalName" type="text" placeholder="Örn: ABC Tedarik ve Lojistik San. Tic. A.Ş." class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-bold text-slate-800" style="border-color: #E2E8F0;" />
-              </div>
-            </div>
-
-            <!-- Faaliyet Sektörleri (Açılır Menü & Çoklu Seçim) -->
-            <div class="space-y-2 relative">
-              <div class="flex items-center justify-between">
-                <label class="block text-[10px] font-black text-slate-500 uppercase">
-                  Faaliyet Sektörleriniz (Açılır Menüden Çoklu Seçiniz)
-                </label>
-                <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">
-                  {{ selectedSectorsList.length }} Sektör Seçili
-                </span>
-              </div>
-
-              <!-- Dropdown Trigger Button -->
-              <div class="relative">
-                <button
-                  type="button"
-                  @click="isSectorDropdownOpen = !isSectorDropdownOpen"
-                  class="w-full rounded-xl border px-4 py-3 text-xs bg-white flex items-center justify-between transition hover:border-blue-400 focus:ring-4 focus:ring-blue-500/10 cursor-pointer shadow-2xs"
-                  :class="isSectorDropdownOpen ? 'border-blue-600 ring-2 ring-blue-500/20' : 'border-slate-200'"
-                >
-                  <div class="flex items-center gap-2 truncate">
-                    <Building2 :size="15" class="text-blue-600 shrink-0" />
-                    <span v-if="selectedSectorsList.length === 0" class="text-slate-400 font-normal">
-                      Sektörleri seçmek için tıklayınız...
-                    </span>
-                    <span v-else class="text-slate-800 font-bold truncate">
-                      {{ selectedSectorsList.length }} Sektör Seçildi ({{ selectedSectorsList.slice(0, 2).join(', ') }}<span v-if="selectedSectorsList.length > 2"> ve {{ selectedSectorsList.length - 2 }} daha...</span>)
-                    </span>
-                  </div>
-                  <ChevronDown :size="16" class="text-slate-400 transition-transform duration-200 shrink-0 ml-2" :class="isSectorDropdownOpen ? 'rotate-180 text-blue-600' : ''" />
-                </button>
-
-                <!-- Dropdown Menu Overlay & List -->
-                <div
-                  v-if="isSectorDropdownOpen"
-                  class="absolute left-0 right-0 top-full mt-2 z-50 rounded-2xl border border-slate-200 bg-white shadow-2xl p-3 space-y-2.5 max-h-[380px] flex flex-col animate-fadeIn"
-                >
-                  <!-- Search Bar & Actions -->
-                  <div class="space-y-2 shrink-0">
-                    <div class="relative">
-                      <Search :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                      <input
-                        v-model="sectorSearchQuery"
-                        type="text"
-                        placeholder="Sektör veya kategori ara... (Örn: İnşaat, Ambalaj, Gıda, IT)"
-                        class="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 text-xs outline-none focus:border-blue-500 bg-slate-50/60 font-medium"
-                      />
-                      <button
-                        v-if="sectorSearchQuery"
-                        type="button"
-                        @click="sectorSearchQuery = ''"
-                        class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs font-bold"
-                      >
-                        ✕
-                      </button>
-                    </div>
-
-                    <div class="flex items-center justify-between text-[11px] font-bold text-slate-500 pt-1 border-b border-slate-100 pb-1.5">
-                      <span>{{ filteredAvailableSectors.length }} Sektör Listeleniyor</span>
-                      <div class="flex items-center gap-2">
-                        <button
-                          type="button"
-                          @click="selectAllFilteredSectors"
-                          class="text-blue-600 hover:underline cursor-pointer"
-                        >
-                          Tümünü Seç
-                        </button>
-                        <span>·</span>
-                        <button
-                          type="button"
-                          @click="clearAllSectors"
-                          class="text-rose-600 hover:underline cursor-pointer"
-                        >
-                          Seçimleri Temizle
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  <!-- Scrollable Options List -->
-                  <div class="overflow-y-auto space-y-1 flex-1 pr-1 max-h-[200px]">
-                    <div
-                      v-for="sec in filteredAvailableSectors"
-                      :key="sec"
-                      @click="toggleSectorTag(sec)"
-                      class="flex items-center justify-between p-2 rounded-xl text-xs transition cursor-pointer"
-                      :class="selectedSectorsList.includes(sec) ? 'bg-blue-50/80 text-blue-900 font-bold border border-blue-200' : 'hover:bg-slate-50 text-slate-700 font-medium border border-transparent'"
-                    >
-                      <div class="flex items-center gap-2.5 truncate pr-2">
-                        <div
-                          class="w-4 h-4 rounded border flex items-center justify-center shrink-0 transition"
-                          :class="selectedSectorsList.includes(sec) ? 'bg-blue-600 border-blue-600 text-white' : 'border-slate-300 bg-white'"
-                        >
-                          <Check v-if="selectedSectorsList.includes(sec)" :size="11" />
-                        </div>
-                        <span class="truncate text-xs">{{ sec }}</span>
-                      </div>
-                      <span v-if="selectedSectorsList.includes(sec)" class="text-[10px] text-blue-600 font-black shrink-0">✓ Seçili</span>
-                    </div>
-
-                    <div v-if="filteredAvailableSectors.length === 0" class="p-6 text-center text-slate-400 text-xs">
-                      "{{ sectorSearchQuery }}" ile eşleşen sektör bulunamadı.
-                    </div>
-                  </div>
-
-                  <!-- Dropdown Footer -->
-                  <div class="pt-2 border-t border-slate-100 flex items-center justify-between shrink-0">
-                    <span class="text-[10px] text-slate-400">Listeden istediğiniz kadar sektör seçebilirsiniz.</span>
-                    <button
-                      type="button"
-                      @click="isSectorDropdownOpen = false"
-                      class="px-4 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs cursor-pointer"
-                    >
-                      Tamamla
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Selected Sector Badges / Tags -->
-              <div v-if="selectedSectorsList.length > 0" class="flex flex-wrap gap-1.5 pt-2">
-                <span
-                  v-for="sec in selectedSectorsList"
-                  :key="sec"
-                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-blue-50 text-blue-800 text-xs font-bold border border-blue-200 transition group hover:bg-blue-100"
-                >
-                  <span>{{ sec }}</span>
-                  <button
-                    type="button"
-                    @click.stop="toggleSectorTag(sec)"
-                    class="text-blue-400 hover:text-rose-600 font-black cursor-pointer rounded-full p-0.5"
-                    title="Kaldır"
-                  >
-                    <X :size="12" />
-                  </button>
-                </span>
-              </div>
-              <p v-else class="text-[11px] text-slate-400 italic pt-1">
-                Henüz sektör seçilmedi. Firmanızın hizmet verdiği sektörleri yukarıdaki açılır menüden seçiniz.
-              </p>
-            </div>
-
-            <!-- Şirket Faaliyet Tanıtımı ve Hakkında Açıklaması (Textarea) -->
-            <div class="space-y-1.5">
-              <label class="block text-[10px] font-black text-slate-500 uppercase">
-                Şirket Faaliyet Tanıtımı & Hakkında Açıklaması
-              </label>
-              <textarea 
-                v-model="companyForm.description" 
-                rows="4" 
-                placeholder="Şirketinizin faaliyet alanı, üretim/satış kapasitesi, referansları ve kurumsal tanıtım metnini buraya yazınız. İhale veren alıcılar ve tedarikçiler profilinizde bu açıklamayı görecektir..."
-                class="w-full rounded-xl border p-4 text-xs bg-white outline-none font-medium leading-relaxed" 
-                style="border-color: #E2E8F0;"
-              ></textarea>
-              <p class="text-[10px] text-slate-400">Şirket açıklaması güvenilirlik puanınızı ve ihale kazanma şansınızı artırır.</p>
-            </div>
-
-            <!-- Vergi, TC, Mersis, Sicil -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">T.C. Kimlik / VKN (Vergi No)</label>
-                <input v-model="companyForm.taxNo" type="text" placeholder="9560161511" class="w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono bg-white outline-none" style="border-color: #E2E8F0;" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Bağlı Vergi Dairesi</label>
-                <input v-model="companyForm.taxOffice" type="text" placeholder="Çanakkale V.D." class="w-full rounded-xl border px-3.5 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">MERSİS Numarası</label>
-                <input v-model="companyForm.mersis" type="text" placeholder="Varsa MERSİS Numaranız" class="w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono bg-white outline-none" style="border-color: #E2E8F0;" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Ticaret Sicil No</label>
-                <input v-model="companyForm.sicilNo" type="text" placeholder="Varsa Ticaret Sicil No" class="w-full rounded-xl border px-3.5 py-2.5 text-xs font-mono bg-white outline-none" style="border-color: #E2E8F0;" />
-              </div>
-            </div>
-
-            <!-- Web Sitesi & Tebligat Adresi -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Kurumsal Web Sitesi</label>
-                <input v-model="companyForm.website" type="text" placeholder="https://www.firmaadi.com" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
-              </div>
-              <div>
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Şirket Tebligat & Fatura Adresi</label>
-                <input v-model="companyForm.faturaAdresi" type="text" placeholder="İsmetpaşa Mah. Taşöz Apt. No:52/1 Çanakkale" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none" style="border-color: #E2E8F0;" />
+                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">Görev / Mesleki Unvan</label>
+                <input v-model="profileForm.title" type="text" placeholder="Örn: Satın Alma Müdürü, Yetkili, Uzman" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-white outline-none font-medium text-slate-800" style="border-color: #E2E8F0;" />
               </div>
             </div>
           </div>
@@ -2089,25 +1791,33 @@ function saveProfile() {
             </button>
           </div>
 
-          <!-- Upload section (Firma Modu) -->
-          <div v-if="isCompanyMode" class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-            <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2"><Camera :size="14" /> Tanıtım Galerisi & Şirket Logosu</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div class="rounded-xl border-2 border-dashed p-6 text-center space-y-3 flex flex-col items-center justify-center" style="border-color: #E2E8F0;">
-                <Camera :size="16" class="text-slate-400" />
-                <span class="text-xs font-bold text-slate-700">Şirket Logosu / Fotoğraf Ekle</span>
-                <button type="button" @click="triggerDocUpload('profil_logo')" class="rounded-lg border px-3 py-1.5 text-[10px] font-bold hover:bg-slate-50 transition cursor-pointer" style="border-color: #E2E8F0;">Fotoğraf Yükle</button>
+          <!-- Kişisel Profil Görseli -->
+          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+            <h3 class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+              <Camera :size="14" class="text-blue-600" />
+              Kişisel Profil Görseli
+            </h3>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div 
+                @click="triggerDocUpload('kisisel_avatar')" 
+                class="h-16 w-16 rounded-2xl bg-gradient-to-tr from-slate-100 to-slate-200 border-2 border-dashed border-slate-300 flex items-center justify-center text-slate-700 font-black text-xl cursor-pointer hover:border-blue-500 transition shrink-0 overflow-hidden"
+              >
+                <img v-if="profileAvatarUrl" :src="profileAvatarUrl" alt="Avatar" class="h-full w-full object-cover" />
+                <span v-else>{{ profileInitials }}</span>
               </div>
-              <div class="rounded-xl border-2 border-dashed p-6 text-center space-y-3 flex flex-col items-center justify-center cursor-pointer hover:bg-slate-50/50 transition" @click="showToast('Sürükle-bırak video arayüzü etkin.')" style="border-color: #E2E8F0;">
-                <Video :size="16" class="text-slate-400" />
-                <span class="text-xs font-bold text-slate-700">Tanıtım Videosu Yüklemek İçin Tıklayın</span>
+              <div class="space-y-1">
+                <div class="text-xs font-bold text-slate-800">Profil Fotoğrafı</div>
+                <p class="text-[11px] text-slate-500">Platform içi teklif geçmişinizde ve mesajlaşmalarda görüntülenecek bireysel profil fotoğrafınızı belirleyin.</p>
+                <button type="button" @click="triggerDocUpload('kisisel_avatar')" class="text-xs font-bold text-blue-600 hover:underline cursor-pointer">
+                  Fotoğraf Seç & Yükle
+                </button>
               </div>
             </div>
           </div>
 
           <div class="rounded-2xl border bg-white p-4 shadow-sm flex items-center justify-between" style="border-color: #E2E8F0;">
-            <span class="text-[10px] text-slate-400 font-bold">Tüm profil, şirket açıklaması ve sektör değişikliklerini kaydedin</span>
-            <button type="button" @click="saveProfile" class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-3 transition cursor-pointer shadow-sm">Profili Güncelle & Kaydet</button>
+            <span class="text-[10px] text-slate-500 font-bold">Kişisel profil ve iletişim bilgilerinizi güncel tutun</span>
+            <button type="button" @click="saveProfile" class="rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-6 py-3 transition cursor-pointer shadow-sm">Kişisel Bilgileri Kaydet</button>
           </div>
         </div>
 
@@ -2137,11 +1847,131 @@ function saveProfile() {
 
           <div v-else class="space-y-6">
 
-          <!-- Genel Bilgiler Card -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
-            <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
-              <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">{{ 'Genel Bilgiler' }}</h3>
+            <!-- ========================================================================= -->
+            <!-- PLATFORM KISTAS VE SEVİYE ÇİZELGESİ (KURUMSAL & TEDARİKÇİ PERFORMANSI) -->
+            <!-- ========================================================================= -->
+            <div class="rounded-3xl border border-amber-200/80 bg-white p-6 shadow-lg text-left space-y-6" style="background: linear-gradient(135deg, #0A1128 0%, #1C2541 100%); border-bottom: 3px solid #C59B27;">
+              <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                  <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-300 p-0.5 shadow-lg shrink-0">
+                    <div class="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center text-amber-400 font-black text-xl font-mono">
+                      <Building2 :size="28" />
+                    </div>
+                  </div>
+
+                  <div class="space-y-1 text-white">
+                    <div class="flex flex-wrap items-center gap-2">
+                      <h2 class="text-xl font-black tracking-tight">{{ companyForm.name || 'Kurumsal Firma' }}</h2>
+                      <span class="rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider flex items-center gap-1">
+                        <ShieldCheck :size="11" class="text-emerald-400" />
+                        ✓ Kurumsal Doğrulanmış
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-300 font-medium flex items-center gap-3">
+                      <span v-if="companyForm.legalName">{{ companyForm.legalName }}</span>
+                      <span v-if="companyForm.taxNo">• VKN: {{ companyForm.taxNo }}</span>
+                      <span v-if="companyForm.taxOffice">• {{ companyForm.taxOffice }}</span>
+                    </p>
+                  </div>
+                </div>
+
+                <!-- Overall Score Pill -->
+                <div class="bg-white/10 p-4 rounded-2xl border border-white/15 text-center min-w-[200px]">
+                  <span class="text-[9px] font-black text-amber-300 uppercase tracking-widest block">GENEL VERİLEN PUAN</span>
+                  <div class="text-2xl font-black text-white font-mono flex items-center justify-center gap-1.5 mt-1">
+                    <Star :size="18" class="text-amber-400 fill-amber-400" />
+                    <span>4.9</span>
+                    <span class="text-xs text-slate-400 font-normal">/ 5.0</span>
+                  </div>
+                  <div class="text-[9px] font-bold text-amber-400 mt-1">⭐⭐⭐⭐⭐ (28 Onaylı Yorum)</div>
+                </div>
+              </div>
+
+              <!-- Kıstas & Seviye Çizelgesi -->
+              <div class="p-4 rounded-2xl bg-white/10 border border-white/15 space-y-3">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between text-xs text-white font-bold gap-2">
+                  <span class="flex items-center gap-1.5 text-amber-300 uppercase text-[10px] font-black tracking-wider">
+                    <Award :size="14" class="text-amber-400" />
+                    PLATFORM KISTAS VE SEVİYE ÇİZELGESİ
+                  </span>
+                  <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black">
+                    🌟 SEVİYE ÜSTÜ (SÜPER TEDARİKÇİ)
+                  </span>
+                </div>
+
+                <!-- Level Progress Bar -->
+                <div class="space-y-1.5">
+                  <div class="w-full bg-slate-900/60 rounded-full h-3.5 p-0.5 border border-white/10 relative overflow-hidden">
+                    <div class="bg-gradient-to-r from-amber-500 via-yellow-400 to-emerald-400 h-full rounded-full w-[88%] transition-all duration-500 shadow-sm"></div>
+                  </div>
+                  <div class="flex justify-between text-[9px] font-bold text-slate-300">
+                    <span>Düşük Düzey (%0 - %40)</span>
+                    <span>Ortalama Seviye (%40 - %70)</span>
+                    <span class="text-amber-300 font-black">Seviye Üstü (%70 - %95) 🔥</span>
+                    <span>Mükemmel (%95 - %100)</span>
+                  </div>
+                </div>
+
+                <!-- Score Matrix breakdown grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                  <div class="bg-slate-900/50 p-2.5 rounded-xl border border-white/10 text-center">
+                    <span class="text-[8px] font-black uppercase text-slate-400 block">TESLİMAT HIZI</span>
+                    <span class="text-xs font-black text-emerald-400 font-mono block mt-0.5">%98 (Seviye Üstü)</span>
+                  </div>
+                  <div class="bg-slate-900/50 p-2.5 rounded-xl border border-white/10 text-center">
+                    <span class="text-[8px] font-black uppercase text-slate-400 block">ŞARTNAME UYUM</span>
+                    <span class="text-xs font-black text-blue-400 font-mono block mt-0.5">%100 (Mükemmel)</span>
+                  </div>
+                  <div class="bg-slate-900/50 p-2.5 rounded-xl border border-white/10 text-center">
+                    <span class="text-[8px] font-black uppercase text-slate-400 block">FİYAT REKABETİ</span>
+                    <span class="text-xs font-black text-amber-400 font-mono block mt-0.5">%96 (Seviye Üstü)</span>
+                  </div>
+                  <div class="bg-slate-900/50 p-2.5 rounded-xl border border-white/10 text-center">
+                    <span class="text-[8px] font-black uppercase text-slate-400 block">GÜVENİLİRLİK</span>
+                    <span class="text-xs font-black text-emerald-400 font-mono block mt-0.5">%99 (Mükemmel)</span>
+                  </div>
+                </div>
+              </div>
             </div>
+
+            <!-- KURUMSAL PROFİL DURUMU & KALİTE SKORU -->
+            <div class="rounded-2xl border bg-white p-6 shadow-sm grid grid-cols-1 md:grid-cols-5 gap-6" style="border-color: #E2E8F0;">
+              <div class="md:col-span-2 flex flex-col items-center justify-center text-center gap-3">
+                <div class="relative h-24 w-24 flex items-center justify-center">
+                  <svg class="absolute transform -rotate-90 w-full h-full">
+                    <circle cx="48" cy="48" r="40" stroke="#F1F5F9" stroke-width="8" fill="transparent" />
+                    <circle cx="48" cy="48" r="40" stroke="#10B981" stroke-width="8" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="12.5" />
+                  </svg>
+                  <span class="text-base font-black text-emerald-700 font-mono">%95</span>
+                </div>
+                <div>
+                  <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">KURUMSAL PROFİL KALİTE SKORU</span>
+                  <span class="text-xs font-bold text-emerald-700 block mt-0.5">✓ Onaylı & Güvenilir Kurumsal</span>
+                </div>
+              </div>
+
+              <div class="md:col-span-3 space-y-3">
+                <span class="text-[9px] font-black text-slate-400 uppercase tracking-wider block">KURUMSAL PROFİL DURUMU</span>
+                <div class="space-y-2 text-[10px] font-bold">
+                  <div class="text-emerald-600 flex items-center gap-2"><CheckCircle2 :size="12" /> Kurumsal firma yetkili bilgileri tanımlı</div>
+                  <div :class="companyForm.sectors ? 'text-emerald-600' : 'text-slate-600'" class="flex items-center gap-2">
+                    <CheckCircle2 :size="12" /> Faaliyet sektörleri seçildi ({{ (companyForm.sectors || '').split(',').filter(Boolean).length }} Sektör)
+                  </div>
+                  <div :class="companyForm.description ? 'text-emerald-600' : 'text-slate-600'" class="flex items-center gap-2">
+                    <CheckCircle2 :size="12" /> Şirket faaliyet tanıtımı & açıklaması tamamlandı
+                  </div>
+                  <div :class="companyForm.taxNo ? 'text-emerald-600' : 'text-slate-600'" class="flex items-center gap-2">
+                    <CheckCircle2 :size="12" /> Vergi Dairesi ve VKN / MERSİS yasal kaydı girildi
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Genel Bilgiler Card -->
+            <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
+              <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
+                <h3 class="text-xs font-black uppercase tracking-wider text-slate-400">{{ 'Genel Bilgiler' }}</h3>
+              </div>
 
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
               <div class="flex items-start gap-4">
