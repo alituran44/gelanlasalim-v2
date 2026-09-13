@@ -8,11 +8,15 @@ import {
   CheckCircle2, 
   AlertCircle,
   ChevronRight,
-  ShieldCheck,
-  Bell,
-  HeartHandshake
+  ShieldCheck, 
+  Bell, 
+  HeartHandshake,
+  Search,
+  RefreshCw,
+  FileCheck
 } from 'lucide-vue-next'
 import { ALL_81_CITIES, COMMON_TAX_OFFICES } from '~/utils/taxonomy'
+import { useGibMersis } from '~/composables/useGibMersis'
 
 definePageMeta({
   layout: 'public' // Header & Footer matching public pages
@@ -24,6 +28,24 @@ useSeoMeta({
 })
 
 const router = useRouter()
+const { isVerifying: isGibChecking, verificationResult: gibData, errorMessage: gibError, queryGibMersis } = useGibMersis()
+
+async function handleGibLiveCheck() {
+  if (!vergiNo.value || vergiNo.value.length < 10) {
+    step1Errors.value.vergiNo = 'Canlı sorgulama için 10 haneli VKN veya 11 haneli TCKN giriniz.'
+    return
+  }
+  step1Errors.value.vergiNo = ''
+  const res = await queryGibMersis(vergiNo.value, firmaUnvani.value, vergiDairesi.value)
+  if (res.success && res.data) {
+    if (!firmaUnvani.value || firmaUnvani.value.length < 5) {
+      firmaUnvani.value = res.data.unvan
+    }
+    if (!vergiDairesi.value) {
+      vergiDairesi.value = res.data.vergiDairesi
+    }
+  }
+}
 
 // Wizard Steps: 1: Şirket Bilgileri, 2: Kişisel Bilgiler, 3: Özet & Beyan, 4: Bildirim Tercihleri
 const currentStep = ref<1 | 2 | 3 | 4>(1)
@@ -343,15 +365,68 @@ function saveAllAndRedirect() {
 
             <!-- Vergi Kimlik No / TC -->
             <div>
-              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">Vergi Kimlik No / TC *</label>
+              <div class="flex items-center justify-between mb-1.5">
+                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider">Vergi Kimlik No / TC *</label>
+                <button 
+                  type="button" 
+                  @click="handleGibLiveCheck" 
+                  :disabled="isGibChecking"
+                  class="text-[11px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition cursor-pointer disabled:opacity-50"
+                >
+                  <RefreshCw v-if="isGibChecking" class="w-3 h-3 animate-spin text-blue-600" />
+                  <Search v-else class="w-3 h-3 text-blue-600" />
+                  <span>{{ isGibChecking ? 'GİB Sorgulanıyor...' : 'GİB & MERSİS Canlı Sorgula' }}</span>
+                </button>
+              </div>
               <input 
                 v-model="vergiNo" 
                 type="text" 
-                class="w-full rounded-xl border px-4 py-3 text-xs outline-none transition"
-                :class="step1Errors.vergiNo ? 'border-red-500' : 'border-slate-200 focus:border-blue-500'"
-                placeholder="10 haneli VKN veya 11 haneli TCKN"
+                class="w-full rounded-xl border px-4 py-3 text-xs outline-none transition" 
+                :class="step1Errors.vergiNo ? 'border-red-500' : 'border-slate-200 focus:border-blue-500'" 
+                placeholder="10 haneli VKN veya 11 haneli TCKN" 
               />
               <p v-if="step1Errors.vergiNo" class="text-[10px] text-red-500 mt-1 font-semibold">{{ step1Errors.vergiNo }}</p>
+              <p v-if="gibError" class="text-[10px] text-amber-600 mt-1 font-semibold">{{ gibError }}</p>
+            </div>
+          </div>
+
+          <!-- GİB & MERSİS CANLI DOĞRULAMA KARTI -->
+          <div v-if="gibData" class="rounded-2xl border border-emerald-200 bg-emerald-50/60 p-4 space-y-3 animate-fadeIn">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <div class="p-1.5 rounded-lg bg-emerald-500 text-white">
+                  <FileCheck class="w-4 h-4" />
+                </div>
+                <div>
+                  <div class="text-xs font-black text-emerald-900 flex items-center gap-1.5">
+                    <span>GİB e-Fatura & MERSİS Doğrulandı</span>
+                    <span class="px-2 py-0.5 rounded-full bg-emerald-600 text-white text-[9px] font-bold">AKTİF MÜKELLEF</span>
+                  </div>
+                  <div class="text-[11px] text-emerald-700 font-mono">{{ gibData.unvan }}</div>
+                </div>
+              </div>
+              <span class="text-[10px] font-mono text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded border border-emerald-200 shrink-0">
+                {{ gibData.gibDogrulamaKodu }}
+              </span>
+            </div>
+
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-emerald-200/60 text-[11px]">
+              <div>
+                <span class="text-[10px] text-slate-500 block">MERSİS Sicil No:</span>
+                <span class="font-mono font-bold text-slate-800">{{ gibData.mersisNo }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 block">NACE Faaliyet Kodu:</span>
+                <span class="font-bold text-slate-800">{{ gibData.naceKodu }}</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 block">e-Fatura Mükellefi:</span>
+                <span class="font-bold text-emerald-700">✓ Kayıtlı (Aktif)</span>
+              </div>
+              <div>
+                <span class="text-[10px] text-slate-500 block">e-İrsaliye / e-Arşiv:</span>
+                <span class="font-bold text-emerald-700">✓ Uyumlu</span>
+              </div>
             </div>
           </div>
 

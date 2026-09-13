@@ -1,6 +1,13 @@
 import { ref, computed } from 'vue'
 import { useCmsData } from '~/composables/useCmsData'
 
+export interface AgencySettings {
+  agentListingVisibility: 'own_only' | 'all_office'
+  allowAgentDirectPublish: boolean
+  notifyBrokerOnListingCreated: boolean
+  enforceAgentQuota: boolean
+}
+
 export interface RealEstateAgency {
   id: string
   name: string
@@ -18,6 +25,7 @@ export interface RealEstateAgency {
   subscriptionExpiresAt: string
   agentsCount: number
   activeListingsCount: number
+  settings: AgencySettings
 }
 
 export interface RealEstateAgent {
@@ -68,7 +76,13 @@ const DEFAULT_AGENCY: RealEstateAgency = {
   subscriptionPlan: 'kurumsal_pro',
   subscriptionExpiresAt: '2026-12-31',
   agentsCount: 4,
-  activeListingsCount: 18
+  activeListingsCount: 18,
+  settings: {
+    agentListingVisibility: 'own_only',
+    allowAgentDirectPublish: true,
+    notifyBrokerOnListingCreated: true,
+    enforceAgentQuota: false
+  }
 }
 
 const DEFAULT_AGENTS: RealEstateAgent[] = [
@@ -202,7 +216,17 @@ function loadFromLocalStorage() {
     const savedAgents = localStorage.getItem('agency_agents')
     const savedLedger = localStorage.getItem('agency_credit_ledger')
 
-    if (savedAgency) currentAgency.value = { ...DEFAULT_AGENCY, ...JSON.parse(savedAgency) }
+    if (savedAgency) {
+      const parsed = JSON.parse(savedAgency)
+      currentAgency.value = { 
+        ...DEFAULT_AGENCY, 
+        ...parsed,
+        settings: {
+          ...DEFAULT_AGENCY.settings,
+          ...(parsed.settings || {})
+        }
+      }
+    }
     if (savedAgents) agentsList.value = JSON.parse(savedAgents)
     if (savedLedger) creditLedger.value = JSON.parse(savedLedger)
   } catch (e) {
@@ -369,6 +393,32 @@ export function useAgencyManagement() {
     syncToLocalStorage()
   }
 
+  function updateAgencySettings(newSettings: Partial<AgencySettings>) {
+    if (!currentAgency.value.settings) {
+      currentAgency.value.settings = { ...DEFAULT_AGENCY.settings }
+    }
+    currentAgency.value.settings = {
+      ...currentAgency.value.settings,
+      ...newSettings
+    }
+    syncToLocalStorage()
+  }
+
+  function updateAgencyProfile(profileData: Partial<RealEstateAgency>) {
+    currentAgency.value = {
+      ...currentAgency.value,
+      ...profileData
+    }
+    syncToLocalStorage()
+  }
+
+  function canAgentViewListing(agentEmailOrId: string, listingOwnerAgentEmailOrId: string): boolean {
+    const policy = currentAgency.value.settings?.agentListingVisibility || 'own_only'
+    if (policy === 'all_office') return true
+    if (!listingOwnerAgentEmailOrId) return true
+    return agentEmailOrId === listingOwnerAgentEmailOrId
+  }
+
   return {
     currentAgency,
     agentsList,
@@ -383,6 +433,9 @@ export function useAgencyManagement() {
     consumeListingCredit,
     topupCredits,
     adminAdjustCredits,
+    updateAgencySettings,
+    updateAgencyProfile,
+    canAgentViewListing,
     syncToLocalStorage
   }
 }

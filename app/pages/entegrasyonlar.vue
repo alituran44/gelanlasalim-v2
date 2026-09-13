@@ -130,12 +130,51 @@ function handleExcelUpload() {
 function importExcelItems() {
   excelParseStatus.value = 'imported'
   setTimeout(() => {
-    // Redirect simulation or success toast
     excelParseStatus.value = 'idle'
     selectedExcelFile.value = ''
     parsedItems.value = []
     alert("Excel'den yüklenen malzemeler ile fason üretim ihalesi başarıyla oluşturuldu!")
   }, 1000)
+}
+
+/* =========================================================
+   KURUMSAL ERP WEBHOOK MOTORU (SAP, LOGO, NETSIS, MIKRO)
+========================================================= */
+const webhookUrl = ref('https://erp.sirketiniz.com/api/ihaleciburada-webhook')
+const webhookSecret = ref('whsec_7f9a2b8e3c1d4059a68b')
+const selectedErpForWebhook = ref<'SAP' | 'LOGO' | 'NETSIS' | 'MIKRO'>('SAP')
+const isTestingWebhook = ref(false)
+const webhookTestResult = ref<any>(null)
+
+async function testErpWebhook() {
+  isTestingWebhook.value = true
+  webhookTestResult.value = null
+  try {
+    const res = await $fetch<any>('/api/v1/erp/webhook-dispatch', {
+      method: 'POST',
+      body: {
+        webhookUrl: webhookUrl.value,
+        secretKey: webhookSecret.value,
+        erpSystem: selectedErpForWebhook.value,
+        eventType: 'TENDER_AWARDED',
+        data: {
+          id: 'IHC-2026-940',
+          baslik: '100 Ton Nervürlü İnşaat Demiri Alımı',
+          butce: '1.850.000 ₺',
+          ownerCompany: 'Hasan Hüseyin Yıldırım Ticari İşletmesi',
+          winnerCompany: 'Kalyoncu Demir Çelik A.Ş.'
+        }
+      }
+    })
+    webhookTestResult.value = res
+  } catch (err: any) {
+    webhookTestResult.value = {
+      success: false,
+      message: err?.data?.message || err?.message || 'Webhook gönderim hatası'
+    }
+  } finally {
+    isTestingWebhook.value = false
+  }
 }
 </script>
 
@@ -426,7 +465,87 @@ function importExcelItems() {
             </div>
           </div>
 
+          <!-- KURUMSAL ERP WEBHOOK ENTEGRASYON MASASI -->
+          <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-xs space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+              <div>
+                <h4 class="text-sm font-black text-slate-800 flex items-center gap-2">
+                  <Network :size="16" class="text-blue-600" />
+                  <span>Kurumsal Webhook Uç Noktası (SAP, Logo, Netsis, Mikro)</span>
+                </h4>
+                <p class="text-[11px] text-slate-500 mt-0.5">
+                  İhale açıldığında veya sonuçlandığında şirket içi ERP sunucunuza HMAC SHA-256 imzalı anlık JSON/XML verisi fırlatılır.
+                </p>
+              </div>
 
+              <!-- ERP Selector -->
+              <div class="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200">
+                <button 
+                  v-for="erp in (['SAP', 'LOGO', 'NETSIS', 'MIKRO'] as const)"
+                  :key="erp"
+                  type="button"
+                  @click="selectedErpForWebhook = erp"
+                  :class="selectedErpForWebhook === erp ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+                  class="px-2.5 py-1 rounded-lg text-[10px] font-black transition cursor-pointer"
+                >
+                  {{ erp }}
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              <div class="space-y-1">
+                <label class="block text-[10px] font-bold text-slate-500">Şirket Webhook Uç Nokta URL'i</label>
+                <input 
+                  v-model="webhookUrl" 
+                  type="text" 
+                  placeholder="https://erp.sirketiniz.com/api/webhook" 
+                  class="w-full rounded-xl border border-slate-200 p-2.5 text-xs font-mono text-slate-800 outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div class="space-y-1">
+                <label class="block text-[10px] font-bold text-slate-500">HMAC SHA-256 Gizli İmza Anahtarı (Secret Key)</label>
+                <div class="flex items-center gap-2">
+                  <input 
+                    v-model="webhookSecret" 
+                    type="password" 
+                    class="w-full rounded-xl border border-slate-200 p-2.5 text-xs font-mono text-slate-800 outline-none focus:border-blue-500"
+                  />
+                  <button 
+                    @click="testErpWebhook" 
+                    :disabled="isTestingWebhook"
+                    class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shrink-0 flex items-center gap-1.5 transition cursor-pointer disabled:opacity-50"
+                  >
+                    <RefreshCw v-if="isTestingWebhook" class="w-3.5 h-3.5 animate-spin" />
+                    <Play v-else class="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Test Gönder</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Webhook Test Sonuç Kartı -->
+            <div v-if="webhookTestResult" class="rounded-xl border p-4 space-y-2 text-xs transition animate-fadeIn" :class="webhookTestResult.success ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'">
+              <div class="flex items-center justify-between">
+                <span class="font-black flex items-center gap-1.5">
+                  <CheckCircle2 v-if="webhookTestResult.success" class="w-4 h-4 text-emerald-600" />
+                  <AlertTriangle v-else class="w-4 h-4 text-rose-600" />
+                  <span>{{ webhookTestResult.message }}</span>
+                </span>
+                <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-white/80 border border-emerald-300">
+                  HTTP {{ webhookTestResult.httpStatus || 200 }} OK · {{ webhookTestResult.durationMs }}ms
+                </span>
+              </div>
+
+              <div class="text-[10px] font-mono text-slate-600 space-y-0.5 pt-1 border-t border-emerald-200/50">
+                <div><strong>Hedef ERP:</strong> {{ webhookTestResult.erpSystem }}</div>
+                <div><strong>HMAC İmzası:</strong> {{ webhookTestResult.signature }}</div>
+                <div><strong>Olay ID:</strong> {{ webhookTestResult.eventId }} (TENDER_AWARDED)</div>
+              </div>
+            </div>
+
+          </div>
 
         </div>
       </div>

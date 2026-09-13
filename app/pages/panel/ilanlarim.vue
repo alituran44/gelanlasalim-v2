@@ -1,17 +1,20 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, watch } from 'vue'
-import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight, Lock, Clock, CheckCircle2, AlertCircle, Trash2, X, ShieldAlert, HelpCircle, Pencil, Ban } from 'lucide-vue-next'
+import { Plus, RotateCw, Search, LayoutGrid, List, FileText, ChevronRight, Lock, Clock, CheckCircle2, AlertCircle, Trash2, X, ShieldAlert, HelpCircle, Pencil, Ban, Sparkles } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale } from '~/composables/useLocale'
 import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
+import AiMatchingModal from '~/components/ai/AiMatchingModal.vue'
 import CategorySpecificFields from '~/components/tender/CategorySpecificFields.vue'
 import { formatSectorSummaryBadges } from '~/utils/categoryFieldsSchema'
+import { useAgencyManagement } from '~/composables/useAgencyManagement'
 
 definePageMeta({
   layout: "dashboard"
 })
 
 const { cmsData, saveCmsData, fetchServerTenders } = useCmsData()
+const { canAgentViewListing } = useAgencyManagement()
 const isLoading = ref(true)
 const activeTab = ref<'aktif' | 'tamamlanan' | 'suresi_dolan' | 'tum'>('tum')
 const activePeriod = ref<'7gun' | '30gun' | '90gun' | '1yil'>('30gun')
@@ -104,6 +107,14 @@ const tendersList = computed(() => {
       const ownerEmail = (item.ownerEmail || '').trim().toLowerCase()
       const ownerComp = (item.ownerCompany || '').trim().toLowerCase()
       if (!currentEmail || ownerEmail === currentEmail || (currentComp && ownerComp === currentComp)) {
+        // Emlak Danışmanı rolündeyse şube yöneticisinin (Broker) belirlediği portföy görünürlük politikasına göre filtrele
+        if (userSession.value?.role === 'agent') {
+          const agentEmail = userSession.value?.email || ''
+          const itemAgentEmail = item.assignedAgentEmail || item.agentEmail || item.ownerEmail || ''
+          if (!canAgentViewListing(agentEmail, itemAgentEmail)) {
+            return
+          }
+        }
         map.set(item.id, item)
       }
     }
@@ -167,6 +178,15 @@ function openCancelModal(tender: any) {
   selectedReasonCode.value = 'NEED_CANCELLED'
   cancelReasonNote.value = ''
   showCancelModal.value = true
+}
+
+// 🤖 AI Tabanlı Otomatik Tedarikçi & Alıcı Eşleştirme Modalı
+const showAiMatchModal = ref(false)
+const selectedTenderForAiMatch = ref<any>(null)
+
+function openAiMatchModal(tender: any) {
+  selectedTenderForAiMatch.value = tender
+  showAiMatchModal.value = true
 }
 
 async function confirmCancelTender() {
@@ -852,6 +872,17 @@ const statusTabs = computed(() => {
             <span>Sorular</span>
           </button>
 
+          <!-- 🤖 AI Tabanlı Otomatik Tedarikçi & Alıcı Eşleştirme Butonu -->
+          <button 
+            type="button" 
+            @click.stop="openAiMatchModal(tender)" 
+            class="px-3 py-2 rounded-xl text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 hover:border-emerald-300 border border-emerald-200 transition shadow-2xs flex items-center gap-1.5 cursor-pointer"
+            title="Yapay Zeka ile NACE Kodu ve Konum Bazlı Uygun Tedarikçi / Fon Eşleştir"
+          >
+            <Sparkles :size="13" class="text-emerald-600" />
+            <span>AI Eşleştir</span>
+          </button>
+
           <span class="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-xl border border-blue-100">
             {{ tender.teklifSayisi || 0 }} {{ 'Teklif Alındı' }}
           </span>
@@ -1258,6 +1289,13 @@ const statusTabs = computed(() => {
       :is-owner="true" 
       @close="showQuestionsModal = false" 
       @answered="reloadTenders"
+    />
+
+    <!-- 🤖 AI TABANLI OTOMATİK TEDARİKÇİ & ALICI EŞLEŞTİRME MODALI -->
+    <AiMatchingModal 
+      :is-open="showAiMatchModal" 
+      :target="selectedTenderForAiMatch" 
+      @close="showAiMatchModal = false" 
     />
 
   </div>

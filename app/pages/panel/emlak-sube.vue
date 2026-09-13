@@ -26,9 +26,16 @@ import {
   ChevronRight,
   RefreshCw,
   X,
-  FileText
+  FileText,
+  Sliders,
+  Eye,
+  EyeOff,
+  Bell,
+  Lock,
+  Save
 } from 'lucide-vue-next'
 import { useAgencyManagement, type RealEstateAgent } from '~/composables/useAgencyManagement'
+import AiMatchingModal from '~/components/ai/AiMatchingModal.vue'
 import { 
   downloadAgentExcelTemplate, 
   downloadListingExcelTemplate, 
@@ -56,12 +63,46 @@ const {
   deleteAgent,
   addAgentsBulk,
   consumeListingCredit,
-  topupCredits
+  topupCredits,
+  updateAgencySettings,
+  updateAgencyProfile
 } = useAgencyManagement()
 
 // Active Tab
-const activeTab = ref<'agents' | 'listings' | 'ledger'>('agents')
+const activeTab = ref<'agents' | 'listings' | 'ledger' | 'settings'>('agents')
 const searchQuery = ref('')
+
+// Broker Profile & Settings Form
+const profileForm = ref({
+  name: currentAgency.value.name,
+  tradeTitle: currentAgency.value.tradeTitle,
+  ttbLicenseNumber: currentAgency.value.ttbLicenseNumber,
+  taxOffice: currentAgency.value.taxOffice,
+  taxNumber: currentAgency.value.taxNumber,
+  phone: currentAgency.value.phone,
+  address: currentAgency.value.address
+})
+
+function saveProfile() {
+  updateAgencyProfile(profileForm.value)
+  triggerToast('Şube künye ve TTB lisans bilgileri başarıyla kaydedildi!', 'success')
+}
+
+function toggleVisibilitySetting(mode: 'own_only' | 'all_office') {
+  updateAgencySettings({ agentListingVisibility: mode })
+  triggerToast(
+    mode === 'own_only' 
+      ? '🔒 Yetki Güncellendi: Danışmanlar yalnızca kendi ilanlarını görebilir.' 
+      : '🌐 Yetki Güncellendi: Danışmanlar şubenin tüm ortak portföyünü görebilir.',
+    'success'
+  )
+}
+
+function toggleBooleanSetting(key: 'allowAgentDirectPublish' | 'notifyBrokerOnListingCreated' | 'enforceAgentQuota') {
+  const current = currentAgency.value.settings?.[key] ?? false
+  updateAgencySettings({ [key]: !current })
+  triggerToast('Ayar başarıyla güncellendi.', 'success')
+}
 
 // Modals
 const showAddAgentModal = ref(false)
@@ -230,6 +271,22 @@ const filteredAgents = computed(() => {
     a.title.toLowerCase().includes(q)
   )
 })
+
+// 🤖 AI Tabanlı Otomatik Yatırımcı & Alıcı Eşleştirme Modalı
+const showAiMatchModal = ref(false)
+const selectedPortfolioForAiMatch = ref<any>(null)
+
+function openPortfolioAiMatch(item?: any) {
+  selectedPortfolioForAiMatch.value = item || {
+    id: 'EMLAK-PORTFOY-01',
+    title: 'Ticari İmarlı Arsa & Konut Geliştirme Portföyü',
+    category: 'Emlak, Arsa & Konut Projeleri',
+    city: currentAgency.value?.city || 'Balıkesir',
+    budget: '15.000.000 ₺',
+    description: `${currentAgency.value?.name || 'Emlak Ofisi'} bünyesindeki kat karşılığı veya doğrudan satışa uygun kurumsal gayrimenkul ve ticari arsa portföyü.`
+  }
+  showAiMatchModal.value = true
+}
 </script>
 
 <template>
@@ -275,7 +332,15 @@ const filteredAgents = computed(() => {
           </div>
 
           <!-- Quick Action Buttons -->
-          <div class="flex items-center gap-3 shrink-0">
+          <div class="flex items-center gap-3 shrink-0 flex-wrap">
+            <button 
+              @click="openPortfolioAiMatch()" 
+              class="px-5 py-3 rounded-2xl bg-slate-800/90 hover:bg-slate-700 text-emerald-400 font-bold text-sm flex items-center gap-2 border border-slate-700 hover:border-emerald-500/40 shadow-lg shadow-emerald-950/20 transition transform active:scale-95 cursor-pointer"
+              title="Portföyü Fonlar ve Kurumsal Yatırımcılarla AI Algoritması ile Eşleştir"
+            >
+              <Sparkles class="w-4 h-4 text-emerald-400" />
+              AI Yatırımcı Eşleştir
+            </button>
             <button 
               @click="showTopupModal = true" 
               class="px-5 py-3 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-sm flex items-center gap-2 shadow-lg shadow-emerald-900/30 transition transform active:scale-95"
@@ -398,6 +463,15 @@ const filteredAgents = computed(() => {
           >
             <Clock class="w-4 h-4" />
             Kontör Harcama Defteri
+          </button>
+
+          <button 
+            @click="activeTab = 'settings'"
+            :class="activeTab === 'settings' ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/40' : 'bg-slate-900 text-slate-400 hover:text-white'"
+            class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition"
+          >
+            <Sliders class="w-4 h-4" />
+            Broker & Yetki Ayarları
           </button>
         </div>
 
@@ -667,6 +741,257 @@ const filteredAgents = computed(() => {
         </div>
       </div>
 
+      <!-- TAB 4: BROKER & YETKİ AYARLARI -->
+      <div v-if="activeTab === 'settings'" class="space-y-8">
+        <!-- Section Header -->
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+              <Sliders class="w-5 h-5 text-indigo-400" />
+              Broker & Şube Yönetim Ayarları
+            </h2>
+            <p class="text-xs text-slate-400 mt-1">
+              Danışmanlarınızın platform üzerindeki erişim sınırlarını, ilan görünürlük kurallarını ve ofis künyesini buradan yönetebilirsiniz.
+            </p>
+          </div>
+        </div>
+
+        <!-- 1. DANIŞMAN PORTFÖY GÖRÜNÜRLÜĞÜ (ÖNE ÇIKAN AYAR KARTI) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-5">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2.5">
+                <span class="p-2.5 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                  <Eye class="w-5 h-5" />
+                </span>
+                <div>
+                  <h3 class="text-base font-bold text-white">Danışman Portföy Görünürlük Politikası</h3>
+                  <p class="text-xs text-slate-400">Danışman alt hesaplarının diğer danışmanların ilanlarını görüp göremeyeceğini belirleyin.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Live Status Pill -->
+            <div class="flex items-center gap-2 self-start sm:self-auto">
+              <span 
+                :class="currentAgency.settings?.agentListingVisibility === 'all_office' 
+                  ? 'bg-blue-500/10 text-blue-400 border-blue-500/30' 
+                  : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'"
+                class="px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-2"
+              >
+                <span class="w-2 h-2 rounded-full" :class="currentAgency.settings?.agentListingVisibility === 'all_office' ? 'bg-blue-400 animate-pulse' : 'bg-emerald-400'"></span>
+                {{ currentAgency.settings?.agentListingVisibility === 'all_office' ? 'Tüm Ofis Havuzu Açık' : 'Yalnızca Kendi Portföyü (İzole)' }}
+              </span>
+            </div>
+          </div>
+
+          <!-- 2 Interactive Segmented Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- OPTION 1: YALNIZCA KENDİ PORTFÖYÜ (Gizlilik & Bireysel Çalışma) -->
+            <div 
+              @click="toggleVisibilitySetting('own_only')"
+              :class="currentAgency.settings?.agentListingVisibility === 'own_only' 
+                ? 'border-emerald-500 bg-emerald-950/20 ring-2 ring-emerald-500/20 shadow-lg' 
+                : 'border-slate-800 bg-slate-950/60 hover:border-slate-700'"
+              class="rounded-2xl p-5 border transition-all cursor-pointer flex flex-col justify-between space-y-4 group"
+            >
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
+                      <EyeOff class="w-4 h-4" />
+                    </div>
+                    <span class="font-bold text-sm text-white">Yalnızca Kendi Portföyü (Tavsiye Edilen)</span>
+                  </div>
+                  <div 
+                    :class="currentAgency.settings?.agentListingVisibility === 'own_only' ? 'bg-emerald-500 border-emerald-400 text-white' : 'border-slate-700'"
+                    class="w-5 h-5 rounded-full border flex items-center justify-center transition"
+                  >
+                    <CheckCircle2 v-if="currentAgency.settings?.agentListingVisibility === 'own_only'" class="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                  Her danışman paneline girdiğinde <strong>yalnızca kendi adına açtığı</strong> emlak ilanlarını görebilir, düzenleyebilir veya silebilir. 
+                  Diğer danışmanların müşteri ve portföy bilgileri gizli tutulur.
+                </p>
+              </div>
+
+              <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500">
+                <span>Müşteri Gizliliği: <strong>Maksimum</strong></span>
+                <span class="text-emerald-400 font-semibold">Ofis İçi İzolasyon</span>
+              </div>
+            </div>
+
+            <!-- OPTION 2: TÜM OFİS PORTFÖYÜ (Ortak Havuz & Şeffaflık) -->
+            <div 
+              @click="toggleVisibilitySetting('all_office')"
+              :class="currentAgency.settings?.agentListingVisibility === 'all_office' 
+                ? 'border-blue-500 bg-blue-950/20 ring-2 ring-blue-500/20 shadow-lg' 
+                : 'border-slate-800 bg-slate-950/60 hover:border-slate-700'"
+              class="rounded-2xl p-5 border transition-all cursor-pointer flex flex-col justify-between space-y-4 group"
+            >
+              <div class="space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <div class="p-2 rounded-xl bg-blue-500/10 text-blue-400">
+                      <Eye class="w-4 h-4" />
+                    </div>
+                    <span class="font-bold text-sm text-white">Tüm Ofis Portföyü (Ortak Havuz)</span>
+                  </div>
+                  <div 
+                    :class="currentAgency.settings?.agentListingVisibility === 'all_office' ? 'bg-blue-500 border-blue-400 text-white' : 'border-slate-700'"
+                    class="w-5 h-5 rounded-full border flex items-center justify-center transition"
+                  >
+                    <CheckCircle2 v-if="currentAgency.settings?.agentListingVisibility === 'all_office'" class="w-3.5 h-3.5" />
+                  </div>
+                </div>
+                <p class="text-xs text-slate-400 leading-relaxed">
+                  Danışmanlar şubenin bünyesindeki <strong>tüm danışmanların açtığı ilanları</strong> ortak havuzda görebilir. 
+                  Gelen alıcı müşterilere ofis portföyündeki diğer gayrimenkulleri önermek ve çapraz satış yapmak için idealdir.
+                </p>
+              </div>
+
+              <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500">
+                <span>Çapraz Eşleştirme: <strong>Aktif</strong></span>
+                <span class="text-blue-400 font-semibold">Ortak Ofis Havuzu</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 2. EK BROKER OPERASYONEL İŞ KURALLARI (TOGGLE SWITCHES) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+          <h3 class="text-base font-bold text-white flex items-center gap-2">
+            <ShieldCheck class="w-5 h-5 text-emerald-400" />
+            İlan Açım ve Yetki Güvenlik Kuralları
+          </h3>
+
+          <div class="divide-y divide-slate-800/80">
+            
+            <!-- Switch 1: Doğrudan Yayına Alma -->
+            <div class="py-4 flex items-center justify-between gap-4">
+              <div class="space-y-0.5">
+                <div class="font-semibold text-sm text-white">Danışman Doğrudan Yayına Alabilsin</div>
+                <p class="text-xs text-slate-400">Açık olduğunda danışmanın girdiği ilan anında yayına alınır ve 1 kontör düşülür. Kapalıysa ilan önce Broker onayına düşer.</p>
+              </div>
+              <button 
+                type="button"
+                @click="toggleBooleanSetting('allowAgentDirectPublish')"
+                :class="currentAgency.settings?.allowAgentDirectPublish ? 'bg-indigo-600' : 'bg-slate-800'"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              >
+                <span 
+                  :class="currentAgency.settings?.allowAgentDirectPublish ? 'translate-x-5' : 'translate-x-0'"
+                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out"
+                />
+              </button>
+            </div>
+
+            <!-- Switch 2: İlan Bildirimi -->
+            <div class="py-4 flex items-center justify-between gap-4">
+              <div class="space-y-0.5">
+                <div class="font-semibold text-sm text-white">İlan Girişinde Broker'a Bildirim İlet</div>
+                <p class="text-xs text-slate-400">Danışmanınız yeni bir ilan açtığında veya güncellediğinde şube e-posta ve SMS hattına anlık bildirim gider.</p>
+              </div>
+              <button 
+                type="button"
+                @click="toggleBooleanSetting('notifyBrokerOnListingCreated')"
+                :class="currentAgency.settings?.notifyBrokerOnListingCreated ? 'bg-indigo-600' : 'bg-slate-800'"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              >
+                <span 
+                  :class="currentAgency.settings?.notifyBrokerOnListingCreated ? 'translate-x-5' : 'translate-x-0'"
+                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out"
+                />
+              </button>
+            </div>
+
+            <!-- Switch 3: Aylık Kota Sınırı -->
+            <div class="py-4 flex items-center justify-between gap-4">
+              <div class="space-y-0.5">
+                <div class="font-semibold text-sm text-white">Danışman Başı Aylık Kontör Kotasını Zorunlu Kıl</div>
+                <p class="text-xs text-slate-400">Danışman kartında tanımlı aylık limit dolduğunda, danışman yeni ilan açamaz (Broker ek limit tanıyana kadar).</p>
+              </div>
+              <button 
+                type="button"
+                @click="toggleBooleanSetting('enforceAgentQuota')"
+                :class="currentAgency.settings?.enforceAgentQuota ? 'bg-indigo-600' : 'bg-slate-800'"
+                class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              >
+                <span 
+                  :class="currentAgency.settings?.enforceAgentQuota ? 'translate-x-5' : 'translate-x-0'"
+                  class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out"
+                />
+              </button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 3. ŞUBE & BROKER KÜNYE BİLGİLERİ DÜZENLEME -->
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-white flex items-center gap-2">
+                <Building2 class="w-5 h-5 text-amber-400" />
+                Şube Künyesi ve Taşınmaz Ticareti Belgesi
+              </h3>
+              <p class="text-xs text-slate-400 mt-0.5">T.C. Ticaret Bakanlığı TTB Lisans numaranız ve kurumsal fatura bilgileriniz.</p>
+            </div>
+            <button 
+              @click="saveProfile" 
+              class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs flex items-center gap-2 transition shadow cursor-pointer"
+            >
+              <Save class="w-4 h-4" />
+              Bilgileri Kaydet
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs">
+            <div class="space-y-1.5">
+              <label class="font-bold text-slate-400">Ofis / Şube Marka Adı</label>
+              <input v-model="profileForm.name" type="text" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-indigo-500 outline-none" />
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="font-bold text-slate-400">Resmi Ticaret Unvanı</label>
+              <input v-model="profileForm.tradeTitle" type="text" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-indigo-500 outline-none" />
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="font-bold text-slate-400 flex items-center gap-1.5">
+                <span>TTB Yetki Belge No</span>
+                <span class="text-emerald-400 text-[10px] font-mono font-bold">(T.C. Ticaret Bak.)</span>
+              </label>
+              <input v-model="profileForm.ttbLicenseNumber" type="text" placeholder="Örn: 3400124" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white font-mono focus:border-indigo-500 outline-none" />
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="font-bold text-slate-400">Vergi Dairesi</label>
+              <input v-model="profileForm.taxOffice" type="text" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-indigo-500 outline-none" />
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="font-bold text-slate-400">Vergi Kimlik No (VKN)</label>
+              <input v-model="profileForm.taxNumber" type="text" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white font-mono focus:border-indigo-500 outline-none" />
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="font-bold text-slate-400">Ofis Sabit / GSM Telefonu</label>
+              <input v-model="profileForm.phone" type="text" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white font-mono focus:border-indigo-500 outline-none" />
+            </div>
+
+            <div class="sm:col-span-2 lg:col-span-3 space-y-1.5">
+              <label class="font-bold text-slate-400">Ofis Adresi</label>
+              <input v-model="profileForm.address" type="text" class="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-white focus:border-indigo-500 outline-none" />
+            </div>
+          </div>
+        </div>
+
+      </div>
+
       <!-- MODAL 1: TEKIL DANISMAN EKLE -->
       <div v-if="showAddAgentModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl space-y-6">
@@ -843,6 +1168,13 @@ const filteredAgents = computed(() => {
           </div>
         </div>
       </div>
+
+      <!-- 🤖 AI Tabanlı Otomatik Yatırımcı & Alıcı Eşleştirme Modalı -->
+      <AiMatchingModal 
+        :is-open="showAiMatchModal" 
+        :target="selectedPortfolioForAiMatch" 
+        @close="showAiMatchModal = false" 
+      />
 
     </div>
   </div>
