@@ -29,11 +29,31 @@ export const DEFAULT_CMS_DATA = {
   pricing: {
     vatNotice: 'Fiyatlara %20 KDV dahildir.',
     disclaimer: 'Bu hizmet Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi) tarafından yürütülmektedir.',
+    realEstate: {
+      listingUnitPriceNet: 30,
+      vatRate: 20,
+      minPurchasePack: 10,
+      enabled: true,
+      bonusRules: [
+        { threshold: 50, bonusCredits: 2 },
+        { threshold: 100, bonusCredits: 5 },
+        { threshold: 250, bonusCredits: 15 },
+        { threshold: 500, bonusCredits: 40 }
+      ],
+      packageTiers: [
+        { id: 'pack_10', name: '10 İlan Kontörü', credits: 10, discountPercent: 0 },
+        { id: 'pack_50', name: '50 İlan Kontörü', credits: 50, discountPercent: 5, isPopular: true },
+        { id: 'pack_100', name: '100 İlan Kontörü', credits: 100, discountPercent: 10 },
+        { id: 'pack_250', name: '250 İlan Kontörü', credits: 250, discountPercent: 15 },
+        { id: 'pack_500', name: '500 İlan Kontörü', credits: 500, discountPercent: 20 }
+      ]
+    },
     packages: [
       { id: '1_month', name: 'Standart İhale Paketi - 1 Ay', price: 900, months: 1, monthlyPrice: 900, badge: 'KURUMSAL KULLANIM' },
       { id: '3_months', name: 'Pro Avantaj Paketi - 3 Ay', price: 1800, months: 3, monthlyPrice: 600, badge: 'EN ÇOK TERCİH EDİLEN POPÜLER PLAN', popular: true },
       { id: '6_months', name: 'Kurumsal Plan - 6 Ay', price: 2700, months: 6, monthlyPrice: 450, badge: 'KURUMSAL KULLANIM' },
-      { id: '12_months', name: 'Yıllık Lisans Paketi - 12 Ay', price: 3600, months: 12, monthlyPrice: 300, badge: 'YILLIK AVANTAJ' }
+      { id: '12_months', name: 'Yıllık Lisans Paketi - 12 Ay', price: 3600, months: 12, monthlyPrice: 300, badge: 'YILLIK AVANTAJ' },
+      { id: 'emlak_ofisi', name: 'Kurumsal Emlak Ofisi & Broker Paketi', price: 2400, months: 3, monthlyPrice: 800, badge: 'EMLAK OFİSLERİ İÇİN ÖZEL', includedAgents: 10, welcomeCredits: 20 }
     ],
     features: [
       [
@@ -606,13 +626,19 @@ export function useCmsData() {
     } else if (saved) {
       try {
         const parsed = JSON.parse(saved)
-        if (parsed && typeof parsed === 'object') {
           cmsDataRef.value = {
             ...DEFAULT_CMS_DATA,
             ...parsed,
-            commissionSettings: parsed.commissionSettings || DEFAULT_CMS_DATA.commissionSettings
+            commissionSettings: parsed.commissionSettings || DEFAULT_CMS_DATA.commissionSettings,
+            pricing: {
+              ...DEFAULT_CMS_DATA.pricing,
+              ...(parsed.pricing || {}),
+              realEstate: {
+                ...DEFAULT_CMS_DATA.pricing.realEstate,
+                ...((parsed.pricing && parsed.pricing.realEstate) || {})
+              }
+            }
           }
-        }
       } catch (e) {
         console.warn('Failed to parse cmsData from localStorage, using clean defaults', e)
         cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))

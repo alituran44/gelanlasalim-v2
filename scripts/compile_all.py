@@ -43,7 +43,7 @@ def generate_ts():
     lines.append("export interface CategoryFieldDef {")
     lines.append("  id: string")
     lines.append("  label: string")
-    lines.append("  type: 'text' | 'number' | 'select' | 'badge-group' | 'radio' | 'boolean' | 'date'")
+    lines.append("  type: 'text' | 'number' | 'select' | 'badge-group' | 'radio' | 'boolean' | 'date' | 'multi-select'")
     lines.append("  placeholder?: string")
     lines.append("  unit?: string")
     lines.append("  options?: Array<string | { value: string; label: string }>")
@@ -620,14 +620,31 @@ export function formatSectorSummaryBadges(
       if (categorySpecificData.adaParselNo) badges.push({ label: 'Ada/Parsel', value: String(categorySpecificData.adaParselNo) })
       if (categorySpecificData.toplamYuzolcumuM2) badges.push({ label: 'Yüzölçümü', value: `${Number(categorySpecificData.toplamYuzolcumuM2).toLocaleString('tr-TR')} m²` })
       if (categorySpecificData.imarDurumu) badges.push({ label: 'İmar', value: String(categorySpecificData.imarDurumu) })
-      if (categorySpecificData.asgariKatKarsiligiOrani) badges.push({ label: 'Kat Karşılığı', value: `%${categorySpecificData.asgariKatKarsiligiOrani}` })
+      if (categorySpecificData.kaksEmsalOrani) badges.push({ label: 'KAKS/Emsal', value: String(categorySpecificData.kaksEmsalOrani) })
+      if (categorySpecificData.gabariHmax) badges.push({ label: 'Gabari', value: String(categorySpecificData.gabariHmax) })
+      if (categorySpecificData.asgariKatKarsiligiOrani && Number(categorySpecificData.asgariKatKarsiligiOrani) > 0) {
+        badges.push({ label: 'Kat Karşılığı', value: `%${categorySpecificData.asgariKatKarsiligiOrani}` })
+      }
+      if (categorySpecificData.tapuMulkDurumu) badges.push({ label: 'Tapu', value: String(categorySpecificData.tapuMulkDurumu) })
+      if (Array.isArray(categorySpecificData.altyapiOzellikleri) && categorySpecificData.altyapiOzellikleri.length > 0) {
+        badges.push({ label: 'Altyapı', value: `${categorySpecificData.altyapiOzellikleri.length} Donanım` })
+      }
       break
 
     case 'konut_daire':
       if (categorySpecificData.odaSayisi) badges.push({ label: 'Oda', value: String(categorySpecificData.odaSayisi) })
-      if (categorySpecificData.netMetrekare) badges.push({ label: 'Net', value: `${categorySpecificData.netMetrekare} m²` })
-      if (categorySpecificData.tapuMulkDurumu) badges.push({ label: 'Tapu', value: String(categorySpecificData.tapuMulkDurumu) })
+      if (categorySpecificData.netMetrekare) badges.push({ label: 'Net Alan', value: `${categorySpecificData.netMetrekare} m²` })
+      if (categorySpecificData.konutTipi) badges.push({ label: 'Tip', value: String(categorySpecificData.konutTipi) })
       if (categorySpecificData.binaYasi) badges.push({ label: 'Yaş', value: String(categorySpecificData.binaYasi) })
+      if (categorySpecificData.bulunduguKat) badges.push({ label: 'Kat', value: String(categorySpecificData.bulunduguKat) })
+      if (categorySpecificData.isinmaTipi) badges.push({ label: 'Isıtma', value: String(categorySpecificData.isinmaTipi) })
+      if (categorySpecificData.tapuMulkDurumu) badges.push({ label: 'Tapu', value: String(categorySpecificData.tapuMulkDurumu) })
+      if (Array.isArray(categorySpecificData.icOzellikler) && categorySpecificData.icOzellikler.length > 0) {
+        badges.push({ label: 'İç Donanım', value: `${categorySpecificData.icOzellikler.length} Özellik` })
+      }
+      if (Array.isArray(categorySpecificData.disOzellikler) && categorySpecificData.disOzellikler.length > 0) {
+        badges.push({ label: 'Sosyal Tesis', value: `${categorySpecificData.disOzellikler.length} Donanım` })
+      }
       break
 
     case 'ticari_gayrimenkul':

@@ -519,7 +519,18 @@ if (!formState.commissionSettings) {
   }
 }
 
-const simAmount = ref(100000)
+if (!formState.pricing) {
+  formState.pricing = {} as any
+}
+if (!formState.pricing.realEstate) {
+  formState.pricing.realEstate = {
+    listingUnitPriceNet: 30,
+    vatRate: 20,
+    minPurchasePack: 10,
+    enabled: true
+  }
+}
+
 const simSectorRate = ref(3.0)
 const simPlatformEarning = computed(() => Math.round((simAmount.value * simSectorRate.value) / 100))
 const simSupplierNet = computed(() => simAmount.value - simPlatformEarning.value)
@@ -4550,18 +4561,115 @@ function removeSubmittedBid(index: number) {
           <!-- TAB: PLANS -->
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'plans'" class="space-y-6">
+            
+            <!-- 1. EMLAK İLAN KONTÖR BİRİM FİYATLANDIRMASI (DİNAMİK) -->
+            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/80 space-y-6 shadow-xl">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                  <h3 class="text-sm font-black text-white flex items-center gap-2">
+                    <DollarSign :size="16" class="text-emerald-400" />
+                    EMLAK İLAN KONTÖR BİRİM FİYATLANDIRMASI (DİNAMİK)
+                  </h3>
+                  <p class="text-xs text-slate-400 mt-1">
+                    Emlak ofislerinin ve danışmanların ilan açarken cüzdanından düşülecek bedel. Buradaki değişiklik anında platform genelinde geçerli olur.
+                  </p>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                  <NuxtLink 
+                    to="/panel/emlak-sube" 
+                    target="_blank" 
+                    class="px-3.5 py-2 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-xl text-xs font-bold flex items-center gap-1.5 transition"
+                  >
+                    <ExternalLink :size="13" />
+                    Emlak Şube Paneli Önizle
+                  </NuxtLink>
+                  <button 
+                    @click="handleSave" 
+                    class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow"
+                  >
+                    <Save :size="13" /> Kaydet
+                  </button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- 1. İlan Başı Net Ücret -->
+                <div class="p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-2">
+                  <label class="block text-xs font-bold text-slate-400">İlan Başı Net Tutar (₺)</label>
+                  <div class="relative">
+                    <input 
+                      v-model.number="formState.pricing.realEstate.listingUnitPriceNet" 
+                      type="number" 
+                      step="1" 
+                      class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono font-black text-base focus:border-emerald-500 outline-none" 
+                    />
+                    <span class="absolute right-3 top-2.5 text-xs text-slate-500 font-bold">₺</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500">Varsayılan: 30 TL. İlan başına ofis cüzdanından çekilecek baz bedel.</p>
+                </div>
+
+                <!-- 2. KDV Oranı -->
+                <div class="p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-2">
+                  <label class="block text-xs font-bold text-slate-400">KDV Oranı (%)</label>
+                  <div class="relative">
+                    <input 
+                      v-model.number="formState.pricing.realEstate.vatRate" 
+                      type="number" 
+                      class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-white font-mono font-black text-base focus:border-emerald-500 outline-none" 
+                    />
+                    <span class="absolute right-3 top-2.5 text-xs text-slate-500 font-bold">%</span>
+                  </div>
+                  <p class="text-[11px] text-slate-500">Mevzuat oranı (Varsayılan %20 KDV).</p>
+                </div>
+
+                <!-- 3. KDV Dahil Hesaplanan Satış Fiyatı -->
+                <div class="p-4 rounded-xl border border-emerald-900/60 bg-emerald-950/30 flex flex-col justify-between">
+                  <div>
+                    <span class="text-xs font-bold text-emerald-400">Hesaplanan Satış Fiyatı (KDV Dahil)</span>
+                    <div class="text-2xl font-black text-white font-mono mt-1">
+                      {{ ((formState.pricing.realEstate.listingUnitPriceNet || 30) * (1 + (formState.pricing.realEstate.vatRate || 20) / 100)).toFixed(2) }} ₺
+                    </div>
+                  </div>
+                  <span class="text-[11px] text-emerald-400/80">İlan başına ofis cüzdanından fiilen düşülecek nihai tutar</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 2. KURUMSAL B2B ABONELİK PLANLARI -->
             <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4">
-              <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">B2B ABONELİK PLANLARI (4 KART)</h3>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div v-for="pkg in formState.pricing.packages" :key="pkg.id" class="p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-2">
-                  <div class="font-bold text-xs text-white">{{ pkg.name }}</div>
-                  <div class="flex items-center gap-2">
-                    <span class="text-xs text-slate-500 font-bold">Fiyat (₺):</span>
-                    <input v-model="pkg.price" type="number" class="w-28 rounded border border-slate-800 bg-slate-900 p-1.5 text-xs text-white font-mono font-bold" />
+              <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div>
+                  <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest">B2B ABONELİK PLANLARI & PAKET FİYATLARI</h3>
+                  <p class="text-xs text-slate-500 mt-0.5">Kullanıcıların ve kurumsal firmaların satın alacağı üyelik paketlerinin ücretlerini buradan düzenleyin.</p>
+                </div>
+                <button 
+                  @click="handleSave" 
+                  class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow"
+                >
+                  <Save :size="13" /> Paket Fiyatlarını Kaydet
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div v-for="pkg in formState.pricing.packages" :key="pkg.id" class="p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-3">
+                  <div>
+                    <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 uppercase font-mono">{{ pkg.badge || 'PLAN' }}</span>
+                    <input v-model="pkg.name" class="mt-2 font-bold text-xs text-white bg-transparent border-b border-slate-800 focus:border-blue-500 w-full outline-none pb-1" />
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                      <span class="text-[11px] text-slate-500 font-semibold block">Toplam (₺):</span>
+                      <input v-model.number="pkg.price" type="number" class="w-full rounded border border-slate-800 bg-slate-900 p-1.5 text-xs text-white font-mono font-bold" />
+                    </div>
+                    <div>
+                      <span class="text-[11px] text-slate-500 font-semibold block">Aylık (₺):</span>
+                      <input v-model.number="pkg.monthlyPrice" type="number" class="w-full rounded border border-slate-800 bg-slate-900 p-1.5 text-xs text-white font-mono font-bold" />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+
           </div>
 
           <!-- ========================================================================= -->

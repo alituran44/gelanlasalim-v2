@@ -149,6 +149,34 @@ function applyPreset(presetValues: Record<string, any>) {
   emit('update:modelValue', { ...formData.value })
 }
 
+function toggleMultiSelect(fieldId: string, value: string) {
+  const currentList = Array.isArray(formData.value[fieldId]) 
+    ? [...formData.value[fieldId]] 
+    : []
+  const index = currentList.indexOf(value)
+  if (index > -1) {
+    currentList.splice(index, 1)
+  } else {
+    currentList.push(value)
+  }
+  updateField(fieldId, currentList)
+}
+
+function isMultiSelected(fieldId: string, value: string): boolean {
+  const currentList = formData.value[fieldId]
+  return Array.isArray(currentList) && currentList.includes(value)
+}
+
+function clearMultiSelect(fieldId: string) {
+  updateField(fieldId, [])
+}
+
+function selectAllMultiSelect(fieldId: string, options?: Array<string | { value: string; label: string }>) {
+  if (!options) return
+  const allValues = options.map(opt => typeof opt === 'string' ? opt : opt.value)
+  updateField(fieldId, allValues)
+}
+
 onMounted(() => {
   applyDefaultValues()
 })
@@ -233,81 +261,169 @@ onMounted(() => {
           v-for="field in teknikFields" 
           :key="field.id" 
           class="space-y-1.5"
-          :class="field.type === 'badge-group' ? 'md:col-span-2' : ''"
+          :class="['badge-group', 'multi-select'].includes(field.type) ? 'md:col-span-2' : (field.type === 'boolean' ? 'p-3 rounded-xl border border-slate-100 bg-slate-50/60 flex items-center justify-between gap-3' : '')"
         >
-          <label class="block text-xs font-bold text-slate-700 flex items-center justify-between">
-            <span>
-              {{ field.label }}
-              <span v-if="field.required" class="text-red-500 ml-0.5">*</span>
-            </span>
-            <span v-if="field.unit" class="text-[10px] font-mono text-slate-400 uppercase bg-slate-100 px-1.5 py-0.5 rounded">
-              Birim: {{ field.unit }}
-            </span>
-          </label>
+          <!-- BOOLEAN SWITCH -->
+          <template v-if="field.type === 'boolean'">
+            <div class="space-y-0.5">
+              <label class="text-xs font-bold text-slate-800 block cursor-pointer" @click="updateField(field.id, !formData[field.id])">
+                {{ field.label }}
+              </label>
+              <p v-if="field.helpText" class="text-[10px] text-slate-400 leading-tight">
+                {{ field.helpText }}
+              </p>
+            </div>
 
-          <!-- SELECT -->
-          <div v-if="field.type === 'select'" class="relative">
-            <select
-              :value="formData[field.id] || ''"
-              @change="updateField(field.id, ($event.target as HTMLSelectElement).value)"
-              class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 text-xs text-slate-800 focus:bg-white focus:border-blue-500 focus:outline-none transition cursor-pointer"
-            >
-              <option value="" disabled>Lütfen seçiniz...</option>
-              <option 
-                v-for="opt in field.options" 
-                :key="typeof opt === 'string' ? opt : opt.value" 
-                :value="typeof opt === 'string' ? opt : opt.value"
-              >
-                {{ typeof opt === 'string' ? opt : opt.label }}
-              </option>
-            </select>
-          </div>
-
-          <!-- BADGE-GROUP (Clickable Chips) -->
-          <div v-else-if="field.type === 'badge-group'" class="flex flex-wrap gap-2 pt-0.5">
             <button
-              v-for="opt in field.options"
-              :key="typeof opt === 'string' ? opt : opt.value"
               type="button"
-              @click="updateField(field.id, typeof opt === 'string' ? opt : opt.value)"
-              class="px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center gap-1.5"
-              :class="formData[field.id] === (typeof opt === 'string' ? opt : opt.value)
-                ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
-                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'"
+              @click="updateField(field.id, !formData[field.id])"
+              class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              :class="formData[field.id] ? 'bg-blue-600' : 'bg-slate-300'"
             >
-              <Check v-if="formData[field.id] === (typeof opt === 'string' ? opt : opt.value)" :size="12" />
-              <span>{{ typeof opt === 'string' ? opt : opt.label }}</span>
+              <span
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"
+                :class="formData[field.id] ? 'translate-x-5' : 'translate-x-0'"
+              />
             </button>
-          </div>
+          </template>
 
-          <!-- NUMBER -->
-          <div v-else-if="field.type === 'number'" class="relative">
-            <input
-              type="number"
-              :value="formData[field.id]"
-              @input="updateField(field.id, Number(($event.target as HTMLInputElement).value))"
-              :placeholder="field.placeholder || '0'"
-              class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 pr-14 text-xs font-mono font-bold text-slate-800 focus:bg-white focus:border-blue-500 focus:outline-none transition"
-            />
-            <span v-if="field.unit" class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold font-mono">
-              {{ field.unit }}
-            </span>
-          </div>
+          <!-- MULTI-SELECT CHIPS -->
+          <template v-else-if="field.type === 'multi-select'">
+            <div class="space-y-2 pt-1">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-slate-700">{{ field.label }}</span>
+                  <span v-if="field.required" class="text-red-500 font-bold">*</span>
+                  <span 
+                    v-if="Array.isArray(formData[field.id]) && formData[field.id].length > 0"
+                    class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200"
+                  >
+                    {{ formData[field.id].length }} seçildi
+                  </span>
+                </div>
+                <div class="flex items-center gap-2 text-[11px]">
+                  <button 
+                    type="button" 
+                    @click="selectAllMultiSelect(field.id, field.options)"
+                    class="text-blue-600 hover:text-blue-800 font-medium hover:underline cursor-pointer"
+                  >
+                    Tümünü Seç
+                  </button>
+                  <span class="text-slate-300">|</span>
+                  <button 
+                    type="button" 
+                    @click="clearMultiSelect(field.id)"
+                    class="text-slate-400 hover:text-red-600 font-medium hover:underline cursor-pointer"
+                  >
+                    Temizle
+                  </button>
+                </div>
+              </div>
 
-          <!-- TEXT -->
-          <div v-else class="relative">
-            <input
-              type="text"
-              :value="formData[field.id] || ''"
-              @input="updateField(field.id, ($event.target as HTMLInputElement).value)"
-              :placeholder="field.placeholder || ''"
-              class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 text-xs text-slate-800 focus:bg-white focus:border-blue-500 focus:outline-none transition"
-            />
-          </div>
+              <div class="flex flex-wrap gap-1.5 p-3 rounded-xl border border-slate-200/80 bg-slate-50/50 max-h-60 overflow-y-auto">
+                <button
+                  v-for="opt in field.options"
+                  :key="typeof opt === 'string' ? opt : opt.value"
+                  type="button"
+                  @click="toggleMultiSelect(field.id, typeof opt === 'string' ? opt : opt.value)"
+                  class="px-2.5 py-1.5 rounded-lg text-xs font-medium border transition cursor-pointer flex items-center gap-1.5 select-none"
+                  :class="isMultiSelected(field.id, typeof opt === 'string' ? opt : opt.value)
+                    ? 'bg-blue-600 text-white border-blue-600 shadow-xs font-semibold'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'"
+                >
+                  <div 
+                    class="w-3.5 h-3.5 rounded flex items-center justify-center border text-[10px]"
+                    :class="isMultiSelected(field.id, typeof opt === 'string' ? opt : opt.value)
+                      ? 'bg-white text-blue-600 border-white'
+                      : 'border-slate-300 bg-slate-50'"
+                  >
+                    <Check v-if="isMultiSelected(field.id, typeof opt === 'string' ? opt : opt.value)" :size="10" stroke-width="3" />
+                  </div>
+                  <span>{{ typeof opt === 'string' ? opt : opt.label }}</span>
+                </button>
+              </div>
+              <p v-if="field.helpText" class="text-[10px] text-slate-400 leading-tight">
+                ℹ️ {{ field.helpText }}
+              </p>
+            </div>
+          </template>
 
-          <p v-if="field.helpText" class="text-[10px] text-slate-400 leading-tight">
-            ℹ️ {{ field.helpText }}
-          </p>
+          <!-- OTHER FIELD TYPES (SELECT, BADGE-GROUP, NUMBER, TEXT) -->
+          <template v-else>
+            <label class="block text-xs font-bold text-slate-700 flex items-center justify-between">
+              <span>
+                {{ field.label }}
+                <span v-if="field.required" class="text-red-500 ml-0.5">*</span>
+              </span>
+              <span v-if="field.unit" class="text-[10px] font-mono text-slate-400 uppercase bg-slate-100 px-1.5 py-0.5 rounded">
+                Birim: {{ field.unit }}
+              </span>
+            </label>
+
+            <!-- SELECT -->
+            <div v-if="field.type === 'select'" class="relative">
+              <select
+                :value="formData[field.id] || ''"
+                @change="updateField(field.id, ($event.target as HTMLSelectElement).value)"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 text-xs text-slate-800 focus:bg-white focus:border-blue-500 focus:outline-none transition cursor-pointer"
+              >
+                <option value="" disabled>Lütfen seçiniz...</option>
+                <option 
+                  v-for="opt in field.options" 
+                  :key="typeof opt === 'string' ? opt : opt.value" 
+                  :value="typeof opt === 'string' ? opt : opt.value"
+                >
+                  {{ typeof opt === 'string' ? opt : opt.label }}
+                </option>
+              </select>
+            </div>
+
+            <!-- BADGE-GROUP (Clickable Chips) -->
+            <div v-else-if="field.type === 'badge-group'" class="flex flex-wrap gap-2 pt-0.5">
+              <button
+                v-for="opt in field.options"
+                :key="typeof opt === 'string' ? opt : opt.value"
+                type="button"
+                @click="updateField(field.id, typeof opt === 'string' ? opt : opt.value)"
+                class="px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center gap-1.5"
+                :class="formData[field.id] === (typeof opt === 'string' ? opt : opt.value)
+                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'"
+              >
+                <Check v-if="formData[field.id] === (typeof opt === 'string' ? opt : opt.value)" :size="12" />
+                <span>{{ typeof opt === 'string' ? opt : opt.label }}</span>
+              </button>
+            </div>
+
+            <!-- NUMBER -->
+            <div v-else-if="field.type === 'number'" class="relative">
+              <input
+                type="number"
+                :value="formData[field.id]"
+                @input="updateField(field.id, Number(($event.target as HTMLInputElement).value))"
+                :placeholder="field.placeholder || '0'"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 pr-14 text-xs font-mono font-bold text-slate-800 focus:bg-white focus:border-blue-500 focus:outline-none transition"
+              />
+              <span v-if="field.unit" class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold font-mono">
+                {{ field.unit }}
+              </span>
+            </div>
+
+            <!-- TEXT -->
+            <div v-else class="relative">
+              <input
+                type="text"
+                :value="formData[field.id] || ''"
+                @input="updateField(field.id, ($event.target as HTMLInputElement).value)"
+                :placeholder="field.placeholder || ''"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 text-xs text-slate-800 focus:bg-white focus:border-blue-500 focus:outline-none transition"
+              />
+            </div>
+
+            <p v-if="field.helpText" class="text-[10px] text-slate-400 leading-tight">
+              ℹ️ {{ field.helpText }}
+            </p>
+          </template>
         </div>
       </div>
     </div>
@@ -327,7 +443,7 @@ onMounted(() => {
           v-for="field in mevzuatFields" 
           :key="field.id" 
           class="space-y-1.5"
-          :class="field.type === 'boolean' ? 'p-3 rounded-xl border border-slate-100 bg-slate-50/60 flex items-center justify-between gap-3' : ''"
+          :class="['badge-group', 'multi-select'].includes(field.type) ? 'md:col-span-2' : (field.type === 'boolean' ? 'p-3 rounded-xl border border-slate-100 bg-slate-50/60 flex items-center justify-between gap-3' : '')"
         >
           <!-- BOOLEAN SWITCH -->
           <template v-if="field.type === 'boolean'">
@@ -351,6 +467,67 @@ onMounted(() => {
                 :class="formData[field.id] ? 'translate-x-5' : 'translate-x-0'"
               />
             </button>
+          </template>
+
+          <!-- MULTI-SELECT CHIPS -->
+          <template v-else-if="field.type === 'multi-select'">
+            <div class="space-y-2 pt-1">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-slate-700">{{ field.label }}</span>
+                  <span v-if="field.required" class="text-red-500 font-bold">*</span>
+                  <span 
+                    v-if="Array.isArray(formData[field.id]) && formData[field.id].length > 0"
+                    class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200"
+                  >
+                    {{ formData[field.id].length }} seçildi
+                  </span>
+                </div>
+                <div class="flex items-center gap-2 text-[11px]">
+                  <button 
+                    type="button" 
+                    @click="selectAllMultiSelect(field.id, field.options)"
+                    class="text-emerald-700 hover:text-emerald-900 font-medium hover:underline cursor-pointer"
+                  >
+                    Tümünü Seç
+                  </button>
+                  <span class="text-slate-300">|</span>
+                  <button 
+                    type="button" 
+                    @click="clearMultiSelect(field.id)"
+                    class="text-slate-400 hover:text-red-600 font-medium hover:underline cursor-pointer"
+                  >
+                    Temizle
+                  </button>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap gap-1.5 p-3 rounded-xl border border-slate-200/80 bg-slate-50/50 max-h-60 overflow-y-auto">
+                <button
+                  v-for="opt in field.options"
+                  :key="typeof opt === 'string' ? opt : opt.value"
+                  type="button"
+                  @click="toggleMultiSelect(field.id, typeof opt === 'string' ? opt : opt.value)"
+                  class="px-2.5 py-1.5 rounded-lg text-xs font-medium border transition cursor-pointer flex items-center gap-1.5 select-none"
+                  :class="isMultiSelected(field.id, typeof opt === 'string' ? opt : opt.value)
+                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs font-semibold'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'"
+                >
+                  <div 
+                    class="w-3.5 h-3.5 rounded flex items-center justify-center border text-[10px]"
+                    :class="isMultiSelected(field.id, typeof opt === 'string' ? opt : opt.value)
+                      ? 'bg-white text-emerald-600 border-white'
+                      : 'border-slate-300 bg-slate-50'"
+                  >
+                    <Check v-if="isMultiSelected(field.id, typeof opt === 'string' ? opt : opt.value)" :size="10" stroke-width="3" />
+                  </div>
+                  <span>{{ typeof opt === 'string' ? opt : opt.label }}</span>
+                </button>
+              </div>
+              <p v-if="field.helpText" class="text-[10px] text-slate-400 leading-tight">
+                ℹ️ {{ field.helpText }}
+              </p>
+            </div>
           </template>
 
           <!-- OTHER TYPES IN MEVZUAT -->
@@ -429,81 +606,169 @@ onMounted(() => {
           v-for="field in ticariFields" 
           :key="field.id" 
           class="space-y-1.5"
-          :class="field.type === 'badge-group' ? 'md:col-span-2' : ''"
+          :class="['badge-group', 'multi-select'].includes(field.type) ? 'md:col-span-2' : (field.type === 'boolean' ? 'p-3 rounded-xl border border-slate-100 bg-slate-50/60 flex items-center justify-between gap-3' : '')"
         >
-          <label class="block text-xs font-bold text-slate-700 flex items-center justify-between">
-            <span>
-              {{ field.label }}
-              <span v-if="field.required" class="text-red-500 ml-0.5">*</span>
-            </span>
-            <span v-if="field.unit" class="text-[10px] font-mono text-slate-400 uppercase bg-slate-100 px-1.5 py-0.5 rounded">
-              Birim: {{ field.unit }}
-            </span>
-          </label>
+          <!-- BOOLEAN SWITCH -->
+          <template v-if="field.type === 'boolean'">
+            <div class="space-y-0.5">
+              <label class="text-xs font-bold text-slate-800 block cursor-pointer" @click="updateField(field.id, !formData[field.id])">
+                {{ field.label }}
+              </label>
+              <p v-if="field.helpText" class="text-[10px] text-slate-400 leading-tight">
+                {{ field.helpText }}
+              </p>
+            </div>
 
-          <!-- SELECT -->
-          <div v-if="field.type === 'select'" class="relative">
-            <select
-              :value="formData[field.id] || ''"
-              @change="updateField(field.id, ($event.target as HTMLSelectElement).value)"
-              class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 text-xs text-slate-800 focus:bg-white focus:border-blue-500 focus:outline-none transition cursor-pointer"
-            >
-              <option value="" disabled>Lütfen seçiniz...</option>
-              <option 
-                v-for="opt in field.options" 
-                :key="typeof opt === 'string' ? opt : opt.value" 
-                :value="typeof opt === 'string' ? opt : opt.value"
-              >
-                {{ typeof opt === 'string' ? opt : opt.label }}
-              </option>
-            </select>
-          </div>
-
-          <!-- BADGE GROUP -->
-          <div v-else-if="field.type === 'badge-group'" class="flex flex-wrap gap-2 pt-0.5">
             <button
-              v-for="opt in field.options"
-              :key="typeof opt === 'string' ? opt : opt.value"
               type="button"
-              @click="updateField(field.id, typeof opt === 'string' ? opt : opt.value)"
-              class="px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center gap-1.5"
-              :class="formData[field.id] === (typeof opt === 'string' ? opt : opt.value)
-                ? 'bg-amber-600 text-white border-amber-600 shadow-xs'
-                : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'"
+              @click="updateField(field.id, !formData[field.id])"
+              class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none"
+              :class="formData[field.id] ? 'bg-amber-600' : 'bg-slate-300'"
             >
-              <Check v-if="formData[field.id] === (typeof opt === 'string' ? opt : opt.value)" :size="12" />
-              <span>{{ typeof opt === 'string' ? opt : opt.label }}</span>
+              <span
+                class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out"
+                :class="formData[field.id] ? 'translate-x-5' : 'translate-x-0'"
+              />
             </button>
-          </div>
+          </template>
 
-          <!-- NUMBER -->
-          <div v-else-if="field.type === 'number'" class="relative">
-            <input
-              type="number"
-              :value="formData[field.id]"
-              @input="updateField(field.id, Number(($event.target as HTMLInputElement).value))"
-              :placeholder="field.placeholder || '0'"
-              class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 pr-14 text-xs font-mono font-bold text-slate-800 focus:bg-white focus:border-blue-500 focus:outline-none transition"
-            />
-            <span v-if="field.unit" class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold font-mono">
-              {{ field.unit }}
-            </span>
-          </div>
+          <!-- MULTI-SELECT CHIPS -->
+          <template v-else-if="field.type === 'multi-select'">
+            <div class="space-y-2 pt-1">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-bold text-slate-700">{{ field.label }}</span>
+                  <span v-if="field.required" class="text-red-500 font-bold">*</span>
+                  <span 
+                    v-if="Array.isArray(formData[field.id]) && formData[field.id].length > 0"
+                    class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200"
+                  >
+                    {{ formData[field.id].length }} seçildi
+                  </span>
+                </div>
+                <div class="flex items-center gap-2 text-[11px]">
+                  <button 
+                    type="button" 
+                    @click="selectAllMultiSelect(field.id, field.options)"
+                    class="text-amber-700 hover:text-amber-900 font-medium hover:underline cursor-pointer"
+                  >
+                    Tümünü Seç
+                  </button>
+                  <span class="text-slate-300">|</span>
+                  <button 
+                    type="button" 
+                    @click="clearMultiSelect(field.id)"
+                    class="text-slate-400 hover:text-red-600 font-medium hover:underline cursor-pointer"
+                  >
+                    Temizle
+                  </button>
+                </div>
+              </div>
 
-          <!-- TEXT -->
-          <div v-else class="relative">
-            <input
-              type="text"
-              :value="formData[field.id] || ''"
-              @input="updateField(field.id, ($event.target as HTMLInputElement).value)"
-              :placeholder="field.placeholder || ''"
-              class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 text-xs text-slate-800 focus:bg-white focus:border-blue-500 focus:outline-none transition"
-            />
-          </div>
+              <div class="flex flex-wrap gap-1.5 p-3 rounded-xl border border-slate-200/80 bg-slate-50/50 max-h-60 overflow-y-auto">
+                <button
+                  v-for="opt in field.options"
+                  :key="typeof opt === 'string' ? opt : opt.value"
+                  type="button"
+                  @click="toggleMultiSelect(field.id, typeof opt === 'string' ? opt : opt.value)"
+                  class="px-2.5 py-1.5 rounded-lg text-xs font-medium border transition cursor-pointer flex items-center gap-1.5 select-none"
+                  :class="isMultiSelected(field.id, typeof opt === 'string' ? opt : opt.value)
+                    ? 'bg-amber-600 text-white border-amber-600 shadow-xs font-semibold'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-100 hover:border-slate-300'"
+                >
+                  <div 
+                    class="w-3.5 h-3.5 rounded flex items-center justify-center border text-[10px]"
+                    :class="isMultiSelected(field.id, typeof opt === 'string' ? opt : opt.value)
+                      ? 'bg-white text-amber-600 border-white'
+                      : 'border-slate-300 bg-slate-50'"
+                  >
+                    <Check v-if="isMultiSelected(field.id, typeof opt === 'string' ? opt : opt.value)" :size="10" stroke-width="3" />
+                  </div>
+                  <span>{{ typeof opt === 'string' ? opt : opt.label }}</span>
+                </button>
+              </div>
+              <p v-if="field.helpText" class="text-[10px] text-slate-400 leading-tight">
+                ℹ️ {{ field.helpText }}
+              </p>
+            </div>
+          </template>
 
-          <p v-if="field.helpText" class="text-[10px] text-slate-400 leading-tight">
-            ℹ️ {{ field.helpText }}
-          </p>
+          <!-- OTHER FIELD TYPES (SELECT, BADGE-GROUP, NUMBER, TEXT) -->
+          <template v-else>
+            <label class="block text-xs font-bold text-slate-700 flex items-center justify-between">
+              <span>
+                {{ field.label }}
+                <span v-if="field.required" class="text-red-500 ml-0.5">*</span>
+              </span>
+              <span v-if="field.unit" class="text-[10px] font-mono text-slate-400 uppercase bg-slate-100 px-1.5 py-0.5 rounded">
+                Birim: {{ field.unit }}
+              </span>
+            </label>
+
+            <!-- SELECT -->
+            <div v-if="field.type === 'select'" class="relative">
+              <select
+                :value="formData[field.id] || ''"
+                @change="updateField(field.id, ($event.target as HTMLSelectElement).value)"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 text-xs text-slate-800 focus:bg-white focus:border-blue-500 focus:outline-none transition cursor-pointer"
+              >
+                <option value="" disabled>Lütfen seçiniz...</option>
+                <option 
+                  v-for="opt in field.options" 
+                  :key="typeof opt === 'string' ? opt : opt.value" 
+                  :value="typeof opt === 'string' ? opt : opt.value"
+                >
+                  {{ typeof opt === 'string' ? opt : opt.label }}
+                </option>
+              </select>
+            </div>
+
+            <!-- BADGE GROUP -->
+            <div v-else-if="field.type === 'badge-group'" class="flex flex-wrap gap-2 pt-0.5">
+              <button
+                v-for="opt in field.options"
+                :key="typeof opt === 'string' ? opt : opt.value"
+                type="button"
+                @click="updateField(field.id, typeof opt === 'string' ? opt : opt.value)"
+                class="px-3 py-1.5 rounded-xl text-xs font-bold border transition cursor-pointer flex items-center gap-1.5"
+                :class="formData[field.id] === (typeof opt === 'string' ? opt : opt.value)
+                  ? 'bg-amber-600 text-white border-amber-600 shadow-xs'
+                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'"
+              >
+                <Check v-if="formData[field.id] === (typeof opt === 'string' ? opt : opt.value)" :size="12" />
+                <span>{{ typeof opt === 'string' ? opt : opt.label }}</span>
+              </button>
+            </div>
+
+            <!-- NUMBER -->
+            <div v-else-if="field.type === 'number'" class="relative">
+              <input
+                type="number"
+                :value="formData[field.id]"
+                @input="updateField(field.id, Number(($event.target as HTMLInputElement).value))"
+                :placeholder="field.placeholder || '0'"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 pr-14 text-xs font-mono font-bold text-slate-800 focus:bg-white focus:border-blue-500 focus:outline-none transition"
+              />
+              <span v-if="field.unit" class="absolute right-3 top-2.5 text-xs text-slate-400 font-bold font-mono">
+                {{ field.unit }}
+              </span>
+            </div>
+
+            <!-- TEXT -->
+            <div v-else class="relative">
+              <input
+                type="text"
+                :value="formData[field.id] || ''"
+                @input="updateField(field.id, ($event.target as HTMLInputElement).value)"
+                :placeholder="field.placeholder || ''"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 text-xs text-slate-800 focus:bg-white focus:border-blue-500 focus:outline-none transition"
+              />
+            </div>
+
+            <p v-if="field.helpText" class="text-[10px] text-slate-400 leading-tight">
+              ℹ️ {{ field.helpText }}
+            </p>
+          </template>
         </div>
       </div>
     </div>

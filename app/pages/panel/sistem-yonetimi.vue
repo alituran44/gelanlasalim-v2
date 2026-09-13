@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import SystemManagementView from '~/components/admin/SystemManagementView.vue'
-
 definePageMeta({
-  layout: 'dashboard'
-})
-
-useHead({
-  title: 'Sistem Yönetimi, UAT & Güvenlik Matrisi (SEC-016 - SEC-020) | İhaleciBurada'
+  middleware: [
+    () => {
+      return navigateTo('/admin?tab=system_ops')
+    }
+  ]
 })
 </script>
 
 <template>
-  <SystemManagementView />
+  <div></div>
 </template>
+
