@@ -3163,24 +3163,19 @@ function saveProfile() {
                 </p>
               </div>
 
-              <div class="inline-flex rounded-2xl border border-slate-200/90 bg-white p-1 shadow-xs">
-                <button
-                  type="button"
-                  @click="toggleCompanyMode(false)"
-                  class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black transition-all cursor-pointer"
-                  :class="!isCompanyMode ? 'bg-[#0F223D] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
-                >
-                  <User :size="14" :class="!isCompanyMode ? 'text-blue-400' : 'text-slate-400'" />
-                  <span>👤 Bireysel Abonelik</span>
-                </button>
+              <!-- Firma modunda bireysel kısım görünmez, sadece rozet görünür. Bireyseldeyken firma moduna geçiş butonu yer alır. -->
+              <div v-if="isCompanyMode" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black shadow-xs shrink-0">
+                <Building2 :size="14" class="text-emerald-600" />
+                <span>🏢 Kurumsal Firma Modu</span>
+              </div>
+              <div v-else class="shrink-0">
                 <button
                   type="button"
                   @click="toggleCompanyMode(true)"
-                  class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black transition-all cursor-pointer"
-                  :class="isCompanyMode ? 'bg-[#0F223D] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+                  class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black bg-[#0F223D] hover:bg-[#003057] text-white shadow-xs transition-all cursor-pointer"
                 >
-                  <Building2 :size="14" :class="isCompanyMode ? 'text-emerald-400' : 'text-slate-400'" />
-                  <span>🏢 Firma Modu</span>
+                  <Building2 :size="14" class="text-emerald-400" />
+                  <span>🏢 Firma Moduna Geç</span>
                 </button>
               </div>
             </div>

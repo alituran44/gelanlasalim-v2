@@ -535,25 +535,19 @@ function completeCheckout() {
               </p>
             </div>
 
-            <!-- Geçişli Mod Butonları -->
-            <div class="bg-slate-100 p-1.5 rounded-2xl border border-slate-200/80 inline-flex items-center gap-1.5 shrink-0 w-full md:w-auto justify-center">
-              <button
-                type="button"
-                @click="toggleCompanyMode(false)"
-                class="flex-1 md:flex-none px-4 py-2.5 rounded-xl text-xs font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
-                :class="!isCompanyMode ? 'bg-[#0F223D] text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'"
-              >
-                <User :size="15" :class="!isCompanyMode ? 'text-blue-400' : 'text-slate-500'" />
-                <span>👤 Bireysel Abonelik</span>
-              </button>
+            <!-- Firma modunda bireysel kısım görünmez, sadece rozet yer alır. Bireyseldeyken firma moduna geçiş butonu yer alır. -->
+            <div v-if="isCompanyMode" class="px-4 py-2 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black flex items-center gap-2 shrink-0">
+              <Building2 :size="16" class="text-emerald-600" />
+              <span>🏢 Kurumsal Firma Modu</span>
+            </div>
+            <div v-else class="shrink-0 w-full md:w-auto">
               <button
                 type="button"
                 @click="toggleCompanyMode(true)"
-                class="flex-1 md:flex-none px-4 py-2.5 rounded-xl text-xs font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
-                :class="isCompanyMode ? 'bg-[#0F223D] text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'"
+                class="w-full md:w-auto px-5 py-3 rounded-2xl bg-[#0F223D] hover:bg-[#003057] text-white text-xs font-black transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
-                <Building2 :size="15" :class="isCompanyMode ? 'text-emerald-400' : 'text-slate-500'" />
-                <span>🏢 Kurumsal Firma Modu</span>
+                <Building2 :size="15" class="text-emerald-400" />
+                <span>🏢 Kurumsal Firma Moduna Geç</span>
               </button>
             </div>
           </div>
@@ -654,19 +648,6 @@ function completeCheckout() {
                 </button>
               </div>
             </div>
-          </div>
-
-          <!-- Kurumsaldan Bireysele Hızlı Geçiş Kutusu -->
-          <div class="p-4 rounded-2xl bg-slate-100 border border-slate-200 text-center max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-            <span class="text-xs text-slate-600 font-medium">Bireysel dönemsel ihale paketlerini mi arıyorsunuz?</span>
-            <button
-              type="button"
-              @click="toggleCompanyMode(false)"
-              class="text-xs font-black text-blue-700 hover:text-blue-900 underline flex items-center gap-1 cursor-pointer"
-            >
-              <span>Bireysel Abonelik Paketlerine Dön</span>
-              <ArrowRight :size="12" />
-            </button>
           </div>
         </div>
 
