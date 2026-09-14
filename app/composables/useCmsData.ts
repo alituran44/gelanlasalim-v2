@@ -137,7 +137,7 @@ export const DEFAULT_CMS_DATA = {
   supportSettings: {
     whatsappEnabled: true,
     whatsappNumber: '908508408695',
-    whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale süreçleri ve 1 ay ücretsiz deneme paketi hakkında bilgi almak istiyorum.',
+    whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale süreçleri ve ilk ihale ücretsiz kampanyası hakkında bilgi almak istiyorum.',
     aiEnabled: true,
     aiBotName: 'İhaleciBurada AI Asistanı',
     aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme veya üyelik süreciniz hakkında size nasıl yardımcı olabilirim?',
@@ -191,8 +191,8 @@ export const DEFAULT_CMS_DATA = {
     {
         "id": "TPL_WELCOME",
         "name": "Kurumsal Hoş Geldiniz & KYC Onayı",
-        "subject": "İhaleciBurada.com Kurumsal Üyeliğiniz ve 1 Ay Ücretsiz Deneme Paketiniz Onaylandı!",
-        "content": "Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza 1 Ay %100 Ücretsiz Lansman Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nHasan Hüseyin Yıldırım (İhaleciBurada)\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"
+        "subject": "İhaleciBurada.com Kurumsal Üyeliğiniz ve İlk İhale Ücretsiz Paketiniz Onaylandı!",
+        "content": "Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza İlk İhale %100 Ücretsiz Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nHasan Hüseyin Yıldırım (İhaleciBurada)\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"
     },
     {
         "id": "TPL_AUCTION_START",
@@ -499,7 +499,7 @@ export const DEFAULT_CMS_DATA = {
 ],
     planDiscountRates: [
       { planName: 'Ücretsiz / Standart Üyelik', commissionRate: 3.0, badge: 'Standart' },
-      { planName: '1 Ay Lansman Deneme', commissionRate: 0.0, badge: '%100 Komisyonsuz' },
+      { planName: 'İlk İhale Lansman Deneme', commissionRate: 0.0, badge: '%100 Komisyonsuz' },
       { planName: '3 Aylık Kurumsal', commissionRate: 2.5, badge: '%0.5 İndirimli' },
       { planName: '6 Aylık Kurumsal Pro', commissionRate: 2.0, badge: '%1.0 İndirimli' },
       { planName: '12 Aylık Enterprise Plus', commissionRate: 1.0, badge: '%2.0 İndirimli' }
@@ -520,7 +520,7 @@ export const DEFAULT_CMS_DATA = {
     maintenanceNotice: 'Platformumuzda planlı altyapı güçlendirme çalışması yapılmaktadır.',
     metaTitle: 'İhaleciBurada.com | B2B İhale ve Satın Alma Platformu',
     metaDescription: 'B2B satın alma ihaleleri açın, onaylı tedarikçilerden rekabetçi teklifler toplayın.',
-    announcementTicker: '⚡ Tüm alıcı ve tedarikçi firmalarımıza ilk 1 ay boyunca %100 ücretsiz kurumsal deneme paketi!',
+    announcementTicker: '⚡ Lansmana Özel: Tüm kurumsal firmalarımıza ilk ihale %100 ücretsiz!',
     googleAnalyticsId: 'G-IHALECIBURADA2026',
     supportPhone: '0850 840 86 95',
     supportEmail: 'ihalecib@gmail.com',

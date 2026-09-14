@@ -311,11 +311,11 @@ onMounted(() => {
 })
 
 const freeTrialPackage = {
-  id: '1-ay-ucretsiz-deneme',
-  name: '1 Ay Ücretsiz Lansman Deneme Paketi',
+  id: 'ilk-ihale-ucretsiz',
+  name: 'İlk İhale Ücretsiz Deneme Paketi',
   price: 0,
-  monthly: '0,00 ₺ / ay',
-  desc: 'Lansmana özel ilk 1 ay boyunca sınırsız ihale açma, teklif verme, ihale ve satın alma ve tüm analiz modülleri %100 ücretsizdir.',
+  monthly: '0,00 ₺',
+  desc: 'Lansmana özel ilk ihalenizi açmak veya ilk ihalenize teklif vermek %100 ücretsizdir.',
   isTrial: true,
   isPromo: true
 }
@@ -462,25 +462,25 @@ function completeCheckout() {
         </div>
       </div>
 
-      <!-- 1-MONTH FREE TRIAL LAUNCH BANNER -->
+      <!-- FIRST TENDER FREE LAUNCH BANNER -->
       <div class="rounded-3xl border border-emerald-500/40 bg-[#0F223D] p-6 sm:p-8 text-white shadow-2xl relative overflow-hidden text-left">
         <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-[#1EAE4C]/10 rounded-full blur-3xl"></div>
         <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
           <div class="space-y-2 max-w-2xl">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1EAE4C]/20 text-[#1EAE4C] text-[10px] font-black uppercase tracking-widest border border-[#1EAE4C]/30">
               <Sparkles :size="13" />
-              <span>LANSMANA ÖZEL: 1 AY BOYUNCA %100 ÜCRETSİZ DENEME SÜRECİ</span>
+              <span>LANSMANA ÖZEL: İLK İHALENİZ %100 ÜCRETSİZ</span>
             </div>
             <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
-              İlk 1 Ay Boyunca Hiçbir Ücret Ödemeden Tüm Sistemi Kullanın!
+              İlk İhalenizi Hiçbir Ücret Ödemeden Başlatın!
             </h2>
             <p class="text-xs text-slate-300 leading-relaxed font-medium">
-              İhaleciBurada platform lansmanına özel olarak tüm alıcı ve tedarikçi firmalarımıza ilk 1 ay boyunca ihale açma, teklif verme, canlı tersine eksiltme ve tüm analiz modülleri <strong>0 ₺</strong> bedelle sunulmaktadır. Kredi kartı gerekmez, 0 komisyon, anında koşulsuz aktivasyon.
+              İhaleciBurada platform lansmanına özel olarak tüm alıcı ve tedarikçi firmalarımıza ilk ihale açma, teklif verme, canlı tersine eksiltme ve analiz süreçleri <strong>0 ₺</strong> bedelle sunulmaktadır. Kredi kartı gerekmez, 0 komisyon, anında koşulsuz aktivasyon.
             </p>
             <div class="flex flex-wrap items-center gap-4 pt-1 text-[11px] text-emerald-300 font-bold">
-              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> 1 Ay Boyunca 0 ₺</span>
+              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> İlk İhale 0 ₺</span>
               <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> Kredi Kartı İstemez</span>
-              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> Sınırsız İhale & Eksiltme</span>
+              <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> Canlı Tersine Eksiltme</span>
               <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-[#1EAE4C]" /> Anında Aktivasyon</span>
             </div>
           </div>
@@ -488,16 +488,10 @@ function completeCheckout() {
           <!-- Free Trial CTA Button -->
           <div class="shrink-0 w-full lg:w-auto">
             <button
-              @click="openCheckout({
-                id: '1-ay-ucretsiz-deneme',
-                name: '1 AY ÜCRETSİZ KURUMSAL DENEME',
-                price: 0,
-                isTrial: true,
-                desc: 'Lansmana özel 1 ay sınırsız ihale ve ihale ve satın alma erişimi.'
-              })"
+              @click="openCheckout(freeTrialPackage)"
               class="w-full lg:w-auto px-8 py-4 rounded-2xl bg-[#1EAE4C] hover:bg-[#188C3D] text-white font-black text-sm transition-all shadow-xl shadow-[#1EAE4C]/30 flex items-center justify-center gap-2 cursor-pointer transform hover:scale-105"
             >
-              <span>1 Ay Ücretsiz Başlat</span>
+              <span>İlk İhalenizi Ücretsiz Başlatın</span>
               <ArrowRight :size="16" />
             </button>
           </div>
@@ -856,16 +850,16 @@ function completeCheckout() {
                     <Sparkles :size="20" />
                   </div>
                   <div>
-                    <h4 class="text-sm font-black text-slate-900">1 Ay Koşulsuz Ücretsiz Deneme</h4>
-                    <p class="text-xs text-emerald-800 font-medium">Kredi kartı gerekmez, 0 ₺ ücret!</p>
+                    <h4 class="text-sm font-black text-slate-900">İlk İhale Koşulsuz Ücretsiz</h4>
+                    <p class="text-xs text-emerald-800 font-medium">Kredi kartı gerekmez, 0 ₺ platform bedeli!</p>
                   </div>
                 </div>
                 <hr class="border-emerald-200/60" />
                 <ul class="space-y-2 text-xs text-slate-700 font-medium">
-                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> Sınırsız B2B İhale Açma & İhale ve Satın Alma</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> İlk B2B İhalenizi Açma & İhale ve Satın Alma</li>
                   <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> Doğrulanmış Firmalardan Belgeli Teklif Toplama</li>
-                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> 1 Ay Boyunca %0 Komisyon, 0 ₺ Bedel</li>
-                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> 25 Eylül 2026 Tarihine Kadar Tam Erişim</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> İlk İhalenizde %0 Komisyon, 0 ₺ Bedel</li>
+                  <li class="flex items-center gap-2"><CheckCircle2 :size="15" class="text-emerald-600 shrink-0" /> Canlı Tersine Eksiltme Odası Erişimi</li>
                 </ul>
               </div>
 
@@ -1052,11 +1046,11 @@ function completeCheckout() {
                 <CheckCircle2 :size="36" />
               </div>
               <h3 class="text-lg font-black text-slate-900">
-                {{ selectedPackage?.isTrial ? '🎉 1 Aylık Ücretsiz Denemeniz Aktif!' : 'Abonelik ve Ödeme İşlemi Başarılı!' }}
+                {{ selectedPackage?.isTrial ? '🎉 İlk İhale Ücretsiz Paketiniz Aktif!' : 'Abonelik ve Ödeme İşlemi Başarılı!' }}
               </h3>
               <p class="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
                 {{ selectedPackage?.isTrial 
-                  ? '1 ay boyunca tüm kurumsal B2B ihale ve ihale ve satın alma modüllerini 0 ₺ bedelle sınırsız kullanabilirsiniz.'
+                  ? 'İlk ihalenizi 0 ₺ platform bedeli ve %0 komisyon güvencesiyle hemen başlatabilirsiniz.'
                   : 'Ödemeniz Paynkolay onayından geçti. E-Faturanız oluşturuldu ve kurumsal panel erişiminiz anında aktifleştirildi.' 
                 }}
               </p>
@@ -1101,7 +1095,7 @@ function completeCheckout() {
               :class="selectedPackage?.isTrial ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-blue-900 hover:bg-blue-950'"
             >
               <span v-if="isProcessing">{{ selectedPackage?.isTrial ? 'Deneme Aktifleştiriliyor...' : '3D Secure Doğrulanıyor...' }}</span>
-              <span v-else-if="selectedPackage?.isTrial">{{ '1 AYLIK ÜCRETSİZ DENEMEYİ HEMEN BAŞLAT (0 ₺)' }}</span>
+              <span v-else-if="selectedPackage?.isTrial">{{ 'İLK İHALENİZİ ÜCRETSİZ BAŞLATIN (0 ₺)' }}</span>
               <span v-else>{{ currencySymbol }}{{ selectedPackage?.price.toLocaleString('tr-TR') }} {{ 'Güvenli 3D Ödeme Yap' }}</span>
               <ArrowRight v-if="!isProcessing" :size="14" />
             </button>

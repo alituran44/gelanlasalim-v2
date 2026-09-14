@@ -1565,20 +1565,20 @@ function saveProfile() {
         <div v-if="activeSubTab === 'uyelik'" class="flex gap-3 bg-white border border-slate-200 p-2.5 rounded-xl shadow-sm text-left">
           <div class="px-2.5 border-r border-slate-100 last:border-0">
             <span class="text-[8px] font-black text-slate-300 uppercase block">MEVCUT PLAN</span>
-            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">1 Ay Lansman Denemesi</span>
+            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">İlk İhale Ücretsiz Paketi</span>
           </div>
           <div class="px-2.5 border-r border-slate-100 last:border-0">
             <span class="text-[8px] font-black text-slate-300 uppercase block">DÖNEM ÜCRETİ</span>
-            <span class="text-[10px] font-bold text-emerald-600 block mt-0.5">0 ₺ <span class="text-[8px] text-emerald-500 font-medium">(Lansmana Özel Bedelsiz)</span></span>
+            <span class="text-[10px] font-bold text-emerald-600 block mt-0.5">0 ₺ <span class="text-[8px] text-emerald-500 font-medium">(Lansmana Özel 0 ₺)</span></span>
           </div>
           <div class="px-2.5 border-r border-slate-100 last:border-0">
-            <span class="text-[8px] font-black text-slate-300 uppercase block">BİTİŞ TARİHİ</span>
-            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">27 Eylül 2026 (1 Ay)</span>
+            <span class="text-[8px] font-black text-slate-300 uppercase block">KULLANIM HAKKI</span>
+            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">İlk İhale (%0 Komisyon)</span>
           </div>
           <div class="px-2.5 flex flex-col justify-center">
             <span class="text-[8px] font-black text-slate-300 uppercase block">DURUM</span>
             <span class="inline-flex items-center gap-0.5 text-[8px] font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 mt-0.5">
-              Aktif Deneme
+              Aktif (İlk İhale 0 ₺)
             </span>
           </div>
         </div>
@@ -3121,28 +3121,28 @@ function saveProfile() {
               <div class="space-y-2 max-w-2xl">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-black uppercase tracking-widest border border-emerald-500/30">
                   <Sparkles :size="13" />
-                  <span>LANSMANA ÖZEL: 1 AY BOYUNCA %100 ÜCRETSİZ DENEME SÜRECİ</span>
+                  <span>LANSMANA ÖZEL: İLK İHALENİZ %100 ÜCRETSİZ</span>
                 </div>
                 <h2 class="text-xl sm:text-2xl font-black text-white tracking-tight">
-                  İlk 1 Ay Boyunca Hiçbir Ücret Ödemeden Tüm Sistemi Kullanın!
+                  İlk İhalenizi Hiçbir Ücret Ödemeden Başlatın!
                 </h2>
                 <p class="text-xs text-slate-300 leading-relaxed font-medium">
-                  İhaleciBurada platform lansmanına özel olarak tüm alıcı ve tedarikçi firmalarımıza ilk 1 ay boyunca ihale açma, teklif verme, canlı tersine eksiltme ve tüm analiz modülleri <strong>0 ₺</strong> bedelle sunulmaktadır. Kredi kartı gerekmez, 0 komisyon, anında koşulsuz aktivasyon.
+                  İhaleciBurada platform lansmanına özel olarak tüm alıcı ve tedarikçi firmalarımıza ilk ihale açma, teklif verme, canlı tersine eksiltme ve tüm analiz modülleri <strong>0 ₺</strong> bedelle sunulmaktadır. Kredi kartı gerekmez, 0 komisyon, anında koşulsuz aktivasyon.
                 </p>
                 <div class="flex flex-wrap items-center gap-4 pt-1 text-[11px] text-emerald-300 font-bold">
-                  <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> 1 Ay Boyunca 0 ₺</span>
+                  <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> İlk İhale 0 ₺</span>
                   <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> Kredi Kartı İstemez</span>
-                  <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> Sınırsız İhale & Eksiltme</span>
+                  <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> Canlı Tersine Eksiltme</span>
                   <span class="flex items-center gap-1.5"><CheckCircle2 :size="14" class="text-emerald-400" /> Anında Aktivasyon</span>
                 </div>
               </div>
 
               <div class="shrink-0 w-full lg:w-auto">
                 <NuxtLink
-                  to="/abonelik"
+                  to="/panel/ihale-olustur"
                   class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs sm:text-sm shadow-lg shadow-emerald-500/30 transition-all hover:scale-105 flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <span>1 AYLIK ÜCRETSİZ DENEMENİZ AKTİF (0 ₺)</span>
+                  <span>İLK İHALENİZİ ÜCRETSİZ BAŞLATIN (0 ₺)</span>
                   <CheckCircle2 :size="16" />
                 </NuxtLink>
               </div>

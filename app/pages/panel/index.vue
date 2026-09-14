@@ -225,7 +225,7 @@ watch(() => userSession.value, () => {
             <span>{{ isCompanyMode ? 'Onaylı Kurumsal Firma' : 'Kişisel / Bireysel Hesap' }}</span>
           </span>
           <span class="text-xs text-slate-300">|</span>
-          <span class="text-xs text-slate-300">{{ isCompanyMode ? '1 Ay Ücretsiz Kurumsal Deneme' : 'Kişisel Çalışma Alanı' }}</span>
+          <span class="text-xs text-slate-300">{{ isCompanyMode ? 'İlk İhale Ücretsiz Paketi' : 'Kişisel Çalışma Alanı' }}</span>
         </div>
         <h1 class="text-xl sm:text-2xl font-black tracking-tight">{{ displayName }}</h1>
         <p class="text-xs text-slate-300">

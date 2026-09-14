@@ -115,7 +115,7 @@ onMounted(() => {
                         isGoogleAuth: true,
                         authProvider: 'google',
                         isPremium: true,
-                        subscriptionPlan: '1 Ay Ücretsiz Deneme'
+                        subscriptionPlan: 'İlk İhale Ücretsiz'
                       }
                       accounts[cleanEmail] = userAccount
                       localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
@@ -275,9 +275,9 @@ function registerToAdminKycQueue(sessionData: any) {
       contactName: sessionData.name || sessionData.firstName || 'Yetkili',
       email: sessionData.email,
       phone: sessionData.phone || phone.value || '0850 840 86 95',
-      status: '1 Ay Deneme Aktif',
+      status: 'İlk İhale Ücretsiz Aktif',
       source: sessionData.authProvider === 'google' ? 'Google OAuth Hızlı Kayıt' : (sessionData.isEDevletVerified ? 'e-Devlet Onaylı Kayıt' : 'Web Kurumsal Kayıt'),
-      notes: `Lansmana özel 1 Ay %100 Ücretsiz Kurumsal Deneme Paketi tanımlandı. Sektörler: ${(sessionData.sektorler || []).join(', ') || 'Genel Tedarik & İhale'}`,
+      notes: `Lansmana özel İlk İhale %100 Ücretsiz Paketi tanımlandı. Sektörler: ${(sessionData.sektorler || []).join(', ') || 'Genel Tedarik & İhale'}`,
       createdAt: new Date().toLocaleDateString('tr-TR')
     }
     const existingLeadIdx = cmsData.value.crmSettings.leads.findIndex((l: any) => l.email === sessionData.email)
@@ -431,7 +431,7 @@ function handleRegister() {
       sektorler: ['Genel Tedarik & İhale'],
       mailBildirimi: true,
       isPremium: true,
-      subscriptionPlan: '1 Ay Ücretsiz Deneme'
+      subscriptionPlan: 'İlk İhale Ücretsiz'
     }
     pendingTargetRoute.value = '/panel'
     startOtpCountdown()
@@ -495,7 +495,7 @@ function handleOAuth(provider = 'google') {
                   isGoogleAuth: true,
                   authProvider: 'google',
                   isPremium: true,
-                  subscriptionPlan: '1 Ay Ücretsiz Deneme'
+                  subscriptionPlan: 'İlk İhale Ücretsiz'
                 }
                 accounts[cleanEmail] = userAccount
                 localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
@@ -584,7 +584,7 @@ function fallbackGoogleLogin() {
         isGoogleAuth: true,
         authProvider: 'google',
         isPremium: true,
-        subscriptionPlan: '1 Ay Ücretsiz Deneme'
+        subscriptionPlan: 'İlk İhale Ücretsiz'
       }
       accounts[cleanEmail] = userAccount
       localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
@@ -604,7 +604,7 @@ function fallbackGoogleLogin() {
       if (isAlreadyRegistered) {
         alert(`ℹ️ HESAP ZATEN KAYITLI\n\n"${cleanEmail}" adresiyle sistemde zaten kayıtlı bir üyelik bulunmaktadır.\n\nMevcut hesabınızla güvenli oturum açıldı ve yönetim panelinize aktarılıyorsunuz.`)
       } else {
-        alert(`🎉 YENİ KURUMSAL ÜYELİK\n\n"${cleanEmail}" adresiyle 1 ay ücretsiz kurumsal üyeliğiniz başarıyla açıldı.`)
+        alert(`🎉 YENİ KURUMSAL ÜYELİK\n\n"${cleanEmail}" adresiyle ilk ihale ücretsiz kurumsal üyeliğiniz başarıyla açıldı.`)
       }
     }
 
@@ -634,7 +634,7 @@ function handleEDevletAuth() {
         verified: true,
         isEDevletVerified: true,
         isPremium: true,
-        subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
+        subscriptionPlan: 'İlk İhale Ücretsiz'
       }))
     }
     router.push('/panel')
@@ -708,7 +708,7 @@ function handleLogin() {
         verified: true,
         is2FaEnabled: true,
         isPremium: true,
-        subscriptionPlan: matchedAccount.subscriptionPlan || '1 Ay Ücretsiz Kurumsal Deneme'
+        subscriptionPlan: matchedAccount.subscriptionPlan || 'İlk İhale Ücretsiz'
       }
       pendingTargetRoute.value = '/panel'
       otpInput.value = '849201'
@@ -756,7 +756,7 @@ function handleLogin() {
         role: isAdminUser ? 'admin' : (existingAccount.role || 'company'),
         verified: true,
         isPremium: true,
-        subscriptionPlan: existingAccount.subscriptionPlan || '1 Ay Ücretsiz Kurumsal Deneme'
+        subscriptionPlan: existingAccount.subscriptionPlan || 'İlk İhale Ücretsiz'
       }
 
       if (isAdminUser) {
@@ -787,7 +787,7 @@ function handleDemoLogin(role: 'company' | 'individual') {
       role: role,
       verified: true,
       isPremium: true,
-      subscriptionPlan: '1 Ay Ücretsiz Kurumsal Deneme'
+      subscriptionPlan: 'İlk İhale Ücretsiz'
     }))
   }
   router.push('/panel')

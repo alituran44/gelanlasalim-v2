@@ -58,7 +58,7 @@ function sendInvite() {
     alert('Lütfen davet edilecek e-posta adresini giriniz.')
     return
   }
-  alert(`✓ DAVET GÖNDERİLDİ\n\n"${inviteEmail.value}" adresine kurumsal tedarikçi katılım davetiyesi ve 1 ay ücretsiz deneme linki iletildi.`)
+  alert(`✓ DAVET GÖNDERİLDİ\n\n"${inviteEmail.value}" adresine kurumsal tedarikçi katılım davetiyesi ve ilk ihale ücretsiz katılım linki iletildi.`)
   showInviteModal.value = false
   inviteEmail.value = ''
   inviteCompanyName.value = ''
@@ -247,7 +247,7 @@ function openCompanyModal(firm: any) {
           </div>
           <div>
             <h3 class="text-sm font-black text-slate-900">Kurumsal Tedarikçi Davet Et</h3>
-            <span class="text-[10px] text-slate-400">1 Ay %100 Ücretsiz Katılım Linki</span>
+            <span class="text-[10px] text-slate-400">İlk İhale %100 Ücretsiz Katılım Linki</span>
           </div>
         </div>
         <button @click="showInviteModal = false" class="text-slate-400 hover:text-slate-600 p-1">✕</button>

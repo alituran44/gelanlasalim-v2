@@ -511,7 +511,7 @@ if (!formState.commissionSettings) {
 ],
     planDiscountRates: [
       { planName: 'Ücretsiz / Standart Üyelik', commissionRate: 3.0, badge: 'Standart' },
-      { planName: '1 Ay Lansman Deneme', commissionRate: 0.0, badge: '%100 Komisyonsuz' },
+      { planName: 'İlk İhale Lansman Deneme', commissionRate: 0.0, badge: '%100 Komisyonsuz' },
       { planName: '3 Aylık Kurumsal', commissionRate: 2.5, badge: '%0.5 İndirimli' },
       { planName: '6 Aylık Kurumsal Pro', commissionRate: 2.0, badge: '%1.0 İndirimli' },
       { planName: '12 Aylık Enterprise Plus', commissionRate: 1.0, badge: '%2.0 İndirimli' }
@@ -733,11 +733,11 @@ if (!formState.supportSettings) {
   formState.supportSettings = {
     whatsappEnabled: true,
     whatsappNumber: '908508408695',
-    whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale ve 1 ay ücretsiz deneme hakkında bilgi almak istiyorum.',
+    whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale ve ilk ihale ücretsiz kampanyası hakkında bilgi almak istiyorum.',
     aiEnabled: true,
     aiBotName: 'İhaleciBurada AI Asistanı',
-    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel 1 Ay %100 Ücretsiz Deneme süreciniz hakkında size nasıl yardımcı olabilirim?',
-    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın. Kullanıcılara 1 ay ücretsiz deneme, ihale açma, teklif verme, ihale ve satın alma konularında yardımcı ol.'
+    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel İlk İhale %100 Ücretsiz süreciniz hakkında size nasıl yardımcı olabilirim?',
+    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın. Kullanıcılara ilk ihale ücretsiz kampanyası, ihale açma, teklif verme, ihale ve satın alma konularında yardımcı ol.'
   }
 }
 
@@ -766,10 +766,10 @@ if (!formState.crmSettings) {
         onEscrow: true
       },
       subscribers: [],
-      templates: [{"id":"TPL_WELCOME","name":"Kurumsal Hoş Geldiniz & KYC Onayı","subject":"İhaleciBurada.com Kurumsal Üyeliğiniz ve 1 Ay Ücretsiz Deneme Paketiniz Onaylandı!","content":"Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza 1 Ay %100 Ücretsiz Lansman Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nHasan Hüseyin Yıldırım (İhaleciBurada)\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"},{"id":"TPL_NEW_TENDER","name":"Yeni İhale Yayını & Şartname Teklif Çağrısı","subject":"Yeni İhale İlanı: [İhale Başlığı] için Teklif Süreci Başladı","content":"Sayın Tedarikçimiz,\n\nFaaliyet gösterdiğiniz sektörde yeni bir satın alma ihalesi onaylanarak yayına alınmıştır.\n\n• İhale Başlığı: [İhale Başlığı]\n• Başlangıç Bütçesi: [Lider Fiyat]\n• Kalan Süre: [Kalan Süre]\n\nTeknik şartnameyi indirmek ve doğrudan fiyat teklifinizi iletmek için bağlantıyı ziyaret ediniz:\n[Panel Linki]\n\nİhaleciBurada.com Satın Alma Masası"},{"id":"TPL_NEW_BID","name":"İhaleye Yeni Teklif Geldi Bildirimi","subject":"İhalenize Yeni Teklif Geldi: [İhale Başlığı]","content":"Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz \"[İhale Başlığı]\" başlıklı satın alma ilanı için onaylı bir tedarikçi firma tarafından yeni bir fiyat teklifi sunuldu.\n\n• Sunulan Teklif: [Lider Fiyat] TL\n• Teklif Veren: [Firma Adı]\n\nTeklifi incelemek ve karşı pazarlık teklifinizi iletmek için kurumsal panelinize giriş yapınız:\n[Panel Linki]\n\nİhaleciBurada B2B Operasyon"},{"id":"TPL_AUCTION_START","name":"Canlı Tersine Eksiltme Başladı Uyarısı","subject":"Canlı İhale Başladı: [İhale Başlığı] İhalesinde Fiyatlar Eksiliyor!","content":"Sayın Yetkili,\n\nTakip ettiğiniz \"[İhale Başlığı]\" ihalesi için canlı tersine eksiltme odası açılmıştır.\n\nTedarikçiler anlık olarak en iyi fiyatı sunmak için yarışmaktadır. Canlı odaya katılarak teklifinizi güncelleyebilir veya süreci izleyebilirsiniz:\n[Panel Linki]\n\nİhaleciBurada Canlı İhale Odası"},{"id":"TPL_ESCROW_RELEASE","name":"Escrow Güvenli Tahsilat & Mal Kabul Makbuzu","subject":"Güvenli Havuz Ödemesi Serbest Bırakıldı: [İhale Başlığı]","content":"Sayın [Firma Adı],\n\n[İhale Başlığı] kapsamındaki siparişin mal kabulü ve irsaliye denetimi alıcı firma tarafından başarıyla onaylanmıştır.\n\nGüvenli havuzda (Escrow) bloke edilen hakediş tutarınız banka hesabınıza transfer edilmek üzere serbest bırakılmıştır.\n\nDetaylı hakediş ve fatura dökümünüzü görüntülemek için:\n[Panel Linki]\n\nİhaleciBurada Güvenli Ticaret Masası"}]
+      templates: [{"id":"TPL_WELCOME","name":"Kurumsal Hoş Geldiniz & KYC Onayı","subject":"İhaleciBurada.com Kurumsal Üyeliğiniz ve İlk İhale Ücretsiz Paketiniz Onaylandı!","content":"Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza İlk İhale %100 Ücretsiz Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nHasan Hüseyin Yıldırım (İhaleciBurada)\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"},{"id":"TPL_NEW_TENDER","name":"Yeni İhale Yayını & Şartname Teklif Çağrısı","subject":"Yeni İhale İlanı: [İhale Başlığı] için Teklif Süreci Başladı","content":"Sayın Tedarikçimiz,\n\nFaaliyet gösterdiğiniz sektörde yeni bir satın alma ihalesi onaylanarak yayına alınmıştır.\n\n• İhale Başlığı: [İhale Başlığı]\n• Başlangıç Bütçesi: [Lider Fiyat]\n• Kalan Süre: [Kalan Süre]\n\nTeknik şartnameyi indirmek ve doğrudan fiyat teklifinizi iletmek için bağlantıyı ziyaret ediniz:\n[Panel Linki]\n\nİhaleciBurada.com Satın Alma Masası"},{"id":"TPL_NEW_BID","name":"İhaleye Yeni Teklif Geldi Bildirimi","subject":"İhalenize Yeni Teklif Geldi: [İhale Başlığı]","content":"Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz \"[İhale Başlığı]\" başlıklı satın alma ilanı için onaylı bir tedarikçi firma tarafından yeni bir fiyat teklifi sunuldu.\n\n• Sunulan Teklif: [Lider Fiyat] TL\n• Teklif Veren: [Firma Adı]\n\nTeklifi incelemek ve karşı pazarlık teklifinizi iletmek için kurumsal panelinize giriş yapınız:\n[Panel Linki]\n\nİhaleciBurada B2B Operasyon"},{"id":"TPL_AUCTION_START","name":"Canlı Tersine Eksiltme Başladı Uyarısı","subject":"Canlı İhale Başladı: [İhale Başlığı] İhalesinde Fiyatlar Eksiliyor!","content":"Sayın Yetkili,\n\nTakip ettiğiniz \"[İhale Başlığı]\" ihalesi için canlı tersine eksiltme odası açılmıştır.\n\nTedarikçiler anlık olarak en iyi fiyatı sunmak için yarışmaktadır. Canlı odaya katılarak teklifinizi güncelleyebilir veya süreci izleyebilirsiniz:\n[Panel Linki]\n\nİhaleciBurada Canlı İhale Odası"},{"id":"TPL_ESCROW_RELEASE","name":"Escrow Güvenli Tahsilat & Mal Kabul Makbuzu","subject":"Güvenli Havuz Ödemesi Serbest Bırakıldı: [İhale Başlığı]","content":"Sayın [Firma Adı],\n\n[İhale Başlığı] kapsamındaki siparişin mal kabulü ve irsaliye denetimi alıcı firma tarafından başarıyla onaylanmıştır.\n\nGüvenli havuzda (Escrow) bloke edilen hakediş tutarınız banka hesabınıza transfer edilmek üzere serbest bırakılmıştır.\n\nDetaylı hakediş ve fatura dökümünüzü görüntülemek için:\n[Panel Linki]\n\nİhaleciBurada Güvenli Ticaret Masası"}]
     }
   } else if (!Array.isArray(formState.emailSettings.templates) || formState.emailSettings.templates.length === 0) {
-    formState.emailSettings.templates = [{"id":"TPL_WELCOME","name":"Kurumsal Hoş Geldiniz & KYC Onayı","subject":"İhaleciBurada.com Kurumsal Üyeliğiniz ve 1 Ay Ücretsiz Deneme Paketiniz Onaylandı!","content":"Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza 1 Ay %100 Ücretsiz Lansman Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nHasan Hüseyin Yıldırım (İhaleciBurada)\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"},{"id":"TPL_NEW_TENDER","name":"Yeni İhale Yayını & Şartname Teklif Çağrısı","subject":"Yeni İhale İlanı: [İhale Başlığı] için Teklif Süreci Başladı","content":"Sayın Tedarikçimiz,\n\nFaaliyet gösterdiğiniz sektörde yeni bir satın alma ihalesi onaylanarak yayına alınmıştır.\n\n• İhale Başlığı: [İhale Başlığı]\n• Başlangıç Bütçesi: [Lider Fiyat]\n• Kalan Süre: [Kalan Süre]\n\nTeknik şartnameyi indirmek ve doğrudan fiyat teklifinizi iletmek için bağlantıyı ziyaret ediniz:\n[Panel Linki]\n\nİhaleciBurada.com Satın Alma Masası"},{"id":"TPL_NEW_BID","name":"İhaleye Yeni Teklif Geldi Bildirimi","subject":"İhalenize Yeni Teklif Geldi: [İhale Başlığı]","content":"Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz \"[İhale Başlığı]\\\" başlıklı satın alma ilanı için onaylı bir tedarikçi firma tarafından yeni bir fiyat teklifi sunuldu.\n\n• Sunulan Teklif: [Lider Fiyat] TL\n• Teklif Veren: [Firma Adı]\n\nTeklifi incelemek ve karşı pazarlık teklifinizi iletmek için kurumsal panelinize giriş yapınız:\n[Panel Linki]\n\nİhaleciBurada B2B Operasyon"},{"id":"TPL_AUCTION_START","name":"Canlı Tersine Eksiltme Başladı Uyarısı","subject":"Canlı İhale Başladı: [İhale Başlığı] İhalesinde Fiyatlar Eksiliyor!","content":"Sayın Yetkili,\n\nTakip ettiğiniz \"[İhale Başlığı]\\\" ihalesi için canlı tersine eksiltme odası açılmıştır.\n\nTedarikçiler anlık olarak en iyi fiyatı sunmak için yarışmaktadır. Canlı odaya katılarak teklifinizi güncelleyebilir veya süreci izleyebilirsiniz:\n[Panel Linki]\n\nİhaleciBurada Canlı İhale Odası"},{"id":"TPL_ESCROW_RELEASE","name":"Escrow Güvenli Tahsilat & Mal Kabul Makbuzu","subject":"Güvenli Havuz Ödemesi Serbest Bırakıldı: [İhale Başlığı]","content":"Sayın [Firma Adı],\n\n[İhale Başlığı] kapsamındaki siparişin mal kabulü ve irsaliye denetimi alıcı firma tarafından başarıyla onaylanmıştır.\n\nGüvenli havuzda (Escrow) bloke edilen hakediş tutarınız banka hesabınıza transfer edilmek üzere serbest bırakılmıştır.\n\nDetaylı hakediş ve fatura dökümünüzü görüntülemek için:\n[Panel Linki]\n\nİhaleciBurada Güvenli Ticaret Masası"}]
+    formState.emailSettings.templates = [{"id":"TPL_WELCOME","name":"Kurumsal Hoş Geldiniz & KYC Onayı","subject":"İhaleciBurada.com Kurumsal Üyeliğiniz ve İlk İhale Ücretsiz Paketiniz Onaylandı!","content":"Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza İlk İhale %100 Ücretsiz Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nHasan Hüseyin Yıldırım (İhaleciBurada)\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"},{"id":"TPL_NEW_TENDER","name":"Yeni İhale Yayını & Şartname Teklif Çağrısı","subject":"Yeni İhale İlanı: [İhale Başlığı] için Teklif Süreci Başladı","content":"Sayın Tedarikçimiz,\n\nFaaliyet gösterdiğiniz sektörde yeni bir satın alma ihalesi onaylanarak yayına alınmıştır.\n\n• İhale Başlığı: [İhale Başlığı]\n• Başlangıç Bütçesi: [Lider Fiyat]\n• Kalan Süre: [Kalan Süre]\n\nTeknik şartnameyi indirmek ve doğrudan fiyat teklifinizi iletmek için bağlantıyı ziyaret ediniz:\n[Panel Linki]\n\nİhaleciBurada.com Satın Alma Masası"},{"id":"TPL_NEW_BID","name":"İhaleye Yeni Teklif Geldi Bildirimi","subject":"İhalenize Yeni Teklif Geldi: [İhale Başlığı]","content":"Sayın Alıcı Yetkilisi,\n\nYayınlamış olduğunuz \"[İhale Başlığı]\\\" başlıklı satın alma ilanı için onaylı bir tedarikçi firma tarafından yeni bir fiyat teklifi sunuldu.\n\n• Sunulan Teklif: [Lider Fiyat] TL\n• Teklif Veren: [Firma Adı]\n\nTeklifi incelemek ve karşı pazarlık teklifinizi iletmek için kurumsal panelinize giriş yapınız:\n[Panel Linki]\n\nİhaleciBurada B2B Operasyon"},{"id":"TPL_AUCTION_START","name":"Canlı Tersine Eksiltme Başladı Uyarısı","subject":"Canlı İhale Başladı: [İhale Başlığı] İhalesinde Fiyatlar Eksiliyor!","content":"Sayın Yetkili,\n\nTakip ettiğiniz \"[İhale Başlığı]\\\" ihalesi için canlı tersine eksiltme odası açılmıştır.\n\nTedarikçiler anlık olarak en iyi fiyatı sunmak için yarışmaktadır. Canlı odaya katılarak teklifinizi güncelleyebilir veya süreci izleyebilirsiniz:\n[Panel Linki]\n\nİhaleciBurada Canlı İhale Odası"},{"id":"TPL_ESCROW_RELEASE","name":"Escrow Güvenli Tahsilat & Mal Kabul Makbuzu","subject":"Güvenli Havuz Ödemesi Serbest Bırakıldı: [İhale Başlığı]","content":"Sayın [Firma Adı],\n\n[İhale Başlığı] kapsamındaki siparişin mal kabulü ve irsaliye denetimi alıcı firma tarafından başarıyla onaylanmıştır.\n\nGüvenli havuzda (Escrow) bloke edilen hakediş tutarınız banka hesabınıza transfer edilmek üzere serbest bırakılmıştır.\n\nDetaylı hakediş ve fatura dökümünüzü görüntülemek için:\n[Panel Linki]\n\nİhaleciBurada Güvenli Ticaret Masası"}]
   }
 
 if (!formState.categories || formState.categories.length === 0) {
@@ -809,7 +809,7 @@ if (!formState.siteSettings) {
     maintenanceNotice: 'Platformumuzda planlı bakım çalışması yapılmaktadır.',
     metaTitle: 'İhaleciBurada.com | Türkiye’nin Öncü B2B İhale ve Satın Alma & Satın Alma Platformu',
     metaDescription: 'B2B satın alma ihaleleri açın, canlı tersine eksiltme ile rekabetçi teklifler toplayın.',
-    announcementTicker: '⚡ LANSMANA ÖZEL: İlk 1 ay boyunca %100 ücretsiz kurumsal deneme paketi (0 ₺)!',
+    announcementTicker: '⚡ LANSMANA ÖZEL: İlk ihale %100 ücretsiz (0 ₺)!',
     googleAnalyticsId: 'G-IHALECIBURADA2026',
     supportPhone: '0850 840 86 95',
     supportEmail: 'ihalecib@gmail.com'
@@ -1048,9 +1048,9 @@ function syncLiveState() {
         contactName: usr.name || usr.firstName || 'Yetkili',
         email: usr.email,
         phone: usr.phone || '0850 840 86 95',
-        status: usr.badgeGranted ? 'Mavi Rozet Verildi' : '1 Ay Deneme Aktif',
+        status: usr.badgeGranted ? 'Mavi Rozet Verildi' : 'İlk İhale Ücretsiz Aktif',
         source: usr.authProvider === 'google' ? 'Google OAuth Kayıt' : (usr.isEDevletVerified ? 'e-Devlet Kayıt' : 'Web Portalı'),
-        notes: usr.notes || `Kurumsal üye kaydı tamamlandı. 1 Ay %100 Ücretsiz B2B Paketi aktif. Sektörler: ${usr.sectors || 'Genel Tedarik'}`,
+        notes: usr.notes || `Kurumsal üye kaydı tamamlandı. İlk İhale %100 Ücretsiz Paketi aktif. Sektörler: ${usr.sectors || 'Genel Tedarik'}`,
         createdAt: usr.createdAt || 'Bugün'
       }
 
@@ -1597,7 +1597,7 @@ function removeAuthority(idx: number) {
 const newPromo = reactive({
   code: '',
   discountType: 'free_trial_months',
-  value: '1 Ay Bedelsiz',
+  value: 'İlk İhale Bedelsiz',
   usageLimit: 500,
   expiryDate: '2026-09-25'
 })
@@ -1650,7 +1650,7 @@ const newLeadForm = reactive({
   contactName: '',
   email: '',
   phone: '',
-  status: '1 Ay Deneme Aktif',
+  status: 'İlk İhale Ücretsiz Aktif',
   notes: ''
 })
 
@@ -1699,7 +1699,7 @@ const emailLogs = ref<any[]>([
     time: 'Bugün 11:42',
     recipient: 'ihalecib@gmail.com',
     template: 'Kurumsal Hoş Geldiniz & KYC Onayı',
-    subject: 'İhaleciBurada.com: 1 Aylık %100 Ücretsiz Lansman Deneme Paketiniz Aktif!',
+    subject: 'İhaleciBurada.com: İlk İhale %100 Ücretsiz Lansman Paketiniz Aktif!',
     status: '250 OK - İletildi'
   },
   {
@@ -1820,8 +1820,8 @@ function resetDefaultTemplates() {
     {
       id: "TPL_WELCOME",
       name: "Kurumsal Hoş Geldiniz & KYC Onayı",
-      subject: "İhaleciBurada.com Kurumsal Üyeliğiniz ve 1 Ay Ücretsiz Deneme Paketiniz Onaylandı!",
-      content: "Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza 1 Ay %100 Ücretsiz Lansman Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nHasan Hüseyin Yıldırım (İhaleciBurada)\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"
+      subject: "İhaleciBurada.com Kurumsal Üyeliğiniz ve İlk İhale Ücretsiz Paketiniz Onaylandı!",
+      content: "Sayın [Firma Adı] Yetkilisi,\n\nİhaleciBurada.com B2B satın alma ve ihale platformuna hoş geldiniz!\n\nKurumsal şirket kaydınız onaylanmış ve hesabınıza İlk İhale %100 Ücretsiz Paketi ile Onaylı Mavi Rozet tanımlanmıştır.\n\nArtık Türkiye genelindeki tüm satın alma ihalelerine teklif sunabilir veya kendi şartnamenizle canlı eksiltme ihaleleri açabilirsiniz.\n\nKurumsal Yönetim Paneli: [Panel Linki]\n\nSaygılarımızla,\nHasan Hüseyin Yıldırım (İhaleciBurada)\nİletişim: 0850 840 86 95 | ihalecib@gmail.com"
     },
     {
       id: "TPL_AUCTION_START",
@@ -2307,7 +2307,7 @@ function removeSubmittedBid(index: number) {
               :class="activeTab === 'plans' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
             >
               <CreditCard :size="14" />
-              Abonelik & 1 Ay Deneme
+              Abonelik & İlk İhale Ücretsiz
             </button>
 
             <!-- GROUP: VERİTABANI İZLEME -->
@@ -2395,7 +2395,7 @@ function removeSubmittedBid(index: number) {
               <span v-else-if="activeTab === 'email_center'">📧 E-Posta Şablonları & Gönderim Merkezi</span>
               <span v-else-if="activeTab === 'newsletter_subs'">📬 Bülten & E-Posta Aboneleri</span>
               <span v-else-if="activeTab === 'hero'">🏠 Ana Sayfa İçerik & Bant Yönetimi</span>
-              <span v-else-if="activeTab === 'plans'">💳 Abonelik & 1 Ay Deneme Fiyatlandırması</span>
+              <span v-else-if="activeTab === 'plans'">💳 Abonelik & İlk İhale Ücretsiz Fiyatlandırması</span>
               <span v-else>🗄️ B2B Veritabanı Kontrolü</span>
             </h1>
             <p class="text-xs mt-1" :class="adminTheme === 'light' ? 'text-slate-500' : 'text-slate-400'">
@@ -3302,7 +3302,7 @@ function removeSubmittedBid(index: number) {
                     <Users :size="16" class="text-blue-400" />
                     CRM Müşteri ve Firma Aday Havuzu
                   </h3>
-                  <p class="text-[11px] text-slate-400">Üye olan, 1 ay ücretsiz deneme başlatan ve kurumsal teklif bekleyen potansiyel firmaları takip edin.</p>
+                  <p class="text-[11px] text-slate-400">Üye olan, ilk ihale ücretsiz başlatan ve kurumsal teklif bekleyen potansiyel firmaları takip edin.</p>
                 </div>
               </div>
 
@@ -3321,7 +3321,7 @@ function removeSubmittedBid(index: number) {
               <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-800">
                 <div class="flex items-center gap-2 flex-wrap">
                   <button 
-                    v-for="st in ['ALL', '1 Ay Deneme Aktif', 'Görüşülüyor', 'Kazanıldı', 'Mavi Rozet Verildi']"
+                    v-for="st in ['ALL', 'İlk İhale Ücretsiz Aktif', 'Görüşülüyor', 'Kazanıldı', 'Mavi Rozet Verildi']"
                     :key="st"
                     @click="crmStatusFilter = st"
                     class="px-3 py-1 rounded-lg text-xs font-bold transition cursor-pointer"
@@ -3369,7 +3369,7 @@ function removeSubmittedBid(index: number) {
                           v-model="lead.status" 
                           class="rounded-lg border border-slate-800 bg-slate-900 px-2 py-1 text-xs font-bold text-emerald-400 outline-none"
                         >
-                          <option value="1 Ay Deneme Aktif">🟢 1 Ay Deneme Aktif</option>
+                          <option value="İlk İhale Ücretsiz Aktif">🟢 İlk İhale Ücretsiz Aktif</option>
                           <option value="Mavi Rozet Verildi">✓ Mavi Rozet Verildi</option>
                           <option value="Görüşülüyor">📞 Görüşülüyor</option>
                           <option value="Kazanıldı">🏆 Kazanıldı (Abone)</option>
@@ -3860,7 +3860,7 @@ function removeSubmittedBid(index: number) {
               </h3>
               <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                 <input v-model="newPromo.code" type="text" placeholder="Kupon Kodu (Örn: LANSMAN2026)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white uppercase font-mono" />
-                <input v-model="newPromo.value" type="text" placeholder="Kupon Değeri (Örn: 1 Ay Bedelsiz)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                <input v-model="newPromo.value" type="text" placeholder="Kupon Değeri (Örn: İlk İhale Bedelsiz)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
                 <input v-model="newPromo.usageLimit" type="number" placeholder="Kullanım Limiti" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
                 <button @click="addPromoCode" class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-black transition cursor-pointer">
                   + Kupon Tanımla
@@ -4426,7 +4426,7 @@ function removeSubmittedBid(index: number) {
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <input v-model="newLeadForm.phone" type="text" placeholder="Telefon (05XX...)" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
                 <select v-model="newLeadForm.status" class="rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white">
-                  <option value="1 Ay Deneme Aktif">1 Ay Deneme Aktif</option>
+                  <option value="İlk İhale Ücretsiz Aktif">İlk İhale Ücretsiz Aktif</option>
                   <option value="Teklif Veren">Teklif Veren</option>
                   <option value="İhale Açan">İhale Açan</option>
                   <option value="Görüşülüyor">Görüşülüyor</option>

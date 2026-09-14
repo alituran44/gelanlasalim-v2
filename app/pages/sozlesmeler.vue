@@ -961,7 +961,7 @@ function printDocument() {
                 <p>2.1.1. <strong>Alıcılar İçin %0 Komisyon, Kazanan Tedarikçiler İçin Sabit %4 Escrow Bedeli:</strong> Platformumuzda alıcılar için ihale açma ve satın alma süreçleri %0 komisyondur (ücretsizdir). İhaleyi kazanan satıcı/tedarikçilerden ise, sektör ayrımı yapılmaksızın tüm kategorilerde yalnızca mal veya hizmet teslimatı alıcı tarafından onaylanıp hakediş serbest bırakıldığında sabit net %4 (+ KDV) Escrow Güvenli Havuz ve teknolojik altyapı bedeli tahsil edilir. İptal edilen, tamamlanmayan veya kazanılamayan ihalelerden hiçbir ücret veya komisyon kesilmez.</p>
                 <p>2.2. <strong>Paketler ve Toplam Fiyat (Tüm Vergiler Dahil):</strong></p>
                 <ul class="list-disc pl-5 space-y-1 text-slate-600">
-                  <li><strong>1 Ay Lansman Deneme Paketi:</strong> 0,00 ₺ (Ücretsiz)</li>
+                  <li><strong>İlk İhale Lansman Deneme Paketi:</strong> 0,00 ₺ (Ücretsiz)</li>
                   <li><strong>1 Aylık Standart İhale Paketi:</strong> 900,00 ₺ (%20 KDV Dahil)</li>
                   <li><strong>3 Aylık Pro Avantaj Paketi:</strong> 1.800,00 ₺ (%20 KDV Dahil)</li>
                   <li><strong>6 Aylık Kurumsal Plan:</strong> 2.700,00 ₺ (%20 KDV Dahil)</li>
@@ -1011,7 +1011,7 @@ function printDocument() {
               <section class="space-y-2 bg-blue-50/60 p-4 rounded-xl border border-blue-200">
                 <h3 class="font-bold text-blue-950 text-sm">MADDE 3 — ANINDA DİJİTAL İFA VE TESLİMAT</h3>
                 <p>3.1. Hizmet tamamen dijital ortamda sunulmakta olup herhangi bir fiziksel kargo teslimatı veya kargo bedeli bulunmamaktadır.</p>
-                <p>3.2. Paynkolay (Aktif Bank) 3D Secure ödeme onayı alındığı anda veya 1 Aylık Ücretsiz Deneme başlatıldığında, abonenin kullanıcı hesabı <strong>anında (0 saniye gecikmeyle)</strong> aktif edilir.</p>
+                <p>3.2. Paynkolay (Aktif Bank) 3D Secure ödeme onayı alındığı anda veya İlk İhale Ücretsiz Deneme Paketi başlatıldığında, abonenin kullanıcı hesabı <strong>anında (0 saniye gecikmeyle)</strong> aktif edilir.</p>
                 <p>3.3. E-Fatura / e-Arşiv faturası en geç 7 iş günü içerisinde düzenlenerek abonenin e-posta adresine iletilir.</p>
               </section>
 
