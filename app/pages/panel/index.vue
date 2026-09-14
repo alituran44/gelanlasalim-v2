@@ -64,8 +64,8 @@ const calcAmount = ref('100.000')
 const calcNum = computed(() => {
   return parseInt(String(calcAmount.value).replace(/\D/g, '')) || 0
 })
-const calcEscrowFee = computed(() => Math.round(calcNum.value * 0.04))
-const calcNetPayout = computed(() => Math.round(calcNum.value * 0.96))
+const calcEscrowFee = computed(() => Math.round(calcNum.value * 0.05))
+const calcNetPayout = computed(() => Math.round(calcNum.value * 0.95))
 
 const userRole = ref('company')
 const isVerified = ref(true)
@@ -426,7 +426,7 @@ watch(() => userSession.value, () => {
               <span class="text-xs text-slate-400 font-mono">TCMB & BDDK Lisanslı Güvenli Havuz</span>
             </div>
             <h2 class="text-base sm:text-lg font-black text-white mt-1">
-              Tüm Sektörlerde Sabit %4 Escrow & Platform Komisyonu
+              Tüm Sektörlerde Sabit %5 Escrow & Platform Komisyonu
             </h2>
           </div>
         </div>
@@ -442,7 +442,7 @@ watch(() => userSession.value, () => {
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 items-center">
         <div class="lg:col-span-7 text-xs text-slate-300 space-y-2 leading-relaxed">
           <p>
-            İhaleciBurada'da sürpriz veya gizli maliyet yoktur. Hangi sektörde ihale açarsanız açın veya teklif verirseniz verin, <strong>sektör ayrımı yapılmaksızın sabit %4 (+ KDV)</strong> Escrow Güvenli Havuz komisyonu uygulanır.
+            İhaleciBurada'da sürpriz veya gizli maliyet yoktur. Hangi sektörde ihale açarsanız açın veya teklif verirseniz verin, <strong>sektör ayrımı yapılmaksızın sabit %5 (+ KDV)</strong> Escrow Güvenli Havuz komisyonu uygulanır.
           </p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1">
             <div class="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700 flex items-center gap-2 text-emerald-300">
@@ -460,7 +460,7 @@ watch(() => userSession.value, () => {
         <div class="lg:col-span-5 p-3.5 rounded-xl bg-slate-800/90 border border-emerald-500/30 space-y-2.5">
           <div class="text-[11px] font-bold text-slate-300 flex justify-between items-center">
             <span>Canlı Komisyon Hesaplama:</span>
-            <span class="text-emerald-400 font-mono font-black">%4 Sabit</span>
+            <span class="text-emerald-400 font-mono font-black">%5 Sabit</span>
           </div>
           <div class="relative">
             <input 
@@ -473,7 +473,7 @@ watch(() => userSession.value, () => {
           </div>
           <div class="grid grid-cols-2 gap-2 text-[11px] font-mono pt-1 border-t border-slate-700">
             <div>
-              <span class="text-[10px] text-slate-400 uppercase block">Escrow Kesintisi (%4)</span>
+              <span class="text-[10px] text-slate-400 uppercase block">Escrow Kesintisi (%5)</span>
               <span class="text-amber-400 font-bold font-mono">{{ calcEscrowFee.toLocaleString('tr-TR') }} ₺</span>
             </div>
             <div class="text-right">

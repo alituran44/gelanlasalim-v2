@@ -50,7 +50,7 @@ const platformLinks = [
   { label: "B2B Pazar Yeri & İlanlar", to: "/pazar-yeri" },
   { label: "Yeni İhale Aç & Teklif Al", to: "/panel/ihale-olustur" },
   { label: "Canlı Tersine Eksiltme", to: "/panel/canli-etkinlikler" },
-  { label: "Escrow & Komisyon Oranları (%0 Alıcı / %4 Başarı Bedeli)", to: "/sozlesmeler?tab=kullanim" },
+  { label: "Escrow & Komisyon Oranları (%0 Alıcı / %5 Başarı Bedeli)", to: "/sozlesmeler?tab=kullanim" },
   { label: "Üyelik & Lansman Planları", to: "/abonelik" },
   { label: "Firma Doğrulama (Mavi Rozet)", to: "/firma-dogrulama" },
   { label: "Video Rehberler & Akademi", to: "/videolar" },

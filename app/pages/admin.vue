@@ -510,11 +510,9 @@ if (!formState.commissionSettings) {
       }
 ],
     planDiscountRates: [
-      { planName: 'Ücretsiz / Standart Üyelik', commissionRate: 3.0, badge: 'Standart' },
-      { planName: 'İlk İhale Lansman Deneme', commissionRate: 0.0, badge: '%100 Komisyonsuz' },
-      { planName: '3 Aylık Kurumsal', commissionRate: 2.5, badge: '%0.5 İndirimli' },
-      { planName: '6 Aylık Kurumsal Pro', commissionRate: 2.0, badge: '%1.0 İndirimli' },
-      { planName: '12 Aylık Enterprise Plus', commissionRate: 1.0, badge: '%2.0 İndirimli' }
+      { planName: 'Standart Tedarikçi Üyeliği', commissionRate: 5.0, badge: '%5 Sabit' },
+      { planName: 'Kurumsal Pro Tedarikçi', commissionRate: 5.0, badge: '%5 Sabit (B2B Rozet)' },
+      { planName: 'Kurumsal Enterprise', commissionRate: 5.0, badge: '%5 Sabit (ERP & Ekip)' }
     ]
   }
 }
@@ -531,24 +529,24 @@ if (!formState.pricing.realEstate) {
   }
 }
 
-const simSectorRate = ref(3.0)
+const simSectorRate = ref(5.0)
 const simPlatformEarning = computed(() => Math.round((simAmount.value * simSectorRate.value) / 100))
 const simSupplierNet = computed(() => simAmount.value - simPlatformEarning.value)
 
 const sectorSearchQuery = ref('')
 const newSectorRate = ref({
   name: '',
-  rate: 3.0,
+  rate: 5.0,
   icon: '🏢',
   description: ''
 })
 
-function setAllSectorsTo4() {
+function setAllSectorsTo5() {
   if (formState.commissionSettings?.sectorRates) {
     formState.commissionSettings.sectorRates.forEach((s: any) => {
-      s.rate = 4.0
+      s.rate = 5.0
     })
-    triggerToast('Tüm 40 sektör komisyonu sabit %4 olarak güncellendi!', 'success')
+    triggerToast('Tüm 40 sektör komisyonu sabit %5 olarak güncellendi!', 'success')
   }
 }
 
@@ -912,8 +910,8 @@ function syncLiveEscrowOrders() {
               totalAmount: approvedBid.fiyat,
               amount: approvedBid.fiyat,
               numericAmount: numericVal,
-              payoutAmount: Math.round(numericVal * 0.97).toLocaleString('tr-TR') + ' ₺',
-              commissionAmount: Math.round(numericVal * 0.03).toLocaleString('tr-TR') + ' ₺',
+              payoutAmount: Math.round(numericVal * 0.95).toLocaleString('tr-TR') + ' ₺',
+              commissionAmount: Math.round(numericVal * 0.05).toLocaleString('tr-TR') + ' ₺',
               status: 'HAVUZDA_BLOKE',
               escrowStatus: 'havuzda_bloke',
               trackingNumber: 'YK-' + Math.floor(1000000 + Math.random() * 9000000),
@@ -4856,7 +4854,7 @@ function removeSubmittedBid(index: number) {
                   <span class="p-2 rounded-xl bg-blue-500/10 text-blue-500"><Percent :size="16" /></span>
                 </div>
                 <div class="text-2xl font-black mt-2 font-mono" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
-                  %{{ formState.commissionSettings?.defaultRate || 3.0 }}
+                  %{{ formState.commissionSettings?.defaultRate || 5.0 }}
                 </div>
                 <div class="text-[11px] text-slate-500 mt-1">Sonuçlanan ihalelerden kesilen oran</div>
               </div>
@@ -4867,7 +4865,7 @@ function removeSubmittedBid(index: number) {
                   <span class="p-2 rounded-xl bg-emerald-500/10 text-emerald-500"><DollarSign :size="16" /></span>
                 </div>
                 <div class="text-2xl font-black mt-2 font-mono text-emerald-500">
-                  {{ (formState.escrowOrders || []).reduce((acc: number, o: any) => acc + ((o.numericAmount || 75000) * ((o.commissionRate || 3) / 100)), 0).toLocaleString('tr-TR') }} ₺
+                  {{ (formState.escrowOrders || []).reduce((acc: number, o: any) => acc + ((o.numericAmount || 75000) * ((o.commissionRate || 5) / 100)), 0).toLocaleString('tr-TR') }} ₺
                 </div>
                 <div class="text-[11px] text-slate-500 mt-1">Güvenli havuz hakediş kesintisi</div>
               </div>
@@ -4938,21 +4936,21 @@ function removeSubmittedBid(index: number) {
                   <div class="flex items-center gap-2">
                     <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
                       <Layers :size="16" class="text-emerald-500" />
-                      Sektör Komisyon Oranları (Sabit %4 Standartı)
+                      Sektör Komisyon Oranları (Sabit %5 Standartı)
                     </h3>
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 font-mono">
                       {{ (formState.commissionSettings?.sectorRates || []).length }} Sektör Aktif
                     </span>
                     <button 
                       type="button" 
-                      @click="setAllSectorsTo4" 
+                      @click="setAllSectorsTo5" 
                       class="px-2.5 py-1 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold cursor-pointer transition"
-                      title="Tüm sektörleri standart %4 oranına sıfırla"
+                      title="Tüm sektörleri standart %5 oranına sıfırla"
                     >
-                      ⚡ Tümünü %4 Yap
+                      ⚡ Tümünü %5 Yap
                     </button>
                   </div>
-                  <p class="text-[11px] text-emerald-400 mt-0.5 font-bold">Platform Genel Kuralı: Sektör ayrımı yapılmaksızın tüm sektörlerde standart %4 (+ KDV) Escrow komisyonu uygulanmaktadır.</p>
+                  <p class="text-[11px] text-emerald-400 mt-0.5 font-bold">Platform Genel Kuralı: Sektör ayrımı yapılmaksızın tüm sektörlerde standart %5 (+ KDV) Escrow komisyonu uygulanmaktadır.</p>
                 </div>
 
                 <!-- Search Input for Sectors -->

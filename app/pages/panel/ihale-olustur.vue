@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { AlertCircle, Calendar, UploadCloud, FileText, FileSpreadsheet, FileCode, X, Camera, Eye, Trash2, Plus, ShieldAlert, FileCheck, CheckCircle2, FilePlus2, ArrowLeft, Pencil, CreditCard, MapPin } from 'lucide-vue-next'
+import { AlertCircle, Calendar, UploadCloud, FileText, FileSpreadsheet, FileCode, X, Camera, Eye, Trash2, Plus, ShieldAlert, FileCheck, CheckCircle2, FilePlus2, ArrowLeft, Pencil, CreditCard, MapPin, Lock } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
@@ -34,6 +34,8 @@ const imageInputRef = ref<HTMLInputElement | null>(null)
 const isBudgetUnspecified = ref(true)
 const form = ref({
   ihaleYonu: 'kapali_zarf', // 'kapali_zarf' | 'eksiltme' | 'artirma' | 'sabit_paket'
+  visibility: 'public' as 'public' | 'private_invited',
+  invitedSuppliers: '',
   baslik: '',
   kategori: 'Organizasyon ve Etkinlik',
   sure: '7 gün',
@@ -724,6 +726,9 @@ async function handleSubmit() {
       ownerEmail: existingTender.value?.ownerEmail || ownerEmail,
       ownerName: existingTender.value?.ownerName || ownerName,
       ownerCompany: existingTender.value?.ownerCompany || ownerCompany,
+      visibility: form.value.visibility || 'public',
+      isPrivate: form.value.visibility === 'private_invited',
+      invitedSuppliers: form.value.invitedSuppliers || '',
       isMine: false,
       olusturma: existingTender.value?.olusturma || 'Bugün'
     }
@@ -1011,7 +1016,7 @@ function resetFormAndCreateNew() {
         <div class="p-3.5 bg-emerald-50/90 border border-emerald-200 rounded-2xl text-xs text-emerald-950 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
           <div class="flex items-center gap-2">
             <span class="px-2.5 py-1 rounded-lg bg-emerald-600 text-white font-black text-[10px] tracking-wider uppercase shrink-0">%0 ALICI KOMİSYONU</span>
-            <span class="font-medium text-[11px] text-emerald-900 leading-relaxed">İhale açmak ve teklif toplamak alıcı firmalar için <strong>%100 ücretsizdir</strong>. Tüm sektörlerde sabit <strong>%4 Escrow Güvenli Havuz</strong> güvencesiyle mal kabulü yapılmadan ödeme aktarılmaz.</span>
+            <span class="font-medium text-[11px] text-emerald-900 leading-relaxed">İhale açmak ve teklif toplamak alıcı firmalar için <strong>%100 ücretsizdir</strong>. Tüm sektörlerde sabit <strong>%5 Escrow Güvenli Havuz</strong> güvencesiyle mal kabulü yapılmadan ödeme aktarılmaz.</span>
           </div>
           <NuxtLink to="/sozlesmeler?tab=kullanim" class="px-2.5 py-1 rounded-lg bg-emerald-100 hover:bg-emerald-200 text-emerald-800 font-bold text-[10px] whitespace-nowrap transition">
             Komisyon & Escrow Şartları →
@@ -1107,6 +1112,71 @@ function resetFormAndCreateNew() {
                 <strong>(Tur, Umre, Etkinlik & Grup):</strong> Kişi başı sabit fiyat (örn: 1000$ / 1100$) ile hedef kontenjan/üye toplayın.
               </p>
             </div>
+          </div>
+        </div>
+
+        <!-- 🔒 İHALE ERİŞİM TÜRÜ: HERKESE AÇIK GENEL PAZAR vs ÖZEL DAVETLİ KAPALI İHALE -->
+        <div class="space-y-2 p-4 bg-slate-50/90 rounded-2xl border-2 border-slate-200">
+          <div class="flex items-center justify-between">
+            <label class="block text-[11px] font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
+              <Lock :size="14" class="text-blue-600" />
+              <span>İHALE GÖRÜNÜRLÜK & ERİŞİM MODELİ</span>
+            </label>
+            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+              Kurumsal Ayrıcalık
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <!-- 1. Herkese Açık Genel Pazar -->
+            <div 
+              @click="form.visibility = 'public'"
+              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
+              :class="form.visibility === 'public' ? 'border-blue-600 bg-blue-50/50 shadow-xs ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-black text-xs flex items-center gap-1.5" :class="form.visibility === 'public' ? 'text-blue-900' : 'text-slate-800'">
+                  <span>🌐 Herkese Açık Genel İhale</span>
+                </span>
+                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.visibility === 'public' ? 'border-blue-600 bg-blue-600 text-white text-[10px]' : 'border-slate-300'">
+                  <span v-if="form.visibility === 'public'">✓</span>
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-snug">
+                İhaleniz Pazar Yeri'nde tüm tedarikçilere yayınlanır. Maksimum rekabet ve en geniş tedarikçi havuzuna ulaşılır.
+              </p>
+            </div>
+
+            <!-- 2. Özel Davetli Kapalı İhale (Kurumsal Enterprise & Pro) -->
+            <div 
+              @click="form.visibility = 'private_invited'"
+              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
+              :class="form.visibility === 'private_invited' ? 'border-indigo-600 bg-indigo-50/50 shadow-xs ring-2 ring-indigo-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+            >
+              <div class="flex items-center justify-between">
+                <span class="font-black text-xs flex items-center gap-1.5" :class="form.visibility === 'private_invited' ? 'text-indigo-900' : 'text-slate-800'">
+                  <span>🔒 Özel Davetli Kapalı İhale (VIP)</span>
+                </span>
+                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.visibility === 'private_invited' ? 'border-indigo-600 bg-indigo-600 text-white text-[10px]' : 'border-slate-300'">
+                  <span v-if="form.visibility === 'private_invited'">✓</span>
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-600 leading-snug">
+                Pazar yerinde genel listelenmez. Yalnızca davet ettiğiniz şirketler veya Mavi Kalkan onaylı seçkin tedarikçiler teklif verebilir.
+              </p>
+            </div>
+          </div>
+
+          <!-- Davetli Tedarikçi Girişi (Kapalı İhale Seçildiğinde) -->
+          <div v-if="form.visibility === 'private_invited'" class="pt-2 space-y-1.5">
+            <label class="block text-[10px] font-black text-indigo-900 uppercase">DAVET EDİLECEK TEDARİKÇİ E-POSTALARI VEYA VKN NUMARALARI</label>
+            <input 
+              v-model="form.invitedSuppliers" 
+              type="text" 
+              placeholder="Örn: tedarik@firma1.com, 4810294719, satis@uretici2.com" 
+              class="w-full rounded-xl border border-indigo-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 outline-none focus:border-indigo-500 font-mono" 
+            />
+            <span class="text-[10px] text-indigo-700 block">Belirttiğiniz tedarikçilere özel şifreli erişim bağlantısı ve öncelikli NetGSM SMS davetiyesi iletilecektir.</span>
           </div>
         </div>
 

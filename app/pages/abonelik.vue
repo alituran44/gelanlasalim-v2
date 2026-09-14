@@ -54,15 +54,15 @@ const corporatePackages = computed(() => [
   {
     id: 'kurumsal-pro',
     name: 'Kurumsal Pro Tedarikçi',
-    badge: '%2.5 Komisyon',
-    commissionRate: 2.5,
+    badge: 'Doğrulanmış B2B',
+    commissionRate: 5.0,
     price: corporateBillingCycle.value === 'annual' ? 18000 : 1800,
     monthlyPrice: 1800,
     annualPrice: 18000,
     monthly: corporateBillingCycle.value === 'annual' ? '₺1.500,00 / ay (Peşin Yıllık)' : '₺1.800,00 / ay',
-    desc: 'İndirimli %2.5 platform başarı komisyonu (%37.5 tasarruf) ve Mavi Kalkan kurumsal tedarikçi rozeti.',
+    desc: 'Yalnızca başarılı ihalede %5 sabit komisyon (alıcıya %0), Mavi Kalkan kurumsal tedarikçi rozeti ve öncelikli alarmlar.',
     features: [
-      'İndirimli %2.5 platform başarı komisyonu (%37.5 tasarruf)',
+      'Yalnızca Başarılı İhalede %5 Sabit Komisyon (Alıcıya %0)',
       'Doğrulanmış B2B Rozeti (Mavi Kalkan)',
       'Yeni açılan ihalelerde öncelikli SMS/E-posta alarmı',
       'Sınırsız teklif revizyonu ve detaylı rakip analiz özeti',
@@ -74,15 +74,15 @@ const corporatePackages = computed(() => [
   {
     id: 'kurumsal-enterprise',
     name: 'Kurumsal Enterprise',
-    badge: '%1.5 Komisyon',
-    commissionRate: 1.5,
+    badge: 'ERP & Limitsiz Ekip',
+    commissionRate: 5.0,
     price: corporateBillingCycle.value === 'annual' ? 45000 : 4500,
     monthlyPrice: 4500,
     annualPrice: 45000,
     monthly: corporateBillingCycle.value === 'annual' ? '₺3.750,00 / ay (Peşin Yıllık)' : '₺4.500,00 / ay',
-    desc: 'En düşük %1.5 komisyon oranı, kurumsal ekip yetkilendirmesi ve SAP/Logo/Netsis ERP REST API entegrasyonu.',
+    desc: 'Yalnızca başarılı ihalede %5 sabit komisyon (alıcıya %0), limitsiz ekip yetkilendirmesi ve SAP/Logo/Netsis ERP REST API entegrasyonu.',
     features: [
-      'Özel indirimli %1.5 platform başarı komisyonu (%62.5 tasarruf)',
+      'Yalnızca Başarılı İhalede %5 Sabit Komisyon (Alıcıya %0)',
       'Kurumsal Alt Kullanıcı & Ekip Yetki Yönetimi (Limitsiz)',
       'SAP / Logo / Netsis / Mikro ERP REST API Entegrasyonu',
       'Özel Müşteri Başarı Yöneticisi (Account Manager)',
@@ -411,7 +411,7 @@ function completeCheckout() {
           {{ 'İhtiyacınıza Uygun Esnek Ödeme Planı Seçin' }}
         </h1>
         <p class="text-xs text-slate-500 font-medium leading-relaxed">
-          {{ 'Alıcılar için %0 komisyon ile sınırsız ihale açma, tedarikçiler için şeffaf paketler ve yalnızca ihale kazanıldığında net %4 Escrow altyapı güvencesi.' }}
+          {{ 'Alıcılar için %0 komisyon ile sınırsız ihale açma, tedarikçiler için şeffaf paketler ve yalnızca ihale kazanıldığında net %5 Escrow altyapı güvencesi.' }}
         </p>
 
         <!-- MARKET REGION TOGGLE SWITCH -->
@@ -523,7 +523,7 @@ function completeCheckout() {
               </h2>
               <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium max-w-2xl">
                 {{ isCompanyMode 
-                  ? 'Firma moduna özel %2.5 ve %1.5 indirimli komisyon oranları, Mavi Kalkan kurumsal rozeti, çoklu kullanıcı ve ERP API entegrasyonu.' 
+                  ? 'Firma moduna özel %5 sabit komisyon (alıcıya %0), Mavi Kalkan kurumsal rozeti, çoklu kullanıcı ve ERP API entegrasyonu.' 
                   : 'Bireysel kullanıcılara özel 1 aydan 12 aya kadar süreli ihale arama, teklif verme ve satın alma abonelik paketleri.' 
                 }}
               </p>
@@ -698,7 +698,7 @@ function completeCheckout() {
           <div class="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-center max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="text-left">
               <span class="text-xs font-bold text-emerald-900 block">Şirket veya Kurumsal Tedarikçi misiniz?</span>
-              <span class="text-[11px] text-emerald-700">Firma moduna geçerek indirimli %1.5 / %2.5 komisyonlu kurumsal fiyatları inceleyin.</span>
+              <span class="text-[11px] text-emerald-700">Firma moduna geçerek kurumsal tedarikçi avantajlarını ve Mavi Kalkan ayrıcalıklarını inceleyin.</span>
             </div>
             <button
               type="button"
@@ -774,7 +774,7 @@ function completeCheckout() {
       <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
         <div>
           <h2 class="text-lg font-black text-slate-900">{{ 'Tüm Paketlerde Dahil Olan Standart Özellikler' }}</h2>
-          <p class="text-xs text-slate-500 mt-0.5">{{ 'Alıcılar için her zaman %0 Komisyon; tedarikçiler için yalnızca teslimat onayında %4 Escrow altyapı bedeli.' }}</p>
+          <p class="text-xs text-slate-500 mt-0.5">{{ 'Alıcılar için her zaman %0 Komisyon; tedarikçiler için yalnızca teslimat onayında %5 Escrow altyapı bedeli.' }}</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4 border-t border-slate-100">

@@ -5,7 +5,7 @@
  * İş Kuralları:
  * - REV-001: Gelir modeli şeffaf ve esnek karar matrisine bağlıdır.
  *   * Alıcı Komisyonu: Net %0 (Her zaman ücretsiz - B2B satın alma alıcı teşviki).
- *   * Satıcı Komisyonu: Net %4 sabit Platform Hizmet / Escrow Havuz Bedeli.
+ *   * Satıcı Komisyonu: Net %5 sabit Platform Hizmet / Escrow Havuz Bedeli.
  * - REV-002: Temel ihale ve teklif motoru ücretlendirmeye BAĞIMSIZDIR (Decoupled).
  *   * İhale açma, teklif verme veya süre uzatma asla bir ödeme duvarına (paywall) kilitlenmez.
  * - REV-003: Kurumsal paket, başarı komisyonu ve faturalandırma simülasyonu analiz edilebilir.
@@ -20,7 +20,7 @@ export type AccrualStatus = 'PENDING_INVOICE' | 'INVOICED' | 'COLLECTED' | 'EXEM
 export interface RevenueModelConfig {
   activeModel: RevenueModelType
   buyerCommissionRate: number // Her zaman 0
-  sellerCommissionRate: number // Standart satıcı komisyon oranı (Örn: %4.0)
+  sellerCommissionRate: number // Standart satıcı komisyon oranı (%5.0 Sabit)
   minCommissionAmount: number // Minimum taban komisyon (₺)
   maxCommissionCap: number // Maksimum tavan komisyon (₺)
   vatRate: number // KDV oranı (%20)
@@ -65,13 +65,13 @@ export interface CommissionAccrualRecord {
 let revenueConfig: RevenueModelConfig = {
   activeModel: 'HYBRID',
   buyerCommissionRate: 0, // Alıcı her zaman %0
-  sellerCommissionRate: 4.0, // Satıcı standart %4.0
+  sellerCommissionRate: 5.0, // Satıcı standart %5.0 Sabit
   minCommissionAmount: 500,
   maxCommissionCap: 150000,
   vatRate: 20, // %20 KDV
   withholdingRate: 0.5, // 5/10 Tevkifat
   isDecoupledFromBidding: true, // REV-002 kuralı gereği ihale akışını bloke etmez
-  lastUpdated: '2026-09-12T00:00:00.000Z',
+  lastUpdated: '2026-09-14T00:00:00.000Z',
   updatedBy: 'Sistem Yöneticisi (9560161511)'
 }
 
@@ -82,11 +82,11 @@ export const CORPORATE_TIERS: CorporateTierInfo[] = [
     name: 'Standart Üretici / Tedarikçi',
     monthlyPrice: 0,
     annualPrice: 0,
-    commissionRate: 4.0,
+    commissionRate: 5.0,
     features: [
       'Alıcı firmalar için %0 komisyonla sınırsız ihale açma',
       'Tüm açık B2B ihalelere katılabilme ve teklif verme',
-      'Standart %4.0 başarı/escrow komisyonu',
+      'Yalnızca Başarılı İhalede %5 Sabit Başarı Komisyonu (Alıcıya %0)',
       'Temel e-posta bildirimleri',
       'Resmi İhale Sonuç Tutanağı erişimi'
     ],
@@ -97,9 +97,9 @@ export const CORPORATE_TIERS: CorporateTierInfo[] = [
     name: 'Kurumsal Pro Tedarikçi',
     monthlyPrice: 1800,
     annualPrice: 18000,
-    commissionRate: 2.5,
+    commissionRate: 5.0,
     features: [
-      'İndirimli %2.5 platform başarı komisyonu (%37.5 tasarruf)',
+      'Yalnızca Başarılı İhalede %5 Sabit Başarı Komisyonu (Alıcıya %0)',
       'Doğrulanmış B2B Rozeti (Mavi Kalkan)',
       'Yeni açılan ihalelerde öncelikli SMS/E-posta alarmı',
       'Sınırsız teklif revizyonu ve detaylı rakip analiz özeti',
@@ -112,9 +112,9 @@ export const CORPORATE_TIERS: CorporateTierInfo[] = [
     name: 'Kurumsal Enterprise',
     monthlyPrice: 4500,
     annualPrice: 45000,
-    commissionRate: 1.5,
+    commissionRate: 5.0,
     features: [
-      'Özel indirimli %1.5 platform başarı komisyonu',
+      'Yalnızca Başarılı İhalede %5 Sabit Başarı Komisyonu (Alıcıya %0)',
       'Kurumsal Alt Kullanıcı & Ekip Yetki Yönetimi (Limitsiz)',
       'SAP / Logo / Netsis / Mikro ERP REST API Entegrasyonu',
       'Özel Müşteri Başarı Yöneticisi (Account Manager)',
@@ -136,16 +136,16 @@ const accrualsStore: CommissionAccrualRecord[] = [
     awardedSupplierVkn: '9560161511',
     sellerTier: 'STANDART',
     tenderFinalAmount: 850000,
-    commissionRate: 4.0,
-    grossCommission: 34000,
-    vatAmount: 6800,
-    withholdingAmount: 3400,
-    netPayableCommission: 37400,
+    commissionRate: 5.0,
+    grossCommission: 42500,
+    vatAmount: 8500,
+    withholdingAmount: 4250,
+    netPayableCommission: 46750,
     status: 'INVOICED',
     invoiceNo: 'IB202600000142',
     invoiceDate: '2026-09-10',
     createdAt: '2026-09-10T14:30:00.000Z',
-    notes: 'İhale sonuç tutanağı taraflarca onaylandı. %4 platform hizmet faturası kesildi.'
+    notes: 'İhale sonuç tutanağı taraflarca onaylandı. %5 platform hizmet faturası kesildi.'
   },
   {
     id: 'ACC-2026-002',
@@ -156,16 +156,16 @@ const accrualsStore: CommissionAccrualRecord[] = [
     awardedSupplierVkn: '3829104812',
     sellerTier: 'KURUMSAL_PRO',
     tenderFinalAmount: 420000,
-    commissionRate: 2.5,
-    grossCommission: 10500,
-    vatAmount: 2100,
-    withholdingAmount: 1050,
-    netPayableCommission: 11550,
+    commissionRate: 5.0,
+    grossCommission: 21000,
+    vatAmount: 4200,
+    withholdingAmount: 2100,
+    netPayableCommission: 23100,
     status: 'COLLECTED',
     invoiceNo: 'IB202600000143',
     invoiceDate: '2026-09-11',
     createdAt: '2026-09-11T11:20:00.000Z',
-    notes: 'Kurumsal Pro indirimli komisyon oranı uygulandı. Ödeme tahsil edildi.'
+    notes: 'Kurumsal Pro %5 sabit komisyon oranı uygulandı. Ödeme tahsil edildi.'
   },
   {
     id: 'ACC-2026-003',
@@ -176,11 +176,11 @@ const accrualsStore: CommissionAccrualRecord[] = [
     awardedSupplierVkn: '1940283741',
     sellerTier: 'STANDART',
     tenderFinalAmount: 2150000,
-    commissionRate: 4.0,
-    grossCommission: 86000,
-    vatAmount: 17200,
-    withholdingAmount: 8600,
-    netPayableCommission: 94600,
+    commissionRate: 5.0,
+    grossCommission: 107500,
+    vatAmount: 21500,
+    withholdingAmount: 10750,
+    netPayableCommission: 118250,
     status: 'PENDING_INVOICE',
     createdAt: '2026-09-11T16:45:00.000Z',
     notes: 'İhale kesinleşti. Fatura kesim kuyruğunda bekliyor.'
@@ -325,8 +325,8 @@ export function simulateRevenueProjection(params: SimulationParams): SimulationR
   const enterpriseVolume = gmv * 0.10
 
   const commStandard = standardVolume * (sellerRate / 100)
-  const commPro = proVolume * (2.5 / 100)
-  const commEnterprise = enterpriseVolume * (1.5 / 100)
+  const commPro = proVolume * (sellerRate / 100)
+  const commEnterprise = enterpriseVolume * (sellerRate / 100)
   const sellerCommissionRev = Math.round(commStandard + commPro + commEnterprise)
 
   // Abonelik gelirleri

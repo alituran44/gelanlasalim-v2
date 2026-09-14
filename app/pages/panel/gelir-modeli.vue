@@ -40,7 +40,7 @@ const saveSuccess = ref(false)
 const config = ref<any>({
   activeModel: 'HYBRID',
   buyerCommissionRate: 0,
-  sellerCommissionRate: 4.0,
+  sellerCommissionRate: 5.0,
   minCommissionAmount: 500,
   maxCommissionCap: 150000,
   vatRate: 20,
@@ -58,7 +58,7 @@ const simParams = ref({
   avgTenderAmount: 350000,
   proSubscriberCount: 25,
   enterpriseSubscriberCount: 8,
-  sellerCommissionRate: 4.0
+  sellerCommissionRate: 5.0
 })
 
 const simResult = ref<any>(null)
@@ -156,11 +156,11 @@ const prdModels = [
     status: 'Tavsiye Edilmiyor'
   },
   {
-    id: 'Başarı / İşlem Komisyonu (%4)',
+    id: 'Başarı / İşlem Komisyonu (%5)',
     target: 'Sonuç Odaklı',
     advantages: 'Platform değer yarattıkça ve ihale başarıyla sonuçlandıkça gelir üretir. Alıcıya %0 komisyon güvencesi sunar.',
     risks: 'İhale sonuç tutanağının ve faturanın tahsilat takibi gerekir; aracı hizmet sağlayıcı rolü korunmalıdır.',
-    compatibility: 'Mevcut Ana Model (%4 Sabit)',
+    compatibility: 'Mevcut Ana Model (%5 Sabit)',
     status: 'Standart / Varsayılan'
   },
   {
@@ -174,7 +174,7 @@ const prdModels = [
   {
     id: 'Hibrit Model (Tavsiye Edilen)',
     target: 'Karma Model',
-    advantages: 'Alıcı %0 + Satıcı %4 Başarı Komisyonu + Opsiyonel Kurumsal Pro/Enterprise Abonelikler. Maksimum likidite.',
+    advantages: 'Alıcı %0 + Satıcı %5 Başarı Komisyonu + Opsiyonel Kurumsal Pro/Enterprise Abonelikler. Maksimum likidite.',
     risks: 'Fiyatlandırma sade ve şeffaf tutulmalıdır.',
     compatibility: 'Tam Uyumlu (PRD Önerisi)',
     status: 'Platform Standardı'
@@ -203,7 +203,7 @@ const prdModels = [
             Gelir Modeli ve Ücretlendirme Stratejisi
           </h1>
           <p class="text-sm text-slate-400 mt-1 max-w-3xl">
-            İhaleciBurada B2B e-ihale pazaryeri gelir mimarisi; alıcı satın alma ekiplerine sıfır maliyet (%0), satıcı firmalara başarı durumunda net %4 platform hizmet bedeli ve kurumsal üyelik paketleri üzerine kuruludur.
+            İhaleciBurada B2B e-ihale pazaryeri gelir mimarisi; alıcı satın alma ekiplerine sıfır maliyet (%0), satıcı firmalara başarı durumunda net %5 platform hizmet bedeli ve kurumsal üyelik paketleri üzerine kuruludur.
           </p>
         </div>
 
@@ -309,8 +309,8 @@ const prdModels = [
                 v-model="config.activeModel"
                 class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none"
               >
-                <option value="HYBRID">Hibrit (Alıcı %0 + Satıcı %4 + SaaS)</option>
-                <option value="COMMISSION_ONLY">Yalnızca Başarı Komisyonu (%4)</option>
+                <option value="HYBRID">Hibrit (Alıcı %0 + Satıcı %5 + SaaS)</option>
+                <option value="COMMISSION_ONLY">Yalnızca Başarı Komisyonu (%5)</option>
                 <option value="SUBSCRIPTION_ONLY">Yalnızca Kurumsal Abonelik</option>
                 <option value="FREE_PILOT">Ücretsiz Pilot Dönemi (%0 Komisyon)</option>
               </select>
@@ -407,7 +407,7 @@ const prdModels = [
               v-for="model in prdModels" 
               :key="model.id"
               class="p-4 rounded-xl border transition-all"
-              :class="model.id.includes('Hibrit') || model.id.includes('%4') 
+              :class="model.id.includes('Hibrit') || model.id.includes('%5') 
                 ? 'bg-slate-950/80 border-emerald-500/30' 
                 : 'bg-slate-950/40 border-slate-800/80'"
             >
@@ -557,7 +557,7 @@ const prdModels = [
                 {{ simResult.sellerCommissionRevenue.toLocaleString('tr-TR') }} ₺
               </div>
               <div class="text-[11px] text-emerald-300 mt-2">
-                Standart %4.0 + Pro %2.5 + Enterprise %1.5
+                Tüm Seviyelerde Sabit %5.0 Başarı Komisyonu
               </div>
             </div>
 

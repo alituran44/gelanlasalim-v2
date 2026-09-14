@@ -180,7 +180,7 @@ const faqList = [
   },
   {
     q: 'İhaleciBurada taraflardan komisyon alıyor mu?',
-    a: 'Alıcılar (ihale açan ve satın alma yapan kurumlar) için platform kullanımı tamamen %0 Komisyondur (Ücretsizdir). İhaleyi kazanan satıcı/tedarikçilerden ise sektör ayrımı yapılmaksızın tüm işlemler için sabit net %4 (+ KDV) Escrow Güvenli Havuz ve teknolojik altyapı bedeli uygulanır. Tamamlanmayan, iptal edilen veya kazanılamayan ihalelerden hiçbir komisyon tahsil edilmez.'
+    a: 'Alıcılar (ihale açan ve satın alma yapan kurumlar) için platform kullanımı tamamen %0 Komisyondur (Ücretsizdir). İhaleyi kazanan satıcı/tedarikçilerden ise sektör ayrımı yapılmaksızın tüm işlemler için sabit net %5 (+ KDV) Escrow Güvenli Havuz ve teknolojik altyapı bedeli uygulanır. Tamamlanmayan, iptal edilen veya kazanılamayan ihalelerden hiçbir komisyon tahsil edilmez.'
   },
   {
     q: 'Anlaşmazlık olursa İhaleciBurada\'nın rolü nedir?',
@@ -3970,10 +3970,10 @@ onMounted(() => {
                 <span class="text-emerald-700 font-black">🛡️</span>
                 <span>Tüm Sektörlerde Sabit Escrow Komisyonu:</span>
               </span>
-              <span class="text-emerald-700 font-black font-mono">%4 Sabit (+ KDV)</span>
+              <span class="text-emerald-700 font-black font-mono">%5 Sabit (+ KDV)</span>
             </div>
             <p class="text-[10px] text-slate-600 leading-tight">
-              * Sektör ayrımı yapılmaksızın tüm işlemlerde sabit %4'tür. Bu hizmet bedeli yalnızca ihale kazanılıp mal/hizmet teslimatı alıcı tarafından onaylandığında hakedişten tahakkuk eder; kazanılamayan veya iptal edilen ihalelerde <strong>%0 (hiçbir ücret alınmaz)</strong>. Platformumuz 6563 SK kapsamında Aracı Hizmet Sağlayıcıdır.
+              * Sektör ayrımı yapılmaksızın tüm işlemlerde sabit %5'tir. Bu hizmet bedeli yalnızca ihale kazanılıp mal/hizmet teslimatı alıcı tarafından onaylandığında hakedişten tahakkuk eder; kazanılamayan veya iptal edilen ihalelerde <strong>%0 (hiçbir ücret alınmaz)</strong>. Platformumuz 6563 SK kapsamında Aracı Hizmet Sağlayıcıdır.
             </p>
           </div>
 

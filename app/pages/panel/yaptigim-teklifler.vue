@@ -38,7 +38,11 @@ import {
   MessageSquare,
   ChevronRight,
   X,
-  Trash2
+  Trash2,
+  TrendingUp,
+  BarChart2,
+  ShieldCheck,
+  Sparkles
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
@@ -68,12 +72,20 @@ function getBidRankStatus(bid: any) {
 
   const isLeader = myPriceNum <= lowestNum
   const rank = sorted.findIndex(t => t.id === bid.id || t.firma === bid.bidderName) + 1 || (isLeader ? 1 : 2)
+  const diff = (lowestNum > 0 && myPriceNum > lowestNum) 
+    ? ((myPriceNum - lowestNum) / lowestNum * 100).toFixed(1) 
+    : '0'
+  const winProbability = isLeader ? 92 : Math.max(30, 85 - (rank * 18))
+  const avg = Math.round(sorted.reduce((acc, curr) => acc + (parseInt(String(curr.fiyat || '0').replace(/\D/g, '')) || 0), 0) / sorted.length)
 
   return {
     isLeader,
     leaderPrice: lowest.fiyat,
     rank,
-    totalBids: sorted.length
+    totalBids: sorted.length,
+    spreadPercent: diff,
+    winProbability,
+    averagePrice: avg.toLocaleString('tr-TR') + ' ₺'
   }
 }
 
@@ -292,8 +304,8 @@ async function acceptCounterOffer(teklif: any) {
   if (!cmsData.value.dashboard.escrowOrders) cmsData.value.dashboard.escrowOrders = []
 
   const numVal = parseInt(String(latestPrice || '75000').replace(/\D/g, '')) || 75000
-  const payoutStr = Math.round(numVal * 0.97).toLocaleString('tr-TR') + ' ₺'
-  const commStr = Math.round(numVal * 0.03).toLocaleString('tr-TR') + ' ₺'
+  const payoutStr = Math.round(numVal * 0.95).toLocaleString('tr-TR') + ' ₺'
+  const commStr = Math.round(numVal * 0.05).toLocaleString('tr-TR') + ' ₺'
 
   const orderItem = {
     id: 'ORD-2026-' + (teklif.tenderId ? String(teklif.tenderId).replace(/\D/g, '') : Math.floor(100 + Math.random() * 900)),
@@ -311,7 +323,7 @@ async function acceptCounterOffer(teklif: any) {
     numericAmount: numVal,
     payoutAmount: payoutStr,
     commissionAmount: commStr,
-    commissionRate: 3,
+    commissionRate: 5,
     status: 'HAVUZDA_BLOKE',
     statusLabel: 'Güvenli Havuzda Bloke Edildi',
     escrowStatus: 'havuzda_bloke',
@@ -719,6 +731,97 @@ function submitReview() {
           </div>
         </div>
 
+        <!-- ========================================================================= -->
+        <!-- KURUMSAL DETAYLI RAKİP ANALİZ ÖZETİ & SINIRSIZ REVİZYON WIDGETI -->
+        <!-- ========================================================================= -->
+        <div v-if="teklif.durum !== 'onaylandi'" class="rounded-2xl border bg-[#0F223D] text-white p-4 sm:p-5 space-y-3.5 shadow-sm border-slate-800">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-2.5">
+            <div class="flex items-center gap-2">
+              <BarChart2 :size="16" class="text-blue-400" />
+              <span class="text-xs font-black uppercase tracking-wider text-slate-200">
+                Canlı Pazar & Rakip Analiz Özeti
+              </span>
+              <span class="px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 text-[9px] font-black tracking-wide">
+                PRO ANALİTİK
+              </span>
+            </div>
+
+            <!-- Sınırsız Revizyon Rozeti -->
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                <Sparkles :size="11" /> Sınırsız Revizyon Hakkı Tanımlı
+              </span>
+            </div>
+          </div>
+
+          <!-- Metrics Grid -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
+            <!-- Rank -->
+            <div class="bg-white/5 p-2.5 rounded-xl border border-white/10">
+              <span class="text-[9px] font-bold uppercase text-slate-400 font-sans block">MEVCUT SIRALAMANIZ</span>
+              <div class="flex items-center gap-1.5 mt-1">
+                <span 
+                  class="text-sm font-black"
+                  :class="getBidRankStatus(teklif).isLeader ? 'text-emerald-400' : 'text-amber-400'"
+                >
+                  {{ getBidRankStatus(teklif).rank }}. Sırada
+                </span>
+                <span class="text-[10px] text-slate-400 font-sans">({{ getBidRankStatus(teklif).totalBids }} Teklif)</span>
+              </div>
+            </div>
+
+            <!-- Leader Price -->
+            <div class="bg-white/5 p-2.5 rounded-xl border border-white/10">
+              <span class="text-[9px] font-bold uppercase text-slate-400 font-sans block">EN İYİ (LİDER) FİYAT</span>
+              <span class="text-sm font-black text-emerald-400 mt-1 block">
+                {{ getBidRankStatus(teklif).leaderPrice }}
+              </span>
+            </div>
+
+            <!-- Spread / Difference -->
+            <div class="bg-white/5 p-2.5 rounded-xl border border-white/10">
+              <span class="text-[9px] font-bold uppercase text-slate-400 font-sans block">LİDERE GÖRE FARK</span>
+              <span 
+                class="text-sm font-black mt-1 block"
+                :class="getBidRankStatus(teklif).isLeader ? 'text-emerald-400' : 'text-rose-400'"
+              >
+                {{ getBidRankStatus(teklif).isLeader ? '✓ En Düşük Teklif' : `+ %${getBidRankStatus(teklif).spreadPercent} Yüksek` }}
+              </span>
+            </div>
+
+            <!-- Win Estimation Probability -->
+            <div class="bg-white/5 p-2.5 rounded-xl border border-white/10">
+              <span class="text-[9px] font-bold uppercase text-slate-400 font-sans block">KAZANMA OLASILIĞI</span>
+              <span 
+                class="text-sm font-black mt-1 block"
+                :class="getBidRankStatus(teklif).winProbability >= 80 ? 'text-emerald-400' : 'text-amber-400'"
+              >
+                %{{ getBidRankStatus(teklif).winProbability }} ({{ getBidRankStatus(teklif).winProbability >= 80 ? 'Yüksek' : 'Orta' }})
+              </span>
+            </div>
+          </div>
+
+          <!-- Quick Action Bar -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-1 text-[11px] text-slate-300 font-sans">
+            <span class="flex items-center gap-1.5">
+              <TrendingUp :size="13" class="text-emerald-400" />
+              <span>Piyasa ortalaması: <strong class="text-white font-mono">{{ getBidRankStatus(teklif).averagePrice }}</strong></span>
+            </span>
+            <button 
+              v-if="!getBidRankStatus(teklif).isLeader"
+              type="button" 
+              @click="openReviseModal(teklif)" 
+              class="inline-flex items-center gap-1 text-emerald-400 hover:text-emerald-300 font-bold hover:underline cursor-pointer"
+            >
+              <RotateCw :size="12" />
+              <span>Teklifi Lider Seviyeye İndirmek İçin Revize Ver ↗</span>
+            </button>
+            <span v-else class="text-emerald-400 font-bold flex items-center gap-1">
+              <CheckCircle2 :size="12" /> Lider teklif sizde, ihale kapanışına kadar avantajınızı koruyun.
+            </span>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -753,6 +856,11 @@ function submitReview() {
             <h3 class="text-base font-black text-slate-900 mt-0.5">{{ selectedBidForRevise.ilanBaslik }}</h3>
           </div>
           <button @click="showReviseModal = false" class="text-slate-400 hover:text-slate-700">✕</button>
+        </div>
+
+        <div class="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold">
+          <Sparkles :size="15" class="text-emerald-600 shrink-0" />
+          <span>Kurumsal Pro / Enterprise Ayrıcalığı: Sınırsız revizyon hakkınız aktiftir. İhale süresince dilediğiniz sayıda fiyat güncellemesi yapabilirsiniz.</span>
         </div>
 
         <div class="space-y-4">

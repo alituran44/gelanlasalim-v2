@@ -248,7 +248,7 @@ function printDocument() {
             <strong class="text-white">3. Ayıp, Teslimat, Eksik İfa ve Cayma Sorumsuzluğu:</strong> İhale konusu malların/hizmetlerin ayıplı, kusurlu, eksik olması, taahhüt edilen sürede teslim edilmemesi, şartnameye uymaması veya ödemenin gecikmesi hallerinde Platform'un hiçbir doğrudan, dolaylı veya müteselsil hukuki veya cezai sorumluluğu bulunmamaktadır. Alıcı ve Satıcı arasındaki uyuşmazlıklarda yegane muhatap sözleşmenin taraflarıdır.
           </p>
           <p>
-            <strong class="text-white">4. Sabit %4 Escrow ve Platform Komisyonu:</strong> Platformumuzda <strong>alıcılar (ihale açan kurum ve şirketler) için %0 Komisyon (Sıfır Komisyon)</strong> uygulanır. İhaleyi kazanan satıcı/tedarikçiler için ise sektör ayrımı yapılmaksızın tüm işlemler için sabit net <strong>%4 (+ KDV) Escrow Güvenli Havuz ve Banka Transfer Altyapı Bedeli</strong> uygulanır. Bu komisyon bedeli yalnızca ihale başarıyla tamamlanıp mal/hizmet teslimatı alıcı tarafından onaylandığında hakediş tutarından tahakkuk ettirilir. Kazanılamayan, sonuçsuz kalan veya iptal edilen ihalelerden hiçbir komisyon tahsil edilmez (%0).
+            <strong class="text-white">4. Sabit %5 Escrow ve Platform Komisyonu:</strong> Platformumuzda <strong>alıcılar (ihale açan kurum ve şirketler) için %0 Komisyon (Sıfır Komisyon)</strong> uygulanır. İhaleyi kazanan satıcı/tedarikçiler için ise sektör ayrımı yapılmaksızın tüm işlemler için sabit net <strong>%5 (+ KDV) Escrow Güvenli Havuz ve Banka Transfer Altyapı Bedeli</strong> uygulanır. Bu komisyon bedeli yalnızca ihale başarıyla tamamlanıp mal/hizmet teslimatı alıcı tarafından onaylandığında hakediş tutarından tahakkuk ettirilir. Kazanılamayan, sonuçsuz kalan veya iptal edilen ihalelerden hiçbir komisyon tahsil edilmez (%0).
           </p>
         </div>
       </div>
@@ -958,7 +958,7 @@ function printDocument() {
               <section class="space-y-2">
                 <h3 class="font-bold text-slate-900 text-sm">MADDE 2 — HİZMETİN TEMEL NİTELİKLERİ VE FİYATLANDIRMA</h3>
                 <p>2.1. <strong>Hizmet Türü ve Aracı Kurum Statüsü:</strong> Şirketimiz 6563 Sayılı Elektronik Ticaret Kanunu uyarınca Aracı Hizmet Sağlayıcı olup bulut tabanlı B2B e-ihale açma, teklif toplama, canlı tersine eksiltme (reverse auction), tedarikçi KYC doğrulama ve güvenli Escrow havuz entegrasyonu hizmeti sunmaktadır.</p>
-                <p>2.1.1. <strong>Alıcılar İçin %0 Komisyon, Kazanan Tedarikçiler İçin Sabit %4 Escrow Bedeli:</strong> Platformumuzda alıcılar için ihale açma ve satın alma süreçleri %0 komisyondur (ücretsizdir). İhaleyi kazanan satıcı/tedarikçilerden ise, sektör ayrımı yapılmaksızın tüm kategorilerde yalnızca mal veya hizmet teslimatı alıcı tarafından onaylanıp hakediş serbest bırakıldığında sabit net %4 (+ KDV) Escrow Güvenli Havuz ve teknolojik altyapı bedeli tahsil edilir. İptal edilen, tamamlanmayan veya kazanılamayan ihalelerden hiçbir ücret veya komisyon kesilmez.</p>
+                <p>2.1.1. <strong>Alıcılar İçin %0 Komisyon, Kazanan Tedarikçiler İçin Sabit %5 Escrow Bedeli:</strong> Platformumuzda alıcılar için ihale açma ve satın alma süreçleri %0 komisyondur (ücretsizdir). İhaleyi kazanan satıcı/tedarikçilerden ise, sektör ayrımı yapılmaksızın tüm kategorilerde yalnızca mal veya hizmet teslimatı alıcı tarafından onaylanıp hakediş serbest bırakıldığında sabit net %5 (+ KDV) Escrow Güvenli Havuz ve teknolojik altyapı bedeli tahsil edilir. İptal edilen, tamamlanmayan veya kazanılamayan ihalelerden hiçbir ücret veya komisyon kesilmez.</p>
                 <p>2.2. <strong>Paketler ve Toplam Fiyat (Tüm Vergiler Dahil):</strong></p>
                 <ul class="list-disc pl-5 space-y-1 text-slate-600">
                   <li><strong>İlk İhale Lansman Deneme Paketi:</strong> 0,00 ₺ (Ücretsiz)</li>
@@ -966,8 +966,8 @@ function printDocument() {
                   <li><strong>3 Aylık Pro Avantaj Paketi:</strong> 1.800,00 ₺ (%20 KDV Dahil)</li>
                   <li><strong>6 Aylık Kurumsal Plan:</strong> 2.700,00 ₺ (%20 KDV Dahil)</li>
                   <li><strong>12 Aylık Yıllık Lisans Paketi:</strong> 3.600,00 ₺ (%20 KDV Dahil)</li>
-                  <li><strong>Kurumsal Pro Tedarikçi Paketi:</strong> 1.800,00 ₺ / Ay (Yıllık Peşin: 18.000,00 ₺ - %2.5 Başarı Komisyonu)</li>
-                  <li><strong>Kurumsal Enterprise Paketi:</strong> 4.500,00 ₺ / Ay (Yıllık Peşin: 45.000,00 ₺ - %1.5 Başarı Komisyonu)</li>
+                  <li><strong>Kurumsal Pro Tedarikçi Paketi:</strong> 1.800,00 ₺ / Ay (Yıllık Peşin: 18.000,00 ₺ - %5 Sabit Başarı Komisyonu)</li>
+                  <li><strong>Kurumsal Enterprise Paketi:</strong> 4.500,00 ₺ / Ay (Yıllık Peşin: 45.000,00 ₺ - %5 Sabit Başarı Komisyonu)</li>
                 </ul>
                 <p>2.3. Satın alınan dijital pakete ilişkin bedel, seçilen ödeme kanalına göre (Kredi Kartı 3D Secure / Havale-EFT) peşin olarak tahsil edilir.</p>
               </section>
@@ -1071,7 +1071,7 @@ function printDocument() {
                 <p>4.1. İhale mutabakatında Alıcı bedeli TCMB lisanslı güvenli havuz hesabına yatırır; tutar bloke edilir.</p>
                 <p>4.2. Tedarikçi malı sevk edip sevk irsaliyesini yükler. Alıcı malı muayene edip mal kabul onayını verdiğinde havuzdaki bloke çözülerek hakediş Tedarikçiye aktarılır.</p>
                 <p>4.3. Şirket bir banka değildir; fonlar lisanslı ödeme kuruluşu (Paynkolay - Aktif Bank) nezdinde güvence altındadır.</p>
-                <p>4.4. <strong>Sabit %4 Escrow ve Platform Komisyonu:</strong> Platformumuzda sektör ayrımı yapılmaksızın tüm ihalelerde <strong>sabit net %4 (+ KDV) Escrow Güvenli Havuz ve Başarı Hizmet Bedeli</strong> uygulanır. Bu bedel yalnızca ihale tamamlanıp mal kabul onayı verildiğinde hakediş tutarından tahakkuk ettirilir. İptal edilen, sonuçlanmayan veya kazanılamayan ihalelerde hiçbir komisyon alınmaz (%0).</p>
+                <p>4.4. <strong>Sabit %5 Escrow ve Platform Komisyonu:</strong> Platformumuzda sektör ayrımı yapılmaksızın tüm ihalelerde <strong>sabit net %5 (+ KDV) Escrow Güvenli Havuz ve Başarı Hizmet Bedeli</strong> uygulanır. Bu bedel yalnızca ihale tamamlanıp mal kabul onayı verildiğinde hakediş tutarından tahakkuk ettirilir. İptal edilen, sonuçlanmayan veya kazanılamayan ihalelerde hiçbir komisyon alınmaz (%0).</p>
               </section>
 
               <section class="space-y-2">

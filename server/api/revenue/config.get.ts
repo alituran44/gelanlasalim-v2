@@ -21,7 +21,7 @@ export default defineEventHandler(() => {
     legalNotes: [
       'REV-001: Alıcı firmalardan ihale açma ve teklif alma aşamalarında komisyon alınmaz (%0 Komisyon).',
       'REV-002: Temel ihale ve teklif motoru ücretlendirmeye bağımsızdır (Decoupled Architecture).',
-      'REV-003: Platform başarı komisyonu (%4.0) yalnızca ihale sonuçlanıp tutanak onaylandığında satıcı tarafına tahakkuk eder.'
+      'REV-003: Platform başarı komisyonu (%5.0) yalnızca ihale sonuçlanıp tutanak onaylandığında satıcı tarafına tahakkuk eder.'
     ]
   }
 })

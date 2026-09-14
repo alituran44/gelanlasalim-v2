@@ -192,8 +192,8 @@ export function useNotifications() {
     list.push({
       id: 'notif-escrow-active',
       type: 'success',
-      title: '🔒 Escrow %4 Güvenli Havuz Koruması Aktif',
-      desc: 'Tüm ihaleleriniz ve teklifleriniz BDDK/TCMB lisanslı Güvenli Ödeme Havuzu güvencesi altındadır. Komisyon oranı tüm işlemler için net %4 olarak uygulanır.',
+      title: '🔒 Escrow %5 Güvenli Havuz Koruması Aktif',
+      desc: 'Tüm ihaleleriniz ve teklifleriniz BDDK/TCMB lisanslı Güvenli Ödeme Havuzu güvencesi altındadır. Komisyon oranı tüm işlemler için net %5 olarak uygulanır.',
       time: 'Sürekli Aktif',
       link: '/panel/siparis-teslimat',
       to: '/panel/siparis-teslimat',

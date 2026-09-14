@@ -267,7 +267,7 @@ export function runCompleteUatSuite(): {
     // REV (Gelir Modeli)
     { code: 'REV-001', title: 'Gelir modeli şeffaflığı ve Alıcı %0 Komisyon güvencesi', category: 'REV', priority: 'P0 - Kritik', status: 'PASSED', testedComponent: 'revenueModelStore.ts', proof: 'Alıcı komisyonu daima %0 kilitlidir.' },
     { code: 'REV-002', title: 'İhale motorunun ücretlendirmeye bağımsız (Decoupled) olması', category: 'REV', priority: 'P0 - Kritik', status: 'PASSED', testedComponent: 'revenueModelStore.ts', proof: 'İhale akışı paywall ile kilitlenemez.' },
-    { code: 'REV-003', title: 'Satıcı %4 platform hizmet komisyonu ve gelir simülasyonu', category: 'REV', priority: 'P0 - Kritik', status: 'PASSED', testedComponent: 'gelir-modeli.vue', proof: 'Ciro simülatörü ve tahakkuk tablosu aktiftir.' }
+    { code: 'REV-003', title: 'Satıcı %5 platform hizmet komisyonu ve gelir simülasyonu', category: 'REV', priority: 'P0 - Kritik', status: 'PASSED', testedComponent: 'gelir-modeli.vue', proof: 'Ciro simülatörü ve tahakkuk tablosu aktiftir.' }
   ]
 
   const passed = requirements.filter(r => r.status === 'PASSED').length

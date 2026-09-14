@@ -69,13 +69,16 @@ const sidebarMenus = computed(() => {
       { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
-      { title: "Escrow & Komisyon (%4)", icon: ShieldCheck, to: "/panel/siparis-teslimat", badge: "%4 Sabit" }
+      { title: "Escrow & Komisyon (%5)", icon: ShieldCheck, to: "/panel/siparis-teslimat", badge: "%5 Sabit" }
     ]
     if (isComp) {
-      list.push({ title: "Üye Firmalar", icon: Building2, to: "/panel/firmalar" })
+      list.push(
+        { title: "Üye Firmalar", icon: Building2, to: "/panel/firmalar" },
+        { title: "Ekip & Yetki", icon: Users, to: "/panel/ekip-yetki", badge: "PRO" }
+      )
     }
     list.push(
-      { title: "Gelir Modeli (%4)", icon: Coins, to: "/panel/gelir-modeli", badge: "REV" },
+      { title: "Gelir Modeli (%5)", icon: Coins, to: "/panel/gelir-modeli", badge: "REV" },
       { title: "Güvenlik & Denetim", icon: ShieldCheck, to: "/panel/guvenlik-denetim", badge: "SEC" },
       { title: "Mücbir Sebep & Fesih", icon: Scale, to: "/panel/mucbir-sebep" },
       { title: "Bildirimler", icon: Bell, to: "/panel/bildirimler" }
@@ -87,13 +90,16 @@ const sidebarMenus = computed(() => {
       { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" },
-      { title: "Escrow & Fee (4%)", icon: ShieldCheck, to: "/panel/siparis-teslimat", badge: "4% Flat" }
+      { title: "Escrow & Fee (5%)", icon: ShieldCheck, to: "/panel/siparis-teslimat", badge: "5% Flat" }
     ]
     if (isComp) {
-      list.push({ title: "Verified Companies", icon: Building2, to: "/panel/firmalar" })
+      list.push(
+        { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
+        { title: "Team & Roles", icon: Users, to: "/panel/ekip-yetki", badge: "PRO" }
+      )
     }
     list.push(
-      { title: "Revenue & Pricing", icon: Coins, to: "/panel/gelir-modeli", badge: "REV" },
+      { title: "Revenue & Pricing (%5)", icon: Coins, to: "/panel/gelir-modeli", badge: "REV" },
       { title: "Security & Audit", icon: ShieldCheck, to: "/panel/guvenlik-denetim", badge: "SEC" },
       { title: "Force Majeure & Disputes", icon: Scale, to: "/panel/mucbir-sebep" },
       { title: "Notifications", icon: Bell, to: "/panel/bildirimler" }

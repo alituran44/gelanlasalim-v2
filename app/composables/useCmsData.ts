@@ -498,11 +498,9 @@ export const DEFAULT_CMS_DATA = {
       }
 ],
     planDiscountRates: [
-      { planName: 'Ücretsiz / Standart Üyelik', commissionRate: 3.0, badge: 'Standart' },
-      { planName: 'İlk İhale Lansman Deneme', commissionRate: 0.0, badge: '%100 Komisyonsuz' },
-      { planName: '3 Aylık Kurumsal', commissionRate: 2.5, badge: '%0.5 İndirimli' },
-      { planName: '6 Aylık Kurumsal Pro', commissionRate: 2.0, badge: '%1.0 İndirimli' },
-      { planName: '12 Aylık Enterprise Plus', commissionRate: 1.0, badge: '%2.0 İndirimli' }
+      { planName: 'Standart Tedarikçi Üyeliği', commissionRate: 5.0, badge: '%5 Sabit' },
+      { planName: 'Kurumsal Pro Tedarikçi', commissionRate: 5.0, badge: '%5 Sabit (B2B Rozet)' },
+      { planName: 'Kurumsal Enterprise', commissionRate: 5.0, badge: '%5 Sabit (ERP & Ekip)' }
     ]
   },
   categories: [

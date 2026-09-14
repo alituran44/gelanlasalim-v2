@@ -1941,10 +1941,10 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
                 <span class="text-emerald-700 font-black">🛡️</span>
                 <span>Tüm Sektörlerde Sabit Escrow Komisyonu:</span>
               </span>
-              <span class="text-emerald-700 font-black font-mono">%4 Sabit (+ KDV)</span>
+              <span class="text-emerald-700 font-black font-mono">%5 Sabit (+ KDV)</span>
             </div>
             <p class="text-[10px] text-slate-600 leading-tight">
-              * Sektör ayrımı yapılmaksızın tüm işlemlerde sabit %4'tür. Bu oran yalnızca ihale kazanılıp teslimat onaylandığında hakedişten tahsil edilir. İhaleyi kazanamazsanız hiçbir ücret alınmaz. Platform 6563 SK gereğince bağımsız Aracı Hizmet Sağlayıcıdır.
+              * Sektör ayrımı yapılmaksızın tüm işlemlerde sabit %5'tir. Bu oran yalnızca ihale kazanılıp teslimat onaylandığında hakedişten tahsil edilir. İhaleyi kazanamazsanız hiçbir ücret alınmaz. Platform 6563 SK gereğince bağımsız Aracı Hizmet Sağlayıcıdır.
             </p>
           </div>
           <!-- 🛡️ BID-012: Teklif ve Ticari Taahhüt Özeti & İkinci Onay -->
@@ -1962,7 +1962,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
                 <span class="font-black text-slate-900 font-mono">{{ bidForm.fiyat || '0 ₺' }}</span>
               </div>
               <div>
-                <span class="text-slate-400 block text-[9px] font-bold">KOMİSYON (%4):</span>
+                <span class="text-slate-400 block text-[9px] font-bold">KOMİSYON (%5):</span>
                 <span class="font-bold text-emerald-700">Başarı halinde</span>
               </div>
             </div>

@@ -80,9 +80,9 @@ const orders = computed(() => {
           totalAmount: approved.fiyat,
           amount: approved.fiyat,
           numericAmount: numVal,
-          payoutAmount: Math.round(numVal * 0.96).toLocaleString('tr-TR') + ' ₺',
-          commissionAmount: Math.round(numVal * 0.04).toLocaleString('tr-TR') + ' ₺',
-          commissionRate: 4,
+          payoutAmount: Math.round(numVal * 0.95).toLocaleString('tr-TR') + ' ₺',
+          commissionAmount: Math.round(numVal * 0.05).toLocaleString('tr-TR') + ' ₺',
+          commissionRate: 5,
           status: 'HAVUZDA_BLOKE',
           statusLabel: 'Güvenli Havuzda Bloke Edildi',
           trackingCode: 'YK-8829104',
@@ -135,7 +135,7 @@ const totalPlatformCommission = computed(() => {
   return orders.value
     .filter(o => o.status === 'TAMAMLANDI')
     .reduce((acc, o) => {
-      const comm = (o.numericAmount || 0) * ((o.commissionRate || 4) / 100)
+      const comm = (o.numericAmount || 0) * ((o.commissionRate || 5) / 100)
       return acc + comm
     }, 0)
 })
@@ -577,11 +577,11 @@ function submitDispute() {
                 <strong class="font-mono text-slate-900 text-sm">{{ order.totalAmount }}</strong>
               </div>
               <div class="flex justify-between items-center text-[11px]">
-                <span class="text-slate-500">Tedarikçi Hakedişi (%{{ 100 - (order.commissionRate || 3) }}):</span>
+                <span class="text-slate-500">Tedarikçi Hakedişi (%{{ 100 - (order.commissionRate || 5) }}):</span>
                 <strong class="font-mono text-emerald-600">{{ order.payoutAmount }}</strong>
               </div>
               <div class="flex justify-between items-center text-[11px] pt-1 border-t border-slate-200">
-                <span class="text-slate-500">Platform Komisyonu (%{{ order.commissionRate || 3 }}):</span>
+                <span class="text-slate-500">Platform Komisyonu (%{{ order.commissionRate || 5 }}):</span>
                 <strong class="font-mono text-blue-600">{{ order.commissionAmount }}</strong>
               </div>
             </div>
