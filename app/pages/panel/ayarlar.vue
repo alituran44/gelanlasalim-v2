@@ -4308,63 +4308,6 @@ function saveProfile() {
             </div>
           </div>
 
-          <!-- Ek İhale Hakları Section -->
-          <div class="space-y-4 pt-4">
-            <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
-              <div>
-                <h3 class="text-sm font-black text-slate-800">Profesyonel Paket Ek İhale Hakları</h3>
-                <p class="text-[10px] text-slate-400 font-bold">Profesyonel paket kullanımınızı ek yıllık ihaleler alarak genişletin.</p>
-              </div>
-              
-              <div class="flex items-center gap-1.5 text-[9px] font-bold text-slate-400">
-                <span class="border rounded px-2 py-1 bg-white">TOPLAM EK LİMİT: +50 İHALE</span>
-                <span>/</span>
-                <span class="border rounded px-2 py-1 bg-white">ADET</span>
-              </div>
-            </div>
-
-            <!-- The Two Horizontal Ek İhale Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              
-              <!-- Ek 50 Card -->
-              <div class="rounded-2xl border bg-white p-5 shadow-sm space-y-4 hover:border-slate-300 transition" style="border-color: #E2E8F0;">
-                <div class="flex items-start justify-between">
-                  <div>
-                    <span class="text-[8px] font-black text-blue-700 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded uppercase">EK PAKET</span>
-                    <h4 class="text-xs font-black text-slate-800 mt-1.5">Ek 50 İhale Hakkı</h4>
-                  </div>
-                  <div class="text-right">
-                    <span class="text-[8px] font-black text-slate-300 block">TOPLAM EK BÜTÇE</span>
-                    <span class="text-xs font-bold text-slate-700 block mt-0.5">₺2.500,00 <span class="text-[8px] text-slate-400 font-medium">+ KDV</span></span>
-                  </div>
-                </div>
-                
-                <button type="button" @click="showToast('Ek 50 İhale ödeme ekranına yönlendiriliyorsunuz...')" class="w-full text-center rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold py-2.5 transition" style="border-color: #E2E8F0;">
-                  Ödemeye Geç
-                </button>
-              </div>
-
-              <!-- Ek 100 Card -->
-              <div class="rounded-2xl border bg-white p-5 shadow-sm space-y-4 hover:border-slate-300 transition" style="border-color: #E2E8F0;">
-                <div class="flex items-start justify-between">
-                  <div>
-                    <span class="text-[8px] font-black text-blue-700 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded uppercase">EK PAKET</span>
-                    <h4 class="text-xs font-black text-slate-800 mt-1.5">Ek 100 İhale Hakkı</h4>
-                  </div>
-                  <div class="text-right">
-                    <span class="text-[8px] font-black text-slate-300 block">TOPLAM EK BÜTÇE</span>
-                    <span class="text-xs font-bold text-slate-700 block mt-0.5">₺4.500,00 <span class="text-[8px] text-slate-400 font-medium">+ KDV</span></span>
-                  </div>
-                </div>
-                
-                <button type="button" @click="showToast('Ek 100 İhale ödeme ekranına yönlendiriliyorsunuz...')" class="w-full text-center rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold py-2.5 transition" style="border-color: #E2E8F0;">
-                  Ödemeye Geç
-                </button>
-              </div>
-
-            </div>
-          </div>
-
         </div>
 
         <!-- AYARLAR (SETTINGS) TAB -->
