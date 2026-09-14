@@ -479,22 +479,6 @@ const membershipCorporateCycle = ref<'monthly' | 'annual'>('monthly')
 
 const membershipCorporateTiers = [
   {
-    id: 'standart-kurumsal',
-    name: 'Standart Üretici / Tedarikçi',
-    badge: '%4 Komisyon',
-    commissionRate: 4.0,
-    monthlyPrice: 0,
-    annualPrice: 0,
-    features: [
-      'Alıcı firmalar için %0 komisyonla sınırsız ihale açma',
-      'Tüm açık B2B ihalelere katılabilme ve teklif verme',
-      'Standart %4.0 başarı/escrow komisyonu',
-      'Temel e-posta bildirimleri',
-      'Resmi İhale Sonuç Tutanağı erişimi'
-    ],
-    isPopular: false
-  },
-  {
     id: 'kurumsal-pro',
     name: 'Kurumsal Pro Tedarikçi',
     badge: '%2.5 Komisyon',
@@ -3165,51 +3149,51 @@ function saveProfile() {
             </div>
           </div>
 
-          <!-- Category Switcher for Domestic: Kurumsal Tedarikçi vs Dönemsel İhale Paketleri -->
+          <!-- Category Switcher for Domestic: Bireysel vs Kurumsal Firma Modu -->
           <div v-if="membershipPricingRegion === 'domestic'" class="space-y-6">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
               <div>
                 <h3 class="text-sm font-black text-slate-800 flex items-center gap-2">
-                  <Award v-if="membershipPackageCategory === 'corporate'" class="text-emerald-600" :size="18" />
-                  <Clock v-else class="text-blue-600" :size="18" />
-                  <span>{{ membershipPackageCategory === 'corporate' ? 'Kurumsal Üyelik & Tedarikçi Paketleri' : 'Dönemsel İhale ve Eksiltme Paketleri' }}</span>
+                  <Building2 v-if="isCompanyMode" class="text-emerald-600" :size="18" />
+                  <User v-else class="text-blue-600" :size="18" />
+                  <span>{{ isCompanyMode ? 'Kurumsal Firma Fiyatlandırması & Tedarikçi Planları' : 'Bireysel İhale Abonelik Paketleri (1 - 12 Ay)' }}</span>
                 </h3>
                 <p class="text-xs text-slate-500 mt-0.5">
-                  {{ membershipPackageCategory === 'corporate' ? 'İndirimli platform komisyonu (%2.5 / %1.5) ve öncelikli destek imkanları' : '1 aydan 12 aya kadar esnek B2B ihale ve satın alma erişim paketleri' }}
+                  {{ isCompanyMode ? 'Firma moduna özel indirimli platform komisyonu (%2.5 / %1.5), Mavi Kalkan ve ERP entegrasyonu' : 'Bireysel kullanıcılara özel 1 aydan 12 aya kadar esnek B2B ihale ve satın alma erişim paketleri' }}
                 </p>
               </div>
 
               <div class="inline-flex rounded-2xl border border-slate-200/90 bg-white p-1 shadow-xs">
                 <button
                   type="button"
-                  @click="membershipPackageCategory = 'corporate'"
+                  @click="toggleCompanyMode(false)"
                   class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black transition-all cursor-pointer"
-                  :class="membershipPackageCategory === 'corporate' ? 'bg-[#0F223D] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+                  :class="!isCompanyMode ? 'bg-[#0F223D] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
                 >
-                  <Award :size="14" class="text-emerald-400" />
-                  <span>Kurumsal Paketler</span>
+                  <User :size="14" :class="!isCompanyMode ? 'text-blue-400' : 'text-slate-400'" />
+                  <span>👤 Bireysel Abonelik</span>
                 </button>
                 <button
                   type="button"
-                  @click="membershipPackageCategory = 'duration'"
+                  @click="toggleCompanyMode(true)"
                   class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black transition-all cursor-pointer"
-                  :class="membershipPackageCategory === 'duration' ? 'bg-[#0F223D] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+                  :class="isCompanyMode ? 'bg-[#0F223D] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
                 >
-                  <Clock :size="14" class="text-blue-400" />
-                  <span>Süreli Paketler (1-12 Ay)</span>
+                  <Building2 :size="14" :class="isCompanyMode ? 'text-emerald-400' : 'text-slate-400'" />
+                  <span>🏢 Firma Modu</span>
                 </button>
               </div>
             </div>
 
-            <!-- Corporate Tiers Grid (Photo 1) -->
-            <div v-if="membershipPackageCategory === 'corporate'" class="space-y-6">
+            <!-- Corporate Tiers Grid (SADECE FİRMA MODUNDA AÇIĞA ÇIKAR) -->
+            <div v-if="isCompanyMode" class="space-y-6 animate-fadeIn">
               <!-- Billing cycle toggle for corporate -->
               <div class="flex justify-center">
                 <div class="inline-flex rounded-xl bg-slate-100 p-1 text-xs font-bold items-center gap-1 border border-slate-200">
                   <button
                     type="button"
                     @click="membershipCorporateCycle = 'monthly'"
-                    class="px-4 py-1.5 rounded-lg transition"
+                    class="px-4 py-1.5 rounded-lg transition cursor-pointer"
                     :class="membershipCorporateCycle === 'monthly' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900'"
                   >
                     Aylık Ödeme
@@ -3217,7 +3201,7 @@ function saveProfile() {
                   <button
                     type="button"
                     @click="membershipCorporateCycle = 'annual'"
-                    class="px-4 py-1.5 rounded-lg transition flex items-center gap-1"
+                    class="px-4 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer"
                     :class="membershipCorporateCycle === 'annual' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900'"
                   >
                     <span>Yıllık Peşin (12 Ay)</span>
@@ -3226,7 +3210,8 @@ function saveProfile() {
                 </div>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+              <!-- 2-column grid for Corporate Pro and Enterprise -->
+              <div class="grid grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto gap-6 items-stretch">
                 <div 
                   v-for="tier in membershipCorporateTiers" 
                   :key="tier.id"
@@ -3249,8 +3234,7 @@ function saveProfile() {
 
                     <div class="my-4 py-3 border-y border-slate-800">
                       <div class="text-3xl font-black text-white font-mono">
-                        <template v-if="tier.monthlyPrice === 0">Ücretsiz</template>
-                        <template v-else-if="membershipCorporateCycle === 'annual'">
+                        <template v-if="membershipCorporateCycle === 'annual'">
                           {{ tier.annualPrice.toLocaleString('tr-TR') }} ₺
                           <span class="text-xs text-slate-400 font-normal">/ yıl</span>
                         </template>
@@ -3283,7 +3267,7 @@ function saveProfile() {
                       class="w-full py-3 px-4 rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
                       :class="tier.isPopular ? 'bg-[#1EAE4C] hover:bg-[#188C3D] text-white shadow-lg' : 'bg-slate-800 hover:bg-slate-700 text-white'"
                     >
-                      <span>{{ tier.monthlyPrice === 0 ? 'Mevcut Planınız' : 'Bu Pakete Geç' }}</span>
+                      <span>Bu Pakete Geç</span>
                       <ArrowRight :size="14" />
                     </NuxtLink>
                   </div>
@@ -3291,8 +3275,8 @@ function saveProfile() {
               </div>
             </div>
 
-            <!-- Duration Packages (Photo 2 with 12-Month) -->
-            <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
+            <!-- Duration Packages (SADECE BİREYSEL MODDA AÇIĞA ÇIKAR; KURUMSALA GEÇİNCE KALDIRILIR) -->
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch animate-fadeIn">
               <div
                 v-for="pkg in membershipPricingDomestic"
                 :key="pkg.id"

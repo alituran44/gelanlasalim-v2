@@ -154,9 +154,10 @@ export function useUserSession() {
            hasAdminToken
   })
 
-  function toggleCompanyMode(active: boolean) {
-    userSession.value.isCompanyActive = active
-    userSession.value.role = active ? 'company' : 'personal'
+  function toggleCompanyMode(active?: boolean | any) {
+    const next = typeof active === 'boolean' ? active : !userSession.value.isCompanyActive
+    userSession.value.isCompanyActive = next
+    userSession.value.role = next ? 'company' : 'personal'
     saveSessionToStorage()
   }
 

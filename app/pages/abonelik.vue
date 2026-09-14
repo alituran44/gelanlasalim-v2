@@ -21,10 +21,12 @@ import {
   Shield,
   Award,
   Clock,
-  ArrowUpRight
+  ArrowUpRight,
+  User
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { locale, t } from '~/composables/useLocale'
+import { useUserSession } from '~/composables/useUserSession'
 import PaymentBadges from '~/components/common/PaymentBadges.vue'
 
 definePageMeta({
@@ -38,37 +40,17 @@ useSeoMeta({
 
 const router = useRouter()
 const route = useRoute()
+const { isCompanyMode, toggleCompanyMode } = useUserSession()
 
 // Region Selector: domestic (Türkiye / TRY ₺) vs international (Global / USD $ - EUR €)
 const paymentRegion = ref<'domestic' | 'international'>('domestic')
 const internationalCurrency = ref<'USD' | 'EUR'>('USD')
 
-// Category Selector: corporate (Standart / Pro / Enterprise) vs duration (1, 3, 6, 12 Ay)
-const pricingCategory = ref<'corporate' | 'duration'>('corporate')
+// Corporate Billing Cycle: monthly vs annual (12 Ay %17 Ek İndirim)
 const corporateBillingCycle = ref<'monthly' | 'annual'>('monthly')
 
-// Kurumsal Üyelik Paketleri (Photo 1 - Komisyon İndirimli)
+// Kurumsal Üyelik Paketleri (Firma Modu Aktif Olduğunda Açığa Çıkar - Standart Ücretsiz Kaldırıldı)
 const corporatePackages = computed(() => [
-  {
-    id: 'standart-kurumsal',
-    name: 'Standart Üretici / Tedarikçi',
-    badge: '%4 Komisyon',
-    commissionRate: 4.0,
-    price: 0,
-    monthlyPrice: 0,
-    annualPrice: 0,
-    monthly: '0,00 ₺ / ay',
-    desc: 'Alıcı firmalar için %0 komisyonla sınırsız ihale açma; açık ihalelere katılım ve standart başarı komisyonu güvencesi.',
-    features: [
-      'Alıcı firmalar için %0 komisyonla sınırsız ihale açma',
-      'Tüm açık B2B ihalelere katılabilme ve teklif verme',
-      'Standart %4.0 başarı/escrow komisyonu',
-      'Temel e-posta bildirimleri',
-      'Resmi İhale Sonuç Tutanağı erişimi'
-    ],
-    isPopular: false,
-    isFree: true
-  },
   {
     id: 'kurumsal-pro',
     name: 'Kurumsal Pro Tedarikçi',
@@ -311,11 +293,16 @@ onMounted(() => {
 
     if (route.query.plan) {
       const planParam = String(route.query.plan).toLowerCase()
-      if (planParam.includes('pro') || planParam.includes('enterprise') || planParam.includes('standart')) {
-        pricingCategory.value = 'corporate'
+      if (planParam.includes('pro') || planParam.includes('enterprise')) {
+        toggleCompanyMode(true)
       } else if (planParam.includes('ay') || planParam.includes('mo')) {
-        pricingCategory.value = 'duration'
+        toggleCompanyMode(false)
       }
+    }
+    if (route.query.mode === 'corporate' || route.query.mode === 'company') {
+      toggleCompanyMode(true)
+    } else if (route.query.mode === 'individual' || route.query.mode === 'bireysel') {
+      toggleCompanyMode(false)
     }
     if (route.query.cycle === 'annual') {
       corporateBillingCycle.value = 'annual'
@@ -520,43 +507,60 @@ function completeCheckout() {
       <!-- PACKAGE SELECTION BLOCK -->
       <div v-if="paymentRegion === 'domestic'" class="space-y-6 pt-2">
         
-        <!-- Category Switcher: Kurumsal Tedarikçi vs Dönemsel İhale Paketleri -->
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-slate-200 shadow-xs">
-          <div>
-            <h2 class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
-              <Award v-if="pricingCategory === 'corporate'" class="text-emerald-600" :size="20" />
-              <Clock v-else class="text-blue-600" :size="20" />
-              <span>{{ pricingCategory === 'corporate' ? 'Kurumsal Üyelik & Tedarikçi Paketleri' : 'Dönemsel İhale ve Eksiltme Paketleri' }}</span>
-            </h2>
-            <p class="text-xs text-slate-500 mt-0.5 font-medium">
-              {{ pricingCategory === 'corporate' ? 'İndirimli platform komisyonu (%2.5 / %1.5), Mavi Kalkan rozeti ve ERP entegrasyonu' : '1 aydan 12 aya kadar esnek B2B ihale arama, teklif verme ve eksiltme erişim paketleri' }}
-            </p>
-          </div>
+        <!-- Mode Switcher: Bireysel Hesap (Abonelik Paketleri) vs Kurumsal Firma Modu (Kurumsal Fiyatlar) -->
+        <div class="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm transition-all duration-300">
+          <div class="flex flex-col md:flex-row items-center justify-between gap-5">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span 
+                  class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider"
+                  :class="isCompanyMode ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-blue-50 text-blue-800 border border-blue-200'"
+                >
+                  <Building2 v-if="isCompanyMode" :size="13" class="text-emerald-600" />
+                  <User v-else :size="13" class="text-blue-600" />
+                  <span>{{ isCompanyMode ? 'FİRMA MODU AKTİF' : 'BİREYSEL HESAP MODU' }}</span>
+                </span>
+                <span class="text-xs text-slate-400 font-medium">• Kolay Geçişli</span>
+              </div>
+              <h2 class="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
+                <Building2 v-if="isCompanyMode" class="text-emerald-600" :size="22" />
+                <Award v-else class="text-blue-600" :size="22" />
+                <span>{{ isCompanyMode ? 'Kurumsal Firma Fiyatlandırması & Tedarikçi Planları' : 'Bireysel İhale Abonelik Sistemi (1 - 12 Ay)' }}</span>
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium max-w-2xl">
+                {{ isCompanyMode 
+                  ? 'Firma moduna özel %2.5 ve %1.5 indirimli komisyon oranları, Mavi Kalkan kurumsal rozeti, çoklu kullanıcı ve ERP API entegrasyonu.' 
+                  : 'Bireysel kullanıcılara özel 1 aydan 12 aya kadar süreli ihale arama, teklif verme ve satın alma abonelik paketleri.' 
+                }}
+              </p>
+            </div>
 
-          <div class="bg-slate-100 p-1 rounded-2xl border border-slate-200 inline-flex gap-1 shrink-0">
-            <button
-              type="button"
-              @click="pricingCategory = 'corporate'"
-              class="px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5"
-              :class="pricingCategory === 'corporate' ? 'bg-[#0F223D] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
-            >
-              <Award :size="14" class="text-emerald-400" />
-              <span>Kurumsal Paketler</span>
-            </button>
-            <button
-              type="button"
-              @click="pricingCategory = 'duration'"
-              class="px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5"
-              :class="pricingCategory === 'duration' ? 'bg-[#0F223D] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
-            >
-              <Clock :size="14" class="text-blue-400" />
-              <span>Süreli Paketler (1-12 Ay)</span>
-            </button>
+            <!-- Geçişli Mod Butonları -->
+            <div class="bg-slate-100 p-1.5 rounded-2xl border border-slate-200/80 inline-flex items-center gap-1.5 shrink-0 w-full md:w-auto justify-center">
+              <button
+                type="button"
+                @click="toggleCompanyMode(false)"
+                class="flex-1 md:flex-none px-4 py-2.5 rounded-xl text-xs font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                :class="!isCompanyMode ? 'bg-[#0F223D] text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'"
+              >
+                <User :size="15" :class="!isCompanyMode ? 'text-blue-400' : 'text-slate-500'" />
+                <span>👤 Bireysel Abonelik</span>
+              </button>
+              <button
+                type="button"
+                @click="toggleCompanyMode(true)"
+                class="flex-1 md:flex-none px-4 py-2.5 rounded-xl text-xs font-black transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
+                :class="isCompanyMode ? 'bg-[#0F223D] text-white shadow-md' : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'"
+              >
+                <Building2 :size="15" :class="isCompanyMode ? 'text-emerald-400' : 'text-slate-500'" />
+                <span>🏢 Kurumsal Firma Modu</span>
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- 1. VIEW: KURUMSAL ÜYELİK PAKETLERİ (Photo 1) -->
-        <div v-if="pricingCategory === 'corporate'" class="space-y-6">
+        <!-- 1. VIEW: KURUMSAL FİRMA FİYATLARI (SADECE FİRMA MODU AKTİFKEN AÇIĞA ÇIKAR) -->
+        <div v-if="isCompanyMode" class="space-y-6 animate-fadeIn">
           
           <!-- Corporate Billing Cycle (Aylık vs 12 Ay Peşin) -->
           <div class="flex justify-center pt-1">
@@ -564,7 +568,7 @@ function completeCheckout() {
               <button
                 type="button"
                 @click="corporateBillingCycle = 'monthly'"
-                class="px-4 py-1.5 rounded-lg transition"
+                class="px-4 py-1.5 rounded-lg transition cursor-pointer"
                 :class="corporateBillingCycle === 'monthly' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900'"
               >
                 Aylık Faturalandırma
@@ -572,7 +576,7 @@ function completeCheckout() {
               <button
                 type="button"
                 @click="corporateBillingCycle = 'annual'"
-                class="px-4 py-1.5 rounded-lg transition flex items-center gap-1.5"
+                class="px-4 py-1.5 rounded-lg transition flex items-center gap-1.5 cursor-pointer"
                 :class="corporateBillingCycle === 'annual' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900'"
               >
                 <span>Yıllık Peşin (12 Ay)</span>
@@ -581,14 +585,14 @@ function completeCheckout() {
             </div>
           </div>
 
-          <!-- 3 Dark Obsidian Corporate Cards -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+          <!-- 2 Dark Obsidian Corporate Cards (Standart Ücretsiz Kartı Kaldırıldı) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 max-w-4xl mx-auto gap-8 items-stretch">
             <div 
               v-for="tier in corporatePackages" 
               :key="tier.id"
-              class="rounded-3xl p-6 sm:p-7 border transition-all flex flex-col justify-between shadow-xl relative"
+              class="rounded-3xl p-7 sm:p-8 border transition-all flex flex-col justify-between shadow-2xl relative"
               :class="tier.isPopular 
-                ? 'border-emerald-500/60 bg-[#0B132B] text-white ring-2 ring-emerald-500/20' 
+                ? 'border-emerald-500/60 bg-[#0B132B] text-white ring-2 ring-emerald-500/30' 
                 : 'border-slate-800 bg-[#0F172A] text-white'"
             >
               <!-- Popüler Rozeti -->
@@ -597,17 +601,16 @@ function completeCheckout() {
               </div>
 
               <div>
-                <div class="flex items-center justify-between mb-3 gap-2">
-                  <h3 class="text-base font-black text-white">{{ tier.name }}</h3>
-                  <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-lg bg-slate-800 text-emerald-400 border border-slate-700">
+                <div class="flex items-center justify-between mb-4 gap-2">
+                  <h3 class="text-lg font-black text-white">{{ tier.name }}</h3>
+                  <span class="text-xs font-mono font-bold px-3 py-1 rounded-lg bg-slate-800 text-emerald-400 border border-slate-700">
                     {{ tier.badge }}
                   </span>
                 </div>
 
-                <div class="my-4 py-3 border-y border-slate-800">
+                <div class="my-4 py-4 border-y border-slate-800">
                   <div class="text-3xl sm:text-4xl font-black text-white font-mono tracking-tight">
-                    <template v-if="tier.monthlyPrice === 0">Ücretsiz</template>
-                    <template v-else-if="corporateBillingCycle === 'annual'">
+                    <template v-if="corporateBillingCycle === 'annual'">
                       {{ tier.annualPrice.toLocaleString('tr-TR') }} ₺
                       <span class="text-xs text-slate-400 font-normal">/ yıl</span>
                     </template>
@@ -616,7 +619,7 @@ function completeCheckout() {
                       <span class="text-xs text-slate-400 font-normal">/ ay</span>
                     </template>
                   </div>
-                  <div v-if="tier.annualPrice > 0" class="text-xs text-emerald-400 font-medium mt-1">
+                  <div class="text-xs text-emerald-400 font-medium mt-1.5">
                     <template v-if="corporateBillingCycle === 'annual'">
                       Aylık efektif maliyet: {{ Math.round(tier.annualPrice / 12).toLocaleString('tr-TR') }} ₺ (%17 ek tasarruf)
                     </template>
@@ -624,15 +627,15 @@ function completeCheckout() {
                       Yıllık peşin: {{ tier.annualPrice.toLocaleString('tr-TR') }} ₺ (%17 ek indirim)
                     </template>
                   </div>
-                  <p class="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                  <p class="text-xs text-slate-400 mt-2.5 leading-relaxed">
                     {{ tier.desc }}
                   </p>
                 </div>
 
                 <!-- Features Checklist -->
-                <div class="space-y-2.5 pt-2 text-xs">
-                  <div v-for="(feat, idx) in tier.features" :key="idx" class="flex items-start gap-2 text-slate-300">
-                    <CheckCircle2 :size="15" class="text-emerald-400 shrink-0 mt-0.5" />
+                <div class="space-y-3 pt-2 text-xs">
+                  <div v-for="(feat, idx) in tier.features" :key="idx" class="flex items-start gap-2.5 text-slate-300">
+                    <CheckCircle2 :size="16" class="text-emerald-400 shrink-0 mt-0.5" />
                     <span class="leading-relaxed">{{ feat }}</span>
                   </div>
                 </div>
@@ -643,62 +646,93 @@ function completeCheckout() {
                 <button
                   type="button"
                   @click="selectCorporatePackage(tier)"
-                  class="w-full py-3.5 px-4 rounded-xl text-center text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md hover:scale-[1.02]"
+                  class="w-full py-4 px-4 rounded-xl text-center text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md hover:scale-[1.02]"
                   :class="tier.isPopular ? 'bg-[#1EAE4C] hover:bg-[#188C3D] text-white shadow-emerald-500/20' : 'bg-slate-800 hover:bg-slate-700 text-white'"
                 >
-                  <span>{{ tier.monthlyPrice === 0 ? 'Mevcut Planınız' : 'Bu Pakete Geç' }}</span>
+                  <span>{{ 'Bu Kurumsal Pakete Geç' }}</span>
                   <ArrowRight :size="14" />
                 </button>
               </div>
             </div>
           </div>
+
+          <!-- Kurumsaldan Bireysele Hızlı Geçiş Kutusu -->
+          <div class="p-4 rounded-2xl bg-slate-100 border border-slate-200 text-center max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <span class="text-xs text-slate-600 font-medium">Bireysel dönemsel ihale paketlerini mi arıyorsunuz?</span>
+            <button
+              type="button"
+              @click="toggleCompanyMode(false)"
+              class="text-xs font-black text-blue-700 hover:text-blue-900 underline flex items-center gap-1 cursor-pointer"
+            >
+              <span>Bireysel Abonelik Paketlerine Dön</span>
+              <ArrowRight :size="12" />
+            </button>
+          </div>
         </div>
 
-        <!-- 2. VIEW: DÖNEMSEL İHALE PAKETLERİ (Photo 2 with 12 Ay) -->
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div 
-            v-for="pkg in domesticPackages" 
-            :key="pkg.id" 
-            class="border rounded-3xl bg-white overflow-hidden transition-all duration-300 flex flex-col justify-between hover:shadow-xl shadow-sm relative group"
-            :class="pkg.isPromo ? 'border-[#1EAE4C] ring-2 ring-[#1EAE4C]/30' : 'border-slate-200'"
-          >
-            <!-- Promo Tag -->
-            <div v-if="pkg.isPromo" class="bg-[#1EAE4C] text-white font-black text-[9px] uppercase tracking-widest text-center py-1.5">
-              ⚡ {{ 'EN ÇOK TERCİH EDİLEN POPÜLER PLAN' }}
-            </div>
-            <div v-else class="bg-[#0F223D] text-white font-bold text-[9px] uppercase tracking-widest text-center py-1.5">
-              {{ pkg.id === '12-ay-tr' ? 'YILLIK AVANTAJ' : 'KURUMSAL KULLANIM' }}
-            </div>
-            
-            <!-- Price & Title Content Area -->
-            <div class="p-6 text-center flex-grow flex flex-col justify-between bg-white">
-              <div>
-                <h3 class="text-xs font-black text-slate-900 uppercase tracking-tight">{{ pkg.name }}</h3>
-                <div class="text-3xl font-black tracking-tight font-mono text-slate-900 mt-4">
-                  {{ currencySymbol }}{{ pkg.price.toLocaleString('tr-TR') }}
-                </div>
-                <div class="text-[11px] text-[#003057] font-bold mt-1 bg-slate-100 py-1 px-2.5 rounded-lg inline-block">
-                  {{ pkg.monthly }}
-                </div>
+        <!-- 2. VIEW: BİREYSEL ABONELİK SİSTEMİ (SADECE BİREYSEL MODDA AÇIĞA ÇIKAR; KURUMSALA GEÇİNCE KALDIRILIR) -->
+        <div v-else class="space-y-6 animate-fadeIn">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div 
+              v-for="pkg in domesticPackages" 
+              :key="pkg.id" 
+              class="border rounded-3xl bg-white overflow-hidden transition-all duration-300 flex flex-col justify-between hover:shadow-xl shadow-sm relative group"
+              :class="pkg.isPromo ? 'border-[#1EAE4C] ring-2 ring-[#1EAE4C]/30' : 'border-slate-200'"
+            >
+              <!-- Promo Tag -->
+              <div v-if="pkg.isPromo" class="bg-[#1EAE4C] text-white font-black text-[9px] uppercase tracking-widest text-center py-1.5">
+                ⚡ {{ 'EN ÇOK TERCİH EDİLEN POPÜLER PLAN' }}
+              </div>
+              <div v-else class="bg-[#0F223D] text-white font-bold text-[9px] uppercase tracking-widest text-center py-1.5">
+                {{ pkg.id === '12-ay-tr' ? 'YILLIK AVANTAJ' : 'BİREYSEL KULLANIM' }}
               </div>
               
-              <p class="text-[11px] text-slate-500 mt-4 leading-relaxed font-medium bg-slate-50 p-3 rounded-xl border border-slate-100 min-h-[50px]">
-                {{ pkg.desc }}
-              </p>
-            </div>
+              <!-- Price & Title Content Area -->
+              <div class="p-6 text-center flex-grow flex flex-col justify-between bg-white">
+                <div>
+                  <h3 class="text-xs font-black text-slate-900 uppercase tracking-tight">{{ pkg.name }}</h3>
+                  <div class="text-3xl font-black tracking-tight font-mono text-slate-900 mt-4">
+                    {{ currencySymbol }}{{ pkg.price.toLocaleString('tr-TR') }}
+                  </div>
+                  <div class="text-[11px] text-[#003057] font-bold mt-1 bg-slate-100 py-1 px-2.5 rounded-lg inline-block">
+                    {{ pkg.monthly }}
+                  </div>
+                </div>
+                
+                <p class="text-[11px] text-slate-500 mt-4 leading-relaxed font-medium bg-slate-50 p-3 rounded-xl border border-slate-100 min-h-[50px]">
+                  {{ pkg.desc }}
+                </p>
+              </div>
 
-            <!-- Action Button Bar -->
-            <div class="p-5 bg-slate-50/80 border-t border-slate-100">
-              <button 
-                type="button"
-                @click="openCheckout(pkg)"
-                class="w-full text-center rounded-xl font-black text-xs py-3.5 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02]"
-                :class="pkg.isPromo ? 'bg-[#1EAE4C] hover:bg-[#188C3D] text-white shadow-[#1EAE4C]/20' : 'bg-[#0F223D] hover:bg-[#003057] text-white'"
-              >
-                <span>{{ 'HEMEN ABONE OL' }}</span>
-                <ArrowRight :size="14" />
-              </button>
+              <!-- Action Button Bar -->
+              <div class="p-5 bg-slate-50/80 border-t border-slate-100">
+                <button 
+                  type="button"
+                  @click="openCheckout(pkg)"
+                  class="w-full text-center rounded-xl font-black text-xs py-3.5 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02]"
+                  :class="pkg.isPromo ? 'bg-[#1EAE4C] hover:bg-[#188C3D] text-white shadow-[#1EAE4C]/20' : 'bg-[#0F223D] hover:bg-[#003057] text-white'"
+                >
+                  <span>{{ 'HEMEN ABONE OL' }}</span>
+                  <ArrowRight :size="14" />
+                </button>
+              </div>
             </div>
+          </div>
+
+          <!-- Bireyselden Kurumsala Hızlı Geçiş Kutusu -->
+          <div class="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-center max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="text-left">
+              <span class="text-xs font-bold text-emerald-900 block">Şirket veya Kurumsal Tedarikçi misiniz?</span>
+              <span class="text-[11px] text-emerald-700">Firma moduna geçerek indirimli %1.5 / %2.5 komisyonlu kurumsal fiyatları inceleyin.</span>
+            </div>
+            <button
+              type="button"
+              @click="toggleCompanyMode(true)"
+              class="px-4 py-2 rounded-xl bg-[#0F223D] hover:bg-[#003057] text-white text-xs font-black transition flex items-center gap-1.5 shrink-0 shadow-sm cursor-pointer"
+            >
+              <span>🏢 Firma Moduna Geç</span>
+              <ArrowRight :size="12" />
+            </button>
           </div>
         </div>
 
