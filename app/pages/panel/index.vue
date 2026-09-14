@@ -29,7 +29,9 @@ import {
   Save,
   MapPin,
   Lock,
-  Bell
+  Bell,
+  Heart,
+  Award
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useUserSession } from '~/composables/useUserSession'
@@ -256,32 +258,89 @@ watch(() => userSession.value, () => {
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 🔀 SEKME DEĞİŞTİRİCİ: GENEL BAKIŞ & PROFİL BİRLEŞİMİ -->
+    <!-- 🗂️ 1.5 SEKMELİ YÖNETİM BAR (GENEL BAKIŞ, PROFİL & TÜM AYAR SEKMELERİ) -->
     <!-- ========================================================================= -->
-    <div class="flex items-center gap-2 border-b border-slate-200 pb-2">
+    <div class="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto scrollbar-none">
+      <!-- 1. Genel Bakış & İhale İstatistikleri -->
       <button 
         type="button" 
         @click="setTab('genel_bakis')"
-        class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border"
+        class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border whitespace-nowrap"
         :class="activeTab === 'genel_bakis' 
           ? 'bg-[#0F223D] text-white border-[#0F223D] shadow-xs' 
           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'"
       >
-        <LayoutDashboard :size="15" />
-        <span>📊 Genel Bakış & İhale İstatistikleri</span>
+        <LayoutDashboard :size="14" :class="activeTab === 'genel_bakis' ? 'text-[#1EAE4C]' : 'text-slate-400'" />
+        <span>Genel Bakış & İhale İstatistikleri</span>
       </button>
 
+      <!-- 2. Kişisel Profil (veya Profil & Hesap Bilgileri) -->
       <button 
         type="button" 
         @click="setTab('profil')"
-        class="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border"
+        class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border whitespace-nowrap"
         :class="activeTab === 'profil' 
           ? 'bg-[#0F223D] text-white border-[#0F223D] shadow-xs' 
           : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'"
       >
-        <User :size="15" />
-        <span>👤 Profil & Hesap Bilgileri</span>
+        <User :size="14" :class="activeTab === 'profil' ? 'text-[#1EAE4C]' : 'text-slate-400'" />
+        <span>Kişisel Profil</span>
       </button>
+
+      <!-- 3. Şirket & Firma (Firma Modunda) -->
+      <NuxtLink 
+        v-if="isCompanyMode"
+        to="/panel/ayarlar?tab=sirket"
+        class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border whitespace-nowrap bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
+      >
+        <Building2 :size="14" class="text-slate-400" />
+        <span>Şirket & Firma</span>
+      </NuxtLink>
+
+      <!-- 4. Bildirim Ayarları -->
+      <NuxtLink 
+        to="/panel/ayarlar?tab=bildirimler"
+        class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border whitespace-nowrap bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
+      >
+        <Bell :size="14" class="text-slate-400" />
+        <span>Bildirim Ayarları</span>
+      </NuxtLink>
+
+      <!-- 5. Kayıtlı Adresler -->
+      <NuxtLink 
+        to="/panel/ayarlar?tab=adresler"
+        class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border whitespace-nowrap bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
+      >
+        <MapPin :size="14" class="text-slate-400" />
+        <span>Kayıtlı Adresler</span>
+      </NuxtLink>
+
+      <!-- 6. Favoriler & Takip -->
+      <NuxtLink 
+        to="/panel/ayarlar?tab=takip"
+        class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border whitespace-nowrap bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
+      >
+        <Heart :size="14" class="text-slate-400" />
+        <span>Favoriler & Takip</span>
+      </NuxtLink>
+
+      <!-- 7. Abonelik & Plan -->
+      <NuxtLink 
+        to="/panel/ayarlar?tab=uyelik"
+        class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border whitespace-nowrap bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
+      >
+        <Award :size="14" class="text-slate-400" />
+        <span>Abonelik & Plan</span>
+      </NuxtLink>
+
+      <!-- 8. Güvenlik & Tercihler -->
+      <NuxtLink 
+        to="/panel/ayarlar?tab=ayarlar"
+        class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all cursor-pointer border whitespace-nowrap bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
+      >
+        <Settings :size="14" class="text-slate-400" />
+        <span>Güvenlik & Tercihler</span>
+      </NuxtLink>
     </div>
 
     <!-- ========================================================================= -->

@@ -3,6 +3,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import {
   Sun,
   Moon,
+  LayoutDashboard,
   User, 
   Building2, 
   MapPin, 
@@ -1587,6 +1588,15 @@ function saveProfile() {
 
     <!-- Horizontal Sub-Navigation Tab Bar -->
     <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-slate-200">
+      <!-- Genel Bakış & İhale İstatistikleri (Panele Dönüş) -->
+      <NuxtLink
+        to="/panel"
+        class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer border bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
+      >
+        <LayoutDashboard :size="14" class="text-slate-400" />
+        <span>Genel Bakış & İhale İstatistikleri</span>
+      </NuxtLink>
+
       <NuxtLink
         v-for="tab in navigationTabs"
         :key="tab.key"
