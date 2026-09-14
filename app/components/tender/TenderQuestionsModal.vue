@@ -14,8 +14,10 @@ import {
   Clock, 
   Radio, 
   Megaphone,
-  Check
+  Check,
+  Lock
 } from 'lucide-vue-next'
+import { containsContactInfo, maskContactInfo } from '~/utils/contactFilter'
 
 const props = defineProps<{
   tender: any
@@ -78,6 +80,14 @@ watch(() => props.isOpen, (val) => {
 
 async function submitQuestion() {
   if (!newQuestionText.value.trim() || isSubmitting.value) return
+
+  // 🛡️ Platform Güvenlik Kuralı: İhale sonuçlanana kadar harici iletişim bilgisi paylaşımı engellenir
+  const check = containsContactInfo(newQuestionText.value)
+  if (check.hasContact) {
+    alert('⚠️ GÜVENLİK ENGELİ:\n\nİhale sonuçlanana kadar soru masasında telefon numarası, e-posta veya harici iletişim adresi paylaşılması kesinlikle yasaktır.\n\nLütfen sorunuzdaki iletişim bilgilerini kaldırarak tekrar deneyiniz.')
+    return
+  }
+
   isSubmitting.value = true
   loadSession()
 
@@ -113,6 +123,14 @@ async function submitQuestion() {
 
 async function submitAnswer(questionId: string) {
   if (!answerText.value.trim() || isSubmitting.value) return
+
+  // 🛡️ Platform Güvenlik Kuralı: Cevaplarda harici iletişim engellenir
+  const check = containsContactInfo(answerText.value)
+  if (check.hasContact) {
+    alert('⚠️ GÜVENLİK ENGELİ:\n\nCevaplarda harici telefon numarası, e-posta veya dış bağlantı paylaşılması platform kuralları gereği yasaktır.\n\nLütfen cevabınızı kurallara uygun olarak düzenleyiniz.')
+    return
+  }
+
   isSubmitting.value = true
   loadSession()
 
@@ -176,6 +194,19 @@ function closeModal() {
         >
           <X :size="20" />
         </button>
+      </div>
+
+      <!-- 🛡️ Güvenli İletişim Protokolü -->
+      <div class="px-5 py-2.5 bg-amber-500/10 border-b border-amber-500/20 text-amber-900 text-xs flex items-center justify-between gap-2">
+        <div class="flex items-center gap-2">
+          <span class="font-bold">🛡️ Güvenli Soru Masası:</span>
+          <span class="text-[11px] text-amber-800">
+            İhale sonuçlanana kadar soru ve cevaplarda telefon numarası, e-posta veya iletişim bilgisi paylaşımı güvenlik algoritması tarafından engellenir.
+          </span>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-200 text-amber-900 font-bold shrink-0">
+          🔒 Filtre Aktif
+        </span>
       </div>
 
       <!-- Content Scrollable Body -->
@@ -329,7 +360,7 @@ function closeModal() {
 
             <!-- Soru Metni -->
             <div class="text-slate-800 font-medium leading-relaxed pl-2 border-l-2 border-blue-500">
-              {{ q.question }}
+              {{ maskContactInfo(q.question) }}
             </div>
 
             <!-- Cevap Alanı (Varsa) -->
@@ -344,7 +375,7 @@ function closeModal() {
                 </span>
               </div>
               <p class="text-slate-700 leading-relaxed font-normal">
-                {{ q.answer }}
+                {{ maskContactInfo(q.answer) }}
               </p>
             </div>
 

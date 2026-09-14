@@ -61,7 +61,8 @@ import {
   FileCheck,
   Cpu,
   Database,
-  Network
+  Network,
+  Lock
 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
@@ -70,15 +71,16 @@ import { useCmsData } from '~/composables/useCmsData'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
 import { useNetGsm } from '~/composables/useNetGsm'
 import { useUserSession } from '~/composables/useUserSession'
+import { isTenderConcluded, maskContactInfo } from '~/utils/contactFilter'
 
 definePageMeta({
   layout: 'public'
 })
 
-const { userSession, canSubmitBid, isCompanyVerified, companyRole, companyVkn } = useUserSession()
+const { userSession, isLoggedIn, canSubmitBid, isCompanyVerified, companyRole, companyVkn } = useUserSession()
 
 useSeoMeta({
-  title: 'İhaleciBurada.com — Türkiye’nin En Kapsamlı İhale ve Satın Alma Portalı',
+  title: 'GelAnlaşalım.com — Türkiye’nin En Kapsamlı İhale ve Satın Alma Portalı',
   description: 'Günlük ihaleler, kamu ve özel sektör satın alma ilanları, şartnameler, doğrudan teklif verme ve sonuç takip sistemi.'
 })
 
@@ -2616,7 +2618,18 @@ onMounted(() => {
                   </h4>
 
                   <!-- Alıcı Kurum / Firma -->
+                  <div v-if="!isLoggedIn" class="flex items-center gap-1.5 overflow-hidden py-0.5">
+                    <Building2 :size="12" class="text-slate-400 shrink-0" />
+                    <span class="filter blur-[5px] select-none pointer-events-none text-[11px] font-bold text-slate-400 truncate max-w-[110px]">
+                      {{ (tender.ownerCompany || tender.authority || 'Kurumsal Şirket').replace(/[a-zA-Z0-9]/g, '█') }}
+                    </span>
+                    <NuxtLink to="/uyelik" class="text-[9px] font-black text-amber-700 hover:text-amber-800 bg-amber-500/10 border border-amber-500/30 px-1.5 py-0.2 rounded-full shrink-0 flex items-center gap-0.5" title="Firma bilgileri üye olmadan görünmemektedir">
+                      <Lock :size="9" />
+                      <span>Üye olmadan görünmez</span>
+                    </NuxtLink>
+                  </div>
                   <button 
+                    v-else
                     type="button"
                     @click="openCompanyProfileModal(tender.ownerCompany || tender.authority, tender.city)"
                     class="text-[11px] font-bold text-blue-700 hover:text-blue-900 hover:underline flex items-center gap-1 text-left truncate w-full cursor-pointer"
@@ -3459,7 +3472,14 @@ onMounted(() => {
               <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs">
                 <div>
                   <span class="text-[10px] font-black text-slate-400 uppercase block">İhaleyi Açan Kurum</span>
-                  <span class="font-bold text-slate-800">{{ selectedTenderModal.ownerCompany || selectedTenderModal.authority || 'Kurumsal Masası' }}</span>
+                  <span v-if="isLoggedIn" class="font-bold text-slate-800">{{ selectedTenderModal.ownerCompany || selectedTenderModal.authority || 'Kurumsal Masası' }}</span>
+                  <span v-else class="flex items-center gap-1.5 mt-0.5">
+                    <span class="filter blur-[5px] select-none pointer-events-none text-slate-400 font-bold">█████████ A.Ş.</span>
+                    <NuxtLink to="/uyelik" class="text-[9px] font-black text-amber-700 bg-amber-500/10 border border-amber-500/30 px-1.5 py-0.2 rounded-full inline-flex items-center gap-0.5">
+                      <Lock :size="9" />
+                      <span>Üye olmadan görünmez</span>
+                    </NuxtLink>
+                  </span>
                 </div>
                 <div>
                   <span class="text-[10px] font-black text-slate-400 uppercase block">Kategori & Sektör</span>
@@ -3648,7 +3668,19 @@ onMounted(() => {
         <!-- 🏢 3. SEKME: İHALE VE ALICI FİRMA BİLGİLERİ -->
         <!-- =================================================================== -->
         <div v-else-if="activeSpecTab === 'details'" class="flex-1 p-6 sm:p-8 bg-slate-800 overflow-y-auto custom-scrollbar space-y-5 text-white">
-          <div class="p-5 rounded-2xl bg-slate-900 border border-slate-700 space-y-3">
+          <div v-if="!isLoggedIn" class="p-8 rounded-2xl bg-slate-900 border border-amber-500/40 text-center space-y-3">
+            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto">
+              <Lock :size="24" />
+            </div>
+            <h4 class="font-black text-sm text-white">Firma Bilgileri Üye Olmadan Görünmemektedir</h4>
+            <p class="text-xs text-slate-400 max-w-sm mx-auto">
+              İhaleyi açan kurumsal şirketin unvanı, iletişim bilgileri ve ticari sicil kayıtları sadece kayıtlı GelAnlaşalım üyelerine açıktır.
+            </p>
+            <NuxtLink to="/uyelik" class="inline-block px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs transition">
+              Giriş Yap / Üye Ol
+            </NuxtLink>
+          </div>
+          <div v-else class="p-5 rounded-2xl bg-slate-900 border border-slate-700 space-y-3">
             <h3 class="font-black text-sm text-blue-400 flex items-center gap-2">
               <Building2 :size="16" />
               <span>İhaleyi Açan Kurumsal Alıcı</span>
@@ -3669,6 +3701,17 @@ onMounted(() => {
               <div>
                 <span class="text-slate-400 text-[11px] block">İhale Durumu:</span>
                 <span class="font-bold text-amber-400">{{ selectedTenderModal.sure || 'Teklif Toplama Devam Ediyor' }}</span>
+              </div>
+            </div>
+
+            <!-- İhale Sonuçlanana Kadar İletişim Bilgileri Koruması -->
+            <div v-if="!isTenderConcluded(selectedTenderModal)" class="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-2">
+              <Lock :size="15" class="text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <span class="font-black block text-amber-300">🔒 İhale Sonuçlanana Kadar Doğrudan İletişim Bilgileri Gizlidir</span>
+                <span class="text-[11px] text-amber-200/90 leading-tight block mt-0.5">
+                  Alıcı firma doğrudan iletişim bilgileri ihale sonuçlanana kadar sistem güvencesinde saklı tutulmaktadır. Görüşmelerinizi panel içi Canlı Mesajlaşma üzerinden yapınız.
+                </span>
               </div>
             </div>
           </div>
@@ -3722,7 +3765,12 @@ onMounted(() => {
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <h3 class="text-base sm:text-lg font-black text-slate-900">{{ selectedCompanyProfileModal.name }}</h3>
+                <h3 class="text-base sm:text-lg font-black text-slate-900">
+                  <span v-if="isLoggedIn">{{ selectedCompanyProfileModal.name }}</span>
+                  <span v-else class="filter blur-[5px] select-none pointer-events-none text-slate-400">
+                    {{ selectedCompanyProfileModal.name.replace(/[a-zA-Z0-9]/g, '█') }}
+                  </span>
+                </h3>
                 <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-black border border-emerald-200 flex items-center gap-1">
                   <ShieldCheck :size="12" />
                   <span>Onaylı Firma</span>
@@ -3738,6 +3786,20 @@ onMounted(() => {
           </button>
         </div>
 
+        <!-- Giriş Yapmamış Kullanıcı İçin Uyarı Barı -->
+        <div v-if="!isLoggedIn" class="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex flex-col sm:flex-row items-center justify-between gap-2.5">
+          <div class="flex items-center gap-2">
+            <Lock :size="16" class="text-amber-700 shrink-0" />
+            <div>
+              <span class="font-black text-xs block">Firma Bilgileri Üye Olmadan Görünmemektedir</span>
+              <span class="text-[11px] text-amber-800">Tam unvan ve resmi ticaret kayıtları için üye girişi yapınız.</span>
+            </div>
+          </div>
+          <NuxtLink to="/uyelik" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 transition">
+            Üye Ol / Giriş Yap
+          </NuxtLink>
+        </div>
+
         <!-- Firma Detay Kartları -->
         <div class="grid grid-cols-3 gap-2.5 text-center">
           <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl">
@@ -3750,7 +3812,8 @@ onMounted(() => {
           </div>
           <div class="p-3 bg-slate-50 border border-slate-200 rounded-2xl">
             <span class="text-[9px] font-bold text-slate-400 uppercase block">VKN / Sicil</span>
-            <span class="font-black text-slate-800 text-xs font-mono">✓ Doğrulandı</span>
+            <span v-if="isLoggedIn" class="font-black text-slate-800 text-xs font-mono">✓ Doğrulandı</span>
+            <span v-else class="filter blur-[3px] select-none pointer-events-none text-slate-400 text-xs font-mono">████████</span>
           </div>
         </div>
 
@@ -3826,7 +3889,8 @@ onMounted(() => {
             <span class="text-slate-500 font-bold">Teklif Verilen Alıcı:</span>
             <span class="font-black text-blue-900 flex items-center gap-1">
               <Building2 :size="13" class="text-blue-600" />
-              <span>{{ quickBidTender.ownerCompany || quickBidTender.authority }}</span>
+              <span v-if="isLoggedIn">{{ quickBidTender.ownerCompany || quickBidTender.authority }}</span>
+              <span v-else class="filter blur-[4px] select-none pointer-events-none text-slate-400">████████ A.Ş.</span>
             </span>
           </div>
           <div class="flex justify-between items-center">
@@ -4048,7 +4112,9 @@ onMounted(() => {
               {{ drawerTender.baslik }}
             </h3>
             <p class="text-[11px] text-slate-400">
-              {{ drawerTender.ownerCompany || drawerTender.authority }} • {{ drawerTender.city || 'Balıkesir' }}
+              <span v-if="isLoggedIn">{{ drawerTender.ownerCompany || drawerTender.authority }}</span>
+              <span v-else class="filter blur-[4px] select-none pointer-events-none text-slate-500">████████ A.Ş.</span>
+              • {{ drawerTender.city || 'Balıkesir' }}
             </p>
           </div>
           <button 

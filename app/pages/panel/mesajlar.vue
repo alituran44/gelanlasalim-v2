@@ -1,14 +1,17 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { MessageSquare, Send, CheckCheck, FileText, Search, User, Paperclip, Phone, ShieldCheck, ExternalLink, Package, ArrowLeft } from 'lucide-vue-next'
+import { MessageSquare, Send, CheckCheck, FileText, Search, User, Paperclip, Phone, ShieldCheck, ExternalLink, Package, ArrowLeft, AlertTriangle, Lock, ShieldAlert, X } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
+import { useUserSession } from '~/composables/useUserSession'
+import { containsContactInfo, maskContactInfo } from '~/utils/contactFilter'
 
 definePageMeta({ layout: 'dashboard' })
 
 const route = useRoute()
 const router = useRouter()
 const { cmsData, saveCmsData } = useCmsData()
+const { userSession } = useUserSession()
 
 const defaultInitialChats: any[] = []
 
@@ -17,6 +20,12 @@ const activeChatIndex = ref(0)
 const activeChat = computed(() => chats.value[activeChatIndex.value] || chats.value[0])
 const newMessage = ref('')
 const searchQuery = ref('')
+
+// 🛡️ Harici İletişim Güvenlik Filtresi Durumu
+const showSecurityModal = ref(false)
+const blockedWarning = ref('')
+const blockedMatches = ref<string[]>([])
+const contactCheck = computed(() => containsContactInfo(newMessage.value))
 
 function loadChats() {
   if (typeof window !== 'undefined') {
@@ -112,6 +121,15 @@ const filteredChats = computed(() =>
 
 function sendMessage() {
   if (!newMessage.value.trim() || !activeChat.value) return
+
+  // 🛡️ Platform Güvenlik Denetimi: Harici iletişim bilgisi paylaşımı engellenir
+  const check = containsContactInfo(newMessage.value)
+  if (check.hasContact) {
+    blockedWarning.value = check.reason || 'Harici iletişim bilgisi tespit edildi.'
+    blockedMatches.value = check.matches
+    showSecurityModal.value = true
+    return
+  }
 
   const now = new Date()
   const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -297,6 +315,22 @@ function handleAttachment() {
           </div>
         </div>
 
+        <!-- 🛡️ Platform Güvenlik Protokolü & İletişim Gizliliği Barı -->
+        <div class="px-4 py-2.5 bg-amber-500/10 border-b border-amber-500/20 text-amber-900 dark:text-amber-200 text-xs flex items-center justify-between gap-3">
+          <div class="flex items-center gap-2">
+            <span class="p-1 rounded-lg bg-amber-500/20 text-amber-700 dark:text-amber-300 font-bold">🛡️</span>
+            <div>
+              <span class="font-black">Güvenli İletişim Protokolü:</span>
+              <span class="ml-1 text-[11px] text-amber-800 dark:text-amber-300">
+                İhaleler sonuçlanana kadar telefon, e-posta veya harici bağlantı paylaşımı güvenlik algoritması tarafından engellenir. Tüm görüşmeler platform içi şifreli mesajlaşma üzerinden yürütülmelidir.
+              </span>
+            </div>
+          </div>
+          <span class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-900 dark:text-amber-200 font-black shrink-0 border border-amber-500/30">
+            🔒 Filtre Aktif
+          </span>
+        </div>
+
         <!-- Chat Messages Feed -->
         <div class="flex-1 p-4 sm:p-6 overflow-y-auto space-y-3.5 bg-slate-50/20 dark:bg-slate-950/20">
           <div 
@@ -307,7 +341,7 @@ function handleAttachment() {
           >
             <!-- System Milestone Message -->
             <div v-if="msg.sender === 'system'" class="my-2 max-w-lg p-3 rounded-2xl bg-blue-500/10 border border-blue-500/30 text-blue-900 dark:text-blue-200 text-xs text-center leading-relaxed font-medium shadow-2xs">
-              {{ msg.text }}
+              {{ maskContactInfo(msg.text) }}
             </div>
 
             <!-- Regular Chat Bubbles -->
@@ -318,7 +352,7 @@ function handleAttachment() {
                 ? 'bg-blue-600 text-white rounded-br-none shadow-blue-600/10' 
                 : 'bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 border border-slate-200 dark:border-slate-700/80 rounded-bl-none'"
             >
-              <div class="leading-relaxed whitespace-pre-line">{{ msg.text }}</div>
+              <div class="leading-relaxed whitespace-pre-line">{{ maskContactInfo(msg.text) }}</div>
               <div 
                 v-if="msg.fileAttachment" 
                 class="mt-2 p-2 rounded-xl border flex items-center justify-between gap-2 text-[11px] font-bold"
@@ -343,6 +377,20 @@ function handleAttachment() {
 
         <!-- Chat Input Footer -->
         <div class="p-3 sm:p-4 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+          <!-- Canlı Harici İletişim Uyarısı -->
+          <div v-if="contactCheck.hasContact" class="mb-3 p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-700 dark:text-rose-300 text-xs flex items-start gap-2.5 animate-pulse">
+            <AlertTriangle :size="16" class="text-rose-600 shrink-0 mt-0.5" />
+            <div class="flex-1">
+              <span class="font-black block">Harici İletişim Tespit Edildi (Engellendi):</span>
+              <p class="text-[11px] mt-0.5 leading-relaxed">
+                İhaleler sonuçlanana kadar telefon, e-posta veya harici iletişim adresi paylaşımı yasaktır. Lütfen mesajınızı kurallara uygun olarak düzenleyiniz.
+              </p>
+            </div>
+            <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-600 text-white font-bold shrink-0">
+              Gönderilemez
+            </span>
+          </div>
+
           <form @submit.prevent="sendMessage" class="flex items-center gap-2">
             <button 
               type="button" 
@@ -358,24 +406,67 @@ function handleAttachment() {
               type="text" 
               placeholder="Mesajınızı yazın (Fiyat, vade, teslimat ve şartname detayları)..." 
               class="flex-1 rounded-xl border border-slate-200 dark:border-slate-800 p-2.5 text-xs outline-none bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white focus:border-blue-500 transition" 
+              :class="contactCheck.hasContact ? 'border-rose-500 focus:border-rose-500' : ''"
             />
 
             <button 
               type="submit" 
               class="px-4 sm:px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-black text-xs rounded-xl transition flex items-center gap-1.5 cursor-pointer shadow-md shadow-blue-600/20"
+              :class="contactCheck.hasContact ? 'opacity-50 cursor-not-allowed bg-rose-600 hover:bg-rose-600' : ''"
             >
               <Send :size="14" />
               <span class="hidden sm:inline">Gönder</span>
             </button>
           </form>
           <div class="text-[10px] text-slate-400 mt-2 flex items-center justify-between">
-            <span>🔒 Mesajlaşmalar KVKK ve İhaleciBurada B2B Güvenli Ticaret Protokolü ile kayıt altına alınmaktadır.</span>
+            <span>🔒 Mesajlaşmalar KVKK ve GelAnlaşalım B2B Güvenli Ticaret Protokolü ile kayıt altına alınmaktadır.</span>
             <span>Escrow Güvenceli Sohbet</span>
           </div>
         </div>
 
       </div>
 
+    </div>
+
+    <!-- 🛡️ Harici İletişim Engellendi Modal -->
+    <div v-if="showSecurityModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-rose-500/30 max-w-md w-full p-6 space-y-4 shadow-2xl text-left">
+        <div class="flex items-center justify-between">
+          <div class="w-12 h-12 rounded-2xl bg-rose-500/10 text-rose-600 flex items-center justify-center font-black">
+            <ShieldAlert :size="24" />
+          </div>
+          <button @click="showSecurityModal = false" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl cursor-pointer">
+            <X :size="20" />
+          </button>
+        </div>
+
+        <div class="space-y-2">
+          <h3 class="text-base font-black text-slate-900 dark:text-white">
+            Harici İletişim Bilgisi Paylaşımı Engellendi
+          </h3>
+          <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+            GelAnlaşalım B2B Güvenli Ticaret İlkeleri gereği; ihaleler sonuçlanıp sözleşme mutabakatı tamamlanana kadar telefon numarası, e-posta, web sitesi veya harici haberleşme linki paylaşılması kesinlikle yasaktır.
+          </p>
+        </div>
+
+        <div v-if="blockedMatches.length > 0" class="p-3 rounded-2xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/50 space-y-1">
+          <span class="text-[10px] font-bold uppercase tracking-wider text-rose-800 dark:text-rose-300">Filtreye Takılan Unsurlar:</span>
+          <div class="flex flex-wrap gap-1.5">
+            <span v-for="(m, idx) in blockedMatches" :key="idx" class="px-2 py-0.5 rounded-lg bg-rose-200 dark:bg-rose-900 text-rose-900 dark:text-rose-100 font-mono text-[11px] font-bold">
+              {{ m }}
+            </span>
+          </div>
+        </div>
+
+        <div class="pt-2 flex justify-end">
+          <button 
+            @click="showSecurityModal = false"
+            class="w-full py-2.5 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-black text-xs transition cursor-pointer shadow-md shadow-rose-600/20"
+          >
+            Anladım, Mesajı Düzenleyeceğim
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>

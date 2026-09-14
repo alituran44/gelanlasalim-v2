@@ -1,16 +1,19 @@
 <script setup lang="ts">
 import { useCmsData } from '~/composables/useCmsData'
+import { useUserSession } from '~/composables/useUserSession'
 import { ref, computed } from 'vue'
-import { Plus, Search, MapPin, Building2, User, Star, X, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-vue-next'
+import { Plus, Search, MapPin, Building2, User, Star, X, CheckCircle2, ShieldCheck, ArrowRight, Lock } from 'lucide-vue-next'
 
 definePageMeta({
   layout: "public"
 })
 
+const { isLoggedIn } = useUserSession()
+
 useSeoMeta({
-  title: 'Kurumsal B2B Firmalar - İhaleciBurada',
+  title: 'Kurumsal B2B Firmalar - GelAnlaşalım',
   description: 'Türkiye genelinde doğrulanmış B2B üretici, toptancı ve tedarikçi firmaların listesi ve kurumsal profilleri.',
-  ogTitle: 'Kurumsal B2B Firmalar - İhaleciBurada',
+  ogTitle: 'Kurumsal B2B Firmalar - GelAnlaşalım',
   ogDescription: 'Türkiye genelinde doğrulanmış B2B üretici, toptancı ve tedarikçi firmalar.'
 })
 
@@ -104,6 +107,24 @@ const selectedFirmForModal = ref<any>(null)
         </div>
       </div>
 
+      <!-- 🔒 Üye Olmayanlar İçin Bilgilendirme Barı -->
+      <div v-if="!isLoggedIn" class="p-4 sm:p-5 rounded-3xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+            <Lock :size="20" />
+          </div>
+          <div>
+            <span class="font-black text-xs sm:text-sm block">Firma Bilgileri Üye Olmadan Görünmemektedir</span>
+            <span class="text-[11px] sm:text-xs text-amber-800 leading-relaxed">
+              B2B firma rehberinde yer alan üretici ve yüklenici şirketlerin resmi ticaret unvanları, iletişim kanalları ve sicil kayıtları yalnızca kayıtlı GelAnlaşalım üyelerine açıktır.
+            </span>
+          </div>
+        </div>
+        <NuxtLink to="/uyelik" class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 shadow-xs transition">
+          Üye Ol / Giriş Yap
+        </NuxtLink>
+      </div>
+
       <!-- Search & Filters -->
       <div class="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
@@ -182,7 +203,10 @@ const selectedFirmForModal = ref<any>(null)
                 <div>
                   <span class="text-[10px] font-bold text-blue-600 uppercase tracking-wider block">{{ firm.sector }}</span>
                   <h3 class="text-sm font-black text-slate-900 line-clamp-1 group-hover:text-blue-600 transition-colors">
-                    {{ firm.name }}
+                    <span v-if="isLoggedIn">{{ firm.name }}</span>
+                    <span v-else class="filter blur-[5px] select-none pointer-events-none text-slate-400">
+                      {{ firm.name.replace(/[a-zA-Z0-9]/g, '█') }}
+                    </span>
                   </h3>
                 </div>
               </div>
@@ -197,7 +221,7 @@ const selectedFirmForModal = ref<any>(null)
               <span class="text-[11px] text-slate-500 font-bold">({{ firm.reviewCount || 38 }} Değerlendirme)</span>
             </div>
 
-            <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed">
+            <p class="text-xs text-slate-500 line-clamp-2 leading-relaxed" :class="!isLoggedIn ? 'filter blur-[3px] select-none pointer-events-none' : ''">
               {{ firm.description }}
             </p>
 
@@ -227,7 +251,16 @@ const selectedFirmForModal = ref<any>(null)
               <span>{{ firm.badge }}</span>
             </span>
 
+            <NuxtLink
+              v-if="!isLoggedIn"
+              to="/uyelik"
+              class="px-4 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs transition flex items-center gap-1.5"
+            >
+              <Lock :size="12" />
+              <span>Üye Ol</span>
+            </NuxtLink>
             <button
+              v-else
               type="button"
               @click="selectedFirmForModal = firm"
               class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-blue-600 text-white font-bold text-xs transition cursor-pointer"
@@ -251,13 +284,34 @@ const selectedFirmForModal = ref<any>(null)
                   <span class="text-xs font-black text-blue-600 uppercase">{{ selectedFirmForModal.sector }}</span>
                   <span class="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 text-[10px] font-black border border-emerald-200">✓ {{ selectedFirmForModal.badge }}</span>
                 </div>
-                <h2 class="text-lg sm:text-2xl font-black text-slate-900 mt-0.5">{{ selectedFirmForModal.name }}</h2>
+                <h2 class="text-lg sm:text-2xl font-black text-slate-900 mt-0.5">
+                  <span v-if="isLoggedIn">{{ selectedFirmForModal.name }}</span>
+                  <span v-else class="filter blur-[5px] select-none pointer-events-none text-slate-400">
+                    {{ selectedFirmForModal.name.replace(/[a-zA-Z0-9]/g, '█') }}
+                  </span>
+                </h2>
                 <span class="text-xs text-slate-500">📍 {{ selectedFirmForModal.district }}, {{ selectedFirmForModal.city }}</span>
               </div>
             </div>
             <button @click="selectedFirmForModal = null" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl cursor-pointer">
               <X :size="22" />
             </button>
+          </div>
+
+          <!-- Giriş Yapmamış Kullanıcı İçin Uyarı Barı -->
+          <div v-if="!isLoggedIn" class="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+            <div class="flex items-center gap-2.5">
+              <Lock :size="18" class="text-amber-700 shrink-0" />
+              <div>
+                <span class="font-black text-xs block">Firma Bilgileri Üye Olmadan Görünmemektedir</span>
+                <span class="text-[11px] text-amber-800">
+                  Şirket unvanı, iletişim numaraları ve resmi ticaret kayıtlarını görüntülemek için kurumsal üye girişi yapınız.
+                </span>
+              </div>
+            </div>
+            <NuxtLink to="/uyelik" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 shadow-xs transition">
+              Üye Ol / Giriş Yap
+            </NuxtLink>
           </div>
 
           <!-- 4-Stat Strip -->
@@ -305,15 +359,18 @@ const selectedFirmForModal = ref<any>(null)
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
                 <span class="text-[10px] text-slate-400 font-bold uppercase block">Vergi Dairesi / VKN</span>
-                <span class="font-black text-slate-800 text-xs">{{ selectedFirmForModal.taxOffice }}</span>
+                <span v-if="isLoggedIn" class="font-black text-slate-800 text-xs">{{ selectedFirmForModal.taxOffice }}</span>
+                <span v-else class="filter blur-[3px] select-none pointer-events-none text-slate-400 font-mono text-xs">████████</span>
               </div>
               <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
                 <span class="text-[10px] text-slate-400 font-bold uppercase block">MERSİS Numarası</span>
-                <span class="font-black font-mono text-slate-800 text-xs">{{ selectedFirmForModal.mersis }}</span>
+                <span v-if="isLoggedIn" class="font-black font-mono text-slate-800 text-xs">{{ selectedFirmForModal.mersis }}</span>
+                <span v-else class="filter blur-[3px] select-none pointer-events-none text-slate-400 font-mono text-xs">0███████████████</span>
               </div>
               <div class="bg-slate-50 p-3.5 rounded-2xl border border-slate-100">
                 <span class="text-[10px] text-slate-400 font-bold uppercase block">İletişim & Destek</span>
-                <span class="font-bold text-slate-800 text-xs">{{ selectedFirmForModal.phone }}</span>
+                <span v-if="isLoggedIn" class="font-bold text-slate-800 text-xs">{{ selectedFirmForModal.phone }}</span>
+                <span v-else class="text-amber-700 font-bold text-xs flex items-center gap-1"><Lock :size="11" /><span>Üyelere Özel</span></span>
               </div>
             </div>
 
@@ -354,6 +411,15 @@ const selectedFirmForModal = ref<any>(null)
               Kapat
             </button>
             <NuxtLink
+              v-if="!isLoggedIn"
+              to="/uyelik"
+              class="px-6 py-2.5 rounded-xl bg-[#0052FF] hover:bg-blue-600 text-white font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
+            >
+              <Lock :size="13" />
+              <span>Firma İletişimi İçin Üye Ol</span>
+            </NuxtLink>
+            <NuxtLink
+              v-else
               to="/panel/ihale-olustur"
               class="px-6 py-2.5 rounded-xl bg-[#0052FF] hover:bg-blue-600 text-white font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
             >

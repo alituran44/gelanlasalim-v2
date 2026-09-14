@@ -32,22 +32,24 @@ import {
   Phone,
   Mail,
   ExternalLink,
-  Megaphone
+  Megaphone,
+  Lock
 } from 'lucide-vue-next'
 import { useCmsData, DEFAULT_CMS_DATA } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
 import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_TYPES, TENDER_METHODS } from '~/utils/taxonomy'
 import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
 import { formatSectorSummaryBadges, resolveSectorKey, SECTOR_DEFINITIONS } from '~/utils/categoryFieldsSchema'
+import { isTenderConcluded, containsContactInfo, maskContactInfo } from '~/utils/contactFilter'
 
 definePageMeta({
   layout: "public"
 })
 
 useSeoMeta({
-  title: 'İhale Portalı & Canlı Eksiltme Pazar Yeri - İhaleciBurada',
+  title: 'İhale Portalı & Canlı Eksiltme Pazar Yeri - GelAnlaşalım',
   description: 'Türkiye genelinde güncel B2B ihaleleri, satın alma şartnameleri, malzeme listeleri ve sözleşme kayıtları.',
-  ogTitle: 'İhale Portalı & Canlı Eksiltme Pazar Yeri - İhaleciBurada',
+  ogTitle: 'İhale Portalı & Canlı Eksiltme Pazar Yeri - GelAnlaşalım',
   ogDescription: 'Güncel B2B ihaleleri, satın alma şartnameleri, malzeme listeleri ve sözleşme kayıtları.'
 })
 
@@ -55,7 +57,7 @@ const route = useRoute()
 const { cmsData, saveCmsData, fetchServerTenders } = useCmsData()
 const { checkAccountCompleteness } = useDeepSeekAgent()
 const { sendSms } = useNetGsm()
-const { userSession, canSubmitBid, isCompanyVerified, companyRole, companyVkn } = useUserSession()
+const { userSession, isLoggedIn, canSubmitBid, isCompanyVerified, companyRole, companyVkn } = useUserSession()
 
 const activeTab = ref<'guncel' | 'gecmis' | 'sonuc' | 'detayli'>('guncel')
 const viewMode = ref<'gelismis' | 'basit'>('gelismis')
@@ -1172,7 +1174,10 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             <div class="flex items-center gap-1.5 text-slate-700">
               <Users :size="14" class="text-[#0084B4] shrink-0" />
               <span class="font-bold text-slate-500 shrink-0">Yüklenici adı:</span>
+
+              <!-- Üye İse Açık Gösterim -->
               <button
+                v-if="isLoggedIn"
                 type="button"
                 @click="openCompanyModal(tender.ownerCompany || 'Doğrulanmış B2B Kurumsal Firma', tender)"
                 class="font-black text-[#0F223D] hover:text-[#0084B4] hover:underline transition-colors cursor-pointer text-left truncate flex items-center gap-1.5"
@@ -1185,6 +1190,20 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
                 </span>
                 <span class="text-[10px] text-blue-600 font-bold hidden md:inline shrink-0">({{ getCompanyData(tender.ownerCompany).completedTenders }} İhale)</span>
               </button>
+
+              <!-- Üye Değilse: Puslu Görünüm & Üyelik Uyarısı -->
+              <div v-else class="flex items-center gap-2 overflow-hidden">
+                <span class="filter blur-[5px] select-none pointer-events-none font-bold text-slate-400 truncate max-w-[130px]">
+                  {{ (tender.ownerCompany || 'B2B Holding Anonim Şirketi').replace(/[a-zA-Z0-9]/g, '█') }}
+                </span>
+                <NuxtLink
+                  to="/uyelik"
+                  class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-700 hover:text-amber-800 border border-amber-500/30 hover:bg-amber-500/20 transition shrink-0"
+                >
+                  <Lock :size="10" />
+                  <span>Firma bilgileri üye olmadan görünmemektedir</span>
+                </NuxtLink>
+              </div>
             </div>
 
             <div class="flex items-center sm:justify-end gap-1.5 text-xs">
@@ -1198,14 +1217,29 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             <div class="flex items-center gap-1.5 text-slate-700">
               <Building2 :size="14" class="text-slate-400 shrink-0" />
               <span class="font-bold text-slate-500 shrink-0">İdare adı:</span>
+
               <button
+                v-if="isLoggedIn"
                 type="button"
                 @click="openCompanyModal(tender.authority, tender)"
                 class="font-bold text-slate-800 hover:text-blue-700 hover:underline transition-colors cursor-pointer text-left truncate"
                 title="İdare Profilini İncele"
               >
-                {{ tender.authority || 'İhaleciBurada Satın Alma Masası' }}
+                {{ tender.authority || 'GelAnlaşalım Satın Alma Masası' }}
               </button>
+
+              <div v-else class="flex items-center gap-2">
+                <span class="filter blur-[5px] select-none pointer-events-none font-medium text-slate-400 truncate max-w-[150px]">
+                  {{ (tender.authority || 'Satın Alma Dairesi Başkanlığı').replace(/[a-zA-Z0-9]/g, '█') }}
+                </span>
+                <NuxtLink
+                  to="/uyelik"
+                  class="text-[10px] font-bold text-amber-700 hover:underline inline-flex items-center gap-0.5 shrink-0"
+                >
+                  <Lock :size="10" />
+                  <span>Giriş Yap</span>
+                </NuxtLink>
+              </div>
             </div>
 
             <div class="flex items-center sm:justify-end gap-1.5 text-xs text-slate-600 font-bold">
@@ -1392,11 +1426,22 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
           <div>
             <span class="text-[10px] font-bold text-slate-400 uppercase block">👥 Yüklenici / Alıcı</span>
-            <span class="font-bold text-slate-800">{{ selectedTenderForDetail.ownerCompany || selectedTenderForDetail.company || 'Doğrulanmış B2B Kurum' }}</span>
+            <span v-if="isLoggedIn" class="font-bold text-slate-800">{{ selectedTenderForDetail.ownerCompany || selectedTenderForDetail.company || 'Doğrulanmış B2B Kurum' }}</span>
+            <span v-else class="flex items-center gap-1.5 mt-0.5">
+              <span class="filter blur-[5px] select-none pointer-events-none font-bold text-slate-400">█████████ A.Ş.</span>
+              <NuxtLink to="/uyelik" class="text-[10px] text-amber-700 font-bold bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
+                <Lock :size="10" />
+                <span>Üye olmadan görünmez</span>
+              </NuxtLink>
+            </span>
           </div>
           <div>
             <span class="text-[10px] font-bold text-slate-400 uppercase block">🏢 İdare / Satın Alma</span>
-            <span class="font-bold text-slate-800">{{ selectedTenderForDetail.authority || 'İhaleciBurada Satın Alma Masası' }}</span>
+            <span v-if="isLoggedIn" class="font-bold text-slate-800">{{ selectedTenderForDetail.authority || 'GelAnlaşalım Satın Alma Masası' }}</span>
+            <span v-else class="flex items-center gap-1.5 mt-0.5">
+              <span class="filter blur-[5px] select-none pointer-events-none font-medium text-slate-400">████████ Dairesi</span>
+              <NuxtLink to="/uyelik" class="text-[10px] text-amber-700 font-bold underline">Giriş Yap</NuxtLink>
+            </span>
           </div>
           <div>
             <span class="text-[10px] font-bold text-slate-400 uppercase block">💰 İhale / Hedef Bedel</span>
@@ -1711,7 +1756,27 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
 
         <!-- Tab 5: Firmalar -->
         <div v-if="detailActiveTab === 'firmalar'" class="space-y-4 text-xs text-slate-700 leading-relaxed">
+          <!-- Giriş Yapmamış Kullanıcı İçin Korumalı Alan -->
+          <div v-if="!isLoggedIn" class="p-8 rounded-3xl bg-slate-50 border border-amber-300 text-center space-y-4 shadow-sm">
+            <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto shadow-xs">
+              <Lock :size="28" />
+            </div>
+            <div class="space-y-1.5 max-w-md mx-auto">
+              <h4 class="font-black text-slate-900 text-base">Firma Bilgileri Üye Olmadan Görünmemektedir</h4>
+              <p class="text-xs text-slate-600 leading-relaxed">
+                İhaleyi açan ve teklif veren kurumsal firmaların ticari sicil bilgileri, vergi dairesi ve yetkili profilleri yalnızca kayıtlı GelAnlaşalım üyelerine açıktır.
+              </p>
+            </div>
+            <div class="pt-2 flex items-center justify-center gap-3">
+              <NuxtLink to="/uyelik" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md transition">
+                Giriş Yap / Ücretsiz Üye Ol
+              </NuxtLink>
+            </div>
+          </div>
+
+          <!-- Üye Olan Kullanıcı İçin Firma Kartı -->
           <div 
+            v-else
             @click="openCompanyModal(selectedTenderForDetail.ownerCompany || selectedTenderForDetail.company, selectedTenderForDetail)"
             class="p-4 rounded-2xl bg-slate-50 hover:bg-blue-50/50 border border-slate-200 hover:border-blue-300 transition-all space-y-3 cursor-pointer group shadow-2xs"
           >
@@ -1741,6 +1806,17 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
               <button type="button" class="px-3 py-1.5 rounded-xl bg-white border border-slate-200 text-blue-700 font-bold text-xs group-hover:bg-blue-600 group-hover:text-white transition shrink-0">
                 Profili Gör →
               </button>
+            </div>
+
+            <!-- İhale Sonuçlanana Kadar İletişim Bilgileri Koruması -->
+            <div v-if="!isTenderConcluded(selectedTenderForDetail)" class="p-3.5 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex items-start gap-2.5">
+              <Lock :size="16" class="text-amber-700 shrink-0 mt-0.5" />
+              <div>
+                <span class="font-black block">🔒 İhale Sonuçlanana Kadar İletişim Bilgileri Korumalı</span>
+                <span class="text-[11px] text-amber-800 leading-relaxed mt-0.5 block">
+                  Alıcı kurumun doğrudan telefon numarası ve e-posta adresi, tekliflerin gizliliği ve tarafsız ihale süreci güvencesiyle ihale sonuçlanana kadar saklı tutulmaktadır. Sorularınızı "Soru & Cevap" sekmesinden iletebilir veya sistem içi şifreli mesajlaşmayı kullanabilirsiniz.
+                </span>
+              </div>
             </div>
           </div>
 
@@ -2020,13 +2096,32 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
                 </span>
               </div>
               <h2 class="text-lg sm:text-2xl font-black text-slate-900 mt-1">
-                {{ selectedCompanyForProfile.name }}
+                <span v-if="isLoggedIn">{{ selectedCompanyForProfile.name }}</span>
+                <span v-else class="filter blur-[5px] select-none pointer-events-none text-slate-400">
+                  {{ (selectedCompanyForProfile.name || 'Kurumsal Şirket').replace(/[a-zA-Z0-9]/g, '█') }}
+                </span>
               </h2>
             </div>
           </div>
           <button @click="selectedCompanyForProfile = null" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl cursor-pointer">
             <X :size="22" />
           </button>
+        </div>
+
+        <!-- Giriş Yapmamış Kullanıcı İçin Uyarı Barı -->
+        <div v-if="!isLoggedIn" class="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
+          <div class="flex items-center gap-2.5">
+            <Lock :size="20" class="text-amber-700 shrink-0" />
+            <div>
+              <span class="font-black text-xs block">Firma Bilgileri Üye Olmadan Görünmemektedir</span>
+              <span class="text-[11px] text-amber-800">
+                Firma unvanı, iletişim numaraları ve resmi ticaret sicil kayıtlarını görüntülemek için kurumsal üye girişi yapınız.
+              </span>
+            </div>
+          </div>
+          <NuxtLink to="/uyelik" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 shadow-xs transition">
+            Üye Ol / Giriş Yap
+          </NuxtLink>
         </div>
 
         <!-- 🌟 4'LÜ PERFORMANS & YILDIZ İSTATİSTİK ŞERİDİ -->
@@ -2083,15 +2178,33 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             </div>
             <div>
               <span class="text-[10px] font-bold text-slate-400 block uppercase">Vergi Dairesi / VKN:</span>
-              <span class="font-mono font-bold text-slate-800">{{ selectedCompanyForProfile.taxOffice }}</span>
+              <span v-if="isLoggedIn" class="font-mono font-bold text-slate-800">{{ selectedCompanyForProfile.taxOffice }}</span>
+              <span v-else class="filter blur-[4px] select-none pointer-events-none font-mono text-slate-400">██████ V.D. / ██████████</span>
             </div>
             <div>
               <span class="text-[10px] font-bold text-slate-400 block uppercase">MERSİS Numarası:</span>
-              <span class="font-mono font-bold text-slate-800">{{ selectedCompanyForProfile.mersis }}</span>
+              <span v-if="isLoggedIn" class="font-mono font-bold text-slate-800">{{ selectedCompanyForProfile.mersis }}</span>
+              <span v-else class="filter blur-[4px] select-none pointer-events-none font-mono text-slate-400">0███████████████</span>
             </div>
             <div>
               <span class="text-[10px] font-bold text-slate-400 block uppercase">İletişim Telefon & E-Posta:</span>
-              <span class="font-bold text-slate-800">{{ selectedCompanyForProfile.phone }} · {{ selectedCompanyForProfile.email }}</span>
+              <div v-if="!isLoggedIn" class="flex items-center gap-1.5 text-slate-400 text-xs mt-0.5">
+                <span class="filter blur-[4px] select-none pointer-events-none font-mono">0532 ███ ██ ██ · info@██████.com</span>
+                <span class="text-[10px] text-amber-700 font-bold ml-1">🔒 Üye Olmadan Görünmez</span>
+              </div>
+              <div v-else-if="selectedCompanyForProfile.currentTender && !isTenderConcluded(selectedCompanyForProfile.currentTender)" class="mt-1 p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-[11px] space-y-1">
+                <div class="flex items-center gap-1 font-black text-amber-800">
+                  <Lock :size="12" />
+                  <span>İhale Sonuçlanana Kadar Korumalı</span>
+                </div>
+                <p class="text-[10px] text-amber-800 leading-tight">
+                  Alıcı kurum doğrudan iletişim bilgileri ihale sonuçlanana kadar platform güvencesinde saklıdır. Lütfen sistem içi mesajlaşmayı kullanınız.
+                </p>
+                <div class="font-mono text-[10px] text-slate-500 pt-0.5">
+                  <span>+90 (***) *** ** **</span> · <span>******@gelanlasalim.com</span>
+                </div>
+              </div>
+              <span v-else class="font-bold text-slate-800">{{ selectedCompanyForProfile.phone }} · {{ selectedCompanyForProfile.email }}</span>
             </div>
           </div>
           <div class="pt-2 border-t border-slate-200 flex flex-wrap items-center gap-4 text-[11px] font-bold text-slate-600">
