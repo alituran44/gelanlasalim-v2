@@ -489,7 +489,7 @@ const membershipCorporateTiers = [
     features: [
       'İndirimli %2.5 platform başarı komisyonu (%37.5 tasarruf)',
       'Doğrulanmış B2B Rozeti (Mavi Kalkan)',
-      'Yeni açılan ihalelerde 15 dakika öncelikli SMS/E-posta alarmı',
+      'Yeni açılan ihalelerde öncelikli SMS/E-posta alarmı',
       'Sınırsız teklif revizyonu ve detaylı rakip analiz özeti',
       '7/24 Öncelikli telefon & KEP destek hattı'
     ],
