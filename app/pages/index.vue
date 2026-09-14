@@ -337,48 +337,48 @@ async function submitLeadRequest() {
   }
 }
 
-// ==================== 1. KATEGORİLER LİSTESİ (İNŞAAT, SAĞLIK, TARIM İLK 3 SIRADA) ====================
+// ==================== 1. KATEGORİLER LİSTESİ (ÇOK KULLANILANDAN AZ KULLANILANA SIRALI) ====================
 const allCategoriesList = [
-  { id: 1, name: 'İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri', short: 'İnşaat & Altyapı', icon: '🏗️' },
-  { id: 2, name: 'Sağlık - İlaç - Kozmetik - Medikal İhaleleri', short: 'Sağlık & Medikal', icon: '💊' },
-  { id: 3, name: 'Gıda - Tarım Ürünleri - Yiyecek - İçecek İhaleleri', short: 'Gıda & Tarım', icon: '🌾' },
-  { id: 4, name: 'Tıbbi Cihaz - Laboratuvar - Hastane Ekipmanları İhaleleri', short: 'Tıbbi Cihaz & Hastane', icon: '🩺' },
-  { id: 5, name: 'Kanalizasyon - Boru - Su - Doğalgaz - Sıhhi Tesisat İhaleleri', short: 'Kanalizasyon & Su', icon: '🚰' },
-  { id: 6, name: 'Enerji - Aydınlatma - Sinyalizasyon - Elektrik Tesisatı İhaleleri', short: 'Enerji & Elektrik', icon: '⚡' },
-  { id: 7, name: 'Akaryakıt - Gazyağı - Madeni Yağ İhaleleri', short: 'Akaryakıt & Madeni Yağ', icon: '⛽' },
-  { id: 8, name: 'Endüstriyel Makine - Motor - Konveyör İhaleleri', short: 'Endüstriyel Makine', icon: '⚙️' },
-  { id: 9, name: 'Yazılım - Bilgi Yönetim Hizmetleri - Bilişim İhaleleri', short: 'Yazılım & Bilişim', icon: '💻' },
-  { id: 10, name: 'Nakliye - Taşımacılık Hizmetleri - Servis İhaleleri', short: 'Nakliye & Lojistik', icon: '🚚' },
-  { id: 11, name: 'Mobilya - Beyaz Eşya - Mutfak - Züccaciye İhaleleri', short: 'Mobilya & Ofis', icon: '🪑' },
-  { id: 12, name: 'Hırdavat - Nalburiye - Metal ve Plastik Ürünler İhaleleri', short: 'Hırdavat & Metal', icon: '🔩' },
-  { id: 13, name: 'Yangın Algılama - Söndürme - İhbar Sistemleri İhaleleri', short: 'Yangın & Güvenlik', icon: '🧯' },
-  { id: 14, name: 'Kimyasal Maddeler - Dezenfektan - Gübre İhaleleri', short: 'Kimyasal & Gübre', icon: '🧪' },
-  { id: 15, name: 'Matbaa - Toner - Kartuş - Ambalaj - Kırtasiye İhaleleri', short: 'Matbaa & Kırtasiye', icon: '📦' },
-  { id: 16, name: 'Kent Mobilyaları - Prefabrik Yapılar - Doğrama İhaleleri', short: 'Kent Mobilyaları', icon: '🏙️' },
-  { id: 17, name: 'Mühendislik - Mimarlık - Danışmanlık İhaleleri', short: 'Mühendislik & Mimarlık', icon: '📐' },
-  { id: 18, name: 'Madencilik - Doğal Kaynaklar - Sondaj İhaleleri', short: 'Madencilik & Sondaj', icon: '⛏️' },
-  { id: 19, name: 'Asansör - Yapı Otomasyon - Mekanik Güvenlik İhaleleri', short: 'Asansör & Otomasyon', icon: '🛗' },
-  { id: 20, name: 'Klima - Soğutma - Isıtma - Havalandırma Tesisatı İhaleleri', short: 'Klima & Havalandırma', icon: '❄️' },
-  { id: 21, name: 'Savunma Sanayi, Silah - Denizcilik - Havacılık İhaleleri', short: 'Savunma & Havacılık', icon: '🛡️' },
-  { id: 22, name: 'Taşıt - İş Makinesi - Yedek Parça İhaleleri', short: 'Taşıt & İş Makinesi', icon: '🚜' },
-  { id: 23, name: 'Turizm - Ödüllendirme Hizmetleri - Organizasyon İhaleleri', short: 'Turizm & Organizasyon', icon: '🎪' },
-  { id: 24, name: 'Reklam - Tabela - Billboard - Tanıtım Materyalleri İhaleleri', short: 'Reklam & Tanıtım', icon: '📢' },
-  { id: 25, name: 'Ormancılık, Bahçıvanlık, Bitki, Kozalak - Peyzaj İhaleleri', short: 'Ormancılık & Peyzaj', icon: '🌲' },
-  { id: 26, name: 'Hayvancılık - Veterinerlik - Hayvan Yemi İhaleleri', short: 'Hayvancılık & Yem', icon: '🐄' },
-  { id: 27, name: 'Sanat Eserleri - Müzik Aletleri - Heykel - Maket İhaleleri', short: 'Sanat & Heykel', icon: '🎨' },
-  { id: 28, name: 'Odun - Kömür - Katıyakıt İhaleleri', short: 'Odun & Kömür', icon: '🪵' },
-  { id: 29, name: 'Hazır Yemek - Lokantacılık İhaleleri', short: 'Hazır Yemek & İkram', icon: '🍽️' },
-  { id: 30, name: 'Elektronik - Ölçü Aletleri - İletişim - Bilgisayar İhaleleri', short: 'Elektronik & Bilgisayar', icon: '🖥️' },
-  { id: 31, name: 'Uydu Takip - Kamera - Scada - Haberleşme Sistemleri İhaleleri', short: 'Kamera & Güvenlik', icon: '📹' },
-  { id: 32, name: 'Temizlik - İlaçlama - Geri Dönüşüm İhaleleri', short: 'Temizlik & Geri Dönüşüm', icon: '🧹' },
-  { id: 33, name: 'Tekstil - Giyim - Spor Ekipmanları İhaleleri', short: 'Tekstil & Giyim', icon: '👕' },
-  { id: 34, name: 'İş Sağlığı - İş Güvenliği ve Ekipmanları İhaleleri', short: 'İş Sağlığı & Güvenliği', icon: '⛑️' },
-  { id: 35, name: 'Özel Güvenlik - Koruma - Bekçilik İhaleleri', short: 'Özel Güvenlik', icon: '👮' },
-  { id: 36, name: 'Eğitim - Araştırma - Anket - Tercümanlık İhaleleri', short: 'Eğitim & Tercümanlık', icon: '📚' },
-  { id: 37, name: 'İşletmecilik - İşçilik - Sosyal Hizmetler İhaleleri', short: 'İşletmecilik & Hizmet', icon: '🤝' },
-  { id: 38, name: 'Sigortacılık - Mali ve Hukuki Hizmetler İhaleleri', short: 'Sigorta & Finans', icon: '⚖️' },
-  { id: 39, name: 'Menkul Mallar - Araç Satışı ve Hurda İhaleleri', short: 'Araç & Hurda Satışı', icon: '🚗' },
-  { id: 40, name: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri', short: 'Gayrimenkul & Arsa', icon: '🏢' }
+  { id: 1, name: 'İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri', short: 'İnşaat & Altyapı', icon: '🏗️', orderRank: 1 },
+  { id: 2, name: 'Sağlık - İlaç - Kozmetik - Medikal İhaleleri', short: 'Sağlık & Medikal', icon: '💊', orderRank: 2 },
+  { id: 3, name: 'Gıda - Tarım Ürünleri - Yiyecek - İçecek İhaleleri', short: 'Gıda & Tarım', icon: '🌾', orderRank: 3 },
+  { id: 29, name: 'Hazır Yemek - Lokantacılık İhaleleri', short: 'Hazır Yemek & İkram', icon: '🍽️', orderRank: 4 },
+  { id: 32, name: 'Temizlik - İlaçlama - Geri Dönüşüm İhaleleri', short: 'Temizlik & Geri Dönüşüm', icon: '🧹', orderRank: 5 },
+  { id: 10, name: 'Nakliye - Taşımacılık Hizmetleri - Servis İhaleleri', short: 'Nakliye & Lojistik', icon: '🚚', orderRank: 6 },
+  { id: 35, name: 'Özel Güvenlik - Koruma - Bekçilik İhaleleri', short: 'Özel Güvenlik', icon: '👮', orderRank: 7 },
+  { id: 7, name: 'Akaryakıt - Gazyağı - Madeni Yağ İhaleleri', short: 'Akaryakıt & Madeni Yağ', icon: '⛽', orderRank: 8 },
+  { id: 9, name: 'Yazılım - Bilgi Yönetim Hizmetleri - Bilişim İhaleleri', short: 'Yazılım & Bilişim', icon: '💻', orderRank: 9 },
+  { id: 6, name: 'Enerji - Aydınlatma - Sinyalizasyon - Elektrik Tesisatı İhaleleri', short: 'Enerji & Elektrik', icon: '⚡', orderRank: 10 },
+  { id: 22, name: 'Taşıt - İş Makinesi - Yedek Parça İhaleleri', short: 'Taşıt & İş Makinesi', icon: '🚜', orderRank: 11 },
+  { id: 4, name: 'Tıbbi Cihaz - Laboratuvar - Hastane Ekipmanları İhaleleri', short: 'Tıbbi Cihaz & Hastane', icon: '🩺', orderRank: 12 },
+  { id: 8, name: 'Endüstriyel Makine - Motor - Konveyör İhaleleri', short: 'Endüstriyel Makine', icon: '⚙️', orderRank: 13 },
+  { id: 11, name: 'Mobilya - Beyaz Eşya - Mutfak - Züccaciye İhaleleri', short: 'Mobilya & Ofis', icon: '🪑', orderRank: 14 },
+  { id: 15, name: 'Matbaa - Toner - Kartuş - Ambalaj - Kırtasiye İhaleleri', short: 'Matbaa & Kırtasiye', icon: '📦', orderRank: 15 },
+  { id: 12, name: 'Hırdavat - Nalburiye - Metal ve Plastik Ürünler İhaleleri', short: 'Hırdavat & Metal', icon: '🔩', orderRank: 16 },
+  { id: 33, name: 'Tekstil - Giyim - Spor Ekipmanları İhaleleri', short: 'Tekstil & Giyim', icon: '👕', orderRank: 17 },
+  { id: 34, name: 'İş Sağlığı - İş Güvenliği ve Ekipmanları İhaleleri', short: 'İş Sağlığı & Güvenliği', icon: '⛑️', orderRank: 18 },
+  { id: 17, name: 'Mühendislik - Mimarlık - Danışmanlık İhaleleri', short: 'Mühendislik & Mimarlık', icon: '📐', orderRank: 19 },
+  { id: 20, name: 'Klima - Soğutma - Isıtma - Havalandırma Tesisatı İhaleleri', short: 'Klima & Havalandırma', icon: '❄️', orderRank: 20 },
+  { id: 5, name: 'Kanalizasyon - Boru - Su - Doğalgaz - Sıhhi Tesisat İhaleleri', short: 'Kanalizasyon & Su', icon: '🚰', orderRank: 21 },
+  { id: 13, name: 'Yangın Algılama - Söndürme - İhbar Sistemleri İhaleleri', short: 'Yangın & Güvenlik', icon: '🧯', orderRank: 22 },
+  { id: 14, name: 'Kimyasal Maddeler - Dezenfektan - Gübre İhaleleri', short: 'Kimyasal & Gübre', icon: '🧪', orderRank: 23 },
+  { id: 30, name: 'Elektronik - Ölçü Aletleri - İletişim - Bilgisayar İhaleleri', short: 'Elektronik & Bilgisayar', icon: '🖥️', orderRank: 24 },
+  { id: 24, name: 'Reklam - Tabela - Billboard - Tanıtım Materyalleri İhaleleri', short: 'Reklam & Tanıtım', icon: '📢', orderRank: 25 },
+  { id: 25, name: 'Ormancılık, Bahçıvanlık, Bitki, Kozalak - Peyzaj İhaleleri', short: 'Ormancılık & Peyzaj', icon: '🌲', orderRank: 26 },
+  { id: 36, name: 'Eğitim - Araştırma - Anket - Tercümanlık İhaleleri', short: 'Eğitim & Tercümanlık', icon: '📚', orderRank: 27 },
+  { id: 23, name: 'Turizm - Ödüllendirme Hizmetleri - Organizasyon İhaleleri', short: 'Turizm & Organizasyon', icon: '🎪', orderRank: 28 },
+  { id: 19, name: 'Asansör - Yapı Otomasyon - Mekanik Güvenlik İhaleleri', short: 'Asansör & Otomasyon', icon: '🛗', orderRank: 29 },
+  { id: 40, name: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri', short: 'Gayrimenkul & Arsa', icon: '🏢', orderRank: 30 },
+  { id: 39, name: 'Menkul Mallar - Araç Satışı ve Hurda İhaleleri', short: 'Araç & Hurda Satışı', icon: '🚗', orderRank: 31 },
+  { id: 16, name: 'Kent Mobilyaları - Prefabrik Yapılar - Doğrama İhaleleri', short: 'Kent Mobilyaları', icon: '🏙️', orderRank: 32 },
+  { id: 26, name: 'Hayvancılık - Veterinerlik - Hayvan Yemi İhaleleri', short: 'Hayvancılık & Yem', icon: '🐄', orderRank: 33 },
+  { id: 38, name: 'Sigortacılık - Mali ve Hukuki Hizmetler İhaleleri', short: 'Sigorta & Finans', icon: '⚖️', orderRank: 34 },
+  { id: 37, name: 'İşletmecilik - İşçilik - Sosyal Hizmetler İhaleleri', short: 'İşletmecilik & Hizmet', icon: '🤝', orderRank: 35 },
+  { id: 18, name: 'Madencilik - Doğal Kaynaklar - Sondaj İhaleleri', short: 'Madencilik & Sondaj', icon: '⛏️', orderRank: 36 },
+  { id: 21, name: 'Savunma Sanayi, Silah - Denizcilik - Havacılık İhaleleri', short: 'Savunma & Havacılık', icon: '🛡️', orderRank: 37 },
+  { id: 31, name: 'Uydu Takip - Kamera - Scada - Haberleşme Sistemleri İhaleleri', short: 'Kamera & Güvenlik', icon: '📹', orderRank: 38 },
+  { id: 28, name: 'Odun - Kömür - Katıyakıt İhaleleri', short: 'Odun & Kömür', icon: '🪵', orderRank: 39 },
+  { id: 27, name: 'Sanat Eserleri - Müzik Aletleri - Heykel - Maket İhaleleri', short: 'Sanat & Heykel', icon: '🎨', orderRank: 40 }
 ]
 
 // ==================== 1.1 ALT KATEGORİLER HARİTASI (TÜM 40 KATEGORİ İÇİN EKSİKSİZ) ====================
@@ -1074,19 +1074,31 @@ function getCompanyCount(compName: string) {
   return allTenders.value.filter((t: any) => (t.ownerCompany || '').toLowerCase().includes(q)).length
 }
 
-// Sol panel kategori listesi (Alt kategorilerle birlikte)
+// Sol panel kategori listesi (Çok kullanılandan az kullanılana sıralı)
 const filteredCategoryTree = computed(() => {
-  const list = allCategoriesList.map(c => ({
+  let list = allCategoriesList.map(c => ({
     ...c,
     subcategories: categorySubcategoriesMap[c.id] || [],
     count: getCategoryCount(c)
   }))
-  if (!leftSidebarSearch.value.trim()) return list
-  const q = leftSidebarSearch.value.toLocaleLowerCase('tr').trim()
-  return list.filter(c => {
-    const nameMatch = c.name.toLocaleLowerCase('tr').includes(q) || c.short.toLocaleLowerCase('tr').includes(q)
-    const subMatch = (c.subcategories || []).some((s: string) => s.toLocaleLowerCase('tr').includes(q))
-    return nameMatch || subMatch
+
+  if (leftSidebarSearch.value.trim()) {
+    const q = leftSidebarSearch.value.toLocaleLowerCase('tr').trim()
+    list = list.filter(c => {
+      const nameMatch = c.name.toLocaleLowerCase('tr').includes(q) || c.short.toLocaleLowerCase('tr').includes(q)
+      const subMatch = (c.subcategories || []).some((s: string) => s.toLocaleLowerCase('tr').includes(q))
+      return nameMatch || subMatch
+    })
+  }
+
+  // 🚀 Çok kullanılandan az kullanılana göre sırala:
+  // 1. İhale sayısı en fazla olanlar en üstte (b.count - a.count)
+  // 2. İhale sayısı eşitse (örneğin hepsi 0 ise) B2B sektör popülerliği / kullanım sırasına göre (orderRank)
+  return [...list].sort((a, b) => {
+    if (b.count !== a.count) {
+      return b.count - a.count
+    }
+    return (a.orderRank || a.id) - (b.orderRank || b.id)
   })
 })
 
