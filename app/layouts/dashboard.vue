@@ -53,7 +53,7 @@ const sidebarMenus = computed(() => {
       { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
       { title: "Üye Firmalar", icon: Building2, to: "/panel/firmalar" },
-      { title: "Gelir Modeli (%4)", icon: Coins, to: "/panel/gelir-modeli" },
+      { title: "Komisyon Kesintisi (%5)", icon: Coins, to: "/panel/gelir-modeli" },
       { title: "Bildirimler", icon: ClipboardList, to: "/panel/bildirimler" }
     ]
   } else {
@@ -63,7 +63,7 @@ const sidebarMenus = computed(() => {
       { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" },
       { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
-      { title: "Revenue & Pricing", icon: Coins, to: "/panel/gelir-modeli" },
+      { title: "Commission & Fee (%5)", icon: Coins, to: "/panel/gelir-modeli" },
       { title: "Notifications", icon: ClipboardList, to: "/panel/bildirimler" }
     ]
   }

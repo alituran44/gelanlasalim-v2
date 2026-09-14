@@ -78,7 +78,7 @@ const sidebarMenus = computed(() => {
       )
     }
     list.push(
-      { title: "Gelir Modeli (%5)", icon: Coins, to: "/panel/gelir-modeli", badge: "REV" },
+      { title: "Komisyon Kesintisi (%5)", icon: Coins, to: "/panel/gelir-modeli", badge: "%5 Sabit" },
       { title: "Güvenlik & Denetim", icon: ShieldCheck, to: "/panel/guvenlik-denetim", badge: "SEC" },
       { title: "Mücbir Sebep & Fesih", icon: Scale, to: "/panel/mucbir-sebep" },
       { title: "Bildirimler", icon: Bell, to: "/panel/bildirimler" }
@@ -99,7 +99,7 @@ const sidebarMenus = computed(() => {
       )
     }
     list.push(
-      { title: "Revenue & Pricing (%5)", icon: Coins, to: "/panel/gelir-modeli", badge: "REV" },
+      { title: "Commission & Fee (%5)", icon: Coins, to: "/panel/gelir-modeli", badge: "5% Flat" },
       { title: "Security & Audit", icon: ShieldCheck, to: "/panel/guvenlik-denetim", badge: "SEC" },
       { title: "Force Majeure & Disputes", icon: Scale, to: "/panel/mucbir-sebep" },
       { title: "Notifications", icon: Bell, to: "/panel/bildirimler" }

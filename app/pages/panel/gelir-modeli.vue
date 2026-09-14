@@ -1,772 +1,392 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { 
-  DollarSign, 
   Percent, 
-  TrendingUp, 
   ShieldCheck, 
-  Sliders, 
-  Building2, 
   CheckCircle2, 
-  AlertCircle, 
-  FileText, 
-  Receipt, 
-  Coins, 
-  Layers, 
-  ArrowUpRight, 
   Calculator, 
+  Coins, 
+  ArrowRight, 
+  Receipt,
+  FileText,
+  Lock,
+  Package,
+  Building2,
   Sparkles,
-  RefreshCw,
-  Info,
-  Check,
-  Award,
-  ChevronRight
+  HelpCircle
 } from 'lucide-vue-next'
+import { useUserSession } from '~/composables/useUserSession'
 
 definePageMeta({
   layout: 'dashboard'
 })
 
 useHead({
-  title: 'Gelir Modeli & Ücretlendirme Stratejisi (REV-001 - REV-003) | İhaleciBurada'
+  title: 'Komisyon Oranları & Kesinti Bilgisi | İhaleciBurada'
 })
 
-const activeTab = ref<'strateji' | 'simulasyon' | 'tahakkuk' | 'paketler'>('strateji')
-const isLoading = ref(false)
-const isUpdating = ref(false)
-const saveSuccess = ref(false)
+const { userSession } = useUserSession()
 
-// Config & Accruals
-const config = ref<any>({
-  activeModel: 'HYBRID',
-  buyerCommissionRate: 0,
-  sellerCommissionRate: 5.0,
-  minCommissionAmount: 500,
-  maxCommissionCap: 150000,
-  vatRate: 20,
-  withholdingRate: 0.5,
-  isDecoupledFromBidding: true
-})
+// Hesaplayıcı Durumu
+const calcAmount = ref<number>(100000)
+const selectedRole = ref<'seller' | 'buyer'>('seller')
 
-const corporateTiers = ref<any[]>([])
-const accruals = ref<any[]>([])
-const accrualsSummary = ref<any>(null)
+const calcSellerCommission = computed(() => Math.round(calcAmount.value * 0.05))
+const calcSellerVat = computed(() => Math.round(calcSellerCommission.value * 0.20))
+const calcSellerTotalDeduction = computed(() => calcSellerCommission.value + calcSellerVat.value)
+const calcSellerNetPayout = computed(() => Math.max(0, calcAmount.value - calcSellerCommission.value))
 
-// Simulation Parameters
-const simParams = ref({
-  monthlyTenderCount: 45,
-  avgTenderAmount: 350000,
-  proSubscriberCount: 25,
-  enterpriseSubscriberCount: 8,
-  sellerCommissionRate: 5.0
-})
-
-const simResult = ref<any>(null)
-
-// Fetch Initial Data
-async function loadData() {
-  isLoading.value = true
-  try {
-    const [cfgRes, accRes] = await Promise.all([
-      $fetch<any>('/api/revenue/config'),
-      $fetch<any>('/api/revenue/accruals')
-    ])
-    if (cfgRes?.config) config.value = cfgRes.config
-    if (cfgRes?.tiers) corporateTiers.value = cfgRes.tiers
-    if (accRes?.accruals) accruals.value = accRes.accruals
-    if (accRes?.summary) accrualsSummary.value = accRes.summary
-    
-    await runSimulation()
-  } catch (err) {
-    console.error('Veri yükleme hatası:', err)
-  } finally {
-    isLoading.value = false
+// Örnek Kullanıcı Hakediş / Kesinti Geçmişi
+const userTransactions = ref([
+  {
+    id: 'İHL-2026-089',
+    title: '400 Ton Nervürlü İnşaat Demiri Alımı',
+    role: 'Satıcı (Tedarikçi)',
+    tenderAmount: 420000,
+    rate: 5,
+    commissionAmount: 21000,
+    netPayout: 399000,
+    status: 'Tamamlandı (Hakediş Ödendi)',
+    date: '10 Eylül 2026'
+  },
+  {
+    id: 'İHL-2026-074',
+    title: '50 Adet Kurumsal Dizüstü Bilgisayar & Monitör',
+    role: 'Alıcı (Kurum)',
+    tenderAmount: 285000,
+    rate: 0,
+    commissionAmount: 0,
+    netPayout: 285000,
+    status: 'Tamamlandı (%0 Masraf)',
+    date: '02 Eylül 2026'
+  },
+  {
+    id: 'İHL-2026-061',
+    title: 'Fabrika Güneş Enerji Paneli ve Trafo Donanımı',
+    role: 'Satıcı (Tedarikçi)',
+    tenderAmount: 750000,
+    rate: 5,
+    commissionAmount: 37500,
+    netPayout: 712500,
+    status: 'Emanet Havuzunda (Teslimat Aşamasında)',
+    date: '28 Ağustos 2026'
   }
-}
-
-// Run Financial Simulation
-async function runSimulation() {
-  try {
-    const res = await $fetch<any>('/api/revenue/simulate', {
-      method: 'POST',
-      body: simParams.value
-    })
-    if (res?.projection) {
-      simResult.value = res.projection
-    }
-  } catch (err) {
-    console.error('Simülasyon hatası:', err)
-  }
-}
-
-// Save Config Changes
-async function saveConfig() {
-  isUpdating.value = true
-  saveSuccess.value = false
-  try {
-    const res = await $fetch<any>('/api/revenue/config', {
-      method: 'PATCH',
-      body: {
-        activeModel: config.value.activeModel,
-        sellerCommissionRate: Number(config.value.sellerCommissionRate),
-        minCommissionAmount: Number(config.value.minCommissionAmount),
-        maxCommissionCap: Number(config.value.maxCommissionCap)
-      }
-    })
-    if (res?.config) {
-      config.value = res.config
-      saveSuccess.value = true
-      setTimeout(() => { saveSuccess.value = false }, 3000)
-      await runSimulation()
-    }
-  } catch (err: any) {
-    alert(err?.data?.statusMessage || 'Kaydetme sırasında bir hata oluştu.')
-  } finally {
-    isUpdating.value = false
-  }
-}
-
-onMounted(() => {
-  loadData()
-})
-
-const prdModels = [
-  {
-    id: 'Alıcı Aboneliği',
-    target: 'Alıcı Odaklı',
-    advantages: 'Alıcıya kurumsal satın alma SaaS değeri üzerinden öngörülebilir gelir. Satıcı networküne sıfır giriş bariyeri.',
-    risks: 'Alıcı firmaların satın alma aracı için bütçe ayırması zaman alabilir; gelişmiş ERP ve onay akışları gerekir.',
-    compatibility: 'Opsiyonel / Kurumsal Eklenti',
-    status: 'Karar Bekliyor'
-  },
-  {
-    id: 'Satıcı Premium',
-    target: 'Satıcı Odaklı',
-    advantages: 'Aktif tedarikçilerden aylık/yıllık üyelik geliri; ihale alarmları, analiz ve vitrin değeri satılabilir.',
-    risks: 'Network yeterli büyüklüğe ulaşmadan ücret koymak yeni tedarikçi kazanımını yavaşlatabilir.',
-    compatibility: 'Mevcut (Kurumsal Pro)',
-    status: 'Aktif Kullanımda'
-  },
-  {
-    id: 'İhale Başına Ücret',
-    target: 'İşlem Başına',
-    advantages: 'Kullandıkça öde mantığı; basit ve şeffaf.',
-    risks: 'Kullanıcılar ihale açmaktan veya teklif vermekten imtina edebilir; likiditeyi düşürür.',
-    compatibility: 'Uygun Değil (REV-002 İhlali)',
-    status: 'Tavsiye Edilmiyor'
-  },
-  {
-    id: 'Başarı / İşlem Komisyonu (%5)',
-    target: 'Sonuç Odaklı',
-    advantages: 'Platform değer yarattıkça ve ihale başarıyla sonuçlandıkça gelir üretir. Alıcıya %0 komisyon güvencesi sunar.',
-    risks: 'İhale sonuç tutanağının ve faturanın tahsilat takibi gerekir; aracı hizmet sağlayıcı rolü korunmalıdır.',
-    compatibility: 'Mevcut Ana Model (%5 Sabit)',
-    status: 'Standart / Varsayılan'
-  },
-  {
-    id: 'Kurumsal Paket (SaaS)',
-    target: 'Büyük Kurumsal',
-    advantages: 'Büyük ölçekli satın alma yapan holdinglere çoklu kullanıcı, onay hiyerarşisi ve ERP API paketi satışı.',
-    risks: 'Satış döngüsü uzundur; entegrasyon desteği gerekir.',
-    compatibility: 'Mevcut (Enterprise)',
-    status: 'Aktif Kullanımda'
-  },
-  {
-    id: 'Hibrit Model (Tavsiye Edilen)',
-    target: 'Karma Model',
-    advantages: 'Alıcı %0 + Satıcı %5 Başarı Komisyonu + Opsiyonel Kurumsal Pro/Enterprise Abonelikler. Maksimum likidite.',
-    risks: 'Fiyatlandırma sade ve şeffaf tutulmalıdır.',
-    compatibility: 'Tam Uyumlu (PRD Önerisi)',
-    status: 'Platform Standardı'
-  }
-]
+])
 </script>
 
 <template>
-  <div class="space-y-6 max-w-7xl mx-auto text-slate-100">
+  <div class="space-y-6 max-w-7xl mx-auto text-left">
     
-    <!-- Üst Başlık & Durum Rozeti -->
-    <div class="rounded-2xl p-6 border border-slate-800 bg-slate-900/90 shadow-xl backdrop-blur-sm">
-      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div>
-          <div class="flex items-center gap-2 mb-2">
-            <span class="px-3 py-1 text-xs font-mono font-bold rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
+    <!-- Üst Başlık & Şeffaflık Güvencesi -->
+    <div class="rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-xs relative overflow-hidden">
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+        <div class="space-y-2 max-w-3xl">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-3 py-1 text-xs font-mono font-bold rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 flex items-center gap-1.5">
               <ShieldCheck :size="14" />
-              PRD BÖLÜM 12 & REV-001 - REV-003 UYUMLU
+              %100 ŞEFFAF VE SABİT KOMİSYON POLİTİKASI
             </span>
-            <span class="px-3 py-1 text-xs font-mono font-bold rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
-              ALICI %0 KOMİSYON GÜVENCESİ
+            <span class="px-3 py-1 text-xs font-mono font-bold rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">
+              ALICILARA %0 MASRAF
             </span>
           </div>
-          <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center gap-3">
-            <Coins class="text-emerald-400" :size="32" />
-            Gelir Modeli ve Ücretlendirme Stratejisi
+
+          <h1 class="text-2xl sm:text-3xl font-black tracking-tight text-slate-900 dark:text-white flex items-center gap-3">
+            <Coins class="text-emerald-500 shrink-0" :size="30" />
+            Komisyon Oranları & Kesinti Bilgisi
           </h1>
-          <p class="text-sm text-slate-400 mt-1 max-w-3xl">
-            İhaleciBurada B2B e-ihale pazaryeri gelir mimarisi; alıcı satın alma ekiplerine sıfır maliyet (%0), satıcı firmalara başarı durumunda net %5 platform hizmet bedeli ve kurumsal üyelik paketleri üzerine kuruludur.
+          <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+            İhaleciBurada platformunda gizli ücret, aidat veya peşin listeleme masrafı yoktur. 
+            Alıcı kurumlar tüm satın alma süreçlerini <strong>sıfır maliyetle (%0)</strong> yürütür; kazanan tedarikçi firmalar ise yalnızca mal veya hizmet teslimatı alıcı tarafından onaylandığında <strong>sabit net %5 başarı bedeli</strong> öder.
           </p>
         </div>
 
-        <!-- Özet Hacim Kartı -->
-        <div class="flex items-center gap-3 bg-slate-950/60 p-4 rounded-xl border border-slate-800 shrink-0">
-          <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-            <TrendingUp :size="24" />
+        <!-- Özet Oran Rozet Kartı -->
+        <div class="flex items-center gap-3 bg-slate-50 dark:bg-slate-950 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shrink-0">
+          <div class="w-12 h-12 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
+            <Percent :size="24" />
           </div>
           <div>
-            <div class="text-xs text-slate-400 font-medium">Toplam Tahakkuk Havuzu</div>
-            <div class="text-xl font-black text-white font-mono">
-              {{ accrualsSummary?.totalNetPayable ? accrualsSummary.totalNetPayable.toLocaleString('tr-TR') + ' ₺' : '143.550 ₺' }}
+            <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Geçerli Başarı Oranı</div>
+            <div class="text-2xl font-black text-slate-900 dark:text-white font-mono">
+              %5 <span class="text-xs font-semibold text-slate-400">Sabit</span>
             </div>
-            <div class="text-[10px] text-emerald-400 font-bold">3 Sonuçlanan İhaleden</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Kural Güvenceleri Şeridi -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mt-6 pt-5 border-t border-slate-800/80 text-xs">
-        <div class="flex items-start gap-2 text-slate-300">
-          <CheckCircle2 :size="16" class="text-emerald-400 shrink-0 mt-0.5" />
-          <div>
-            <span class="font-bold text-white">REV-001 (Alıcı %0 Komisyon):</span> Alıcı firmalar ihale açarken, şartname yayınlarken veya teklif kabul ederken hiçbir komisyon ödemez.
-          </div>
-        </div>
-        <div class="flex items-start gap-2 text-slate-300">
-          <CheckCircle2 :size="16" class="text-emerald-400 shrink-0 mt-0.5" />
-          <div>
-            <span class="font-bold text-white">REV-002 (Decoupled Engine):</span> Temel ihale ve teklif motoru ücretlendirmeye bağımsızdır; ihale akışı ödeme duvarına kilitlenemez.
-          </div>
-        </div>
-        <div class="flex items-start gap-2 text-slate-300">
-          <CheckCircle2 :size="16" class="text-emerald-400 shrink-0 mt-0.5" />
-          <div>
-            <span class="font-bold text-white">REV-003 (Tahakkuk Analitiği):</span> Platform hizmet bedeli sadece resmi İhale Sonuç Tutanağı onaylandığında kazanana tahakkuk eder.
+            <div class="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">Yalnızca Onaylanan Teslimatta</div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Sekme Navigasyonu -->
-    <div class="flex border-b border-slate-800 space-x-1 overflow-x-auto scrollbar-none">
-      <button
-        type="button"
-        @click="activeTab = 'strateji'"
-        class="px-5 py-3 text-xs font-bold transition-all border-b-2 flex items-center gap-2 cursor-pointer shrink-0"
-        :class="activeTab === 'strateji' ? 'border-emerald-500 text-emerald-400 bg-slate-900/50' : 'border-transparent text-slate-400 hover:text-slate-200'"
-      >
-        <Layers :size="16" />
-        Bölüm 12 Karar Matrisi
-      </button>
+    <!-- 3 Temel İlke Kartı (Net ve Sade) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      
+      <!-- İlke 1: Alıcı -->
+      <div class="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-xs space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-black">
+          %0
+        </div>
+        <div>
+          <h3 class="text-sm font-black text-slate-900 dark:text-white">Alıcı Şirketler İçin %0 Masraf</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+            İhale açmak, şartname yayınlamak, teklif toplamak ve satıcı seçmek tamamen ücretsizdir. Alıcılardan hiçbir aşamada komisyon kesilmez.
+          </p>
+        </div>
+        <ul class="text-[11px] text-slate-600 dark:text-slate-400 space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <li class="flex items-center gap-1.5"><CheckCircle2 :size="13" class="text-emerald-500 shrink-0" /> Sınırsız ihale açma</li>
+          <li class="flex items-center gap-1.5"><CheckCircle2 :size="13" class="text-emerald-500 shrink-0" /> Sıfır üyelik ve aidat maliyeti</li>
+          <li class="flex items-center gap-1.5"><CheckCircle2 :size="13" class="text-emerald-500 shrink-0" /> Doğrulanmış üreticilere doğrudan erişim</li>
+        </ul>
+      </div>
 
-      <button
-        type="button"
-        @click="activeTab = 'simulasyon'"
-        class="px-5 py-3 text-xs font-bold transition-all border-b-2 flex items-center gap-2 cursor-pointer shrink-0"
-        :class="activeTab === 'simulasyon' ? 'border-emerald-500 text-emerald-400 bg-slate-900/50' : 'border-transparent text-slate-400 hover:text-slate-200'"
-      >
-        <Calculator :size="16" />
-        Dinamik Gelir Simülatörü
-      </button>
+      <!-- İlke 2: Satıcı -->
+      <div class="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-xs space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-black">
+          %5
+        </div>
+        <div>
+          <h3 class="text-sm font-black text-slate-900 dark:text-white">Satıcılar İçin Sabit %5 Başarı Komisyonu</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+            İhalelere teklif vermek ücretsizdir. Komisyon sadece ihale kazanılıp alıcı malı/hizmeti teslim aldığında hakediş tutarından kesilir.
+          </p>
+        </div>
+        <ul class="text-[11px] text-slate-600 dark:text-slate-400 space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <li class="flex items-center gap-1.5"><CheckCircle2 :size="13" class="text-blue-500 shrink-0" /> Yalnızca kazandığınızda ödeme</li>
+          <li class="flex items-center gap-1.5"><CheckCircle2 :size="13" class="text-blue-500 shrink-0" /> Sektörden bağımsız sabit %5 kuralı</li>
+          <li class="flex items-center gap-1.5"><CheckCircle2 :size="13" class="text-blue-500 shrink-0" /> Resmi e-Fatura / e-Arşiv kesintisi</li>
+        </ul>
+      </div>
 
-      <button
-        type="button"
-        @click="activeTab = 'tahakkuk'"
-        class="px-5 py-3 text-xs font-bold transition-all border-b-2 flex items-center gap-2 cursor-pointer shrink-0"
-        :class="activeTab === 'tahakkuk' ? 'border-emerald-500 text-emerald-400 bg-slate-900/50' : 'border-transparent text-slate-400 hover:text-slate-200'"
-      >
-        <Receipt :size="16" />
-        Komisyon Tahakkuk Tablosu
-      </button>
+      <!-- İlke 3: Sıfır Risk -->
+      <div class="p-6 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 shadow-xs space-y-3">
+        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center font-black">
+          <Lock :size="18" />
+        </div>
+        <div>
+          <h3 class="text-sm font-black text-slate-900 dark:text-white">Kayıp / İptal Durumunda Sıfır Risk</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
+            Kazanamadığınız, alıcı tarafından iptal edilen veya mutabakat sağlanamayan ihaleler için hiçbir bedel ödemezsiniz.
+          </p>
+        </div>
+        <ul class="text-[11px] text-slate-600 dark:text-slate-400 space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <li class="flex items-center gap-1.5"><CheckCircle2 :size="13" class="text-purple-500 shrink-0" /> Başarısız tekliflerde 0 ₺ kesinti</li>
+          <li class="flex items-center gap-1.5"><CheckCircle2 :size="13" class="text-purple-500 shrink-0" /> Lisanslı ödeme havuzu güvencesi</li>
+          <li class="flex items-center gap-1.5"><CheckCircle2 :size="13" class="text-purple-500 shrink-0" /> Sürpriz ek maliyet veya ceza yok</li>
+        </ul>
+      </div>
 
-      <button
-        type="button"
-        @click="activeTab = 'paketler'"
-        class="px-5 py-3 text-xs font-bold transition-all border-b-2 flex items-center gap-2 cursor-pointer shrink-0"
-        :class="activeTab === 'paketler' ? 'border-emerald-500 text-emerald-400 bg-slate-900/50' : 'border-transparent text-slate-400 hover:text-slate-200'"
-      >
-        <Award :size="16" />
-        Kurumsal Üyelik Paketleri
-      </button>
     </div>
 
-    <!-- 1. TAB: STRATEJİ & KARAR MATRİSİ -->
-    <div v-if="activeTab === 'strateji'" class="space-y-6">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Sol: Aktif Model Yapılandırması Formu -->
-        <div class="lg:col-span-1 rounded-2xl p-6 border border-slate-800 bg-slate-900/80 space-y-4">
-          <h2 class="text-base font-bold text-white flex items-center gap-2">
-            <Sliders :size="18" class="text-emerald-400" />
-            Aktif Model Parametreleri
+    <!-- Hızlı Şeffaf Hakediş & Kesinti Hesaplayıcı -->
+    <div class="p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-xs space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+        <div>
+          <h2 class="text-base sm:text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <Calculator class="text-blue-600" :size="20" />
+            Canlı Komisyon & Net Hakediş Hesaplayıcı
           </h2>
-          <p class="text-xs text-slate-400">
-            Platform genelinde geçerli olan komisyon tabanı ve katsayıları yönetin.
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            İhale tutarını girerek hesabınıza geçecek net tutarı ve platform komisyonunu anında hesaplayın.
           </p>
+        </div>
 
-          <form @submit.prevent="saveConfig" class="space-y-4 pt-2">
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">Seçili Model Stratejisi</label>
-              <select 
-                v-model="config.activeModel"
-                class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none"
-              >
-                <option value="HYBRID">Hibrit (Alıcı %0 + Satıcı %5 + SaaS)</option>
-                <option value="COMMISSION_ONLY">Yalnızca Başarı Komisyonu (%5)</option>
-                <option value="SUBSCRIPTION_ONLY">Yalnızca Kurumsal Abonelik</option>
-                <option value="FREE_PILOT">Ücretsiz Pilot Dönemi (%0 Komisyon)</option>
-              </select>
-            </div>
+        <!-- Rol Seçici -->
+        <div class="flex items-center p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold shrink-0">
+          <button 
+            type="button" 
+            @click="selectedRole = 'seller'" 
+            class="px-3 py-1.5 rounded-lg transition cursor-pointer"
+            :class="selectedRole === 'seller' ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'"
+          >
+            Tedarikçi (Satıcı) Gözüyle
+          </button>
+          <button 
+            type="button" 
+            @click="selectedRole = 'buyer'" 
+            class="px-3 py-1.5 rounded-lg transition cursor-pointer"
+            :class="selectedRole === 'buyer' ? 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 shadow-xs' : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'"
+          >
+            Satın Alıcı Gözüyle
+          </button>
+        </div>
+      </div>
 
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">
-                Alıcı Komisyon Oranı (%)
-                <span class="text-[10px] text-emerald-400 ml-1 font-normal">(PRD Kuralı: Kilitli)</span>
-              </label>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        
+        <!-- Giriş Alanı -->
+        <div class="lg:col-span-5 space-y-4">
+          <div>
+            <label class="block text-xs font-black text-slate-700 dark:text-slate-300 uppercase mb-1.5">
+              İhale / Sipariş Bedeli (₺)
+            </label>
+            <div class="relative">
               <input 
+                v-model.number="calcAmount" 
                 type="number" 
-                :value="0" 
-                disabled 
-                class="w-full bg-slate-950/50 border border-slate-800/80 rounded-xl px-3 py-2 text-xs text-slate-400 cursor-not-allowed font-mono"
+                step="5000"
+                min="1000"
+                class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-white text-base font-black font-mono focus:ring-2 focus:ring-blue-500 outline-none transition"
               />
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-black text-slate-400 font-mono">₺</span>
             </div>
-
-            <div>
-              <label class="block text-xs font-bold text-slate-300 mb-1">Satıcı Standart Başarı Komisyonu (%)</label>
-              <div class="relative">
-                <input 
-                  type="number" 
-                  step="0.1" 
-                  min="0" 
-                  max="15"
-                  v-model.number="config.sellerCommissionRate"
-                  class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none font-mono"
-                />
-                <span class="absolute right-3 top-2 text-xs text-slate-500">%</span>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-              <div>
-                <label class="block text-[11px] font-bold text-slate-300 mb-1">Min. Taban Tutar</label>
-                <input 
-                  type="number" 
-                  v-model.number="config.minCommissionAmount"
-                  class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none font-mono"
-                />
-              </div>
-              <div>
-                <label class="block text-[11px] font-bold text-slate-300 mb-1">Maks. Tavan Sınırı</label>
-                <input 
-                  type="number" 
-                  v-model.number="config.maxCommissionCap"
-                  class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-xs text-white focus:border-emerald-500 focus:outline-none font-mono"
-                />
-              </div>
-            </div>
-
-            <div class="p-3 rounded-xl bg-slate-950/70 border border-slate-800 text-[11px] text-slate-400 space-y-1">
-              <div class="flex justify-between">
-                <span>KDV Oranı:</span>
-                <span class="text-white font-mono">%20</span>
-              </div>
-              <div class="flex justify-between">
-                <span>B2B KDV Tevkifatı:</span>
-                <span class="text-white font-mono">5/10 (Yarısı Tevkif)</span>
-              </div>
-              <div class="flex justify-between">
-                <span>İhale Motoru Kilidi:</span>
-                <span class="text-emerald-400 font-bold">Kapalı (Decoupled)</span>
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              :disabled="isUpdating"
-              class="w-full py-2.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              <RefreshCw v-if="isUpdating" class="animate-spin" :size="14" />
-              <Check v-else-if="saveSuccess" class="text-white" :size="14" />
-              <span>{{ saveSuccess ? 'Parametreler Güncellendi!' : 'Modeli Kaydet & Uygula' }}</span>
-            </button>
-          </form>
-        </div>
-
-        <!-- Sağ: PRD Bölüm 12 Karşılaştırmalı Değerlendirme Tablosu -->
-        <div class="lg:col-span-2 rounded-2xl p-6 border border-slate-800 bg-slate-900/80 space-y-4">
-          <div>
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
-              <FileText :size="18" class="text-blue-400" />
-              PRD Bölüm 12: 6 Modelin Değerlendirme Çerçevesi
-            </h2>
-            <p class="text-xs text-slate-400 mt-1">
-              Ürün analiz dokümanında masaya yatırılan modellerin risk, avantaj ve platform kararları.
-            </p>
-          </div>
-
-          <div class="space-y-3">
-            <div 
-              v-for="model in prdModels" 
-              :key="model.id"
-              class="p-4 rounded-xl border transition-all"
-              :class="model.id.includes('Hibrit') || model.id.includes('%5') 
-                ? 'bg-slate-950/80 border-emerald-500/30' 
-                : 'bg-slate-950/40 border-slate-800/80'"
-            >
-              <div class="flex items-center justify-between gap-2 mb-2">
-                <div class="flex items-center gap-2">
-                  <h3 class="text-xs font-bold text-white">{{ model.id }}</h3>
-                  <span class="text-[10px] px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-mono">
-                    {{ model.target }}
-                  </span>
-                </div>
-                <span 
-                  class="text-[10px] font-bold px-2 py-0.5 rounded-full"
-                  :class="model.status.includes('Standart') || model.status.includes('Platform')
-                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
-                    : 'bg-slate-800 text-slate-400 border border-slate-700'"
-                >
-                  {{ model.status }}
-                </span>
-              </div>
-
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px]">
-                <div>
-                  <span class="text-emerald-400 font-bold block mb-0.5">Avantaj:</span>
-                  <p class="text-slate-300 leading-relaxed">{{ model.advantages }}</p>
-                </div>
-                <div>
-                  <span class="text-amber-400 font-bold block mb-0.5">Risk / Ürün Etkisi:</span>
-                  <p class="text-slate-400 leading-relaxed">{{ model.risks }}</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- 2. TAB: DİNAMİK GELİR SİMÜLATÖRÜ -->
-    <div v-if="activeTab === 'simulasyon'" class="space-y-6">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <!-- Simülasyon Girdi Alanları -->
-        <div class="lg:col-span-1 rounded-2xl p-6 border border-slate-800 bg-slate-900/80 space-y-4">
-          <h2 class="text-base font-bold text-white flex items-center gap-2">
-            <Sliders :size="18" class="text-emerald-400" />
-            Projeksiyon Değişkenleri
-          </h2>
-          <p class="text-xs text-slate-400">
-            Aylık hacim ve katılımcı senaryolarını test ederek platform gelir ve tasarruf potansiyelini simüle edin.
-          </p>
-
-          <div class="space-y-4 pt-2">
-            <div>
-              <div class="flex justify-between text-xs font-bold text-slate-300 mb-1">
-                <span>Aylık Sonuçlanan İhale Adedi</span>
-                <span class="text-emerald-400 font-mono">{{ simParams.monthlyTenderCount }} Adet</span>
-              </div>
-              <input 
-                type="range" 
-                min="5" 
-                max="300" 
-                step="5"
-                v-model.number="simParams.monthlyTenderCount"
-                @input="runSimulation"
-                class="w-full accent-emerald-500 cursor-pointer"
-              />
-            </div>
-
-            <div>
-              <div class="flex justify-between text-xs font-bold text-slate-300 mb-1">
-                <span>Ortalama İhale Bedeli</span>
-                <span class="text-emerald-400 font-mono">{{ simParams.avgTenderAmount.toLocaleString('tr-TR') }} ₺</span>
-              </div>
-              <input 
-                type="range" 
-                min="50000" 
-                max="2000000" 
-                step="25000"
-                v-model.number="simParams.avgTenderAmount"
-                @input="runSimulation"
-                class="w-full accent-emerald-500 cursor-pointer"
-              />
-            </div>
-
-            <div>
-              <div class="flex justify-between text-xs font-bold text-slate-300 mb-1">
-                <span>Kurumsal Pro Abone Sayısı</span>
-                <span class="text-blue-400 font-mono">{{ simParams.proSubscriberCount }} Firma (1.800 ₺/ay)</span>
-              </div>
-              <input 
-                type="range" 
-                min="0" 
-                max="150" 
-                step="5"
-                v-model.number="simParams.proSubscriberCount"
-                @input="runSimulation"
-                class="w-full accent-blue-500 cursor-pointer"
-              />
-            </div>
-
-            <div>
-              <div class="flex justify-between text-xs font-bold text-slate-300 mb-1">
-                <span>Kurumsal Enterprise Abone Sayısı</span>
-                <span class="text-purple-400 font-mono">{{ simParams.enterpriseSubscriberCount }} Firma (4.500 ₺/ay)</span>
-              </div>
-              <input 
-                type="range" 
-                min="0" 
-                max="50" 
-                step="1"
-                v-model.number="simParams.enterpriseSubscriberCount"
-                @input="runSimulation"
-                class="w-full accent-purple-500 cursor-pointer"
-              />
-            </div>
-
-            <div class="pt-2">
-              <button
+            <div class="flex items-center gap-2 mt-2">
+              <button 
+                v-for="amt in [50000, 100000, 250000, 500000, 1000000]" 
+                :key="amt"
                 type="button"
-                @click="runSimulation"
-                class="w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
+                @click="calcAmount = amt"
+                class="px-2 py-1 rounded-lg border border-slate-200 dark:border-slate-800 text-[10px] font-bold text-slate-600 dark:text-slate-400 hover:border-blue-500 hover:text-blue-600 transition cursor-pointer"
               >
-                <Calculator :size="14" />
-                <span>Projeksiyonu Yeniden Hesapla</span>
+                {{ (amt / 1000) }}K ₺
               </button>
             </div>
           </div>
-        </div>
 
-        <!-- Simülasyon Çıktı Kartları -->
-        <div class="lg:col-span-2 space-y-6">
-          <div v-if="simResult" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            
-            <div class="rounded-2xl p-5 border border-slate-800 bg-slate-900/80">
-              <div class="text-xs text-slate-400 font-medium">Toplam Ticaret Hacmi (GMV)</div>
-              <div class="text-2xl font-black text-white font-mono mt-1">
-                {{ simResult.totalGrossMerchandiseVolume.toLocaleString('tr-TR') }} ₺
-              </div>
-              <div class="text-[11px] text-slate-400 mt-2">
-                {{ simResult.monthlyTenderCount }} ihale × {{ simResult.avgTenderAmount.toLocaleString('tr-TR') }} ₺ ortalama
-              </div>
+          <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 space-y-1.5 leading-relaxed">
+            <div class="flex items-center gap-1.5 font-bold text-slate-700 dark:text-slate-300">
+              <Lock :size="13" class="text-blue-600" />
+              TCMB Lisanslı Havuz Güvencesi:
             </div>
-
-            <div class="rounded-2xl p-5 border border-slate-800 bg-slate-900/80">
-              <div class="text-xs text-slate-400 font-medium">Satıcı Komisyon Geliri</div>
-              <div class="text-2xl font-black text-emerald-400 font-mono mt-1">
-                {{ simResult.sellerCommissionRevenue.toLocaleString('tr-TR') }} ₺
-              </div>
-              <div class="text-[11px] text-emerald-300 mt-2">
-                Tüm Seviyelerde Sabit %5.0 Başarı Komisyonu
-              </div>
-            </div>
-
-            <div class="rounded-2xl p-5 border border-slate-800 bg-slate-900/80">
-              <div class="text-xs text-slate-400 font-medium">SaaS Abonelik Geliri</div>
-              <div class="text-2xl font-black text-blue-400 font-mono mt-1">
-                {{ simResult.totalSubscriptionRevenue.toLocaleString('tr-TR') }} ₺
-              </div>
-              <div class="text-[11px] text-blue-300 mt-2">
-                Pro ({{ simResult.proSubscriptionRevenue.toLocaleString('tr-TR') }} ₺) + Ent ({{ simResult.enterpriseSubscriptionRevenue.toLocaleString('tr-TR') }} ₺)
-              </div>
-            </div>
-
-            <div class="rounded-2xl p-5 border border-emerald-500/30 bg-emerald-950/20 sm:col-span-2">
-              <div class="flex items-center justify-between">
-                <div>
-                  <div class="text-xs text-emerald-400 font-bold uppercase tracking-wider">Aylık Toplam Net Platform Ciro</div>
-                  <div class="text-3xl font-black text-white font-mono mt-1">
-                    {{ simResult.netPlatformRevenue.toLocaleString('tr-TR') }} ₺
-                  </div>
-                </div>
-                <div class="text-right">
-                  <div class="text-xs text-slate-400">Efektif Take-Rate</div>
-                  <div class="text-xl font-bold text-emerald-400 font-mono">
-                    %{{ simResult.effectiveTakeRate }}
-                  </div>
-                </div>
-              </div>
-              <div class="mt-4 pt-3 border-t border-emerald-500/20 text-xs text-slate-300 flex items-center justify-between">
-                <span>Alıcı Komisyon Geliri: <strong class="text-white">0 ₺ (Ücretsiz)</strong></span>
-                <span>Yıllık Tahmini Projeksiyon: <strong class="text-emerald-400 font-mono">{{ (simResult.netPlatformRevenue * 12).toLocaleString('tr-TR') }} ₺</strong></span>
-              </div>
-            </div>
-
-            <div class="rounded-2xl p-5 border border-amber-500/30 bg-amber-950/20">
-              <div class="text-xs text-amber-400 font-bold uppercase tracking-wider">Alıcıların Sağladığı Tasarruf</div>
-              <div class="text-2xl font-black text-white font-mono mt-1">
-                {{ simResult.buyerSavingsEstimated.toLocaleString('tr-TR') }} ₺
-              </div>
-              <div class="text-[11px] text-amber-200/80 mt-2">
-                Açık eksiltme ile sağlanan ortalama %14.2 satın alma tasarrufu
-              </div>
-            </div>
-
-          </div>
-
-          <!-- Finansal Şeffaflık & Fatura Dağılımı -->
-          <div class="rounded-2xl p-6 border border-slate-800 bg-slate-900/80">
-            <h3 class="text-xs font-bold text-white uppercase tracking-wider mb-3">
-              Vergi & Tevkifat Dağılım Modeli
-            </h3>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                <span class="text-slate-400 block mb-1">Hesaplanan KDV (%20):</span>
-                <span class="text-white font-mono font-bold text-sm">
-                  {{ simResult?.totalVatLiability?.toLocaleString('tr-TR') || 0 }} ₺
-                </span>
-              </div>
-              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                <span class="text-slate-400 block mb-1">Satıcı Tarafından Tevkif Edilen (5/10):</span>
-                <span class="text-emerald-400 font-mono font-bold text-sm">
-                  {{ Math.round((simResult?.totalVatLiability || 0) * 0.5).toLocaleString('tr-TR') }} ₺
-                </span>
-              </div>
-              <div class="p-3 rounded-xl bg-slate-950 border border-slate-800">
-                <span class="text-slate-400 block mb-1">Platforma Doğrudan Ödenen KDV:</span>
-                <span class="text-blue-400 font-mono font-bold text-sm">
-                  {{ Math.round((simResult?.totalVatLiability || 0) * 0.5).toLocaleString('tr-TR') }} ₺
-                </span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </div>
-
-    <!-- 3. TAB: TAHAKKUK TABLOSU -->
-    <div v-if="activeTab === 'tahakkuk'" class="space-y-6">
-      <div class="rounded-2xl p-6 border border-slate-800 bg-slate-900/80 space-y-4">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h2 class="text-base font-bold text-white flex items-center gap-2">
-              <Receipt :size="18" class="text-emerald-400" />
-              İhale Sonuç Tutanağı Komisyon Tahakkukları
-            </h2>
-            <p class="text-xs text-slate-400 mt-1">
-              Tamamlanan ve onaylanan ihalelerden satıcı tarafına tahakkuk ettirilen platform hizmet bedelleri.
+            <p>
+              Tutar alıcı tarafından yatırıldığında lisanslı banka havuzunda bloke edilir. Siz şartnameye uygun malı/hizmeti teslim edip alıcı onay verene kadar hiçbir kesinti veya para transferi gerçekleşmez.
             </p>
           </div>
-
-          <button 
-            type="button"
-            @click="loadData"
-            class="px-3 py-1.5 rounded-xl border border-slate-700 bg-slate-800 hover:bg-slate-700 text-xs font-bold text-white flex items-center gap-1.5 transition cursor-pointer"
-          >
-            <RefreshCw :size="13" />
-            <span>Listeyi Yenile</span>
-          </button>
         </div>
 
-        <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs border-collapse">
-            <thead>
-              <tr class="border-b border-slate-800 text-slate-400 uppercase text-[10px] tracking-wider">
-                <th class="py-3 px-3">Tahakkuk / İhale No</th>
-                <th class="py-3 px-3">İhale Başlığı & Taraflar</th>
-                <th class="py-3 px-3">Nihai İhale Bedeli</th>
-                <th class="py-3 px-3">Oran & Hizmet Bedeli</th>
-                <th class="py-3 px-3">KDV & Net Ödenecek</th>
-                <th class="py-3 px-3">Fatura Durumu</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-800/60">
-              <tr v-for="acc in accruals" :key="acc.id" class="hover:bg-slate-950/40 transition">
-                <td class="py-3 px-3 font-mono">
-                  <div class="text-white font-bold">{{ acc.id }}</div>
-                  <div class="text-[10px] text-slate-400">{{ acc.tenderId }}</div>
-                </td>
-                <td class="py-3 px-3 max-w-xs">
-                  <div class="text-white font-semibold truncate" :title="acc.tenderTitle">{{ acc.tenderTitle }}</div>
-                  <div class="text-[10px] text-slate-400 mt-0.5">
-                    Alıcı: {{ acc.buyerCompany }} | Satıcı: <strong class="text-slate-300">{{ acc.awardedSupplier }}</strong> (VKN: {{ acc.awardedSupplierVkn }})
-                  </div>
-                </td>
-                <td class="py-3 px-3 font-mono text-white font-bold">
-                  {{ acc.tenderFinalAmount.toLocaleString('tr-TR') }} ₺
-                </td>
-                <td class="py-3 px-3 font-mono">
-                  <div class="text-emerald-400 font-bold">%{{ acc.commissionRate }} Komisyon</div>
-                  <div class="text-[10px] text-slate-300">{{ acc.grossCommission.toLocaleString('tr-TR') }} ₺ Brüt</div>
-                </td>
-                <td class="py-3 px-3 font-mono">
-                  <div class="text-white font-bold">{{ acc.netPayableCommission.toLocaleString('tr-TR') }} ₺</div>
-                  <div class="text-[10px] text-slate-400">+{{ acc.vatAmount.toLocaleString('tr-TR') }} KDV (-{{ acc.withholdingAmount.toLocaleString('tr-TR') }} Tevkifat)</div>
-                </td>
-                <td class="py-3 px-3">
-                  <span 
-                    class="px-2.5 py-1 rounded-full text-[10px] font-bold font-mono inline-flex items-center gap-1"
-                    :class="{
-                      'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30': acc.status === 'COLLECTED',
-                      'bg-blue-500/20 text-blue-400 border border-blue-500/30': acc.status === 'INVOICED',
-                      'bg-amber-500/20 text-amber-400 border border-amber-500/30': acc.status === 'PENDING_INVOICE'
-                    }"
-                  >
-                    {{ acc.status === 'COLLECTED' ? 'Tahsil Edildi' : (acc.status === 'INVOICED' ? 'Faturalandı (' + acc.invoiceNo + ')' : 'Fatura Bekliyor') }}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        <!-- Sonuç Kartları (Satıcı Gözüyle) -->
+        <div v-if="selectedRole === 'seller'" class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/40 space-y-1">
+            <span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">Platform Hizmet Bedeli (%5)</span>
+            <div class="text-2xl font-black font-mono text-blue-700 dark:text-blue-400">
+              {{ calcSellerCommission.toLocaleString('tr-TR') }} ₺
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">+ KDV (Faturanız sistemden iletilir)</p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 space-y-1">
+            <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">Hesabınıza Aktarılacak Net Tutar (%95)</span>
+            <div class="text-2xl font-black font-mono text-emerald-700 dark:text-emerald-400">
+              {{ calcSellerNetPayout.toLocaleString('tr-TR') }} ₺
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">Mal kabul onayında doğrudan IBAN'ınıza aktarılır</p>
+          </div>
+
+          <div class="sm:col-span-2 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 flex items-center justify-between text-xs">
+            <span class="text-slate-600 dark:text-slate-400">Başarısız / Kazanılamayan İhalelerde Kesinti:</span>
+            <strong class="text-emerald-600 dark:text-emerald-400 font-mono font-bold">0,00 ₺ (%0 Komisyon)</strong>
+          </div>
         </div>
+
+        <!-- Sonuç Kartları (Alıcı Gözüyle) -->
+        <div v-else class="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/40 space-y-1">
+            <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">Alıcı Komisyon Bedeli</span>
+            <div class="text-2xl font-black font-mono text-emerald-700 dark:text-emerald-400">
+              0,00 ₺ (%0)
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">Alıcı firmalardan hiçbir komisyon alınmaz</p>
+          </div>
+
+          <div class="p-5 rounded-2xl bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/40 space-y-1">
+            <span class="text-[10px] font-bold text-blue-600 dark:text-blue-400 uppercase tracking-wider block">Toplam Ödeyeceğiniz Tutar</span>
+            <div class="text-2xl font-black font-mono text-blue-700 dark:text-blue-400">
+              {{ Number(calcAmount).toLocaleString('tr-TR') }} ₺
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400">Yalnızca ihalede kabul ettiğiniz mal bedeli</p>
+          </div>
+
+          <div class="sm:col-span-2 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 flex items-center justify-between text-xs">
+            <span class="text-slate-600 dark:text-slate-400">Platform İhale Açma & Şartname Masrafı:</span>
+            <strong class="text-emerald-600 dark:text-emerald-400 font-mono font-bold">Tamamen Ücretsiz (0 ₺)</strong>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- 4. TAB: KURUMSAL ÜYELİK PAKETLERİ -->
-    <div v-if="activeTab === 'paketler'" class="space-y-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div 
-          v-for="tier in corporateTiers" 
-          :key="tier.id"
-          class="rounded-2xl p-6 border transition-all flex flex-col justify-between"
-          :class="tier.isPopular 
-            ? 'border-emerald-500/50 bg-slate-900 shadow-2xl relative' 
-            : 'border-slate-800 bg-slate-900/70'"
-        >
-          <div v-if="tier.isPopular" class="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-black uppercase tracking-wider">
-            En Popüler Kurumsal Plan
-          </div>
-
-          <div>
-            <div class="flex items-center justify-between mb-2">
-              <h3 class="text-base font-black text-white">{{ tier.name }}</h3>
-              <span class="text-xs font-mono font-bold px-2 py-0.5 rounded-md bg-slate-800 text-emerald-400">
-                %{{ tier.commissionRate }} Komisyon
-              </span>
-            </div>
-
-            <div class="my-4">
-              <div class="text-3xl font-black text-white font-mono">
-                {{ tier.monthlyPrice === 0 ? 'Ücretsiz' : tier.monthlyPrice.toLocaleString('tr-TR') + ' ₺' }}
-                <span v-if="tier.monthlyPrice > 0" class="text-xs text-slate-400 font-normal">/ ay</span>
-              </div>
-              <div v-if="tier.annualPrice > 0" class="text-xs text-emerald-400 font-medium mt-1">
-                Yıllık peşin: {{ tier.annualPrice.toLocaleString('tr-TR') }} ₺ (%17 ek indirim)
-              </div>
-            </div>
-
-            <div class="space-y-2 pt-4 border-t border-slate-800 text-xs">
-              <div v-for="(feat, idx) in tier.features" :key="idx" class="flex items-start gap-2 text-slate-300">
-                <CheckCircle2 :size="14" class="text-emerald-400 shrink-0 mt-0.5" />
-                <span>{{ feat }}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="pt-6 mt-6 border-t border-slate-800/80">
-            <NuxtLink
-              to="/abonelik"
-              class="w-full py-2.5 px-4 rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-2"
-              :class="tier.isPopular ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg' : 'bg-slate-800 hover:bg-slate-700 text-white'"
-            >
-              <span>{{ tier.monthlyPrice === 0 ? 'Mevcut Planınız' : 'Bu Pakete Geç' }}</span>
-              <ArrowUpRight :size="14" />
-            </NuxtLink>
-          </div>
+    <!-- Hakediş & Sipariş Dökümü (Şeffaf Tablo) -->
+    <div class="p-6 sm:p-8 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-xs space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+        <div>
+          <h2 class="text-base font-black text-slate-900 dark:text-white flex items-center gap-2">
+            <Receipt class="text-emerald-500" :size="18" />
+            İhale Hakediş & Kesinti Dökümüm
+          </h2>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Sonuçlanan işlemlerinizde uygulanan resmi komisyon oranları ve net hakediş durumları.
+          </p>
         </div>
+
+        <NuxtLink 
+          to="/panel/siparis-teslimat" 
+          class="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline"
+        >
+          <span>Tüm Escrow İşlemlerini Gör</span>
+          <ArrowRight :size="14" />
+        </NuxtLink>
       </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs">
+          <thead>
+            <tr class="border-b border-slate-200 dark:border-slate-800 text-[10px] font-black uppercase tracking-wider text-slate-400">
+              <th class="py-3 px-3">İhale No & Başlık</th>
+              <th class="py-3 px-3">Rol</th>
+              <th class="py-3 px-3 text-right">İşlem Tutarı</th>
+              <th class="py-3 px-3 text-center">Komisyon Oranı</th>
+              <th class="py-3 px-3 text-right">Kesinti Tutarı</th>
+              <th class="py-3 px-3 text-right">Net Hakediş</th>
+              <th class="py-3 px-3 text-right">Durum</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
+            <tr v-for="t in userTransactions" :key="t.id" class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
+              <td class="py-3.5 px-3">
+                <div class="font-bold text-slate-900 dark:text-white">{{ t.title }}</div>
+                <div class="text-[10px] font-mono text-slate-400">{{ t.id }} · {{ t.date }}</div>
+              </td>
+              <td class="py-3.5 px-3">
+                <span 
+                  class="px-2 py-0.5 rounded text-[10px] font-bold"
+                  :class="t.role.includes('Alıcı') ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800' : 'bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-400 border border-blue-200 dark:border-blue-800'"
+                >
+                  {{ t.role }}
+                </span>
+              </td>
+              <td class="py-3.5 px-3 text-right font-mono font-bold text-slate-900 dark:text-white">
+                {{ t.tenderAmount.toLocaleString('tr-TR') }} ₺
+              </td>
+              <td class="py-3.5 px-3 text-center font-mono font-bold" :class="t.rate === 0 ? 'text-emerald-600' : 'text-blue-600'">
+                %{{ t.rate }}
+              </td>
+              <td class="py-3.5 px-3 text-right font-mono font-bold" :class="t.commissionAmount === 0 ? 'text-slate-400' : 'text-rose-600 dark:text-rose-400'">
+                {{ t.commissionAmount > 0 ? '-' + t.commissionAmount.toLocaleString('tr-TR') + ' ₺' : '0 ₺' }}
+              </td>
+              <td class="py-3.5 px-3 text-right font-mono font-black text-emerald-600 dark:text-emerald-400">
+                {{ t.netPayout.toLocaleString('tr-TR') }} ₺
+              </td>
+              <td class="py-3.5 px-3 text-right">
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                  {{ t.status }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Alt Bilgilendirme & Yasal Dayanak -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-slate-500">
+      <div class="flex items-center gap-2">
+        <FileText :size="16" class="text-blue-600 shrink-0" />
+        <span>Tüm komisyon ve hakediş kuralları <strong>Platform Aracılık Sözleşmesi (6563 SK Md. 9)</strong> kapsamında güvence altındadır.</span>
+      </div>
+      <NuxtLink 
+        to="/sozlesmeler?tab=aracilik" 
+        class="text-blue-600 dark:text-blue-400 font-bold hover:underline shrink-0"
+      >
+        Yasal Şartları İncele →
+      </NuxtLink>
     </div>
 
   </div>

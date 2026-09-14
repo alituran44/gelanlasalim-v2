@@ -529,9 +529,86 @@ if (!formState.pricing.realEstate) {
   }
 }
 
+const simAmount = ref(100000)
 const simSectorRate = ref(5.0)
 const simPlatformEarning = computed(() => Math.round((simAmount.value * simSectorRate.value) / 100))
 const simSupplierNet = computed(() => simAmount.value - simPlatformEarning.value)
+
+// 📊 Yıllık Finansal Ciro & B2B Projeksiyon Simülatörü (PRD Bölüm 12)
+const annualSimParams = reactive({
+  monthlyTenderCount: 45,
+  avgTenderAmount: 350000,
+  proSubscriberCount: 25,
+  enterpriseSubscriberCount: 8,
+  sellerCommissionRate: 5.0
+})
+
+const annualSimResult = computed(() => {
+  const annualTenderVolume = annualSimParams.monthlyTenderCount * 12 * annualSimParams.avgTenderAmount
+  const annualCommission = Math.round(annualTenderVolume * (annualSimParams.sellerCommissionRate / 100))
+  const annualProSaaS = annualSimParams.proSubscriberCount * 1490 * 12
+  const annualEnterpriseSaaS = annualSimParams.enterpriseSubscriberCount * 4990 * 12
+  const totalAnnualGross = annualCommission + annualProSaaS + annualEnterpriseSaaS
+  return {
+    annualTenderVolume,
+    annualCommission,
+    annualProSaaS,
+    annualEnterpriseSaaS,
+    totalAnnualGross
+  }
+})
+
+// 📋 PRD Bölüm 12: 6 Modelin Değerlendirme Çerçevesi & Karar Matrisi
+const prdModels = [
+  {
+    id: 'Alıcı Aboneliği',
+    target: 'Alıcı Odaklı',
+    advantages: 'Alıcıya kurumsal satın alma SaaS değeri üzerinden öngörülebilir gelir. Satıcı networküne sıfır giriş bariyeri.',
+    risks: 'Alıcı firmaların satın alma aracı için bütçe ayırması zaman alabilir; gelişmiş ERP ve onay akışları gerekir.',
+    compatibility: 'Opsiyonel / Kurumsal Eklenti',
+    status: 'Karar Bekliyor'
+  },
+  {
+    id: 'Satıcı Premium',
+    target: 'Satıcı Odaklı',
+    advantages: 'Aktif tedarikçilerden aylık/yıllık üyelik geliri; ihale alarmları, analiz ve vitrin değeri satılabilir.',
+    risks: 'Network yeterli büyüklüğe ulaşmadan ücret koymak yeni tedarikçi kazanımını yavaşlatabilir.',
+    compatibility: 'Mevcut (Kurumsal Pro)',
+    status: 'Aktif Kullanımda'
+  },
+  {
+    id: 'İhale Başına Ücret',
+    target: 'İşlem Başına',
+    advantages: 'Kullandıkça öde mantığı; basit ve şeffaf.',
+    risks: 'Kullanıcılar ihale açmaktan veya teklif vermekten imtina edebilir; likiditeyi düşürür.',
+    compatibility: 'Uygun Değil (REV-002 İhlali)',
+    status: 'Tavsiye Edilmiyor'
+  },
+  {
+    id: 'Başarı / İşlem Komisyonu (%5)',
+    target: 'Sonuç Odaklı',
+    advantages: 'Platform değer yarattıkça ve ihale başarıyla sonuçlandıkça gelir üretir. Alıcıya %0 komisyon güvencesi sunar.',
+    risks: 'İhale sonuç tutanağının ve faturanın tahsilat takibi gerekir; aracı hizmet sağlayıcı rolü korunmalıdır.',
+    compatibility: 'Mevcut Ana Model (%5 Sabit)',
+    status: 'Standart / Varsayılan'
+  },
+  {
+    id: 'Kurumsal Paket (SaaS)',
+    target: 'Büyük Kurumsal',
+    advantages: 'Büyük ölçekli satın alma yapan holdinglere çoklu kullanıcı, onay hiyerarşisi ve ERP API paketi satışı.',
+    risks: 'Satış döngüsü uzundur; entegrasyon desteği gerekir.',
+    compatibility: 'Mevcut (Enterprise)',
+    status: 'Aktif Kullanımda'
+  },
+  {
+    id: 'Hibrit Model (Tavsiye Edilen)',
+    target: 'Karma Model',
+    advantages: 'Alıcı %0 + Satıcı %5 Başarı Komisyonu + Opsiyonel Kurumsal Pro/Enterprise Abonelikler. Maksimum likidite.',
+    risks: 'Fiyatlandırma sade ve şeffaf tutulmalıdır.',
+    compatibility: 'Tam Uyumlu (PRD Önerisi)',
+    status: 'Platform Standardı'
+  }
+]
 
 const sectorSearchQuery = ref('')
 const newSectorRate = ref({
@@ -5063,6 +5140,130 @@ function removeSubmittedBid(index: number) {
                   <p class="text-[10px] text-slate-500">
                     * Otomatik TCMB lisanslı ödeme kuruluşu (Paynkolay - Aktif Bank) split payment protokolü ile teslimat onaylandığı anda komisyon platform havuzuna, kalan hakediş ise tedarikçi IBAN hesabına aktarılır.
                   </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 📈 Yıllık Finansal Ciro & B2B Projeksiyon Simülatörü (PRD Bölüm 12) -->
+            <div class="p-6 rounded-2xl border space-y-4" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+              <div class="flex items-center justify-between border-b pb-3" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                <div>
+                  <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                    <TrendingUp :size="16" class="text-emerald-500" />
+                    Yıllık Platform Finansal Hacim & Ciro Projeksiyon Simülatörü
+                  </h3>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Aylık ihale adedi, ortalama bütçe ve kurumsal SaaS aboneliklerine göre yıllık platform gelir simülasyonu.</p>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                  PRD REV-001 / REV-003 UYUMLU
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Aylık İhale Adedi</label>
+                  <input v-model.number="annualSimParams.monthlyTenderCount" type="number" class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold" :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Ortalama İhale Bedeli (₺)</label>
+                  <input v-model.number="annualSimParams.avgTenderAmount" type="number" step="10000" class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold" :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Kurumsal Pro Üye (1.490 ₺/ay)</label>
+                  <input v-model.number="annualSimParams.proSubscriberCount" type="number" class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold" :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" />
+                </div>
+                <div>
+                  <label class="block text-[10px] font-bold text-slate-400 mb-1 uppercase">Kurumsal Enterprise (4.990 ₺/ay)</label>
+                  <input v-model.number="annualSimParams.enterpriseSubscriberCount" type="number" class="w-full rounded-xl border p-2.5 text-xs font-mono font-bold" :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-300 text-slate-900' : 'bg-slate-950 border-slate-800 text-white'" />
+                </div>
+              </div>
+
+              <!-- Computed Projection Cards -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2">
+                <div class="p-4 rounded-xl border" :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-slate-950 border-slate-800'">
+                  <span class="text-[10px] text-slate-400 font-bold block uppercase">Yıllık Toplam Ticaret Hacmi (GMV)</span>
+                  <span class="text-base font-black font-mono mt-1 block" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                    {{ annualSimResult.annualTenderVolume.toLocaleString('tr-TR') }} ₺
+                  </span>
+                  <span class="text-[9px] text-slate-500">{{ annualSimParams.monthlyTenderCount * 12 }} Tamamlanan İhale</span>
+                </div>
+
+                <div class="p-4 rounded-xl border" :class="adminTheme === 'light' ? 'bg-blue-50/60 border-blue-200' : 'bg-blue-950/20 border-blue-800/40'">
+                  <span class="text-[10px] text-blue-500 font-bold block uppercase">Yıllık Sabit Komisyon Geliri (%5)</span>
+                  <span class="text-base font-black font-mono text-blue-600 mt-1 block">
+                    {{ annualSimResult.annualCommission.toLocaleString('tr-TR') }} ₺
+                  </span>
+                  <span class="text-[9px] text-blue-400 font-medium">Başarıya endeksli net havuz</span>
+                </div>
+
+                <div class="p-4 rounded-xl border" :class="adminTheme === 'light' ? 'bg-purple-50/60 border-purple-200' : 'bg-purple-950/20 border-purple-800/40'">
+                  <span class="text-[10px] text-purple-500 font-bold block uppercase">Yıllık SaaS Abonelik Geliri</span>
+                  <span class="text-base font-black font-mono text-purple-600 mt-1 block">
+                    {{ (annualSimResult.annualProSaaS + annualSimResult.annualEnterpriseSaaS).toLocaleString('tr-TR') }} ₺
+                  </span>
+                  <span class="text-[9px] text-purple-400 font-medium">Pro + Enterprise paketler</span>
+                </div>
+
+                <div class="p-4 rounded-xl border" :class="adminTheme === 'light' ? 'bg-emerald-50/60 border-emerald-200' : 'bg-emerald-950/20 border-emerald-800/40'">
+                  <span class="text-[10px] text-emerald-500 font-bold block uppercase">Toplam Yıllık Brüt Platform Geliri</span>
+                  <span class="text-base font-black font-mono text-emerald-600 mt-1 block">
+                    {{ annualSimResult.totalAnnualGross.toLocaleString('tr-TR') }} ₺
+                  </span>
+                  <span class="text-[9px] text-emerald-400 font-bold">Komisyon + SaaS Toplamı</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 📋 PRD Bölüm 12: 6 Modelin Değerlendirme Çerçevesi & Karar Matrisi -->
+            <div class="p-6 rounded-2xl border space-y-4" :class="adminTheme === 'light' ? 'bg-white border-slate-200 shadow-xs' : 'bg-slate-900/60 border-slate-800'">
+              <div class="flex items-center justify-between border-b pb-3" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                <div>
+                  <h3 class="text-sm font-black flex items-center gap-2" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">
+                    <FileText :size="16" class="text-blue-500" />
+                    PRD Bölüm 12: 6 Modelin Değerlendirme Çerçevesi & Karar Matrisi
+                  </h3>
+                  <p class="text-[11px] text-slate-500 mt-0.5">Ürün mimarisinde masaya yatırılan gelir modellerinin risk, avantaj ve platform standartları.</p>
+                </div>
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-black bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono">
+                  YÖNETİM STRATEJİSİ
+                </span>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div 
+                  v-for="m in prdModels" 
+                  :key="m.id" 
+                  class="p-4 rounded-xl border space-y-3 transition"
+                  :class="adminTheme === 'light' ? 'bg-slate-50 border-slate-200 hover:border-slate-300' : 'bg-slate-950 border-slate-800 hover:border-slate-700'"
+                >
+                  <div class="flex items-start justify-between gap-2">
+                    <div>
+                      <h4 class="text-xs font-black" :class="adminTheme === 'light' ? 'text-slate-900' : 'text-white'">{{ m.id }}</h4>
+                      <span class="text-[10px] font-bold text-slate-400">{{ m.target }}</span>
+                    </div>
+                    <span 
+                      class="px-2 py-0.5 rounded-md text-[9px] font-black shrink-0"
+                      :class="m.status === 'Platform Standardı' || m.status === 'Standart / Varsayılan' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : (m.status === 'Aktif Kullanımda' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' : 'bg-slate-500/20 text-slate-400 border border-slate-500/30')"
+                    >
+                      {{ m.status }}
+                    </span>
+                  </div>
+
+                  <div class="space-y-1.5 text-[11px]">
+                    <div>
+                      <span class="font-bold text-emerald-600 block text-[10px] uppercase">Avantaj:</span>
+                      <p class="text-slate-600 dark:text-slate-300 leading-relaxed">{{ m.advantages }}</p>
+                    </div>
+                    <div>
+                      <span class="font-bold text-amber-600 block text-[10px] uppercase">Risk / Ürün Etkisi:</span>
+                      <p class="text-slate-500 dark:text-slate-400 leading-relaxed">{{ m.risks }}</p>
+                    </div>
+                  </div>
+
+                  <div class="pt-2 border-t text-[10px] font-mono text-slate-400 flex items-center justify-between" :class="adminTheme === 'light' ? 'border-slate-200' : 'border-slate-800'">
+                    <span>Uyumluluk:</span>
+                    <strong class="text-slate-700 dark:text-slate-300">{{ m.compatibility }}</strong>
+                  </div>
                 </div>
               </div>
             </div>
