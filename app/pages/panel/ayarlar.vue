@@ -1586,33 +1586,41 @@ function saveProfile() {
       </div>
     </div>
 
-    <!-- Horizontal Sub-Navigation Tab Bar -->
-    <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-slate-200">
-      <!-- Genel Bakış & İhale İstatistikleri (Panele Dönüş) -->
-      <NuxtLink
-        to="/panel"
-        class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer border bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900"
-      >
-        <LayoutDashboard :size="14" class="text-slate-400" />
-        <span>Genel Bakış & İhale İstatistikleri</span>
-      </NuxtLink>
+    <!-- 🗂️ 2 KOLONLU DÜZEN: SOL DİKEY MENÜ (ALT ALTA) & SAĞ İÇERİK -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
-      <NuxtLink
-        v-for="tab in navigationTabs"
-        :key="tab.key"
-        :to="tab.to"
-        class="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer border"
-        :class="activeSubTab === tab.key 
-          ? 'bg-[#0F223D] text-white border-[#0F223D] shadow-sm' 
-          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50 hover:text-slate-900'"
-      >
-        <component :is="tab.icon" :size="14" :class="activeSubTab === tab.key ? 'text-[#1EAE4C]' : 'text-slate-400'" />
-        <span>{{ tab.label }}</span>
-      </NuxtLink>
-    </div>
+      <!-- Sol Dikey Sekme Menüsü (Alt Alta) -->
+      <aside class="lg:col-span-3 bg-white rounded-2xl border border-slate-200 p-2.5 shadow-xs space-y-1 lg:sticky lg:top-4">
+        <div class="px-3 py-2 text-[10px] font-black uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
+          Hesap & Ayarlar Menüsü
+        </div>
 
-    <!-- Main Content Area -->
-    <div class="space-y-6">
+        <!-- 1. Genel Bakış & İhale İstatistikleri (Panele Dönüş) -->
+        <NuxtLink
+          to="/panel"
+          class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all w-full border border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+        >
+          <LayoutDashboard :size="15" class="text-slate-400 shrink-0" />
+          <span>Genel Bakış & İstatistikler</span>
+        </NuxtLink>
+
+        <!-- Ayarlar Sekmeleri (Alt Alta) -->
+        <NuxtLink
+          v-for="tab in navigationTabs"
+          :key="tab.key"
+          :to="tab.to"
+          class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all w-full border"
+          :class="activeSubTab === tab.key 
+            ? 'bg-[#0F223D] text-white border-[#0F223D] shadow-xs' 
+            : 'border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
+        >
+          <component :is="tab.icon" :size="15" :class="activeSubTab === tab.key ? 'text-[#1EAE4C]' : 'text-slate-400'" class="shrink-0" />
+          <span class="truncate">{{ tab.label }}</span>
+        </NuxtLink>
+      </aside>
+
+      <!-- Sağ Ana İçerik Alanı -->
+      <main class="lg:col-span-9 space-y-6 min-w-0">
         
         <!-- KIŞISEL TAB -->
         <div v-if="activeSubTab === 'kisisel'" class="space-y-6">
@@ -4199,6 +4207,7 @@ function saveProfile() {
 
         </div>
 
+      </main>
     </div>
 
     <!-- 1. Sözleşme Detay Modalı (Modal System) -->
