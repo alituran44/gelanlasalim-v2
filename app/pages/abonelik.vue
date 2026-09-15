@@ -49,50 +49,85 @@ const internationalCurrency = ref<'USD' | 'EUR'>('USD')
 // Corporate Billing Cycle: monthly vs annual (12 Ay %17 Ek İndirim)
 const corporateBillingCycle = ref<'monthly' | 'annual'>('monthly')
 
-// Kurumsal Üyelik Paketleri (Firma Modu Aktif Olduğunda Açığa Çıkar - Standart Ücretsiz Kaldırıldı)
-const corporatePackages = computed(() => [
-  {
-    id: 'kurumsal-pro',
-    name: 'Kurumsal Pro Tedarikçi',
-    badge: 'Doğrulanmış B2B',
-    commissionRate: 5.0,
-    price: corporateBillingCycle.value === 'annual' ? 18000 : 1800,
-    monthlyPrice: 1800,
-    annualPrice: 18000,
-    monthly: corporateBillingCycle.value === 'annual' ? '₺1.500,00 / ay (Peşin Yıllık)' : '₺1.800,00 / ay',
-    desc: 'Yalnızca başarılı ihalede %5 sabit komisyon (alıcıya %0), Mavi Kalkan kurumsal tedarikçi rozeti ve öncelikli alarmlar.',
-    features: [
-      'Yalnızca Başarılı İhalede %5 Sabit Komisyon (Alıcıya %0)',
-      'Doğrulanmış B2B Rozeti (Mavi Kalkan)',
-      'Yeni açılan ihalelerde öncelikli SMS/E-posta alarmı',
-      'Sınırsız teklif revizyonu ve detaylı rakip analiz özeti',
-      '7/24 Öncelikli telefon & KEP destek hattı'
-    ],
-    isPopular: true,
-    isFree: false
-  },
-  {
-    id: 'kurumsal-enterprise',
-    name: 'Kurumsal Enterprise',
-    badge: 'ERP & Limitsiz Ekip',
-    commissionRate: 5.0,
-    price: corporateBillingCycle.value === 'annual' ? 45000 : 4500,
-    monthlyPrice: 4500,
-    annualPrice: 45000,
-    monthly: corporateBillingCycle.value === 'annual' ? '₺3.750,00 / ay (Peşin Yıllık)' : '₺4.500,00 / ay',
-    desc: 'Yalnızca başarılı ihalede %5 sabit komisyon (alıcıya %0), limitsiz ekip yetkilendirmesi ve SAP/Logo/Netsis ERP REST API entegrasyonu.',
-    features: [
-      'Yalnızca Başarılı İhalede %5 Sabit Komisyon (Alıcıya %0)',
-      'Kurumsal Alt Kullanıcı & Ekip Yetki Yönetimi (Limitsiz)',
-      'SAP / Logo / Netsis / Mikro ERP REST API Entegrasyonu',
-      'Özel Müşteri Başarı Yöneticisi (Account Manager)',
-      'Özel davetli kapalı ihalelere otomatik doğrudan davet',
-      'Gelişmiş Likidite ve Fiyat Hareketi Analitik Raporu'
-    ],
-    isPopular: false,
-    isFree: false
-  }
-])
+// Kurumsal Üyelik Paketleri (Firma Modu Aktif Olduğunda Açığa Çıkar - Yurt İçi ve Yurt Dışı Skalası)
+const corporatePackages = computed(() => {
+  const isIntl = paymentRegion.value === 'international'
+  const isEUR = isIntl && internationalCurrency.value === 'EUR'
+  const isAnnual = corporateBillingCycle.value === 'annual'
+  const sym = isIntl ? (isEUR ? '€' : '$') : '₺'
+
+  // Uluslararası ödeme skalası hesabı:
+  // Standart Global Bireysel $49 baz alınarak 2X kurumsal çarpanla Pro ($99/ay veya €89/ay),
+  // 5X çarpanla ve ERP altyapısıyla Enterprise ($249/ay veya €229/ay) belirlenmiştir.
+  // Yıllık peşin ödemede 12 ay için %17 ek tasarruf (10 ay fiyatına 12 ay) uygulanır.
+  const proMonthly = isIntl ? (isEUR ? 89 : 99) : 1800
+  const proAnnual = isIntl ? (isEUR ? 890 : 990) : 18000
+  const entMonthly = isIntl ? (isEUR ? 229 : 249) : 4500
+  const entAnnual = isIntl ? (isEUR ? 2290 : 2490) : 45000
+
+  return [
+    {
+      id: 'kurumsal-pro',
+      name: isIntl ? 'Global Pro B2B Supplier' : 'Kurumsal Pro Tedarikçi',
+      badge: isIntl ? 'Verified Global B2B' : 'Doğrulanmış B2B',
+      commissionRate: 5.0,
+      currency: sym,
+      price: isAnnual ? proAnnual : proMonthly,
+      monthlyPrice: proMonthly,
+      annualPrice: proAnnual,
+      monthly: isAnnual ? `${sym}${Math.round(proAnnual / 12).toLocaleString('tr-TR')} / ${isIntl ? 'mo' : 'ay'}` : `${sym}${proMonthly.toLocaleString('tr-TR')} / ${isIntl ? 'mo' : 'ay'}`,
+      desc: isIntl
+        ? 'Fixed 5% escrow success fee (0% for buyers), Verified Global Blue Shield badge, priority international tender radar alerts.'
+        : 'Yalnızca başarılı ihalede %5 sabit komisyon (alıcıya %0), Mavi Kalkan kurumsal tedarikçi rozeti ve öncelikli alarmlar.',
+      features: isIntl ? [
+        'Only 5% Fixed Escrow Success Fee (0% for Buyer)',
+        'Verified Global B2B Badge (Blue Shield)',
+        'Priority International Tender Radar & SMS/Email Alerts',
+        'Unlimited Bid Revisions & Competitor Price Intelligence',
+        '24/7 Priority Multilingual Phone & SWIFT Support'
+      ] : [
+        'Yalnızca Başarılı İhalede %5 Sabit Komisyon (Alıcıya %0)',
+        'Doğrulanmış B2B Rozeti (Mavi Kalkan)',
+        'Yeni açılan ihalelerde öncelikli SMS/E-posta alarmı',
+        'Sınırsız teklif revizyonu ve detaylı rakip analiz özeti',
+        '7/24 Öncelikli telefon & KEP destek hattı'
+      ],
+      isPopular: true,
+      isFree: false
+    },
+    {
+      id: 'kurumsal-enterprise',
+      name: isIntl ? 'Global Enterprise & ERP' : 'Kurumsal Enterprise',
+      badge: isIntl ? 'ERP & Unlimited Seats' : 'ERP & Limitsiz Ekip',
+      commissionRate: 5.0,
+      currency: sym,
+      price: isAnnual ? entAnnual : entMonthly,
+      monthlyPrice: entMonthly,
+      annualPrice: entAnnual,
+      monthly: isAnnual ? `${sym}${Math.round(entAnnual / 12).toLocaleString('tr-TR')} / ${isIntl ? 'mo' : 'ay'}` : `${sym}${entMonthly.toLocaleString('tr-TR')} / ${isIntl ? 'mo' : 'ay'}`,
+      desc: isIntl
+        ? 'Fixed 5% escrow fee, unlimited role-based team management (RBAC), and SAP / Oracle / Netsis ERP REST API integration.'
+        : 'Yalnızca başarılı ihalede %5 sabit komisyon (alıcıya %0), limitsiz ekip yetkilendirmesi ve SAP/Logo/Netsis ERP REST API entegrasyonu.',
+      features: isIntl ? [
+        'Only 5% Fixed Escrow Success Fee (0% for Buyer)',
+        'Unlimited Cross-Border Team Seats & RBAC Roles',
+        'Global SAP / Oracle / Netsis / Logo ERP REST API',
+        'Dedicated International Account Success Manager',
+        'Direct Access to Closed & High-Volume Global Tenders',
+        'Advanced Multi-Currency Liquidity & Risk Analytics'
+      ] : [
+        'Yalnızca Başarılı İhalede %5 Sabit Komisyon (Alıcıya %0)',
+        'Kurumsal Alt Kullanıcı & Ekip Yetki Yönetimi (Limitsiz)',
+        'SAP / Logo / Netsis / Mikro ERP REST API Entegrasyonu',
+        'Özel Müşteri Başarı Yöneticisi (Account Manager)',
+        'Özel davetli kapalı ihalelere otomatik doğrudan davet',
+        'Gelişmiş Likidite ve Fiyat Hareketi Analitik Raporu'
+      ],
+      isPopular: false,
+      isFree: false
+    }
+  ]
+})
 
 // Domestic Pricing Packages (TRY ₺) - 1, 3, 6, 12 Ay
 const domesticPackages = [
@@ -138,70 +173,78 @@ const domesticPackages = [
 const internationalPackagesUSD = [
   { 
     id: '1-month-global-usd', 
-    name: 'Global Pass - 1 Month', 
-    price: 29, 
-    monthly: '$29.00 / mo',
-    desc: '1 Month Full Access to Global B2B Auction Arena (VAT Exempt)',
-    isPromo: false
+    name: 'MEMBERSHIP - 1 MONTH', 
+    price: 49, 
+    monthly: '$49.00 / mo',
+    desc: '1 Month Global B2B Reverse Auction & Tender Access',
+    isPromo: false,
+    duration: '1 Month'
   },
   { 
     id: '3-months-global-usd', 
-    name: 'Global Business - 3 Months', 
-    price: 75, 
-    monthly: '$25.00 / mo',
-    desc: '3 Months Global Access with 15% Quarterly Discount',
-    isPromo: true
+    name: 'MEMBERSHIP - 3 MONTHS', 
+    price: 99, 
+    monthly: '$33.00 / mo',
+    desc: '3 Months Global Access with 33% Savings',
+    isPromo: true,
+    duration: '3 Months'
   },
   { 
     id: '6-months-global-usd', 
-    name: 'Global Enterprise - 6 Months', 
-    price: 120, 
-    monthly: '$20.00 / mo',
-    desc: '6 Months Global Tier with 30% Bi-Annual Discount',
-    isPromo: false
+    name: 'MEMBERSHIP - 6 MONTHS', 
+    price: 149, 
+    monthly: '$25.00 / mo',
+    desc: '6 Months Global Package with 50% Savings',
+    isPromo: false,
+    duration: '6 Months'
   },
   { 
     id: '12-months-global-usd', 
-    name: 'Global Annual Pass - 12 Months', 
-    price: 180, 
-    monthly: '$15.00 / mo',
-    desc: '12 Months Annual Pass with Maximum 50% Savings',
-    isPromo: false
+    name: 'MEMBERSHIP - 12 MONTHS', 
+    price: 199, 
+    monthly: '$16.58 / mo',
+    desc: '12 Months Annual Pass with Maximum 66% Savings',
+    isPromo: false,
+    duration: '12 Months'
   }
 ]
 
 const internationalPackagesEUR = [
   { 
     id: '1-month-global-eur', 
-    name: 'Global Pass - 1 Month', 
-    price: 25, 
-    monthly: '€25.00 / mo',
-    desc: '1 Month Full Access to Global B2B Auction Arena (VAT Exempt)',
-    isPromo: false
+    name: 'MEMBERSHIP - 1 MONTH', 
+    price: 45, 
+    monthly: '€45.00 / mo',
+    desc: '1 Month Global B2B Reverse Auction & Tender Access',
+    isPromo: false,
+    duration: '1 Month'
   },
   { 
     id: '3-months-global-eur', 
-    name: 'Global Business - 3 Months', 
-    price: 65, 
-    monthly: '€21.66 / mo',
-    desc: '3 Months Global Access with 15% Quarterly Discount',
-    isPromo: true
+    name: 'MEMBERSHIP - 3 MONTHS', 
+    price: 89, 
+    monthly: '€29.66 / mo',
+    desc: '3 Months Global Access with 33% Savings',
+    isPromo: true,
+    duration: '3 Months'
   },
   { 
     id: '6-months-global-eur', 
-    name: 'Global Enterprise - 6 Months', 
-    price: 105, 
-    monthly: '€17.50 / mo',
-    desc: '6 Months Global Tier with 30% Bi-Annual Discount',
-    isPromo: false
+    name: 'MEMBERSHIP - 6 MONTHS', 
+    price: 135, 
+    monthly: '€22.50 / mo',
+    desc: '6 Months Global Package with 50% Savings',
+    isPromo: false,
+    duration: '6 Months'
   },
   { 
     id: '12-months-global-eur', 
-    name: 'Global Annual Pass - 12 Months', 
-    price: 155, 
-    monthly: '€12.91 / mo',
-    desc: '12 Months Annual Pass with Maximum 50% Savings',
-    isPromo: false
+    name: 'MEMBERSHIP - 12 MONTHS', 
+    price: 179, 
+    monthly: '€14.91 / mo',
+    desc: '12 Months Annual Pass with Maximum 66% Savings',
+    isPromo: false,
+    duration: '12 Months'
   }
 ]
 
@@ -351,13 +394,19 @@ function selectCorporatePackage(tier: any) {
   }
 
   const isAnnual = corporateBillingCycle.value === 'annual'
+  const isIntl = paymentRegion.value === 'international'
+  const sym = tier.currency || currencySymbol.value
   const pkgToCheckout = {
     id: isAnnual ? `${tier.id}-annual` : `${tier.id}-monthly`,
     tierId: tier.id,
     tierName: tier.name,
-    name: isAnnual ? `${tier.name} (12 Aylık Yıllık)` : `${tier.name} (Aylık)`,
+    name: isAnnual 
+      ? (isIntl ? `${tier.name} (12 Months / Annual)` : `${tier.name} (12 Aylık Yıllık)`)
+      : (isIntl ? `${tier.name} (Monthly)` : `${tier.name} (Aylık)`),
     price: isAnnual ? tier.annualPrice : tier.monthlyPrice,
-    monthly: isAnnual ? `₺${Math.round(tier.annualPrice / 12).toLocaleString('tr-TR')},00 / ay` : `₺${tier.monthlyPrice.toLocaleString('tr-TR')},00 / ay`,
+    monthly: isAnnual 
+      ? `${sym}${Math.round(tier.annualPrice / 12).toLocaleString('tr-TR')},00 / ${isIntl ? 'mo' : 'ay'}` 
+      : `${sym}${tier.monthlyPrice.toLocaleString('tr-TR')},00 / ${isIntl ? 'mo' : 'ay'}`,
     desc: tier.desc,
     isPromo: tier.isPopular
   }
@@ -522,8 +571,8 @@ function completeCheckout() {
         </div>
       </div>
 
-      <!-- PACKAGE SELECTION BLOCK -->
-      <div v-if="paymentRegion === 'domestic'" class="space-y-6 pt-2">
+      <!-- PACKAGE SELECTION BLOCK (YURT İÇİ VE YURT DIŞI KURUMSAL / BİREYSEL MOD ENTEGRASYONU) -->
+      <div class="space-y-6 pt-2">
         
         <!-- Mode Switcher: Bireysel Hesap (Abonelik Paketleri) vs Kurumsal Firma Modu (Kurumsal Fiyatlar) -->
         <div class="p-5 rounded-3xl bg-white border border-slate-200 shadow-sm transition-all duration-300">
@@ -536,19 +585,25 @@ function completeCheckout() {
                 >
                   <Building2 v-if="isCompanyMode" :size="13" class="text-emerald-600" />
                   <User v-else :size="13" class="text-blue-600" />
-                  <span>{{ isCompanyMode ? 'FİRMA MODU AKTİF' : 'BİREYSEL HESAP MODU' }}</span>
+                  <span>{{ isCompanyMode ? (paymentRegion === 'international' ? 'CORPORATE MODE ACTIVE' : 'FİRMA MODU AKTİF') : (paymentRegion === 'international' ? 'INDIVIDUAL ACCOUNT MODE' : 'BİREYSEL HESAP MODU') }}</span>
                 </span>
-                <span class="text-xs text-slate-400 font-medium">• Kolay Geçişli</span>
+                <span class="text-xs text-slate-400 font-medium">• {{ paymentRegion === 'international' ? 'Instant Switch' : 'Kolay Geçişli' }}</span>
               </div>
               <h2 class="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
                 <Building2 v-if="isCompanyMode" class="text-emerald-600" :size="22" />
                 <Award v-else class="text-blue-600" :size="22" />
-                <span>{{ isCompanyMode ? 'Kurumsal Firma Fiyatlandırması & Tedarikçi Planları' : 'Bireysel İhale Abonelik Sistemi (1 - 12 Ay)' }}</span>
+                <span>{{ isCompanyMode 
+                  ? (paymentRegion === 'international' ? 'Corporate B2B Pricing & Supplier Tiers (USD / EUR)' : 'Kurumsal Firma Fiyatlandırması & Tedarikçi Planları') 
+                  : (paymentRegion === 'international' ? 'Global Individual Auction Passes (1 - 12 Months)' : 'Bireysel İhale Abonelik Sistemi (1 - 12 Ay)') }}</span>
               </h2>
               <p class="text-xs sm:text-sm text-slate-500 mt-1 font-medium max-w-2xl">
                 {{ isCompanyMode 
-                  ? 'Firma moduna özel %5 sabit komisyon (alıcıya %0), Mavi Kalkan kurumsal rozeti, çoklu kullanıcı ve ERP API entegrasyonu.' 
-                  : 'Bireysel kullanıcılara özel 1 aydan 12 aya kadar süreli ihale arama, teklif verme ve satın alma abonelik paketleri.' 
+                  ? (paymentRegion === 'international' 
+                      ? 'Exclusive corporate advantages: 5% fixed escrow success fee (0% for buyers), Blue Shield verified badge, unlimited team seats, and ERP REST API integration.'
+                      : 'Firma moduna özel %5 sabit komisyon (alıcıya %0), Mavi Kalkan kurumsal rozeti, çoklu kullanıcı ve ERP API entegrasyonu.') 
+                  : (paymentRegion === 'international'
+                      ? 'Global tender browsing, verified bidding, and reverse auction access passes from 1 to 12 months with maximum savings.'
+                      : 'Bireysel kullanıcılara özel 1 aydan 12 aya kadar süreli ihale arama, teklif verme ve satın alma abonelik paketleri.') 
                 }}
               </p>
             </div>
@@ -557,16 +612,16 @@ function completeCheckout() {
             <div v-if="isCompanyMode" class="flex flex-wrap items-center gap-2.5 shrink-0">
               <div class="px-4 py-2 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black flex items-center gap-2">
                 <Building2 :size="16" class="text-emerald-600" />
-                <span>🏢 Kurumsal Firma Modu</span>
+                <span>🏢 {{ paymentRegion === 'international' ? 'Corporate Mode' : 'Kurumsal Firma Modu' }}</span>
               </div>
               <button
                 type="button"
                 @click="toggleCompanyMode(false)"
                 class="px-4 py-2 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 hover:text-blue-600 border border-slate-300 shadow-xs text-xs font-black transition-all flex items-center gap-2 cursor-pointer"
-                title="Bireysel abonelik paketlerine geri dön"
+                :title="paymentRegion === 'international' ? 'Return to individual packages' : 'Bireysel abonelik paketlerine geri dön'"
               >
                 <User :size="15" class="text-blue-600" />
-                <span>👤 Bireysel Moda Geç</span>
+                <span>👤 {{ paymentRegion === 'international' ? 'Switch to Individual' : 'Bireysel Moda Geç' }}</span>
               </button>
             </div>
             <div v-else class="shrink-0 w-full md:w-auto">
@@ -576,7 +631,7 @@ function completeCheckout() {
                 class="w-full md:w-auto px-5 py-3 rounded-2xl bg-[#0F223D] hover:bg-[#003057] text-white text-xs font-black transition-all flex items-center justify-center gap-2 shadow-md cursor-pointer"
               >
                 <Building2 :size="15" class="text-emerald-400" />
-                <span>🏢 Kurumsal Firma Moduna Geç</span>
+                <span>🏢 {{ paymentRegion === 'international' ? 'Switch to Corporate Mode' : 'Kurumsal Firma Moduna Geç' }}</span>
               </button>
             </div>
           </div>
@@ -594,7 +649,7 @@ function completeCheckout() {
                 class="px-4 py-1.5 rounded-lg transition cursor-pointer"
                 :class="corporateBillingCycle === 'monthly' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900'"
               >
-                Aylık Faturalandırma
+                {{ paymentRegion === 'international' ? 'Monthly Billing' : 'Aylık Faturalandırma' }}
               </button>
               <button
                 type="button"
@@ -602,8 +657,8 @@ function completeCheckout() {
                 class="px-4 py-1.5 rounded-lg transition flex items-center gap-1.5 cursor-pointer"
                 :class="corporateBillingCycle === 'annual' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900'"
               >
-                <span>Yıllık Peşin (12 Ay)</span>
-                <span class="text-[10px] font-black text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-md">%17 Ek İndirim</span>
+                <span>{{ paymentRegion === 'international' ? 'Annual Prepaid (12 Mo)' : 'Yıllık Peşin (12 Ay)' }}</span>
+                <span class="text-[10px] font-black text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-md">{{ paymentRegion === 'international' ? '17% Extra Savings' : '%17 Ek İndirim' }}</span>
               </button>
             </div>
           </div>
@@ -620,7 +675,7 @@ function completeCheckout() {
             >
               <!-- Popüler Rozeti -->
               <div v-if="tier.isPopular" class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-lg">
-                EN POPÜLER KURUMSAL PLAN
+                {{ paymentRegion === 'international' ? 'MOST POPULAR CORPORATE PLAN' : 'EN POPÜLER KURUMSAL PLAN' }}
               </div>
 
               <div>
@@ -634,20 +689,20 @@ function completeCheckout() {
                 <div class="my-4 py-4 border-y border-slate-800">
                   <div class="text-3xl sm:text-4xl font-black text-white font-mono tracking-tight">
                     <template v-if="corporateBillingCycle === 'annual'">
-                      {{ tier.annualPrice.toLocaleString('tr-TR') }} ₺
-                      <span class="text-xs text-slate-400 font-normal">/ yıl</span>
+                      {{ tier.currency }}{{ tier.annualPrice.toLocaleString('tr-TR') }}
+                      <span class="text-xs text-slate-400 font-normal">/ {{ paymentRegion === 'international' ? 'yr' : 'yıl' }}</span>
                     </template>
                     <template v-else>
-                      {{ tier.monthlyPrice.toLocaleString('tr-TR') }} ₺
-                      <span class="text-xs text-slate-400 font-normal">/ ay</span>
+                      {{ tier.currency }}{{ tier.monthlyPrice.toLocaleString('tr-TR') }}
+                      <span class="text-xs text-slate-400 font-normal">/ {{ paymentRegion === 'international' ? 'mo' : 'ay' }}</span>
                     </template>
                   </div>
                   <div class="text-xs text-emerald-400 font-medium mt-1.5">
                     <template v-if="corporateBillingCycle === 'annual'">
-                      Aylık efektif maliyet: {{ Math.round(tier.annualPrice / 12).toLocaleString('tr-TR') }} ₺ (%17 ek tasarruf)
+                      {{ paymentRegion === 'international' ? 'Effective monthly cost:' : 'Aylık efektif maliyet:' }} {{ tier.currency }}{{ Math.round(tier.annualPrice / 12).toLocaleString('tr-TR') }} ({{ paymentRegion === 'international' ? '17% savings' : '%17 ek tasarruf' }})
                     </template>
                     <template v-else>
-                      Yıllık peşin: {{ tier.annualPrice.toLocaleString('tr-TR') }} ₺ (%17 ek indirim)
+                      {{ paymentRegion === 'international' ? 'Annual prepaid:' : 'Yıllık peşin:' }} {{ tier.currency }}{{ tier.annualPrice.toLocaleString('tr-TR') }} ({{ paymentRegion === 'international' ? '17% extra discount' : '%17 ek indirim' }})
                     </template>
                   </div>
                   <p class="text-xs text-slate-400 mt-2.5 leading-relaxed">
@@ -682,23 +737,23 @@ function completeCheckout() {
                 >
                   <template v-if="tier.id === 'kurumsal-enterprise' && isCorporateEnterprise">
                     <CheckCircle2 :size="16" class="text-white" />
-                    <span>✓ Mevcut Planınız (Enterprise Aktif)</span>
+                    <span>{{ paymentRegion === 'international' ? '✓ Current Plan (Enterprise Active)' : '✓ Mevcut Planınız (Enterprise Aktif)' }}</span>
                   </template>
                   <template v-else-if="tier.id === 'kurumsal-pro' && isCorporateEnterprise">
                     <Check :size="16" class="text-emerald-400" />
-                    <span>Enterprise Planınız Kapsamında Aktif</span>
+                    <span>{{ paymentRegion === 'international' ? 'Active Under Enterprise Plan' : 'Enterprise Planınız Kapsamında Aktif' }}</span>
                   </template>
                   <template v-else-if="tier.id === 'kurumsal-pro' && isCorporatePro">
                     <CheckCircle2 :size="16" class="text-white" />
-                    <span>✓ Mevcut Planınız (Pro Aktif)</span>
+                    <span>{{ paymentRegion === 'international' ? '✓ Current Plan (Pro Active)' : '✓ Mevcut Planınız (Pro Aktif)' }}</span>
                   </template>
                   <template v-else-if="tier.id === 'kurumsal-enterprise' && isCorporatePro">
                     <Sparkles :size="15" class="text-slate-950" />
-                    <span>Enterprise'a Yükselt (+₺2.700 Farkla)</span>
+                    <span>{{ paymentRegion === 'international' ? `Upgrade to Enterprise (+${internationalCurrency === 'EUR' ? '€140' : '$150'} diff)` : `Enterprise'a Yükselt (+₺2.700 Farkla)` }}</span>
                     <ArrowRight :size="14" />
                   </template>
                   <template v-else>
-                    <span>{{ 'Bu Kurumsal Pakete Geç' }}</span>
+                    <span>{{ paymentRegion === 'international' ? 'Choose This Corporate Tier' : 'Bu Kurumsal Pakete Geç' }}</span>
                     <ArrowRight :size="14" />
                   </template>
                 </button>
@@ -711,17 +766,17 @@ function completeCheckout() {
         <div v-else class="space-y-6 animate-fadeIn">
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div 
-              v-for="pkg in domesticPackages" 
+              v-for="pkg in (paymentRegion === 'domestic' ? domesticPackages : activePackages)" 
               :key="pkg.id" 
               class="border rounded-3xl bg-white overflow-hidden transition-all duration-300 flex flex-col justify-between hover:shadow-xl shadow-sm relative group"
               :class="pkg.isPromo ? 'border-[#1EAE4C] ring-2 ring-[#1EAE4C]/30' : 'border-slate-200'"
             >
               <!-- Promo Tag -->
               <div v-if="pkg.isPromo" class="bg-[#1EAE4C] text-white font-black text-[9px] uppercase tracking-widest text-center py-1.5">
-                ⚡ {{ 'EN ÇOK TERCİH EDİLEN POPÜLER PLAN' }}
+                ⚡ {{ paymentRegion === 'international' ? 'MOST POPULAR GLOBAL PLAN' : 'EN ÇOK TERCİH EDİLEN POPÜLER PLAN' }}
               </div>
               <div v-else class="bg-[#0F223D] text-white font-bold text-[9px] uppercase tracking-widest text-center py-1.5">
-                {{ pkg.id === '12-ay-tr' ? 'YILLIK AVANTAJ' : 'BİREYSEL KULLANIM' }}
+                {{ paymentRegion === 'international' ? 'GLOBAL ACCESS' : (pkg.id === '12-ay-tr' ? 'YILLIK AVANTAJ' : 'BİREYSEL KULLANIM') }}
               </div>
               
               <!-- Price & Title Content Area -->
@@ -749,7 +804,7 @@ function completeCheckout() {
                   class="w-full text-center rounded-xl font-black text-xs py-3.5 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02]"
                   :class="pkg.isPromo ? 'bg-[#1EAE4C] hover:bg-[#188C3D] text-white shadow-[#1EAE4C]/20' : 'bg-[#0F223D] hover:bg-[#003057] text-white'"
                 >
-                  <span>{{ 'HEMEN ABONE OL' }}</span>
+                  <span>{{ paymentRegion === 'international' ? 'SUBSCRIBE NOW' : 'HEMEN ABONE OL' }}</span>
                   <ArrowRight :size="14" />
                 </button>
               </div>
@@ -759,65 +814,20 @@ function completeCheckout() {
           <!-- Bireyselden Kurumsala Hızlı Geçiş Kutusu -->
           <div class="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-center max-w-2xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="text-left">
-              <span class="text-xs font-bold text-emerald-900 block">Şirket veya Kurumsal Tedarikçi misiniz?</span>
-              <span class="text-[11px] text-emerald-700">Firma moduna geçerek kurumsal tedarikçi avantajlarını ve Mavi Kalkan ayrıcalıklarını inceleyin.</span>
+              <span class="text-xs font-bold text-emerald-900 block">{{ paymentRegion === 'international' ? 'Are you a B2B Company or Supplier?' : 'Şirket veya Kurumsal Tedarikçi misiniz?' }}</span>
+              <span class="text-[11px] text-emerald-700">{{ paymentRegion === 'international' ? 'Switch to Corporate Mode to explore verified blue shield badge and ERP integration.' : 'Firma moduna geçerek kurumsal tedarikçi avantajlarını ve Mavi Kalkan ayrıcalıklarını inceleyin.' }}</span>
             </div>
             <button
               type="button"
               @click="toggleCompanyMode(true)"
               class="px-4 py-2 rounded-xl bg-[#0F223D] hover:bg-[#003057] text-white text-xs font-black transition flex items-center gap-1.5 shrink-0 shadow-sm cursor-pointer"
             >
-              <span>🏢 Firma Moduna Geç</span>
+              <span>🏢 {{ paymentRegion === 'international' ? 'Switch to Corporate Mode' : 'Firma Moduna Geç' }}</span>
               <ArrowRight :size="12" />
             </button>
           </div>
         </div>
 
-      </div>
-
-      <!-- INTERNATIONAL GLOBAL PACKAGES -->
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 pt-2">
-        <div 
-          v-for="pkg in activePackages" 
-          :key="pkg.id" 
-          class="border rounded-3xl bg-white overflow-hidden transition-all duration-300 flex flex-col justify-between hover:shadow-xl shadow-sm relative group"
-          :class="pkg.isPromo ? 'border-[#1EAE4C] ring-2 ring-[#1EAE4C]/30' : 'border-slate-200'"
-        >
-          <div v-if="pkg.isPromo" class="bg-[#1EAE4C] text-white font-black text-[9px] uppercase tracking-widest text-center py-1.5">
-            ⚡ {{ 'MOST POPULAR GLOBAL PLAN' }}
-          </div>
-          <div v-else class="bg-[#0F223D] text-white font-bold text-[9px] uppercase tracking-widest text-center py-1.5">
-            {{ 'GLOBAL ACCESS' }}
-          </div>
-          
-          <div class="p-6 text-center flex-grow flex flex-col justify-between bg-white">
-            <div>
-              <h3 class="text-xs font-black text-slate-900 uppercase tracking-tight">{{ pkg.name }}</h3>
-              <div class="text-3xl font-black tracking-tight font-mono text-slate-900 mt-4">
-                {{ currencySymbol }}{{ pkg.price.toLocaleString('tr-TR') }}
-              </div>
-              <div class="text-[11px] text-[#003057] font-bold mt-1 bg-slate-100 py-1 px-2.5 rounded-lg inline-block">
-                {{ pkg.monthly }}
-              </div>
-            </div>
-            
-            <p class="text-[11px] text-slate-500 mt-4 leading-relaxed font-medium bg-slate-50 p-3 rounded-xl border border-slate-100 min-h-[50px]">
-              {{ pkg.desc }}
-            </p>
-          </div>
-
-          <div class="p-5 bg-slate-50/80 border-t border-slate-100">
-            <button 
-              type="button"
-              @click="openCheckout(pkg)"
-              class="w-full text-center rounded-xl font-black text-xs py-3.5 transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer hover:scale-[1.02]"
-              :class="pkg.isPromo ? 'bg-[#1EAE4C] hover:bg-[#188C3D] text-white shadow-[#1EAE4C]/20' : 'bg-[#0F223D] hover:bg-[#003057] text-white'"
-            >
-              <span>{{ 'SUBSCRIBE NOW' }}</span>
-              <ArrowRight :size="14" />
-            </button>
-          </div>
-        </div>
       </div>
 
       <!-- TAX & SECURITY NOTICE BAR -->

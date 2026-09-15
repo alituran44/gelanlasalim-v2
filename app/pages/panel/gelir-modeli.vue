@@ -13,21 +13,127 @@ import {
   Package,
   Building2,
   Sparkles,
-  HelpCircle
+  HelpCircle,
+  Truck,
+  DollarSign,
+  Search,
+  Scale
 } from 'lucide-vue-next'
 import { useUserSession } from '~/composables/useUserSession'
+import { useCmsData } from '~/composables/useCmsData'
 
 definePageMeta({
   layout: 'dashboard'
 })
 
 useHead({
-  title: 'Komisyon Oranları & Kesinti Bilgisi | İhaleciBurada'
+  title: 'Sipariş, Teslimat & Güvenli Havuz (Escrow) ve Komisyon Bilgisi | İhaleciBurada'
 })
 
 const { userSession } = useUserSession()
+const { cmsData } = useCmsData()
 
-// Hesaplayıcı Durumu
+// =========================================================================
+// 1. ESCROW & SİPARİŞ TESLİMAT DURUMU (FOTO 1)
+// =========================================================================
+const escrowSearchQuery = ref('')
+const activeEscrowTab = ref<'all' | 'HAVUZDA_BLOKE' | 'MAL_KABUL_BEKLIYOR' | 'TAMAMLANDI'>('all')
+
+const orders = computed(() => {
+  const list: any[] = []
+  const seenIds = new Set()
+
+  // 1. Check cmsData.value.dashboard.escrowOrders
+  const dOrders = cmsData.value?.dashboard?.escrowOrders || []
+  dOrders.forEach((o: any) => {
+    if (!seenIds.has(o.id || o.tenderId)) {
+      seenIds.add(o.id || o.tenderId)
+      list.push(o)
+    }
+  })
+
+  // 2. Check cmsData.value.escrowOrders
+  const rootOrders = cmsData.value?.escrowOrders || []
+  rootOrders.forEach((o: any) => {
+    if (!seenIds.has(o.id || o.tenderId)) {
+      seenIds.add(o.id || o.tenderId)
+      list.push(o)
+    }
+  })
+
+  // 3. Check receivedBids for approved offers
+  const receivedGroups = cmsData.value?.dashboard?.receivedBids || []
+  receivedGroups.forEach((group: any) => {
+    if (group.teklifler) {
+      const approved = group.teklifler.find((t: any) => t.durum === 'onaylandi' || t.durum === 'anlasildi')
+      if (approved && !seenIds.has(group.id)) {
+        seenIds.add(group.id)
+        const numVal = parseInt(String(approved.fiyat || '75000').replace(/\D/g, '')) || 75000
+        list.unshift({
+          id: 'ORD-2026-' + (group.id ? group.id.replace(/\D/g, '') : Math.floor(100 + Math.random() * 900)),
+          orderCode: 'SIP-2026-' + Math.floor(1000 + Math.random() * 9000),
+          tenderId: group.id,
+          tenderTitle: group.baslik,
+          buyerFirm: group.ownerCompany || userSession.value?.companyName || 'Kurumsal Alıcı Firma',
+          supplierFirm: approved.firma,
+          totalAmount: approved.fiyat,
+          numericAmount: numVal,
+          payoutAmount: Math.round(numVal * 0.95).toLocaleString('tr-TR') + ' ₺',
+          commissionAmount: Math.round(numVal * 0.05).toLocaleString('tr-TR') + ' ₺',
+          commissionRate: 5,
+          status: 'HAVUZDA_BLOKE',
+          trackingCode: 'YK-8829104',
+          shippingCompany: 'Yurtiçi Kargo & Borusan Lojistik',
+          createdAt: 'Bugün'
+        })
+      }
+    }
+  })
+
+  return list
+})
+
+const filteredOrders = computed(() => {
+  const q = escrowSearchQuery.value.trim().toLowerCase()
+  return orders.value.filter(o => {
+    if (activeEscrowTab.value !== 'all' && o.status !== activeEscrowTab.value) {
+      return false
+    }
+    if (q) {
+      const matchTitle = (o.tenderTitle || '').toLowerCase().includes(q)
+      const matchId = (o.id || '').toLowerCase().includes(q)
+      const matchSupplier = (o.supplierFirm || '').toLowerCase().includes(q)
+      const matchBuyer = (o.buyerFirm || '').toLowerCase().includes(q)
+      if (!matchTitle && !matchId && !matchSupplier && !matchBuyer) return false
+    }
+    return true
+  })
+})
+
+const totalEscrowLocked = computed(() => {
+  return orders.value
+    .filter(o => o.status === 'HAVUZDA_BLOKE' || o.status === 'SEVKIYATTA' || o.status === 'MAL_KABUL_BEKLIYOR')
+    .reduce((acc, o) => acc + (o.numericAmount || 0), 0)
+})
+
+const totalCompletedVolume = computed(() => {
+  return orders.value
+    .filter(o => o.status === 'TAMAMLANDI')
+    .reduce((acc, o) => acc + (o.numericAmount || 0), 0)
+})
+
+const totalPlatformCommission = computed(() => {
+  return orders.value
+    .filter(o => o.status === 'TAMAMLANDI')
+    .reduce((acc, o) => {
+      const comm = (o.numericAmount || 0) * ((o.commissionRate || 5) / 100)
+      return acc + comm
+    }, 0)
+})
+
+// =========================================================================
+// 2. KOMİSYON HESAPLAYICI DURUMU (FOTO 2)
+// =========================================================================
 const calcAmount = ref<number>(100000)
 const selectedRole = ref<'seller' | 'buyer'>('seller')
 
@@ -75,9 +181,254 @@ const userTransactions = ref([
 </script>
 
 <template>
-  <div class="space-y-6 max-w-7xl mx-auto text-left">
-    
-    <!-- Üst Başlık & Şeffaflık Güvencesi -->
+  <div class="space-y-8 max-w-7xl mx-auto text-left">
+
+    <!-- ========================================================================= -->
+    <!-- 1. BÖLÜM: SİPARİŞ, TESLİMAT & GÜVENLİ HAVUZ (ESCROW) (FOTO 1) -->
+    <!-- ========================================================================= -->
+    <div class="space-y-6">
+      <!-- Top Header -->
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b pb-4 border-slate-200 dark:border-slate-800">
+        <div>
+          <div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-[10px] font-black uppercase tracking-wider mb-1">
+            <ShieldCheck :size="13" />
+            <span>TCMB & BDDK MEVZUATINA UYGUN PAZARYERİ GÜVENLİ HAVUZ (ESCROW)</span>
+          </div>
+          <h1 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+            Sipariş, Teslimat & Güvenli Havuz (Escrow)
+          </h1>
+          <p class="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+            İhale mutabakatı sağlanan siparişlerin ödemelerini havuzda güvenceye alın, sevkiyatı izleyin ve mal kabulünde hakedişi aktarın.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2.5">
+          <NuxtLink
+            to="/sozlesmeler?tab=escrow"
+            class="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-slate-300 text-slate-700 dark:text-slate-200 text-xs font-bold transition flex items-center gap-1.5 shadow-2xs cursor-pointer"
+          >
+            <FileText :size="13" class="text-blue-600" />
+            <span>Havuz Sözleşmesi</span>
+          </NuxtLink>
+          <NuxtLink
+            to="/panel/gelen-teklifler"
+            class="px-4 py-2 rounded-xl bg-[#003057] hover:bg-[#1EAE4C] text-white text-xs font-black transition flex items-center gap-1.5 shadow-xs cursor-pointer"
+          >
+            <span>Gelen Teklifler</span>
+            <ArrowRight :size="13" />
+          </NuxtLink>
+        </div>
+      </div>
+
+      <!-- ESCROW STATS CARDS -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Card 1: Havuzda Bloke Tutar -->
+        <div class="p-5 rounded-2xl bg-gradient-to-br from-[#0F223D] to-[#152B4D] text-white shadow-md relative overflow-hidden">
+          <div class="flex items-center justify-between text-slate-300 text-xs font-bold">
+            <span>Güvenli Havuzda Bloke</span>
+            <Lock :size="16" class="text-amber-400" />
+          </div>
+          <div class="text-2xl font-black font-mono mt-2 text-[#00C2FF]">
+            {{ totalEscrowLocked.toLocaleString('tr-TR') }} ₺
+          </div>
+          <div class="text-[10px] text-slate-300 mt-1 font-medium flex items-center gap-1">
+            <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+            Paynkolay Korumalı Hesapta
+          </div>
+        </div>
+
+        <!-- Card 2: Sevkiyatta / Mal Kabul -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-bold">
+            <span>Sevkiyat & Mal Kabul</span>
+            <Truck :size="16" class="text-blue-600" />
+          </div>
+          <div class="text-2xl font-black font-mono mt-2 text-slate-900 dark:text-white">
+            {{ orders.filter(o => o.status === 'SEVKIYATTA' || o.status === 'MAL_KABUL_BEKLIYOR').length }} Sipariş
+          </div>
+          <div class="text-[10px] text-slate-400 mt-1 font-medium">
+            Kargo ve İrsaliye Takibinde
+          </div>
+        </div>
+
+        <!-- Card 3: Tamamlanan Hacim -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-bold">
+            <span>Başarıyla Tamamlanan</span>
+            <CheckCircle2 :size="16" class="text-emerald-600" />
+          </div>
+          <div class="text-2xl font-black font-mono mt-2 text-emerald-600">
+            {{ totalCompletedVolume.toLocaleString('tr-TR') }} ₺
+          </div>
+          <div class="text-[10px] text-slate-400 mt-1 font-medium">
+            Hakedişi Dağıtılmış Ticaret
+          </div>
+        </div>
+
+        <!-- Card 4: Platform Komisyon Geliri -->
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-xs">
+          <div class="flex items-center justify-between text-slate-500 dark:text-slate-400 text-xs font-bold">
+            <span>Platform Komisyon Geliri</span>
+            <DollarSign :size="16" class="text-[#1EAE4C]" />
+          </div>
+          <div class="text-2xl font-black font-mono mt-2 text-[#003057] dark:text-emerald-400">
+            {{ totalPlatformCommission.toLocaleString('tr-TR') }} ₺
+          </div>
+          <div class="text-[10px] text-slate-400 mt-1 font-medium">
+            Otomatik Split Payment Kesintisi
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TABS & SEARCH -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        
+        <!-- Status Tabs -->
+        <div class="flex items-center gap-1.5 bg-white dark:bg-slate-900 rounded-2xl border p-1.5 shadow-xs overflow-x-auto border-slate-200 dark:border-slate-800">
+          <button
+            type="button"
+            @click="activeEscrowTab = 'all'"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer shrink-0"
+            :class="activeEscrowTab === 'all' ? 'bg-[#003057] text-white shadow-xs' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'"
+          >
+            Tüm Siparişler ({{ orders.length }})
+          </button>
+          <button
+            type="button"
+            @click="activeEscrowTab = 'HAVUZDA_BLOKE'"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 flex items-center gap-1.5"
+            :class="activeEscrowTab === 'HAVUZDA_BLOKE' ? 'bg-amber-500 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'"
+          >
+            <Lock :size="12" />
+            <span>Havuzda Bloke ({{ orders.filter(o => o.status === 'HAVUZDA_BLOKE').length }})</span>
+          </button>
+          <button
+            type="button"
+            @click="activeEscrowTab = 'MAL_KABUL_BEKLIYOR'"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 flex items-center gap-1.5"
+            :class="activeEscrowTab === 'MAL_KABUL_BEKLIYOR' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'"
+          >
+            <Package :size="12" />
+            <span>Mal Kabul Bekleyen ({{ orders.filter(o => o.status === 'MAL_KABUL_BEKLIYOR').length }})</span>
+          </button>
+          <button
+            type="button"
+            @click="activeEscrowTab = 'TAMAMLANDI'"
+            class="px-3.5 py-2 rounded-xl text-xs font-bold transition cursor-pointer shrink-0 flex items-center gap-1.5"
+            :class="activeEscrowTab === 'TAMAMLANDI' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'"
+          >
+            <CheckCircle2 :size="12" />
+            <span>Tamamlanan ({{ orders.filter(o => o.status === 'TAMAMLANDI').length }})</span>
+          </button>
+        </div>
+
+        <!-- Search Box -->
+        <div class="relative flex-1 md:max-w-xs">
+          <Search :size="14" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input 
+            v-model="escrowSearchQuery"
+            type="text"
+            placeholder="Sipariş no, ihale adı, firma..."
+            class="w-full rounded-2xl border pl-9 pr-4 py-2.5 text-xs outline-none bg-white dark:bg-slate-900 transition focus:border-blue-500 font-medium border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white"
+          />
+        </div>
+
+      </div>
+
+      <!-- ORDERS LIST OR EMPTY STATE -->
+      <div v-if="filteredOrders.length > 0" class="space-y-4">
+        <div
+          v-for="order in filteredOrders"
+          :key="order.id"
+          class="rounded-3xl border bg-white dark:bg-slate-900 shadow-xs overflow-hidden transition-all hover:shadow-md border-slate-200 dark:border-slate-800 text-left"
+        >
+          <!-- Card Header -->
+          <div class="p-5 sm:p-6 bg-slate-50/70 dark:bg-slate-950/70 border-b border-slate-200/80 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-mono text-xs font-black px-2.5 py-1 rounded-lg bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-800 dark:text-white shadow-2xs">
+                  {{ order.id }}
+                </span>
+                <span class="text-xs text-slate-400">•</span>
+                <span class="text-xs font-bold text-slate-500 font-mono">İhale: {{ order.tenderId }}</span>
+                <span class="text-xs text-slate-400">•</span>
+                <span class="text-xs text-slate-400 font-medium">{{ order.createdAt }}</span>
+              </div>
+              <h2 class="text-base font-black text-slate-900 dark:text-white mt-1">
+                {{ order.tenderTitle }}
+              </h2>
+            </div>
+
+            <!-- Status Badge -->
+            <div>
+              <span
+                class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black shadow-2xs"
+                :class="{
+                  'bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border border-amber-300': order.status === 'HAVUZDA_BLOKE',
+                  'bg-blue-100 dark:bg-blue-950/60 text-blue-900 dark:text-blue-300 border border-blue-300': order.status === 'SEVKIYATTA' || order.status === 'MAL_KABUL_BEKLIYOR',
+                  'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-900 dark:text-emerald-300 border border-emerald-300': order.status === 'TAMAMLANDI'
+                }"
+              >
+                <Lock v-if="order.status === 'HAVUZDA_BLOKE'" :size="13" />
+                <Truck v-else-if="order.status === 'SEVKIYATTA' || order.status === 'MAL_KABUL_BEKLIYOR'" :size="13" />
+                <CheckCircle2 v-else :size="13" />
+
+                {{
+                  order.status === 'HAVUZDA_BLOKE' ? 'ÖDEME HAVUZDA BLOKE (GÜVENCEDE)' :
+                  order.status === 'SEVKIYATTA' ? 'SEVKİYAT AŞAMASINDA' :
+                  order.status === 'MAL_KABUL_BEKLIYOR' ? 'MAL KABUL & ONAY BEKLİYOR' :
+                  'TAMAMLANDI & HAKEDİŞ ÖDENDİ ✓'
+                }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Body details -->
+          <div class="p-5 sm:p-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+            <div>
+              <span class="text-slate-400 text-[11px] block">Alıcı Firma:</span>
+              <span class="font-bold text-slate-800 dark:text-white">{{ order.buyerFirm }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 text-[11px] block">Tedarikçi Firma:</span>
+              <span class="font-bold text-slate-800 dark:text-white">{{ order.supplierFirm }}</span>
+            </div>
+            <div>
+              <span class="text-slate-400 text-[11px] block">Toplam İhale Bedeli:</span>
+              <span class="font-mono font-black text-slate-900 dark:text-white text-sm">{{ order.totalAmount }}</span>
+            </div>
+            <div class="flex items-center justify-start sm:justify-end">
+              <NuxtLink
+                to="/panel/siparis-teslimat"
+                class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-white font-bold transition flex items-center gap-1.5"
+              >
+                <span>İşlemleri Yönet</span>
+                <ArrowRight :size="13" />
+              </NuxtLink>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- EMPTY STATE (EXACTLY AS IN PHOTO 1) -->
+      <div v-else class="rounded-3xl border bg-white dark:bg-slate-900/70 p-12 text-center shadow-xs border-slate-200 dark:border-slate-800">
+        <div class="w-16 h-16 rounded-2xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 flex items-center justify-center mx-auto mb-4">
+          <Package :size="28" />
+        </div>
+        <h3 class="text-sm font-black text-slate-800 dark:text-white">
+          Seçilen Kriterde Sipariş Bulunamadı
+        </h3>
+        <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto leading-relaxed">
+          İhale mutabakatı sağlandığında alıcı ödemeleri ve sevkiyat takip süreçleri bu ekranda otomatik listelenir.
+        </p>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 2. BÖLÜM: KOMİSYON ORANLARI & KESİNTİ BİLGİSİ (FOTO 2) -->
+    <!-- ========================================================================= -->
     <div class="rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 shadow-xs relative overflow-hidden">
       <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
         <div class="space-y-2 max-w-3xl">

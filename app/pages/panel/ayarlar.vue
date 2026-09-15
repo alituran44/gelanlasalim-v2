@@ -541,41 +541,65 @@ const membershipPricingRegion = ref<'domestic' | 'international'>('domestic')
 const membershipPackageCategory = ref<'corporate' | 'duration'>('corporate')
 const membershipCorporateCycle = ref<'monthly' | 'annual'>('monthly')
 
-const membershipCorporateTiers = [
-  {
-    id: 'kurumsal-pro',
-    name: 'Kurumsal Pro Tedarikçi',
-    badge: 'Doğrulanmış B2B',
-    commissionRate: 5.0,
-    monthlyPrice: 1800,
-    annualPrice: 18000,
-    features: [
-      'Yalnızca Başarılı İhalede %5 Sabit Komisyon (Alıcıya %0)',
-      'Doğrulanmış B2B Rozeti (Mavi Kalkan)',
-      'Yeni açılan ihalelerde öncelikli SMS/E-posta alarmı',
-      'Sınırsız teklif revizyonu ve detaylı rakip analiz özeti',
-      '7/24 Öncelikli telefon & KEP destek hattı'
-    ],
-    isPopular: true
-  },
-  {
-    id: 'kurumsal-enterprise',
-    name: 'Kurumsal Enterprise',
-    badge: 'ERP & Limitsiz Ekip',
-    commissionRate: 5.0,
-    monthlyPrice: 4500,
-    annualPrice: 45000,
-    features: [
-      'Yalnızca Başarılı İhalede %5 Sabit Komisyon (Alıcıya %0)',
-      'Kurumsal Alt Kullanıcı & Ekip Yetki Yönetimi (Limitsiz)',
-      'SAP / Logo / Netsis / Mikro ERP REST API Entegrasyonu',
-      'Özel Müşteri Başarı Yöneticisi (Account Manager)',
-      'Özel davetli kapalı ihalelere otomatik doğrudan davet',
-      'Gelişmiş Likidite ve Fiyat Hareketi Analitik Raporu'
-    ],
-    isPopular: false
-  }
-]
+const membershipCorporateTiers = computed(() => {
+  const isIntl = membershipPricingRegion.value === 'international'
+  const sym = isIntl ? '$' : '₺'
+  const proMonthly = isIntl ? 99 : 1800
+  const proAnnual = isIntl ? 990 : 18000
+  const entMonthly = isIntl ? 249 : 4500
+  const entAnnual = isIntl ? 2490 : 45000
+
+  return [
+    {
+      id: 'kurumsal-pro',
+      name: isIntl ? 'Global Pro B2B Supplier' : 'Kurumsal Pro Tedarikçi',
+      badge: isIntl ? 'Verified Global B2B' : 'Doğrulanmış B2B',
+      commissionRate: 5.0,
+      currency: sym,
+      monthlyPrice: proMonthly,
+      annualPrice: proAnnual,
+      features: isIntl ? [
+        'Only 5% Fixed Escrow Success Fee (0% for Buyer)',
+        'Verified Global B2B Badge (Blue Shield)',
+        'Priority International Tender Radar & Instant Alerts',
+        'Unlimited Bid Revisions & Competitor Intelligence',
+        '24/7 Priority Global VIP Hotline & SWIFT Support'
+      ] : [
+        'Yalnızca Başarılı İhalede %5 Sabit Komisyon (Alıcıya %0)',
+        'Doğrulanmış B2B Rozeti (Mavi Kalkan)',
+        'Yeni açılan ihalelerde öncelikli SMS/E-posta alarmı',
+        'Sınırsız teklif revizyonu ve detaylı rakip analiz özeti',
+        '7/24 Öncelikli telefon & KEP destek hattı'
+      ],
+      isPopular: true
+    },
+    {
+      id: 'kurumsal-enterprise',
+      name: isIntl ? 'Global Enterprise & ERP' : 'Kurumsal Enterprise',
+      badge: isIntl ? 'ERP & Unlimited Seats' : 'ERP & Limitsiz Ekip',
+      commissionRate: 5.0,
+      currency: sym,
+      monthlyPrice: entMonthly,
+      annualPrice: entAnnual,
+      features: isIntl ? [
+        'Only 5% Fixed Escrow Success Fee (0% for Buyer)',
+        'Unlimited Cross-Border Team Seats & RBAC Roles',
+        'Global SAP / Oracle / Netsis / Logo ERP REST API',
+        'Dedicated International Account Success Manager',
+        'Direct Invitations to Closed & High-Volume Tenders',
+        'Advanced Multi-Currency Liquidity & Risk Analytics'
+      ] : [
+        'Yalnızca Başarılı İhalede %5 Sabit Komisyon (Alıcıya %0)',
+        'Kurumsal Alt Kullanıcı & Ekip Yetki Yönetimi (Limitsiz)',
+        'SAP / Logo / Netsis / Mikro ERP REST API Entegrasyonu',
+        'Özel Müşteri Başarı Yöneticisi (Account Manager)',
+        'Özel davetli kapalı ihalelere otomatik doğrudan davet',
+        'Gelişmiş Likidite ve Fiyat Hareketi Analitik Raporu'
+      ],
+      isPopular: false
+    }
+  ]
+})
 
 const membershipPricingDomestic = [
   {
@@ -4522,17 +4546,25 @@ function saveProfile() {
             </div>
           </div>
 
-          <!-- Category Switcher for Domestic: Bireysel vs Kurumsal Firma Modu -->
-          <div v-if="membershipPricingRegion === 'domestic'" class="space-y-6">
+          <!-- Category Switcher: Bireysel vs Kurumsal Firma Modu (Yurt İçi ve Yurt Dışı İçin Aktif) -->
+          <div class="space-y-6">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
               <div>
                 <h3 class="text-sm font-black text-slate-800 flex items-center gap-2">
                   <Building2 v-if="isCompanyMode" class="text-emerald-600" :size="18" />
                   <User v-else class="text-blue-600" :size="18" />
-                  <span>{{ isCompanyMode ? 'Kurumsal Firma Fiyatlandırması & Tedarikçi Planları' : 'Bireysel İhale Abonelik Paketleri (1 - 12 Ay)' }}</span>
+                  <span>{{ isCompanyMode 
+                    ? (membershipPricingRegion === 'international' ? 'Corporate B2B Pricing & Supplier Tiers (USD)' : 'Kurumsal Firma Fiyatlandırması & Tedarikçi Planları')
+                    : (membershipPricingRegion === 'international' ? 'Global B2B Auction Passes (1 - 12 Months)' : 'Bireysel İhale Abonelik Paketleri (1 - 12 Ay)') }}</span>
                 </h3>
                 <p class="text-xs text-slate-500 mt-0.5">
-                  {{ isCompanyMode ? 'Firma moduna özel %5 sabit komisyon (alıcıya %0), Mavi Kalkan ve ERP entegrasyonu' : 'Bireysel kullanıcılara özel 1 aydan 12 aya kadar esnek B2B ihale ve satın alma erişim paketleri' }}
+                  {{ isCompanyMode 
+                    ? (membershipPricingRegion === 'international' 
+                        ? 'Exclusive corporate advantages: 5% fixed escrow fee (0% for buyer), Blue Shield verified badge, and ERP integration' 
+                        : 'Firma moduna özel %5 sabit komisyon (alıcıya %0), Mavi Kalkan ve ERP entegrasyonu')
+                    : (membershipPricingRegion === 'international'
+                        ? 'Global individual B2B tender browsing and verified bidding passes with maximum savings'
+                        : 'Bireysel kullanıcılara özel 1 aydan 12 aya kadar esnek B2B ihale ve satın alma erişim paketleri') }}
                 </p>
               </div>
 
@@ -4540,16 +4572,16 @@ function saveProfile() {
               <div v-if="isCompanyMode" class="flex flex-wrap items-center gap-2 shrink-0">
                 <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black shadow-xs">
                   <Building2 :size="14" class="text-emerald-600" />
-                  <span>🏢 Kurumsal Firma Modu</span>
+                  <span>🏢 {{ membershipPricingRegion === 'international' ? 'Corporate Mode' : 'Kurumsal Firma Modu' }}</span>
                 </div>
                 <button
                   type="button"
                   @click="toggleCompanyMode(false)"
                   class="flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-black bg-white hover:bg-slate-50 text-slate-700 hover:text-blue-600 border border-slate-300 shadow-xs transition-all cursor-pointer"
-                  title="Bireysel abonelik paketlerine geri dön"
+                  :title="membershipPricingRegion === 'international' ? 'Return to individual packages' : 'Bireysel abonelik paketlerine geri dön'"
                 >
                   <User :size="14" class="text-blue-600" />
-                  <span>👤 Bireysel Moda Geç</span>
+                  <span>👤 {{ membershipPricingRegion === 'international' ? 'Switch to Individual' : 'Bireysel Moda Geç' }}</span>
                 </button>
               </div>
               <div v-else class="shrink-0">
@@ -4559,7 +4591,7 @@ function saveProfile() {
                   class="flex items-center gap-1.5 rounded-xl px-4 py-2 text-xs font-black bg-[#0F223D] hover:bg-[#003057] text-white shadow-xs transition-all cursor-pointer"
                 >
                   <Building2 :size="14" class="text-emerald-400" />
-                  <span>🏢 Firma Moduna Geç</span>
+                  <span>🏢 {{ membershipPricingRegion === 'international' ? 'Switch to Corporate Mode' : 'Firma Moduna Geç' }}</span>
                 </button>
               </div>
             </div>
@@ -4575,7 +4607,7 @@ function saveProfile() {
                     class="px-4 py-1.5 rounded-lg transition cursor-pointer"
                     :class="membershipCorporateCycle === 'monthly' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900'"
                   >
-                    Aylık Ödeme
+                    {{ membershipPricingRegion === 'international' ? 'Monthly Billing' : 'Aylık Ödeme' }}
                   </button>
                   <button
                     type="button"
@@ -4583,8 +4615,8 @@ function saveProfile() {
                     class="px-4 py-1.5 rounded-lg transition flex items-center gap-1 cursor-pointer"
                     :class="membershipCorporateCycle === 'annual' ? 'bg-white text-slate-900 shadow-xs font-black' : 'text-slate-600 hover:text-slate-900'"
                   >
-                    <span>Yıllık Peşin (12 Ay)</span>
-                    <span class="text-[10px] font-black text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-md">%17 Ek İndirim</span>
+                    <span>{{ membershipPricingRegion === 'international' ? 'Annual Prepaid (12 Mo)' : 'Yıllık Peşin (12 Ay)' }}</span>
+                    <span class="text-[10px] font-black text-emerald-600 bg-emerald-100 px-1.5 py-0.5 rounded-md">{{ membershipPricingRegion === 'international' ? '17% Extra Savings' : '%17 Ek İndirim' }}</span>
                   </button>
                 </div>
               </div>
@@ -4600,7 +4632,7 @@ function saveProfile() {
                     : 'border-slate-800 bg-[#0F172A] text-white'"
                 >
                   <div v-if="tier.isPopular" class="absolute -top-3.5 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-emerald-500 text-slate-950 text-[10px] font-black uppercase tracking-wider shadow-md">
-                    En Popüler Kurumsal Plan
+                    {{ membershipPricingRegion === 'international' ? 'MOST POPULAR CORPORATE PLAN' : 'En Popüler Kurumsal Plan' }}
                   </div>
 
                   <div>
@@ -4614,20 +4646,20 @@ function saveProfile() {
                     <div class="my-4 py-3 border-y border-slate-800">
                       <div class="text-3xl font-black text-white font-mono">
                         <template v-if="membershipCorporateCycle === 'annual'">
-                          {{ tier.annualPrice.toLocaleString('tr-TR') }} ₺
-                          <span class="text-xs text-slate-400 font-normal">/ yıl</span>
+                          {{ tier.currency || '₺' }}{{ tier.annualPrice.toLocaleString('tr-TR') }}
+                          <span class="text-xs text-slate-400 font-normal">/ {{ membershipPricingRegion === 'international' ? 'yr' : 'yıl' }}</span>
                         </template>
                         <template v-else>
-                          {{ tier.monthlyPrice.toLocaleString('tr-TR') }} ₺
-                          <span class="text-xs text-slate-400 font-normal">/ ay</span>
+                          {{ tier.currency || '₺' }}{{ tier.monthlyPrice.toLocaleString('tr-TR') }}
+                          <span class="text-xs text-slate-400 font-normal">/ {{ membershipPricingRegion === 'international' ? 'mo' : 'ay' }}</span>
                         </template>
                       </div>
                       <div v-if="tier.annualPrice > 0" class="text-xs text-emerald-400 font-medium mt-1">
                         <template v-if="membershipCorporateCycle === 'annual'">
-                          Aylık maliyet: {{ Math.round(tier.annualPrice / 12).toLocaleString('tr-TR') }} ₺ (%17 tasarruf)
+                          {{ membershipPricingRegion === 'international' ? 'Effective monthly cost:' : 'Aylık maliyet:' }} {{ tier.currency || '₺' }}{{ Math.round(tier.annualPrice / 12).toLocaleString('tr-TR') }} ({{ membershipPricingRegion === 'international' ? '17% savings' : '%17 tasarruf' }})
                         </template>
                         <template v-else>
-                          Yıllık peşin: {{ tier.annualPrice.toLocaleString('tr-TR') }} ₺ (%17 ek indirim)
+                          {{ membershipPricingRegion === 'international' ? 'Annual prepaid:' : 'Yıllık peşin:' }} {{ tier.currency || '₺' }}{{ tier.annualPrice.toLocaleString('tr-TR') }} ({{ membershipPricingRegion === 'international' ? '17% extra discount' : '%17 ek indirim' }})
                         </template>
                       </div>
                     </div>
@@ -4656,23 +4688,23 @@ function saveProfile() {
                     >
                       <template v-if="tier.id === 'kurumsal-enterprise' && isCorporateEnterprise">
                         <CheckCircle2 :size="16" class="text-white" />
-                        <span>✓ Mevcut Planınız (Enterprise Aktif)</span>
+                        <span>{{ membershipPricingRegion === 'international' ? '✓ Current Plan (Enterprise Active)' : '✓ Mevcut Planınız (Enterprise Aktif)' }}</span>
                       </template>
                       <template v-else-if="tier.id === 'kurumsal-pro' && isCorporateEnterprise">
                         <Check :size="16" class="text-emerald-400" />
-                        <span>Enterprise Planınız Kapsamında Aktif</span>
+                        <span>{{ membershipPricingRegion === 'international' ? 'Active Under Enterprise Plan' : 'Enterprise Planınız Kapsamında Aktif' }}</span>
                       </template>
                       <template v-else-if="tier.id === 'kurumsal-pro' && isCorporatePro">
                         <CheckCircle2 :size="16" class="text-white" />
-                        <span>✓ Mevcut Planınız (Pro Aktif)</span>
+                        <span>{{ membershipPricingRegion === 'international' ? '✓ Current Plan (Pro Active)' : '✓ Mevcut Planınız (Pro Aktif)' }}</span>
                       </template>
                       <template v-else-if="tier.id === 'kurumsal-enterprise' && isCorporatePro">
                         <Sparkles :size="15" class="text-slate-950" />
-                        <span>Enterprise'a Yükselt (+₺2.700 Farkla)</span>
+                        <span>{{ membershipPricingRegion === 'international' ? "Enterprise'a Yükselt (+$150 Farkla)" : "Enterprise'a Yükselt (+₺2.700 Farkla)" }}</span>
                         <ArrowRight :size="14" />
                       </template>
                       <template v-else>
-                        <span>Bu Kurumsal Pakete Geç</span>
+                        <span>{{ membershipPricingRegion === 'international' ? 'Bu Kurumsal Pakete Geç (USD)' : 'Bu Kurumsal Pakete Geç' }}</span>
                         <ArrowRight :size="14" />
                       </template>
                     </NuxtLink>
@@ -4684,7 +4716,7 @@ function saveProfile() {
             <!-- Duration Packages (SADECE BİREYSEL MODDA AÇIĞA ÇIKAR; KURUMSALA GEÇİNCE KALDIRILIR) -->
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch animate-fadeIn">
               <div
-                v-for="pkg in membershipPricingDomestic"
+                v-for="pkg in (membershipPricingRegion === 'domestic' ? membershipPricingDomestic : membershipPricingGlobalUSD)"
                 :key="pkg.id"
                 class="rounded-3xl border bg-white p-6 shadow-sm flex flex-col justify-between transition-all hover:shadow-xl relative overflow-hidden"
                 :class="pkg.isPopular ? 'border-amber-400 ring-2 ring-amber-400/20' : 'border-slate-200/80'"
@@ -4700,7 +4732,7 @@ function saveProfile() {
                   <h3 class="text-xs font-black text-slate-800 tracking-wider text-center uppercase">{{ pkg.name }}</h3>
                   
                   <div class="text-center py-3 border-y border-slate-100">
-                    <div class="text-4xl font-black text-slate-900 font-mono tracking-tight">₺{{ pkg.price.toLocaleString('tr-TR') }}</div>
+                    <div class="text-4xl font-black text-slate-900 font-mono tracking-tight">{{ membershipPricingRegion === 'international' ? '$' : '₺' }}{{ pkg.price.toLocaleString('tr-TR') }}</div>
                     <div class="text-xs font-bold text-slate-400 mt-1">{{ pkg.monthly }}</div>
                   </div>
 
@@ -4715,50 +4747,10 @@ function saveProfile() {
                     class="w-full py-3.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer"
                     :class="pkg.isPopular ? 'bg-amber-400 hover:bg-amber-500 text-slate-950' : 'bg-[#0F223D] hover:bg-[#0052FF] text-white'"
                   >
-                    <span>HEMEN ABONE OL</span>
+                    <span>{{ membershipPricingRegion === 'international' ? 'SUBSCRIBE NOW' : 'HEMEN ABONE OL' }}</span>
                     <ArrowRight :size="14" />
                   </NuxtLink>
                 </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- International Packages (Global USD / EUR) - 4 Cards Grid (Photo 2) -->
-          <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 items-stretch">
-            <div
-              v-for="pkg in membershipPricingGlobalUSD"
-              :key="pkg.id"
-              class="rounded-3xl border bg-white p-6 shadow-sm flex flex-col justify-between transition-all hover:shadow-xl relative overflow-hidden"
-              :class="pkg.isPopular ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-slate-200/80'"
-            >
-              <div
-                class="text-[9px] font-black uppercase tracking-wider py-1.5 px-3 rounded-lg text-center mb-4"
-                :class="pkg.isPopular ? 'bg-[#0052FF] text-white' : 'bg-slate-800 text-white'"
-              >
-                {{ pkg.badge }}
-              </div>
-
-              <div class="space-y-4">
-                <h3 class="text-xs font-black text-slate-800 tracking-wider text-center uppercase">{{ pkg.name }}</h3>
-                
-                <div class="text-center py-3 border-y border-slate-100">
-                  <div class="text-4xl font-black text-slate-900 font-mono tracking-tight">${{ pkg.price }}</div>
-                  <div class="text-xs font-bold text-slate-400 mt-1">{{ pkg.monthly }}</div>
-                </div>
-
-                <p class="text-[11px] text-slate-500 leading-relaxed text-center min-h-[36px]">
-                  {{ pkg.desc }}
-                </p>
-              </div>
-
-              <div class="pt-6">
-                <NuxtLink
-                  :to="`/abonelik?plan=${pkg.id}`"
-                  class="w-full py-3.5 rounded-xl font-black text-xs transition flex items-center justify-center gap-2 shadow-md cursor-pointer bg-[#0052FF] hover:bg-blue-700 text-white"
-                >
-                  <span>SUBSCRIBE NOW</span>
-                  <ArrowRight :size="14" />
-                </NuxtLink>
               </div>
             </div>
           </div>
