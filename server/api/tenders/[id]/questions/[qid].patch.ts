@@ -2,7 +2,7 @@ import { defineEventHandler, readBody, createError } from 'h3'
 import { answerTenderQuestion, getAllTenderQuestions } from '~~/server/utils/tenderQuestionsStore'
 import { getAllTenders } from '~~/server/utils/tendersStore'
 import { createNotification } from '~~/server/utils/notificationsStore'
-import { sanitizeXss } from '~~/server/utils/authGuard'
+import { sanitizeXss, assertTenantAccess } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
   const tenderId = event.context.params?.id
@@ -24,6 +24,18 @@ export default defineEventHandler(async (event) => {
       statusMessage: 'Soru bulunamadı.'
     })
   }
+
+  const tenders = getAllTenders()
+  const tender = tenders.find(t => t.id === tenderId)
+  if (!tender) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: 'İhale bulunamadı.'
+    })
+  }
+
+  // 🛡️ SEC-002: Tenant İzolasyonu - Soruyu sadece ihale sahibi yanıtlayabilir
+  assertTenantAccess(event, [tender.ownerEmail, (tender as any).vkn, (tender as any).taxId].filter(Boolean))
 
   const answered = answerTenderQuestion(qid, {
     answer: sanitizeXss(body.answer),

@@ -1,5 +1,7 @@
+import { defineEventHandler, getRouterParam, readBody, setHeader, createError } from 'h3'
 import { getAllTenders, addTender, TenderItem } from '~~/server/utils/tendersStore'
 import { addGibLog } from '~~/server/utils/gibAuditStore'
+import { assertTenantAccess, requireRole } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -37,20 +39,16 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Yetkilendirme kontrolü: İhale sahibi veya admin token
-  const headers = getRequestHeaders(event)
-  const reqEmail = (headers['x-user-email'] as string | undefined)?.toLowerCase().trim()
-  const authHeader = headers['authorization'] || ''
-  const isAdmin = authHeader.includes('admin') || Boolean(headers['x-admin-token'])
+  // 🛡️ SEC-002 & SEC-006: Tenant İzolasyonu, IDOR ve Rol Kontrolü
+  // İhaleyi sadece ihaleyi açan firma yetkilisi veya sistem admini güncelleyebilir
+  const allowedOwners = [
+    targetTender.ownerEmail,
+    (targetTender as any).vkn,
+    (targetTender as any).taxId
+  ].filter(Boolean)
 
-  if (targetTender.ownerEmail && reqEmail && !isAdmin) {
-    if (targetTender.ownerEmail.toLowerCase().trim() !== reqEmail) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Bu ihaleyi yalnızca ihale sahibi güncelleyebilir (Yetkisiz IDOR işlemi engellendi).'
-      })
-    }
-  }
+  assertTenantAccess(event, allowedOwners)
+  requireRole(event, ['FİRMA_YÖNETİCİSİ', 'SATINALMA_UZMANI'])
 
   // Revizyon geçmişi kaydı (TND-014 denetim izi)
   const currentVersion = Number(targetTender.specVersion || 1)

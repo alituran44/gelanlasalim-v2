@@ -1,6 +1,7 @@
-﻿import fs from 'node:fs'
+import fs from 'node:fs'
 import path from 'node:path'
 import type { H3Event } from 'h3'
+import { getRequestHeaders, getRequestIP } from 'h3'
 
 export interface BidAuditLogItem {
   id: string

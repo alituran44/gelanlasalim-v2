@@ -1,5 +1,7 @@
+import { defineEventHandler, getRouterParam, getQuery, setHeader, createError } from 'h3'
 import { getAllBids, removeBid, addBid } from '~~/server/utils/bidsStore'
 import { logBidEvent } from '~~/server/utils/bidAuditStore'
+import { assertTenantAccess } from '~~/server/utils/authGuard'
 
 export default defineEventHandler((event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -26,20 +28,16 @@ export default defineEventHandler((event) => {
     })
   }
 
-  // Yetkilendirme kontrolü
-  const headers = getRequestHeaders(event)
-  const reqEmail = (headers['x-user-email'] as string | undefined)?.toLowerCase().trim()
-  const authHeader = headers['authorization'] || ''
-  const isAdmin = authHeader.includes('admin') || headers['x-admin-token']
+  // 🛡️ SEC-002: Tenant İzolasyonu & IDOR Doğrulaması
+  // Teklifi yalnızca teklifi veren firma (tedarikçi) veya ihaleyi açan firma (alıcı) veya admin geri çekebilir
+  const allowedOwners = [
+    targetBid.eposta,
+    targetBid.ownerEmail,
+    targetBid.vkn,
+    (targetBid as any).taxId
+  ].filter(Boolean)
 
-  if (targetBid.eposta && reqEmail && !isAdmin) {
-    if (targetBid.eposta.toLowerCase().trim() !== reqEmail && (targetBid.ownerEmail || '').toLowerCase().trim() !== reqEmail) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Bu teklifi yalnızca teklif sahibi veya ihale açan firma geri çekebilir (IDOR engellendi).'
-      })
-    }
-  }
+  assertTenantAccess(event, allowedOwners)
 
   const query = getQuery(event)
   const cancelReason = (query.reason as string) || 'Kullanıcı tarafından geri çekilme / iptal talebi oluşturuldu.'

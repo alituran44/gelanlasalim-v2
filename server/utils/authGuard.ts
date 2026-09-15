@@ -292,14 +292,19 @@ export function requireRole(event: H3Event, allowedRoles: (CompanyRole | string)
  * 🛡️ SEC-002: Tenant İzolasyonu & IDOR Koruması
  * Bir firmanın verisine farklı bir firmanın erişmesini engeller.
  */
-export function assertTenantAccess(event: H3Event, targetVknOrEmail: string): UserSessionContext {
+export function assertTenantAccess(event: H3Event, targetVknOrEmail: string | (string | undefined)[]): UserSessionContext {
   const session = requireAuth(event)
   if (session.isAdmin) return session
 
-  const cleanTarget = targetVknOrEmail.trim().toLowerCase()
-  const isMatch = 
-    (session.companyVkn && session.companyVkn === cleanTarget) ||
-    session.userEmail.toLowerCase() === cleanTarget
+  const rawTargets = Array.isArray(targetVknOrEmail) ? targetVknOrEmail : [targetVknOrEmail]
+  const cleanTargets = rawTargets
+    .filter((t): t is string => Boolean(t && typeof t === 'string' && t.trim()))
+    .map(t => t.trim().toLowerCase())
+
+  const isMatch = cleanTargets.some(target => 
+    (session.companyVkn && session.companyVkn.trim().toLowerCase() === target) ||
+    (session.userEmail && session.userEmail.trim().toLowerCase() === target)
+  )
 
   if (!isMatch) {
     logSecurityEvent(event, {
@@ -310,8 +315,9 @@ export function assertTenantAccess(event: H3Event, targetVknOrEmail: string): Us
       targetResource: event.node.req.url,
       actionTaken: 'BLOCKED_403',
       details: {
-        attemptedTarget: targetVknOrEmail,
-        actualUserVkn: session.companyVkn
+        attemptedTarget: cleanTargets.join(','),
+        actualUserVkn: session.companyVkn,
+        actualUserEmail: session.userEmail
       }
     })
 

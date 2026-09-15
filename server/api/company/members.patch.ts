@@ -1,31 +1,29 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { getCompanyByVkn, saveCompanies, getAllCompanies, CompanyRole } from '~~/server/utils/companyVerificationStore'
+import { assertTenantAccess, requireRole } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
   const body = await readBody(event) || {}
-  const { vkn, targetEmail, newRole, action, adminEmail } = body
+  const { vkn, targetEmail, newRole, action } = body
 
-  if (!vkn || !targetEmail || !adminEmail) {
+  if (!vkn || !targetEmail) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'VKN, hedef üye e-postası ve yönetici e-postası zorunludur.'
+      statusMessage: 'VKN ve hedef üye e-postası zorunludur.'
     })
   }
+
+  // 🛡️ SEC-002 & SEC-006: Tenant İzolasyonu, IDOR ve Rol Kontrolü
+  // Yalnızca ilgili firmanın yöneticisi veya sistem yöneticisi üye yönetebilir
+  assertTenantAccess(event, vkn)
+  const session = requireRole(event, ['FİRMA_YÖNETİCİSİ'])
+  const actorEmail = session.userEmail
 
   const company = getCompanyByVkn(vkn)
   if (!company) {
     throw createError({
       statusCode: 404,
       statusMessage: 'Firma bulunamadı.'
-    })
-  }
-
-  // Check admin authority
-  const adminMember = company.members.find(m => m.userEmail.toLowerCase() === adminEmail.trim().toLowerCase())
-  if (!adminMember || adminMember.role !== 'FİRMA_YÖNETİCİSİ') {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Bu işlemi yapmaya sadece Firma Yöneticisi yetkilidir. (Kural USR-003)'
     })
   }
 
@@ -44,7 +42,7 @@ export default defineEventHandler(async (event) => {
     targetMember.status = 'REMOVED'
     company.auditLog.push({
       action: 'MEMBER_REMOVED',
-      actor: adminEmail,
+      actor: actorEmail,
       timestamp: now,
       details: { targetEmail }
     })
@@ -61,7 +59,7 @@ export default defineEventHandler(async (event) => {
     targetMember.role = newRole as CompanyRole
     company.auditLog.push({
       action: 'MEMBER_ROLE_UPDATED',
-      actor: adminEmail,
+      actor: actorEmail,
       timestamp: now,
       details: { targetEmail, oldRole, newRole }
     })

@@ -1,5 +1,7 @@
-﻿import { getAllTenders, updateTenderStatus, TenderStatus, TenderReasonCode } from '~~/server/utils/tendersStore'
+import { defineEventHandler, getRouterParam, readBody, setHeader, createError } from 'h3'
+import { getAllTenders, updateTenderStatus, TenderStatus, TenderReasonCode } from '~~/server/utils/tendersStore'
 import { addGibLog } from '~~/server/utils/gibAuditStore'
+import { assertTenantAccess, requireRole } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -24,20 +26,16 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 404, statusMessage: 'İhale bulunamadı.' })
   }
 
-  // Yetkilendirme (IDOR) kontrolü
-  const headers = getRequestHeaders(event)
-  const reqEmail = (headers['x-user-email'] as string | undefined)?.toLowerCase().trim()
-  const authHeader = headers['authorization'] || ''
-  const isAdmin = authHeader.includes('admin') || Boolean(headers['x-admin-token'])
+  // 🛡️ SEC-002 & SEC-006: Tenant İzolasyonu, IDOR ve Rol Kontrolü
+  // İhalenin statüsünü sadece ihaleyi açan firma yetkilisi veya sistem admini değiştirebilir
+  const allowedOwners = [
+    target.ownerEmail,
+    (target as any).vkn,
+    (target as any).taxId
+  ].filter(Boolean)
 
-  if (target.ownerEmail && reqEmail && !isAdmin) {
-    if (target.ownerEmail.toLowerCase().trim() !== reqEmail) {
-      throw createError({
-        statusCode: 403,
-        statusMessage: 'Bu ihalenin statüsünü yalnızca ihale sahibi veya yetkili admin değiştirebilir.'
-      })
-    }
-  }
+  assertTenantAccess(event, allowedOwners)
+  requireRole(event, ['FİRMA_YÖNETİCİSİ', 'SATINALMA_UZMANI'])
 
   // 🛡️ State Machine Geçişini Uygula (PRD Bölüm 3.3 & 3.5)
   const result = updateTenderStatus(id, body.statusCode, {

@@ -1,6 +1,8 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { getAllBids, saveBids } from '~~/server/utils/bidsStore'
+import { getAllTenders } from '~~/server/utils/tendersStore'
 import { logGibAudit } from '~~/server/utils/gibAuditStore'
+import { assertTenantAccess, requireRole } from '~~/server/utils/authGuard'
 
 export interface RejectBidPayload {
   bidId: string
@@ -20,13 +22,33 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const tenders = getAllTenders()
+  const tender = tenders.find(t => t.id === tenderId)
+  if (!tender) {
+    throw createError({
+      statusCode: 404,
+      statusMessage: `İhale bulunamadı: ${tenderId}`
+    })
+  }
+
+  // 🛡️ SEC-002 & SEC-006: Tenant İzolasyonu, IDOR ve Rol Kontrolü
+  // Teklifi sadece ihaleyi açan firma yetkilisi veya sistem yöneticisi reddedebilir
+  const allowedOwners = [
+    tender.ownerEmail,
+    (tender as any).vkn,
+    (tender as any).taxId
+  ].filter(Boolean)
+
+  assertTenantAccess(event, allowedOwners)
+  requireRole(event, ['FİRMA_YÖNETİCİSİ', 'SATINALMA_UZMANI'])
+
   const bids = getAllBids()
-  const bid = bids.find(b => b.id === body.bidId)
+  const bid = bids.find(b => b.id === body.bidId && b.tenderId === tenderId)
 
   if (!bid) {
     throw createError({
       statusCode: 404,
-      statusMessage: `Teklif bulunamadı: ${body.bidId}`
+      statusMessage: `Bu ihaleye ait teklif bulunamadı: ${body.bidId}`
     })
   }
 

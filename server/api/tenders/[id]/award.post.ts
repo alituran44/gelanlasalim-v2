@@ -1,6 +1,7 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { getAllTenders, saveTenders } from '~~/server/utils/tendersStore'
 import { logGibAudit } from '~~/server/utils/gibAuditStore'
+import { assertTenantAccess, requireRole } from '~~/server/utils/authGuard'
 
 export interface AwardPayload {
   bidId: string
@@ -33,6 +34,17 @@ export default defineEventHandler(async (event) => {
       statusMessage: `İhale bulunamadı: ${tenderId}`
     })
   }
+
+  // 🛡️ SEC-002 & SEC-006: Tenant İzolasyonu, IDOR ve Rol Kontrolü
+  // İhaleyi sadece ihaleyi açan firmanın yetkilisi (Firma Yöneticisi / Satın Alma Uzmanı) veya admin sonuçlandırabilir
+  const allowedOwners = [
+    tender.ownerEmail,
+    (tender as any).vkn,
+    (tender as any).taxId
+  ].filter(Boolean)
+
+  assertTenantAccess(event, allowedOwners)
+  requireRole(event, ['FİRMA_YÖNETİCİSİ', 'SATINALMA_UZMANI'])
 
   // 🛡️ AWD-006: Asgari Teklif Sayısı Kontrolü
   const minRequired = tender.minBidsCount || 1
