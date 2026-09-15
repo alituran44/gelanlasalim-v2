@@ -154,6 +154,35 @@ export function useUserSession() {
            hasAdminToken
   })
 
+  // 💎 Abonelik & Kurumsal Paket Yetkileri (Pro vs Enterprise)
+  const isPremiumUser = computed(() => {
+    return userSession.value?.isPremium === true
+  })
+
+  const subscriptionPlan = computed(() => {
+    return userSession.value?.subscriptionPlan || ''
+  })
+
+  // Kurumsal Pro: Pro veya Enterprise (Enterprise üst paket olup Pro özelliklerini de kapsar)
+  const isCorporatePro = computed(() => {
+    if (!userSession.value?.isPremium) return false
+    const plan = (userSession.value?.subscriptionPlan || '').toLowerCase()
+    const tierId = userSession.value?.tierId || ''
+    return tierId === 'kurumsal-pro' || 
+           tierId === 'kurumsal-enterprise' || 
+           plan.includes('pro') || 
+           plan.includes('enterprise')
+  })
+
+  // Kurumsal Enterprise: Yalnızca Kurumsal Enterprise paketi seçip ödemesini yapanlar
+  const isCorporateEnterprise = computed(() => {
+    if (!userSession.value?.isPremium) return false
+    const plan = (userSession.value?.subscriptionPlan || '').toLowerCase()
+    const tierId = userSession.value?.tierId || ''
+    return tierId === 'kurumsal-enterprise' || 
+           plan.includes('enterprise')
+  })
+
   function toggleCompanyMode(active?: boolean | any) {
     const next = typeof active === 'boolean' ? active : !userSession.value.isCompanyActive
     userSession.value.isCompanyActive = next
@@ -214,6 +243,10 @@ export function useUserSession() {
     companyVkn,
     canSubmitBid,
     isAdmin,
+    isPremiumUser,
+    subscriptionPlan,
+    isCorporatePro,
+    isCorporateEnterprise,
     toggleCompanyMode,
     updateSession,
     setPhoneVerified,

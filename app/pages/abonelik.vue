@@ -40,7 +40,7 @@ useSeoMeta({
 
 const router = useRouter()
 const route = useRoute()
-const { isCompanyMode, toggleCompanyMode } = useUserSession()
+const { isCompanyMode, toggleCompanyMode, isCorporatePro, isCorporateEnterprise, subscriptionPlan } = useUserSession()
 
 // Region Selector: domestic (Türkiye / TRY ₺) vs international (Global / USD $ - EUR €)
 const paymentRegion = ref<'domestic' | 'international'>('domestic')
@@ -295,6 +295,15 @@ onMounted(() => {
       const planParam = String(route.query.plan).toLowerCase()
       if (planParam.includes('pro') || planParam.includes('enterprise')) {
         toggleCompanyMode(true)
+        setTimeout(() => {
+          if (planParam.includes('enterprise')) {
+            const entTier = corporatePackages.value.find(p => p.id === 'kurumsal-enterprise')
+            if (entTier) selectCorporatePackage(entTier)
+          } else if (planParam.includes('pro')) {
+            const proTier = corporatePackages.value.find(p => p.id === 'kurumsal-pro')
+            if (proTier) selectCorporatePackage(proTier)
+          }
+        }, 150)
       } else if (planParam.includes('ay') || planParam.includes('mo')) {
         toggleCompanyMode(false)
       }
@@ -330,7 +339,12 @@ function selectCorporatePackage(tier: any) {
       const current = JSON.parse(localStorage.getItem('userSession') || '{}')
       current.isPremium = false
       current.subscriptionPlan = tier.name
+      current.tierId = tier.id
+      current.isCorporatePro = false
+      current.isCorporateEnterprise = false
       localStorage.setItem('userSession', JSON.stringify(current))
+      window.dispatchEvent(new Event('storage'))
+      window.dispatchEvent(new CustomEvent('session-updated'))
     }
     alert('Standart planınız başarıyla tanımlanmıştır. Tüm açık ihalelere ücretsiz katılabilir ve teklif verebilirsiniz.')
     return
@@ -339,6 +353,8 @@ function selectCorporatePackage(tier: any) {
   const isAnnual = corporateBillingCycle.value === 'annual'
   const pkgToCheckout = {
     id: isAnnual ? `${tier.id}-annual` : `${tier.id}-monthly`,
+    tierId: tier.id,
+    tierName: tier.name,
     name: isAnnual ? `${tier.name} (12 Aylık Yıllık)` : `${tier.name} (Aylık)`,
     price: isAnnual ? tier.annualPrice : tier.monthlyPrice,
     monthly: isAnnual ? `₺${Math.round(tier.annualPrice / 12).toLocaleString('tr-TR')},00 / ay` : `₺${tier.monthlyPrice.toLocaleString('tr-TR')},00 / ay`,
@@ -372,8 +388,14 @@ function handlePayment() {
 
     if (typeof window !== 'undefined') {
       const current = JSON.parse(localStorage.getItem('userSession') || '{}')
+      const targetPlanName = selectedPackage.value?.tierName || selectedPackage.value?.name
+      const targetTierId = selectedPackage.value?.tierId || (String(targetPlanName).includes('Enterprise') ? 'kurumsal-enterprise' : String(targetPlanName).includes('Pro') ? 'kurumsal-pro' : selectedPackage.value?.id)
+      
       current.isPremium = true
-      current.subscriptionPlan = selectedPackage.value?.name
+      current.subscriptionPlan = targetPlanName
+      current.tierId = targetTierId
+      current.isCorporateEnterprise = targetTierId === 'kurumsal-enterprise' || String(targetPlanName).includes('Enterprise')
+      current.isCorporatePro = current.isCorporateEnterprise || targetTierId === 'kurumsal-pro' || String(targetPlanName).includes('Pro')
       current.subscriptionRegion = paymentRegion.value
       current.isTrial = selectedPackage.value?.isTrial || false
       current.trialExpiresAt = '28 Eylül 2026'
@@ -388,6 +410,8 @@ function handlePayment() {
         email: billingEmail.value
       }
       localStorage.setItem('userSession', JSON.stringify(current))
+      window.dispatchEvent(new Event('storage'))
+      window.dispatchEvent(new CustomEvent('session-updated'))
     }
   }, selectedPackage.value?.isTrial ? 600 : 1200)
 }
@@ -646,10 +670,37 @@ function completeCheckout() {
                   type="button"
                   @click="selectCorporatePackage(tier)"
                   class="w-full py-4 px-4 rounded-xl text-center text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md hover:scale-[1.02]"
-                  :class="tier.isPopular ? 'bg-[#1EAE4C] hover:bg-[#188C3D] text-white shadow-emerald-500/20' : 'bg-slate-800 hover:bg-slate-700 text-white'"
+                  :class="[
+                    (tier.id === 'kurumsal-enterprise' && isCorporateEnterprise) || (tier.id === 'kurumsal-pro' && isCorporatePro && !isCorporateEnterprise)
+                      ? 'bg-emerald-600 text-white shadow-emerald-500/20 ring-2 ring-emerald-400'
+                      : (tier.id === 'kurumsal-enterprise' && isCorporatePro)
+                        ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black shadow-lg shadow-emerald-500/30'
+                        : tier.isPopular 
+                          ? 'bg-[#1EAE4C] hover:bg-[#188C3D] text-white shadow-emerald-500/20' 
+                          : 'bg-slate-800 hover:bg-slate-700 text-white'
+                  ]"
                 >
-                  <span>{{ 'Bu Kurumsal Pakete Geç' }}</span>
-                  <ArrowRight :size="14" />
+                  <template v-if="tier.id === 'kurumsal-enterprise' && isCorporateEnterprise">
+                    <CheckCircle2 :size="16" class="text-white" />
+                    <span>✓ Mevcut Planınız (Enterprise Aktif)</span>
+                  </template>
+                  <template v-else-if="tier.id === 'kurumsal-pro' && isCorporateEnterprise">
+                    <Check :size="16" class="text-emerald-400" />
+                    <span>Enterprise Planınız Kapsamında Aktif</span>
+                  </template>
+                  <template v-else-if="tier.id === 'kurumsal-pro' && isCorporatePro">
+                    <CheckCircle2 :size="16" class="text-white" />
+                    <span>✓ Mevcut Planınız (Pro Aktif)</span>
+                  </template>
+                  <template v-else-if="tier.id === 'kurumsal-enterprise' && isCorporatePro">
+                    <Sparkles :size="15" class="text-slate-950" />
+                    <span>Enterprise'a Yükselt (+₺2.700 Farkla)</span>
+                    <ArrowRight :size="14" />
+                  </template>
+                  <template v-else>
+                    <span>{{ 'Bu Kurumsal Pakete Geç' }}</span>
+                    <ArrowRight :size="14" />
+                  </template>
                 </button>
               </div>
             </div>

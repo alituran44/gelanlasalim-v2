@@ -82,6 +82,9 @@ const {
   companyName, 
   isPhoneVerified, 
   isEmailVerified, 
+  isCorporatePro,
+  isCorporateEnterprise,
+  subscriptionPlan,
   toggleCompanyMode, 
   updateSession, 
   setPhoneVerified, 
@@ -226,16 +229,56 @@ function syncProfileFromSession() {
 
 
 const navigationTabs = computed(() => {
-  const list = [
+  const list: any[] = [
     { key: 'kisisel', label: 'Kişisel Profil', icon: User, to: '/panel/ayarlar?tab=kisisel' }
   ]
   if (isCompanyMode.value) {
     list.push(
-      { key: 'sirket', label: 'Şirket & Firma', icon: Building2, to: '/panel/ayarlar?tab=sirket' },
-      { key: 'ekip', label: 'Ekip & Yetki', icon: Users, to: '/panel/ayarlar?tab=ekip' },
-      { key: 'erp', label: 'ERP REST API', icon: Key, to: '/panel/ayarlar?tab=erp' },
-      { key: 'radar', label: 'İhale Radarı & SMS', icon: Radio, to: '/panel/ayarlar?tab=radar' },
-      { key: 'destek', label: 'VIP Müşteri Danışmanı', icon: Headphones, to: '/panel/ayarlar?tab=destek' }
+      { 
+        key: 'sirket', 
+        label: 'Şirket & Firma', 
+        icon: Building2, 
+        to: '/panel/ayarlar?tab=sirket',
+        badge: isCorporatePro.value ? 'PRO' : 'PRO',
+        badgeColor: isCorporatePro.value ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-slate-100 text-slate-500 border-slate-200',
+        locked: false
+      },
+      { 
+        key: 'radar', 
+        label: 'İhale Radarı & SMS', 
+        icon: Radio, 
+        to: '/panel/ayarlar?tab=radar',
+        badge: isCorporatePro.value ? 'PRO' : 'PRO',
+        badgeColor: isCorporatePro.value ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-slate-100 text-slate-500 border-slate-200',
+        locked: !isCorporatePro.value
+      },
+      { 
+        key: 'ekip', 
+        label: 'Ekip & Yetki (RBAC)', 
+        icon: Users, 
+        to: '/panel/ayarlar?tab=ekip',
+        badge: isCorporateEnterprise.value ? 'ENTERPRISE' : 'ENTERPRISE',
+        badgeColor: isCorporateEnterprise.value ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-purple-50 text-purple-700 border-purple-200',
+        locked: !isCorporateEnterprise.value
+      },
+      { 
+        key: 'erp', 
+        label: 'ERP REST API', 
+        icon: Key, 
+        to: '/panel/ayarlar?tab=erp',
+        badge: isCorporateEnterprise.value ? 'ENTERPRISE' : 'ENTERPRISE',
+        badgeColor: isCorporateEnterprise.value ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-purple-50 text-purple-700 border-purple-200',
+        locked: !isCorporateEnterprise.value
+      },
+      { 
+        key: 'destek', 
+        label: 'VIP Danışman Masası', 
+        icon: Headphones, 
+        to: '/panel/ayarlar?tab=destek',
+        badge: isCorporateEnterprise.value ? 'VIP ENTERPRISE' : 'ENTERPRISE',
+        badgeColor: isCorporateEnterprise.value ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-purple-50 text-purple-700 border-purple-200',
+        locked: !isCorporateEnterprise.value
+      }
     )
   }
   list.push(
@@ -1766,16 +1809,16 @@ function saveProfile() {
 
       <!-- Actions and status pills dynamically linked next to page title -->
       <div class="flex items-center gap-2">
-        <button v-if="activeSubTab === 'ekip'" type="button" @click="showInviteModal = true" class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 transition shadow-sm cursor-pointer">
+        <button v-if="activeSubTab === 'ekip' && isCorporateEnterprise" type="button" @click="showInviteModal = true" class="inline-flex items-center gap-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2.5 transition shadow-sm cursor-pointer">
           <Plus :size="14" /> Yeni Ekip Üyesi Davet Et
         </button>
-        <button v-if="activeSubTab === 'erp'" type="button" @click="testErpConnection" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 transition shadow-sm cursor-pointer">
+        <button v-if="activeSubTab === 'erp' && isCorporateEnterprise" type="button" @click="testErpConnection" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 transition shadow-sm cursor-pointer">
           <Activity :size="14" /> Entegrasyonu Test Et
         </button>
-        <button v-if="activeSubTab === 'radar'" type="button" @click="sendTestRadarAlert" class="inline-flex items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2.5 transition shadow-sm cursor-pointer">
+        <button v-if="activeSubTab === 'radar' && isCorporatePro" type="button" @click="sendTestRadarAlert" class="inline-flex items-center gap-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs px-4 py-2.5 transition shadow-sm cursor-pointer">
           <Radio :size="14" /> Test Alarmı Gönder
         </button>
-        <button v-if="activeSubTab === 'destek'" type="button" @click="showMeetingModal = true" class="inline-flex items-center gap-2 rounded-xl bg-[#0F223D] hover:bg-[#1C2541] text-white font-bold text-xs px-4 py-2.5 transition shadow-sm cursor-pointer">
+        <button v-if="activeSubTab === 'destek' && isCorporateEnterprise" type="button" @click="showMeetingModal = true" class="inline-flex items-center gap-2 rounded-xl bg-[#0F223D] hover:bg-[#1C2541] text-white font-bold text-xs px-4 py-2.5 transition shadow-sm cursor-pointer">
           <Headphones :size="14" /> Birebir Randevu Planla
         </button>
         <button v-if="activeSubTab === 'adresler'" type="button" @click="isNewAddressModalOpen = true" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs px-4 py-2.5 transition">
@@ -1791,21 +1834,28 @@ function saveProfile() {
         <!-- Üyelik summary pill matching design -->
         <div v-if="activeSubTab === 'uyelik'" class="flex gap-3 bg-white border border-slate-200 p-2.5 rounded-xl shadow-sm text-left">
           <div class="px-2.5 border-r border-slate-100 last:border-0">
-            <span class="text-[8px] font-black text-slate-300 uppercase block">MEVCUT PLAN</span>
-            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">İlk İhale Ücretsiz Paketi</span>
+            <span class="text-[8px] font-black text-slate-400 uppercase block">MEVCUT PLAN</span>
+            <span class="text-[10px] font-bold text-slate-800 block mt-0.5">
+              {{ isCorporateEnterprise ? 'Kurumsal Enterprise' : isCorporatePro ? 'Kurumsal Pro Tedarikçi' : (subscriptionPlan || 'Standart Firma') }}
+            </span>
           </div>
           <div class="px-2.5 border-r border-slate-100 last:border-0">
-            <span class="text-[8px] font-black text-slate-300 uppercase block">DÖNEM ÜCRETİ</span>
-            <span class="text-[10px] font-bold text-emerald-600 block mt-0.5">0 ₺ <span class="text-[8px] text-emerald-500 font-medium">(Lansmana Özel 0 ₺)</span></span>
+            <span class="text-[8px] font-black text-slate-400 uppercase block">DÖNEM ÜCRETİ</span>
+            <span class="text-[10px] font-bold text-emerald-600 block mt-0.5">
+              {{ isCorporateEnterprise ? '₺4.500 / ay' : isCorporatePro ? '₺1.800 / ay' : '0 ₺ (Lansman)' }}
+            </span>
           </div>
           <div class="px-2.5 border-r border-slate-100 last:border-0">
-            <span class="text-[8px] font-black text-slate-300 uppercase block">KULLANIM HAKKI</span>
-            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">İlk İhale (%0 Komisyon)</span>
+            <span class="text-[8px] font-black text-slate-400 uppercase block">KOMİSYON</span>
+            <span class="text-[10px] font-bold text-slate-700 block mt-0.5">%5 Escrow (Alıcı %0)</span>
           </div>
           <div class="px-2.5 flex flex-col justify-center">
-            <span class="text-[8px] font-black text-slate-300 uppercase block">DURUM</span>
-            <span class="inline-flex items-center gap-0.5 text-[8px] font-black text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 mt-0.5">
-              Aktif (İlk İhale 0 ₺)
+            <span class="text-[8px] font-black text-slate-400 uppercase block">DURUM</span>
+            <span 
+              class="inline-flex items-center gap-0.5 text-[8px] font-black px-1.5 py-0.5 rounded border mt-0.5"
+              :class="isCorporateEnterprise ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : isCorporatePro ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-slate-50 text-slate-700 border-slate-200'"
+            >
+              {{ isCorporateEnterprise ? 'Enterprise Aktif' : isCorporatePro ? 'Pro Tedarikçi Aktif' : 'Standart (0 ₺)' }}
             </span>
           </div>
         </div>
@@ -1835,13 +1885,31 @@ function saveProfile() {
           v-for="tab in navigationTabs"
           :key="tab.key"
           :to="tab.to"
-          class="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all w-full border"
+          class="flex items-center justify-between px-3.5 py-2.5 rounded-xl text-xs font-bold transition-all w-full border group"
           :class="activeSubTab === tab.key 
             ? 'bg-[#0F223D] text-white border-[#0F223D] shadow-xs' 
             : 'border-transparent text-slate-600 hover:bg-slate-50 hover:text-slate-900'"
         >
-          <component :is="tab.icon" :size="15" :class="activeSubTab === tab.key ? 'text-[#1EAE4C]' : 'text-slate-400'" class="shrink-0" />
-          <span class="truncate">{{ tab.label }}</span>
+          <div class="flex items-center gap-2.5 truncate min-w-0">
+            <component :is="tab.icon" :size="15" :class="activeSubTab === tab.key ? 'text-[#1EAE4C]' : 'text-slate-400'" class="shrink-0" />
+            <span class="truncate">{{ tab.label }}</span>
+          </div>
+
+          <div class="flex items-center gap-1.5 shrink-0 ml-1">
+            <span 
+              v-if="tab.badge" 
+              class="px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-wider border"
+              :class="activeSubTab === tab.key ? 'bg-white/15 text-white border-white/20' : tab.badgeColor"
+            >
+              {{ tab.badge }}
+            </span>
+            <Lock 
+              v-if="tab.locked" 
+              :size="12" 
+              :class="activeSubTab === tab.key ? 'text-amber-300' : 'text-slate-400 group-hover:text-amber-500'" 
+              title="Yükseltme Gerekir"
+            />
+          </div>
         </NuxtLink>
       </aside>
 
@@ -2260,13 +2328,28 @@ function saveProfile() {
                   <div class="space-y-1.5">
                     <div class="flex flex-wrap items-center gap-2.5">
                       <h3 class="text-base font-black text-slate-900">Doğrulanmış B2B Rozeti (Mavi Kalkan)</h3>
-                      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-[10px] font-black tracking-wide border border-blue-200 shadow-2xs">
+                      <span 
+                        v-if="isCorporatePro"
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-[10px] font-black tracking-wide border border-blue-200 shadow-2xs"
+                      >
                         <CheckCircle2 :size="12" class="text-blue-600" />
-                        AKTİF & DOĞRULANDI
+                        AKTİF & DOĞRULANDI (PRO)
+                      </span>
+                      <span 
+                        v-else
+                        class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 text-amber-800 text-[10px] font-black tracking-wide border border-amber-200 shadow-2xs"
+                      >
+                        <Lock :size="12" class="text-amber-600" />
+                        KURUMSAL PRO GEREKLİ
                       </span>
                     </div>
                     <p class="text-xs text-slate-600 leading-relaxed max-w-2xl">
-                      Şirketinizin VKN, Ticaret Sicil Gazetesi, Faaliyet Belgesi ve KEP resmi kayıtları doğrulanmıştır. Açılan tüm ihalelerde, teklif listelerinde ve tedarikçi dizininde mavi kalkan rozetiniz alıcılara en üst sırada güvenilirlik garantisi sunar.
+                      <template v-if="isCorporatePro">
+                        Şirketinizin VKN, Ticaret Sicil Gazetesi, Faaliyet Belgesi ve KEP resmi kayıtları doğrulanmıştır. Açılan tüm ihalelerde, teklif listelerinde ve tedarikçi dizininde mavi kalkan rozetiniz alıcılara en üst sırada güvenilirlik garantisi sunar.
+                      </template>
+                      <template v-else>
+                        Mavi Kalkan Doğrulanmış B2B Tedarikçi Rozeti, <strong>Kurumsal Pro Tedarikçi</strong> ve <strong>Kurumsal Enterprise</strong> abonelerimize tahsis edilmektedir. Tekliflerinizin en üstte rozetli görünmesi ve alıcı güveni için kurumsal plana geçebilirsiniz.
+                      </template>
                     </p>
                     <div class="flex flex-wrap items-center gap-4 text-[11px] font-mono text-slate-500 pt-0.5">
                       <span>Sertifika No: <strong class="text-slate-800">{{ blueShieldCertNo }}</strong></span>
@@ -2280,6 +2363,7 @@ function saveProfile() {
 
                 <div class="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end gap-2.5 shrink-0 w-full lg:w-auto">
                   <button 
+                    v-if="isCorporatePro"
                     type="button" 
                     @click="downloadBlueShieldCertificate" 
                     class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F223D] hover:bg-[#1E3A8A] text-white font-bold text-xs transition shadow-sm cursor-pointer"
@@ -2287,7 +2371,17 @@ function saveProfile() {
                     <Download :size="14" />
                     <span>Doğrulama Sertifikasını İndir (PDF)</span>
                   </button>
-                  <span class="text-[10px] text-slate-400 text-center lg:text-right font-medium">Tüm tekliflerinizde otomatik rozetlenir</span>
+                  <NuxtLink
+                    v-else
+                    to="/abonelik?plan=kurumsal-pro&mode=corporate"
+                    class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition shadow-sm cursor-pointer"
+                  >
+                    <ShieldCheck :size="14" />
+                    <span>Mavi Kalkan Rozeti Edin (Pro'ya Geç)</span>
+                  </NuxtLink>
+                  <span class="text-[10px] text-slate-400 text-center lg:text-right font-medium">
+                    {{ isCorporatePro ? 'Tüm tekliflerinizde otomatik rozetlenir' : 'Kurumsal Pro & Enterprise pakete dahildir' }}
+                  </span>
                 </div>
               </div>
             </div>
@@ -2848,488 +2942,877 @@ function saveProfile() {
         <!-- 1. KURUMSAL ALT KULLANICI & EKİP YETKİ YÖNETİMİ TAB -->
         <!-- ========================================================================= -->
         <div v-if="activeSubTab === 'ekip'" class="space-y-6">
-          <!-- Header Banner -->
-          <div class="rounded-3xl border bg-gradient-to-br from-[#0F223D] via-[#162B4D] to-[#0A1628] p-6 text-white shadow-xl relative overflow-hidden">
-            <div class="absolute right-0 top-0 translate-x-10 -translate-y-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative">
-              <div class="flex items-start gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center shadow-lg shadow-emerald-500/25 shrink-0">
-                  <Users :size="30" class="text-white" />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex flex-wrap items-center gap-2.5">
-                    <h2 class="text-lg font-black text-white tracking-tight">Kurumsal Ekip ve Alt Kullanıcı Yönetimi</h2>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black border border-emerald-400/30">
-                      <ShieldCheck :size="12" /> ÇOKLU KOLTUK (RBAC) AKTİF
+
+          <!-- ENTERPRISE GATING BARRIER -->
+          <div v-if="!isCorporateEnterprise" class="rounded-3xl border border-slate-800 bg-gradient-to-b from-[#0B132B] via-[#0F172A] to-[#080D1A] p-8 text-white shadow-2xl relative overflow-hidden text-left">
+            <div class="absolute -right-12 -top-12 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 max-w-3xl space-y-6">
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-black border border-emerald-500/30">
+                <Lock :size="13" class="text-emerald-400" />
+                <span>KURUMSAL ENTERPRISE AYRICALIĞI</span>
+              </div>
+
+              <div class="space-y-2">
+                <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                  Kurumsal Ekip ve Rol Bazlı Yetki Yönetimi (RBAC)
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+                  Departman bazlı yetki ayrımı, sınırsız alt kullanıcı koltuğu, ihale açma, teklif verme ve finans/escrow onaylayıcı rollerini bağımsız çalışanlarınıza atama yeteneği <strong>Kurumsal Enterprise</strong> planına dahildir.
+                </p>
+              </div>
+
+              <!-- Mevcut Hesap Durumu -->
+              <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-amber-400">
+                    <Building2 :size="20" />
+                  </div>
+                  <div>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">MEVCUT PLANINIZ</span>
+                    <span class="text-xs font-bold text-white block">
+                      {{ isCorporatePro ? 'Kurumsal Pro Tedarikçi (Mavi Kalkan & Radar Aktif)' : (subscriptionPlan || 'Standart Firma Hesabı') }}
                     </span>
                   </div>
-                  <p class="text-xs text-slate-300 leading-relaxed max-w-2xl">
-                    Firmanız bünyesindeki satın alma uzmanları, ihale teklif yetkilileri ve muhasebe sorumluları için bağımsız alt hesaplar oluşturun. Departman bazlı erişim sınırları ile kurumsal güvenliği en üst düzeye çıkarın.
-                  </p>
+                </div>
+
+                <div v-if="isCorporatePro" class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20">
+                  ✓ Kurumsal Pro üyemizsiniz. Enterprise plana geçerek ekip yetkilendirmesini derhal açabilirsiniz.
                 </div>
               </div>
 
-              <button 
-                type="button" 
-                @click="showInviteModal = true" 
-                class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs transition shadow-md shadow-emerald-500/20 shrink-0 cursor-pointer"
-              >
-                <Plus :size="15" />
-                <span>Yeni Ekip Üyesi Davet Et</span>
-              </button>
-            </div>
+              <!-- Enterprise İle Açılan Özellikler Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">Limitsiz Alt Kullanıcı ve Koltuk</span>
+                    <span class="text-[11px] text-slate-400">Tüm satın alma, teklif ve finans personellerinizi davet edin.</span>
+                  </div>
+                </div>
 
-            <!-- Stats Counters -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 mt-6 border-t border-white/10">
-              <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
-                <span class="text-[9px] font-black uppercase text-slate-400 block tracking-wider">KOLTUK KAPASİTESİ</span>
-                <span class="text-base font-black text-white font-mono mt-0.5 block">5 / 5 Koltuk</span>
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">Rol Bazlı Erişim Denetimi</span>
+                    <span class="text-[11px] text-slate-400">İhale Açma, Teklif Verme ve Escrow Onayı yetkilerini ayırın.</span>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">SAP / Logo / Netsis ERP REST API</span>
+                    <span class="text-[11px] text-slate-400">Canlı webhook dinleyicileri ve otomatik stok-fiyat köprüsü.</span>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">Özel Müşteri Başarı Yöneticisi</span>
+                    <span class="text-[11px] text-slate-400">Zeynep Karahan ile 1-on-1 strateji ve 7/24 VIP hat desteği.</span>
+                  </div>
+                </div>
               </div>
-              <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
-                <span class="text-[9px] font-black uppercase text-slate-400 block tracking-wider">AKTİF KULLANICI</span>
-                <span class="text-base font-black text-emerald-400 font-mono mt-0.5 block">{{ teamMembers.filter(m => m.status === 'Aktif').length }} Üye</span>
-              </div>
-              <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
-                <span class="text-[9px] font-black uppercase text-slate-400 block tracking-wider">BEKLEYEN DAVET</span>
-                <span class="text-base font-black text-amber-400 font-mono mt-0.5 block">{{ teamMembers.filter(m => m.status === 'Davet Gönderildi').length }} Davet</span>
-              </div>
-              <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
-                <span class="text-[9px] font-black uppercase text-slate-400 block tracking-wider">YÖNETİCİ SAYISI</span>
-                <span class="text-base font-black text-blue-400 font-mono mt-0.5 block">{{ teamMembers.filter(m => m.role === 'Firma Yöneticisi').length }} Yetkili</span>
+
+              <!-- CTA Butonları -->
+              <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
+                <NuxtLink
+                  to="/abonelik?plan=kurumsal-enterprise&mode=corporate"
+                  class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs transition shadow-lg shadow-emerald-500/30 flex items-center gap-2 cursor-pointer"
+                >
+                  <Sparkles :size="15" />
+                  <span>Kurumsal Enterprise'a Yükselt (₺4.500 / ay)</span>
+                  <ArrowRight :size="14" />
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/panel/ayarlar?tab=uyelik"
+                  class="px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs transition border border-white/10 cursor-pointer"
+                >
+                  Tüm Kurumsal Paketleri Karşılaştır
+                </NuxtLink>
               </div>
             </div>
           </div>
 
-          <!-- Team Table Card -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-            <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
-              <div>
-                <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Kayıtlı Alt Kullanıcılar ve Yetkiler</h3>
-                <p class="text-[11px] text-slate-400 mt-0.5">Departman sorumlularının erişebileceği modülleri ve onay yetkilerini yönetin.</p>
+          <!-- ACTIVE ENTERPRISE VIEW -->
+          <template v-else>
+            <!-- Header Banner -->
+            <div class="rounded-3xl border bg-gradient-to-br from-[#0F223D] via-[#162B4D] to-[#0A1628] p-6 text-white shadow-xl relative overflow-hidden">
+              <div class="absolute right-0 top-0 translate-x-10 -translate-y-10 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+              <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative">
+                <div class="flex items-start gap-4">
+                  <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-white flex items-center justify-center shadow-lg shadow-emerald-500/25 shrink-0">
+                    <Users :size="30" class="text-white" />
+                  </div>
+                  <div class="space-y-1">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                      <h2 class="text-lg font-black text-white tracking-tight">Kurumsal Ekip ve Alt Kullanıcı Yönetimi</h2>
+                      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black border border-emerald-400/30">
+                        <ShieldCheck :size="12" /> ÇOKLU KOLTUK (RBAC) AKTİF
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed max-w-2xl">
+                      Firmanız bünyesindeki satın alma uzmanları, ihale teklif yetkilileri ve muhasebe sorumluları için bağımsız alt hesaplar oluşturun. Departman bazlı erişim sınırları ile kurumsal güvenliği en üst düzeye çıkarın.
+                    </p>
+                  </div>
+                </div>
+
+                <button 
+                  type="button" 
+                  @click="showInviteModal = true" 
+                  class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs transition shadow-md shadow-emerald-500/20 shrink-0 cursor-pointer"
+                >
+                  <Plus :size="15" />
+                  <span>Yeni Ekip Üyesi Davet Et</span>
+                </button>
               </div>
-              <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
-                Toplam {{ teamMembers.length }} Kayıtlı Üye
-              </span>
+
+              <!-- Stats Counters -->
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 mt-6 border-t border-white/10">
+                <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block tracking-wider">KOLTUK KAPASİTESİ</span>
+                  <span class="text-base font-black text-white font-mono mt-0.5 block">5 / 5 Koltuk</span>
+                </div>
+                <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block tracking-wider">AKTİF KULLANICI</span>
+                  <span class="text-base font-black text-emerald-400 font-mono mt-0.5 block">{{ teamMembers.filter(m => m.status === 'Aktif').length }} Üye</span>
+                </div>
+                <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block tracking-wider">BEKLEYEN DAVET</span>
+                  <span class="text-base font-black text-amber-400 font-mono mt-0.5 block">{{ teamMembers.filter(m => m.status === 'Davet Gönderildi').length }} Davet</span>
+                </div>
+                <div class="bg-white/5 p-3 rounded-xl border border-white/10 text-center">
+                  <span class="text-[9px] font-black uppercase text-slate-400 block tracking-wider">YÖNETİCİ SAYISI</span>
+                  <span class="text-base font-black text-blue-400 font-mono mt-0.5 block">{{ teamMembers.filter(m => m.role === 'Firma Yöneticisi').length }} Yetkili</span>
+                </div>
+              </div>
             </div>
 
-            <!-- Table -->
-            <div class="overflow-x-auto">
-              <table class="w-full text-left text-xs">
-                <thead>
-                  <tr class="border-b text-[10px] font-black uppercase tracking-wider text-slate-400" style="border-color: #F1F5F9;">
-                    <th class="py-3 px-3">KULLANICI & E-POSTA</th>
-                    <th class="py-3 px-3">ROL & DEPARTMAN</th>
-                    <th class="py-3 px-3">ERİŞİM YETKİLERİ</th>
-                    <th class="py-3 px-3">DURUM</th>
-                    <th class="py-3 px-3">SON AKTİFLİK</th>
-                    <th class="py-3 px-3 text-right">İŞLEM</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 font-medium">
-                  <tr v-for="member in teamMembers" :key="member.id" class="hover:bg-slate-50/60 transition">
-                    <td class="py-3.5 px-3">
-                      <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 rounded-xl bg-[#0F223D] text-white flex items-center justify-center font-black text-xs shrink-0">
-                          {{ member.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() }}
-                        </div>
-                        <div>
-                          <div class="flex items-center gap-1.5">
-                            <span class="font-bold text-slate-800">{{ member.name }}</span>
-                            <span v-if="member.isOwner" class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 text-[9px] font-black">Hesap Sahibi</span>
+            <!-- Team Table Card -->
+            <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
+              <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
+                <div>
+                  <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Kayıtlı Alt Kullanıcılar ve Yetkiler</h3>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Departman sorumlularının erişebileceği modülleri ve onay yetkilerini yönetin.</p>
+                </div>
+                <span class="text-[10px] font-bold text-slate-500 bg-slate-100 px-2.5 py-1 rounded-lg">
+                  Toplam {{ teamMembers.length }} Kayıtlı Üye
+                </span>
+              </div>
+
+              <!-- Table -->
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs">
+                  <thead>
+                    <tr class="border-b text-[10px] font-black uppercase tracking-wider text-slate-400" style="border-color: #F1F5F9;">
+                      <th class="py-3 px-3">KULLANICI & E-POSTA</th>
+                      <th class="py-3 px-3">ROL & DEPARTMAN</th>
+                      <th class="py-3 px-3">ERİŞİM YETKİLERİ</th>
+                      <th class="py-3 px-3">DURUM</th>
+                      <th class="py-3 px-3">SON AKTİFLİK</th>
+                      <th class="py-3 px-3 text-right">İŞLEM</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-100 font-medium">
+                    <tr v-for="member in teamMembers" :key="member.id" class="hover:bg-slate-50/60 transition">
+                      <td class="py-3.5 px-3">
+                        <div class="flex items-center gap-3">
+                          <div class="w-9 h-9 rounded-xl bg-[#0F223D] text-white flex items-center justify-center font-black text-xs shrink-0">
+                            {{ member.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase() }}
                           </div>
-                          <span class="text-[11px] text-slate-400 font-mono block">{{ member.email }}</span>
+                          <div>
+                            <div class="flex items-center gap-1.5">
+                              <span class="font-bold text-slate-800">{{ member.name }}</span>
+                              <span v-if="member.isOwner" class="px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 text-[9px] font-black">Hesap Sahibi</span>
+                            </div>
+                            <span class="text-[11px] text-slate-400 font-mono block">{{ member.email }}</span>
+                          </div>
                         </div>
-                      </div>
-                    </td>
-                    <td class="py-3.5 px-3">
-                      <span 
-                        class="inline-block px-2.5 py-1 rounded-lg text-[10px] font-black"
-                        :class="
-                          member.role === 'Firma Yöneticisi' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
-                          member.role === 'Satın Alma Sorumlusu' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
-                          'bg-purple-50 text-purple-700 border border-purple-200'
-                        "
-                      >
-                        {{ member.role }}
-                      </span>
-                    </td>
-                    <td class="py-3.5 px-3">
-                      <div class="flex flex-wrap gap-1">
+                      </td>
+                      <td class="py-3.5 px-3">
                         <span 
-                          v-for="perm in member.permissions" 
-                          :key="perm" 
-                          class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-bold"
+                          class="inline-block px-2.5 py-1 rounded-lg text-[10px] font-black"
+                          :class="
+                            member.role === 'Firma Yöneticisi' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                            member.role === 'Satın Alma Sorumlusu' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                            'bg-purple-50 text-purple-700 border border-purple-200'
+                          "
                         >
-                          {{ perm }}
+                          {{ member.role }}
                         </span>
-                      </div>
-                    </td>
-                    <td class="py-3.5 px-3">
-                      <span 
-                        class="inline-flex items-center gap-1 text-[10px] font-bold"
-                        :class="member.status === 'Aktif' ? 'text-emerald-600' : 'text-amber-600'"
-                      >
-                        <span class="w-1.5 h-1.5 rounded-full" :class="member.status === 'Aktif' ? 'bg-emerald-500' : 'bg-amber-500'"></span>
-                        {{ member.status }}
-                      </span>
-                    </td>
-                    <td class="py-3.5 px-3 text-slate-400 text-[11px] font-mono">
-                      {{ member.lastActive }}
-                    </td>
-                    <td class="py-3.5 px-3 text-right">
-                      <button 
-                        v-if="!member.isOwner" 
-                        type="button" 
-                        @click="removeTeamMember(member.id)" 
-                        title="Yetkisini Kaldır"
-                        class="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition cursor-pointer"
-                      >
-                        <Trash2 :size="14" />
-                      </button>
-                      <span v-else class="text-[10px] text-slate-300 font-bold px-2 py-1">Kilitli</span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                      </td>
+                      <td class="py-3.5 px-3">
+                        <div class="flex flex-wrap gap-1">
+                          <span 
+                            v-for="perm in member.permissions" 
+                            :key="perm" 
+                            class="px-2 py-0.5 rounded bg-slate-100 text-slate-600 text-[10px] font-bold"
+                          >
+                            {{ perm }}
+                          </span>
+                        </div>
+                      </td>
+                      <td class="py-3.5 px-3">
+                        <span 
+                          class="inline-flex items-center gap-1 text-[10px] font-bold"
+                          :class="member.status === 'Aktif' ? 'text-emerald-600' : 'text-amber-600'"
+                        >
+                          <span class="w-1.5 h-1.5 rounded-full" :class="member.status === 'Aktif' ? 'bg-emerald-500' : 'bg-amber-500'"></span>
+                          {{ member.status }}
+                        </span>
+                      </td>
+                      <td class="py-3.5 px-3 text-slate-400 text-[11px] font-mono">
+                        {{ member.lastActive }}
+                      </td>
+                      <td class="py-3.5 px-3 text-right">
+                        <button 
+                          v-if="!member.isOwner" 
+                          type="button" 
+                          @click="removeTeamMember(member.id)" 
+                          title="Yetkisini Kaldır"
+                          class="p-2 rounded-lg text-slate-400 hover:text-red-600 hover:bg-red-50 transition cursor-pointer"
+                        >
+                          <Trash2 :size="14" />
+                        </button>
+                        <span v-else class="text-[10px] text-slate-300 font-bold px-2 py-1">Kilitli</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </div>
 
-          <!-- Role Explanation Matrix Card -->
-          <div class="rounded-2xl border bg-slate-50/70 p-6 space-y-4" style="border-color: #E2E8F0;">
-            <h4 class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
-              <ShieldCheck :size="15" class="text-emerald-600" /> Rol Bazlı Yetkilendirme (RBAC) Rehberi
-            </h4>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-              <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-1.5">
-                <span class="font-black text-slate-800 block">Firma Yöneticisi</span>
-                <p class="text-[11px] text-slate-500 leading-relaxed">Şirket profili, faturalandırma, ekip davetleri, sözleşmeler ve tüm ihale/teklif süreçlerinde tam imza yetkisine sahiptir.</p>
-              </div>
-              <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-1.5">
-                <span class="font-black text-slate-800 block">Satın Alma Sorumlusu</span>
-                <p class="text-[11px] text-slate-500 leading-relaxed">Yeni eksiltme/ihale oluşturabilir, şartname yükleyebilir, teklifleri inceleyip müzakere pencerelerini yönetebilir.</p>
-              </div>
-              <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-1.5">
-                <span class="font-black text-slate-800 block">Finans & Muhasebe</span>
-                <p class="text-[11px] text-slate-500 leading-relaxed">Escrow bloke ve hakediş transferlerini onaylar, e-fatura ve komisyon makbuzlarını görüntüler, mutabakat yapar.</p>
+            <!-- Role Explanation Matrix Card -->
+            <div class="rounded-2xl border bg-slate-50/70 p-6 space-y-4" style="border-color: #E2E8F0;">
+              <h4 class="text-xs font-black uppercase tracking-wider text-slate-700 flex items-center gap-2">
+                <ShieldCheck :size="15" class="text-emerald-600" /> Rol Bazlı Yetkilendirme (RBAC) Rehberi
+              </h4>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+                <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                  <span class="font-black text-slate-800 block">Firma Yöneticisi</span>
+                  <p class="text-[11px] text-slate-500 leading-relaxed">Şirket profili, faturalandırma, ekip davetleri, sözleşmeler ve tüm ihale/teklif süreçlerinde tam imza yetkisine sahiptir.</p>
+                </div>
+                <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                  <span class="font-black text-slate-800 block">Satın Alma Sorumlusu</span>
+                  <p class="text-[11px] text-slate-500 leading-relaxed">Yeni eksiltme/ihale oluşturabilir, şartname yükleyebilir, teklifleri inceleyip müzakere pencerelerini yönetebilir.</p>
+                </div>
+                <div class="p-4 bg-white rounded-xl border border-slate-200 space-y-1.5">
+                  <span class="font-black text-slate-800 block">Finans & Muhasebe</span>
+                  <p class="text-[11px] text-slate-500 leading-relaxed">Escrow bloke ve hakediş transferlerini onaylar, e-fatura ve komisyon makbuzlarını görüntüler, mutabakat yapar.</p>
+                </div>
               </div>
             </div>
-          </div>
+          </template>
         </div>
 
         <!-- ========================================================================= -->
         <!-- 2. SAP / LOGO / NETSİS / MİKRO ERP REST API ENTEGRASYONU TAB -->
         <!-- ========================================================================= -->
         <div v-if="activeSubTab === 'erp'" class="space-y-6">
-          <!-- Header Banner -->
-          <div class="rounded-3xl border bg-gradient-to-br from-[#0A192F] via-[#102A45] to-[#0A1628] p-6 text-white shadow-xl relative overflow-hidden">
-            <div class="absolute right-0 top-0 translate-x-10 -translate-y-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative">
-              <div class="flex items-start gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/25 shrink-0">
-                  <Cpu :size="30" class="text-white" />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex flex-wrap items-center gap-2.5">
-                    <h2 class="text-lg font-black text-white tracking-tight">ERP REST API & Webhook Entegrasyon Merkezi</h2>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-black border border-blue-400/30">
-                      <Activity :size="12" /> CANLI REST v1.4 BAĞLANTISI
+
+          <!-- ENTERPRISE GATING BARRIER -->
+          <div v-if="!isCorporateEnterprise" class="rounded-3xl border border-slate-800 bg-gradient-to-b from-[#0B132B] via-[#0F172A] to-[#080D1A] p-8 text-white shadow-2xl relative overflow-hidden text-left">
+            <div class="absolute -right-12 -top-12 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 max-w-3xl space-y-6">
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/20 text-blue-300 text-xs font-black border border-blue-500/30">
+                <Lock :size="13" class="text-blue-400" />
+                <span>KURUMSAL ENTERPRISE AYRICALIĞI</span>
+              </div>
+
+              <div class="space-y-2">
+                <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                  SAP, Logo, Netsis ve Mikro ERP REST API Entegrasyonu
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+                  Canlı webhook dinleyicileri, HMAC-SHA256 imzalı REST API uç noktaları ve şirket içi muhasebe yazılımlarınızla otomatik ihale-teklif senkronizasyonu <strong>Kurumsal Enterprise</strong> planına dahildir.
+                </p>
+              </div>
+
+              <!-- Mevcut Hesap Durumu -->
+              <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-blue-400">
+                    <Key :size="20" />
+                  </div>
+                  <div>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">MEVCUT PLANINIZ</span>
+                    <span class="text-xs font-bold text-white block">
+                      {{ isCorporatePro ? 'Kurumsal Pro Tedarikçi (Mavi Kalkan & Radar Aktif)' : (subscriptionPlan || 'Standart Firma Hesabı') }}
                     </span>
                   </div>
-                  <p class="text-xs text-slate-300 leading-relaxed max-w-2xl">
-                    İhaleciBurada platformunu mevcut kurumsal ERP yazılımınıza (SAP, Logo, Netsis, Mikro) çift yönlü bağlayın. Açılan ihaleler, teklifler ve emanet hakedişler anında muhasebe sisteminize aksın.
-                  </p>
+                </div>
+
+                <div v-if="isCorporatePro" class="text-xs text-blue-300 font-bold bg-blue-500/10 px-3 py-1.5 rounded-xl border border-blue-500/20">
+                  ✓ Kurumsal Pro üyemizsiniz. Enterprise plana yükselterek REST API anahtarlarınızı anında alabilirsiniz.
                 </div>
               </div>
 
-              <button 
-                type="button" 
-                @click="testErpConnection" 
-                :disabled="isTestingErp"
-                class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition shadow-md shadow-blue-500/20 shrink-0 cursor-pointer disabled:opacity-50"
-              >
-                <Activity :size="15" :class="isTestingErp ? 'animate-spin' : ''" />
-                <span>{{ isTestingErp ? 'Bağlantı Sınanıyor...' : 'Entegrasyonu Test Et' }}</span>
-              </button>
-            </div>
-
-            <!-- ERP Systems Selector Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-6 mt-6 border-t border-white/10">
-              <button 
-                v-for="erp in [
-                  { id: 'logo', name: 'Logo Tiger / Go 3', desc: 'Object Service / REST' },
-                  { id: 'sap', name: 'SAP S/4HANA & ECC', desc: 'OData & RFC Bridge' },
-                  { id: 'netsis', name: 'Netsis Enterprise', desc: 'NetOpenX REST API' },
-                  { id: 'mikro', name: 'Mikro Yazılım', desc: 'Fly & Jump Entegratör' },
-                  { id: 'rest', name: 'Özel REST API', desc: 'JSON Webhook & OpenAPI' }
-                ]" 
-                :key="erp.id"
-                type="button"
-                @click="selectedErpSystem = erp.id as any; showToast(`Aktif ERP sistemi: ${erp.name}`)"
-                class="p-3 rounded-xl border text-left transition cursor-pointer"
-                :class="selectedErpSystem === erp.id ? 'bg-blue-600/30 border-blue-400 ring-2 ring-blue-500/40' : 'bg-white/5 border-white/10 hover:bg-white/10'"
-              >
-                <div class="flex items-center justify-between mb-1">
-                  <span class="text-xs font-black text-white">{{ erp.name }}</span>
-                  <CheckCircle2 v-if="selectedErpSystem === erp.id" :size="12" class="text-blue-400" />
+              <!-- Enterprise ile Açılan Özellikler -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-blue-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">Logo Tiger / Go3 ve Netsis Köprüsü</span>
+                    <span class="text-[11px] text-slate-400">Sipariş ve fatura süreçlerinizi otomatik bağlayın.</span>
+                  </div>
                 </div>
-                <span class="text-[10px] text-slate-400 block">{{ erp.desc }}</span>
-              </button>
+
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-blue-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">SAP S/4HANA & OData Entegrasyonu</span>
+                    <span class="text-[11px] text-slate-400">Büyük kurumsal yapılar için RFC ve OData uç noktaları.</span>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-blue-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">HMAC-SHA256 İmzalı Webhook'lar</span>
+                    <span class="text-[11px] text-slate-400">İhale açıldığında, teklif verildiğinde ve kazanıldığında anlık JSON iletimi.</span>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-blue-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">Özel Teknik Entegratör Desteği</span>
+                    <span class="text-[11px] text-slate-400">Yazılım ekibiniz için API rehberi ve sandbox ortamı.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- CTA Butonları -->
+              <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
+                <NuxtLink
+                  to="/abonelik?plan=kurumsal-enterprise&mode=corporate"
+                  class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-black text-xs transition shadow-lg shadow-blue-500/30 flex items-center gap-2 cursor-pointer"
+                >
+                  <Key :size="15" />
+                  <span>Kurumsal Enterprise'a Yükselt (₺4.500 / ay)</span>
+                  <ArrowRight :size="14" />
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/panel/ayarlar?tab=uyelik"
+                  class="px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs transition border border-white/10 cursor-pointer"
+                >
+                  Tüm Kurumsal Paketleri Karşılaştır
+                </NuxtLink>
+              </div>
             </div>
           </div>
 
-          <!-- API Credentials Card -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
-            <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
-              <div>
-                <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">API Anahtarları ve Bağlantı Bilgileri</h3>
-                <p class="text-[11px] text-slate-400 mt-0.5">ERP sunucunuzun güvenli yetkilendirme (Bearer Token) ile kullanacağı kimlik bilgileri.</p>
+          <!-- ACTIVE ENTERPRISE VIEW -->
+          <template v-else>
+            <!-- Header Banner -->
+            <div class="rounded-3xl border bg-gradient-to-br from-[#0A192F] via-[#102A45] to-[#0A1628] p-6 text-white shadow-xl relative overflow-hidden">
+              <div class="absolute right-0 top-0 translate-x-10 -translate-y-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+              <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative">
+                <div class="flex items-start gap-4">
+                  <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center shadow-lg shadow-blue-500/25 shrink-0">
+                    <Cpu :size="30" class="text-white" />
+                  </div>
+                  <div class="space-y-1">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                      <h2 class="text-lg font-black text-white tracking-tight">ERP REST API & Webhook Entegrasyon Merkezi</h2>
+                      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-[10px] font-black border border-blue-400/30">
+                        <Activity :size="12" /> CANLI REST v1.4 BAĞLANTISI
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed max-w-2xl">
+                      İhaleciBurada platformunu mevcut kurumsal ERP yazılımınıza (SAP, Logo, Netsis, Mikro) çift yönlü bağlayın. Açılan ihaleler, teklifler ve emanet hakedişler anında muhasebe sisteminize aksın.
+                    </p>
+                  </div>
+                </div>
+
+                <button 
+                  type="button" 
+                  @click="testErpConnection" 
+                  :disabled="isTestingErp"
+                  class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition shadow-md shadow-blue-500/20 shrink-0 cursor-pointer disabled:opacity-50"
+                >
+                  <Activity :size="15" :class="isTestingErp ? 'animate-spin' : ''" />
+                  <span>{{ isTestingErp ? 'Bağlantı Sınanıyor...' : 'Entegrasyonu Test Et' }}</span>
+                </button>
               </div>
-              <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
-                Production Ortamı
-              </span>
+
+              <!-- ERP Systems Selector Grid -->
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-6 mt-6 border-t border-white/10">
+                <button 
+                  v-for="erp in [
+                    { id: 'logo', name: 'Logo Tiger / Go 3', desc: 'Object Service / REST' },
+                    { id: 'sap', name: 'SAP S/4HANA & ECC', desc: 'OData & RFC Bridge' },
+                    { id: 'netsis', name: 'Netsis Enterprise', desc: 'NetOpenX REST API' },
+                    { id: 'mikro', name: 'Mikro Yazılım', desc: 'Fly & Jump Entegratör' },
+                    { id: 'rest', name: 'Özel REST API', desc: 'JSON Webhook & OpenAPI' }
+                  ]" 
+                  :key="erp.id"
+                  type="button"
+                  @click="selectedErpSystem = erp.id as any; showToast(`Aktif ERP sistemi: ${erp.name}`)"
+                  class="p-3 rounded-xl border text-left transition cursor-pointer"
+                  :class="selectedErpSystem === erp.id ? 'bg-blue-600/30 border-blue-400 ring-2 ring-blue-500/40' : 'bg-white/5 border-white/10 hover:bg-white/10'"
+                >
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-xs font-black text-white">{{ erp.name }}</span>
+                    <CheckCircle2 v-if="selectedErpSystem === erp.id" :size="12" class="text-blue-400" />
+                  </div>
+                  <span class="text-[10px] text-slate-400 block">{{ erp.desc }}</span>
+                </button>
+              </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- API Base URL -->
-              <div>
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">REST API BASE URL</label>
-                <div class="flex items-center rounded-xl border bg-slate-50 px-3.5 py-2.5 text-xs font-mono text-slate-700" style="border-color: #E2E8F0;">
-                  <span class="truncate">https://api.gelanlasalim.com/v1/erp</span>
+            <!-- API Credentials Card -->
+            <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
+              <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
+                <div>
+                  <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">API Anahtarları ve Bağlantı Bilgileri</h3>
+                  <p class="text-[11px] text-slate-400 mt-0.5">ERP sunucunuzun güvenli yetkilendirme (Bearer Token) ile kullanacağı kimlik bilgileri.</p>
                 </div>
+                <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-lg">
+                  Production Ortamı
+                </span>
               </div>
 
-              <!-- API Key -->
-              <div>
-                <div class="flex items-center justify-between mb-1">
-                  <label class="block text-[10px] font-black text-slate-500 uppercase">GİZLİ API ANAHTARI (SECRET KEY)</label>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- API Base URL -->
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">REST API BASE URL</label>
+                  <div class="flex items-center rounded-xl border bg-slate-50 px-3.5 py-2.5 text-xs font-mono text-slate-700" style="border-color: #E2E8F0;">
+                    <span class="truncate">https://api.gelanlasalim.com/v1/erp</span>
+                  </div>
+                </div>
+
+                <!-- API Key -->
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="block text-[10px] font-black text-slate-500 uppercase">GİZLİ API ANAHTARI (SECRET KEY)</label>
+                    <div class="flex items-center gap-2">
+                      <button type="button" @click="showApiKey = !showApiKey" class="text-[10px] text-blue-600 font-bold hover:underline cursor-pointer">
+                        {{ showApiKey ? 'Gizle' : 'Göster' }}
+                      </button>
+                      <button type="button" @click="regenerateErpApiKey" class="text-[10px] text-amber-600 font-bold hover:underline cursor-pointer">
+                        Yenile
+                      </button>
+                    </div>
+                  </div>
                   <div class="flex items-center gap-2">
-                    <button type="button" @click="showApiKey = !showApiKey" class="text-[10px] text-blue-600 font-bold hover:underline cursor-pointer">
-                      {{ showApiKey ? 'Gizle' : 'Göster' }}
-                    </button>
-                    <button type="button" @click="regenerateErpApiKey" class="text-[10px] text-amber-600 font-bold hover:underline cursor-pointer">
-                      Yenile
+                    <input 
+                      :type="showApiKey ? 'text' : 'password'" 
+                      readonly 
+                      :value="erpApiKey" 
+                      class="w-full rounded-xl border bg-slate-50 px-3.5 py-2.5 text-xs font-mono font-bold text-slate-800 outline-none" 
+                      style="border-color: #E2E8F0;" 
+                    />
+                    <button 
+                      type="button" 
+                      @click="copyErpApiKey" 
+                      class="p-2.5 rounded-xl border hover:bg-slate-50 text-slate-600 transition cursor-pointer shrink-0" 
+                      style="border-color: #E2E8F0;"
+                      title="Kopyala"
+                    >
+                      <Copy :size="15" />
                     </button>
                   </div>
                 </div>
-                <div class="flex items-center gap-2">
+
+                <!-- Webhook URL -->
+                <div class="md:col-span-2">
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">ŞİRKETİNİZİN DİNLEYİCİ WEBHOOK URL ADRESİ</label>
                   <input 
-                    :type="showApiKey ? 'text' : 'password'" 
-                    readonly 
-                    :value="erpApiKey" 
-                    class="w-full rounded-xl border bg-slate-50 px-3.5 py-2.5 text-xs font-mono font-bold text-slate-800 outline-none" 
+                    v-model="erpWebhookUrl" 
+                    type="url" 
+                    class="w-full rounded-xl border px-4 py-2.5 text-xs font-mono text-slate-800 focus:border-blue-500 outline-none bg-white" 
                     style="border-color: #E2E8F0;" 
+                    placeholder="https://erp.firmaniz.com/api/webhooks/tender-events" 
                   />
-                  <button 
-                    type="button" 
-                    @click="copyErpApiKey" 
-                    class="p-2.5 rounded-xl border hover:bg-slate-50 text-slate-600 transition cursor-pointer shrink-0" 
-                    style="border-color: #E2E8F0;"
-                    title="Kopyala"
-                  >
-                    <Copy :size="15" />
-                  </button>
+                  <span class="text-[10px] text-slate-400 mt-1 block">Olay gerçekleştiğinde sistemimiz bu endpoint'e HMAC-SHA256 imzalı POST isteği gönderir.</span>
                 </div>
               </div>
 
-              <!-- Webhook URL -->
-              <div class="md:col-span-2">
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">ŞİRKETİNİZİN DİNLEYİCİ WEBHOOK URL ADRESİ</label>
-                <input 
-                  v-model="erpWebhookUrl" 
-                  type="url" 
-                  class="w-full rounded-xl border px-4 py-2.5 text-xs font-mono text-slate-800 focus:border-blue-500 outline-none bg-white" 
-                  style="border-color: #E2E8F0;" 
-                  placeholder="https://erp.firmaniz.com/api/webhooks/tender-events" 
-                />
-                <span class="text-[10px] text-slate-400 mt-1 block">Olay gerçekleştiğinde sistemimiz bu endpoint'e HMAC-SHA256 imzalı POST isteği gönderir.</span>
+              <!-- Webhook Event Subscriptions -->
+              <div class="pt-2 border-t border-slate-100 space-y-3">
+                <label class="block text-[10px] font-black text-slate-500 uppercase">ABONE OLUNAN WEBHOOK OLAYLARI</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                  <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition">
+                    <input type="checkbox" v-model="erpEvents.tenderCreated" class="rounded mt-0.5 text-blue-600" />
+                    <div>
+                      <span class="text-xs font-bold text-slate-800 block">tender.created</span>
+                      <span class="text-[10px] text-slate-500">Yeni ihale açıldığında</span>
+                    </div>
+                  </label>
+                  <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition">
+                    <input type="checkbox" v-model="erpEvents.bidReceived" class="rounded mt-0.5 text-blue-600" />
+                    <div>
+                      <span class="text-xs font-bold text-slate-800 block">bid.submitted</span>
+                      <span class="text-[10px] text-slate-500">Teklif verildiğinde</span>
+                    </div>
+                  </label>
+                  <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition">
+                    <input type="checkbox" v-model="erpEvents.tenderAwarded" class="rounded mt-0.5 text-blue-600" />
+                    <div>
+                      <span class="text-xs font-bold text-slate-800 block">bid.won</span>
+                      <span class="text-[10px] text-slate-500">İhale kazanıldığında</span>
+                    </div>
+                  </label>
+                  <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition">
+                    <input type="checkbox" v-model="erpEvents.escrowReleased" class="rounded mt-0.5 text-blue-600" />
+                    <div>
+                      <span class="text-xs font-bold text-slate-800 block">escrow.released</span>
+                      <span class="text-[10px] text-slate-500">Hakediş çözüldüğünde</span>
+                    </div>
+                  </label>
+                </div>
               </div>
             </div>
 
-            <!-- Webhook Event Subscriptions -->
-            <div class="pt-2 border-t border-slate-100 space-y-3">
-              <label class="block text-[10px] font-black text-slate-500 uppercase">ABONE OLUNAN WEBHOOK OLAYLARI</label>
-              <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition">
-                  <input type="checkbox" v-model="erpEvents.tenderCreated" class="rounded mt-0.5 text-blue-600" />
-                  <div>
-                    <span class="text-xs font-bold text-slate-800 block">tender.created</span>
-                    <span class="text-[10px] text-slate-500">Yeni ihale açıldığında</span>
-                  </div>
-                </label>
-                <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition">
-                  <input type="checkbox" v-model="erpEvents.bidReceived" class="rounded mt-0.5 text-blue-600" />
-                  <div>
-                    <span class="text-xs font-bold text-slate-800 block">bid.submitted</span>
-                    <span class="text-[10px] text-slate-500">Teklif verildiğinde</span>
-                  </div>
-                </label>
-                <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition">
-                  <input type="checkbox" v-model="erpEvents.tenderAwarded" class="rounded mt-0.5 text-blue-600" />
-                  <div>
-                    <span class="text-xs font-bold text-slate-800 block">bid.won</span>
-                    <span class="text-[10px] text-slate-500">İhale kazanıldığında</span>
-                  </div>
-                </label>
-                <label class="flex items-start gap-2.5 p-3 rounded-xl border border-slate-200 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition">
-                  <input type="checkbox" v-model="erpEvents.escrowReleased" class="rounded mt-0.5 text-blue-600" />
-                  <div>
-                    <span class="text-xs font-bold text-slate-800 block">escrow.released</span>
-                    <span class="text-[10px] text-slate-500">Hakediş çözüldüğünde</span>
-                  </div>
-                </label>
+            <!-- Diagnostic Test Output Window -->
+            <div v-if="erpTestResult" class="rounded-2xl border bg-slate-900 p-6 text-emerald-400 font-mono text-xs shadow-xl space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span class="flex items-center gap-2 text-slate-300 font-bold">
+                  <Terminal :size="14" /> CANLI ERP VE WEBHOOK TANI RAPORU
+                </span>
+                <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">
+                  HTTP {{ erpTestResult.status }} OK
+                </span>
+              </div>
+              <div class="space-y-1 leading-relaxed text-[11px]">
+                <p>> Sistem: <span class="text-white">{{ erpTestResult.system }} ENTEGRASYON MODÜLÜ</span></p>
+                <p>> Gecikme: <span class="text-amber-400">{{ erpTestResult.latency }}</span> | Zaman: <span class="text-slate-400">{{ erpTestResult.timestamp }}</span></p>
+                <p>> Mesaj: <span class="text-white">{{ erpTestResult.message }}</span></p>
+                <p>> İhale Senkronizasyonu: <span class="text-emerald-300">BAŞARILI (Aktif 14 İhale Verisi Doğrulandı)</span></p>
               </div>
             </div>
-          </div>
-
-          <!-- Diagnostic Test Output Window -->
-          <div v-if="erpTestResult" class="rounded-2xl border bg-slate-900 p-6 text-emerald-400 font-mono text-xs shadow-xl space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-              <span class="flex items-center gap-2 text-slate-300 font-bold">
-                <Terminal :size="14" /> CANLI ERP VE WEBHOOK TANI RAPORU
-              </span>
-              <span class="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 text-[10px] font-bold">
-                HTTP {{ erpTestResult.status }} OK
-              </span>
-            </div>
-            <div class="space-y-1 leading-relaxed text-[11px]">
-              <p>> Sistem: <span class="text-white">{{ erpTestResult.system }} ENTEGRASYON MODÜLÜ</span></p>
-              <p>> Gecikme: <span class="text-amber-400">{{ erpTestResult.latency }}</span> | Zaman: <span class="text-slate-400">{{ erpTestResult.timestamp }}</span></p>
-              <p>> Mesaj: <span class="text-white">{{ erpTestResult.message }}</span></p>
-              <p>> İhale Senkronizasyonu: <span class="text-emerald-300">BAŞARILI (Aktif 14 İhale Verisi Doğrulandı)</span></p>
-            </div>
-          </div>
+          </template>
         </div>
 
         <!-- ========================================================================= -->
         <!-- 3. ÖNCELİKLİ B2B İHALE RADARI & SMS / E-POSTA ALARMI TAB -->
         <!-- ========================================================================= -->
         <div v-if="activeSubTab === 'radar'" class="space-y-6">
-          <!-- Header Banner -->
-          <div class="rounded-3xl border bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#020617] p-6 text-white shadow-xl relative overflow-hidden">
-            <div class="absolute right-0 top-0 translate-x-10 -translate-y-10 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative">
-              <div class="flex items-start gap-4">
-                <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-white flex items-center justify-center shadow-lg shadow-amber-500/25 shrink-0">
-                  <Radio :size="30" class="text-slate-900" />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex flex-wrap items-center gap-2.5">
-                    <h2 class="text-lg font-black text-white tracking-tight">Öncelikli B2B İhale Radarı & SMS Alarmı</h2>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black border border-amber-400/30">
-                      <Sparkles :size="12" /> 15 DK ÖNCELİKLİ ERİŞİM
+
+          <!-- PRO GATING BARRIER -->
+          <div v-if="!isCorporatePro" class="rounded-3xl border border-slate-800 bg-gradient-to-b from-[#1A1A2E] via-[#0F172A] to-[#0A0E1A] p-8 text-white shadow-2xl relative overflow-hidden text-left">
+            <div class="absolute -right-12 -top-12 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 max-w-3xl space-y-6">
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/20 text-amber-300 text-xs font-black border border-amber-500/30">
+                <Lock :size="13" class="text-amber-400" />
+                <span>KURUMSAL PRO & ENTERPRISE AYRICALIĞI</span>
+              </div>
+
+              <div class="space-y-2">
+                <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                  Öncelikli B2B İhale Radarı & SMS / E-Posta Alarmı
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+                  Sektörünüzde açılan ihalelerden sistem yayınlandığı saniyede ilk 15 dakika öncelikli haberdar olma, NetGSM SMS ve anlık e-posta alarmları <strong>Kurumsal Pro Tedarikçi</strong> ve <strong>Kurumsal Enterprise</strong> planlarımıza dahildir.
+                </p>
+              </div>
+
+              <!-- Mevcut Hesap Durumu -->
+              <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-amber-400">
+                    <Radio :size="20" />
+                  </div>
+                  <div>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">MEVCUT PLANINIZ</span>
+                    <span class="text-xs font-bold text-white block">
+                      {{ subscriptionPlan || 'Standart Firma Hesabı' }}
                     </span>
                   </div>
-                  <p class="text-xs text-slate-300 leading-relaxed max-w-2xl">
-                    Faaliyet sektörlerinizde açılan tüm ihaleleri sistem yayınlandığı saniyede radarınıza alın. NetGSM entegre SMS ve kurumsal e-posta alarmlarıyla teklifinizi rakiplerinizden önce hazırlayın.
-                  </p>
+                </div>
+
+                <div class="text-xs text-amber-400 font-bold bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20">
+                  Radar alarmlarını aktif etmek için Kurumsal Pro veya Enterprise plana geçiş yapabilirsiniz.
                 </div>
               </div>
 
-              <button 
-                type="button" 
-                @click="sendTestRadarAlert" 
-                :disabled="isSendingRadarTest"
-                class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-black text-xs transition shadow-md shadow-amber-500/20 shrink-0 cursor-pointer disabled:opacity-50"
-              >
-                <Send :size="15" :class="isSendingRadarTest ? 'animate-bounce' : ''" />
-                <span>{{ isSendingRadarTest ? 'İletiliyor...' : 'SMS Test Alarmı Gönder' }}</span>
-              </button>
-            </div>
-
-            <!-- Radar Channels Quick Toggles -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 mt-6 border-t border-white/10">
-              <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <Smartphone :size="18" class="text-amber-400" />
+              <!-- Pro İle Açılan Özellikler -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-amber-400 shrink-0 mt-0.5" />
                   <div>
-                    <span class="text-xs font-bold text-white block">NetGSM SMS Alarmı</span>
-                    <span class="text-[10px] text-slate-400">{{ companyForm.phone || profileForm.phone || '0850 840 86 95' }}</span>
+                    <span class="text-xs font-bold text-white block">15 Dk Öncelikli İhale Bildirimi</span>
+                    <span class="text-[11px] text-slate-400">Teklifinizi rakiplerinizden önce hazırlayıp ilk sıraya yerleşin.</span>
                   </div>
                 </div>
-                <input type="checkbox" v-model="radarSmsEnabled" class="rounded text-amber-500 h-4 w-4" />
+
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">NetGSM Doğrudan Cep SMS Alarmı</span>
+                    <span class="text-[11px] text-slate-400">İhale onaylandığı anda telefonunuza doğrudan özet SMS düşsün.</span>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">Sektör ve Bütçe Eşiği Filtreleri</span>
+                    <span class="text-[11px] text-slate-400">Yalnızca şirket ölçeğinize uyan nitelikli ihaleleri takip edin.</span>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">Doğrulanmış B2B Mavi Kalkan Rozeti</span>
+                    <span class="text-[11px] text-slate-400">Birlikte gelen Mavi Kalkan ile alıcılara resmi güven damgası sunun.</span>
+                  </div>
+                </div>
               </div>
 
-              <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <Mail :size="18" class="text-blue-400" />
-                  <div>
-                    <span class="text-xs font-bold text-white block">Kurumsal E-Posta Radarı</span>
-                    <span class="text-[10px] text-slate-400">Anlık & Detaylı Şartname</span>
-                  </div>
-                </div>
-                <input type="checkbox" v-model="radarEmailEnabled" class="rounded text-blue-500 h-4 w-4" />
-              </div>
+              <!-- CTA Butonları -->
+              <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
+                <NuxtLink
+                  to="/abonelik?plan=kurumsal-pro&mode=corporate"
+                  class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-400 hover:from-amber-400 hover:to-yellow-300 text-slate-950 font-black text-xs transition shadow-lg shadow-amber-500/30 flex items-center gap-2 cursor-pointer"
+                >
+                  <Radio :size="15" />
+                  <span>Kurumsal Pro'ya Geç (₺1.800 / ay)</span>
+                  <ArrowRight :size="14" />
+                </NuxtLink>
 
-              <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
-                <div class="flex items-center gap-2.5">
-                  <Bell :size="18" class="text-emerald-400" />
-                  <div>
-                    <span class="text-xs font-bold text-white block">Tarayıcı & Mobil Push</span>
-                    <span class="text-[10px] text-slate-400">Canlı Masaüstü Bildirimi</span>
-                  </div>
-                </div>
-                <input type="checkbox" v-model="radarPushEnabled" class="rounded text-emerald-500 h-4 w-4" />
+                <NuxtLink
+                  to="/abonelik?plan=kurumsal-enterprise&mode=corporate"
+                  class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs transition shadow-lg shadow-emerald-500/30 flex items-center gap-2 cursor-pointer"
+                >
+                  <Sparkles :size="15" />
+                  <span>Enterprise'a Geç (₺4.500 / ay)</span>
+                  <ArrowRight :size="14" />
+                </NuxtLink>
               </div>
             </div>
           </div>
 
-          <!-- Radar Filter Settings Card -->
-          <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
-            <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
-              <div>
-                <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Radar Kriterleri ve Alarm Eşikleri</h3>
-                <p class="text-[11px] text-slate-400 mt-0.5">Yalnızca şirketinizin ölçeğine ve ilgi alanına uyan nitelikli ihaleler için alarm alın.</p>
-              </div>
-            </div>
+          <!-- ACTIVE RADAR VIEW -->
+          <template v-else>
+            <!-- Header Banner -->
+            <div class="rounded-3xl border bg-gradient-to-br from-[#1E293B] via-[#0F172A] to-[#020617] p-6 text-white shadow-xl relative overflow-hidden">
+              <div class="absolute right-0 top-0 translate-x-10 -translate-y-10 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+              <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative">
+                <div class="flex items-start gap-4">
+                  <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-amber-500 to-yellow-400 text-white flex items-center justify-center shadow-lg shadow-amber-500/25 shrink-0">
+                    <Radio :size="30" class="text-slate-900" />
+                  </div>
+                  <div class="space-y-1">
+                    <div class="flex flex-wrap items-center gap-2.5">
+                      <h2 class="text-lg font-black text-white tracking-tight">Öncelikli B2B İhale Radarı & SMS Alarmı</h2>
+                      <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black border border-amber-400/30">
+                        <Sparkles :size="12" /> 15 DK ÖNCELİKLİ ERİŞİM
+                      </span>
+                    </div>
+                    <p class="text-xs text-slate-300 leading-relaxed max-w-2xl">
+                      Faaliyet sektörlerinizde açılan tüm ihaleleri sistem yayınlandığı saniyede radarınıza alın. NetGSM entegre SMS ve kurumsal e-posta alarmlarıyla teklifinizi rakiplerinizden önce hazırlayın.
+                    </p>
+                  </div>
+                </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <!-- Min Budget Threshold -->
-              <div>
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">MİNİMUM İHALE BÜTÇE EŞİĞİ</label>
-                <select v-model="radarMinBudget" class="w-full rounded-xl border px-4 py-2.5 text-xs font-bold text-slate-800 focus:border-blue-500 outline-none bg-white" style="border-color: #E2E8F0;">
-                  <option value="0">Tüm İhaleler (Bütçe Eşiği Yok)</option>
-                  <option value="50000">50.000 ₺ ve Üzeri</option>
-                  <option value="100000">100.000 ₺ ve Üzeri (Önerilen)</option>
-                  <option value="250000">250.000 ₺ ve Üzeri</option>
-                  <option value="1000000">1.000.000 ₺ ve Üzeri (Büyük İhaleler)</option>
-                </select>
+                <button 
+                  type="button" 
+                  @click="sendTestRadarAlert" 
+                  :disabled="isSendingRadarTest"
+                  class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-black text-xs transition shadow-md shadow-amber-500/20 shrink-0 cursor-pointer disabled:opacity-50"
+                >
+                  <Send :size="15" :class="isSendingRadarTest ? 'animate-bounce' : ''" />
+                  <span>{{ isSendingRadarTest ? 'İletiliyor...' : 'SMS Test Alarmı Gönder' }}</span>
+                </button>
               </div>
 
-              <!-- Location Filter -->
-              <div>
-                <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">HEDEF TESLİMAT BÖLGESİ</label>
-                <select class="w-full rounded-xl border px-4 py-2.5 text-xs font-bold text-slate-800 focus:border-blue-500 outline-none bg-white" style="border-color: #E2E8F0;">
-                  <option value="all">Tüm Türkiye (Ulusal İhaleler)</option>
-                  <option value="marmara">Marmara Bölgesi (İstanbul, Kocaeli, Bursa...)</option>
-                  <option value="ege">Ege Bölgesi (İzmir, Manisa, Denizli...)</option>
-                  <option value="ic_anadolu">İç Anadolu (Ankara, Konya, Kayseri...)</option>
-                </select>
-              </div>
+              <!-- Radar Channels Quick Toggles -->
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 mt-6 border-t border-white/10">
+                <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <Smartphone :size="18" class="text-amber-400" />
+                    <div>
+                      <span class="text-xs font-bold text-white block">NetGSM SMS Alarmı</span>
+                      <span class="text-[10px] text-slate-400">{{ companyForm.phone || profileForm.phone || '0850 840 86 95' }}</span>
+                    </div>
+                  </div>
+                  <input type="checkbox" v-model="radarSmsEnabled" class="rounded text-amber-500 h-4 w-4" />
+                </div>
 
-              <!-- Monitored Sectors Chips -->
-              <div class="md:col-span-2 space-y-2">
-                <label class="block text-[10px] font-black text-slate-500 uppercase">RADARA DAHİL EDİLEN FAALİYET SEKTÖRLERİ</label>
-                <div class="flex flex-wrap gap-2">
-                  <span 
-                    v-for="sec in radarSelectedSectors" 
-                    :key="sec" 
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-800 text-xs font-bold border border-blue-200"
-                  >
-                    <CheckCircle2 :size="13" class="text-blue-600" />
-                    {{ sec }}
-                  </span>
+                <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <Mail :size="18" class="text-blue-400" />
+                    <div>
+                      <span class="text-xs font-bold text-white block">Kurumsal E-Posta Radarı</span>
+                      <span class="text-[10px] text-slate-400">Anlık & Detaylı Şartname</span>
+                    </div>
+                  </div>
+                  <input type="checkbox" v-model="radarEmailEnabled" class="rounded text-blue-500 h-4 w-4" />
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
+                  <div class="flex items-center gap-2.5">
+                    <Bell :size="18" class="text-emerald-400" />
+                    <div>
+                      <span class="text-xs font-bold text-white block">Tarayıcı & Mobil Push</span>
+                      <span class="text-[10px] text-slate-400">Canlı Masaüstü Bildirimi</span>
+                    </div>
+                  </div>
+                  <input type="checkbox" v-model="radarPushEnabled" class="rounded text-emerald-500 h-4 w-4" />
                 </div>
               </div>
             </div>
-          </div>
+
+            <!-- Radar Filter Settings Card -->
+            <div class="rounded-2xl border bg-white p-6 shadow-sm space-y-6" style="border-color: #E2E8F0;">
+              <div class="flex items-center justify-between border-b pb-3" style="border-color: #F1F5F9;">
+                <div>
+                  <h3 class="text-xs font-black uppercase tracking-wider text-slate-700">Radar Kriterleri ve Alarm Eşikleri</h3>
+                  <p class="text-[11px] text-slate-400 mt-0.5">Yalnızca şirketinizin ölçeğine ve ilgi alanına uyan nitelikli ihaleler için alarm alın.</p>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Min Budget Threshold -->
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">MİNİMUM İHALE BÜTÇE EŞİĞİ</label>
+                  <select v-model="radarMinBudget" class="w-full rounded-xl border px-4 py-2.5 text-xs font-bold text-slate-800 focus:border-blue-500 outline-none bg-white" style="border-color: #E2E8F0;">
+                    <option value="0">Tüm İhaleler (Bütçe Eşiği Yok)</option>
+                    <option value="50000">50.000 ₺ ve Üzeri</option>
+                    <option value="100000">100.000 ₺ ve Üzeri (Önerilen)</option>
+                    <option value="250000">250.000 ₺ ve Üzeri</option>
+                    <option value="1000000">1.000.000 ₺ ve Üzeri (Büyük İhaleler)</option>
+                  </select>
+                </div>
+
+                <!-- Location Filter -->
+                <div>
+                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">HEDEF TESLİMAT BÖLGESİ</label>
+                  <select class="w-full rounded-xl border px-4 py-2.5 text-xs font-bold text-slate-800 focus:border-blue-500 outline-none bg-white" style="border-color: #E2E8F0;">
+                    <option value="all">Tüm Türkiye (Ulusal İhaleler)</option>
+                    <option value="marmara">Marmara Bölgesi (İstanbul, Kocaeli, Bursa...)</option>
+                    <option value="ege">Ege Bölgesi (İzmir, Manisa, Denizli...)</option>
+                    <option value="ic_anadolu">İç Anadolu (Ankara, Konya, Kayseri...)</option>
+                  </select>
+                </div>
+
+                <!-- Monitored Sectors Chips -->
+                <div class="md:col-span-2 space-y-2">
+                  <label class="block text-[10px] font-black text-slate-500 uppercase">RADARA DAHİL EDİLEN FAALİYET SEKTÖRLERİ</label>
+                  <div class="flex flex-wrap gap-2">
+                    <span 
+                      v-for="sec in radarSelectedSectors" 
+                      :key="sec" 
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 text-blue-800 text-xs font-bold border border-blue-200"
+                    >
+                      <CheckCircle2 :size="13" class="text-blue-600" />
+                      {{ sec }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </template>
         </div>
 
         <!-- ========================================================================= -->
         <!-- 4. ÖZEL MÜŞTERİ BAŞARI YÖNETİCİSİ & VIP DESTEK MASASI TAB -->
         <!-- ========================================================================= -->
         <div v-if="activeSubTab === 'destek'" class="space-y-6">
-          <!-- Header Banner -->
-          <div class="rounded-3xl border bg-gradient-to-br from-[#0F223D] via-[#1A2E4C] to-[#0A1628] p-6 text-white shadow-xl relative overflow-hidden">
+
+          <!-- ENTERPRISE GATING BARRIER -->
+          <div v-if="!isCorporateEnterprise" class="rounded-3xl border border-slate-800 bg-gradient-to-b from-[#0B132B] via-[#0F172A] to-[#080D1A] p-8 text-white shadow-2xl relative overflow-hidden text-left">
+            <div class="absolute -right-12 -top-12 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="relative z-10 max-w-3xl space-y-6">
+              <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-black border border-emerald-500/30">
+                <Lock :size="13" class="text-emerald-400" />
+                <span>KURUMSAL ENTERPRISE AYRICALIĞI</span>
+              </div>
+
+              <div class="space-y-2">
+                <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
+                  Özel Müşteri Başarı Yöneticisi & VIP Destek Masası
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
+                  Firmanıza özel portföy danışmanı (Zeynep Karahan), 1-on-1 ihale ve teklif optimizasyon stratejisi, &lt; 15 dakika VIP SLA taahhüdü, 7/24 öncelikli direkt telefon hattı ve resmi KEP/WhatsApp masaları <strong>Kurumsal Enterprise</strong> planına dahildir.
+                </p>
+              </div>
+
+              <!-- Mevcut Hesap Durumu -->
+              <div class="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between flex-wrap gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-amber-400">
+                    <Building2 :size="20" />
+                  </div>
+                  <div>
+                    <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">MEVCUT PLANINIZ</span>
+                    <span class="text-xs font-bold text-white block">
+                      {{ isCorporatePro ? 'Kurumsal Pro Tedarikçi (Mavi Kalkan & Radar Aktif)' : (subscriptionPlan || 'Standart Firma Hesabı') }}
+                    </span>
+                  </div>
+                </div>
+
+                <div v-if="isCorporatePro" class="text-xs text-emerald-400 font-bold bg-emerald-500/10 px-3 py-1.5 rounded-xl border border-emerald-500/20">
+                  ✓ Kurumsal Pro üyemizsiniz. Enterprise plana geçerek birebir portföy yöneticinizi derhal aktif edebilirsiniz.
+                </div>
+              </div>
+
+              <!-- Enterprise İle Açılan Özellikler Grid -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">Birebir Müşteri Başarı Danışmanı</span>
+                    <span class="text-[11px] text-slate-400">Tüm ihalelerinizde şartname analizi ve stratejik teklif mentörlüğü.</span>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">&lt; 15 Dakika VIP Yanıt SLA'sı</span>
+                    <span class="text-[11px] text-slate-400">Çağrı ve destek biletlerinde kurumsal öncelikli kuyruk garantisi.</span>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">7/24 Direkt VIP Destek Telefon Hattı</span>
+                    <span class="text-[11px] text-slate-400">Bekleme olmaksızın portföy yöneticinize anında erişim imkanı.</span>
+                  </div>
+                </div>
+
+                <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
+                  <CheckCircle2 :size="18" class="text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <span class="text-xs font-bold text-white block">KEP & WhatsApp Kurumsal İletişim</span>
+                    <span class="text-[11px] text-slate-400">Resmi tebligatlar ve acil teknik çizimler için entegre masalar.</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- CTA Butonları -->
+              <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-white/10">
+                <NuxtLink
+                  to="/abonelik?plan=kurumsal-enterprise&mode=corporate"
+                  class="px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black text-xs transition shadow-lg shadow-emerald-500/30 flex items-center gap-2 cursor-pointer"
+                >
+                  <Sparkles :size="15" />
+                  <span>Kurumsal Enterprise'a Yükselt (₺4.500 / ay)</span>
+                  <ArrowRight :size="14" />
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/panel/ayarlar?tab=uyelik"
+                  class="px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs transition border border-white/10 cursor-pointer"
+                >
+                  Tüm Kurumsal Paketleri Karşılaştır
+                </NuxtLink>
+              </div>
+            </div>
+          </div>
+
+          <!-- ACTIVE ENTERPRISE VIEW -->
+          <template v-else>
+            <!-- Header Banner -->
+            <div class="rounded-3xl border bg-gradient-to-br from-[#0F223D] via-[#1A2E4C] to-[#0A1628] p-6 text-white shadow-xl relative overflow-hidden">
             <div class="absolute right-0 top-0 translate-x-10 -translate-y-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
             <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative">
               <div class="flex items-start gap-4">
@@ -3444,7 +3927,8 @@ function saveProfile() {
               </div>
             </div>
           </div>
-        </div>
+        </template>
+      </div>
 
         <!-- KAYITLI ADRESLER TAB -->
         <div v-if="activeSubTab === 'adresler'" class="space-y-6">
@@ -4158,12 +4642,39 @@ function saveProfile() {
 
                   <div class="pt-6 mt-6 border-t border-slate-800">
                     <NuxtLink
-                      :to="`/abonelik?plan=${tier.id}&cycle=${membershipCorporateCycle}`"
-                      class="w-full py-3 px-4 rounded-xl text-center text-xs font-bold transition flex items-center justify-center gap-2 cursor-pointer"
-                      :class="tier.isPopular ? 'bg-[#1EAE4C] hover:bg-[#188C3D] text-white shadow-lg' : 'bg-slate-800 hover:bg-slate-700 text-white'"
+                      :to="`/abonelik?plan=${tier.id}&cycle=${membershipCorporateCycle}&mode=corporate`"
+                      class="w-full py-3.5 px-4 rounded-xl text-center text-xs font-black transition flex items-center justify-center gap-2 cursor-pointer shadow-md hover:scale-[1.01]"
+                      :class="[
+                        (tier.id === 'kurumsal-enterprise' && isCorporateEnterprise) || (tier.id === 'kurumsal-pro' && isCorporatePro && !isCorporateEnterprise)
+                          ? 'bg-emerald-600 text-white shadow-emerald-500/20 ring-2 ring-emerald-400 pointer-events-none'
+                          : (tier.id === 'kurumsal-enterprise' && isCorporatePro)
+                            ? 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-black shadow-lg shadow-emerald-500/30'
+                            : tier.isPopular 
+                              ? 'bg-[#1EAE4C] hover:bg-[#188C3D] text-white shadow-emerald-500/20' 
+                              : 'bg-slate-800 hover:bg-slate-700 text-white'
+                      ]"
                     >
-                      <span>Bu Pakete Geç</span>
-                      <ArrowRight :size="14" />
+                      <template v-if="tier.id === 'kurumsal-enterprise' && isCorporateEnterprise">
+                        <CheckCircle2 :size="16" class="text-white" />
+                        <span>✓ Mevcut Planınız (Enterprise Aktif)</span>
+                      </template>
+                      <template v-else-if="tier.id === 'kurumsal-pro' && isCorporateEnterprise">
+                        <Check :size="16" class="text-emerald-400" />
+                        <span>Enterprise Planınız Kapsamında Aktif</span>
+                      </template>
+                      <template v-else-if="tier.id === 'kurumsal-pro' && isCorporatePro">
+                        <CheckCircle2 :size="16" class="text-white" />
+                        <span>✓ Mevcut Planınız (Pro Aktif)</span>
+                      </template>
+                      <template v-else-if="tier.id === 'kurumsal-enterprise' && isCorporatePro">
+                        <Sparkles :size="15" class="text-slate-950" />
+                        <span>Enterprise'a Yükselt (+₺2.700 Farkla)</span>
+                        <ArrowRight :size="14" />
+                      </template>
+                      <template v-else>
+                        <span>Bu Kurumsal Pakete Geç</span>
+                        <ArrowRight :size="14" />
+                      </template>
                     </NuxtLink>
                   </div>
                 </div>
