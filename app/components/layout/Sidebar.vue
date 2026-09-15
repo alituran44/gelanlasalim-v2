@@ -68,8 +68,7 @@ const sidebarMenus = computed(() => {
       { title: "Genel Bakış & Profil", icon: LayoutDashboard, to: "/panel" },
       { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
-      { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
-      { title: "Escrow & Komisyon (%5)", icon: ShieldCheck, to: "/panel/siparis-teslimat", badge: "%5 Sabit" }
+      { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" }
     ]
     if (isComp) {
       list.push(
@@ -89,8 +88,7 @@ const sidebarMenus = computed(() => {
       { title: "Overview & Profile", icon: LayoutDashboard, to: "/panel" },
       { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
-      { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" },
-      { title: "Escrow & Fee (5%)", icon: ShieldCheck, to: "/panel/siparis-teslimat", badge: "5% Flat" }
+      { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" }
     ]
     if (isComp) {
       list.push(
