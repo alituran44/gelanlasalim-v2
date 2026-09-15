@@ -74,8 +74,7 @@ const sidebarMenus = computed(() => {
     ]
     if (isComp) {
       list.push(
-        { title: "Üye Firmalar", icon: Building2, to: "/panel/firmalar" },
-        { title: "Ekip & Yetki", icon: Users, to: "/panel/ekip-yetki", badge: "PRO" }
+        { title: "Üye Firmalar", icon: Building2, to: "/panel/firmalar" }
       )
     }
     list.push(
@@ -95,8 +94,7 @@ const sidebarMenus = computed(() => {
     ]
     if (isComp) {
       list.push(
-        { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
-        { title: "Team & Roles", icon: Users, to: "/panel/ekip-yetki", badge: "PRO" }
+        { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" }
       )
     }
     list.push(

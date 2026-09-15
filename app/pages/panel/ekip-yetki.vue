@@ -266,12 +266,36 @@ function exportTeamCsv() {
 
 onMounted(() => {
   loadCompanyStatus()
+  if (typeof window !== 'undefined') {
+    setTimeout(() => {
+      navigateTo('/admin?tab=company_teams')
+    }, 500)
+  }
 })
 </script>
 
 <template>
   <div class="p-4 sm:p-6 max-w-6xl mx-auto text-left space-y-6 animate-fadeIn">
     
+    <!-- YÖNETİM PANELİNE TAŞINDI BİLDİRİMİ -->
+    <div class="p-4 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="p-2 rounded-xl bg-blue-600 text-white shrink-0">
+          <Building2 :size="18" />
+        </div>
+        <div>
+          <h3 class="text-xs font-black">Ekip & Yetkilendirme Modülü Yönetim Paneline Taşındı</h3>
+          <p class="text-[11px] text-blue-700">Tüm kurumsal ekip, çalışan davetleri, katılım talepleri ve yetki matrisi artık Yönetim Paneli üzerinden yönetilmektedir.</p>
+        </div>
+      </div>
+      <NuxtLink 
+        to="/admin?tab=company_teams" 
+        class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-black shadow transition shrink-0"
+      >
+        Yönetim Paneline Git →
+      </NuxtLink>
+    </div>
+
     <!-- ÜST BAŞLIK & FİRMA RESMİ KİMLİK KARTI -->
     <div class="rounded-3xl border border-slate-200 bg-white p-5 sm:p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
       <div class="space-y-1.5">

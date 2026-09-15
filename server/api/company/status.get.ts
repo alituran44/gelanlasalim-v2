@@ -6,9 +6,32 @@ export default defineEventHandler(async (event) => {
   const userEmail = (query.email as string || '').trim().toLowerCase()
   const vkn = (query.vkn as string || '').trim()
 
+  if (query.all === 'true') {
+    const companies = getAllCompanies()
+    return {
+      companies: companies.map(c => ({
+        vkn: c.vkn,
+        companyTitle: c.companyTitle,
+        taxOffice: c.taxOffice,
+        status: c.status,
+        verificationBadge: c.verificationBadge,
+        membersCount: (c.members || []).filter(m => m.status === 'ACTIVE').length,
+        pendingRequestsCount: (c.joinRequests || []).filter(r => r.status === 'PENDING').length
+      })),
+      total: companies.length
+    }
+  }
+
   if (vkn) {
     const company = getCompanyByVkn(vkn)
     if (company) {
+      if (query.full === 'true') {
+        return {
+          hasCompany: true,
+          company,
+          member: company.members[0]
+        }
+      }
       return {
         exists: true,
         companyTitle: company.companyTitle,

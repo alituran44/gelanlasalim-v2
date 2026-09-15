@@ -80,6 +80,7 @@ import { useCmsData } from '~/composables/useCmsData'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
 import { useNetGsm } from '~/composables/useNetGsm'
 import SystemManagementView from '~/components/admin/SystemManagementView.vue'
+import CompanyTeamsView from '~/components/admin/CompanyTeamsView.vue'
 
 definePageMeta({
   layout: false // Custom full screen admin dashboard
@@ -174,6 +175,7 @@ function resolveDispute(dispute: any, action: 'approved' | 'rejected') {
 // Tabs
 export type AdminTab = 
   | 'overview'
+  | 'company_teams'
   | 'kyc_desk'
   | 'live_rooms'
   | 'escrow_delivery'
@@ -1173,6 +1175,8 @@ onMounted(async () => {
       const qTab = String(route.query.tab)
       if (qTab === 'sistem' || qTab === 'system' || qTab === 'uat' || qTab === 'system_ops') {
         activeTab.value = 'system_ops'
+      } else if (qTab === 'company_teams' || qTab === 'ekip-yetki' || qTab === 'ekip_yetki') {
+        activeTab.value = 'company_teams'
       } else {
         activeTab.value = qTab as AdminTab
       }
@@ -2259,6 +2263,18 @@ function removeSubmittedBid(index: number) {
             </button>
 
             <button 
+              @click="activeTab = 'company_teams'" 
+              class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'company_teams' ? 'bg-blue-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
+            >
+              <span class="flex items-center gap-2.5"><Users :size="14" /> Ekip & Yetkilendirme</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-black border"
+                :class="activeTab === 'company_teams' ? 'bg-white/20 text-white border-white/30' : 'bg-blue-500/20 text-blue-400 border-blue-500/30'">
+                USR-004
+              </span>
+            </button>
+
+            <button 
               @click="activeTab = 'audit_logs'" 
               class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
               :class="activeTab === 'audit_logs' ? 'bg-indigo-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
@@ -2500,6 +2516,7 @@ function removeSubmittedBid(index: number) {
           <div>
             <h1 class="text-xl font-black flex items-center gap-2.5" :class="adminTheme === 'light' ? 'text-slate-950' : 'text-white'">
               <span v-if="activeTab === 'overview'">📊 İhaleciBurada Yönetici Özeti & Finansal KPI</span>
+              <span v-else-if="activeTab === 'company_teams'">👥 Kurumsal Ekip, Yetkilendirme & Yetki Matrisi (USR-001 ~ USR-006)</span>
               <span v-else-if="activeTab === 'kyc_desk'">🛡️ Kurumsal Firma Doğrulama & KYC Masası (Mavi Rozet)</span>
               <span v-else-if="activeTab === 'live_rooms'">🔴 Canlı Tersine Eksiltme Odası Operatörü</span>
               <span v-else-if="activeTab === 'escrow_delivery'">📦 Sipariş, Güvenli Havuz (Escrow) & Teslimat</span>
@@ -4418,6 +4435,13 @@ function removeSubmittedBid(index: number) {
               </div>
             </div>
 
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB: KURUMSAL EKİP, ROLLER & YETKİ MATRİSİ (USR-001 - USR-006) -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'company_teams'" class="space-y-6 text-left">
+            <CompanyTeamsView :theme="adminTheme" />
           </div>
 
           <!-- ========================================================================= -->
