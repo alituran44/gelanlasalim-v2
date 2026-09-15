@@ -654,6 +654,14 @@ function submitReview() {
 
               <!-- ONAYLANDIYSA DEĞERLENDİRME & MÜCBİR SEBEP -->
               <template v-else-if="teklif.durum === 'onaylandi'">
+                <NuxtLink
+                  :to="`/panel/mesajlar?tenderId=${teklif.ihaleId || teklif.id}&company=${encodeURIComponent(teklif.yetkili || 'Alıcı Kurum')}&title=${encodeURIComponent(teklif.ihaleBaslik || 'İhale Satın Alma Talebi')}&amount=${encodeURIComponent(teklif.fiyat)}`"
+                  class="rounded-xl px-3 py-2 text-xs font-black bg-emerald-600 hover:bg-emerald-700 text-white flex items-center gap-1 shadow-xs transition"
+                  title="Alıcı ile Güvenli Mesajlaş"
+                >
+                  <MessageSquare :size="13" />
+                  <span>Mesaj Gönder</span>
+                </NuxtLink>
                 <button
                   type="button"
                   @click="openReviewModal(teklif)"
@@ -683,11 +691,19 @@ function submitReview() {
               <CheckCircle2 :size="15" class="text-emerald-600" />
               ALICI FİRMA DOĞRUDAN İLETİŞİM & SEVKİYAT DETAYLARI (AÇILDI)
             </span>
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
               <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 flex items-center gap-1">
                 <Lock :size="11" class="text-emerald-600" />
                 <span>Alıcı Ödemesi Havuzda Güvencede</span>
               </span>
+              <NuxtLink
+                :to="`/panel/mesajlar?tenderId=${teklif.ihaleId || teklif.id}&company=${encodeURIComponent(teklif.yetkili || 'Alıcı Kurum')}&title=${encodeURIComponent(teklif.ihaleBaslik || 'İhale Satın Alma Talebi')}&amount=${encodeURIComponent(teklif.fiyat)}`"
+                class="text-[11px] font-black text-emerald-700 hover:text-emerald-900 bg-emerald-50 px-2.5 py-1 rounded-lg border border-emerald-200 flex items-center gap-1"
+                title="Alıcı ile Güvenli Mesajlaş"
+              >
+                <MessageSquare :size="12" />
+                <span>Mesajlaş</span>
+              </NuxtLink>
               <NuxtLink
                 to="/panel/siparis-teslimat"
                 class="text-[11px] font-black text-blue-600 hover:text-blue-800 bg-blue-50 px-2.5 py-1 rounded-lg border border-blue-200 flex items-center gap-1"

@@ -13,7 +13,34 @@ const router = useRouter()
 const { cmsData, saveCmsData } = useCmsData()
 const { userSession } = useUserSession()
 
-const defaultInitialChats: any[] = []
+const defaultInitialChats: any[] = [
+  {
+    id: 'chat-support-welcome',
+    tenderId: 'IHC-DESTEK',
+    tender: 'İhaleciBurada B2B Destek & Operasyon Masası',
+    company: 'İhaleciBurada Destek Merkezi',
+    buyerCompany: 'Sistem Yöneticisi',
+    initial: 'İ',
+    status: 'online',
+    orderCode: 'SIP-DESTEK',
+    amount: 'Escrow Güvencesi',
+    lastMessage: 'İhaleciBurada Güvenli Mesajlaşma Arenası’na hoş geldiniz.',
+    time: 'Bugün',
+    unread: 1,
+    messages: [
+      {
+        sender: 'system',
+        text: '🛡️ İhaleciBurada B2B Güvenli İletişim ve Escrow Masasına hoş geldiniz! İhalelerinizde mutabakata vardığınız alıcı ve tedarikçiler ile doğrudan buradan şifreli olarak mesajlaşabilir, irsaliye, şartname ve sözleşme belgelerini anında paylaşabilirsiniz.',
+        time: '10:00'
+      },
+      {
+        sender: 'them',
+        text: 'Sayın Üyemiz, sistemimiz 6698 s. KVKK ve 6563 s. Elektronik Ticaret Kanunu mevzuatına %100 uyumludur. Karşılıklı faturalandırma ve teslimat detaylarını buradan görüşebilirsiniz. Başarılar dileriz!',
+        time: '10:01'
+      }
+    ]
+  }
+]
 
 const chats = ref<any[]>([])
 const activeChatIndex = ref(0)
@@ -32,16 +59,22 @@ function loadChats() {
     try {
       const saved = localStorage.getItem('b2b_messages_chats')
       if (saved) {
-        chats.value = JSON.parse(saved)
+        const parsed = JSON.parse(saved)
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          chats.value = parsed
+        } else {
+          chats.value = [...defaultInitialChats]
+          localStorage.setItem('b2b_messages_chats', JSON.stringify(defaultInitialChats))
+        }
       } else {
-        chats.value = defaultInitialChats
+        chats.value = [...defaultInitialChats]
         localStorage.setItem('b2b_messages_chats', JSON.stringify(defaultInitialChats))
       }
     } catch (e) {
-      chats.value = defaultInitialChats
+      chats.value = [...defaultInitialChats]
     }
   } else {
-    chats.value = defaultInitialChats
+    chats.value = [...defaultInitialChats]
   }
 
   // Handle URL Query Params (e.g. ?tenderId=IHC-2026-178&company=...)
@@ -424,6 +457,27 @@ function handleAttachment() {
           </div>
         </div>
 
+      </div>
+
+      <!-- Sağ Sütun Boş Durum (Aktif Sohbet Yokken) -->
+      <div v-else class="md:col-span-8 flex flex-col items-center justify-center p-10 text-center bg-slate-50/40 dark:bg-slate-950/40 space-y-4">
+        <div class="h-16 w-16 rounded-3xl bg-blue-50 dark:bg-blue-950/40 text-blue-600 flex items-center justify-center shadow-xs border border-blue-200/50 dark:border-blue-900/50">
+          <MessageSquare :size="32" />
+        </div>
+        <div class="max-w-md space-y-1.5">
+          <h3 class="text-base font-black text-slate-800 dark:text-white">Henüz Bir Sohbet Seçilmedi</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+            İhalelerinizde mutabakata vardığınız alıcı veya tedarikçiler ile doğrudan buradan yazışabilir, sözleşme, şartname ve irsaliye detaylarını güvenle görüşebilirsiniz.
+          </p>
+        </div>
+        <div class="flex items-center gap-3 pt-2">
+          <NuxtLink to="/panel/gelen-teklifler" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm transition">
+            Gelen Teklifleri İncele
+          </NuxtLink>
+          <NuxtLink to="/panel/ilanlarim" class="px-4 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs hover:bg-slate-50 transition">
+            İhalelerime Git
+          </NuxtLink>
+        </div>
       </div>
 
     </div>

@@ -762,7 +762,15 @@ function submitReview() {
                   </div>
 
                   <!-- Anlaşıldıysa Değerlendirme & İptal Butonları -->
-                  <div v-else-if="teklif.durum === 'onaylandi'" class="flex items-center gap-2">
+                  <div v-else-if="teklif.durum === 'onaylandi'" class="flex items-center gap-2 flex-wrap">
+                    <NuxtLink
+                      :to="`/panel/mesajlar?tenderId=${ilan.id}&company=${encodeURIComponent(teklif.firma)}&title=${encodeURIComponent(ilan.baslik)}&amount=${encodeURIComponent(teklif.fiyat)}`"
+                      class="rounded-xl px-3.5 py-2 text-xs font-black bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+                      title="Tedarikçi ile Doğrudan Güvenli Mesajlaş"
+                    >
+                      <MessageSquare :size="13" />
+                      <span>Mesaj Gönder</span>
+                    </NuxtLink>
                     <button
                       type="button"
                       @click="openTutanakModal(ilan)"
