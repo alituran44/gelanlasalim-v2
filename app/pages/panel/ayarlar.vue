@@ -4052,10 +4052,21 @@ function saveProfile() {
                 </p>
               </div>
 
-              <!-- Firma modunda bireysel kısım görünmez, sadece rozet görünür. Bireyseldeyken firma moduna geçiş butonu yer alır. -->
-              <div v-if="isCompanyMode" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black shadow-xs shrink-0">
-                <Building2 :size="14" class="text-emerald-600" />
-                <span>🏢 Kurumsal Firma Modu</span>
+              <!-- Firma modundayken hem mod rozeti hem de bireysel moda dönüş butonu yer alır. Bireyseldeyken firma moduna geçiş butonu yer alır. -->
+              <div v-if="isCompanyMode" class="flex flex-wrap items-center gap-2 shrink-0">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black shadow-xs">
+                  <Building2 :size="14" class="text-emerald-600" />
+                  <span>🏢 Kurumsal Firma Modu</span>
+                </div>
+                <button
+                  type="button"
+                  @click="toggleCompanyMode(false)"
+                  class="flex items-center gap-1.5 rounded-xl px-3.5 py-1.5 text-xs font-black bg-white hover:bg-slate-50 text-slate-700 hover:text-blue-600 border border-slate-300 shadow-xs transition-all cursor-pointer"
+                  title="Bireysel abonelik paketlerine geri dön"
+                >
+                  <User :size="14" class="text-blue-600" />
+                  <span>👤 Bireysel Moda Geç</span>
+                </button>
               </div>
               <div v-else class="shrink-0">
                 <button

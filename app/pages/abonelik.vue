@@ -529,10 +529,21 @@ function completeCheckout() {
               </p>
             </div>
 
-            <!-- Firma modunda bireysel kısım görünmez, sadece rozet yer alır. Bireyseldeyken firma moduna geçiş butonu yer alır. -->
-            <div v-if="isCompanyMode" class="px-4 py-2 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black flex items-center gap-2 shrink-0">
-              <Building2 :size="16" class="text-emerald-600" />
-              <span>🏢 Kurumsal Firma Modu</span>
+            <!-- Firma modundayken hem mod rozeti hem de bireysel moda dönüş butonu yer alır. Bireyseldeyken firma moduna geçiş butonu yer alır. -->
+            <div v-if="isCompanyMode" class="flex flex-wrap items-center gap-2.5 shrink-0">
+              <div class="px-4 py-2 rounded-2xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-black flex items-center gap-2">
+                <Building2 :size="16" class="text-emerald-600" />
+                <span>🏢 Kurumsal Firma Modu</span>
+              </div>
+              <button
+                type="button"
+                @click="toggleCompanyMode(false)"
+                class="px-4 py-2 rounded-2xl bg-white hover:bg-slate-50 text-slate-700 hover:text-blue-600 border border-slate-300 shadow-xs text-xs font-black transition-all flex items-center gap-2 cursor-pointer"
+                title="Bireysel abonelik paketlerine geri dön"
+              >
+                <User :size="15" class="text-blue-600" />
+                <span>👤 Bireysel Moda Geç</span>
+              </button>
             </div>
             <div v-else class="shrink-0 w-full md:w-auto">
               <button
