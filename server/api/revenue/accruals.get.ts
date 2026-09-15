@@ -1,7 +1,11 @@
 import { defineEventHandler, getQuery } from 'h3'
 import { getAllCommissionAccruals, AccrualStatus, CorporateTier } from '~~/server/utils/revenueModelStore'
+import { requireAdmin } from '~~/server/utils/authGuard'
 
 export default defineEventHandler((event) => {
+  // 🛡️ Admin Yetki Doğrulaması (401/403)
+  requireAdmin(event)
+
   const query = getQuery(event)
   const status = query.status as AccrualStatus | undefined
   const tier = query.tier as CorporateTier | undefined

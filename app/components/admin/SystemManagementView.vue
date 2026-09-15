@@ -101,8 +101,26 @@ async function testBackupCycle() {
   isTestingBackup.value = true
   backupCycleResult.value = null
   try {
+    const mfaSend = await $fetch<any>('/api/auth/mfa/send', {
+      method: 'POST',
+      body: { phoneOrEmail: 'admin@ihaleciburada.com', purpose: 'SYSTEM_RESTORE' }
+    })
+    let mfaCode = mfaSend?.demoCode
+    if (!mfaCode) {
+      mfaCode = prompt('Yedekleme Döngü Testi Onayı: 6 haneli MFA kodunu giriniz:')
+    }
+    if (!mfaCode) return
+
+    const mfaVerify = await $fetch<any>('/api/auth/mfa/verify', {
+      method: 'POST',
+      body: { phoneOrEmail: 'admin@ihaleciburada.com', code: mfaCode, purpose: 'SYSTEM_RESTORE' }
+    })
+
     const res = await $fetch<any>('/api/admin/system/restore', {
       method: 'POST',
+      headers: {
+        'x-mfa-token': mfaVerify.actionToken
+      },
       body: { mode: 'SELF_TEST' }
     })
     if (res?.testResult) {

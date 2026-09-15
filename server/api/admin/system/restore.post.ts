@@ -4,8 +4,11 @@ import { requireAdmin, requireMfaVerification } from '~~/server/utils/authGuard'
 import { logSecurityEvent } from '~~/server/utils/securityAuditStore'
 
 export default defineEventHandler(async (event) => {
-  // 🛡️ 1. Sunucu Tarafı Yetkili Admin Kontrolü
+  // 🛡️ 1. Sunucu Tarafı Yetkili Admin Kontrolü (401/403)
   const session = requireAdmin(event)
+
+  // 🛡️ 2. Katman 3: Amaca Bağlı MFA Doğrulama Zorunluluğu (SYSTEM_RESTORE)
+  const mfa = requireMfaVerification(event, 'SYSTEM_RESTORE')
 
   const body = await readBody(event)
 
@@ -18,9 +21,6 @@ export default defineEventHandler(async (event) => {
       testResult
     }
   }
-
-  // 🛡️ 2. Gerçek Snapshot Geri Yükleme için Katman 3 Purpose-Bound MFA Zorunluluğu
-  const mfa = requireMfaVerification(event, 'SYSTEM_RESTORE')
 
   if (!body || !body.snapshot) {
     throw createError({

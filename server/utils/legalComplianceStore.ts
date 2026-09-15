@@ -306,7 +306,10 @@ export function recordAcceptance(
   return item
 }
 
-export function getUserAcceptances(email: string): UserContractAcceptance[] {
+export function getUserAcceptances(email?: string): UserContractAcceptance[] {
+  if (!email) {
+    return getAllAcceptances()
+  }
   const cleanEmail = email.toLowerCase().trim()
   return getAllAcceptances().filter(a => a.userEmail === cleanEmail)
 }

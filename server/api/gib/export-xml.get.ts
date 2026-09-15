@@ -1,6 +1,9 @@
 import { getGibLogsByPeriod, getAllGibLogs, generateBtransXml } from '~~/server/utils/gibAuditStore'
+import { requireAdmin } from '~~/server/utils/authGuard'
 
 export default defineEventHandler((event) => {
+  // 🛡️ Admin Yetki Doğrulaması (401/403)
+  requireAdmin(event)
   const query = getQuery(event)
   const period = (query.period as string) || '2026-09'
 

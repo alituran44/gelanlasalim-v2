@@ -1,6 +1,10 @@
 import { getGibLogsByPeriod, getAllGibLogs } from '~~/server/utils/gibAuditStore'
+import { requireAdmin } from '~~/server/utils/authGuard'
 
 export default defineEventHandler((event) => {
+  // 🛡️ Admin Yetki Doğrulaması (401/403)
+  requireAdmin(event)
+
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
   const query = getQuery(event)
   const period = query.period as string | undefined

@@ -1,9 +1,9 @@
 import type { H3Event } from 'h3'
-import { getRequestHeaders, getRequestHeader, createError } from 'h3'
+import { getRequestHeaders, getRequestHeader, getQuery, createError } from 'h3'
 import { getCompanyByVkn, getAllCompanies, CompanyRole } from './companyVerificationStore'
 import { logSecurityEvent } from './securityAuditStore'
 import { getSessionCookie, verifySessionToken, verifyAdminSession } from './sessionStore'
-import { consumePurposeBoundMfaToken } from './mfaStore'
+import { consumePurposeBoundMfaToken, verifyMfaOtp } from './mfaStore'
 
 export interface UserSessionContext {
   isAuthenticated: boolean
@@ -57,10 +57,10 @@ export function resolveSession(event: H3Event): UserSessionContext {
 
       // Şirket ve yetki çözümlemesi
       const allCompanies = getAllCompanies()
-      const email = serverSession.userEmail.toLowerCase().trim()
+      const email = (serverSession.userEmail || '').toLowerCase().trim()
       const matchedCompany = allCompanies.find(c =>
-        c.adminEmail.toLowerCase() === email ||
-        c.members.some(m => m.email.toLowerCase() === email && m.status === 'ACTIVE')
+        (c.adminEmail && c.adminEmail.toLowerCase() === email) ||
+        (Array.isArray(c.members) && c.members.some(m => ((m.userEmail || (m as any).email || '').toLowerCase() === email) && m.status === 'ACTIVE'))
       )
 
       let role = serverSession.companyRole || ('GÖRÜNTÜLEYİCİ' as CompanyRole)
@@ -69,11 +69,11 @@ export function resolveSession(event: H3Event): UserSessionContext {
 
       if (matchedCompany) {
         isVerified = matchedCompany.status === 'VERIFIED'
-        if (matchedCompany.adminEmail.toLowerCase() === email) {
+        if (matchedCompany.adminEmail && matchedCompany.adminEmail.toLowerCase() === email) {
           role = 'FİRMA_YÖNETİCİSİ'
           userName = matchedCompany.adminName || userName
-        } else {
-          const member = matchedCompany.members.find(m => m.email.toLowerCase() === email)
+        } else if (Array.isArray(matchedCompany.members)) {
+          const member = matchedCompany.members.find(m => (m.userEmail || (m as any).email || '').toLowerCase() === email)
           if (member) {
             role = member.role
             userName = member.name || userName
@@ -143,6 +143,21 @@ export function requireAuth(event: H3Event): UserSessionContext {
  */
 export function requireAdmin(event: H3Event): UserSessionContext {
   const session = resolveSession(event)
+
+  if (!session.isAuthenticated && !session.isAdmin) {
+    logSecurityEvent(event, {
+      eventType: 'AUTH_FAILURE',
+      severity: 'HIGH',
+      targetResource: event.node.req.url,
+      actionTaken: 'BLOCKED_401',
+      details: { reason: 'Yetkisiz erişim: Oturum açılmamış.' }
+    })
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Yetkisiz erişim: Bu işlem için geçerli bir yönetici oturumu açmanız gerekmektedir (Kural SEC-001).'
+    })
+  }
+
   if (!session.isAdmin) {
     logSecurityEvent(event, {
       eventType: 'ROLE_VIOLATION',
@@ -150,7 +165,7 @@ export function requireAdmin(event: H3Event): UserSessionContext {
       actorEmail: session.userEmail || undefined,
       targetResource: event.node.req.url,
       actionTaken: 'BLOCKED_403',
-      details: { reason: 'Yetkisiz erişim: Yönetici (Admin) oturumu doğrulanmadı.' }
+      details: { reason: 'Yetkisiz erişim: Yönetici (Admin) yetkisi doğrulanmadı.' }
     })
     throw createError({
       statusCode: 403,
@@ -165,15 +180,17 @@ export function requireAdmin(event: H3Event): UserSessionContext {
  */
 export function requireMfaVerification(event: H3Event, requiredPurpose: string): { phoneOrEmail: string } {
   const headers = getRequestHeaders(event)
-  const mfaToken = (headers['x-mfa-token'] as string || '').trim()
+  const query = getQuery(event)
+  const mfaToken = (headers['x-mfa-token'] as string || query.mfaToken as string || '').trim()
+  const mfaCode = (headers['x-mfa-code'] as string || query.mfaCode as string || '').trim()
 
-  if (!mfaToken) {
+  if (!mfaToken && !mfaCode) {
     logSecurityEvent(event, {
       eventType: 'MFA_FAILED',
       severity: 'HIGH',
       targetResource: event.node.req.url,
       actionTaken: 'BLOCKED_403',
-      details: { reason: 'MFA aksiyon tokenı eksik.', requiredPurpose }
+      details: { reason: 'MFA aksiyon tokenı veya onay kodu eksik.', requiredPurpose }
     })
     throw createError({
       statusCode: 403,
@@ -181,18 +198,48 @@ export function requireMfaVerification(event: H3Event, requiredPurpose: string):
     })
   }
 
-  const verification = consumePurposeBoundMfaToken(mfaToken, requiredPurpose)
-  if (!verification.valid) {
+  if (mfaToken) {
+    const verification = consumePurposeBoundMfaToken(mfaToken, requiredPurpose)
+    if (!verification.valid) {
+      logSecurityEvent(event, {
+        eventType: 'MFA_FAILED',
+        severity: 'CRITICAL',
+        targetResource: event.node.req.url,
+        actionTaken: 'BLOCKED_403',
+        details: { reason: verification.error, requiredPurpose }
+      })
+      throw createError({
+        statusCode: 403,
+        statusMessage: verification.error || 'Geçersiz veya süresi dolmuş MFA doğrulaması.'
+      })
+    }
+
+    logSecurityEvent(event, {
+      eventType: 'MFA_VERIFIED',
+      severity: 'LOW',
+      targetResource: event.node.req.url,
+      actionTaken: 'ALLOWED',
+      details: { purpose: requiredPurpose, phoneOrEmail: verification.phoneOrEmail }
+    })
+
+    return { phoneOrEmail: verification.phoneOrEmail || '' }
+  }
+
+  // x-mfa-code veya query.mfaCode sağlandıysa:
+  const session = resolveSession(event)
+  const phoneOrEmail = session.userEmail || 'admin@ihaleciburada.com'
+  const otpResult = verifyMfaOtp(phoneOrEmail, mfaCode, requiredPurpose)
+  if (!otpResult.valid) {
     logSecurityEvent(event, {
       eventType: 'MFA_FAILED',
       severity: 'CRITICAL',
       targetResource: event.node.req.url,
       actionTaken: 'BLOCKED_403',
-      details: { reason: verification.error, requiredPurpose }
+      details: { reason: otpResult.error, requiredPurpose }
     })
     throw createError({
       statusCode: 403,
-      statusMessage: verification.error || 'Geçersiz veya süresi dolmuş MFA doğrulaması.'
+      statusMessage: otpResult.error || 'Geçersiz veya süresi dolmuş MFA onay kodu.'
     })
   }
 
@@ -201,10 +248,10 @@ export function requireMfaVerification(event: H3Event, requiredPurpose: string):
     severity: 'LOW',
     targetResource: event.node.req.url,
     actionTaken: 'ALLOWED',
-    details: { purpose: requiredPurpose, phoneOrEmail: verification.phoneOrEmail }
+    details: { purpose: requiredPurpose, phoneOrEmail }
   })
 
-  return { phoneOrEmail: verification.phoneOrEmail || '' }
+  return { phoneOrEmail }
 }
 
 /**

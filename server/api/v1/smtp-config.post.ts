@@ -1,7 +1,11 @@
 import { defineEventHandler, readBody } from 'h3'
 import { saveStoredSmtpConfig, SmtpConfig, sendViaGoogleSmtp } from '~~/server/utils/smtpClient'
+import { requireAdmin } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
+  // 🛡️ Admin Yetki Doğrulaması (401/403)
+  requireAdmin(event)
+
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
   try {
     const body = await readBody<Partial<SmtpConfig> & { testEmail?: string }>(event)

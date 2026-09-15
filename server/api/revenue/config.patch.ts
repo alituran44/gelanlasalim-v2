@@ -1,7 +1,10 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { updateRevenueModelConfig, RevenueModelConfig } from '~~/server/utils/revenueModelStore'
+import { requireAdmin } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
+  // 🛡️ Admin Yetki Doğrulaması (401/403)
+  requireAdmin(event)
   const body = await readBody<Partial<RevenueModelConfig>>(event)
 
   if (!body) {
