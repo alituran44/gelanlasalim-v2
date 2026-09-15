@@ -166,6 +166,8 @@ const companyName = ref('')
 const agreeKvkk = ref(false)
 const agreeUserAgreement = ref(false)
 const agreePlatformAgreement = ref(false)
+const agreeCommercialConsent = ref(false) // 🛡️ 6563 s. ETK & İYS Uyumlu Ticari Elektronik İleti İzni
+const agreeExplicitConsent = ref(false) // 🛡️ 6698 s. KVKK Md. 5/1 Açık Rıza
 
 const loginEmail = ref('')
 const loginPassword = ref('')
@@ -339,6 +341,22 @@ function verifyOtp() {
 
     window.dispatchEvent(new Event('storage'))
     window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionData }))
+
+    // 🛡️ LEG-004 & LEG-006: Hukuki sözleşme ve ticari ileti kabulünü tescil et
+    try {
+      $fetch('/api/legal/acceptances', {
+        method: 'POST',
+        body: {
+          userEmail: sessionData.email,
+          companyVkn: '9560161511',
+          documentCode: 'TERMS_OF_USE',
+          documentVersion: '2.1',
+          channel: 'WEB',
+          isExplicitConsent: Boolean(sessionData.agreeExplicitConsent),
+          isCommercialCommConsent: Boolean(sessionData.agreeCommercialConsent)
+        }
+      }).catch(() => {})
+    } catch {}
   }
   showOtpModal.value = false
   router.push(pendingTargetRoute.value || '/panel')
@@ -429,7 +447,11 @@ function handleRegister() {
       role: 'individual',
       isCompanyActive: false,
       sektorler: ['Genel Tedarik & İhale'],
-      mailBildirimi: true,
+      mailBildirimi: agreeCommercialConsent.value,
+      agreeCommercialConsent: agreeCommercialConsent.value,
+      agreeExplicitConsent: agreeExplicitConsent.value,
+      agreeKvkk: true,
+      legalTermsAcceptedAt: new Date().toISOString(),
       isPremium: true,
       subscriptionPlan: 'İlk İhale Ücretsiz'
     }
@@ -1125,36 +1147,44 @@ function handleDemoLogin(role: 'company' | 'individual') {
               </div>
             </div>
 
-            <!-- AÇIK RIZA ONAYLARI (KVKK M.5/1) -->
-            <div class="pt-2 space-y-2 text-left">
+            <!-- AÇIK RIZA & TİCARİ İLETİ ONAYLARI (KVKK M.5/1 & 6563 S. ETK) -->
+            <div class="pt-2 space-y-2.5 text-left">
               <span class="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
-                {{ 'AÇIK RIZA ONAYLARI (KVKK M.5/1)' }}
+                {{ 'İSTEĞE BAĞLI ONAYLAR (KVKK M.5/1 & 6563 S. ETK)' }}
               </span>
 
-              <!-- Açık Rıza Kartı -->
-              <div class="border border-blue-200 bg-[#eef3fb] rounded-xl p-3.5 flex items-center justify-between gap-3">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-800 shrink-0">
-                    <FileText :size="16" />
-                  </div>
-                  <div>
-                    <h4 class="text-xs font-bold text-slate-900">{{ 'Açık Rıza Metni (KVKK m.5/1)' }}</h4>
-                    <p class="text-[11px] text-slate-500 leading-tight mt-0.5">{{ 'İsteğe bağlı açık rıza metnini inceleyin; onay kutuları ayrıca seçilir.' }}</p>
-                  </div>
-                </div>
-                <NuxtLink
-                  to="/sozlesmeler?tab=riza"
-                  target="_blank"
-                  class="text-xs font-bold text-[#0e3a8c] hover:underline flex items-center gap-1 shrink-0"
-                >
-                  <span>{{ 'Metni Oku' }}</span>
-                  <ArrowRight :size="12" />
-                </NuxtLink>
+              <!-- 1. KVKK Açık Rıza Onay Kutusu (İsteğe Bağlı) -->
+              <div class="border border-slate-200 rounded-xl p-3 flex items-start gap-2.5 bg-white shadow-2xs hover:border-blue-200 transition">
+                <input
+                  v-model="agreeExplicitConsent"
+                  type="checkbox"
+                  id="agree-explicit-consent"
+                  class="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#0e3a8c] focus:ring-[#0e3a8c] cursor-pointer"
+                />
+                <label for="agree-explicit-consent" class="text-xs text-slate-700 cursor-pointer leading-relaxed select-none">
+                  <span>Kişisel verilerimin, </span>
+                  <NuxtLink to="/sozlesmeler?tab=riza" target="_blank" class="text-[#0e3a8c] underline font-bold hover:text-blue-900">Açık Rıza Metni</NuxtLink>
+                  <span> kapsamında işlenmesini, profil ve ihale eşleştirme analitiği amacıyla kullanılmasını kabul ediyorum (İsteğe bağlı).</span>
+                </label>
               </div>
 
-              <!-- Açık Rıza Açıklama Kutusu -->
-              <div class="border border-slate-200 rounded-xl p-3 bg-slate-50/60 text-xs text-slate-600 leading-relaxed">
-                {{ 'Açık rıza onayları isteğe bağlıdır. Vermemeniz halinde temel platform hizmetlerinden yararlanmaya devam edebilirsiniz.' }}
+              <!-- 2. Ticari Elektronik İleti İzni (İYS Uyumlu - İsteğe Bağlı) -->
+              <div class="border border-emerald-200/80 bg-emerald-50/40 rounded-xl p-3 flex items-start gap-2.5 shadow-2xs hover:border-emerald-300 transition">
+                <input
+                  v-model="agreeCommercialConsent"
+                  type="checkbox"
+                  id="agree-commercial-consent"
+                  class="mt-0.5 h-4 w-4 rounded border-emerald-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer"
+                />
+                <label for="agree-commercial-consent" class="text-xs text-slate-700 cursor-pointer leading-relaxed select-none">
+                  <span class="font-bold text-emerald-950">Ticari Elektronik İleti İzni (6563 s. ETK & İYS Uyumlu): </span>
+                  <span>İhaleciBurada platformundaki yeni alım ihaleleri, sektör duyuruları ve avantajlı tedarik fırsatları hakkında tarafıma SMS (NetGSM) ve E-posta yoluyla bilgilendirme yapılmasını kabul ediyorum (Dilediğiniz an iptal edebilirsiniz).</span>
+                </label>
+              </div>
+
+              <!-- Yasal Bilgilendirme Notu -->
+              <div class="rounded-xl p-2.5 bg-slate-50 border border-slate-200 text-[11px] text-slate-500 leading-normal">
+                🛡️ Açık rıza ve ticari ileti onayları tamamen isteğe bağlıdır; vermemeniz halinde platform üyelik ve ihale işlemleriniz etkilenmeksizin devam eder.
               </div>
             </div>
 

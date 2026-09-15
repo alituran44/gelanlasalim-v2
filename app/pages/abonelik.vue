@@ -309,10 +309,10 @@ const transferName = ref('')
 const isProcessing = ref(false)
 const showSuccessScreen = ref(false)
 
-// Compliance Checkboxes (Mandatory for Paynkolay / Aktif Bank)
-const preInfoApproved = ref(true)
-const distanceSalesApproved = ref(true)
-const refundPolicyApproved = ref(true)
+// Compliance Checkboxes (Mandatory Opt-in: Must be checked manually by user per consumer regulations)
+const preInfoApproved = ref(false)
+const distanceSalesApproved = ref(false)
+const refundPolicyApproved = ref(false)
 
 onMounted(() => {
   if (typeof window !== 'undefined') {
@@ -421,6 +421,9 @@ function openCheckout(pkg: any) {
     activePaymentChannel.value = 'stripe'
   }
   showSuccessScreen.value = false
+  preInfoApproved.value = false
+  distanceSalesApproved.value = false
+  refundPolicyApproved.value = false
   isCheckoutOpen.value = true
 }
 
