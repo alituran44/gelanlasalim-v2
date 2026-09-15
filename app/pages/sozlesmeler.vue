@@ -29,6 +29,25 @@ useSeoMeta({
   description: 'İhaleciBurada kullanıcı sözleşmesi, platform aracılık sözleşmesi, KVKK aydınlatma metni, Paynkolay Escrow havuz kuralları ve gizlilik politikası.'
 })
 
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://ihaleciburada.com/sozlesmeler' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'DigitalDocument',
+        '@id': 'https://ihaleciburada.com/sozlesmeler#terms',
+        'url': 'https://ihaleciburada.com/sozlesmeler',
+        'name': 'İhaleciBurada B2B Yasal Sözleşmeler & KVKK Aydınlatma Metni',
+        'publisher': { '@id': 'https://ihaleciburada.com/#organization' }
+      })
+    }
+  ]
+})
+
 const route = useRoute()
 const router = useRouter()
 

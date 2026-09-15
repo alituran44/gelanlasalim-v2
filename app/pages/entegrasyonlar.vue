@@ -26,6 +26,27 @@ useSeoMeta({
   description: 'SAP S/4HANA, Logo Tiger, Netsis, Microsoft Dynamics 365 ve REST API ile İhaleciBurada B2B ihale ve satın alma süreçlerinizi entegre edin.'
 })
 
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://ihaleciburada.com/entegrasyonlar' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'SoftwareApplication',
+        '@id': 'https://ihaleciburada.com/entegrasyonlar#erp-api',
+        'name': 'İhaleciBurada ERP & Webhook Entegrasyon Katmanı',
+        'applicationCategory': 'BusinessApplication',
+        'operatingSystem': 'Cloud / REST API',
+        'description': 'SAP, Logo, Netsis, Microsoft Dynamics 365 ve OpenAPI standartlarında B2B ihale ve teklif senkronizasyon servisi.',
+        'provider': { '@id': 'https://ihaleciburada.com/#organization' }
+      })
+    }
+  ]
+})
+
 const route = useRoute()
 const activeTab = ref<'sap' | 'logo' | 'dynamics' | 'api'>('sap')
 

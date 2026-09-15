@@ -35,6 +35,30 @@ const faqs = [
   { q: "Alıcı olarak üyelik komisyonu ödemem gerekiyor mu?", a: "Hayır. İhaleciBurada platformunda alıcı şirketler için üyelik ve ihale açma süreçleri lansmana özel tamamen ücretsizdir." }
 ]
 
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://ihaleciburada.com/yardim' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        '@id': 'https://ihaleciburada.com/yardim#faq',
+        'mainEntity': faqs.map(f => ({
+          '@type': 'Question',
+          'name': f.q,
+          'acceptedAnswer': {
+            '@type': 'Answer',
+            'text': f.a
+          }
+        }))
+      })
+    }
+  ]
+})
+
 const videoCards = [
   {
     id: 'intro-3min',

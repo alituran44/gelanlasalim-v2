@@ -79,14 +79,14 @@ export default defineNuxtConfig({
           name: 'description',
           content: 'İhaleciBurada.com ile kurumsal satın alma taleplerinizi yayınlayın, onaylı tedarikçilerden en rekabetçi teklifleri anında toplayın ve güvenle ticaret yapın.'
         },
-        { name: 'keywords', content: 'b2b ihale, tersine ihale, eksiltme ihalesi, satın alma platformu, şartname, doğrudan teklif verme, tedarikçi ağı, escrow güvenli havuz, çanakkale ihaleleri, türkiye b2b portalı, kurumsal satın alma, kamu ve özel sektör ihaleleri' },
+        { name: 'keywords', content: 'b2b ihale, tersine ihale, eksiltme ihalesi, satın alma platformu, şartname, doğrudan teklif verme, tedarikçi ağı, escrow güvenli havuz, balıkesir ihaleleri, çanakkale ihaleleri, bursa sanayi ihaleleri, istanbul b2b satın alma, kocaeli gebze osb, ankara ostim ihaleleri, izmir b2b portalı, kurumsal satın alma, kamu ve özel sektör ihaleleri, toptan malzeme alımı' },
         { name: 'author', content: 'Hasan Hüseyin Yıldırım - İhaleciBurada' },
         { name: 'publisher', content: 'Hasan Hüseyin Yıldırım (İhaleciBurada)' },
         { name: 'copyright', content: 'İhaleciBurada / Hasan Hüseyin Yıldırım' },
         { name: 'theme-color', content: '#0F223D' },
         { name: 'robots', content: 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1' },
-        { name: 'geo.region', content: 'TR-17' },
-        { name: 'geo.placename', content: 'Çanakkale, Türkiye' },
+        { name: 'geo.region', content: 'TR' },
+        { name: 'geo.placename', content: 'Türkiye (Marmara, Çanakkale, Balıkesir, Bursa, İstanbul, Kocaeli, Ankara, İzmir)' },
         { name: 'geo.position', content: '40.1553;26.4142' },
         { name: 'ICBM', content: '40.1553, 26.4142' },
         { name: 'rating', content: 'general' },
@@ -102,14 +102,23 @@ export default defineNuxtConfig({
         { property: 'og:url', content: 'https://ihaleciburada.com' },
         { property: 'og:site_name', content: 'İhaleciBurada' },
         { property: 'og:image', content: 'https://ihaleciburada.com/auth_skyscraper_bg.jpg' },
+        { property: 'og:image:width', content: '1200' },
+        { property: 'og:image:height', content: '630' },
+        { property: 'og:image:type', content: 'image/jpeg' },
         { property: 'og:image:alt', content: 'İhaleciBurada Kurumsal B2B Genel Merkez' },
         { name: 'twitter:card', content: 'summary_large_image' },
+        { name: 'twitter:site', content: '@ihaleciburada' },
+        { name: 'twitter:creator', content: '@ihaleciburada' },
         { name: 'twitter:title', content: 'İhaleciBurada — Kurumsal B2B İhale' },
         { name: 'twitter:description', content: 'Satın alma maliyetlerinizi dijital ihale ve doğrudan teklif ile optimize edin.' },
         { name: 'twitter:image', content: 'https://ihaleciburada.com/auth_skyscraper_bg.jpg' }
       ],
       link: [
-        { rel: 'icon', type: 'image/png', href: '/logo.png' }
+        { rel: 'icon', type: 'image/png', href: '/logo.png' },
+        { rel: 'canonical', href: 'https://ihaleciburada.com' },
+        { rel: 'alternate', hreflang: 'tr', href: 'https://ihaleciburada.com' },
+        { rel: 'alternate', hreflang: 'en', href: 'https://ihaleciburada.com' },
+        { rel: 'alternate', hreflang: 'x-default', href: 'https://ihaleciburada.com' }
       ],
       script: [
         { src: 'https://accounts.google.com/gsi/client', async: true, defer: true }

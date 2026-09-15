@@ -23,7 +23,28 @@ definePageMeta({
 
 useSeoMeta({
   title: 'Hakkımızda — B2B İhale ve Satın Alma Ekosistemi | İhaleciBurada',
-  description: 'UK Elektrik Malzemeleri San. Tic. Ltd. Şti. güvencesiyle Türkiye genelinde şeffaf, güvenilir ve rekabetçi B2B dijital satın alma platformu.'
+  description: 'Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi) güvencesiyle Türkiye genelinde şeffaf, güvenilir ve rekabetçi B2B dijital satın alma ve canlı eksiltme platformu.'
+})
+
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://ihaleciburada.com/hakkimizda' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'AboutPage',
+        '@id': 'https://ihaleciburada.com/hakkimizda#webpage',
+        'url': 'https://ihaleciburada.com/hakkimizda',
+        'name': 'Hakkımızda — İhaleciBurada B2B İhale Ekosistemi',
+        'description': 'Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi) kurumsal kimlik, şirket künyesi ve B2B satın alma vizyonu.',
+        'isPartOf': { '@id': 'https://ihaleciburada.com/#website' },
+        'about': { '@id': 'https://ihaleciburada.com/#organization' }
+      })
+    }
+  ]
 })
 </script>
 

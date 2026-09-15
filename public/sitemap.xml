@@ -1,69 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://ihaleciburada.com</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://ihaleciburada.com" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ihaleciburada.com" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ihaleciburada.com" />
     <lastmod>2026-09-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://ihaleciburada.com/auth_skyscraper_bg.jpg</image:loc>
+      <image:title>İhaleciBurada Kurumsal B2B İhale ve Satın Alma Platformu</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://ihaleciburada.com/pazar-yeri</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://ihaleciburada.com/pazar-yeri" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ihaleciburada.com/pazar-yeri" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ihaleciburada.com/pazar-yeri" />
     <lastmod>2026-09-15</lastmod>
     <changefreq>hourly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://ihaleciburada.com/auth_skyscraper_bg.jpg</image:loc>
+      <image:title>Canlı B2B İhale ve Eksiltme Pazar Yeri</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://ihaleciburada.com/firmalar</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://ihaleciburada.com/firmalar" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ihaleciburada.com/firmalar" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ihaleciburada.com/firmalar" />
     <lastmod>2026-09-15</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://ihaleciburada.com/logo.png</image:loc>
+      <image:title>Doğrulanmış B2B Üretici ve Tedarikçi Firmalar</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://ihaleciburada.com/entegrasyonlar</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://ihaleciburada.com/entegrasyonlar" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ihaleciburada.com/entegrasyonlar" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ihaleciburada.com/entegrasyonlar" />
     <lastmod>2026-09-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+    <image:image>
+      <image:loc>https://ihaleciburada.com/logo.png</image:loc>
+      <image:title>Kurumsal ERP ve API Entegrasyonları (SAP, Logo, Netsis)</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://ihaleciburada.com/abonelik</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://ihaleciburada.com/abonelik" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ihaleciburada.com/abonelik" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ihaleciburada.com/abonelik" />
     <lastmod>2026-09-15</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://ihaleciburada.com/logo.png</image:loc>
+      <image:title>Kurumsal İhale Paketleri ve B2B Üyelik</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://ihaleciburada.com/sozlesmeler</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://ihaleciburada.com/sozlesmeler" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ihaleciburada.com/sozlesmeler" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ihaleciburada.com/sozlesmeler" />
     <lastmod>2026-09-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://ihaleciburada.com/logo.png</image:loc>
+      <image:title>Yasal Sözleşmeler, KVKK ve Escrow Şartları</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://ihaleciburada.com/firma-dogrulama</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://ihaleciburada.com/firma-dogrulama" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ihaleciburada.com/firma-dogrulama" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ihaleciburada.com/firma-dogrulama" />
     <lastmod>2026-09-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://ihaleciburada.com/logo.png</image:loc>
+      <image:title>Kurumsal Kimlik ve Evrak Doğrulama (KYC)</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://ihaleciburada.com/hakkimizda</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://ihaleciburada.com/hakkimizda" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ihaleciburada.com/hakkimizda" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ihaleciburada.com/hakkimizda" />
     <lastmod>2026-09-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://ihaleciburada.com/auth_skyscraper_bg.jpg</image:loc>
+      <image:title>Hakkımızda - İhaleciBurada Şirket Künyesi ve Vizyon</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://ihaleciburada.com/yardim</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://ihaleciburada.com/yardim" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ihaleciburada.com/yardim" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ihaleciburada.com/yardim" />
     <lastmod>2026-09-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://ihaleciburada.com/logo.png</image:loc>
+      <image:title>Yardım Merkezi & Sıkça Sorulan Sorular (SSS)</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://ihaleciburada.com/uyelik</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://ihaleciburada.com/uyelik" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ihaleciburada.com/uyelik" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ihaleciburada.com/uyelik" />
     <lastmod>2026-09-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://ihaleciburada.com/logo.png</image:loc>
+      <image:title>Üye Kaydı ve Kurumsal Giriş</image:title>
+    </image:image>
   </url>
   <url>
     <loc>https://ihaleciburada.com/videolar</loc>
+    <xhtml:link rel="alternate" hreflang="tr" href="https://ihaleciburada.com/videolar" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://ihaleciburada.com/videolar" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://ihaleciburada.com/videolar" />
     <lastmod>2026-09-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://ihaleciburada.com/logo.png</image:loc>
+      <image:title>Video Kılavuzlar ve İhale Eğitim Rehberi</image:title>
+    </image:image>
   </url>
 </urlset>

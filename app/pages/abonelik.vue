@@ -38,6 +38,12 @@ useSeoMeta({
   description: 'Türkiye geneli B2B satın alma ihalelerine katılın, sınırsız teklif verin ve doğrulanmış kurumsal tedarikçi rozeti kazanın.'
 })
 
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://ihaleciburada.com/abonelik' }
+  ]
+})
+
 const router = useRouter()
 const route = useRoute()
 const { isCompanyMode, toggleCompanyMode, isCorporatePro, isCorporateEnterprise, subscriptionPlan } = useUserSession()

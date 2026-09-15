@@ -259,6 +259,43 @@ useHead({
             }
           },
           {
+            '@type': 'Service',
+            '@id': 'https://ihaleciburada.com/#service-escrow-procurement',
+            'name': 'B2B Tersine İhale, Canlı Eksiltme & Escrow Güvenli Havuz Hizmeti',
+            'serviceType': 'B2B Reverse Auction & Escrow Procurement Platform',
+            'provider': { '@id': 'https://ihaleciburada.com/#organization' },
+            'description': 'Kurumsal satın alma taleplerinin şartname bazında canlı eksiltmeye çıkarılması, onaylı tedarikçilerden rekabetçi tekliflerin toplanması ve Paynkolay lisanslı Escrow bloke havuzu ile %100 tahsilat ve teslimat güvencesi sunulması.',
+            'termsOfService': 'https://ihaleciburada.com/sozlesmeler',
+            'areaServed': [
+              { '@type': 'Country', 'name': 'TR' },
+              { '@type': 'AdministrativeArea', 'name': 'Marmara Bölgesi' },
+              { '@type': 'AdministrativeArea', 'name': 'Balıkesir' },
+              { '@type': 'AdministrativeArea', 'name': 'Çanakkale' },
+              { '@type': 'AdministrativeArea', 'name': 'Bursa' },
+              { '@type': 'AdministrativeArea', 'name': 'İstanbul' },
+              { '@type': 'AdministrativeArea', 'name': 'Kocaeli' },
+              { '@type': 'AdministrativeArea', 'name': 'Ankara' },
+              { '@type': 'AdministrativeArea', 'name': 'İzmir' }
+            ],
+            'audience': {
+              '@type': 'BusinessAudience',
+              'audienceType': "Kurumsal Satın Alma Masaları, Üretici Fabrikalar, Toptancılar ve KOBİ'ler"
+            },
+            'aggregateRating': {
+              '@type': 'AggregateRating',
+              'ratingValue': '4.9',
+              'reviewCount': '148',
+              'bestRating': '5',
+              'worstRating': '1'
+            },
+            'offers': {
+              '@type': 'Offer',
+              'price': '0',
+              'priceCurrency': 'TRY',
+              'description': 'Alıcılar için ihale açma ve teklif toplama tamamen ücretsizdir. Başarılı mutabakatta %5 sabit emanet ve aracılık komisyonu uygulanır.'
+            }
+          },
+          {
             '@type': 'FAQPage',
             '@id': 'https://ihaleciburada.com/#faq',
             'mainEntity': faqList.map(item => ({

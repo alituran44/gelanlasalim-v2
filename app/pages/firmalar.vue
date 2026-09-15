@@ -17,6 +17,29 @@ useSeoMeta({
   ogDescription: 'Türkiye genelinde doğrulanmış B2B üretici, toptancı ve tedarikçi firmalar.'
 })
 
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://ihaleciburada.com/firmalar' }
+  ],
+  meta: [
+    { name: 'keywords', content: 'b2b firmalar, onaylı tedarikçiler, üretici dizini, toptancılar, kyc doğrulanmış şirketler, balıkesir firmaları, çanakkale üreticileri, bursa sanayi firmaları' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        '@id': 'https://ihaleciburada.com/firmalar#webpage',
+        'url': 'https://ihaleciburada.com/firmalar',
+        'name': 'Kurumsal B2B Firmalar & Doğrulanmış Tedarikçiler - İhaleciBurada',
+        'description': 'Türkiye genelinde doğrulanmış B2B üretici, toptancı ve tedarikçi firmaların listesi ve kurumsal profilleri.',
+        'isPartOf': { '@id': 'https://ihaleciburada.com/#website' }
+      })
+    }
+  ]
+})
+
 const searchQuery = ref('')
 const selectedCity = ref('Tümü')
 const selectedSector = ref('Tümü')

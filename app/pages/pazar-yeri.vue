@@ -53,6 +53,30 @@ useSeoMeta({
   ogDescription: 'Güncel B2B ihaleleri, satın alma şartnameleri, malzeme listeleri ve sözleşme kayıtları.'
 })
 
+useHead({
+  link: [
+    { rel: 'canonical', href: 'https://ihaleciburada.com/pazar-yeri' }
+  ],
+  meta: [
+    { name: 'keywords', content: 'ihale portalı, canlı eksiltme, pazar yeri, b2b satın alma, şartname, toptan malzeme, balıkesir ihaleleri, çanakkale ihaleleri, istanbul b2b, bursa sanayi' }
+  ],
+  script: [
+    {
+      type: 'application/ld+json',
+      innerHTML: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        '@id': 'https://ihaleciburada.com/pazar-yeri#webpage',
+        'url': 'https://ihaleciburada.com/pazar-yeri',
+        'name': 'İhale Portalı & Canlı Eksiltme Pazar Yeri - İhaleciBurada',
+        'description': 'Türkiye genelinde güncel B2B ihaleleri, satın alma şartnameleri, malzeme listeleri ve sözleşme kayıtları.',
+        'isPartOf': { '@id': 'https://ihaleciburada.com/#website' },
+        'about': { '@id': 'https://ihaleciburada.com/#service-escrow-procurement' }
+      })
+    }
+  ]
+})
+
 const route = useRoute()
 const { cmsData, saveCmsData, fetchServerTenders } = useCmsData()
 const { checkAccountCompleteness } = useDeepSeekAgent()
