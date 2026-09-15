@@ -20,7 +20,8 @@ import {
   ChevronDown,
   Inbox,
   Server,
-  Plus
+  Plus,
+  MessageSquare
 } from "lucide-vue-next"
 
 import { locale, detectLocale } from '~/composables/useLocale'
@@ -52,6 +53,7 @@ const sidebarMenus = computed(() => {
       { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
+      { title: "Mesajlar", icon: MessageSquare, to: "/panel/mesajlar" },
       { title: "Üye Firmalar", icon: Building2, to: "/panel/firmalar" },
       { title: "Komisyon Kesintisi (%5)", icon: Coins, to: "/panel/gelir-modeli" },
       { title: "Bildirimler", icon: ClipboardList, to: "/panel/bildirimler" }
@@ -62,6 +64,7 @@ const sidebarMenus = computed(() => {
       { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" },
+      { title: "Messages", icon: MessageSquare, to: "/panel/mesajlar" },
       { title: "Verified Companies", icon: Building2, to: "/panel/firmalar" },
       { title: "Commission & Fee (%5)", icon: Coins, to: "/panel/gelir-modeli" },
       { title: "Notifications", icon: ClipboardList, to: "/panel/bildirimler" }

@@ -31,7 +31,8 @@ import {
   Globe,
   ShieldCheck,
   Scale,
-  Server
+  Server,
+  MessageSquare
 } from "lucide-vue-next"
 import { locale } from '~/composables/useLocale'
 
@@ -68,7 +69,8 @@ const sidebarMenus = computed(() => {
       { title: "Genel Bakış & Profil", icon: LayoutDashboard, to: "/panel" },
       { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
-      { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" }
+      { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
+      { title: "Mesajlar", icon: MessageSquare, to: "/panel/mesajlar" }
     ]
     if (isComp) {
       list.push(
@@ -88,7 +90,8 @@ const sidebarMenus = computed(() => {
       { title: "Overview & Profile", icon: LayoutDashboard, to: "/panel" },
       { title: "My Tenders", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Received Bids", icon: Inbox, to: "/panel/gelen-teklifler" },
-      { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" }
+      { title: "Submitted Bids", icon: Send, to: "/panel/yaptigim-teklifler" },
+      { title: "Messages", icon: MessageSquare, to: "/panel/mesajlar" }
     ]
     if (isComp) {
       list.push(

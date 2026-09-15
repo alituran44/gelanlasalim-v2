@@ -122,6 +122,16 @@ const pageTitle = computed(() => {
         <span>+ İHALE AÇ</span>
       </NuxtLink>
 
+      <!-- Mesajlar Hızlı Butonu -->
+      <NuxtLink
+        to="/panel/mesajlar"
+        class="relative flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 transition hover:bg-slate-50 cursor-pointer text-slate-600"
+        :class="route.path === '/panel/mesajlar' ? 'bg-blue-50 border-blue-300 text-blue-700' : ''"
+        title="Mesajlar & Güvenli İletişim"
+      >
+        <MessageSquare :size="17" />
+      </NuxtLink>
+
       <!-- Notifications Dropdown Trigger -->
       <div class="relative">
         <button 
@@ -246,6 +256,10 @@ const pageTitle = computed(() => {
             <NuxtLink to="/panel/ayarlar?tab=adresler" @click="showUserMenu=false"
               class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
               📍 Adreslerim
+            </NuxtLink>
+            <NuxtLink to="/panel/mesajlar" @click="showUserMenu=false"
+              class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
+              💬 Mesajlarım
             </NuxtLink>
             <NuxtLink to="/abonelik" @click="showUserMenu=false"
               class="block px-4 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50">
