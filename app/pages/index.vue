@@ -80,7 +80,7 @@ definePageMeta({
 const { userSession, isLoggedIn, canSubmitBid, isCompanyVerified, companyRole, companyVkn } = useUserSession()
 
 useSeoMeta({
-  title: 'GelAnlaşalım.com — Türkiye’nin En Kapsamlı İhale ve Satın Alma Portalı',
+  title: 'İhaleciBurada.com — Türkiye’nin En Kapsamlı B2B İhale ve Satın Alma Portalı',
   description: 'Günlük ihaleler, kamu ve özel sektör satın alma ilanları, şartnameler, doğrudan teklif verme ve sonuç takip sistemi.'
 })
 
@@ -3674,7 +3674,7 @@ onMounted(() => {
             </div>
             <h4 class="font-black text-sm text-white">Firma Bilgileri Üye Olmadan Görünmemektedir</h4>
             <p class="text-xs text-slate-400 max-w-sm mx-auto">
-              İhaleyi açan kurumsal şirketin unvanı, iletişim bilgileri ve ticari sicil kayıtları sadece kayıtlı GelAnlaşalım üyelerine açıktır.
+              İhaleyi açan kurumsal şirketin unvanı, iletişim bilgileri ve ticari sicil kayıtları sadece kayıtlı İhaleciBurada üyelerine açıktır.
             </p>
             <NuxtLink to="/uyelik" class="inline-block px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs transition">
               Giriş Yap / Üye Ol

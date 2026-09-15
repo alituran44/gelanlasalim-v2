@@ -47,9 +47,9 @@ definePageMeta({
 })
 
 useSeoMeta({
-  title: 'İhale Portalı & Canlı Eksiltme Pazar Yeri - GelAnlaşalım',
+  title: 'İhale Portalı & Canlı Eksiltme Pazar Yeri - İhaleciBurada',
   description: 'Türkiye genelinde güncel B2B ihaleleri, satın alma şartnameleri, malzeme listeleri ve sözleşme kayıtları.',
-  ogTitle: 'İhale Portalı & Canlı Eksiltme Pazar Yeri - GelAnlaşalım',
+  ogTitle: 'İhale Portalı & Canlı Eksiltme Pazar Yeri - İhaleciBurada',
   ogDescription: 'Güncel B2B ihaleleri, satın alma şartnameleri, malzeme listeleri ve sözleşme kayıtları.'
 })
 
@@ -1225,7 +1225,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
                 class="font-bold text-slate-800 hover:text-blue-700 hover:underline transition-colors cursor-pointer text-left truncate"
                 title="İdare Profilini İncele"
               >
-                {{ tender.authority || 'GelAnlaşalım Satın Alma Masası' }}
+                {{ tender.authority || 'İhaleciBurada Satın Alma Masası' }}
               </button>
 
               <div v-else class="flex items-center gap-2">
@@ -1437,7 +1437,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
           </div>
           <div>
             <span class="text-[10px] font-bold text-slate-400 uppercase block">🏢 İdare / Satın Alma</span>
-            <span v-if="isLoggedIn" class="font-bold text-slate-800">{{ selectedTenderForDetail.authority || 'GelAnlaşalım Satın Alma Masası' }}</span>
+            <span v-if="isLoggedIn" class="font-bold text-slate-800">{{ selectedTenderForDetail.authority || 'İhaleciBurada Satın Alma Masası' }}</span>
             <span v-else class="flex items-center gap-1.5 mt-0.5">
               <span class="filter blur-[5px] select-none pointer-events-none font-medium text-slate-400">████████ Dairesi</span>
               <NuxtLink to="/uyelik" class="text-[10px] text-amber-700 font-bold underline">Giriş Yap</NuxtLink>
@@ -1764,7 +1764,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             <div class="space-y-1.5 max-w-md mx-auto">
               <h4 class="font-black text-slate-900 text-base">Firma Bilgileri Üye Olmadan Görünmemektedir</h4>
               <p class="text-xs text-slate-600 leading-relaxed">
-                İhaleyi açan ve teklif veren kurumsal firmaların ticari sicil bilgileri, vergi dairesi ve yetkili profilleri yalnızca kayıtlı GelAnlaşalım üyelerine açıktır.
+                İhaleyi açan ve teklif veren kurumsal firmaların ticari sicil bilgileri, vergi dairesi ve yetkili profilleri yalnızca kayıtlı İhaleciBurada üyelerine açıktır.
               </p>
             </div>
             <div class="pt-2 flex items-center justify-center gap-3">
@@ -2201,7 +2201,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
                   Alıcı kurum doğrudan iletişim bilgileri ihale sonuçlanana kadar platform güvencesinde saklıdır. Lütfen sistem içi mesajlaşmayı kullanınız.
                 </p>
                 <div class="font-mono text-[10px] text-slate-500 pt-0.5">
-                  <span>+90 (***) *** ** **</span> · <span>******@gelanlasalim.com</span>
+                  <span>+90 (***) *** ** **</span> · <span>******@ihaleciburada.com</span>
                 </div>
               </div>
               <span v-else class="font-bold text-slate-800">{{ selectedCompanyForProfile.phone }} · {{ selectedCompanyForProfile.email }}</span>

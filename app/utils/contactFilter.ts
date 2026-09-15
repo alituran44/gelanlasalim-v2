@@ -1,5 +1,5 @@
 /**
- * contactFilter.ts - GelAnlasalim B2B Güvenli İletişim & Harici İletişim Engelleme Motoru
+ * contactFilter.ts - İhaleciBurada B2B Güvenli İletişim & Harici İletişim Engelleme Motoru
  * 
  * Kurallar:
  * 1. Sistem içi mesajlaşmalarda telefon, e-posta, web sitesi veya harici haberleşme (WhatsApp, Telegram vb.) paylaşımı kesinlikle yasaktır.

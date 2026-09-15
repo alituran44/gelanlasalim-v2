@@ -3405,7 +3405,7 @@ function saveProfile() {
                 <div>
                   <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">REST API BASE URL</label>
                   <div class="flex items-center rounded-xl border bg-slate-50 px-3.5 py-2.5 text-xs font-mono text-slate-700" style="border-color: #E2E8F0;">
-                    <span class="truncate">https://api.gelanlasalim.com/v1/erp</span>
+                    <span class="truncate">https://api.ihaleciburada.com/v1/erp</span>
                   </div>
                 </div>
 
@@ -3933,7 +3933,7 @@ function saveProfile() {
                 <p class="text-[11px] text-slate-500 mt-1 leading-relaxed">Yasal tebligatlar, ihtar ve kurumsal sözleşmeler için kayıtlı adresimiz.</p>
               </div>
               <div class="pt-2 border-t border-slate-100">
-                <span class="text-xs font-mono font-black text-purple-700 block">gelanlasalim@hs01.kep.tr</span>
+                <span class="text-xs font-mono font-black text-purple-700 block">hasanhuseyin.yildirim.17@hs01.kep.tr</span>
               </div>
             </div>
 

@@ -419,7 +419,7 @@ function handleAttachment() {
             </button>
           </form>
           <div class="text-[10px] text-slate-400 mt-2 flex items-center justify-between">
-            <span>🔒 Mesajlaşmalar KVKK ve GelAnlaşalım B2B Güvenli Ticaret Protokolü ile kayıt altına alınmaktadır.</span>
+            <span>🔒 Mesajlaşmalar KVKK ve İhaleciBurada B2B Güvenli Ticaret Protokolü ile kayıt altına alınmaktadır.</span>
             <span>Escrow Güvenceli Sohbet</span>
           </div>
         </div>
@@ -445,7 +445,7 @@ function handleAttachment() {
             Harici İletişim Bilgisi Paylaşımı Engellendi
           </h3>
           <p class="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-            GelAnlaşalım B2B Güvenli Ticaret İlkeleri gereği; ihaleler sonuçlanıp sözleşme mutabakatı tamamlanana kadar telefon numarası, e-posta, web sitesi veya harici haberleşme linki paylaşılması kesinlikle yasaktır.
+            İhaleciBurada B2B Güvenli Ticaret İlkeleri gereği; ihaleler sonuçlanıp sözleşme mutabakatı tamamlanana kadar telefon numarası, e-posta, web sitesi veya harici haberleşme linki paylaşılması kesinlikle yasaktır.
           </p>
         </div>
 

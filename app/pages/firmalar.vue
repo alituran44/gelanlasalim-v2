@@ -11,9 +11,9 @@ definePageMeta({
 const { isLoggedIn } = useUserSession()
 
 useSeoMeta({
-  title: 'Kurumsal B2B Firmalar - GelAnlaşalım',
+  title: 'Kurumsal B2B Firmalar - İhaleciBurada',
   description: 'Türkiye genelinde doğrulanmış B2B üretici, toptancı ve tedarikçi firmaların listesi ve kurumsal profilleri.',
-  ogTitle: 'Kurumsal B2B Firmalar - GelAnlaşalım',
+  ogTitle: 'Kurumsal B2B Firmalar - İhaleciBurada',
   ogDescription: 'Türkiye genelinde doğrulanmış B2B üretici, toptancı ve tedarikçi firmalar.'
 })
 
@@ -116,7 +116,7 @@ const selectedFirmForModal = ref<any>(null)
           <div>
             <span class="font-black text-xs sm:text-sm block">Firma Bilgileri Üye Olmadan Görünmemektedir</span>
             <span class="text-[11px] sm:text-xs text-amber-800 leading-relaxed">
-              B2B firma rehberinde yer alan üretici ve yüklenici şirketlerin resmi ticaret unvanları, iletişim kanalları ve sicil kayıtları yalnızca kayıtlı GelAnlaşalım üyelerine açıktır.
+              B2B firma rehberinde yer alan üretici ve yüklenici şirketlerin resmi ticaret unvanları, iletişim kanalları ve sicil kayıtları yalnızca kayıtlı İhaleciBurada üyelerine açıktır.
             </span>
           </div>
         </div>
