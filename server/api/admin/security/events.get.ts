@@ -1,7 +1,11 @@
 import { defineEventHandler, getQuery } from 'h3'
 import { getAllSecurityEvents, SecurityEventType, SecuritySeverity } from '~~/server/utils/securityAuditStore'
+import { requireAdmin } from '~~/server/utils/authGuard'
 
 export default defineEventHandler((event) => {
+  // 🛡️ Admin Yetki Doğrulaması
+  requireAdmin(event)
+
   const query = getQuery(event)
   const eventType = query.type as SecurityEventType | undefined
   const severity = query.severity as SecuritySeverity | undefined

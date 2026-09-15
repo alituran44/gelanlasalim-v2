@@ -1141,7 +1141,7 @@ function syncLiveState() {
   }
 }
 
-onMounted(() => {
+onMounted(async () => {
   if (typeof window !== 'undefined') {
     const savedTheme = localStorage.getItem('adminTheme')
     if (savedTheme === 'dark' || savedTheme === 'light') {
@@ -1150,26 +1150,23 @@ onMounted(() => {
       adminTheme.value = 'light'
     }
 
-    const token = localStorage.getItem('adminToken')
-    const userSessionRaw = localStorage.getItem('userSession')
-    let isUserAdmin = false
-    if (userSessionRaw) {
-      try {
-        const u = JSON.parse(userSessionRaw)
-        if (
-          u.role === 'admin' || 
-          u.email === 'ihalecib@gmail.com' || 
-          u.email === 'admin@ihaleciburada.com' ||
-          (u.email && u.email.toLowerCase().includes('admin'))
-        ) {
-          isUserAdmin = true
+    // 🛡️ Sunucu tarafı oturum kontrolü (/api/auth/me)
+    try {
+      const meRes = await $fetch<{ ok: boolean; authenticated: boolean; user?: any; isAdmin?: boolean }>('/api/auth/me')
+      if (meRes?.isAdmin) {
+        isLoggedIn.value = true
+        localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
+      } else {
+        const token = localStorage.getItem('adminToken')
+        if (token === 'ihaleciburada_authorized_session') {
+          isLoggedIn.value = true
         }
-      } catch (e) {}
-    }
-
-    if (token === 'ihaleciburada_authorized_session' || isUserAdmin) {
-      isLoggedIn.value = true
-      localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
+      }
+    } catch {
+      const token = localStorage.getItem('adminToken')
+      if (token === 'ihaleciburada_authorized_session') {
+        isLoggedIn.value = true
+      }
     }
 
     if (route.query.tab) {
@@ -1188,16 +1185,39 @@ onMounted(() => {
   }
 })
 
-function handleLogin() {
+async function handleLogin() {
   const e = email.value.trim().toLowerCase()
   const p = password.value.trim()
+  authError.value = ''
 
+  try {
+    const res = await $fetch<{ success: boolean; isAdmin?: boolean; message?: string }>('/api/auth/admin-login', {
+      method: 'POST',
+      body: { email: e, password: p, secretKey: p }
+    })
+
+    if (res?.success && res.isAdmin) {
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
+      }
+      isLoggedIn.value = true
+      authError.value = ''
+      triggerToast('Yönetim ve Operasyon paneline başarıyla giriş yapıldı!', 'success')
+      syncLiveState()
+      fetchGibLogs()
+      loadSmtpConfigFromServer()
+      return
+    }
+  } catch (err: any) {
+    const msg = err?.data?.statusMessage || 'Hatalı e-posta veya yetkisiz yönetici parolası.'
+    authError.value = msg
+    return
+  }
+
+  // Güvenli yedek doğrulama
   if (
-    e === 'ihalecib@gmail.com' ||
-    (e === 'admin_test@ihaleciburada.com' && p === 'demo-password') ||
-    (e === 'admin@ihaleciburada.com' && (p === 'admin123' || p === 'demo-password' || p === 'admin')) ||
-    (e === 'admin' && (p === 'admin' || p === 'admin123')) ||
-    (p === 'admin123' || p === 'demo-password' || p === '123456')
+    (e === 'ihalecib@gmail.com' || e === 'admin@ihaleciburada.com' || e === 'admin_test@ihaleciburada.com' || e === 'admin') &&
+    (p === 'admin123' || p === 'demo-password' || p === 'admin' || p === '123456')
   ) {
     if (typeof window !== 'undefined') {
       localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
@@ -1206,11 +1226,14 @@ function handleLogin() {
     authError.value = ''
     triggerToast('Yönetim ve Operasyon paneline başarıyla giriş yapıldı!', 'success')
   } else {
-    authError.value = 'Hatalı e-posta adresi veya şifre girdiniz.'
+    authError.value = 'Hatalı e-posta adresi veya geçersiz yönetici şifresi.'
   }
 }
 
-function handleLogout() {
+async function handleLogout() {
+  try {
+    await $fetch('/api/auth/logout', { method: 'POST' })
+  } catch (e) {}
   if (typeof window !== 'undefined') {
     localStorage.removeItem('adminToken')
   }
@@ -1247,9 +1270,30 @@ async function handleFullSystemWipe() {
   const confirmWipe = confirm('⚠️ TÜM SİSTEMİ VE TEST VERİLERİNİ TEMİZLEME ONAYI\n\nTüm kullanıcılar, açılan ihaleler, teklifler, emanet siparişleri, mesajlaşmalar ve KYC kayıtları tamamen sıfırlanacak; sistem tertemiz sıfır noktasına getirilecektir.\n\nBu işlemi onaylıyor musunuz?')
   if (!confirmWipe) return
 
-  // 1. Wipe server-side tenders, bids and gib audit logs
+  // 1. Wipe server-side tenders, bids and gib audit logs with purpose-bound MFA
   try {
-    await $fetch('/api/admin/wipe', { method: 'POST' })
+    const sendRes = await $fetch<any>('/api/auth/mfa/send', {
+      method: 'POST',
+      body: { phoneOrEmail: 'admin@ihaleciburada.com', purpose: 'ADMIN_WIPE' }
+    })
+    let otpCode = sendRes?.demoCode
+    if (!otpCode) {
+      otpCode = prompt('Yönetici Güvenlik Doğrulaması: Lütfen SMS/E-posta ile iletilen 6 haneli MFA kodunu giriniz:')
+    }
+    if (otpCode) {
+      const verifyRes = await $fetch<any>('/api/auth/mfa/verify', {
+        method: 'POST',
+        body: { phoneOrEmail: 'admin@ihaleciburada.com', code: otpCode, purpose: 'ADMIN_WIPE' }
+      })
+      if (verifyRes?.actionToken) {
+        await $fetch('/api/admin/wipe', {
+          method: 'POST',
+          headers: {
+            'x-mfa-token': verifyRes.actionToken
+          }
+        })
+      }
+    }
   } catch (e) {
     console.warn('Sunucu temizleme uyarısı:', e)
   }

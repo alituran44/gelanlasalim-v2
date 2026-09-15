@@ -2,6 +2,8 @@ import type { H3Event } from 'h3'
 import { getRequestHeaders, getRequestHeader, createError } from 'h3'
 import { getCompanyByVkn, getAllCompanies, CompanyRole } from './companyVerificationStore'
 import { logSecurityEvent } from './securityAuditStore'
+import { getSessionCookie, verifySessionToken, verifyAdminSession } from './sessionStore'
+import { consumePurposeBoundMfaToken } from './mfaStore'
 
 export interface UserSessionContext {
   isAuthenticated: boolean
@@ -15,8 +17,9 @@ export interface UserSessionContext {
 }
 
 /**
- * 🛡️ SEC-001 & SEC-003: Sunucu Tarafında Kimlik & Tenant Çözümleme
- * İstemciden gelen companyId alanına körü körüne güvenmek yerine oturumdan doğrular.
+ * 🛡️ SEC-001: Gerçek Sunucu Taraflı Oturum & Kimlik Çözümleme
+ * İstemci tarafından serbestçe gönderilebilen x-user-email gibi başlıklara ASLA güvenmez.
+ * Yalnızca imzalı httpOnly cookie veya doğrulanmış Bearer oturum token'larını esas alır.
  */
 export function resolveSession(event: H3Event): UserSessionContext {
   const headers = getRequestHeaders(event)
@@ -26,70 +29,90 @@ export function resolveSession(event: H3Event): UserSessionContext {
     event.node.req.socket.remoteAddress ||
     '127.0.0.1'
 
-  const isAdmin = authHeader.includes('admin') || Boolean(headers['x-admin-token'])
+  // 1. Admin Tespiti: Yalnızca gizli sunucu anahtarıyla veya doğrulanmış admin oturumuyla mümkündür.
+  // Header'ın içinde "admin" kelimesi geçmesi KESİNLİKLE yetmez.
+  let isAdmin = false
+  const adminHeaderToken = (headers['x-admin-token'] as string || '').trim()
+  if (adminHeaderToken && verifyAdminSession(adminHeaderToken)) {
+    isAdmin = true
+  }
 
-  // Header or Bearer simulation
-  let email = (headers['x-user-email'] as string || '').trim().toLowerCase()
-  if (!email && authHeader.startsWith('Bearer ')) {
-    const token = authHeader.substring(7)
-    if (token.includes('@')) {
-      email = token.toLowerCase().trim()
+  // 2. Token Çıkarma: Önce imzalı httpOnly cookie'ye bakılır, yoksa Bearer başlığına bakılır
+  let rawToken = getSessionCookie(event)
+  if (!rawToken && authHeader.startsWith('Bearer ')) {
+    rawToken = authHeader.substring(7).trim()
+    // Eğer Bearer doğrudan admin secret token'ı ise
+    if (verifyAdminSession(rawToken)) {
+      isAdmin = true
     }
   }
 
-  if (!email && !isAdmin) {
-    return {
-      isAuthenticated: false,
-      userEmail: '',
-      userName: 'Anonim Kullanıcı',
-      isCompanyVerified: false,
-      isAdmin: false,
-      clientIp
-    }
-  }
+  // 3. Token'ı Sunucu Session Store ve Kriptografik İmzayla Doğrulama
+  if (rawToken) {
+    const serverSession = verifySessionToken(rawToken)
+    if (serverSession) {
+      if (serverSession.isAdmin) {
+        isAdmin = true
+      }
 
-  // Resolve company membership and role from companyVerificationStore
-  const allCompanies = getAllCompanies()
-  let matchedCompany = allCompanies.find(c => 
-    c.adminEmail.toLowerCase() === email ||
-    c.members.some(m => m.email.toLowerCase() === email && m.status === 'ACTIVE')
-  )
+      // Şirket ve yetki çözümlemesi
+      const allCompanies = getAllCompanies()
+      const email = serverSession.userEmail.toLowerCase().trim()
+      const matchedCompany = allCompanies.find(c =>
+        c.adminEmail.toLowerCase() === email ||
+        c.members.some(m => m.email.toLowerCase() === email && m.status === 'ACTIVE')
+      )
 
-  // If header provided VKN, check if user actually belongs to it (prevent VKN spoofing)
-  const headerVkn = (headers['x-user-vkn'] as string || '').trim()
-  if (headerVkn && (!matchedCompany || matchedCompany.vkn !== headerVkn)) {
-    const vknTarget = getCompanyByVkn(headerVkn)
-    if (vknTarget && vknTarget.members.some(m => m.email.toLowerCase() === email && m.status === 'ACTIVE')) {
-      matchedCompany = vknTarget
-    }
-  }
+      let role = serverSession.companyRole || ('GÖRÜNTÜLEYİCİ' as CompanyRole)
+      let userName = serverSession.userName || email.split('@')[0]
+      let isVerified = serverSession.isCompanyVerified
 
-  let role: CompanyRole = 'GÖRÜNTÜLEYİCİ'
-  let userName = email.split('@')[0]
-  let isVerified = false
+      if (matchedCompany) {
+        isVerified = matchedCompany.status === 'VERIFIED'
+        if (matchedCompany.adminEmail.toLowerCase() === email) {
+          role = 'FİRMA_YÖNETİCİSİ'
+          userName = matchedCompany.adminName || userName
+        } else {
+          const member = matchedCompany.members.find(m => m.email.toLowerCase() === email)
+          if (member) {
+            role = member.role
+            userName = member.name || userName
+          }
+        }
+      }
 
-  if (matchedCompany) {
-    isVerified = matchedCompany.status === 'VERIFIED'
-    if (matchedCompany.adminEmail.toLowerCase() === email) {
-      role = 'FİRMA_YÖNETİCİSİ'
-      userName = matchedCompany.adminName || userName
-    } else {
-      const member = matchedCompany.members.find(m => m.email.toLowerCase() === email)
-      if (member) {
-        role = member.role
-        userName = member.name || userName
+      return {
+        isAuthenticated: true,
+        userEmail: email,
+        userName,
+        companyVkn: serverSession.companyVkn || matchedCompany?.vkn,
+        companyRole: role,
+        isCompanyVerified: isVerified,
+        isAdmin,
+        clientIp
       }
     }
   }
 
+  // 4. Doğrulanmış admin gizli anahtarı varsa ama kullanıcı session'ı yoksa
+  if (isAdmin) {
+    return {
+      isAuthenticated: true,
+      userEmail: 'admin@ihaleciburada.com',
+      userName: 'Sistem Yöneticisi (Admin)',
+      isCompanyVerified: true,
+      isAdmin: true,
+      clientIp
+    }
+  }
+
+  // 5. Doğrulanamayan istek: Anonim
   return {
-    isAuthenticated: true,
-    userEmail: email,
-    userName,
-    companyVkn: matchedCompany?.vkn,
-    companyRole: role,
-    isCompanyVerified: isVerified,
-    isAdmin,
+    isAuthenticated: false,
+    userEmail: '',
+    userName: 'Anonim Kullanıcı',
+    isCompanyVerified: false,
+    isAdmin: false,
     clientIp
   }
 }
@@ -109,10 +132,79 @@ export function requireAuth(event: H3Event): UserSessionContext {
     })
     throw createError({
       statusCode: 401,
-      statusMessage: 'Bu işlem için oturum açmanız gerekmektedir (Kural SEC-001).'
+      statusMessage: 'Bu işlem için geçerli bir oturum açmanız gerekmektedir (Kural SEC-001).'
     })
   }
   return session
+}
+
+/**
+ * 🛡️ SEC-ADM: Kesin Admin Yetki Zorunluluğu
+ */
+export function requireAdmin(event: H3Event): UserSessionContext {
+  const session = resolveSession(event)
+  if (!session.isAdmin) {
+    logSecurityEvent(event, {
+      eventType: 'ROLE_VIOLATION',
+      severity: 'CRITICAL',
+      actorEmail: session.userEmail || undefined,
+      targetResource: event.node.req.url,
+      actionTaken: 'BLOCKED_403',
+      details: { reason: 'Yetkisiz erişim: Yönetici (Admin) oturumu doğrulanmadı.' }
+    })
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Yetkisiz işlem: Bu kaynak yalnızca doğrulanmış sistem yöneticilerine açıktır.'
+    })
+  }
+  return session
+}
+
+/**
+ * 🛡️ Katman 3: Amaca Bağlı (Purpose-Bound) MFA Doğrulama Zorunluluğu
+ */
+export function requireMfaVerification(event: H3Event, requiredPurpose: string): { phoneOrEmail: string } {
+  const headers = getRequestHeaders(event)
+  const mfaToken = (headers['x-mfa-token'] as string || '').trim()
+
+  if (!mfaToken) {
+    logSecurityEvent(event, {
+      eventType: 'MFA_FAILED',
+      severity: 'HIGH',
+      targetResource: event.node.req.url,
+      actionTaken: 'BLOCKED_403',
+      details: { reason: 'MFA aksiyon tokenı eksik.', requiredPurpose }
+    })
+    throw createError({
+      statusCode: 403,
+      statusMessage: `Bu kritik işlem için '${requiredPurpose}' amaçlı 2FA / MFA doğrulaması zorunludur (Kural SEC-009).`
+    })
+  }
+
+  const verification = consumePurposeBoundMfaToken(mfaToken, requiredPurpose)
+  if (!verification.valid) {
+    logSecurityEvent(event, {
+      eventType: 'MFA_FAILED',
+      severity: 'CRITICAL',
+      targetResource: event.node.req.url,
+      actionTaken: 'BLOCKED_403',
+      details: { reason: verification.error, requiredPurpose }
+    })
+    throw createError({
+      statusCode: 403,
+      statusMessage: verification.error || 'Geçersiz veya süresi dolmuş MFA doğrulaması.'
+    })
+  }
+
+  logSecurityEvent(event, {
+    eventType: 'MFA_VERIFIED',
+    severity: 'LOW',
+    targetResource: event.node.req.url,
+    actionTaken: 'ALLOWED',
+    details: { purpose: requiredPurpose, phoneOrEmail: verification.phoneOrEmail }
+  })
+
+  return { phoneOrEmail: verification.phoneOrEmail || '' }
 }
 
 /**

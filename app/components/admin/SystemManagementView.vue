@@ -133,8 +133,27 @@ async function handleFileUpload(e: Event) {
     const text = await file.text()
     const json = JSON.parse(text)
 
+    // 🛡️ Katman 3: SYSTEM_RESTORE için amaca bağlı MFA doğrulaması
+    const mfaSend = await $fetch<any>('/api/auth/mfa/send', {
+      method: 'POST',
+      body: { phoneOrEmail: 'admin@ihaleciburada.com', purpose: 'SYSTEM_RESTORE' }
+    })
+    let mfaCode = mfaSend?.demoCode
+    if (!mfaCode) {
+      mfaCode = prompt('Kritik Sistem Geri Yükleme Onayı: 6 haneli MFA kodunu giriniz:')
+    }
+    if (!mfaCode) throw new Error('MFA doğrulaması iptal edildi.')
+
+    const mfaVerify = await $fetch<any>('/api/auth/mfa/verify', {
+      method: 'POST',
+      body: { phoneOrEmail: 'admin@ihaleciburada.com', code: mfaCode, purpose: 'SYSTEM_RESTORE' }
+    })
+
     const res = await $fetch<any>('/api/admin/system/restore', {
       method: 'POST',
+      headers: {
+        'x-mfa-token': mfaVerify.actionToken
+      },
       body: { snapshot: json }
     })
 

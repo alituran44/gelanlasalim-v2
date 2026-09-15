@@ -4,10 +4,14 @@ import { getAllTenders } from '~~/server/utils/tendersStore'
 import { getAllBids } from '~~/server/utils/bidsStore'
 import { getAllCompanies } from '~~/server/utils/companyVerificationStore'
 import { calculatePlatformKpis } from '~~/server/utils/reportingKpiStore'
+import { requireAdmin } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
+  // 🛡️ Admin Yetki Doğrulaması
+  const session = requireAdmin(event)
+
   const body = await readBody(event) || {}
-  const actorEmail = (body.userEmail || 'ihalecib@gmail.com') as string
+  const actorEmail = session.userEmail || (body.userEmail as string) || 'admin@ihaleciburada.com'
   const reportType = (body.reportType || 'kpi') as 'kpi' | 'tenders' | 'bids' | 'companies'
   const period = (body.period || '30gun') as string
 

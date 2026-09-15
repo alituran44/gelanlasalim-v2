@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody, createError } from 'h3'
-import { verifyMfaOtp } from '~~/server/utils/mfaStore'
+import { verifyMfaOtp, createPurposeBoundMfaToken } from '~~/server/utils/mfaStore'
 import { logSecurityEvent } from '~~/server/utils/securityAuditStore'
 import { sanitizeXss } from '~~/server/utils/authGuard'
 
@@ -7,6 +7,7 @@ export default defineEventHandler(async (event) => {
   const body = await readBody(event) || {}
   const phoneOrEmail = sanitizeXss(body.phoneOrEmail || body.phone || body.email)
   const code = sanitizeXss(body.code)
+  const purpose = sanitizeXss(body.purpose || 'CRITICAL_ACTION')
 
   if (!phoneOrEmail || !code) {
     throw createError({
@@ -15,7 +16,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const result = verifyMfaOtp(phoneOrEmail, code)
+  const result = verifyMfaOtp(phoneOrEmail, code, purpose)
 
   if (!result.valid) {
     logSecurityEvent(event, {
@@ -23,7 +24,7 @@ export default defineEventHandler(async (event) => {
       severity: 'HIGH',
       actorEmail: phoneOrEmail.includes('@') ? phoneOrEmail : undefined,
       actionTaken: 'BLOCKED_403',
-      details: { phoneOrEmail, reason: result.error }
+      details: { phoneOrEmail, purpose, reason: result.error }
     })
 
     throw createError({
@@ -32,20 +33,22 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // 🛡️ Katman 3: Amaca Bağlı (Purpose-Bound) İmzalı Tek Kullanımlık Token Üret
+  const actionToken = createPurposeBoundMfaToken(phoneOrEmail, purpose)
+
   logSecurityEvent(event, {
     eventType: 'MFA_VERIFIED',
     severity: 'LOW',
     actorEmail: phoneOrEmail.includes('@') ? phoneOrEmail : undefined,
     actionTaken: 'ALLOWED',
-    details: { phoneOrEmail }
+    details: { phoneOrEmail, purpose }
   })
-
-  // Return signed one-time token
-  const actionToken = `mfa_ok_${Date.now()}_${Math.random().toString(36).substring(2, 10)}`
 
   return {
     success: true,
     message: 'MFA iki faktörlü kimlik doğrulaması başarıyla tamamlandı (Kural SEC-009).',
-    actionToken
+    purpose,
+    actionToken,
+    expiresInSeconds: 300
   }
 })

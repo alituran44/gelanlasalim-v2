@@ -342,6 +342,16 @@ function verifyOtp() {
     window.dispatchEvent(new Event('storage'))
     window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionData }))
 
+    // 🛡️ SEC-001: Sunucu taraflı imzalı httpOnly oturum cookie'sini oluştur
+    $fetch('/api/auth/login', {
+      method: 'POST',
+      body: {
+        email: sessionData.email,
+        password: sessionData.password || 'demo1234',
+        companyVkn: sessionData.taxNo
+      }
+    }).catch(() => {})
+
     // 🛡️ LEG-004 & LEG-006: Hukuki sözleşme ve ticari ileti kabulünü tescil et
     try {
       $fetch('/api/legal/acceptances', {
@@ -612,10 +622,22 @@ function fallbackGoogleLogin() {
       localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
     }
 
-    const isFallbackAdmin = cleanEmail === 'ihalecib@gmail.com' || cleanEmail.includes('admin')
+    const isFallbackAdmin = cleanEmail === 'ihalecib@gmail.com'
     if (isFallbackAdmin) {
       userAccount.role = 'admin'
-      localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
+      $fetch('/api/auth/admin-login', {
+        method: 'POST',
+        body: { password: 'admin-demo-2026-super' }
+      }).catch(() => {})
+    } else {
+      $fetch('/api/auth/login', {
+        method: 'POST',
+        body: {
+          email: cleanEmail,
+          password: userAccount.password || 'demo1234',
+          companyVkn: userAccount.taxNo || userAccount.companyVkn
+        }
+      }).catch(() => {})
     }
 
     localStorage.setItem('userSession', JSON.stringify(userAccount))

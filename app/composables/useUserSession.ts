@@ -74,6 +74,7 @@ export function useUserSession() {
   if (typeof window !== 'undefined' && !isInitialized.value) {
     isInitialized.value = true
     loadSessionFromStorage()
+    fetchServerSession()
     window.addEventListener('storage', loadSessionFromStorage)
     window.addEventListener('session-updated', loadSessionFromStorage)
     window.addEventListener('user-session-changed', loadSessionFromStorage)
@@ -216,10 +217,50 @@ export function useUserSession() {
     saveSessionToStorage()
   }
 
+  async function fetchServerSession() {
+    if (typeof window === 'undefined') return
+    try {
+      const res: any = await $fetch('/api/auth/me')
+      if (res?.success && res.isAuthenticated && res.user) {
+        userSession.value = {
+          ...userSession.value,
+          ...res.user
+        }
+        saveSessionToStorage()
+      }
+    } catch {
+      // Offline / unauthenticated
+    }
+  }
+
+  async function serverLogin(payload: { email: string; password?: string; companyVkn?: string }) {
+    const res: any = await $fetch('/api/auth/login', {
+      method: 'POST',
+      body: payload
+    })
+    if (res?.success && res.user) {
+      userSession.value = {
+        ...userSession.value,
+        ...res.user
+      }
+      saveSessionToStorage()
+    }
+    return res
+  }
+
+  async function serverLogout() {
+    try {
+      await $fetch('/api/auth/logout', { method: 'POST' })
+    } catch {}
+    logout()
+  }
+
   function logout() {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('userSession')
       localStorage.removeItem('auth_token')
+      // Try to clear server cookie asynchronously
+      $fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
     }
     userSession.value = {}
     if (typeof window !== 'undefined') {
@@ -252,6 +293,9 @@ export function useUserSession() {
     setPhoneVerified,
     setEmailVerified,
     logout,
+    serverLogin,
+    serverLogout,
+    fetchServerSession,
     loadSessionFromStorage
   }
 }
