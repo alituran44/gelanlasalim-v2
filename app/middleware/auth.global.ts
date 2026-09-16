@@ -1,13 +1,27 @@
+import { useUserSession } from '~/composables/useUserSession'
+
 export default defineNuxtRouteMiddleware((to, from) => {
   const isPanelRoute = to.path === '/panel' || to.path.startsWith('/panel/')
   if (!isPanelRoute) return
 
-  // 🛡️ SEC-010 (Katman 4): Cookie tabanlı sunucu oturum doğrulaması
-  // useCookie('ihb_session') hem SSR sırasında gelen istek başlıklarından hem de client'ta çalışır
-  const sessionCookie = useCookie<string | null | undefined>('ihb_session')
+  // 🛡️ SEC-010 (Katman 4): Sunucu Tarafı SSR Koruması
+  // SSR sırasında HTTP başlıklarında taşınan imzalı 'ihb_session' doğrulanır.
+  if (import.meta.server) {
+    const sessionCookie = useCookie<string | null | undefined>('ihb_session')
+    if (!sessionCookie.value) {
+      return navigateTo('/uyelik', { redirectCode: 302 })
+    }
+  }
 
-  if (!sessionCookie.value) {
-    // SSR ve Client aşamasında anında /uyelik sayfasına yönlendir
-    return navigateTo('/uyelik', { redirectCode: 302 })
+  // 🛡️ SEC-010: İstemci Tarafı Navigasyon Doğrulaması
+  // İstemcide 'ihb_auth' çerezi veya reaktif oturum durumu kontrol edilir.
+  if (import.meta.client) {
+    const authCookie = useCookie<string | null | undefined>('ihb_auth')
+    const sessionCookie = useCookie<string | null | undefined>('ihb_session')
+    const { isLoggedIn } = useUserSession()
+
+    if (!authCookie.value && !sessionCookie.value && !isLoggedIn.value) {
+      return navigateTo('/uyelik')
+    }
   }
 })

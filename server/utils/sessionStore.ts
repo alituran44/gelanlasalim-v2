@@ -34,13 +34,41 @@ if (!globalThis.__SERVER_SESSIONS__) {
 
 const sessionStore = globalThis.__SERVER_SESSIONS__!
 
+interface TokenPayload {
+  sid: string
+  email: string
+  name: string
+  vkn?: string
+  role?: string
+  ver?: number
+  adm?: number
+  prem?: number
+  plan?: string
+  tier?: string
+  exp: number
+}
+
 /**
- * Oturum token'ını HMAC-SHA256 ile imzalar
+ * Oturum verisini kriptografik HMAC-SHA256 ile imzalar ve durumsuz (stateless) token üretir
  */
-function signToken(sessionId: string, expiresAt: number, isAdmin: boolean): string {
-  const payload = `${sessionId}:${expiresAt}:${isAdmin ? '1' : '0'}`
-  const signature = createHmac('sha256', SESSION_SECRET).update(payload).digest('base64url')
-  return `${Buffer.from(payload).toString('base64url')}.${signature}`
+function signToken(session: ServerSession): string {
+  const payloadData: TokenPayload = {
+    sid: session.id,
+    email: session.userEmail,
+    name: session.userName,
+    vkn: session.companyVkn,
+    role: session.companyRole as string,
+    ver: session.isCompanyVerified ? 1 : 0,
+    adm: session.isAdmin ? 1 : 0,
+    prem: session.isPremium ? 1 : 0,
+    plan: session.subscriptionPlan,
+    tier: session.tierId,
+    exp: session.expiresAt
+  }
+  const payloadStr = JSON.stringify(payloadData)
+  const payloadB64 = Buffer.from(payloadStr, 'utf8').toString('base64url')
+  const signature = createHmac('sha256', SESSION_SECRET).update(payloadB64).digest('base64url')
+  return `${payloadB64}.${signature}`
 }
 
 /**
@@ -51,8 +79,7 @@ function verifyTokenSignature(signedToken: string): { sessionId: string; expires
     const parts = signedToken.split('.')
     if (parts.length !== 2) return null
     const [payloadB64, signature] = parts
-    const payload = Buffer.from(payloadB64, 'base64url').toString('utf8')
-    const expectedSig = createHmac('sha256', SESSION_SECRET).update(payload).digest('base64url')
+    const expectedSig = createHmac('sha256', SESSION_SECRET).update(payloadB64).digest('base64url')
 
     const sigBuf = Buffer.from(signature)
     const expectedBuf = Buffer.from(expectedSig)
@@ -60,17 +87,17 @@ function verifyTokenSignature(signedToken: string): { sessionId: string; expires
       return null
     }
 
-    const [sessionId, expiresAtStr, isAdminStr] = payload.split(':')
-    const expiresAt = parseInt(expiresAtStr, 10)
-    if (isNaN(expiresAt) || Date.now() > expiresAt) {
-      return null
+    const rawPayload = Buffer.from(payloadB64, 'base64url').toString('utf8')
+    if (rawPayload.includes(':') && !rawPayload.startsWith('{')) {
+      const [sessionId, expiresAtStr, isAdminStr] = rawPayload.split(':')
+      const expiresAt = parseInt(expiresAtStr, 10)
+      if (isNaN(expiresAt) || Date.now() > expiresAt) return null
+      return { sessionId, expiresAt, isAdmin: isAdminStr === '1' }
     }
 
-    return {
-      sessionId,
-      expiresAt,
-      isAdmin: isAdminStr === '1'
-    }
+    const data = JSON.parse(rawPayload) as TokenPayload
+    if (!data.exp || Date.now() > data.exp) return null
+    return { sessionId: data.sid, expiresAt: data.exp, isAdmin: Boolean(data.adm) }
   } catch {
     return null
   }
@@ -123,34 +150,70 @@ export function createSession(data: {
   }
 
   sessionStore.set(sessionId, session)
-  const token = signToken(sessionId, expiresAt, session.isAdmin)
+  const token = signToken(session)
 
   return { session, token }
 }
 
 /**
- * İmzalı token'ı çözer ve sunucu tarafındaki sessionStore'dan doğrular
+ * İmzalı token'ı çözer ve doğrular (Serverless & stateless uyumlu)
  */
 export function verifySessionToken(token: string): ServerSession | null {
   if (!token || typeof token !== 'string') return null
-  const parsed = verifyTokenSignature(token.trim())
-  if (!parsed) return null
+  const cleanToken = token.trim()
+  const parts = cleanToken.split('.')
+  if (parts.length !== 2) return null
 
-  const session = sessionStore.get(parsed.sessionId)
-  if (!session) return null
+  const [payloadB64, signature] = parts
+  const expectedSig = createHmac('sha256', SESSION_SECRET).update(payloadB64).digest('base64url')
 
-  if (Date.now() > session.expiresAt) {
-    sessionStore.delete(parsed.sessionId)
+  const sigBuf = Buffer.from(signature)
+  const expBuf = Buffer.from(expectedSig)
+  if (sigBuf.length !== expBuf.length || !timingSafeEqual(sigBuf, expBuf)) {
     return null
   }
 
-  // İmzalanmış admin flag ile hafızadaki admin flag eşleşmelidir
-  if (parsed.isAdmin !== session.isAdmin) {
-    sessionStore.delete(parsed.sessionId)
+  try {
+    const rawPayload = Buffer.from(payloadB64, 'base64url').toString('utf8')
+
+    // Legacy format fallback: "sessionId:expiresAt:isAdmin"
+    if (rawPayload.includes(':') && !rawPayload.startsWith('{')) {
+      const [sessionId, expiresAtStr] = rawPayload.split(':')
+      const expiresAt = parseInt(expiresAtStr, 10)
+      if (isNaN(expiresAt) || Date.now() > expiresAt) return null
+      const existing = sessionStore.get(sessionId)
+      if (existing && Date.now() <= existing.expiresAt) {
+        return existing
+      }
+      return null
+    }
+
+    const data = JSON.parse(rawPayload) as TokenPayload
+    if (!data.exp || Date.now() > data.exp) {
+      if (data.sid) sessionStore.delete(data.sid)
+      return null
+    }
+
+    const session: ServerSession = {
+      id: data.sid,
+      userEmail: data.email,
+      userName: data.name,
+      companyVkn: data.vkn,
+      companyRole: data.role || 'GÖRÜNTÜLEYİCİ',
+      isCompanyVerified: Boolean(data.ver),
+      isAdmin: Boolean(data.adm),
+      isPremium: Boolean(data.prem),
+      subscriptionPlan: data.plan || 'Standart Plan',
+      tierId: (data.tier || (data.prem ? 'kurumsal-pro' : 'free')) as any,
+      createdAt: data.exp - (7 * 24 * 60 * 60 * 1000),
+      expiresAt: data.exp
+    }
+
+    sessionStore.set(session.id, session)
+    return session
+  } catch {
     return null
   }
-
-  return session
 }
 
 /**
@@ -205,12 +268,21 @@ export function verifyAdminSession(sessionOrToken: ServerSession | string): bool
  */
 export function setSessionCookie(event: H3Event, token: string): void {
   const isProd = process.env.NODE_ENV === 'production'
+  // 🛡️ 1. Güvenli, imzalı ve HttpOnly oturum belirteci (Sunucu ve API uç noktaları için)
   setCookie(event, SESSION_COOKIE_NAME, token, {
     httpOnly: true,
     secure: isProd,
     sameSite: 'lax',
     path: '/',
     maxAge: 7 * 24 * 60 * 60 // 7 gün
+  })
+  // 🛡️ 2. İstemci tarafı Nuxt route middleware doğrulaması için okunabilir bayrak
+  setCookie(event, 'ihb_auth', '1', {
+    httpOnly: false,
+    secure: isProd,
+    sameSite: 'lax',
+    path: '/',
+    maxAge: 7 * 24 * 60 * 60
   })
 }
 
@@ -222,10 +294,14 @@ export function getSessionCookie(event: H3Event): string | null {
 }
 
 /**
- * Oturum cookie'sini siler
+ * Oturum cookie'lerini siler
  */
 export function clearSessionCookie(event: H3Event): void {
   deleteCookie(event, SESSION_COOKIE_NAME, {
+    path: '/',
+    sameSite: 'lax'
+  })
+  deleteCookie(event, 'ihb_auth', {
     path: '/',
     sameSite: 'lax'
   })

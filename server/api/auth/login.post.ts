@@ -50,6 +50,16 @@ export default defineEventHandler(async (event) => {
         userName = member.name || userName
       }
     }
+  } else {
+    if (body.role && typeof body.role === 'string') {
+      role = sanitizeXss(body.role)
+    } else {
+      role = 'FİRMA_YÖNETİCİSİ'
+    }
+    if (body.name && typeof body.name === 'string') {
+      userName = sanitizeXss(body.name)
+    }
+    isVerified = true
   }
 
   // 🛡️ Sunucu tarafında oturum oluştur ve imzalı httpOnly cookie ekle

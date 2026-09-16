@@ -71,7 +71,7 @@ function parseJwt(token: string) {
   }
 }
 
-async function syncServerLogin(emailStr: string, roleStr?: string, vknStr?: string) {
+async function syncServerLogin(emailStr: string, roleStr?: string, vknStr?: string, passStr?: string, nameStr?: string) {
   try {
     const cleanEmail = (emailStr || '').trim().toLowerCase()
     const isAdmin = cleanEmail === 'ihalecib@gmail.com' || cleanEmail === 'admin@ihaleciburada.com' || cleanEmail.includes('admin') || roleStr === 'admin'
@@ -85,11 +85,17 @@ async function syncServerLogin(emailStr: string, roleStr?: string, vknStr?: stri
         method: 'POST',
         body: {
           email: cleanEmail,
-          password: 'demo_auto_session',
-          companyVkn: vknStr || '9560161511'
+          password: passStr || 'demo_auto_session',
+          companyVkn: vknStr || '9560161511',
+          role: roleStr,
+          name: nameStr
         }
       })
     }
+    try {
+      const authCookie = useCookie('ihb_auth')
+      authCookie.value = '1'
+    } catch {}
   } catch (e) {
     console.warn('syncServerLogin warning', e)
   }
@@ -152,9 +158,10 @@ onMounted(() => {
                     }
                     localStorage.setItem('userSession', JSON.stringify(userAccount))
                     registerToAdminKycQueue(userAccount)
-                    window.dispatchEvent(new Event('storage'))
                     await syncServerLogin(cleanEmail, userAccount.role)
-                    router.push(isGoogleAdmin ? '/admin' : '/panel')
+                    const { fetchServerSession } = useUserSession()
+                    await fetchServerSession()
+                    await navigateTo(isGoogleAdmin ? '/admin' : '/panel')
                 }
               }
             },
@@ -329,7 +336,7 @@ function registerToAdminKycQueue(sessionData: any) {
 }
 
 
-function verifyOtp() {
+async function verifyOtp() {
   const entered = (otpInput.value || '').trim()
   if (!entered || entered.length < 6) {
     alert(locale.value === 'tr' ? 'Lütfen 6 haneli onay kodunu giriniz.' : 'Please enter 6-digit verification code.')
@@ -367,15 +374,22 @@ function verifyOtp() {
     window.dispatchEvent(new Event('storage'))
     window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionData }))
 
-    // 🛡️ SEC-001: Sunucu taraflı imzalı httpOnly oturum cookie'sini oluştur
-    $fetch('/api/auth/login', {
-      method: 'POST',
-      body: {
-        email: sessionData.email,
-        password: sessionData.password || 'demo1234',
-        companyVkn: sessionData.taxNo
-      }
-    }).catch(() => {})
+    // 🛡️ SEC-001: Sunucu taraflı imzalı oturum cookie'sini oluştur
+    await syncServerLogin(
+      sessionData.email,
+      sessionData.role || 'company',
+      sessionData.taxNo || '9560161511',
+      sessionData.password || 'demo1234',
+      sessionData.name
+    )
+
+    try {
+      const authCookie = useCookie('ihb_auth')
+      authCookie.value = '1'
+    } catch {}
+
+    const { fetchServerSession } = useUserSession()
+    await fetchServerSession()
 
     // 🛡️ LEG-004 & LEG-006: Hukuki sözleşme ve ticari ileti kabulünü tescil et
     try {
@@ -394,7 +408,7 @@ function verifyOtp() {
     } catch {}
   }
   showOtpModal.value = false
-  router.push(pendingTargetRoute.value || '/panel')
+  await navigateTo(pendingTargetRoute.value || '/panel')
 }
 
 async function resendOtp() {
@@ -567,7 +581,9 @@ function handleOAuth(provider = 'google') {
                 if (isAlreadyRegistered) {
                   alert(`ℹ️ HESAP ZATEN KAYITLI\n\n"${cleanEmail}" Google hesabı ile sistemde zaten kayıtlı bir üyeliğiniz bulunmaktadır.\n\nMevcut hesabınızla güvenli giriş yapıldı ve yönetim panelinize yönlendiriliyorsunuz.`)
                   await syncServerLogin(cleanEmail, userAccount.role)
-                  router.push('/panel')
+                  const { fetchServerSession } = useUserSession()
+                  await fetchServerSession()
+                  await navigateTo('/panel')
                   return
                 } else {
                   // New Google user -> Trigger Email OTP Verification
@@ -587,7 +603,9 @@ function handleOAuth(provider = 'google') {
               }
 
               await syncServerLogin(cleanEmail, userAccount.role)
-              router.push('/panel')
+              const { fetchServerSession } = useUserSession()
+              await fetchServerSession()
+              await navigateTo('/panel')
               return
             } catch (err) {
               console.warn('Google userinfo fetch fallback', err)
@@ -664,7 +682,9 @@ function fallbackGoogleLogin() {
       }
     }
 
-    router.push(isFallbackAdmin ? '/admin' : '/panel')
+    const { fetchServerSession } = useUserSession()
+    await fetchServerSession()
+    await navigateTo(isFallbackAdmin ? '/admin' : '/panel')
   }, 500)
 }
 
@@ -695,7 +715,9 @@ function handleEDevletAuth() {
       }))
     }
     await syncServerLogin(targetEmail, 'company')
-    router.push('/panel')
+    const { fetchServerSession } = useUserSession()
+    await fetchServerSession()
+    await navigateTo('/panel')
   }, 900)
 }
 
@@ -725,7 +747,7 @@ async function handleForgotPassword() {
   forgotSubmitted.value = true
 }
 
-function handleLogin() {
+async function handleLogin() {
   if (!loginEmail.value || !loginPassword.value) {
     errorMessage.value = 'Lütfen e-posta ve şifrenizi girin.'
     return
@@ -734,25 +756,26 @@ function handleLogin() {
   isSubmitting.value = true
   errorMessage.value = ''
 
-  setTimeout(async () => {
-    isSubmitting.value = false
+  try {
+    const cleanEmail = loginEmail.value.trim().toLowerCase()
     let currentSession: any = {}
-    try {
-      currentSession = JSON.parse(localStorage.getItem('userSession') || '{}')
-    } catch (e) {}
+    if (typeof window !== 'undefined') {
+      try {
+        currentSession = JSON.parse(localStorage.getItem('userSession') || '{}')
+      } catch (e) {}
+    }
 
-    const is2Fa = (currentSession.email === loginEmail.value && currentSession.is2FaEnabled === true)
+    const is2Fa = (currentSession.email === cleanEmail && currentSession.is2FaEnabled === true)
 
     if (is2Fa) {
       // Trigger real 2FA verification via modal
-      const clean2FaEmail = loginEmail.value.trim().toLowerCase()
       const regAccounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
-      const matchedAccount = regAccounts[clean2FaEmail] || {}
-      const raw2FaPrefix = clean2FaEmail.split('@')[0]
+      const matchedAccount = regAccounts[cleanEmail] || {}
+      const raw2FaPrefix = cleanEmail.split('@')[0]
       const derived2FaName = raw2FaPrefix.charAt(0).toUpperCase() + raw2FaPrefix.slice(1)
 
       pendingUserSession.value = {
-        email: clean2FaEmail,
+        email: cleanEmail,
         firstName: matchedAccount.firstName || derived2FaName,
         lastName: matchedAccount.lastName || matchedAccount.surname || '',
         surname: matchedAccount.lastName || matchedAccount.surname || '',
@@ -783,78 +806,122 @@ function handleLogin() {
         })
       } catch (e) {}
 
+      isSubmitting.value = false
       showOtpModal.value = true
       return
     }
 
+    const accounts = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('user_accounts_registry') || '{}') : {}
+    const existingAccount = accounts[cleanEmail] || {}
+
+    const rawPrefix = cleanEmail.split('@')[0]
+    const derivedName = rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1).replace(/[^a-zA-Z0-9]/g, ' ')
+
+    const isAdminUser = cleanEmail === 'ihalecib@gmail.com' || 
+                        cleanEmail === 'admin@ihaleciburada.com' || 
+                        cleanEmail.includes('admin') || 
+                        existingAccount.role === 'admin'
+
+    const sessionObj = {
+      email: cleanEmail,
+      firstName: existingAccount.firstName || derivedName,
+      lastName: existingAccount.lastName || existingAccount.surname || '',
+      surname: existingAccount.lastName || existingAccount.surname || '',
+      name: existingAccount.name || (derivedName + (existingAccount.lastName ? ' ' + existingAccount.lastName : '')),
+      username: existingAccount.username || derivedName,
+      company: existingAccount.company || existingAccount.companyName || (derivedName + ' Tedarik'),
+      companyName: existingAccount.companyName || existingAccount.company || (derivedName + ' Tedarik'),
+      phone: existingAccount.phone || '',
+      city: existingAccount.city || 'Balıkesir',
+      role: isAdminUser ? 'admin' : (existingAccount.role || 'company'),
+      verified: true,
+      isPremium: true,
+      subscriptionPlan: existingAccount.subscriptionPlan || 'İlk İhale Ücretsiz'
+    }
+
     if (typeof window !== 'undefined') {
-      const cleanEmail = loginEmail.value.trim().toLowerCase()
-      const accounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
-      const existingAccount = accounts[cleanEmail] || {}
-
-      const rawPrefix = cleanEmail.split('@')[0]
-      const derivedName = rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1).replace(/[^a-zA-Z0-9]/g, ' ')
-
-      const isAdminUser = cleanEmail === 'ihalecib@gmail.com' || 
-                          cleanEmail === 'admin@ihaleciburada.com' || 
-                          cleanEmail.includes('admin') || 
-                          existingAccount.role === 'admin'
-
-      const sessionObj = {
-        email: cleanEmail,
-        firstName: existingAccount.firstName || derivedName,
-        lastName: existingAccount.lastName || existingAccount.surname || '',
-        surname: existingAccount.lastName || existingAccount.surname || '',
-        name: existingAccount.name || (derivedName + (existingAccount.lastName ? ' ' + existingAccount.lastName : '')),
-        username: existingAccount.username || derivedName,
-        company: existingAccount.company || existingAccount.companyName || (derivedName + ' Tedarik'),
-        companyName: existingAccount.companyName || existingAccount.company || (derivedName + ' Tedarik'),
-        phone: existingAccount.phone || '',
-        city: existingAccount.city || 'Balıkesir',
-        role: isAdminUser ? 'admin' : (existingAccount.role || 'company'),
-        verified: true,
-        isPremium: true,
-        subscriptionPlan: existingAccount.subscriptionPlan || 'İlk İhale Ücretsiz'
-      }
-
       if (isAdminUser) {
         localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
       }
-
       localStorage.setItem('userSession', JSON.stringify(sessionObj))
       registerToAdminKycQueue(sessionObj)
       window.dispatchEvent(new Event('storage'))
       window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionObj }))
-
-      // 🛡️ SEC-010: Sunucu tarafı imzalı oturum cookie'sini oluştur
-      await syncServerLogin(cleanEmail, isAdminUser ? 'admin' : (existingAccount.role || 'company'), existingAccount.taxNo)
-
-      if (isAdminUser) {
-        router.push('/admin')
-        return
-      }
     }
-    router.push('/panel')
-  }, 600)
+
+    // 🛡️ SEC-010: Sunucu tarafı imzalı oturum cookie'sini oluştur
+    await syncServerLogin(
+      cleanEmail,
+      isAdminUser ? 'admin' : (existingAccount.role || 'company'),
+      existingAccount.taxNo || '9560161511',
+      loginPassword.value,
+      sessionObj.name
+    )
+
+    try {
+      const authCookie = useCookie('ihb_auth')
+      authCookie.value = '1'
+    } catch {}
+
+    const { fetchServerSession } = useUserSession()
+    await fetchServerSession()
+
+    isSubmitting.value = false
+
+    if (isAdminUser) {
+      await navigateTo('/admin')
+    } else {
+      await navigateTo('/panel')
+    }
+  } catch (err: any) {
+    isSubmitting.value = false
+    errorMessage.value = err?.statusMessage || err?.message || 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol ediniz.'
+  }
 }
 
 async function handleDemoLogin(role: 'company' | 'individual') {
-  const targetEmail = role === 'company' ? 'firma_demo@ihaleciburada.com' : 'kullanici_demo@ihaleciburada.com'
-  if (typeof window !== 'undefined') {
-    localStorage.setItem('userSession', JSON.stringify({
+  isSubmitting.value = true
+  errorMessage.value = ''
+  try {
+    const targetEmail = role === 'company' ? 'firma_demo@ihaleciburada.com' : 'kullanici_demo@ihaleciburada.com'
+    const sessionObj = {
       email: targetEmail,
       firstName: role === 'company' ? 'Kemal' : 'Ahmet',
       name: role === 'company' ? 'Kemal Yılmaz' : 'Ahmet Yıldız',
       company: role === 'company' ? 'Yılmaz Tekstil A.Ş.' : 'Bireysel Üye',
-      role: role,
+      role: role === 'company' ? 'company' : 'individual',
       verified: true,
       isPremium: true,
       subscriptionPlan: 'İlk İhale Ücretsiz'
-    }))
+    }
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('userSession', JSON.stringify(sessionObj))
+      window.dispatchEvent(new Event('storage'))
+      window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionObj }))
+    }
+    // 🛡️ SEC-010: Demo girişi için geçerli sunucu oturum cookie'si oluştur
+    await syncServerLogin(
+      targetEmail,
+      role === 'company' ? 'FİRMA_YÖNETİCİSİ' : 'GÖRÜNTÜLEYİCİ',
+      role === 'company' ? '9560161511' : undefined,
+      'demo_auto_session',
+      sessionObj.name
+    )
+
+    try {
+      const authCookie = useCookie('ihb_auth')
+      authCookie.value = '1'
+    } catch {}
+
+    const { fetchServerSession } = useUserSession()
+    await fetchServerSession()
+
+    isSubmitting.value = false
+    await navigateTo('/panel')
+  } catch (e: any) {
+    isSubmitting.value = false
+    errorMessage.value = e?.message || 'Demo girişi başarısız.'
   }
-  // 🛡️ SEC-010: Demo girişi için geçerli sunucu oturum cookie'si oluştur
-  await syncServerLogin(targetEmail, role, role === 'company' ? '9560161511' : undefined)
-  router.push('/panel')
 }
 </script>
 
@@ -1298,6 +1365,29 @@ async function handleDemoLogin(role: 'company' | 'individual') {
               <span>{{ isSubmitting ? ('Giriş Yapılıyor...') : ('Giriş Yap') }}</span>
               <ChevronRight v-if="!isSubmitting" :size="14" />
             </button>
+
+            <!-- Hızlı Test / Demo Giriş Seçenekleri -->
+            <div class="pt-3 border-t border-slate-200">
+              <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">Hızlı Test / Demo Erişimi</span>
+              <div class="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  @click="handleDemoLogin('company')"
+                  class="py-2.5 px-3 bg-slate-100 hover:bg-teal-50 hover:border-teal-300 hover:text-teal-900 text-slate-700 text-[11px] font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200"
+                >
+                  <Building2 :size="14" class="text-teal-600 shrink-0" />
+                  <span>Kurumsal Demo</span>
+                </button>
+                <button
+                  type="button"
+                  @click="handleDemoLogin('individual')"
+                  class="py-2.5 px-3 bg-slate-100 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-900 text-slate-700 text-[11px] font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200"
+                >
+                  <User :size="14" class="text-blue-600 shrink-0" />
+                  <span>Bireysel Demo</span>
+                </button>
+              </div>
+            </div>
           </form>
         </div>
 

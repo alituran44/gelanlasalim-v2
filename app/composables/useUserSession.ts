@@ -264,6 +264,10 @@ export function useUserSession() {
           ...res.user
         }
         saveSessionToStorage()
+        try {
+          const authCookie = useCookie('ihb_auth')
+          authCookie.value = '1'
+        } catch {}
       } else {
         serverSession.value = null
       }
@@ -272,12 +276,16 @@ export function useUserSession() {
     }
   }
 
-  async function serverLogin(payload: { email: string; password?: string; companyVkn?: string }) {
+  async function serverLogin(payload: { email: string; password?: string; companyVkn?: string; role?: string; name?: string }) {
     const res: any = await $fetch('/api/auth/login', {
       method: 'POST',
       body: payload
     })
     if (res?.success && res.user) {
+      try {
+        const authCookie = useCookie('ihb_auth')
+        authCookie.value = '1'
+      } catch {}
       await fetchServerSession()
     }
     return res
@@ -294,6 +302,10 @@ export function useUserSession() {
     serverSession.value = null
     userSession.value = {}
     if (typeof window !== 'undefined') {
+      try {
+        const authCookie = useCookie('ihb_auth')
+        authCookie.value = null
+      } catch {}
       localStorage.removeItem('userSession')
       localStorage.removeItem('auth_token')
       localStorage.removeItem('adminToken')
