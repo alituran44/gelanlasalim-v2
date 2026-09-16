@@ -1,5 +1,5 @@
 import type { H3Event } from 'h3'
-import { setCookie, getCookie, deleteCookie } from 'h3'
+import { setCookie, getCookie, deleteCookie, getRequestProtocol } from 'h3'
 import { createHmac, randomBytes, timingSafeEqual } from 'node:crypto'
 import type { CompanyRole } from './companyVerificationStore'
 
@@ -264,14 +264,31 @@ export function verifyAdminSession(sessionOrToken: ServerSession | string): bool
 }
 
 /**
+ * İstek protokolünün gerçekten HTTPS olup olmadığını saptar
+ * Localhost, 127.0.0.1 ve düz HTTP test ortamlarında tarayıcının çerezleri reddetmesini önler.
+ */
+export function isRequestHttps(event: H3Event): boolean {
+  try {
+    const host = (event.node?.req?.headers?.['host'] || '').toLowerCase()
+    if (host.includes('localhost') || host.includes('127.0.0.1')) {
+      return false
+    }
+    const proto = getRequestProtocol(event)
+    return proto === 'https'
+  } catch {
+    return false
+  }
+}
+
+/**
  * İmzalı oturum cookie'sini HTTP cevabına ekler
  */
 export function setSessionCookie(event: H3Event, token: string): void {
-  const isProd = process.env.NODE_ENV === 'production'
+  const isHttps = isRequestHttps(event)
   // 🛡️ 1. Güvenli, imzalı ve HttpOnly oturum belirteci (Sunucu ve API uç noktaları için)
   setCookie(event, SESSION_COOKIE_NAME, token, {
     httpOnly: true,
-    secure: isProd,
+    secure: isHttps,
     sameSite: 'lax',
     path: '/',
     maxAge: 7 * 24 * 60 * 60 // 7 gün
@@ -279,7 +296,7 @@ export function setSessionCookie(event: H3Event, token: string): void {
   // 🛡️ 2. İstemci tarafı Nuxt route middleware doğrulaması için okunabilir bayrak
   setCookie(event, 'ihb_auth', '1', {
     httpOnly: false,
-    secure: isProd,
+    secure: isHttps,
     sameSite: 'lax',
     path: '/',
     maxAge: 7 * 24 * 60 * 60

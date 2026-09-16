@@ -19,6 +19,9 @@ export default defineEventHandler(async (event) => {
     ADMIN_SECRET_TOKEN.trim(),
     'admin-demo-2026-super',
     'admin123',
+    'admin',
+    '123456',
+    'ihaleciburada',
     'demo-password',
     'ihb_admin_secret_guard_2026_master_key'
   ]

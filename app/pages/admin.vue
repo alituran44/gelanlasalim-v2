@@ -1202,6 +1202,13 @@ async function handleLogin() {
     if (res?.success && res.isAdmin) {
       isLoggedIn.value = true
       authError.value = ''
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
+      }
+      try {
+        const authCookie = useCookie('ihb_auth')
+        authCookie.value = '1'
+      } catch {}
       triggerToast('Yönetim ve Operasyon paneline başarıyla giriş yapıldı!', 'success')
       syncLiveState()
       fetchGibLogs()
@@ -1217,6 +1224,12 @@ async function handleLogin() {
 
   authError.value = 'Hatalı e-posta adresi veya yetkisiz yönetici parolası.'
   isLoggedIn.value = false
+}
+
+async function quickAdminDemoLogin() {
+  email.value = 'admin@ihaleciburada.com'
+  password.value = 'admin123'
+  await handleLogin()
 }
 
 async function handleLogout() {
@@ -2188,6 +2201,15 @@ function removeSubmittedBid(index: number) {
 
           <button type="submit" class="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-xs font-black text-white hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 cursor-pointer">
             Operasyon Merkezine Giriş Yap
+          </button>
+
+          <button 
+            type="button" 
+            @click="quickAdminDemoLogin" 
+            class="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 py-2.5 text-xs font-bold transition border border-emerald-600/30 cursor-pointer"
+          >
+            <Zap :size="14" />
+            <span>⚡ Hızlı Demo Girişi (1 Tık)</span>
           </button>
         </form>
       </div>

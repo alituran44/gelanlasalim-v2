@@ -74,7 +74,7 @@ function parseJwt(token: string) {
 async function syncServerLogin(emailStr: string, roleStr?: string, vknStr?: string, passStr?: string, nameStr?: string) {
   try {
     const cleanEmail = (emailStr || '').trim().toLowerCase()
-    const isAdmin = cleanEmail === 'ihalecib@gmail.com' || cleanEmail === 'admin@ihaleciburada.com' || cleanEmail.includes('admin') || roleStr === 'admin'
+    const isAdmin = cleanEmail === 'ihalecib@gmail.com' || cleanEmail === 'admin@ihaleciburada.com' || cleanEmail.startsWith('admin@') || roleStr === 'admin'
     if (isAdmin) {
       await $fetch('/api/auth/admin-login', {
         method: 'POST',
@@ -819,7 +819,7 @@ async function handleLogin() {
 
     const isAdminUser = cleanEmail === 'ihalecib@gmail.com' || 
                         cleanEmail === 'admin@ihaleciburada.com' || 
-                        cleanEmail.includes('admin') || 
+                        cleanEmail.startsWith('admin@') || 
                         existingAccount.role === 'admin'
 
     const sessionObj = {
@@ -879,10 +879,49 @@ async function handleLogin() {
   }
 }
 
-async function handleDemoLogin(role: 'company' | 'individual') {
+async function handleDemoLogin(role: 'company' | 'individual' | 'admin') {
   isSubmitting.value = true
   errorMessage.value = ''
   try {
+    if (role === 'admin') {
+      const targetEmail = 'admin@ihaleciburada.com'
+      const sessionObj = {
+        email: targetEmail,
+        firstName: 'Sistem',
+        name: 'Sistem Yöneticisi (Admin)',
+        company: 'İhaleciBurada Yönetim Suite',
+        role: 'admin',
+        verified: true,
+        isAdmin: true,
+        isPremium: true,
+        subscriptionPlan: 'Kurumsal Enterprise (Sistem Yöneticisi)'
+      }
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
+        localStorage.setItem('userSession', JSON.stringify(sessionObj))
+        window.dispatchEvent(new Event('storage'))
+        window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionObj }))
+      }
+      await syncServerLogin(
+        targetEmail,
+        'admin',
+        undefined,
+        'admin123',
+        sessionObj.name
+      )
+      try {
+        const authCookie = useCookie('ihb_auth')
+        authCookie.value = '1'
+      } catch {}
+
+      const { fetchServerSession } = useUserSession()
+      await fetchServerSession()
+
+      isSubmitting.value = false
+      await navigateTo('/admin')
+      return
+    }
+
     const targetEmail = role === 'company' ? 'firma_demo@ihaleciburada.com' : 'kullanici_demo@ihaleciburada.com'
     const sessionObj = {
       email: targetEmail,
@@ -1369,22 +1408,30 @@ async function handleDemoLogin(role: 'company' | 'individual') {
             <!-- Hızlı Test / Demo Giriş Seçenekleri -->
             <div class="pt-3 border-t border-slate-200">
               <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">Hızlı Test / Demo Erişimi</span>
-              <div class="grid grid-cols-2 gap-2">
+              <div class="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   @click="handleDemoLogin('company')"
-                  class="py-2.5 px-3 bg-slate-100 hover:bg-teal-50 hover:border-teal-300 hover:text-teal-900 text-slate-700 text-[11px] font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200"
+                  class="py-2.5 px-2 bg-slate-100 hover:bg-teal-50 hover:border-teal-300 hover:text-teal-900 text-slate-700 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer border border-slate-200"
                 >
-                  <Building2 :size="14" class="text-teal-600 shrink-0" />
-                  <span>Kurumsal Demo</span>
+                  <Building2 :size="13" class="text-teal-600 shrink-0" />
+                  <span>🏢 Kurumsal</span>
                 </button>
                 <button
                   type="button"
                   @click="handleDemoLogin('individual')"
-                  class="py-2.5 px-3 bg-slate-100 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-900 text-slate-700 text-[11px] font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-slate-200"
+                  class="py-2.5 px-2 bg-slate-100 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-900 text-slate-700 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer border border-slate-200"
                 >
-                  <User :size="14" class="text-blue-600 shrink-0" />
-                  <span>Bireysel Demo</span>
+                  <User :size="13" class="text-blue-600 shrink-0" />
+                  <span>👤 Bireysel</span>
+                </button>
+                <button
+                  type="button"
+                  @click="handleDemoLogin('admin')"
+                  class="py-2.5 px-2 bg-slate-100 hover:bg-amber-50 hover:border-amber-300 hover:text-amber-900 text-slate-700 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer border border-slate-200"
+                >
+                  <ShieldCheck :size="13" class="text-amber-600 shrink-0" />
+                  <span>👑 Yönetici</span>
                 </button>
               </div>
             </div>
