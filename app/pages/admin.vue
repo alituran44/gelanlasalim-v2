@@ -1152,22 +1152,21 @@ onMounted(async () => {
       adminTheme.value = 'light'
     }
 
-    // 🛡️ Sunucu tarafı oturum kontrolü (/api/auth/me)
+    // 🛡️ SEC-011 (Katman 5): Sunucu tarafı kesin oturum kontrolü (/api/auth/me)
     try {
-      const meRes = await $fetch<{ ok: boolean; authenticated: boolean; user?: any; isAdmin?: boolean }>('/api/auth/me')
-      if (meRes?.isAdmin) {
+      const meRes = await $fetch<{ success: boolean; isAuthenticated: boolean; isAdmin?: boolean; user?: any }>('/api/auth/me')
+      if (meRes?.isAdmin || meRes?.user?.isAdmin) {
         isLoggedIn.value = true
-        localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
       } else {
-        const token = localStorage.getItem('adminToken')
-        if (token === 'ihaleciburada_authorized_session') {
-          isLoggedIn.value = true
+        isLoggedIn.value = false
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('adminToken')
         }
       }
     } catch {
-      const token = localStorage.getItem('adminToken')
-      if (token === 'ihaleciburada_authorized_session') {
-        isLoggedIn.value = true
+      isLoggedIn.value = false
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('adminToken')
       }
     }
 
@@ -1201,9 +1200,6 @@ async function handleLogin() {
     })
 
     if (res?.success && res.isAdmin) {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
-      }
       isLoggedIn.value = true
       authError.value = ''
       triggerToast('Yönetim ve Operasyon paneline başarıyla giriş yapıldı!', 'success')
@@ -1215,23 +1211,12 @@ async function handleLogin() {
   } catch (err: any) {
     const msg = err?.data?.statusMessage || 'Hatalı e-posta veya yetkisiz yönetici parolası.'
     authError.value = msg
+    isLoggedIn.value = false
     return
   }
 
-  // Güvenli yedek doğrulama
-  if (
-    (e === 'ihalecib@gmail.com' || e === 'admin@ihaleciburada.com' || e === 'admin_test@ihaleciburada.com' || e === 'admin') &&
-    (p === 'admin123' || p === 'demo-password' || p === 'admin' || p === '123456')
-  ) {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
-    }
-    isLoggedIn.value = true
-    authError.value = ''
-    triggerToast('Yönetim ve Operasyon paneline başarıyla giriş yapıldı!', 'success')
-  } else {
-    authError.value = 'Hatalı e-posta adresi veya geçersiz yönetici şifresi.'
-  }
+  authError.value = 'Hatalı e-posta adresi veya yetkisiz yönetici parolası.'
+  isLoggedIn.value = false
 }
 
 async function handleLogout() {

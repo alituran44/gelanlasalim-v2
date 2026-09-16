@@ -11,6 +11,9 @@ export interface ServerSession {
   companyRole?: CompanyRole | string
   isCompanyVerified: boolean
   isAdmin: boolean
+  isPremium: boolean
+  subscriptionPlan: string
+  tierId: 'free' | 'kurumsal-pro' | 'kurumsal-enterprise'
   createdAt: number
   expiresAt: number
 }
@@ -73,6 +76,8 @@ function verifyTokenSignature(signedToken: string): { sessionId: string; expires
   }
 }
 
+import { getSubscription } from './subscriptionStore'
+
 /**
  * Yeni bir sunucu oturumu oluşturur ve imzalı token üretir
  */
@@ -83,12 +88,24 @@ export function createSession(data: {
   companyRole?: CompanyRole | string
   isCompanyVerified?: boolean
   isAdmin?: boolean
+  isPremium?: boolean
+  subscriptionPlan?: string
+  tierId?: 'free' | 'kurumsal-pro' | 'kurumsal-enterprise'
   ttlMs?: number
 }): { session: ServerSession; token: string } {
   const sessionId = randomBytes(24).toString('hex')
   const now = Date.now()
   const ttl = data.ttlMs || 7 * 24 * 60 * 60 * 1000 // 7 gün
   const expiresAt = now + ttl
+
+  const sub = getSubscription(data.companyVkn) || getSubscription(data.userEmail)
+  const isPremium = Boolean(data.isAdmin || data.isPremium || sub?.isPremium)
+  const subscriptionPlan = data.isAdmin
+    ? 'Kurumsal Enterprise (Sistem Yöneticisi)'
+    : (data.subscriptionPlan || sub?.subscriptionPlan || (isPremium ? 'Kurumsal Pro' : 'Standart Plan'))
+  const tierId = (data.isAdmin
+    ? 'kurumsal-enterprise'
+    : (data.tierId || sub?.tierId || (isPremium ? 'kurumsal-pro' : 'free'))) as 'free' | 'kurumsal-pro' | 'kurumsal-enterprise'
 
   const session: ServerSession = {
     id: sessionId,
@@ -98,6 +115,9 @@ export function createSession(data: {
     companyRole: data.companyRole,
     isCompanyVerified: Boolean(data.isCompanyVerified),
     isAdmin: Boolean(data.isAdmin),
+    isPremium,
+    subscriptionPlan,
+    tierId,
     createdAt: now,
     expiresAt
   }

@@ -5,6 +5,8 @@ import { logSecurityEvent } from './securityAuditStore'
 import { getSessionCookie, verifySessionToken, verifyAdminSession } from './sessionStore'
 import { consumePurposeBoundMfaToken, verifyMfaOtp } from './mfaStore'
 
+import { getSubscription } from './subscriptionStore'
+
 export interface UserSessionContext {
   isAuthenticated: boolean
   userEmail: string
@@ -13,6 +15,9 @@ export interface UserSessionContext {
   companyRole?: CompanyRole | string
   isCompanyVerified: boolean
   isAdmin: boolean
+  isPremium: boolean
+  subscriptionPlan: string
+  tierId: 'free' | 'kurumsal-pro' | 'kurumsal-enterprise'
   clientIp: string
 }
 
@@ -81,6 +86,15 @@ export function resolveSession(event: H3Event): UserSessionContext {
         }
       }
 
+      const sub = getSubscription(serverSession.companyVkn) || getSubscription(serverSession.userEmail)
+      const isPremium = Boolean(isAdmin || serverSession.isPremium || sub?.isPremium)
+      const subscriptionPlan = isAdmin
+        ? 'Kurumsal Enterprise (Sistem Yöneticisi)'
+        : (serverSession.subscriptionPlan || sub?.subscriptionPlan || (isPremium ? 'Kurumsal Pro' : 'Standart Plan'))
+      const tierId = (isAdmin
+        ? 'kurumsal-enterprise'
+        : (serverSession.tierId || sub?.tierId || (isPremium ? 'kurumsal-pro' : 'free'))) as 'free' | 'kurumsal-pro' | 'kurumsal-enterprise'
+
       return {
         isAuthenticated: true,
         userEmail: email,
@@ -89,6 +103,9 @@ export function resolveSession(event: H3Event): UserSessionContext {
         companyRole: role,
         isCompanyVerified: isVerified,
         isAdmin,
+        isPremium,
+        subscriptionPlan,
+        tierId,
         clientIp
       }
     }
@@ -102,6 +119,9 @@ export function resolveSession(event: H3Event): UserSessionContext {
       userName: 'Sistem Yöneticisi (Admin)',
       isCompanyVerified: true,
       isAdmin: true,
+      isPremium: true,
+      subscriptionPlan: 'Kurumsal Enterprise (Sistem Yöneticisi)',
+      tierId: 'kurumsal-enterprise',
       clientIp
     }
   }
@@ -113,6 +133,9 @@ export function resolveSession(event: H3Event): UserSessionContext {
     userName: 'Anonim Kullanıcı',
     isCompanyVerified: false,
     isAdmin: false,
+    isPremium: false,
+    subscriptionPlan: 'Yok',
+    tierId: 'free',
     clientIp
   }
 }
@@ -172,6 +195,63 @@ export function requireAdmin(event: H3Event): UserSessionContext {
       statusMessage: 'Yetkisiz işlem: Bu kaynak yalnızca doğrulanmış sistem yöneticilerine açıktır.'
     })
   }
+  return session
+}
+
+/**
+ * 🛡️ SEC-011 (Katman 5): Sunucu Tarafı Zorunlu Aktif Kurumsal Abonelik Denetimi
+ * İstemcinin localStorage veya istek gövdesinde gönderdiği sahte abonelik iddialarını reddeder.
+ * Yalnızca serverSession / subscriptionStore'daki gerçek ve aktif abonelikleri doğrular.
+ */
+export function requireActiveSubscription(
+  event: H3Event,
+  requiredTier?: 'kurumsal-pro' | 'kurumsal-enterprise'
+): UserSessionContext {
+  const session = requireAuth(event)
+
+  // Sistem yöneticisi tüm kurumsal özellikleri kullanabilir
+  if (session.isAdmin) {
+    return session
+  }
+
+  if (!session.isPremium) {
+    logSecurityEvent(event, {
+      eventType: 'SUBSCRIPTION_REQUIRED',
+      severity: 'MEDIUM',
+      actorEmail: session.userEmail,
+      actorVkn: session.companyVkn,
+      targetResource: event.node?.req?.url || event.path,
+      actionTaken: 'BLOCKED_403',
+      details: {
+        message: 'Bu kurumsal özellik için aktif bir abonelik gereklidir.',
+        requiredTier: requiredTier || 'kurumsal-pro'
+      }
+    })
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Bu özellik için aktif bir kurumsal abonelik gereklidir. Lütfen abonelik paketinizi yükseltin.'
+    })
+  }
+
+  if (requiredTier === 'kurumsal-enterprise' && session.tierId !== 'kurumsal-enterprise') {
+    logSecurityEvent(event, {
+      eventType: 'SUBSCRIPTION_TIER_INSUFFICIENT',
+      severity: 'LOW',
+      actorEmail: session.userEmail,
+      actorVkn: session.companyVkn,
+      targetResource: event.node?.req?.url || event.path,
+      actionTaken: 'BLOCKED_403',
+      details: {
+        required: 'kurumsal-enterprise',
+        actual: session.tierId
+      }
+    })
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Bu işlem Kurumsal Enterprise seviyesi abonelik gerektirmektedir.'
+    })
+  }
+
   return session
 }
 

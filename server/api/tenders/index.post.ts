@@ -1,9 +1,15 @@
-import { addTender, TenderItem } from '~~/server/utils/tendersStore'
-import { addGibLog } from '~~/server/utils/gibAuditStore'
-import { sendViaGoogleSmtp, getStoredSmtpConfig } from '~~/server/utils/smtpClient'
+import { defineEventHandler, readBody, setHeader, createError, getRequestHeaders } from 'h3'
+import { addTender, TenderItem } from '../../utils/tendersStore'
+import { addGibLog } from '../../utils/gibAuditStore'
+import { sendViaGoogleSmtp, getStoredSmtpConfig } from '../../utils/smtpClient'
+import { requireAuth, requireRole } from '../../utils/authGuard'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
+  // 🛡️ SEC-001 & SEC-003: Oturum ve İhale Açma Yetkisi Zorunludur
+  const session = requireAuth(event)
+  requireRole(event, ['FİRMA_YÖNETİCİSİ', 'SATIN_ALMA', 'İHALE_ONAYLAYICISI', 'ADMIN'])
+
   try {
     const body = await readBody<Partial<TenderItem>>(event)
     if (!body || !body.baslik) {
@@ -25,8 +31,8 @@ export default defineEventHandler(async (event) => {
       mainCategory: body.mainCategory || body.kategori || 'Genel',
       subCategory: body.subCategory || 'Malzeme & Hizmet',
       city: body.city || body.sehir || 'Türkiye',
-      ownerCompany: body.ownerCompany || 'Firma Sahibi',
-      ownerEmail: body.ownerEmail || '',
+      ownerCompany: body.ownerCompany || session.companyVkn || 'Firma Sahibi',
+      ownerEmail: session.userEmail,
       authority: body.authority || 'Yetkili Satın Alma Komisyonu',
       butce: body.butce || '💬 Teklif Usulü',
       sure: body.sure || '7 gün kaldı',

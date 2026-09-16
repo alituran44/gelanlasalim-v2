@@ -2,58 +2,16 @@
 import { ref, computed, onMounted } from 'vue'
 import AppButton from "~/components/ui/AppButton.vue"
 
-const userSession = ref<any>(null)
+import { useUserSession } from '~/composables/useUserSession'
 
-const isLoggedIn = computed(() => {
-  if (!userSession.value) return false
-  return !!(userSession.value.email || userSession.value.name || userSession.value.username)
-})
-
-const isAdmin = computed(() => {
-  if (!userSession.value) {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('adminToken') === 'ihaleciburada_authorized_session'
-    }
-    return false
-  }
-  const email = (userSession.value.email || '').trim().toLowerCase()
-  const role = userSession.value.role || ''
-  return role === 'admin' || 
-         email === 'ihalecib@gmail.com' || 
-         email === 'admin@ihaleciburada.com' || 
-         email.includes('admin') ||
-         (typeof window !== 'undefined' && localStorage.getItem('adminToken') === 'ihaleciburada_authorized_session')
-})
-
-function checkSession() {
-  if (typeof window !== 'undefined') {
-    try {
-      const raw = localStorage.getItem('userSession')
-      if (raw && raw !== 'null' && raw !== 'undefined' && raw !== '{}') {
-        userSession.value = JSON.parse(raw)
-      } else {
-        userSession.value = null
-      }
-    } catch {
-      userSession.value = null
-    }
-  }
-}
+const { userSession, isLoggedIn, isAdmin, logout } = useUserSession()
 
 function handleLogout() {
+  logout()
   if (typeof window !== 'undefined') {
-    localStorage.removeItem('userSession')
-    localStorage.removeItem('guestSession')
     window.location.reload()
   }
 }
-
-onMounted(() => {
-  checkSession()
-  if (typeof window !== 'undefined') {
-    window.addEventListener('storage', checkSession)
-  }
-})
 
 const menu = [
   { title: "İhaleler", to: "/pazar-yeri" },

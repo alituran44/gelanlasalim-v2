@@ -1,8 +1,12 @@
 import { defineEventHandler, readBody } from 'h3'
 import crypto from 'node:crypto'
 import { formatForSap, formatForLogo, formatForMikro } from './schemas'
+import { requireActiveSubscription } from '../../../utils/authGuard'
 
 export default defineEventHandler(async (event) => {
+  // 🛡️ SEC-011 (Katman 5): ERP Webhook dağıtımı Kurumsal Pro veya Enterprise aboneliği gerektirir
+  requireActiveSubscription(event, 'kurumsal-pro')
+
   const body = await readBody(event) || {}
   const { webhookUrl, secretKey, erpSystem, eventType, data } = body
 

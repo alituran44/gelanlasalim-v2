@@ -7,13 +7,17 @@ export default defineEventHandler((event) => {
   return {
     success: true,
     isAuthenticated: session.isAuthenticated,
+    isAdmin: session.isAdmin,
     user: session.isAuthenticated ? {
       email: session.userEmail,
       name: session.userName,
       companyVkn: session.companyVkn,
       companyRole: session.companyRole,
       isCompanyVerified: session.isCompanyVerified,
-      isAdmin: session.isAdmin
+      isAdmin: session.isAdmin,
+      isPremium: session.isPremium,
+      subscriptionPlan: session.subscriptionPlan,
+      tierId: session.tierId
     } : null
   }
 })

@@ -38,6 +38,22 @@ export interface UserSessionData {
   [key: string]: any
 }
 
+export interface ServerVerifiedSession {
+  isAuthenticated: boolean
+  userEmail: string
+  userName: string
+  companyVkn?: string
+  companyRole?: string
+  isCompanyVerified: boolean
+  isAdmin: boolean
+  isPremium: boolean
+  subscriptionPlan: string
+  tierId?: string
+}
+
+// 🛡️ SEC-011: Sunucu Tarafından Doğrulanmış Oturum (Trusted Server State)
+// Yetkilendirme (role, isAdmin, isPremium vb.) KESİNLİKLE buna dayanır.
+const serverSession = ref<ServerVerifiedSession | null>(null)
 const userSession = ref<UserSessionData>({})
 const isInitialized = ref(false)
 
@@ -75,21 +91,34 @@ export function useUserSession() {
     isInitialized.value = true
     loadSessionFromStorage()
     fetchServerSession()
-    window.addEventListener('storage', loadSessionFromStorage)
+    window.addEventListener('storage', () => {
+      loadSessionFromStorage()
+      fetchServerSession()
+    })
     window.addEventListener('session-updated', loadSessionFromStorage)
-    window.addEventListener('user-session-changed', loadSessionFromStorage)
+    window.addEventListener('user-session-changed', () => {
+      loadSessionFromStorage()
+      fetchServerSession()
+    })
   }
 
+  // 🛡️ SEC-011: Oturum durumu öncelikle sunucu doğrulamasına dayanır
   const isLoggedIn = computed(() => {
+    if (serverSession.value) return serverSession.value.isAuthenticated
     return !!(userSession.value?.email || userSession.value?.name || userSession.value?.firstName)
   })
 
   // Bireysel (Kişisel) vs Kurumsal (Firma) Modu
   const isCompanyMode = computed(() => {
+    if (serverSession.value) {
+      return Boolean(serverSession.value.companyVkn && serverSession.value.companyRole !== 'GÖRÜNTÜLEYİCİ')
+    }
     return userSession.value?.isCompanyActive === true || userSession.value?.role === 'company'
   })
 
+  // UI Görüntüleme için İsim (Güvenlik kararlarında kullanılmaz)
   const userName = computed(() => {
+    if (serverSession.value?.userName) return serverSession.value.userName
     if (userSession.value?.name && userSession.value.name.trim()) {
       return userSession.value.name.trim()
     }
@@ -107,7 +136,7 @@ export function useUserSession() {
     return 'Kullanıcı'
   })
 
-  const userEmail = computed(() => userSession.value?.email || '')
+  const userEmail = computed(() => serverSession.value?.userEmail || userSession.value?.email || '')
   const userPhone = computed(() => userSession.value?.phone || '')
 
   const companyName = computed(() => {
@@ -122,64 +151,61 @@ export function useUserSession() {
     return userSession.value?.isEmailVerified === true || userSession.value?.emailVerified === true
   })
 
-  // 🛡️ VER-001 & VER-004: Firma Doğrulama & Yetkililik Durumu
+  // 🛡️ VER-001 & SEC-011: Firma Doğrulama & Yetkililik Durumu (Sunucu Teyitli)
   const isCompanyVerified = computed(() => {
-    return userSession.value?.isCompanyVerified === true || 
-           userSession.value?.companyVerificationStatus === 'VERIFIED' ||
-           userSession.value?.taxNo === '9560161511' ||
-           userSession.value?.email?.includes('ihalecib') ||
-           userSession.value?.email?.includes('demo')
+    if (serverSession.value) {
+      return serverSession.value.isCompanyVerified === true
+    }
+    return false
   })
 
+  // 🛡️ SEC-011: Firma Rolü (Sunucu Tarafı Teyitli)
   const companyRole = computed(() => {
-    return userSession.value?.companyRole || (isCompanyMode.value ? 'FİRMA_YÖNETİCİSİ' : 'GÖRÜNTÜLEYİCİ')
+    if (serverSession.value?.companyRole) {
+      return serverSession.value.companyRole
+    }
+    return 'GÖRÜNTÜLEYİCİ'
   })
 
   const companyVkn = computed(() => {
-    return userSession.value?.taxNo || userSession.value?.vkn || '9560161511'
+    return serverSession.value?.companyVkn || userSession.value?.taxNo || userSession.value?.vkn || '9560161511'
   })
 
   const canSubmitBid = computed(() => {
-    return isCompanyVerified.value && ['FİRMA_YÖNETİCİSİ', 'SATIN_ALMA', 'TEKLİF_YETKİLİSİ'].includes(companyRole.value)
+    return isCompanyVerified.value && ['FİRMA_YÖNETİCİSİ', 'SATIN_ALMA', 'TEKLİF_YETKİLİSİ', 'ADMIN'].includes(companyRole.value)
   })
 
-  // 👑 ADM-001: Süper Admin Yetkisi Tespiti
+  // 👑 ADM-001 & SEC-011: Süper Admin Yetkisi (SADECE Sunucu Tarafı Teyitli!)
+  // localStorage veya istemci token aldatmacalarına KESİNLİKLE İZİN VERİLMEZ.
   const isAdmin = computed(() => {
-    const email = (userSession.value?.email || '').trim().toLowerCase()
-    const role = userSession.value?.role || ''
-    const hasAdminToken = typeof window !== 'undefined' && localStorage.getItem('adminToken') === 'ihaleciburada_authorized_session'
-    return role === 'admin' ||
-           email === 'ihalecib@gmail.com' ||
-           email === 'admin@ihaleciburada.com' ||
-           email.includes('admin') ||
-           hasAdminToken
+    return serverSession.value?.isAdmin === true
   })
 
-  // 💎 Abonelik & Kurumsal Paket Yetkileri (Pro vs Enterprise)
+  // 💎 SEC-011: Abonelik & Premium Yetkileri (SADECE Sunucu Tarafı Teyitli!)
   const isPremiumUser = computed(() => {
-    return userSession.value?.isPremium === true
+    return serverSession.value?.isPremium === true
   })
 
   const subscriptionPlan = computed(() => {
-    return userSession.value?.subscriptionPlan || ''
+    return serverSession.value?.subscriptionPlan || 'Standart Plan'
   })
 
   // Kurumsal Pro: Pro veya Enterprise (Enterprise üst paket olup Pro özelliklerini de kapsar)
   const isCorporatePro = computed(() => {
-    if (!userSession.value?.isPremium) return false
-    const plan = (userSession.value?.subscriptionPlan || '').toLowerCase()
-    const tierId = userSession.value?.tierId || ''
+    if (!serverSession.value?.isPremium) return false
+    const plan = (serverSession.value?.subscriptionPlan || '').toLowerCase()
+    const tierId = serverSession.value?.tierId || ''
     return tierId === 'kurumsal-pro' || 
            tierId === 'kurumsal-enterprise' || 
            plan.includes('pro') || 
            plan.includes('enterprise')
   })
 
-  // Kurumsal Enterprise: Yalnızca Kurumsal Enterprise paketi seçip ödemesini yapanlar
+  // Kurumsal Enterprise: Yalnızca Kurumsal Enterprise paketi olanlar
   const isCorporateEnterprise = computed(() => {
-    if (!userSession.value?.isPremium) return false
-    const plan = (userSession.value?.subscriptionPlan || '').toLowerCase()
-    const tierId = userSession.value?.tierId || ''
+    if (!serverSession.value?.isPremium) return false
+    const plan = (serverSession.value?.subscriptionPlan || '').toLowerCase()
+    const tierId = serverSession.value?.tierId || ''
     return tierId === 'kurumsal-enterprise' || 
            plan.includes('enterprise')
   })
@@ -218,18 +244,31 @@ export function useUserSession() {
   }
 
   async function fetchServerSession() {
-    if (typeof window === 'undefined') return
     try {
       const res: any = await $fetch('/api/auth/me')
       if (res?.success && res.isAuthenticated && res.user) {
+        serverSession.value = {
+          isAuthenticated: true,
+          userEmail: res.user.email,
+          userName: res.user.name,
+          companyVkn: res.user.companyVkn,
+          companyRole: res.user.companyRole,
+          isCompanyVerified: Boolean(res.user.isCompanyVerified),
+          isAdmin: Boolean(res.user.isAdmin || res.isAdmin),
+          isPremium: Boolean(res.user.isPremium),
+          subscriptionPlan: res.user.subscriptionPlan || 'Standart Plan',
+          tierId: res.user.tierId || (res.user.isPremium ? 'kurumsal-pro' : 'free')
+        }
         userSession.value = {
           ...userSession.value,
           ...res.user
         }
         saveSessionToStorage()
+      } else {
+        serverSession.value = null
       }
     } catch {
-      // Offline / unauthenticated
+      serverSession.value = null
     }
   }
 
@@ -239,11 +278,7 @@ export function useUserSession() {
       body: payload
     })
     if (res?.success && res.user) {
-      userSession.value = {
-        ...userSession.value,
-        ...res.user
-      }
-      saveSessionToStorage()
+      await fetchServerSession()
     }
     return res
   }
@@ -256,20 +291,20 @@ export function useUserSession() {
   }
 
   function logout() {
+    serverSession.value = null
+    userSession.value = {}
     if (typeof window !== 'undefined') {
       localStorage.removeItem('userSession')
       localStorage.removeItem('auth_token')
-      // Try to clear server cookie asynchronously
+      localStorage.removeItem('adminToken')
       $fetch('/api/auth/logout', { method: 'POST' }).catch(() => {})
-    }
-    userSession.value = {}
-    if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('storage'))
       window.dispatchEvent(new CustomEvent('session-updated'))
     }
   }
 
   return {
+    serverSession,
     userSession,
     isLoggedIn,
     isCompanyMode,
