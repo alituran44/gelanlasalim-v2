@@ -105,9 +105,15 @@ async function testBackupCycle() {
       method: 'POST',
       body: { phoneOrEmail: 'admin@ihaleciburada.com', purpose: 'SYSTEM_RESTORE' }
     })
-    let mfaCode = mfaSend?.demoCode
+    let mfaCode = ''
+    if (import.meta.dev) {
+      try {
+        const inspect = await $fetch<any>('/api/dev/mfa-inspect', { query: { phoneOrEmail: 'admin@ihaleciburada.com' } })
+        if (inspect?.code) mfaCode = inspect.code
+      } catch {}
+    }
     if (!mfaCode) {
-      mfaCode = prompt('Yedekleme Döngü Testi Onayı: 6 haneli MFA kodunu giriniz:')
+      mfaCode = prompt('Yedekleme Döngü Testi Onayı: E-posta ile iletilen 6 haneli MFA kodunu giriniz:')
     }
     if (!mfaCode) return
 
@@ -156,9 +162,15 @@ async function handleFileUpload(e: Event) {
       method: 'POST',
       body: { phoneOrEmail: 'admin@ihaleciburada.com', purpose: 'SYSTEM_RESTORE' }
     })
-    let mfaCode = mfaSend?.demoCode
+    let mfaCode = ''
+    if (import.meta.dev) {
+      try {
+        const inspect = await $fetch<any>('/api/dev/mfa-inspect', { query: { phoneOrEmail: 'admin@ihaleciburada.com' } })
+        if (inspect?.code) mfaCode = inspect.code
+      } catch {}
+    }
     if (!mfaCode) {
-      mfaCode = prompt('Kritik Sistem Geri Yükleme Onayı: 6 haneli MFA kodunu giriniz:')
+      mfaCode = prompt('Kritik Sistem Geri Yükleme Onayı: E-posta ile iletilen 6 haneli MFA kodunu giriniz:')
     }
     if (!mfaCode) throw new Error('MFA doğrulaması iptal edildi.')
 

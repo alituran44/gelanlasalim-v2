@@ -54,7 +54,6 @@ const mfaPhone = ref('')
 const mfaPurpose = ref('HIGH_VALUE_AWARD')
 const mfaCodeSent = ref(false)
 const mfaInputCode = ref('')
-const mfaDemoCode = ref('')
 const mfaStatusMessage = ref('')
 const isSendingMfa = ref(false)
 const isVerifyingMfa = ref(false)
@@ -112,8 +111,7 @@ async function sendMfaOtp() {
 
     if (res?.success) {
       mfaCodeSent.value = true
-      mfaDemoCode.value = res.demoCode || ''
-      mfaStatusMessage.value = `SMS kodu gönderildi! Test Kodu: ${res.demoCode}`
+      mfaStatusMessage.value = res.message || 'Güvenlik doğrulama kodu başarıyla iletildi.'
     }
   } catch (e: any) {
     alert('MFA kod gönderim hatası: ' + (e.data?.message || e.message))
@@ -330,9 +328,9 @@ async function verifyMfaOtpCode() {
           <!-- Kod Doğrulama Alanı -->
           <div v-else class="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 space-y-3">
             <div class="flex items-center justify-between text-[11px]">
-              <span class="font-bold text-blue-900">SMS Güvenlik Kodu Giriniz:</span>
-              <span v-if="mfaDemoCode" class="font-mono font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded">
-                Test Kodu: {{ mfaDemoCode }}
+              <span class="font-bold text-blue-900">SMS / E-Posta Güvenlik Kodu Giriniz:</span>
+              <span class="font-mono text-[10px] font-bold text-blue-600 bg-blue-100/70 px-2 py-0.5 rounded">
+                ⏱️ 3 Dakika Geçerli
               </span>
             </div>
 

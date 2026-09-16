@@ -173,3 +173,14 @@ export function consumePurposeBoundMfaToken(
     return { valid: false, error: err?.message || 'MFA token doğrulanırken hata oluştu.' }
   }
 }
+
+/**
+ * 🔒 Yalnızca Yerel Geliştirme/Test Amaçlı (Production ortamında kesinlikle undefined döner)
+ */
+export function getMfaOtpForDev(phoneOrEmail: string): MfaOtpRecord | undefined {
+  if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
+    return undefined
+  }
+  return otpStore.get(phoneOrEmail.toLowerCase().trim())
+}
+

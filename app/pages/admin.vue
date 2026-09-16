@@ -1280,7 +1280,13 @@ async function handleFullSystemWipe() {
       method: 'POST',
       body: { phoneOrEmail: 'admin@ihaleciburada.com', purpose: 'ADMIN_WIPE' }
     })
-    let otpCode = sendRes?.demoCode
+    let otpCode = ''
+    if (import.meta.dev) {
+      try {
+        const inspect = await $fetch<any>('/api/dev/mfa-inspect', { query: { phoneOrEmail: 'admin@ihaleciburada.com' } })
+        if (inspect?.code) otpCode = inspect.code
+      } catch {}
+    }
     if (!otpCode) {
       otpCode = prompt('Yönetici Güvenlik Doğrulaması: Lütfen SMS/E-posta ile iletilen 6 haneli MFA kodunu giriniz:')
     }

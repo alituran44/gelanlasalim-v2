@@ -1,4 +1,12 @@
 // nuxt.config.ts
+
+// 🛡️ Katman 3: Derleme zamanı güvenlik denetimi
+// Production ortamında hiçbir koşulda güvensiz MFA bypass / demo sızıntı flag'i açık olamaz
+if ((process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') && 
+    (process.env.ENABLE_MFA_DEMO_CODE === 'true' || process.env.ALLOW_INSECURE_MFA === 'true')) {
+  throw new Error('[SECURITY FATAL] ENABLE_MFA_DEMO_CODE cannot be enabled in production environments (Kural SEC-009)!')
+}
+
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   future: {
