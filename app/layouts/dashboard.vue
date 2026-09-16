@@ -36,14 +36,14 @@ useHead({
   ]
 })
 
-onMounted(() => {
+import { useUserSession } from '~/composables/useUserSession'
+
+const { fetchServerSession } = useUserSession()
+
+onMounted(async () => {
   detectLocale()
-  if (typeof window !== 'undefined') {
-    const raw = localStorage.getItem('userSession')
-    if (!raw || raw === 'null' || raw === 'undefined' || raw === '{}') {
-      router.push('/uyelik')
-    }
-  }
+  // 🛡️ SEC-010: Sayfa açılışında sunucu oturumuyla istemci durumunu senkronize et
+  await fetchServerSession()
 })
 
 const sidebarMenus = computed(() => {
