@@ -366,6 +366,23 @@ export const SECTOR_DEFINITIONS: Record<string, SectorDefinition> = {
         type: "boolean",
         group: "ticari",
         defaultValue: true
+      },
+      {
+        id: "kimden",
+        label: "Kimden (İlan Sahibi / Yetki Statüsü)",
+        type: "select",
+        group: "ticari",
+        required: true,
+        options: ["Sahibinden (Doğrudan Arsa Sahibi)", "Emlak Ofisinden / Gayrimenkul Danışmanı", "Yatırımcı / Müteahhit Portföyünden", "Kamu / Belediye İdaresinden"],
+        defaultValue: "Sahibinden (Doğrudan Arsa Sahibi)"
+      },
+      {
+        id: "takasDurumu",
+        label: "Takas Tekliflerine Açık mı?",
+        type: "select",
+        group: "ticari",
+        options: ["Takasa Kapalı (Yalnızca Nakit / Kat Karşılığı)", "Araç Takasına Açık", "Kat Karşılığı + Nakit Üste", "Değerinde Başka Gayrimenkul ile Takas"],
+        defaultValue: "Takasa Kapalı (Yalnızca Nakit / Kat Karşılığı)"
       }
     ]
   },
@@ -654,6 +671,15 @@ export const SECTOR_DEFINITIONS: Record<string, SectorDefinition> = {
         defaultValue: "KDV Muaf / Şahıs Satışı"
       },
       {
+        id: "kimden",
+        label: "Kimden (İlan Sahibi / Yetki Statüsü)",
+        type: "select",
+        group: "ticari",
+        required: true,
+        options: ["Sahibinden (Doğrudan Mülk Sahibi)", "Emlak Ofisinden / Gayrimenkul Danışmanı", "İnşaat / Müteahhit Firmasından (Birinci El)", "Bankadan / İcradan Satış", "Kamu / Belediye İdaresinden"],
+        defaultValue: "Sahibinden (Doğrudan Mülk Sahibi)"
+      },
+      {
         id: "takasDurumu",
         label: "Takas Tekliflerine Açık mı?",
         type: "select",
@@ -743,16 +769,73 @@ export const SECTOR_DEFINITIONS: Record<string, SectorDefinition> = {
         type: "number",
         group: "ticari",
         unit: "Rampa",
-        placeholder: "Örn: 6",
-        defaultValue: 6
+        placeholder: "Örn: 0",
+        defaultValue: 0
       },
       {
         id: "zeminYukKapasitesi",
         label: "Zemin Taşıma Kapasitesi (Ton/m²)",
         type: "select",
         group: "ticari",
-        options: ["5 Ton/m² Endüstriyel Helikopter Zemin", "7.5 Ton/m² Ağır Yük Zemin", "Standart Ticari Zemin"],
-        defaultValue: "5 Ton/m² Endüstriyel Helikopter Zemin"
+        options: ["Standart Ticari Zemin", "5 Ton/m² Endüstriyel Helikopter Zemin", "7.5 Ton/m² Ağır Yük Zemin"],
+        defaultValue: "Standart Ticari Zemin"
+      },
+      {
+        id: "odaBolumSayisi",
+        label: "Bölüm / Oda Sayısı",
+        type: "select",
+        group: "teknik",
+        options: ["Açık Alan (Tek Hacim / Kolonsuz)", "2 Bölüm", "3 Bölüm", "4 Bölüm", "5 Bölüm ve Üzeri", "Bölümlendirilmemiş Ham Alan"],
+        defaultValue: "Açık Alan (Tek Hacim / Kolonsuz)"
+      },
+      {
+        id: "bulunduguKat",
+        label: "Bulunduğu Kat",
+        type: "select",
+        group: "teknik",
+        options: ["Düz Giriş Zemin Kat", "Asma Katlı Zemin Mağaza", "Bodrum + Zemin Komple Bina", "Plaza Katı / Ara Kat", "Komple Müstakil Bina"],
+        defaultValue: "Düz Giriş Zemin Kat"
+      },
+      {
+        id: "isinmaTipi",
+        label: "Isıtma / İklimlendirme Tipi",
+        type: "select",
+        group: "teknik",
+        options: ["Merkezi VRF / Fancoil Klima Sistemi", "Bireysel Doğalgaz Kombi", "Yerden Isıtma", "Isı Pompası", "Isıtma Yok"],
+        defaultValue: "Merkezi VRF / Fancoil Klima Sistemi"
+      },
+      {
+        id: "tapuMulkDurumu",
+        label: "Tapu Mülkiyet Durumu",
+        type: "select",
+        group: "mevzuat",
+        options: ["Kat Mülkiyetli (Ticari İskânlı)", "Kat İrtifaklı", "Müstakil Parsel Tapusu", "Hisseli Tapu"],
+        defaultValue: "Kat Mülkiyetli (Ticari İskânlı)"
+      },
+      {
+        id: "krediyeUygunluk",
+        label: "Ticari Krediye Uygunluk",
+        type: "select",
+        group: "mevzuat",
+        options: ["Ticari Krediye Tam Uygun", "Krediye Uygun Değil", "Bilinmiyor / Ekspertiz Gerekli"],
+        defaultValue: "Ticari Krediye Tam Uygun"
+      },
+      {
+        id: "kimden",
+        label: "Kimden (İlan Sahibi / Yetki Statüsü)",
+        type: "select",
+        group: "ticari",
+        required: true,
+        options: ["Sahibinden (Doğrudan Mülk Sahibi)", "Emlak Ofisinden / Gayrimenkul Danışmanı", "Kurumsal Firma / Şirket Mülkü", "Banka / Kamu İhalesi"],
+        defaultValue: "Sahibinden (Doğrudan Mülk Sahibi)"
+      },
+      {
+        id: "takasDurumu",
+        label: "Takas Tekliflerine Açık mı?",
+        type: "select",
+        group: "ticari",
+        options: ["Takasa Kapalı (Yalnızca Nakit / Finansman)", "Araç Takasına Açık", "Gayrimenkul / Arsa Takasına Açık"],
+        defaultValue: "Takasa Kapalı (Yalnızca Nakit / Finansman)"
       }
     ]
   },
@@ -771,14 +854,16 @@ export function resolveSectorKey(category?: string | number, subCategory?: strin
   const subStr = String(subCategory || '').trim().toLowerCase()
   const combined = `${catStr} ${subStr}`
 
-  // 1. Arsa & İmar & Tarla & Kat Karşılığı
+  // 1. Arsa & İmar & Tarla & Kat Karşılığı & Bağ / Bahçe
   if (
     subStr.includes('arsa') ||
     subStr.includes('arazi') ||
     subStr.includes('tarla') ||
     subStr.includes('bahçe') ||
+    subStr.includes('bağ') ||
     subStr.includes('çiftlik') ||
     subStr.includes('zeytinlik') ||
+    subStr.includes('mera') ||
     subStr.includes('kat karşılığı') ||
     combined.includes('arsa') ||
     combined.includes('arazi') ||
@@ -787,7 +872,7 @@ export function resolveSectorKey(category?: string | number, subCategory?: strin
     return 'arsa_arazi'
   }
 
-  // 2. Konut & Daire & Villa & Rezidans
+  // 2. Konut & Daire & Villa & Rezidans & Müstakil Ev
   if (
     subStr.includes('konut') ||
     subStr.includes('daire') ||
@@ -797,14 +882,17 @@ export function resolveSectorKey(category?: string | number, subCategory?: strin
     subStr.includes('yazlık') ||
     subStr.includes('prefabrik') ||
     subStr.includes('lojman') ||
+    subStr.includes('köşk') ||
+    subStr.includes('yalı') ||
     combined.includes('konut') ||
     combined.includes('daire') ||
+    combined.includes('villa') ||
     combined.includes('ev')
   ) {
     return 'konut_daire'
   }
 
-  // 3. Ticari Mülk & Dükkan & Depo & İşyeri
+  // 3. Ticari Mülk & Dükkan & Depo & İşyeri & Ofis & Plaza & Fabrika & AVM & Otel
   if (
     subStr.includes('dükkan') ||
     subStr.includes('işyeri') ||
@@ -818,10 +906,16 @@ export function resolveSectorKey(category?: string | number, subCategory?: strin
     subStr.includes('imalathane') ||
     subStr.includes('otopark') ||
     subStr.includes('kantin') ||
+    subStr.includes('otel') ||
+    subStr.includes('turistik') ||
+    subStr.includes('avm') ||
+    subStr.includes('tesis') ||
     combined.includes('dükkan') ||
     combined.includes('ticari') ||
     combined.includes('işyeri') ||
-    combined.includes('depo')
+    combined.includes('depo') ||
+    combined.includes('otel') ||
+    combined.includes('avm')
   ) {
     return 'ticari_gayrimenkul'
   }
@@ -861,6 +955,7 @@ export function formatSectorSummaryBadges(
         badges.push({ label: 'Kat Karşılığı', value: `%${categorySpecificData.asgariKatKarsiligiOrani}` })
       }
       if (categorySpecificData.tapuMulkDurumu) badges.push({ label: 'Tapu', value: String(categorySpecificData.tapuMulkDurumu) })
+      if (categorySpecificData.kimden) badges.push({ label: 'Kimden', value: String(categorySpecificData.kimden) })
       if (Array.isArray(categorySpecificData.altyapiOzellikleri) && categorySpecificData.altyapiOzellikleri.length > 0) {
         badges.push({ label: 'Altyapı', value: `${categorySpecificData.altyapiOzellikleri.length} Donanım` })
       }
@@ -874,6 +969,8 @@ export function formatSectorSummaryBadges(
       if (categorySpecificData.bulunduguKat) badges.push({ label: 'Kat', value: String(categorySpecificData.bulunduguKat) })
       if (categorySpecificData.isinmaTipi) badges.push({ label: 'Isıtma', value: String(categorySpecificData.isinmaTipi) })
       if (categorySpecificData.tapuMulkDurumu) badges.push({ label: 'Tapu', value: String(categorySpecificData.tapuMulkDurumu) })
+      if (categorySpecificData.kimden) badges.push({ label: 'Kimden', value: String(categorySpecificData.kimden) })
+      if (categorySpecificData.krediyeUygunluk) badges.push({ label: 'Kredi', value: String(categorySpecificData.krediyeUygunluk) })
       if (Array.isArray(categorySpecificData.icOzellikler) && categorySpecificData.icOzellikler.length > 0) {
         badges.push({ label: 'İç Donanım', value: `${categorySpecificData.icOzellikler.length} Özellik` })
       }
@@ -885,8 +982,14 @@ export function formatSectorSummaryBadges(
     case 'ticari_gayrimenkul':
       if (categorySpecificData.ticariNitelik) badges.push({ label: 'Tip', value: String(categorySpecificData.ticariNitelik) })
       if (categorySpecificData.kapaliAlanM2) badges.push({ label: 'Kapalı Alan', value: `${Number(categorySpecificData.kapaliAlanM2).toLocaleString('tr-TR')} m²` })
+      if (categorySpecificData.odaBolumSayisi) badges.push({ label: 'Bölüm', value: String(categorySpecificData.odaBolumSayisi) })
+      if (categorySpecificData.bulunduguKat) badges.push({ label: 'Kat', value: String(categorySpecificData.bulunduguKat) })
+      if (categorySpecificData.isinmaTipi) badges.push({ label: 'Isıtma', value: String(categorySpecificData.isinmaTipi) })
       if (categorySpecificData.tavanYuksekligiMetre) badges.push({ label: 'Yükseklik', value: String(categorySpecificData.tavanYuksekligiMetre) })
       if (categorySpecificData.tirYuklemeRampasiAdedi) badges.push({ label: 'Rampa', value: `${categorySpecificData.tirYuklemeRampasiAdedi} Adet` })
+      if (categorySpecificData.tapuMulkDurumu) badges.push({ label: 'Tapu', value: String(categorySpecificData.tapuMulkDurumu) })
+      if (categorySpecificData.kimden) badges.push({ label: 'Kimden', value: String(categorySpecificData.kimden) })
+      if (categorySpecificData.krediyeUygunluk) badges.push({ label: 'Kredi', value: String(categorySpecificData.krediyeUygunluk) })
       break
 
     default:

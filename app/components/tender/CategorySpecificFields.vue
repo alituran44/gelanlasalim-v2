@@ -63,16 +63,15 @@ const isManualOverride = ref(false)
 watch(
   [() => props.category, () => props.subCategory],
   ([newCat, newSub]) => {
-    if (!isManualOverride.value) {
-      const detected = resolveSectorKey(newCat, newSub)
-      const finalKey = REAL_ESTATE_SECTOR_KEYS.includes(detected) 
-        ? detected 
-        : 'gayrimenkul_arsa'
-      if (finalKey !== activeSectorKey.value) {
-        activeSectorKey.value = finalKey
-        emit('sectorChanged', finalKey)
-        applyDefaultValues()
-      }
+    const detected = resolveSectorKey(newCat, newSub)
+    const finalKey = REAL_ESTATE_SECTOR_KEYS.includes(detected) 
+      ? detected 
+      : 'gayrimenkul_arsa'
+    if (finalKey !== activeSectorKey.value) {
+      activeSectorKey.value = finalKey
+      isManualOverride.value = false
+      emit('sectorChanged', finalKey)
+      applyDefaultValues()
     }
   },
   { immediate: true }

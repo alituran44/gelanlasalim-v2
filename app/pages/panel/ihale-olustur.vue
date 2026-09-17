@@ -106,6 +106,39 @@ const estimatedDeadlineDate = computed(() => {
 
 const selectedSubcategory = ref('')
 
+// Dinamik İhale & İlan Başlığı Placeholder
+const titlePlaceholder = computed(() => {
+  const cat = String(form.value.kategori || '').toLowerCase()
+  const sub = String(selectedSubcategory.value || '').toLowerCase()
+  if (cat.includes('gayrimenkul') || isRealEstateCategory.value) {
+    if (sub.includes('arsa') || sub.includes('tarla') || sub.includes('arazi') || sub.includes('bağ') || sub.includes('bahçe') || sub.includes('çiftlik')) {
+      return "Örn: Çanakkale Kepez'de 1.500 m² %50 Kat Karşılığı Konut İmarlı Arsa"
+    }
+    if (sub.includes('işyeri') || sub.includes('dükkan') || sub.includes('ofis') || sub.includes('plaza') || sub.includes('depo') || sub.includes('fabrika') || sub.includes('avm') || sub.includes('otel')) {
+      return "Örn: Kadıköy Çarşıda Satılık / Kiralık 120 m² Çift Cepheli Dükkan"
+    }
+    return "Örn: Kadıköy Moda'da 3+1 145 m² Geniş Balkonlu İskânlı Satılık Daire"
+  }
+  if (cat.includes('araç') || cat.includes('makine')) {
+    return 'Örn: 2023 Model 5 Adet Dizel Forklift veya Ekskavatör Kiralama'
+  }
+  if (cat.includes('inşaat') || cat.includes('yapı')) {
+    return 'Örn: Anahtar Teslim Konut İnşaatı Kaba & İnce İşçilik Alımı'
+  }
+  if (cat.includes('mühendislik') || cat.includes('mimarlık')) {
+    return 'Örn: Kadıköy Konut Projesi Statik & Mimari Çizim ve Zemin Etüdü'
+  }
+  return 'Örn: 20.000 Adet Mukavva Kutu Alımı veya Malzeme Tedariği'
+})
+
+// Dinamik Şartname & Açıklama Placeholder
+const descPlaceholder = computed(() => {
+  if (isRealEstateCategory.value) {
+    return "Örn: Kadıköy Moda merkezde, sahile ve metroya 5 dakika yürüme mesafesinde, 145 m² brüt, 3+1, kombili, çift balkonlu, güney cepheli, masrafsız lüks satılık daire. Krediye tam uygundur, takas teklifleri değerlendirilebilir..."
+  }
+  return "İhaleye ait teslimat süreleri, teknik şartnameler, kalite belgeleri (ISO, CE vb.) ve muayene kabul şartlarını buraya yazabilirsiniz..."
+})
+
 // Yalnızca Ev / Arsa / Gayrimenkul kategorilerinde şartname kriter formu geçerlidir
 const isRealEstateCategory = computed(() => {
   const cat = String(form.value.kategori || '').toLowerCase()
@@ -126,11 +159,15 @@ const isRealEstateCategory = computed(() => {
   )
 })
 
-// Kategori ev/arsa değilse şartname formunu tamamen kaldır ve dosya yüklemeye çek
+// Kategori ev/arsa ise doğrudan platform şartnamesini ve sektör anahtarını devreye sok
 watch(
   [() => form.value.kategori, () => selectedSubcategory.value],
-  () => {
-    if (!isRealEstateCategory.value) {
+  ([newCat, newSub]) => {
+    if (isRealEstateCategory.value) {
+      specMethod.value = 'platform'
+      const detected = resolveSectorKey(newCat, newSub)
+      currentSectorKey.value = detected
+    } else {
       specMethod.value = 'upload'
       categorySpecificData.value = {}
     }
@@ -1370,9 +1407,8 @@ function resetFormAndCreateNew() {
           <input 
             v-model="form.baslik" 
             type="text" 
-            
-            placeholder="Örn: 20.000 Adet Mukavva Kutu Alımı" 
-            class="w-full rounded-lg border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100" 
+            :placeholder="titlePlaceholder" 
+            class="w-full rounded-lg border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-semibold" 
             style="border-color: #CBD5E1; color: #0F172A;"
           />
         </div>
@@ -1721,73 +1757,55 @@ function resetFormAndCreateNew() {
         </div>
       </div>
 
-      <!-- KART: TEKNİK ŞARTNAME & PROJE DOSYALARI -->
+      <!-- KART 2 (GAYRİMENKUL): SAHİBİNDEN.COM STANDART PARAMETRELERİ -->
+      <div v-if="isRealEstateCategory" class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center font-bold text-base shrink-0">
+              🏡
+            </div>
+            <div>
+              <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] flex items-center gap-1.5">
+                <span>2. Gayrimenkul & Emlak Detay Bilgileri</span>
+                <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/80">Sahibinden.com Standartları</span>
+              </h2>
+              <p class="text-[11px] text-slate-500 mt-0.5">
+                Oda sayısı, brüt/net m², bina yaşı, kat, ısıtma, tapu durumu ve kredi uygunluğu gibi kriterleri eksiksiz belirleyin veya hazır şablon butonlarıyla hızlıca doldurun.
+              </p>
+            </div>
+          </div>
+          <span class="self-start sm:self-auto text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+            ✓ Emlak Parametreleri Aktif
+          </span>
+        </div>
+
+        <CategorySpecificFields
+          v-model="categorySpecificData"
+          :category="form.kategori"
+          :sub-category="selectedSubcategory"
+          :closeable="false"
+          @sector-changed="handleSectorChanged"
+        />
+      </div>
+
+      <!-- KART: ŞARTNAME / TAPU SENEDİ, İMAR ÇAPI & PROJE DOSYALARI -->
       <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
           <div>
             <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] flex items-center gap-1.5">
-              <span>📄 Teknik Şartname & Proje Dosyaları</span>
+              <span>{{ isRealEstateCategory ? '📑 Tapu Senedi, İmar Çapı & Ek Belgeler' : '📄 Teknik Şartname & Proje Dosyaları' }}</span>
             </h2>
             <p class="text-[11px] text-slate-500 mt-0.5">
-              {{ isRealEstateCategory ? 'Hazır şartnameniz veya tapu/imar belgeniz varsa doğrudan yükleyebilir ya da detaylı emlak formunu açabilirsiniz.' : 'İhaleniz için teknik şartname, malzeme/metraj listesi veya proje dosyalarınızı yükleyin.' }}
+              {{ isRealEstateCategory ? 'Tapu fotokopisi, belediye imar durum belgesi, mimari kat planı veya şartname dosyanızı yükleyebilirsiniz (İsteğe bağlı).' : 'İhaleniz için teknik şartname, malzeme/metraj listesi veya CAD çizim dosyalarınızı yükleyin.' }}
             </p>
           </div>
           <span class="self-start sm:self-auto text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-            ✓ Serbest Belge Yükleme
+            ✓ {{ isRealEstateCategory ? 'Belge / Tapu Ekleme' : 'Serbest Belge Yükleme' }}
           </span>
         </div>
 
-        <!-- Şartname Modu Seçimi: YALNIZCA EV / ARSA / GAYRİMENKUL İLANLARINDA GÖSTERİLİR -->
-        <div v-if="isRealEstateCategory" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div 
-            @click="specMethod = 'upload'"
-            class="p-4 rounded-xl border-2 cursor-pointer transition flex items-start gap-3 text-left"
-            :class="specMethod === 'upload' ? 'border-blue-600 bg-blue-50/40 ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
-          >
-            <div class="p-2.5 rounded-xl bg-blue-100 text-blue-700 shrink-0">
-              <UploadCloud :size="20" />
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-xs" :class="specMethod === 'upload' ? 'text-blue-900' : 'text-slate-800'">
-                  Kendi Şartnamemi / Tapumu Yükleyeceğim
-                </span>
-                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center text-[10px]" :class="specMethod === 'upload' ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300'">
-                  <span v-if="specMethod === 'upload'">✓</span>
-                </span>
-              </div>
-              <p class="text-[11px] text-slate-500 mt-1 leading-snug">
-                PDF, Word, Excel veya AutoCAD DWG dosyanızı yükleyin; form doldurmanız <strong>gerekmez</strong>.
-              </p>
-            </div>
-          </div>
-
-          <div 
-            @click="specMethod = 'platform'"
-            class="p-4 rounded-xl border-2 cursor-pointer transition flex items-start gap-3 text-left"
-            :class="specMethod === 'platform' ? 'border-emerald-600 bg-emerald-50/40 ring-2 ring-emerald-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
-          >
-            <div class="p-2.5 rounded-xl bg-emerald-100 text-emerald-700 shrink-0">
-              <FileCheck :size="20" />
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-xs" :class="specMethod === 'platform' ? 'text-emerald-900' : 'text-slate-800'">
-                  🏡 Ev / Arsa Detay Kriterlerini Belirle
-                </span>
-                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center text-[10px]" :class="specMethod === 'platform' ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300'">
-                  <span v-if="specMethod === 'platform'">✓</span>
-                </span>
-              </div>
-              <p class="text-[11px] text-slate-500 mt-1 leading-snug">
-                Ev veya arsa ilanınız için oda sayısı, metrekare, ada/parsel, imar durumu ve tapu kriterlerini belirleyin.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 1. Kendi Dosyasını Yükleme Alanı (Her zaman veya upload modunda) -->
-        <div v-if="!isRealEstateCategory || specMethod === 'upload' || specMethod === 'both'" class="space-y-3 pt-1">
+        <!-- Dosya Yükleme Alanı -->
+        <div class="space-y-3 pt-1">
           <div 
             @click="triggerFileSelect"
             class="border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition hover:bg-blue-50/40 flex flex-col items-center justify-center gap-2 group bg-slate-50/50"
@@ -1798,7 +1816,7 @@ function resetFormAndCreateNew() {
             </div>
             <div>
               <span class="text-xs font-bold text-slate-800 block">
-                Teknik Şartname, Metraj Listesi veya Çizim Dosyanızı Yükleyin
+                {{ isRealEstateCategory ? 'Tapu Fotokopisi, İmar Belgesi veya Mimari Çizim Yükleyin' : 'Teknik Şartname, Metraj Listesi veya Çizim Dosyanızı Yükleyin' }}
               </span>
               <p class="text-[10px] text-slate-500 mt-0.5">
                 PDF, Word (.docx), Excel (.xlsx) veya DWG / DXF (AutoCAD Çizim) · Maks: 50MB
@@ -1808,17 +1826,25 @@ function resetFormAndCreateNew() {
               type="button" 
               class="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition shadow-xs cursor-pointer"
             >
-              📁 Bilgisayardan / Telefondan Dosya Seç
+              📁 Bilgisayardan / Telefondan Belge Seç
             </button>
+            <input 
+              ref="fileInputRef"
+              type="file"
+              multiple
+              accept=".dwg,.dxf,.pdf,.doc,.docx,.xls,.xlsx,application/acad,application/x-acad,application/autocad_dwg,image/vnd.dwg,application/dwg,application/x-dwg,application/octet-stream,*/*"
+              class="hidden"
+              @change="handleFileChange"
+            />
           </div>
 
           <!-- Yüklenen Belgeler Listesi -->
           <div v-if="form.files.length > 0" class="space-y-2 mt-3">
             <div class="flex items-center justify-between">
               <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider">
-                YÜKLENEN ŞARTNAME & BELGELER ({{ form.files.length }})
+                YÜKLENEN BELGELER ({{ form.files.length }})
               </label>
-              <span class="text-[10px] text-emerald-600 font-bold">✓ İhale Şartnamesi Olarak Kaydedildi</span>
+              <span class="text-[10px] text-emerald-600 font-bold">✓ İhale / İlan Dosyası Olarak Kaydedildi</span>
             </div>
             <div 
               v-for="(file, index) in form.files" 
@@ -1842,7 +1868,7 @@ function resetFormAndCreateNew() {
                 </div>
                 <div class="flex items-center justify-between mt-1">
                   <span class="text-[9px] font-bold text-emerald-600 flex items-center gap-1">
-                    <CheckCircle2 :size="12" /> Yüklendi ve İhale Şartnamesi Olarak Bağlandı
+                    <CheckCircle2 :size="12" /> Yüklendi ve İhaleye Bağlandı
                   </span>
                 </div>
               </div>
@@ -1862,42 +1888,16 @@ function resetFormAndCreateNew() {
           <div class="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-xl flex items-start gap-2.5">
             <CheckCircle2 :size="16" class="text-emerald-600 shrink-0 mt-0.5" />
             <p class="text-[11px] text-emerald-900 leading-relaxed font-medium">
-              <strong>Özgür Şartname:</strong> Kendi şartname veya proje dosyanızı yüklediğinizde platform formunu doldurmanız gerekmez. Tedarikçiler bu şartnameyi inceleyerek tekliflerini sunacaktır.
+              <strong>{{ isRealEstateCategory ? 'Resmi Evrak Desteği:' : 'Özgür Şartname:' }}</strong>
+              {{ isRealEstateCategory ? 'Tapu senedi ve imar çapı gibi belgeler tedarikçilerin ve alıcıların tekliflerini daha hızlı ve güvenle vermesini sağlar.' : 'Kendi şartname veya proje dosyanızı yüklediğinizde tedarikçiler bu şartnameyi inceleyerek tekliflerini sunacaktır.' }}
             </p>
           </div>
         </div>
-
-        <!-- 2. Platform Formu Alanı (YALNIZCA EV / ARSA SEÇİLDİYSE VE PLATFORM MODUNDAYSA) -->
-        <div v-if="isRealEstateCategory && (specMethod === 'platform' || specMethod === 'both')" class="pt-2 space-y-3">
-          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
-            <div class="flex items-center gap-2">
-              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-              <span class="text-xs font-bold text-slate-700">Ev & Arsa Detaylı Şartname Kriterleri</span>
-            </div>
-            <button 
-              type="button" 
-              @click="specMethod = 'upload'; categorySpecificData = {}"
-              class="text-xs text-red-600 hover:text-red-800 font-semibold flex items-center gap-1 cursor-pointer bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg border border-red-200 transition"
-              title="Bu Formu Kapat ve Kaldır"
-            >
-              <Trash2 :size="13" /> Formu Kaldır / Dosya Yüklemeye Dön
-            </button>
-          </div>
-
-          <CategorySpecificFields
-            v-model="categorySpecificData"
-            :category="form.kategori"
-            :sub-category="selectedSubcategory"
-            :closeable="true"
-            @sector-changed="handleSectorChanged"
-            @close="specMethod = 'upload'; categorySpecificData = {}"
-          />
-        </div>
       </div>
 
-      <!-- KART 2: LOJİSTİK VE ÖDEME ŞARTLARI -->
+      <!-- KART: LOJİSTİK VE ÖDEME ŞARTLARI -->
       <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
-        <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] mb-2">2. Lojistik & Ödeme Şartları</h2>
+        <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] mb-2">Lojistik, Teslimat & Ödeme Şartları</h2>
         
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <!-- Ödeme Yöntemi Tercihi -->
@@ -2214,23 +2214,25 @@ function resetFormAndCreateNew() {
 
         <!-- 3.4 GENEL ŞARTNAME & AÇIKLAMA METNİ -->
         <div>
-          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">GENEL ŞARTNAME & İHALE ÖZEL HÜKÜMLERİ</label>
+          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">
+            {{ isRealEstateCategory ? 'GAYRİMENKUL DETAYLI AÇIKLAMA & ÖZEL HÜKÜMLER' : 'GENEL ŞARTNAME & İHALE ÖZEL HÜKÜMLERİ' }}
+          </label>
           <textarea 
             v-model="form.aciklama" 
             rows="4" 
-            placeholder="İhaleye ait teslimat süreleri, teknik şartnameler, kalite belgeleri (ISO, CE vb.) ve muayene kabul şartlarını buraya yazabilirsiniz..." 
-            class="w-full rounded-lg border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+            :placeholder="descPlaceholder" 
+            class="w-full rounded-lg border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-medium"
             style="border-color: #CBD5E1; color: #0F172A;"
           ></textarea>
         </div>
       </div>
 
-      <!-- KART 4: İHALE & NUMUNE GÖRSELLERİ YÜKLEME -->
+      <!-- KART: İHALE & NUMUNE GÖRSELLERİ YÜKLEME -->
       <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
         <div class="flex items-center justify-between">
           <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
             <Camera :size="15" />
-            <span>4. İhale & Numune Görselleri Yükleme (Fotoğraf)</span>
+            <span>{{ isRealEstateCategory ? 'Gayrimenkul Fotoğrafları Yükleme' : 'İhale & Numune Görselleri Yükleme (Fotoğraf)' }}</span>
           </h2>
           <span class="text-[10px] text-slate-400 font-bold">İsteğe Bağlı</span>
         </div>
@@ -2242,7 +2244,9 @@ function resetFormAndCreateNew() {
         >
           <Camera :size="28" class="text-slate-400 group-hover:text-blue-600 transition" />
           <div>
-            <span class="text-xs font-bold text-slate-700">İhale Ürün Fotoğrafı veya Numune Görseli Yükleyin</span>
+            <span class="text-xs font-bold text-slate-700">
+              {{ isRealEstateCategory ? 'Emlak / Gayrimenkul Fotoğrafları Yükleyin' : 'İhale Ürün Fotoğrafı veya Numune Görseli Yükleyin' }}
+            </span>
             <p class="text-[10px] text-slate-400 mt-1">JPG, PNG veya WEBP (Maks: 5MB)</p>
           </div>
           <input 
@@ -2257,42 +2261,74 @@ function resetFormAndCreateNew() {
 
         <!-- Predefined sample quick-add buttons -->
         <div class="flex flex-wrap items-center gap-2 pt-1">
-          <span class="text-[10px] font-bold text-slate-400">Hızlı Numune Ekle:</span>
-          <button 
-            type="button" 
-            @click="addSampleImage('https://images.unsplash.com/photo-1558904541-efa8c4a08931?w=800&auto=format&fit=crop&q=80', 'Peyzaj & Bahçe Düzenleme')"
-            class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-          >
-            <Plus :size="10" /> 🌿 Peyzaj & Bahçe
-          </button>
-          <button 
-            type="button" 
-            @click="addSampleImage('https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&auto=format&fit=crop&q=80', 'Mimari & Statik Proje')"
-            class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-          >
-            <Plus :size="10" /> 📐 Mimarlık & Mühendislik
-          </button>
-          <button 
-            type="button" 
-            @click="addSampleImage('https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80', 'Kurumsal Donanım Numunesi')"
-            class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-          >
-            <Plus :size="10" /> 💻 Donanım / Laptop
-          </button>
-          <button 
-            type="button" 
-            @click="addSampleImage('https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80', 'İnşaat / Çatı Numunesi')"
-            class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-          >
-            <Plus :size="10" /> 🏗️ Çatı / İnşaat
-          </button>
-          <button 
-            type="button" 
-            @click="addSampleImage('https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=800&auto=format&fit=crop&q=80', 'Kutu & Koli Ambalaj Numunesi')"
-            class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-          >
-            <Plus :size="10" /> 📦 Ambalaj / Kutu
-          </button>
+          <span class="text-[10px] font-bold text-slate-400">Hızlı Görsel Ekle:</span>
+          <template v-if="isRealEstateCategory">
+            <button 
+              type="button" 
+              @click="addSampleImage('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop&q=80', 'Modern Daire Salonu')"
+              class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer border border-amber-200"
+            >
+              <Plus :size="10" /> 🏢 Salon / Daire İçi
+            </button>
+            <button 
+              type="button" 
+              @click="addSampleImage('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=80', 'Bina Dış Cephe & Peyzaj')"
+              class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer border border-amber-200"
+            >
+              <Plus :size="10" /> 🏡 Bina Dış Cephe
+            </button>
+            <button 
+              type="button" 
+              @click="addSampleImage('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop&q=80', 'İmarlı Arsa & Parsel')"
+              class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer border border-amber-200"
+            >
+              <Plus :size="10" /> 🗺️ Arsa & Parsel
+            </button>
+            <button 
+              type="button" 
+              @click="addSampleImage('https://images.unsplash.com/photo-1582037928769-181f2644ecb7?w=800&auto=format&fit=crop&q=80', 'Cadde Dükkanı / Mağaza')"
+              class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer border border-amber-200"
+            >
+              <Plus :size="10" /> 🏬 Dükkan & Mağaza
+            </button>
+          </template>
+          <template v-else>
+            <button 
+              type="button" 
+              @click="addSampleImage('https://images.unsplash.com/photo-1558904541-efa8c4a08931?w=800&auto=format&fit=crop&q=80', 'Peyzaj & Bahçe Düzenleme')"
+              class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
+            >
+              <Plus :size="10" /> 🌿 Peyzaj & Bahçe
+            </button>
+            <button 
+              type="button" 
+              @click="addSampleImage('https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&auto=format&fit=crop&q=80', 'Mimari & Statik Proje')"
+              class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
+            >
+              <Plus :size="10" /> 📐 Mimarlık & Mühendislik
+            </button>
+            <button 
+              type="button" 
+              @click="addSampleImage('https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80', 'Kurumsal Donanım Numunesi')"
+              class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
+            >
+              <Plus :size="10" /> 💻 Donanım / Laptop
+            </button>
+            <button 
+              type="button" 
+              @click="addSampleImage('https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80', 'İnşaat / Çatı Numunesi')"
+              class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
+            >
+              <Plus :size="10" /> 🏗️ Çatı / İnşaat
+            </button>
+            <button 
+              type="button" 
+              @click="addSampleImage('https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=800&auto=format&fit=crop&q=80', 'Kutu & Koli Ambalaj Numunesi')"
+              class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
+            >
+              <Plus :size="10" /> 📦 Ambalaj / Kutu
+            </button>
+          </template>
         </div>
 
         <!-- Uploaded Images Preview Grid -->
@@ -2317,82 +2353,6 @@ function resetFormAndCreateNew() {
                 {{ img.name }}
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- KART 5: DOSYA & ŞARTNAME YÜKLEME -->
-      <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-        <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">5. Şartname & Ek Belgeler Yükleme</h2>
-        
-        <!-- Drag & Drop Zone -->
-        <div 
-          @click="triggerFileSelect"
-          class="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition hover:bg-slate-50 flex flex-col items-center justify-center gap-2 group"
-          style="border-color: #CBD5E1;"
-        >
-          <UploadCloud :size="28" class="text-slate-400 group-hover:text-blue-600 transition" />
-          <div>
-            <span class="text-xs font-bold text-slate-700">Teknik Şartname & DWG Çizim / Proje Dosyası Yükleyin</span>
-            <p class="text-[10px] text-slate-400 mt-1">PDF, Word, Excel veya DWG / DXF (AutoCAD Çizim) · Mobil ve Masaüstü Uyumlu (Maks: 50MB)</p>
-          </div>
-          <input 
-            ref="fileInputRef"
-            type="file"
-            multiple
-            accept=".dwg,.dxf,.pdf,.doc,.docx,.xls,.xlsx,application/acad,application/x-acad,application/autocad_dwg,image/vnd.dwg,application/dwg,application/x-dwg,application/octet-stream,*/*"
-            class="hidden"
-            @change="handleFileChange"
-          />
-        </div>
-
-        <!-- Uploaded Files List -->
-        <div v-if="form.files.length > 0" class="space-y-2 mt-4">
-          <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">YÜKLENEN BELGELER</label>
-          <div 
-            v-for="(file, index) in form.files" 
-            :key="index"
-            class="flex items-center gap-3 p-3 bg-slate-50 border rounded-xl"
-            style="border-color: #E2E8F0;"
-          >
-            <!-- File Icon type -->
-            <FileText v-if="file.type === 'pdf'" :size="16" class="text-red-500 shrink-0" />
-            <FileSpreadsheet v-else-if="file.type === 'excel'" :size="16" class="text-emerald-600 shrink-0" />
-            <FileCode v-else-if="file.type === 'cad'" :size="16" class="text-amber-500 shrink-0" />
-            <FileText v-else :size="16" class="text-blue-600 shrink-0" />
-
-            <!-- File details -->
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between">
-                <div class="flex items-center gap-1.5 truncate pr-4">
-                  <span class="text-xs font-bold text-slate-700 truncate">{{ file.name }}</span>
-                  <span v-if="file.type === 'cad'" class="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20 shrink-0">AutoCAD DWG</span>
-                </div>
-                <span class="text-[10px] text-slate-400 shrink-0 font-medium">{{ file.size }}</span>
-              </div>
-              
-              <!-- Progress Bar -->
-              <div class="w-full bg-slate-200 h-1.5 rounded-full mt-1.5 overflow-hidden">
-                <div 
-                  class="bg-blue-600 h-full rounded-full transition-all duration-300"
-                  :style="{ width: file.progress + '%' }"
-                ></div>
-              </div>
-              <div class="flex items-center justify-between mt-1">
-                <span class="text-[9px] font-bold text-blue-600">
-                  {{ file.progress < 100 ? `Yükleniyor %${file.progress}` : 'Hazır / Yüklendi ✓' }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Remove file button -->
-            <button 
-              type="button"
-              @click="removeFile(index)"
-              class="p-1 rounded-lg hover:bg-slate-200 text-slate-400 hover:text-slate-900 transition cursor-pointer"
-            >
-              <X :size="14" />
-            </button>
           </div>
         </div>
       </div>
