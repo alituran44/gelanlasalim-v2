@@ -102,9 +102,9 @@ export function useUserSession() {
     })
   }
 
-  // 🛡️ SEC-011: Oturum durumu öncelikle sunucu doğrulamasına dayanır
+  // 🛡️ SEC-011: Oturum durumu öncelikle sunucu doğrulamasına dayanır, yoksa yerel oturuma bakar
   const isLoggedIn = computed(() => {
-    if (serverSession.value) return serverSession.value.isAuthenticated
+    if (serverSession.value?.isAuthenticated) return true
     return !!(userSession.value?.email || userSession.value?.name || userSession.value?.firstName)
   })
 

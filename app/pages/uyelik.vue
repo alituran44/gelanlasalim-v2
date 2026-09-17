@@ -36,10 +36,45 @@ import {
   X
 } from 'lucide-vue-next'
 import { locale, detectLocale, t } from '~/composables/useLocale'
+import { useUserSession } from '~/composables/useUserSession'
 
 const route = useRoute()
 const router = useRouter()
-const activeTab = ref<'login' | 'register' | 'forgot'>('register')
+const {
+  userSession,
+  serverSession,
+  isLoggedIn,
+  fetchServerSession,
+  updateSession
+} = useUserSession()
+const authCookie = useCookie<string | null | undefined>('ihb_auth')
+
+function parseTabFromQuery(qTab: any, qMode?: any): 'login' | 'register' | 'forgot' {
+  const str = String(qTab || qMode || '').toLowerCase().trim()
+  if (str === 'login' || str === 'giris' || str === 'signin' || str === 'sign-in') return 'login'
+  if (str === 'forgot' || str === 'reset' || str === 'sifremi-unuttum' || str === 'sifre') return 'forgot'
+  if (str === 'register' || str === 'kayit' || str === 'uye-ol') return 'register'
+  return 'register'
+}
+
+const activeTab = ref<'login' | 'register' | 'forgot'>(parseTabFromQuery(route.query.tab, route.query.mode))
+
+watch(
+  () => [route.query.tab, route.query.mode],
+  ([newTab, newMode]) => {
+    if (newTab || newMode) {
+      activeTab.value = parseTabFromQuery(newTab, newMode)
+    }
+  },
+  { immediate: true }
+)
+
+function switchTab(tab: 'login' | 'register' | 'forgot') {
+  activeTab.value = tab
+  errorMessage.value = ''
+  router.replace({ query: { ...route.query, tab } }).catch(() => {})
+}
+
 const authToastMessage = ref('')
 const showAuthToast = ref(false)
 const authToastType = ref<'success' | 'info' | 'error'>('success')
@@ -92,8 +127,10 @@ async function syncServerLogin(emailStr: string, roleStr?: string, vknStr?: stri
         }
       })
     }
+    if (typeof document !== 'undefined') {
+      document.cookie = 'ihb_auth=1; path=/; max-age=604800; SameSite=Lax'
+    }
     try {
-      const authCookie = useCookie('ihb_auth')
       authCookie.value = '1'
     } catch {}
   } catch (e) {
@@ -103,10 +140,8 @@ async function syncServerLogin(emailStr: string, roleStr?: string, vknStr?: stri
 
 onMounted(() => {
   detectLocale()
-  if (route.query.tab === 'login') {
-    activeTab.value = 'login'
-  } else {
-    activeTab.value = 'register'
+  if (route.query.tab || route.query.mode) {
+    activeTab.value = parseTabFromQuery(route.query.tab, route.query.mode)
   }
 
   // Google Identity Services (GSI) One-Tap Entegrasyonu
@@ -159,7 +194,6 @@ onMounted(() => {
                     localStorage.setItem('userSession', JSON.stringify(userAccount))
                     registerToAdminKycQueue(userAccount)
                     await syncServerLogin(cleanEmail, userAccount.role)
-                    const { fetchServerSession } = useUserSession()
                     await fetchServerSession()
                     await navigateTo(isGoogleAdmin ? '/admin' : '/panel')
                 }
@@ -383,12 +417,14 @@ async function verifyOtp() {
       sessionData.name
     )
 
+    if (typeof document !== 'undefined') {
+      document.cookie = 'ihb_auth=1; path=/; max-age=604800; SameSite=Lax'
+    }
     try {
-      const authCookie = useCookie('ihb_auth')
       authCookie.value = '1'
     } catch {}
 
-    const { fetchServerSession } = useUserSession()
+    updateSession(sessionData)
     await fetchServerSession()
 
     // 🛡️ LEG-004 & LEG-006: Hukuki sözleşme ve ticari ileti kabulünü tescil et
@@ -581,7 +617,6 @@ function handleOAuth(provider = 'google') {
                 if (isAlreadyRegistered) {
                   alert(`ℹ️ HESAP ZATEN KAYITLI\n\n"${cleanEmail}" Google hesabı ile sistemde zaten kayıtlı bir üyeliğiniz bulunmaktadır.\n\nMevcut hesabınızla güvenli giriş yapıldı ve yönetim panelinize yönlendiriliyorsunuz.`)
                   await syncServerLogin(cleanEmail, userAccount.role)
-                  const { fetchServerSession } = useUserSession()
                   await fetchServerSession()
                   await navigateTo('/panel')
                   return
@@ -603,7 +638,6 @@ function handleOAuth(provider = 'google') {
               }
 
               await syncServerLogin(cleanEmail, userAccount.role)
-              const { fetchServerSession } = useUserSession()
               await fetchServerSession()
               await navigateTo('/panel')
               return
@@ -682,7 +716,6 @@ function fallbackGoogleLogin() {
       }
     }
 
-    const { fetchServerSession } = useUserSession()
     await fetchServerSession()
     await navigateTo(isFallbackAdmin ? '/admin' : '/panel')
   }, 500)
@@ -715,7 +748,6 @@ function handleEDevletAuth() {
       }))
     }
     await syncServerLogin(targetEmail, 'company')
-    const { fetchServerSession } = useUserSession()
     await fetchServerSession()
     await navigateTo('/panel')
   }, 900)
@@ -849,6 +881,15 @@ async function handleLogin() {
       window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionObj }))
     }
 
+    if (typeof document !== 'undefined') {
+      document.cookie = 'ihb_auth=1; path=/; max-age=604800; SameSite=Lax'
+    }
+    try {
+      authCookie.value = '1'
+    } catch {}
+
+    updateSession(sessionObj)
+
     // 🛡️ SEC-010: Sunucu tarafı imzalı oturum cookie'sini oluştur
     await syncServerLogin(
       cleanEmail,
@@ -858,15 +899,10 @@ async function handleLogin() {
       sessionObj.name
     )
 
-    try {
-      const authCookie = useCookie('ihb_auth')
-      authCookie.value = '1'
-    } catch {}
-
-    const { fetchServerSession } = useUserSession()
     await fetchServerSession()
 
     isSubmitting.value = false
+    triggerAuthToast('Giriş başarılı! Yönlendiriliyorsunuz...', 'success')
 
     if (isAdminUser) {
       await navigateTo('/admin')
@@ -902,6 +938,15 @@ async function handleDemoLogin(role: 'company' | 'individual' | 'admin') {
         window.dispatchEvent(new Event('storage'))
         window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionObj }))
       }
+      if (typeof document !== 'undefined') {
+        document.cookie = 'ihb_auth=1; path=/; max-age=604800; SameSite=Lax'
+      }
+      try {
+        authCookie.value = '1'
+      } catch {}
+
+      updateSession(sessionObj)
+
       await syncServerLogin(
         targetEmail,
         'admin',
@@ -909,15 +954,11 @@ async function handleDemoLogin(role: 'company' | 'individual' | 'admin') {
         'admin123',
         sessionObj.name
       )
-      try {
-        const authCookie = useCookie('ihb_auth')
-        authCookie.value = '1'
-      } catch {}
 
-      const { fetchServerSession } = useUserSession()
       await fetchServerSession()
 
       isSubmitting.value = false
+      triggerAuthToast('Yönetici girişi yapıldı! Operasyon paneline aktarılıyorsunuz...', 'success')
       await navigateTo('/admin')
       return
     }
@@ -938,6 +979,15 @@ async function handleDemoLogin(role: 'company' | 'individual' | 'admin') {
       window.dispatchEvent(new Event('storage'))
       window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionObj }))
     }
+    if (typeof document !== 'undefined') {
+      document.cookie = 'ihb_auth=1; path=/; max-age=604800; SameSite=Lax'
+    }
+    try {
+      authCookie.value = '1'
+    } catch {}
+
+    updateSession(sessionObj)
+
     // 🛡️ SEC-010: Demo girişi için geçerli sunucu oturum cookie'si oluştur
     await syncServerLogin(
       targetEmail,
@@ -947,15 +997,10 @@ async function handleDemoLogin(role: 'company' | 'individual' | 'admin') {
       sessionObj.name
     )
 
-    try {
-      const authCookie = useCookie('ihb_auth')
-      authCookie.value = '1'
-    } catch {}
-
-    const { fetchServerSession } = useUserSession()
     await fetchServerSession()
 
     isSubmitting.value = false
+    triggerAuthToast('Giriş başarılı! Yönetim panelinize aktarılıyorsunuz...', 'success')
     await navigateTo('/panel')
   } catch (e: any) {
     isSubmitting.value = false
@@ -1063,10 +1108,10 @@ async function handleDemoLogin(role: 'company' | 'individual' | 'admin') {
 
         <!-- Switch tabs (Register / Login) -->
         <div class="mb-8 flex border-b border-slate-100 gap-1">
-          <button @click="activeTab = 'register'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2" :class="activeTab === 'register' ? 'border-[#0F223D] text-[#0F223D]' : 'border-transparent text-slate-400 hover:text-slate-600'">
+          <button @click="switchTab('register')" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2 cursor-pointer" :class="activeTab === 'register' ? 'border-[#0F223D] text-[#0F223D]' : 'border-transparent text-slate-400 hover:text-slate-600'">
             {{ 'Yeni Üyelik' }}
           </button>
-          <button @click="activeTab = 'login'; errorMessage = ''" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2" :class="activeTab === 'login' ? 'border-[#0F223D] text-[#0F223D]' : 'border-transparent text-slate-400 hover:text-slate-600'">
+          <button @click="switchTab('login')" class="flex-1 pb-3 text-center text-xs font-black uppercase tracking-wider transition-colors border-b-2 cursor-pointer" :class="activeTab === 'login' ? 'border-[#0F223D] text-[#0F223D]' : 'border-transparent text-slate-400 hover:text-slate-600'">
             {{ 'Giriş Yap' }}
           </button>
         </div>

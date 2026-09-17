@@ -3720,7 +3720,7 @@ onMounted(() => {
             <p class="text-xs text-slate-400 max-w-sm mx-auto">
               İhaleyi açan kurumsal şirketin unvanı, iletişim bilgileri ve ticari sicil kayıtları sadece kayıtlı İhaleciBurada üyelerine açıktır.
             </p>
-            <NuxtLink to="/uyelik" class="inline-block px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs transition">
+            <NuxtLink to="/uyelik?tab=login" class="inline-block px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs transition">
               Giriş Yap / Üye Ol
             </NuxtLink>
           </div>
@@ -3839,7 +3839,7 @@ onMounted(() => {
               <span class="text-[11px] text-amber-800">Tam unvan ve resmi ticaret kayıtları için üye girişi yapınız.</span>
             </div>
           </div>
-          <NuxtLink to="/uyelik" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 transition">
+          <NuxtLink to="/uyelik?tab=login" class="px-3.5 py-1.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 transition">
             Üye Ol / Giriş Yap
           </NuxtLink>
         </div>

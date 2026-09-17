@@ -143,7 +143,7 @@ const selectedFirmForModal = ref<any>(null)
             </span>
           </div>
         </div>
-        <NuxtLink to="/uyelik" class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 shadow-xs transition">
+        <NuxtLink to="/uyelik?tab=login" class="px-5 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 shadow-xs transition">
           Üye Ol / Giriş Yap
         </NuxtLink>
       </div>
@@ -332,7 +332,7 @@ const selectedFirmForModal = ref<any>(null)
                 </span>
               </div>
             </div>
-            <NuxtLink to="/uyelik" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 shadow-xs transition">
+            <NuxtLink to="/uyelik?tab=login" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 shadow-xs transition">
               Üye Ol / Giriş Yap
             </NuxtLink>
           </div>

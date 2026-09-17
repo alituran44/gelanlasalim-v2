@@ -9,7 +9,7 @@ export default defineNuxtRouteMiddleware((to, from) => {
   if (import.meta.server) {
     const sessionCookie = useCookie<string | null | undefined>('ihb_session')
     if (!sessionCookie.value) {
-      return navigateTo('/uyelik', { redirectCode: 302 })
+      return navigateTo('/uyelik?tab=login', { redirectCode: 302 })
     }
   }
 
@@ -18,10 +18,30 @@ export default defineNuxtRouteMiddleware((to, from) => {
   if (import.meta.client) {
     const authCookie = useCookie<string | null | undefined>('ihb_auth')
     const sessionCookie = useCookie<string | null | undefined>('ihb_session')
-    const { isLoggedIn } = useUserSession()
+    const { isLoggedIn, userSession, loadSessionFromStorage } = useUserSession()
 
-    if (!authCookie.value && !sessionCookie.value && !isLoggedIn.value) {
-      return navigateTo('/uyelik')
+    const hasClientCookie = typeof document !== 'undefined' && document.cookie.includes('ihb_auth=1')
+    let hasStorageSession = false
+    if (typeof window !== 'undefined') {
+      try {
+        const raw = localStorage.getItem('userSession')
+        if (raw) {
+          const parsed = JSON.parse(raw)
+          if (parsed && (parsed.email || parsed.name || parsed.username)) {
+            hasStorageSession = true
+            if (!userSession.value?.email) {
+              loadSessionFromStorage()
+            }
+          }
+        }
+        if (localStorage.getItem('adminToken')) {
+          hasStorageSession = true
+        }
+      } catch {}
+    }
+
+    if (!authCookie.value && !hasClientCookie && !sessionCookie.value && !isLoggedIn.value && !hasStorageSession) {
+      return navigateTo('/uyelik?tab=login')
     }
   }
 })

@@ -1205,6 +1205,9 @@ async function handleLogin() {
       if (typeof window !== 'undefined') {
         localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
       }
+      if (typeof document !== 'undefined') {
+        document.cookie = 'ihb_auth=1; path=/; max-age=604800; SameSite=Lax'
+      }
       try {
         const authCookie = useCookie('ihb_auth')
         authCookie.value = '1'

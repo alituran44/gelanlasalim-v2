@@ -1268,7 +1268,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
                   {{ (tender.authority || 'Satın Alma Dairesi Başkanlığı').replace(/[a-zA-Z0-9]/g, '█') }}
                 </span>
                 <NuxtLink
-                  to="/uyelik"
+                  to="/uyelik?tab=login"
                   class="text-[10px] font-bold text-amber-700 hover:underline inline-flex items-center gap-0.5 shrink-0"
                 >
                   <Lock :size="10" />
@@ -1475,7 +1475,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             <span v-if="isLoggedIn" class="font-bold text-slate-800">{{ selectedTenderForDetail.authority || 'İhaleciBurada Satın Alma Masası' }}</span>
             <span v-else class="flex items-center gap-1.5 mt-0.5">
               <span class="filter blur-[5px] select-none pointer-events-none font-medium text-slate-400">████████ Dairesi</span>
-              <NuxtLink to="/uyelik" class="text-[10px] text-amber-700 font-bold underline">Giriş Yap</NuxtLink>
+              <NuxtLink to="/uyelik?tab=login" class="text-[10px] text-amber-700 font-bold underline">Giriş Yap</NuxtLink>
             </span>
           </div>
           <div>
@@ -1803,7 +1803,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
               </p>
             </div>
             <div class="pt-2 flex items-center justify-center gap-3">
-              <NuxtLink to="/uyelik" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md transition">
+              <NuxtLink to="/uyelik?tab=login" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md transition">
                 Giriş Yap / Ücretsiz Üye Ol
               </NuxtLink>
             </div>
@@ -2154,7 +2154,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
               </span>
             </div>
           </div>
-          <NuxtLink to="/uyelik" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 shadow-xs transition">
+          <NuxtLink to="/uyelik?tab=login" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 shadow-xs transition">
             Üye Ol / Giriş Yap
           </NuxtLink>
         </div>
