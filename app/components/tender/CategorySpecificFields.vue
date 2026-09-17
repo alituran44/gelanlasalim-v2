@@ -22,7 +22,8 @@ import {
   Laptop,
   Stethoscope,
   ChevronDown,
-  Check
+  Check,
+  X
 } from 'lucide-vue-next'
 
 const props = withDefaults(
@@ -31,18 +32,21 @@ const props = withDefaults(
     category?: string
     subCategory?: string
     disabled?: boolean
+    closeable?: boolean
   }>(),
   {
     modelValue: () => ({}),
     category: '',
     subCategory: '',
-    disabled: false
+    disabled: false,
+    closeable: false
   }
 )
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: Record<string, any>): void
   (e: 'sectorChanged', sectorKey: string): void
+  (e: 'close'): void
 }>()
 
 // Internal reactive form state
@@ -219,6 +223,16 @@ onMounted(() => {
             </option>
           </select>
         </div>
+
+        <button
+          v-if="closeable"
+          type="button"
+          @click="emit('close')"
+          class="p-2 rounded-xl text-slate-400 hover:text-red-600 hover:bg-red-50 border border-slate-200 transition cursor-pointer"
+          title="Bu şartname bölümünü kaldır"
+        >
+          <X :size="16" />
+        </button>
       </div>
     </div>
 

@@ -344,6 +344,25 @@ const editForm = ref({
   kalemler: [] as Array<{ id: string; ad: string; miktar: number; birim: string; teknikAciklama?: string }>
 })
 
+const isRealEstateEditForm = computed(() => {
+  const cat = String(editForm.value.kategori || '').toLowerCase()
+  const sub = String(editForm.value.subCategory || '').toLowerCase()
+  const combined = `${cat} ${sub}`
+  return (
+    combined.includes('gayrimenkul') ||
+    combined.includes('arsa') ||
+    combined.includes('arazi') ||
+    combined.includes('tarla') ||
+    combined.includes('konut') ||
+    combined.includes('daire') ||
+    combined.includes('villa') ||
+    combined.includes('işyeri') ||
+    combined.includes('dükkan') ||
+    combined.includes('depo') ||
+    cat === 'gayrimenkul'
+  )
+})
+
 function openEditModal(tender: any) {
   if (!tender) return
   editingTender.value = tender
@@ -1194,8 +1213,8 @@ const statusTabs = computed(() => {
             ></textarea>
           </div>
 
-          <!-- 📐 Sektöre Özel Teknik ve Mevzuat Parametreleri (İnşaat, Akaryakıt, Arsa vb.) -->
-          <div class="pt-2 border-t border-slate-100">
+          <!-- 📐 Sektöre Özel Teknik ve Mevzuat Parametreleri (Yalnızca Ev & Arsa İlanlarında) -->
+          <div v-if="isRealEstateEditForm" class="pt-2 border-t border-slate-100">
             <CategorySpecificFields 
               v-model="editForm.categorySpecificData"
               :category="editForm.kategori"

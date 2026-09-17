@@ -22,7 +22,7 @@ const existingTender = ref<any>(null)
 
 // Sektöre Özgü Dinamik Şartname Parametreleri
 const categorySpecificData = ref<Record<string, any>>({})
-const currentSectorKey = ref<string>('insaat_yapi')
+const currentSectorKey = ref<string>('gayrimenkul_arsa')
 
 // Şartname Belirleme Yöntemi: 'upload' (Kendi dosyasını yükleme) | 'platform' (Platform akıllı şartname formu) | 'both' (Her ikisi)
 const specMethod = ref<'upload' | 'platform' | 'both'>('upload')
@@ -105,6 +105,38 @@ const estimatedDeadlineDate = computed(() => {
 })
 
 const selectedSubcategory = ref('')
+
+// Yalnızca Ev / Arsa / Gayrimenkul kategorilerinde şartname kriter formu geçerlidir
+const isRealEstateCategory = computed(() => {
+  const cat = String(form.value.kategori || '').toLowerCase()
+  const sub = String(selectedSubcategory.value || '').toLowerCase()
+  const combined = `${cat} ${sub}`
+  return (
+    combined.includes('gayrimenkul') ||
+    combined.includes('arsa') ||
+    combined.includes('arazi') ||
+    combined.includes('tarla') ||
+    combined.includes('konut') ||
+    combined.includes('daire') ||
+    combined.includes('villa') ||
+    combined.includes('işyeri') ||
+    combined.includes('dükkan') ||
+    combined.includes('depo') ||
+    cat === 'gayrimenkul'
+  )
+})
+
+// Kategori ev/arsa değilse şartname formunu tamamen kaldır ve dosya yüklemeye çek
+watch(
+  [() => form.value.kategori, () => selectedSubcategory.value],
+  () => {
+    if (!isRealEstateCategory.value) {
+      specMethod.value = 'upload'
+      categorySpecificData.value = {}
+    }
+  },
+  { immediate: true }
+)
 
 // Subcategory Map (Photo 4 Alt Kategoriler)
 const categoryMap = reactive<Record<string, string[]>>({
@@ -1689,24 +1721,24 @@ function resetFormAndCreateNew() {
         </div>
       </div>
 
-      <!-- KART: TEKNİK ŞARTNAME & PROJE DOSYALARI (KENDİ DOSYANI YÜKLE VEYA DİNAMİK FORM SEÇ) -->
+      <!-- KART: TEKNİK ŞARTNAME & PROJE DOSYALARI -->
       <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
           <div>
             <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] flex items-center gap-1.5">
-              <span>📄 Teknik Şartname, Çizim & Emlak Kriterleri</span>
+              <span>📄 Teknik Şartname & Proje Dosyaları</span>
             </h2>
             <p class="text-[11px] text-slate-500 mt-0.5">
-              Hazır şartnameniz varsa doğrudan yükleyebilir ya da ev/arsa ilanları için detaylı emlak formunu doldurabilirsiniz.
+              {{ isRealEstateCategory ? 'Hazır şartnameniz veya tapu/imar belgeniz varsa doğrudan yükleyebilir ya da detaylı emlak formunu açabilirsiniz.' : 'İhaleniz için teknik şartname, malzeme/metraj listesi veya proje dosyalarınızı yükleyin.' }}
             </p>
           </div>
           <span class="self-start sm:self-auto text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-            ✓ Hazır Şablon Zorunlu Değildir
+            ✓ Serbest Belge Yükleme
           </span>
         </div>
 
-        <!-- Şartname Modu Seçimi: Kendi Dosyamı Yükleyeceğim vs Ev/Arsa Formu -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <!-- Şartname Modu Seçimi: YALNIZCA EV / ARSA / GAYRİMENKUL İLANLARINDA GÖSTERİLİR -->
+        <div v-if="isRealEstateCategory" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div 
             @click="specMethod = 'upload'"
             class="p-4 rounded-xl border-2 cursor-pointer transition flex items-start gap-3 text-left"
@@ -1718,14 +1750,14 @@ function resetFormAndCreateNew() {
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
                 <span class="font-bold text-xs" :class="specMethod === 'upload' ? 'text-blue-900' : 'text-slate-800'">
-                  Kendi Şartnamemi / Çizimimi Yükleyeceğim
+                  Kendi Şartnamemi / Tapumu Yükleyeceğim
                 </span>
                 <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center text-[10px]" :class="specMethod === 'upload' ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300'">
                   <span v-if="specMethod === 'upload'">✓</span>
                 </span>
               </div>
               <p class="text-[11px] text-slate-500 mt-1 leading-snug">
-                Hazır PDF, Word, Excel veya AutoCAD DWG dosyanızı yükleyin; platform formunu doldurmanız <strong>gerekmez</strong>.
+                PDF, Word, Excel veya AutoCAD DWG dosyanızı yükleyin; form doldurmanız <strong>gerekmez</strong>.
               </p>
             </div>
           </div>
@@ -1741,21 +1773,21 @@ function resetFormAndCreateNew() {
             <div class="flex-1 min-w-0">
               <div class="flex items-center justify-between">
                 <span class="font-bold text-xs" :class="specMethod === 'platform' ? 'text-emerald-900' : 'text-slate-800'">
-                  🏡 Ev / Arsa Emlak Detay Formunu Dolduracağım
+                  🏡 Ev / Arsa Detay Kriterlerini Belirle
                 </span>
                 <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center text-[10px]" :class="specMethod === 'platform' ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300'">
                   <span v-if="specMethod === 'platform'">✓</span>
                 </span>
               </div>
               <p class="text-[11px] text-slate-500 mt-1 leading-snug">
-                Ev veya arsa ilanınız için oda sayısı, net m², kat, ada/parsel, imar durumu ve tapu kriterlerini adım adım belirleyin.
+                Ev veya arsa ilanınız için oda sayısı, metrekare, ada/parsel, imar durumu ve tapu kriterlerini belirleyin.
               </p>
             </div>
           </div>
         </div>
 
-        <!-- 1. Kendi Dosyasını Yükleme Alanı -->
-        <div v-if="specMethod === 'upload' || specMethod === 'both'" class="space-y-3 pt-1">
+        <!-- 1. Kendi Dosyasını Yükleme Alanı (Her zaman veya upload modunda) -->
+        <div v-if="!isRealEstateCategory || specMethod === 'upload' || specMethod === 'both'" class="space-y-3 pt-1">
           <div 
             @click="triggerFileSelect"
             class="border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition hover:bg-blue-50/40 flex flex-col items-center justify-center gap-2 group bg-slate-50/50"
@@ -1766,7 +1798,7 @@ function resetFormAndCreateNew() {
             </div>
             <div>
               <span class="text-xs font-bold text-slate-800 block">
-                Teknik Şartname, Metraj Listesi veya AutoCAD Projenizi Yükleyin
+                Teknik Şartname, Metraj Listesi veya Çizim Dosyanızı Yükleyin
               </span>
               <p class="text-[10px] text-slate-500 mt-0.5">
                 PDF, Word (.docx), Excel (.xlsx) veya DWG / DXF (AutoCAD Çizim) · Maks: 50MB
@@ -1816,7 +1848,7 @@ function resetFormAndCreateNew() {
               </div>
 
               <button 
-                type="button"
+                type="button" 
                 @click="removeFile(index)"
                 class="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition cursor-pointer"
                 title="Dosyayı Kaldır"
@@ -1835,13 +1867,30 @@ function resetFormAndCreateNew() {
           </div>
         </div>
 
-        <!-- 2. Platform Formu Alanı -->
-        <div v-if="specMethod === 'platform' || specMethod === 'both'" class="pt-2">
+        <!-- 2. Platform Formu Alanı (YALNIZCA EV / ARSA SEÇİLDİYSE VE PLATFORM MODUNDAYSA) -->
+        <div v-if="isRealEstateCategory && (specMethod === 'platform' || specMethod === 'both')" class="pt-2 space-y-3">
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="flex items-center gap-2">
+              <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+              <span class="text-xs font-bold text-slate-700">Ev & Arsa Detaylı Şartname Kriterleri</span>
+            </div>
+            <button 
+              type="button" 
+              @click="specMethod = 'upload'; categorySpecificData = {}"
+              class="text-xs text-red-600 hover:text-red-800 font-semibold flex items-center gap-1 cursor-pointer bg-red-50 hover:bg-red-100 px-3 py-1.5 rounded-lg border border-red-200 transition"
+              title="Bu Formu Kapat ve Kaldır"
+            >
+              <Trash2 :size="13" /> Formu Kaldır / Dosya Yüklemeye Dön
+            </button>
+          </div>
+
           <CategorySpecificFields
             v-model="categorySpecificData"
             :category="form.kategori"
             :sub-category="selectedSubcategory"
+            :closeable="true"
             @sector-changed="handleSectorChanged"
+            @close="specMethod = 'upload'; categorySpecificData = {}"
           />
         </div>
       </div>
