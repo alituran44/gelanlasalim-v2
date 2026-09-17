@@ -905,9 +905,17 @@ async function handleLogin() {
     triggerAuthToast('Giriş başarılı! Yönlendiriliyorsunuz...', 'success')
 
     if (isAdminUser) {
-      await navigateTo('/admin')
+      if (typeof window !== 'undefined') {
+        window.location.href = '/admin'
+      } else {
+        await navigateTo('/admin')
+      }
     } else {
-      await navigateTo('/panel')
+      if (typeof window !== 'undefined') {
+        window.location.href = '/panel'
+      } else {
+        await navigateTo('/panel')
+      }
     }
   } catch (err: any) {
     isSubmitting.value = false
@@ -959,7 +967,11 @@ async function handleDemoLogin(role: 'company' | 'individual' | 'admin') {
 
       isSubmitting.value = false
       triggerAuthToast('Yönetici girişi yapıldı! Operasyon paneline aktarılıyorsunuz...', 'success')
-      await navigateTo('/admin')
+      if (typeof window !== 'undefined') {
+        window.location.href = '/admin'
+      } else {
+        await navigateTo('/admin')
+      }
       return
     }
 
@@ -1001,7 +1013,11 @@ async function handleDemoLogin(role: 'company' | 'individual' | 'admin') {
 
     isSubmitting.value = false
     triggerAuthToast('Giriş başarılı! Yönetim panelinize aktarılıyorsunuz...', 'success')
-    await navigateTo('/panel')
+    if (typeof window !== 'undefined') {
+      window.location.href = '/panel'
+    } else {
+      await navigateTo('/panel')
+    }
   } catch (e: any) {
     isSubmitting.value = false
     errorMessage.value = e?.message || 'Demo girişi başarısız.'

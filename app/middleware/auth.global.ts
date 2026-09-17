@@ -5,10 +5,11 @@ export default defineNuxtRouteMiddleware((to, from) => {
   if (!isPanelRoute) return
 
   // 🛡️ SEC-010 (Katman 4): Sunucu Tarafı SSR Koruması
-  // SSR sırasında HTTP başlıklarında taşınan imzalı 'ihb_session' doğrulanır.
+  // SSR sırasında HTTP başlıklarında taşınan imzalı 'ihb_session' veya 'ihb_auth' doğrulanır.
   if (import.meta.server) {
     const sessionCookie = useCookie<string | null | undefined>('ihb_session')
-    if (!sessionCookie.value) {
+    const authCookie = useCookie<string | null | undefined>('ihb_auth')
+    if (!sessionCookie.value && !authCookie.value) {
       return navigateTo('/uyelik?tab=login', { redirectCode: 302 })
     }
   }

@@ -29,8 +29,8 @@ export default defineEventHandler(async (event) => {
   // Pre-production: Şirket eşleşmesini kontrol et
   const allCompanies = getAllCompanies()
   const matchedCompany = allCompanies.find(c =>
-    c.adminEmail.toLowerCase() === email ||
-    c.members.some(m => m.email.toLowerCase() === email && m.status === 'ACTIVE') ||
+    (c.adminEmail && c.adminEmail.toLowerCase() === email) ||
+    (Array.isArray(c.members) && c.members.some(m => ((m.userEmail || (m as any).email || '').toLowerCase() === email) && m.status === 'ACTIVE')) ||
     (companyVkn && c.vkn === companyVkn)
   )
 
@@ -42,14 +42,14 @@ export default defineEventHandler(async (event) => {
   if (matchedCompany) {
     targetVkn = matchedCompany.vkn
     isVerified = matchedCompany.status === 'VERIFIED'
-    if (matchedCompany.adminEmail.toLowerCase() === email) {
+    if (matchedCompany.adminEmail && matchedCompany.adminEmail.toLowerCase() === email) {
       role = 'FİRMA_YÖNETİCİSİ'
-      userName = matchedCompany.adminName || userName
-    } else {
-      const member = matchedCompany.members.find(m => m.email.toLowerCase() === email)
+      userName = (matchedCompany as any).adminName || userName
+    } else if (Array.isArray(matchedCompany.members)) {
+      const member = matchedCompany.members.find(m => ((m.userEmail || (m as any).email || '').toLowerCase() === email))
       if (member) {
         role = member.role
-        userName = member.name || userName
+        userName = member.fullName || (member as any).name || userName
       }
     }
   } else {
