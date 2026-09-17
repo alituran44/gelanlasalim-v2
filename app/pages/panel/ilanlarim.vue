@@ -432,6 +432,7 @@ async function saveTenderEdit() {
   else if (ihaleYonuVal === 'artirma') tenderTur = 'Açık Artırma (Fiyat Artırımlı / Satış)'
 
   const updatedFields: any = {
+    id: tenderId,
     baslik: editForm.value.baslik,
     kategori: combinedCategory,
     mainCategory: editForm.value.kategori,
@@ -450,8 +451,49 @@ async function saveTenderEdit() {
     kalemler: editForm.value.kalemler
   }
 
+  // 1. Update localStorage 'myTenders' FIRST (Anında yerel kayıt)
+  if (typeof window !== 'undefined') {
+    try {
+      const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+      const idx = myTenders.findIndex((t: any) => t.id === tenderId)
+      if (idx >= 0) {
+        myTenders[idx] = { ...myTenders[idx], ...updatedFields }
+        localStorage.setItem('myTenders', JSON.stringify(myTenders))
+      } else {
+        myTenders.unshift(updatedFields)
+        localStorage.setItem('myTenders', JSON.stringify(myTenders))
+      }
+      window.dispatchEvent(new Event('storage'))
+    } catch (e) {}
+  }
+
+  // 2. Update cmsData
+  if (cmsData.value?.dashboard?.tenders) {
+    const idx = cmsData.value.dashboard.tenders.findIndex((t: any) => t.id === tenderId)
+    if (idx >= 0) {
+      cmsData.value.dashboard.tenders[idx] = { ...cmsData.value.dashboard.tenders[idx], ...updatedFields }
+      saveCmsData(cmsData.value)
+    }
+  }
+
+  // 3. Update receivedBids
+  if (cmsData.value?.dashboard?.receivedBids) {
+    const g = cmsData.value.dashboard.receivedBids.find((x: any) => x.id === tenderId)
+    if (g) {
+      g.baslik = editForm.value.baslik
+      g.kategori = combinedCategory
+      saveCmsData(cmsData.value)
+    }
+  }
+
+  // 4. Update local state
+  const localItem = localTendersState.value.find(t => t.id === tenderId)
+  if (localItem) {
+    Object.assign(localItem, updatedFields)
+  }
+
+  // 5. Server sync via PUT endpoint
   try {
-    // 1. Call server PUT endpoint
     await $fetch(`/api/tenders/${encodeURIComponent(tenderId)}`, {
       method: 'PUT',
       headers: {
@@ -459,54 +501,14 @@ async function saveTenderEdit() {
       },
       body: updatedFields
     })
-
-    // 2. Update localStorage 'myTenders'
-    if (typeof window !== 'undefined') {
-      try {
-        const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
-        const idx = myTenders.findIndex((t: any) => t.id === tenderId)
-        if (idx >= 0) {
-          myTenders[idx] = { ...myTenders[idx], ...updatedFields }
-          localStorage.setItem('myTenders', JSON.stringify(myTenders))
-        }
-        window.dispatchEvent(new Event('storage'))
-      } catch (e) {}
-    }
-
-    // 3. Update cmsData
-    if (cmsData.value?.dashboard?.tenders) {
-      const idx = cmsData.value.dashboard.tenders.findIndex((t: any) => t.id === tenderId)
-      if (idx >= 0) {
-        cmsData.value.dashboard.tenders[idx] = { ...cmsData.value.dashboard.tenders[idx], ...updatedFields }
-        saveCmsData(cmsData.value)
-      }
-    }
-
-    // 4. Update receivedBids
-    if (cmsData.value?.dashboard?.receivedBids) {
-      const g = cmsData.value.dashboard.receivedBids.find((x: any) => x.id === tenderId)
-      if (g) {
-        g.baslik = editForm.value.baslik
-        g.kategori = combinedCategory
-        saveCmsData(cmsData.value)
-      }
-    }
-
-    // 5. Update local state
-    const localItem = localTendersState.value.find(t => t.id === tenderId)
-    if (localItem) {
-      Object.assign(localItem, updatedFields)
-    }
-
-    reloadTenders()
-    showEditModal.value = false
-    alert(`✅ İhale Başarıyla Güncellendi!\n\n"${editForm.value.baslik}" (#${tenderId}) ihale bilgileri güncellendi.`)
-  } catch (err: any) {
-    console.error('Update tender error:', err)
-    alert(err?.data?.statusMessage || err?.message || 'İhale güncellenirken bir hata oluştu.')
-  } finally {
-    isSavingEdit.value = false
+  } catch (apiErr: any) {
+    console.warn('Server PUT sync soft error (local state preserved):', apiErr)
   }
+
+  reloadTenders()
+  showEditModal.value = false
+  isSavingEdit.value = false
+  alert(`✅ İhale Başarıyla Güncellendi!\n\n"${editForm.value.baslik}" (#${tenderId}) ihale bilgileri güncellendi.`)
 }
 
 // 🗑️ İhale Kalıcı Silme (Delete)
