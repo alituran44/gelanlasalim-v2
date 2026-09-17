@@ -150,15 +150,28 @@ const selectedCompanyProfileModal = ref<any>(null)
 
 const { cmsData, saveCmsData } = useCmsData()
 const { checkAccountCompleteness } = useDeepSeekAgent()
-// Clean onMounted in index.vue
-onMounted(() => {
+// Clean onMounted in index.vue - Reconcile local tenders with server store
+onMounted(async () => {
   if (typeof window !== 'undefined') {
     try {
       const raw = localStorage.getItem('myTenders')
-      if (raw && (raw.includes('IHC-2026-178') || raw.includes('aesredtruıo85urıy'))) {
-        localStorage.removeItem('myTenders')
-        localStorage.removeItem('myBids')
-        localStorage.removeItem('mySubmittedBids')
+      if (raw) {
+        const localList = JSON.parse(raw)
+        if (Array.isArray(localList) && localList.length > 0) {
+          // Reconcile client tenders with shared server store
+          await $fetch('/api/tenders/sync', {
+            method: 'POST',
+            body: { tenders: localList }
+          }).catch(() => {})
+        }
+      }
+    } catch (e) {}
+
+    try {
+      const refreshed = await $fetch<{ tenders: any[] }>('/api/tenders')
+      if (refreshed && Array.isArray(refreshed.tenders)) {
+        if (!serverTendersData.value) serverTendersData.value = { tenders: [] }
+        serverTendersData.value.tenders = refreshed.tenders
       }
     } catch (e) {}
   }
@@ -1045,17 +1058,17 @@ function openTenderByIdOrBid(bid: any) {
 
 const allTenders = computed(() => {
   const apiTenders = (serverTendersData.value?.tenders || []).filter(
-    (t: any) => t.adminApproved === true && t.durum !== 'pending_approval' && t.durum !== 'rejected'
+    (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected'
   )
   const cmsTenders = (cmsData.value?.dashboard?.tenders || []).filter(
-    (t: any) => t.adminApproved === true && t.durum !== 'pending_approval' && t.durum !== 'rejected'
+    (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected'
   )
   
   let localTenders: any[] = []
   if (typeof window !== 'undefined') {
     try {
       localTenders = JSON.parse(localStorage.getItem('myTenders') || '[]').filter(
-        (t: any) => t.adminApproved === true && t.durum !== 'pending_approval' && t.durum !== 'rejected'
+        (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected'
       )
     } catch (e) {}
   }
@@ -2611,9 +2624,9 @@ onMounted(() => {
                 <div class="absolute top-2 left-2 flex flex-col gap-1">
                   <span 
                     class="px-2 py-0.5 rounded text-[9px] font-black uppercase text-white shadow-xs backdrop-blur-xs"
-                    :class="tender.durum === 'closed' ? 'bg-amber-600' : 'bg-emerald-600'"
+                    :class="tender.durum === 'closed' ? 'bg-amber-600' : ((tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan') ? 'bg-teal-600' : 'bg-emerald-600')"
                   >
-                    {{ tender.durum === 'closed' ? '🏆 Sonuçlandı' : '🟢 Canlı İhale' }}
+                    {{ tender.durum === 'closed' ? '🏆 Sonuçlandı' : ((tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan') ? '📢 Proje & Hizmet İlanı' : '🟢 Canlı İhale') }}
                   </span>
                 </div>
 
@@ -2743,6 +2756,20 @@ onMounted(() => {
                       <span>Teklif Ver</span>
                     </button>
                   </div>
+
+                  <!-- Web Sitesi Butonu (Varsa) -->
+                  <a
+                    v-if="tender.websiteUrl"
+                    :href="tender.websiteUrl"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    @click.stop
+                    class="w-full py-1.5 px-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-300 font-bold text-[10px] transition cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
+                    title="Proje / Firma Resmi Web Sitesine Git"
+                  >
+                    <ExternalLink :size="11" class="text-teal-700" />
+                    <span>🌐 Proje / Web Sitesine Git ↗</span>
+                  </a>
 
                   <!-- 3. Canlı Teklifler (Drawer Açıcı) -->
                   <button
@@ -3712,7 +3739,68 @@ onMounted(() => {
         <!-- 🏢 3. SEKME: İHALE VE ALICI FİRMA BİLGİLERİ -->
         <!-- =================================================================== -->
         <div v-else-if="activeSpecTab === 'details'" class="flex-1 p-6 sm:p-8 bg-slate-800 overflow-y-auto custom-scrollbar space-y-5 text-white">
-          <div v-if="!isLoggedIn" class="p-8 rounded-2xl bg-slate-900 border border-amber-500/40 text-center space-y-3">
+          <!-- A. PROJE & HİZMET İLANI İSE (Herkese Açık İletişim & Web Sitesi) -->
+          <div v-if="selectedTenderModal.isIlan || selectedTenderModal.ihaleYonu === 'ihalesiz_ilan'" class="p-6 rounded-2xl bg-slate-900 border border-teal-500/50 space-y-4">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded-lg bg-teal-500/20 text-teal-300 font-black text-xs border border-teal-500/30">
+                  📢 Proje & Hizmet İlanı
+                </span>
+                <span class="text-xs text-slate-400 font-medium">Doğrudan İletişim & Tanıtım</span>
+              </div>
+              <a 
+                v-if="selectedTenderModal.websiteUrl" 
+                :href="selectedTenderModal.websiteUrl" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-md shadow-teal-600/20"
+              >
+                <ExternalLink :size="13" />
+                <span>🌐 Resmi Web Sayfasına / Projeye Git ↗</span>
+              </a>
+            </div>
+
+            <!-- İlan Açıklaması / Notu (Vatandaşın Görebileceği Açıklama) -->
+            <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-1.5">
+              <span class="text-[10px] font-black uppercase tracking-wider text-teal-400 block">İlan Sahibi Notu & Şartname Özeti:</span>
+              <p class="text-xs text-slate-200 leading-relaxed whitespace-pre-line font-medium">
+                {{ selectedTenderModal.aciklama || selectedTenderModal.baslik }}
+              </p>
+            </div>
+
+            <!-- İletişim & Adres Detayları -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs pt-2">
+              <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[11px] block">İlan Sahibi / Kurum:</span>
+                <span class="font-bold text-white text-sm">{{ selectedTenderModal.ownerCompany || selectedTenderModal.authority || 'Kurumsal Firma' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[11px] block">İletişim Telefonu:</span>
+                <a v-if="selectedTenderModal.ownerPhone" :href="'tel:' + selectedTenderModal.ownerPhone" class="font-bold text-teal-300 hover:underline text-sm">
+                  📞 {{ selectedTenderModal.ownerPhone }}
+                </a>
+                <span v-else class="font-bold text-slate-300">İlanda Belirtilmedi</span>
+              </div>
+              <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[11px] block">E-Posta:</span>
+                <a v-if="selectedTenderModal.ownerEmail" :href="'mailto:' + selectedTenderModal.ownerEmail" class="font-bold text-blue-300 hover:underline">
+                  ✉️ {{ selectedTenderModal.ownerEmail }}
+                </a>
+                <span v-else class="font-bold text-slate-300">Doğrulanmış Üye</span>
+              </div>
+              <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[11px] block">Lokasyon:</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.city || 'Balıkesir' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/80 sm:col-span-2">
+                <span class="text-slate-400 text-[11px] block">Adres / Saha:</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.teslimatAdresi || selectedTenderModal.city }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- B. STANDART İHALE İSE -->
+          <div v-else-if="!isLoggedIn" class="p-8 rounded-2xl bg-slate-900 border border-amber-500/40 text-center space-y-3">
             <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-400 flex items-center justify-center mx-auto">
               <Lock :size="24" />
             </div>
@@ -3772,13 +3860,24 @@ onMounted(() => {
           </button>
           
           <div class="flex items-center gap-2">
+            <a 
+              v-if="selectedTenderModal.websiteUrl" 
+              :href="selectedTenderModal.websiteUrl" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              class="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-black text-xs transition cursor-pointer shadow-md flex items-center gap-1.5"
+            >
+              <ExternalLink :size="13" />
+              <span>🌐 Proje Web Sayfası ↗</span>
+            </a>
+
             <NuxtLink 
               v-if="isMyOwnTender(selectedTenderModal)"
               to="/panel/gelen-teklifler"
               class="px-5 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-black text-xs transition cursor-pointer flex items-center gap-1.5"
             >
               <Building2 :size="13" class="text-amber-700" />
-              <span>👤 Kendi İlanınız (Gelen Teklifler)</span>
+              <span>👤 Sizin İlanınız</span>
             </NuxtLink>
             <button 
               v-else

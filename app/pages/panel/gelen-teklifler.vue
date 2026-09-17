@@ -53,17 +53,16 @@ const filteredReceivedBids = computed(() => {
   const allReceived = cmsData.value?.dashboard?.receivedBids || []
   const allTenders = cmsData.value?.dashboard?.tenders || []
 
-  let localMyTenderIds: string[] = []
-  let localMyTenderTitles: string[] = []
+  let localMyTenders: any[] = []
   if (typeof window !== 'undefined') {
     try {
-      const localMy = JSON.parse(localStorage.getItem('myTenders') || '[]')
-      localMyTenderIds = localMy.map((t: any) => t.id).filter(Boolean)
-      localMyTenderTitles = localMy.map((t: any) => (t.baslik || '').trim().toLowerCase()).filter(Boolean)
+      localMyTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
     } catch (e) {}
   }
+  const localMyTenderIds = localMyTenders.map((t: any) => t.id).filter(Boolean)
+  const localMyTenderTitles = localMyTenders.map((t: any) => (t.baslik || '').trim().toLowerCase()).filter(Boolean)
 
-  // Check user's own tenders by email or local storage
+  // Find user's own tenders
   const myTenders = allTenders.filter((t: any) => {
     const ownerEmail = (t.ownerEmail || '').trim().toLowerCase()
     if (currentEmail && ownerEmail && currentEmail === ownerEmail) return true
@@ -71,18 +70,49 @@ const filteredReceivedBids = computed(() => {
     if (localMyTenderTitles.includes((t.baslik || '').trim().toLowerCase())) return true
     return false
   })
-  const myTenderIds = myTenders.map((t: any) => t.id).concat(localMyTenderIds)
 
-  if (myTenderIds.length > 0) {
-    const matched = allReceived.filter((g: any) => 
-      myTenderIds.includes(g.id) || 
-      myTenders.some((mt: any) => mt.baslik === g.baslik) ||
-      localMyTenderTitles.includes((g.baslik || '').trim().toLowerCase())
-    )
-    if (matched.length > 0) return matched
+  // Combine unique my tenders from server tenders and localStorage tenders
+  const combinedMyTendersMap = new Map<string, any>()
+  for (const t of myTenders) {
+    if (t.id) combinedMyTendersMap.set(t.id, t)
+  }
+  for (const t of localMyTenders) {
+    if (t.id && !combinedMyTendersMap.has(t.id)) {
+      combinedMyTendersMap.set(t.id, t)
+    }
+  }
+  const allMyTenders = Array.from(combinedMyTendersMap.values())
+
+  // If user is logged in or has created tenders in this browser
+  if (currentEmail || allMyTenders.length > 0) {
+    if (allMyTenders.length > 0) {
+      // Map each of user's own tenders to their received bids group (or empty if none yet)
+      const myGroups: any[] = []
+      for (const t of allMyTenders) {
+        const existingGroup = allReceived.find((g: any) => 
+          g.id === t.id || 
+          (g.baslik && t.baslik && g.baslik.trim().toLowerCase() === t.baslik.trim().toLowerCase())
+        )
+        if (existingGroup) {
+          myGroups.push(existingGroup)
+        } else {
+          myGroups.push({
+            id: t.id,
+            baslik: t.baslik,
+            kategori: t.kategori,
+            bitis: t.sure || '7 gün',
+            teklifler: []
+          })
+        }
+      }
+      return myGroups
+    } else {
+      // User is logged in but hasn't created any tenders yet
+      return []
+    }
   }
 
-  // Fallback: Return all received tender groups so data is never lost or hidden
+  // Fallback for demo/unauthenticated visitor preview:
   return allReceived
 })
 

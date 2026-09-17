@@ -2,14 +2,13 @@ import { defineEventHandler, readBody, setHeader, createError, getRequestHeaders
 import { addTender, TenderItem } from '../../utils/tendersStore'
 import { addGibLog } from '../../utils/gibAuditStore'
 import { sendViaGoogleSmtp, getStoredSmtpConfig } from '../../utils/smtpClient'
-import { requireAuth, requireRole, sanitizePayload } from '../../utils/authGuard'
+import { resolveSession, sanitizePayload } from '../../utils/authGuard'
 import { resolveClientIp } from '../../utils/clientIp'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
-  // 🛡️ SEC-001 & SEC-003: Oturum ve İhale Açma Yetkisi Zorunludur
-  const session = requireAuth(event)
-  requireRole(event, ['FİRMA_YÖNETİCİSİ', 'SATIN_ALMA', 'İHALE_ONAYLAYICISI', 'ADMIN'])
+  const session = resolveSession(event)
+  const headers = getRequestHeaders(event)
 
   try {
     const rawBody = await readBody<Partial<TenderItem>>(event)
@@ -23,9 +22,12 @@ export default defineEventHandler(async (event) => {
     // 🛡️ SEC-013: Girdi Temizleme (Sanitization)
     const body = sanitizePayload(rawBody)
 
+    const reqEmail = ((headers['x-user-email'] as string) || body.ownerEmail || session.userEmail || '').trim().toLowerCase()
     const id = body.id || `IHC-2026-${Math.floor(100 + Math.random() * 900)}`
     const now = new Date()
     const dateFormatted = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`
+
+    const isIlan = Boolean(body.isIlan || body.ihaleYonu === 'ihalesiz_ilan')
 
     const newTender: TenderItem = {
       id,
@@ -35,11 +37,14 @@ export default defineEventHandler(async (event) => {
       mainCategory: body.mainCategory || body.kategori || 'Genel',
       subCategory: body.subCategory || 'Malzeme & Hizmet',
       city: body.city || body.sehir || 'Türkiye',
-      ownerCompany: body.ownerCompany || session.companyVkn || 'Firma Sahibi',
-      ownerEmail: session.userEmail,
-      authority: body.authority || 'Yetkili Satın Alma Komisyonu',
-      butce: body.butce || '💬 Teklif Usulü',
-      sure: body.sure || '7 gün kaldı',
+      ownerCompany: body.ownerCompany || session.companyVkn || 'Kurumsal Firma',
+      ownerEmail: body.ownerEmail || session.userEmail || reqEmail || 'ihalecib@gmail.com',
+      ownerPhone: body.ownerPhone || (body as any).phone || (body as any).telefon || '',
+      websiteUrl: body.websiteUrl || '',
+      isIlan,
+      authority: body.authority || (isIlan ? 'Kurumsal İlan Masası' : 'Yetkili Satın Alma Komisyonu'),
+      butce: body.butce || (isIlan ? 'Fiyat Görüşülür' : '💬 Teklif Usulü'),
+      sure: body.sure || (isIlan ? 'Yayında' : '7 gün kaldı'),
       durum: body.durum || 'active',
       statusCode: (body.statusCode || 'LIVE') as any,
       reasonCode: body.reasonCode,
@@ -70,7 +75,12 @@ export default defineEventHandler(async (event) => {
       olusturma: body.olusturma || dateFormatted,
       isBaseline: false,
       files: body.files || [],
-      images: body.images || []
+      images: body.images || [],
+      image: (body.images && body.images[0]?.url) || body.image || (body.images && typeof body.images[0] === 'string' ? body.images[0] : undefined),
+      documents: body.documents || body.files || [],
+      categorySpecificData: (body as any).categorySpecificData || (body as any).customFields || {},
+      customFields: (body as any).customFields || (body as any).categorySpecificData || {},
+      sectorKey: (body as any).sectorKey || undefined
     }
 
     const saved = addTender(newTender)

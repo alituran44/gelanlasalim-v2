@@ -63,6 +63,10 @@ const form = ref({
   aciklama: '',
   sehir: 'Balıkesir',
   teslimatAdresi: '',
+  ownerPhone: '',
+  ownerEmail: '',
+  ownerCompany: '',
+  websiteUrl: '',
   odemeYontemi: '🛡️ İhaleciBurada Güvenli Emanet Havuz (Escrow - Mal Kabul Onaylı)',
   faturaTuru: '🏢 Kurumsal E-Fatura (%20 KDV)',
   images: [] as { url: string; name: string }[],
@@ -119,6 +123,9 @@ const titlePlaceholder = computed(() => {
     }
     return "Örn: Kadıköy Moda'da 3+1 145 m² Geniş Balkonlu İskânlı Satılık Daire"
   }
+  if (cat.includes('peyzaj') || sub.includes('peyzaj') || sub.includes('bahçe') || sub.includes('fidan') || sub.includes('çim')) {
+    return "Örn: Bodrum Yalıkavak'ta 2.500 m² Lüks Villa Peyzaj Projesi & Otomatik Sulama Uygulaması"
+  }
   if (cat.includes('araç') || cat.includes('makine')) {
     return 'Örn: 2023 Model 5 Adet Dizel Forklift veya Ekskavatör Kiralama'
   }
@@ -135,6 +142,11 @@ const titlePlaceholder = computed(() => {
 const descPlaceholder = computed(() => {
   if (isRealEstateCategory.value) {
     return "Örn: Kadıköy Moda merkezde, sahile ve metroya 5 dakika yürüme mesafesinde, 145 m² brüt, 3+1, kombili, çift balkonlu, güney cepheli, masrafsız lüks satılık daire. Krediye tam uygundur, takas teklifleri değerlendirilebilir..."
+  }
+  const cat = String(form.value.kategori || '').toLowerCase()
+  const sub = String(selectedSubcategory.value || '').toLowerCase()
+  if (cat.includes('peyzaj') || sub.includes('peyzaj')) {
+    return "Örn: 2.500 m² ortak ve özel bahçe alanı için peyzaj mimarlığı projelendirme, rulo çim serme, ithal palmiye dikimi, otomatik rotor sulama sistemi montajı yapılacaktır. Detaylı teknik projeler ve keşif metrajları web sitemizde yer almaktadır..."
   }
   return "İhaleye ait teslimat süreleri, teknik şartnameler, kalite belgeleri (ISO, CE vb.) ve muayene kabul şartlarını buraya yazabilirsiniz..."
 })
@@ -493,12 +505,31 @@ async function loadTenderForEdit(tenderId: string) {
     if (tender.sectorKey) {
       currentSectorKey.value = tender.sectorKey
     }
+    if (tender.websiteUrl) form.value.websiteUrl = tender.websiteUrl
+    if (tender.ownerPhone) form.value.ownerPhone = tender.ownerPhone
+    if (tender.ownerEmail) form.value.ownerEmail = tender.ownerEmail
+    if (tender.ownerCompany) form.value.ownerCompany = tender.ownerCompany
   } catch (err) {
     console.error('Failed to load tender for editing:', err)
   }
 }
 
 onMounted(async () => {
+  // Panelden adres ve iletişim bilgilerini otomatik çekme (Pre-fill)
+  if (typeof window !== 'undefined') {
+    try {
+      const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+      if (session) {
+        if (session.city || session.il) form.value.sehir = session.city || session.il
+        if (session.address || session.adres) form.value.teslimatAdresi = session.address || session.adres
+        if (session.phone || session.telefon) form.value.ownerPhone = session.phone || session.telefon
+        if (session.email) form.value.ownerEmail = session.email
+        if (session.companyName || session.company) form.value.ownerCompany = session.companyName || session.company
+        if (session.website || session.webSitesi) form.value.websiteUrl = session.website || session.webSitesi
+      }
+    } catch (e) {}
+  }
+
   const editId = route.query.edit as string | undefined
   if (editId) {
     editingTenderId.value = editId
@@ -925,9 +956,11 @@ async function handleSubmit() {
       categorySpecificData: categorySpecificData.value,
       customFields: categorySpecificData.value,
       sectorKey: currentSectorKey.value || resolveSectorKey(form.value.kategori, selectedSubcategory.value),
-      ownerEmail: existingTender.value?.ownerEmail || ownerEmail,
-      ownerName: existingTender.value?.ownerName || ownerName,
-      ownerCompany: existingTender.value?.ownerCompany || ownerCompany,
+      websiteUrl: form.value.websiteUrl || '',
+      ownerPhone: form.value.ownerPhone || session.phone || '',
+      ownerEmail: form.value.ownerEmail || existingTender.value?.ownerEmail || ownerEmail,
+      ownerCompany: form.value.ownerCompany || existingTender.value?.ownerCompany || ownerCompany,
+      isIlan: tenderDirection === 'ihalesiz_ilan' || tenderDirection === 'ilan',
       visibility: form.value.visibility || 'public',
       isPrivate: form.value.visibility === 'private_invited',
       invitedSuppliers: form.value.invitedSuppliers || '',
@@ -984,6 +1017,9 @@ async function handleSubmit() {
       } else {
         await $fetch('/api/tenders', {
           method: 'POST',
+          headers: {
+            'x-user-email': ownerEmail
+          },
           body: tenderObject
         })
       }
@@ -1315,7 +1351,7 @@ function resetFormAndCreateNew() {
               </p>
             </div>
 
-            <!-- 5. İhalesiz İlan (Net Fiyat) -->
+            <!-- 5. Proje, Firma & Hizmet İlanı (İhalesiz) -->
             <div 
               @click="form.ihaleYonu = 'ihalesiz_ilan'"
               class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
@@ -1323,14 +1359,14 @@ function resetFormAndCreateNew() {
             >
               <div class="flex items-center justify-between">
                 <span class="font-black text-xs flex items-center gap-1.5" :class="form.ihaleYonu === 'ihalesiz_ilan' ? 'text-teal-900' : 'text-slate-800'">
-                  <span>💰 İhalesiz İlan</span>
+                  <span>📢 Proje & Hizmet İlanı</span>
                 </span>
                 <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.ihaleYonu === 'ihalesiz_ilan' ? 'border-teal-600 bg-teal-600 text-white text-[10px]' : 'border-slate-300'">
                   <span v-if="form.ihaleYonu === 'ihalesiz_ilan'">✓</span>
                 </span>
               </div>
               <p class="text-[11px] text-slate-600 leading-snug">
-                <strong>(Net Fiyatlı İlan):</strong> İhale veya eksiltme olmadan, belirlediğiniz kesin net fiyatla doğrudan satış veya alım ilanına çıkın.
+                <strong>(İhalesiz / Doğrudan Tanıtım):</strong> Canlı ihale veya eksiltme olmadan, projenizi veya hizmetinizi web siteniz ve iletişim bilgilerinizle doğrudan yayınlayın.
               </p>
             </div>
           </div>
@@ -1954,6 +1990,79 @@ function resetFormAndCreateNew() {
           >
             🚀 Yeni Kategori Öner
           </button>
+        </div>
+      </div>
+
+      <!-- KART: KURUMSAL İLETİŞİM & PROJE WEB SAYFASI -->
+      <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+          <div>
+            <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] flex items-center gap-2">
+              <span>🌐 Kurumsal İletişim & Proje Web Sayfası</span>
+            </h2>
+            <p class="text-[11px] text-slate-500 mt-0.5">
+              İlanınızda görünecek iletişim bilgileriniz ve varsa projenizin detaylı web sayfası / portfolyo bağlantısı.
+            </p>
+          </div>
+          <span class="self-start sm:self-auto text-[10px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
+            Otomatik Panelden Çekilir (Düzenlenebilir)
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <!-- Firma / Kurum Unvanı -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">FİRMA / KURUM ADI</label>
+            <input 
+              v-model="form.ownerCompany" 
+              type="text" 
+              placeholder="Örn: Simay Peyzaj & İnşaat Ltd."
+              class="w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition focus:border-blue-600 border-slate-300 text-slate-900 bg-white font-medium"
+            />
+          </div>
+
+          <!-- Telefon Numarası -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">İLETİŞİM TELEFONU</label>
+            <input 
+              v-model="form.ownerPhone" 
+              type="tel" 
+              placeholder="Örn: 0532 123 45 67"
+              class="w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition focus:border-blue-600 border-slate-300 text-slate-900 bg-white font-medium"
+            />
+          </div>
+
+          <!-- E-Posta -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">KURUMSAL E-POSTA</label>
+            <input 
+              v-model="form.ownerEmail" 
+              type="email" 
+              placeholder="Örn: info@firmam.com"
+              class="w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition focus:border-blue-600 border-slate-300 text-slate-900 bg-white font-medium"
+            />
+          </div>
+
+          <!-- Proje / Web Sayfası Linki -->
+          <div>
+            <label class="block text-[10px] font-black text-emerald-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+              <span>PROJE / WEB ADRESİ</span>
+              <span class="text-[9px] font-bold text-slate-400 font-normal">(İsteğe Bağlı)</span>
+            </label>
+            <input 
+              v-model="form.websiteUrl" 
+              type="url" 
+              placeholder="Örn: https://www.peyzaj.com/proje"
+              class="w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition focus:border-emerald-600 border-emerald-300 text-slate-900 bg-emerald-50/20 font-bold"
+            />
+          </div>
+        </div>
+
+        <div class="p-3 bg-blue-50/80 border border-blue-200/80 rounded-xl flex items-start gap-2.5">
+          <CheckCircle2 :size="16" class="text-blue-600 shrink-0 mt-0.5" />
+          <p class="text-[11px] text-blue-950 leading-relaxed">
+            <strong>Doğrudan Web Yönlendirmesi:</strong> Web adresi girdiğinizde, ilanınızda <em>"🌐 Proje / Web Sayfasına Git ↗"</em> butonu aktif olur. Üyeler ve ziyaretçiler tek tıkla projenizi inceleyebilir ve işlemlerine devam edebilir.
+          </p>
         </div>
       </div>
 

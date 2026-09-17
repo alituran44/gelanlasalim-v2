@@ -292,6 +292,8 @@ async function republishTender(tender: any) {
 }
 
 const EDIT_CATEGORIES = [
+  'Peyzaj, Çevre Düzenleme ve Bahçe',
+  'Mühendislik ve Mimarlık Hizmetleri',
   'Organizasyon ve Etkinlik',
   'İnşaat ve Yapı',
   'Gayrimenkul',
@@ -339,6 +341,9 @@ const editForm = ref({
   sure: '7 gün',
   city: 'Balıkesir',
   teslimatAdresi: '',
+  ownerPhone: '',
+  websiteUrl: '',
+  isIlan: false,
   aciklama: '',
   categorySpecificData: {} as Record<string, any>,
   kalemler: [] as Array<{ id: string; ad: string; miktar: number; birim: string; teknikAciklama?: string }>
@@ -385,6 +390,9 @@ function openEditModal(tender: any) {
     sure: tender.sure || '7 gün',
     city: tender.city || 'Balıkesir',
     teslimatAdresi: tender.teslimatAdresi || '',
+    ownerPhone: tender.ownerPhone || '',
+    websiteUrl: tender.websiteUrl || '',
+    isIlan: Boolean(tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan'),
     aciklama: tender.aciklama || '',
     categorySpecificData: tender.categorySpecificData ? JSON.parse(JSON.stringify(tender.categorySpecificData)) : {},
     kalemler: Array.isArray(tender.kalemler) && tender.kalemler.length > 0
@@ -440,12 +448,15 @@ async function saveTenderEdit() {
     ihaleYonu: ihaleYonuVal,
     isIhalesiz: ihaleYonuVal === 'ihalesiz_ilan',
     isSabitPaket: ihaleYonuVal === 'sabit_paket',
+    isIlan: ihaleYonuVal === 'ihalesiz_ilan' || editForm.value.isIlan,
     tur: tenderTur,
     rekabetTuru: tenderTur,
     butce: editForm.value.butce,
     sure: editForm.value.sure,
     city: editForm.value.city,
     teslimatAdresi: editForm.value.teslimatAdresi,
+    ownerPhone: editForm.value.ownerPhone,
+    websiteUrl: editForm.value.websiteUrl,
     aciklama: editForm.value.aciklama,
     categorySpecificData: editForm.value.categorySpecificData || {},
     kalemler: editForm.value.kalemler
@@ -806,11 +817,18 @@ const statusTabs = computed(() => {
                 <span>Süresi Doldu</span>
               </span>
               <span 
+                v-else-if="tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan'"
+                class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-teal-100 text-teal-900 border border-teal-300 flex items-center gap-1"
+              >
+                <CheckCircle2 :size="11" />
+                <span>📢 İlan Yayında (Aktif)</span>
+              </span>
+              <span 
                 v-else
                 class="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1"
               >
                 <CheckCircle2 :size="11" />
-                <span>🟢 Yayında (Aktif)</span>
+                <span>🟢 İhale Yayında (Aktif)</span>
               </span>
             </div>
 
@@ -819,7 +837,7 @@ const statusTabs = computed(() => {
             </div>
 
             <p class="text-xs text-slate-400 mt-1 font-medium">
-              {{ 'İhale Kodu:' }} <strong class="font-mono text-slate-700">{{ tender.id }}</strong> • 
+              {{ 'İhale / İlan Kodu:' }} <strong class="font-mono text-slate-700">{{ tender.id }}</strong> • 
               {{ 'Kategori:' }} {{ tender.kategori }}
             </p>
             
@@ -832,6 +850,18 @@ const statusTabs = computed(() => {
               <span v-if="tender.files?.length || tender.documents?.length" class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-blue-50 text-blue-700 font-bold border border-blue-200">
                 📄 {{ (tender.files || tender.documents)[0]?.name || 'Şartname (PDF)' }}
               </span>
+
+              <!-- Proje / Firma Web Sitesi Bağlantısı -->
+              <a 
+                v-if="tender.websiteUrl" 
+                :href="tender.websiteUrl" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-300 font-bold transition text-[10px]"
+                title="Proje / Web Sayfasına Git"
+              >
+                🌐 Web Sitesi ↗
+              </a>
 
               <!-- 🛡️ Standart Reason Code Varsa Göster -->
               <span v-if="tender.reasonCode" class="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-red-50 text-red-700 font-bold border border-red-200 text-[9px]">
@@ -1198,6 +1228,32 @@ const statusTabs = computed(() => {
                 type="text"
                 placeholder="Merkez Depo / Şantiye Teslim..."
                 class="w-full p-3 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 outline-none focus:border-blue-600 transition"
+              />
+            </div>
+          </div>
+
+          <!-- İletişim & Proje Web Sayfası -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">
+                İLETİŞİM TELEFONU
+              </label>
+              <input 
+                v-model="editForm.ownerPhone"
+                type="tel"
+                placeholder="Örn: 0532 123 45 67"
+                class="w-full p-3 rounded-xl border border-slate-200 text-xs font-medium text-slate-800 outline-none focus:border-blue-600 transition"
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-emerald-700 uppercase tracking-wider mb-1.5">
+                PROJE / WEB ADRESİ (İSTEĞE BAĞLI)
+              </label>
+              <input 
+                v-model="editForm.websiteUrl"
+                type="url"
+                placeholder="Örn: https://www.peyzaj.com"
+                class="w-full p-3 rounded-xl border border-emerald-300 text-xs font-bold text-slate-800 outline-none focus:border-emerald-600 transition bg-emerald-50/20"
               />
             </div>
           </div>

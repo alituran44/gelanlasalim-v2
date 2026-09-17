@@ -342,20 +342,28 @@ const bidForm = ref({
 })
 
 onMounted(async () => {
+  if (typeof window !== 'undefined') {
+    try {
+      const raw = localStorage.getItem('myTenders')
+      if (raw) {
+        const localList = JSON.parse(raw)
+        if (Array.isArray(localList) && localList.length > 0) {
+          // Reconcile client tenders with shared server store
+          await $fetch('/api/tenders/sync', {
+            method: 'POST',
+            body: { tenders: localList }
+          }).catch(() => {})
+        }
+      }
+    } catch (e) {}
+  }
+
   try {
     if (fetchServerTenders) {
       await fetchServerTenders()
     }
   } catch (e) {}
-  if (typeof window !== 'undefined') {
-    try {
-      const raw = localStorage.getItem('myTenders')
-      if (raw && (raw.includes('IHC-2026-178') || raw.includes('aesredtruıo85urıy'))) {
-        localStorage.removeItem('myTenders')
-        localStorage.removeItem('myBids')
-      }
-    } catch (e) {}
-  }
+
   if (typeof window !== 'undefined') {
     try {
       userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
@@ -377,8 +385,18 @@ onMounted(async () => {
 })
 
 const allTenders = computed(() => {
-  const raw = cmsData.value?.dashboard?.tenders || []
-  return raw.filter((t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected')
+  const cmsList = cmsData.value?.dashboard?.tenders || []
+  let localList: any[] = []
+  if (typeof window !== 'undefined') {
+    try {
+      localList = JSON.parse(localStorage.getItem('myTenders') || '[]')
+    } catch (e) {}
+  }
+  const map = new Map<string, any>()
+  localList.forEach(t => { if (t && t.id) map.set(t.id, t) })
+  cmsList.forEach(t => { if (t && t.id) map.set(t.id, t) })
+  const combined = Array.from(map.values())
+  return combined.filter((t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected')
 })
 
 
@@ -396,7 +414,7 @@ const costRanges = [
 ]
 
 const filteredTenders = computed(() => {
-  const q = searchQuery.value.trim().toLowerCase()
+  const q = searchQuery.value.trim().toLocaleLowerCase('tr-TR')
   let list = allTenders.value.filter(t => {
     if (activeTab.value === 'sonuc' && t.durum !== 'closed') {
       return false
@@ -430,15 +448,24 @@ const filteredTenders = computed(() => {
     }
 
     if (q) {
-      const matchTitle = (t.baslik || '').toLowerCase().includes(q)
-      const matchCat = (t.kategori || '').toLowerCase().includes(q)
-      const matchDesc = (t.aciklama || '').toLowerCase().includes(q)
-      const matchCity = (t.city || '').toLowerCase().includes(q)
-      const matchId = (t.id || '').toLowerCase().includes(q)
-      const matchAuth = (t.authority || '').toLowerCase().includes(q)
-      if (!matchTitle && !matchCat && !matchDesc && !matchCity && !matchId && !matchAuth) {
-        return false
-      }
+      const rawTokens = q.split(/\s+/).filter(Boolean)
+      const searchableText = [
+        t.baslik,
+        t.aciklama,
+        t.kategori,
+        t.subCategory,
+        t.mainCategory,
+        t.city,
+        t.authority,
+        t.ownerCompany,
+        t.websiteUrl,
+        t.id,
+        JSON.stringify(t.categorySpecificData || {}),
+        JSON.stringify(t.kalemler || [])
+      ].filter(Boolean).join(' ').toLocaleLowerCase('tr-TR')
+
+      const matchesAllTokens = rawTokens.every(tok => searchableText.includes(tok))
+      if (!matchesAllTokens) return false
     }
 
     return true
@@ -1198,8 +1225,11 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
               >
                 {{ getTenderDirectionBadge(tender).label }}
               </span>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold" :class="tender.durum === 'closed' ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'">
-                {{ tender.durum === 'closed' ? 'Tamamlandı' : '🟢 Canlı / Açık' }}
+              <span 
+                class="px-2 py-0.5 rounded text-[10px] font-bold" 
+                :class="tender.durum === 'closed' ? 'bg-amber-100 text-amber-800' : ((tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan') ? 'bg-teal-100 text-teal-900 border border-teal-300' : 'bg-emerald-100 text-emerald-800')"
+              >
+                {{ tender.durum === 'closed' ? 'Tamamlandı' : ((tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan') ? '📢 Proje & Hizmet İlanı' : '🟢 Canlı / Açık') }}
               </span>
             </div>
           </div>
@@ -1375,6 +1405,18 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             </div>
 
             <div class="flex items-center gap-2">
+              <a
+                v-if="tender.websiteUrl"
+                :href="tender.websiteUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="px-3 py-1.5 rounded bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-300 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                title="Proje / Firma Web Sitesi"
+              >
+                <ExternalLink :size="12" class="text-teal-700" />
+                <span>🌐 Web Sitesi ↗</span>
+              </a>
+
               <NuxtLink
                 v-if="isMyOwnTender(tender)"
                 to="/panel/gelen-teklifler"
@@ -1382,7 +1424,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
                 title="Bu sizin kendi ihale ilanınızdır"
               >
                 <Building2 :size="12" class="text-amber-700" />
-                <span>👤 Kendi İlanınız</span>
+                <span>👤 Sizin İlanınız</span>
               </NuxtLink>
               <button
                 v-else-if="tender.durum !== 'closed' && tender.durum !== 'expired'"
@@ -1582,7 +1624,68 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
 
         <!-- Tab 1: İhale İlanı -->
         <div v-if="detailActiveTab === 'ilan'" class="space-y-4 text-xs text-slate-700 leading-relaxed">
-          <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
+          <!-- A. PROJE & HİZMET İLANI İSE (Herkese Açık İletişim & Web Sitesi & Not) -->
+          <div v-if="selectedTenderForDetail.isIlan || selectedTenderForDetail.ihaleYonu === 'ihalesiz_ilan'" class="p-5 rounded-2xl bg-teal-50/70 border border-teal-200 space-y-4 text-slate-800">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-teal-200/80 pb-3">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded-lg bg-teal-600 text-white font-black text-xs shadow-xs">
+                  📢 Proje & Hizmet İlanı
+                </span>
+                <span class="text-xs text-teal-900 font-medium">Doğrudan İletişim & Tanıtım Vitrini</span>
+              </div>
+              <a
+                v-if="selectedTenderForDetail.websiteUrl"
+                :href="selectedTenderForDetail.websiteUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-md shrink-0"
+              >
+                <ExternalLink :size="13" />
+                <span>🌐 Resmi Web Sayfasına / Projeye Git ↗</span>
+              </a>
+            </div>
+
+            <!-- İlan Notu / Açıklaması -->
+            <div class="bg-white p-4 rounded-xl border border-teal-200/80 space-y-1.5 shadow-2xs">
+              <span class="text-[10px] font-black uppercase tracking-wider text-teal-700 block">İlan Sahibi Notu & Proje Özeti:</span>
+              <p class="text-xs text-slate-800 leading-relaxed whitespace-pre-line font-medium">
+                {{ selectedTenderForDetail.aciklama || selectedTenderForDetail.baslik }}
+              </p>
+            </div>
+
+            <!-- İletişim Bilgileri -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
+              <div class="bg-white p-3 rounded-xl border border-teal-200/80 shadow-2xs">
+                <span class="text-slate-500 text-[10px] uppercase font-bold block">İlan Sahibi / Kurum:</span>
+                <span class="font-black text-slate-900 text-sm">{{ selectedTenderForDetail.ownerCompany || selectedTenderForDetail.authority || 'Kurumsal Firma' }}</span>
+              </div>
+              <div class="bg-white p-3 rounded-xl border border-teal-200/80 shadow-2xs">
+                <span class="text-slate-500 text-[10px] uppercase font-bold block">İletişim Telefonu:</span>
+                <a v-if="selectedTenderForDetail.ownerPhone" :href="'tel:' + selectedTenderForDetail.ownerPhone" class="font-bold text-teal-700 hover:underline text-sm">
+                  📞 {{ selectedTenderForDetail.ownerPhone }}
+                </a>
+                <span v-else class="font-bold text-slate-400">İlanda Belirtilmedi</span>
+              </div>
+              <div class="bg-white p-3 rounded-xl border border-teal-200/80 shadow-2xs">
+                <span class="text-slate-500 text-[10px] uppercase font-bold block">E-Posta:</span>
+                <a v-if="selectedTenderForDetail.ownerEmail" :href="'mailto:' + selectedTenderForDetail.ownerEmail" class="font-bold text-blue-600 hover:underline">
+                  ✉️ {{ selectedTenderForDetail.ownerEmail }}
+                </a>
+                <span v-else class="font-bold text-slate-400">Doğrulanmış Üye</span>
+              </div>
+              <div class="bg-white p-3 rounded-xl border border-teal-200/80 shadow-2xs">
+                <span class="text-slate-500 text-[10px] uppercase font-bold block">Lokasyon:</span>
+                <span class="font-bold text-slate-900">{{ selectedTenderForDetail.city || 'Belirtilmedi' }}</span>
+              </div>
+              <div class="bg-white p-3 rounded-xl border border-teal-200/80 shadow-2xs sm:col-span-2">
+                <span class="text-slate-500 text-[10px] uppercase font-bold block">Adres / Saha:</span>
+                <span class="font-bold text-slate-900">{{ selectedTenderForDetail.teslimatAdresi || selectedTenderForDetail.city }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- B. STANDART İHALE İSE -->
+          <div v-else class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5">
             <div class="flex items-center justify-between">
               <h4 class="font-black text-slate-900 text-sm">Resmi İhale İlan Metni & Kapsamı</h4>
               <button
@@ -1952,6 +2055,17 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
           </button>
 
           <div class="flex items-center gap-2">
+            <a 
+              v-if="selectedTenderForDetail.websiteUrl" 
+              :href="selectedTenderForDetail.websiteUrl" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              class="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-black text-xs transition cursor-pointer shadow-md flex items-center gap-1.5"
+            >
+              <ExternalLink :size="13" />
+              <span>🌐 Web Sayfası ↗</span>
+            </a>
+
             <button 
               @click="selectedTenderForDetail = null" 
               class="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
@@ -1964,7 +2078,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
               class="px-5 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-black text-xs transition flex items-center gap-1.5 cursor-pointer"
             >
               <Building2 :size="13" class="text-amber-700" />
-              <span>👤 Kendi İlanınız (Gelen Teklifleri Gör)</span>
+              <span>👤 Sizin İlanınız</span>
             </NuxtLink>
             <button
               v-else-if="selectedTenderForDetail.durum !== 'closed' && selectedTenderForDetail.durum !== 'expired'"

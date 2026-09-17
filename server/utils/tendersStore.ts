@@ -106,10 +106,182 @@ export interface TenderItem {
   antiSnipingActive?: boolean
   lastExtendedAt?: string
   isBaseline?: boolean
+  websiteUrl?: string
+  ownerPhone?: string
+  isIlan?: boolean
   [key: string]: any
 }
 
-const BASELINE_TENDERS: TenderItem[] = []
+export const BASELINE_TENDERS: TenderItem[] = [
+  {
+    id: 'IHC-2026-101',
+    baslik: 'Bodrum Yalıkavak 2.500 m² Lüks Villa Sitesi Peyzaj ve Otomatik Sulama Projesi',
+    aciklama: 'Bodrum Yalıkavak sırtlarında bulunan 8 villalık site projemizin 2.500 m² ortak ve özel bahçe alanları için peyzaj mimarlığı projelendirme, rulo çim serme, ithal palmiye dikimi, Hunter marka otomatik damlama ve rotor sulama altyapısı montajı yapılacaktır. Detaylı teknik projeler ve keşif metrajları için web sayfamızı ziyaret edebilir veya doğrudan iletişime geçebilirsiniz.',
+    kategori: 'Peyzaj, Çevre Düzenleme ve Bahçe / Peyzaj Mimarlığı ve Proje Uygulama',
+    mainCategory: 'Peyzaj, Çevre Düzenleme ve Bahçe',
+    subCategory: 'Peyzaj Mimarlığı ve Proje Uygulama',
+    city: 'Muğla',
+    ownerCompany: 'Yıldırım Mimarlık & Peyzaj Proje A.Ş.',
+    ownerEmail: 'proje@yildirimmimarlik.com.tr',
+    ownerPhone: '0850 840 86 95',
+    websiteUrl: 'https://www.ihaleciburada.com',
+    isIlan: true,
+    ihaleYonu: 'ihalesiz_ilan',
+    tur: 'Proje & Hizmet İlanı',
+    usul: 'Doğrudan Teklif & İletişim',
+    butce: '850.000 ₺ · Net Fiyat',
+    sure: 'Yayında (Aktif İlan)',
+    durum: 'active',
+    statusCode: 'LIVE',
+    adminApproved: true,
+    aiApproved: true,
+    aiScore: 99,
+    image: 'https://images.unsplash.com/photo-1558904541-efa8c4a08931?w=800&auto=format&fit=crop&q=80',
+    images: [{ url: 'https://images.unsplash.com/photo-1558904541-efa8c4a08931?w=800&auto=format&fit=crop&q=80', name: 'Peyzaj Uygulaması' }],
+    teklifSayisi: 0,
+    olusturma: 'Bugün',
+    isBaseline: true
+  },
+  {
+    id: 'IHC-2026-102',
+    baslik: "Çanakkale Kepez Sahilinde 1.500 m² %50 Kat Karşılığı Konut İmarlı Arsa",
+    aciklama: 'Çanakkale Kepez sahil bandına 200 metre mesafede, 1.500 m² yüzölçümlü, KAKS: 1.50, Emsal 4 kat konut imarlı müstakil parsel arsa. Kat karşılığı sözleşme düzenlemek isteyen kurumsal inşaat firmaları aranmaktadır. Tapu ve imar çapı evrakları mevcuttur.',
+    kategori: 'Gayrimenkul / Arsa',
+    mainCategory: 'Gayrimenkul',
+    subCategory: 'Arsa',
+    city: 'Çanakkale',
+    ownerCompany: 'Hasan Hüseyin Yıldırım Emlak & Yatırım',
+    ownerEmail: 'emlak@ihaleciburada.com',
+    ownerPhone: '0850 840 86 95',
+    websiteUrl: 'https://www.ihaleciburada.com',
+    isIlan: true,
+    ihaleYonu: 'ihalesiz_ilan',
+    tur: 'Proje & Gayrimenkul İlanı',
+    usul: 'Kat Karşılığı Görüşme',
+    butce: 'Kat Karşılığı (%50)',
+    sure: 'Yayında (Aktif İlan)',
+    durum: 'active',
+    statusCode: 'LIVE',
+    adminApproved: true,
+    aiApproved: true,
+    aiScore: 98,
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop&q=80',
+    images: [{ url: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop&q=80', name: 'İmarlı Arsa Parsel' }],
+    teklifSayisi: 0,
+    olusturma: 'Dün',
+    isBaseline: true
+  },
+  {
+    id: 'IHC-2026-103',
+    baslik: 'Balıkesir OSB Fabrika İnşaatı 250 Ton Nervürlü İnşaat Demiri (Ø8-Ø32) Alımı',
+    aciklama: 'Balıkesir Organize Sanayi Bölgesi 2. Etap fabrika inşaatımızda kullanılmak üzere B420C kalite 250 ton nervürlü inşaat demiri eksiltme usulüyle satın alınacaktır. Sevkiyat şantiye sahamıza parça parça yapılacaktır.',
+    kategori: 'İnşaat ve Yapı / Demir-Çelik İşleri',
+    mainCategory: 'İnşaat ve Yapı',
+    subCategory: 'Demir-Çelik İşleri',
+    city: 'Balıkesir',
+    ownerCompany: 'Balıkesir Sanayi Yapı Endüstri A.Ş.',
+    ownerEmail: 'satinalma@balikesirsanayi.com.tr',
+    ownerPhone: '0850 840 86 95',
+    ihaleYonu: 'eksiltme',
+    tur: 'Açık Eksiltmeli Satın Alma',
+    usul: 'Fiyat Azaltımlı Açık Eksiltme',
+    butce: '6.450.000 ₺',
+    sure: '12 gün kaldı',
+    durum: 'active',
+    statusCode: 'LIVE',
+    adminApproved: true,
+    aiApproved: true,
+    aiScore: 97,
+    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80',
+    images: [{ url: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80', name: 'İnşaat Demiri' }],
+    teklifSayisi: 3,
+    olusturma: 'Bugün',
+    isBaseline: true
+  },
+  {
+    id: 'IHC-2026-104',
+    baslik: "İstanbul Kadıköy Moda'da 145 m² 3+1 Lüks Sıfır Balkonlu Daire",
+    aciklama: 'Kadıköy Moda sahil yürüyüş yoluna 3 dakika mesafede, kapalı otoparklı, çift asansörlü, yerden ısıtmalı ve akıllı ev altyapısına sahip sıfır daire. Krediye tam uygundur.',
+    kategori: 'Gayrimenkul / Konut',
+    mainCategory: 'Gayrimenkul',
+    subCategory: 'Konut',
+    city: 'İstanbul',
+    ownerCompany: 'Kalyoncu Gayrimenkul Yatırım Ofisi',
+    ownerEmail: 'moda@kalyoncugayrimenkul.com',
+    ownerPhone: '0850 840 86 95',
+    websiteUrl: 'https://www.ihaleciburada.com',
+    isIlan: true,
+    ihaleYonu: 'ihalesiz_ilan',
+    tur: 'Gayrimenkul Vitrin İlanı',
+    usul: 'Doğrudan Satış',
+    butce: '14.750.000 ₺',
+    sure: 'Yayında (Aktif İlan)',
+    durum: 'active',
+    statusCode: 'LIVE',
+    adminApproved: true,
+    aiApproved: true,
+    aiScore: 99,
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80',
+    images: [{ url: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800&auto=format&fit=crop&q=80', name: 'Moda Daire' }],
+    teklifSayisi: 0,
+    olusturma: 'Bugün',
+    isBaseline: true
+  },
+  {
+    id: 'IHC-2026-105',
+    baslik: 'Bursa Nilüfer Projesi 6 Ay Süreli 2 Adet 22 Ton Paletli Ekskavatör Kiralama',
+    aciklama: 'Nilüfer konut şantiyemizde 6 ay boyunca hafriyat ve kanal kazısı işlerinde çalışacak, 2021 model ve üzeri, bakımları eksiksiz 2 adet 22 ton paletli ekskavatör operatörsüz olarak kiralanacaktır.',
+    kategori: 'Araç ve İş Makineleri / İş Makinesi Kiralama',
+    mainCategory: 'Araç ve İş Makineleri',
+    subCategory: 'İş Makinesi Kiralama',
+    city: 'Bursa',
+    ownerCompany: 'Marmara Altyapı ve Hafriyat Ltd. Şti.',
+    ownerEmail: 'operasyon@marmarahafriyat.com',
+    ownerPhone: '0850 840 86 95',
+    ihaleYonu: 'kapali_zarf',
+    tur: 'Kapalı Zarf Usulü Teklif Alma',
+    usul: 'Kapalı Zarf',
+    butce: '1.200.000 ₺',
+    sure: '8 gün kaldı',
+    durum: 'active',
+    statusCode: 'LIVE',
+    adminApproved: true,
+    aiApproved: true,
+    aiScore: 96,
+    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&auto=format&fit=crop&q=80',
+    images: [{ url: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&auto=format&fit=crop&q=80', name: 'Ekskavatör' }],
+    teklifSayisi: 2,
+    olusturma: '2 gün önce',
+    isBaseline: true
+  },
+  {
+    id: 'IHC-2026-106',
+    baslik: 'İzmir Kemalpaşa Fabrikası 350 Kişilik Günlük Tabldot Yemek & Catering Hizmeti',
+    aciklama: 'Fabrikamızda çalışan 350 personelin öğle yemeği ihtiyacı için 12 ay süreli 4 kap sıcak tabldot yemek alımı ihalesidir. ISO 22000 Gıda Güvenliği belgesi zorunludur.',
+    kategori: 'Gıda ve Catering / Hazır Yemek',
+    mainCategory: 'Gıda ve Catering',
+    subCategory: 'Hazır Yemek',
+    city: 'İzmir',
+    ownerCompany: 'Ege Ambalaj ve Sanayi A.Ş.',
+    ownerEmail: 'ik@egeambalaj.com.tr',
+    ownerPhone: '0850 840 86 95',
+    ihaleYonu: 'eksiltme',
+    tur: 'Açık Eksiltme İhalesi',
+    usul: 'Fiyat Eksiltmeli',
+    butce: '3.150.000 ₺',
+    sure: '5 gün kaldı',
+    durum: 'active',
+    statusCode: 'LIVE',
+    adminApproved: true,
+    aiApproved: true,
+    aiScore: 98,
+    image: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800&auto=format&fit=crop&q=80',
+    images: [{ url: 'https://images.unsplash.com/photo-1555244162-803834f70033?w=800&auto=format&fit=crop&q=80', name: 'Catering' }],
+    teklifSayisi: 4,
+    olusturma: '3 gün önce',
+    isBaseline: true
+  }
+]
 
 declare global {
   // eslint-disable-next-line no-var
@@ -209,12 +381,31 @@ export function computeTenderTiming(tender: TenderItem): {
     } else {
       sureText = `${minutes} dakika kaldı`
     }
+    if (tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan') {
+      return {
+        durum: 'active',
+        durumLabel: '📢 Proje & Hizmet İlanı',
+        sureText,
+        isExpired: false,
+        remainingMs: diff
+      }
+    }
     return {
       durum: 'active',
       durumLabel: 'Canlı İhale',
       sureText,
       isExpired: false,
       remainingMs: diff
+    }
+  }
+
+  if (tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan') {
+    return {
+      durum: tender.durum || 'active',
+      durumLabel: '📢 Proje & Hizmet İlanı',
+      sureText: tender.sure || 'Yayında',
+      isExpired: tender.durum === 'closed',
+      remainingMs: 0
     }
   }
 
@@ -230,10 +421,18 @@ export function computeTenderTiming(tender: TenderItem): {
 export function getAllTenders(): TenderItem[] {
   if (!globalThis.__SHARED_TENDERS__) {
     const diskTenders = tryReadFromDisk()
-    if (diskTenders && Array.isArray(diskTenders)) {
-      globalThis.__SHARED_TENDERS__ = diskTenders
+    if (diskTenders && Array.isArray(diskTenders) && diskTenders.length > 0) {
+      const diskIds = new Set(diskTenders.map(t => t.id))
+      const merged = [...diskTenders]
+      for (const b of BASELINE_TENDERS) {
+        if (!diskIds.has(b.id)) {
+          merged.push(b)
+        }
+      }
+      globalThis.__SHARED_TENDERS__ = merged
     } else {
-      globalThis.__SHARED_TENDERS__ = []
+      globalThis.__SHARED_TENDERS__ = [...BASELINE_TENDERS]
+      trySaveToDisk(globalThis.__SHARED_TENDERS__)
     }
   }
 
@@ -248,9 +447,31 @@ export function getAllTenders(): TenderItem[] {
     const timing = computeTenderTiming(t)
     t.durum = timing.durum
     t.sure = timing.sureText
+    if (t.isIlan || t.ihaleYonu === 'ihalesiz_ilan') {
+      t.durumLabel = '📢 Proje & Hizmet İlanı'
+    }
   }
 
   return tenders
+}
+
+export function syncTendersBatch(incomingTenders: TenderItem[]): TenderItem[] {
+  if (!Array.isArray(incomingTenders) || incomingTenders.length === 0) {
+    return getAllTenders()
+  }
+  const current = getAllTenders()
+  const map = new Map<string, TenderItem>()
+  current.forEach(t => { if (t && t.id) map.set(t.id, t) })
+  incomingTenders.forEach(t => {
+    if (t && t.id) {
+      const existing = map.get(t.id)
+      map.set(t.id, { ...existing, ...t })
+    }
+  })
+  const updated = Array.from(map.values())
+  globalThis.__SHARED_TENDERS__ = updated
+  trySaveToDisk(updated)
+  return updated
 }
 
 export function addTender(tender: TenderItem): TenderItem {
