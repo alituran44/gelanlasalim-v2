@@ -1,9 +1,11 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { respondToJoinRequest } from '~~/server/utils/companyVerificationStore'
-import { assertTenantAccess, requireRole } from '~~/server/utils/authGuard'
+import { assertTenantAccess, requireRole, sanitizePayload } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event) || {}
+  const rawBody = await readBody(event) || {}
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
   const { vkn, requestId, approved, assignedRole } = body
 
   if (!vkn || !requestId || approved === undefined) {

@@ -1,10 +1,13 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { createAdminSession, setSessionCookie, ADMIN_SECRET_TOKEN } from '~~/server/utils/sessionStore'
 import { logSecurityEvent } from '~~/server/utils/securityAuditStore'
+import { sanitizePayload } from '~~/server/utils/authGuard'
 import { timingSafeEqual } from 'node:crypto'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event) || {}
+  const rawBody = await readBody(event) || {}
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
   const secretKey = (body.secretKey || body.password || '').trim()
 
   if (!secretKey) {

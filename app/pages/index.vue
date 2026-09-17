@@ -89,7 +89,7 @@ const router = useRouter()
 // ==================== MENÜ VE GÖRÜNÜM SEÇİMİ ====================
 const activeLeftTab = ref<'kategoriler' | 'sehirler' | 'sektorler' | 'idareler' | 'firmalar'>('kategoriler')
 const activeTimeTab = ref<'guncel' | 'gecmis' | 'sonuc' | 'detayli'>('guncel')
-const viewLayout = ref<'list' | 'grid'>('grid') // 'list' = Sahibinden Liste Görünümü, 'grid' = Vitrin Görünümü
+const viewLayout = ref<'list' | 'grid'>('grid') // 'list' = Liste Görünümü, 'grid' = Vitrin Görünümü
 const viewMode = ref<'gelismis' | 'basit'>('gelismis')
 const readMode = ref<'goster' | 'gizle'>('goster')
 const showMobileFilters = ref(false)
@@ -174,7 +174,7 @@ function toggleFaq(index: number) {
 const faqList = [
   {
     q: 'İhaleciBurada üzerinden satış yapmak güvenli mi?',
-    a: 'Evet. Platforma katılan firmalardan tüzel kişilik bilgileri, vergi dairesi ve VKN doğrulaması alınır; gerekli görülen durumlarda ek resmi belge incelemesi yapılır. Verileriniz TLS 1.3 ve AES-256 ile şifreli bağlantı üzerinden korunur; 6563 sayılı Elektronik Ticaret Kanunu ve 6698 sayılı KVKK standartlarına tam uyumlu olarak TCMB lisanslı güvenli Escrow havuzu altyapısıyla çalışılır. Mal veya hizmet teslimatı alıcı tarafından onaylanana kadar ödeme güvence altında tutulur.'
+    a: 'Evet. Platforma katılan firmalardan tüzel kişilik bilgileri, vergi dairesi ve VKN doğrulaması alınır. VKN/TCKN bilgileri algoritmik süzgeçten geçirilir; resmi GİB mükellefiyeti ve Ticaret Sicil kayıtları teyit edilene kadar firmalar \'İnceleme Bekliyor\' statüsünde tutulur. Yalnızca resmi evrak ve sicil kaydı teyit edilen firmalara Mavi Doğrulama Rozeti verilerek teklif verme yetkisi açılır. Verileriniz TLS 1.3 ve AES-256 ile şifreli bağlantı üzerinden korunur; 6563 sayılı Elektronik Ticaret Kanunu ve 6698 sayılı KVKK standartlarına tam uyumlu olarak TCMB lisanslı güvenli Escrow havuzu altyapısıyla çalışılır. Mal veya hizmet teslimatı alıcı tarafından onaylanana kadar ödeme güvence altında tutulur.'
   },
   {
     q: 'Ödeme nasıl yapılır?',
@@ -860,6 +860,13 @@ function getTenderDirectionBadge(tender: any) {
   const tur = (tender.tur || tender.rekabetTuru || '').toLowerCase()
   const yonu = (tender.ihaleYonu || '').toLowerCase()
   
+  if (yonu === 'ihalesiz_ilan' || tender.isIhalesiz || tur.includes('ihalesiz') || tur.includes('net fiyat') || tur.includes('hemen al')) {
+    return { 
+      label: '💰 İhalesiz İlan (Net Fiyat)', 
+      fullLabel: '💰 İhalesiz Sabit / Net Fiyatlı İlan',
+      class: 'bg-teal-100 text-teal-950 border-teal-400 font-black shadow-2xs' 
+    }
+  }
   if (yonu === 'sabit_paket' || tender.isSabitPaket || tur.includes('sabit') || tur.includes('paket') || tur.includes('kontenjan')) {
     return { 
       label: '🏷️ Sabit Paket & Kontenjan', 

@@ -1,12 +1,14 @@
 import { defineEventHandler, readBody } from 'h3'
 import { matchSuppliersOrBuyers } from '../../../utils/smartMatchingEngine'
-import { requireActiveSubscription } from '../../../utils/authGuard'
+import { requireActiveSubscription, sanitizePayload } from '../../../utils/authGuard'
 
 export default defineEventHandler(async (event) => {
   // 🛡️ SEC-011 (Katman 5): AI Akıllı Tedarikçi Eşleştirme Motoru aktif kurumsal abonelik gerektirir
   requireActiveSubscription(event)
 
-  const body = await readBody(event) || {}
+  const rawBody = await readBody(event) || {}
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
 
   if (!body.title) {
     return {

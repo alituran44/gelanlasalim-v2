@@ -48,8 +48,11 @@ const emit = defineEmits<{
 // Internal reactive form state
 const formData = ref<Record<string, any>>({ ...props.modelValue })
 
+// YALNIZCA EV, ARSA VE GAYRİMENKUL ŞARTNAME KRİTERLERİ (Kullanıcı Talebi: Sadece Ev & Arsa İlanı)
+const REAL_ESTATE_SECTOR_KEYS = ['gayrimenkul_arsa', 'arsa_arazi', 'konut_daire', 'ticari_gayrimenkul']
+
 // Active sector key (auto-resolved or manually selected)
-const activeSectorKey = ref<string>('insaat_yapi')
+const activeSectorKey = ref<string>('gayrimenkul_arsa')
 const isManualOverride = ref(false)
 
 // Resolve sector automatically whenever category or subcategory changes
@@ -58,9 +61,12 @@ watch(
   ([newCat, newSub]) => {
     if (!isManualOverride.value) {
       const detected = resolveSectorKey(newCat, newSub)
-      if (detected !== activeSectorKey.value) {
-        activeSectorKey.value = detected
-        emit('sectorChanged', detected)
+      const finalKey = REAL_ESTATE_SECTOR_KEYS.includes(detected) 
+        ? detected 
+        : 'gayrimenkul_arsa'
+      if (finalKey !== activeSectorKey.value) {
+        activeSectorKey.value = finalKey
+        emit('sectorChanged', finalKey)
         applyDefaultValues()
       }
     }
@@ -81,20 +87,17 @@ watch(
 
 // Active sector definition object
 const currentSector = computed<SectorDefinition>(() => {
-  return SECTOR_DEFINITIONS[activeSectorKey.value] || SECTOR_DEFINITIONS.insaat_yapi || SECTOR_DEFINITIONS.insaat_altyapi
+  return SECTOR_DEFINITIONS[activeSectorKey.value] || SECTOR_DEFINITIONS.gayrimenkul_arsa || SECTOR_DEFINITIONS.arsa_arazi || SECTOR_DEFINITIONS.konut_daire || SECTOR_DEFINITIONS.ticari_gayrimenkul
 })
 
-// Unique list of sector definitions for manual selection dropdown
+// Unique list of sector definitions for manual selection dropdown (Yalnızca Ev ve Arsa Şartnameleri)
 const availableSectors = computed(() => {
-  const seen = new Set<string>()
-  const list: SectorDefinition[] = []
-  for (const s of Object.values(SECTOR_DEFINITIONS)) {
-    if (s && s.key && !seen.has(s.key)) {
-      seen.add(s.key)
-      list.push(s)
-    }
-  }
-  return list
+  return [
+    SECTOR_DEFINITIONS.gayrimenkul_arsa,
+    SECTOR_DEFINITIONS.arsa_arazi,
+    SECTOR_DEFINITIONS.konut_daire,
+    SECTOR_DEFINITIONS.ticari_gayrimenkul
+  ].filter(Boolean) as SectorDefinition[]
 })
 
 // Grouped fields
@@ -193,7 +196,7 @@ onMounted(() => {
             <Sparkles :size="12" class="text-emerald-600" />
             {{ currentSector.badgeText }}
           </span>
-          <span class="text-xs text-slate-400 font-mono">Dinamik Şartname Kriterleri</span>
+          <span class="text-xs text-slate-400 font-mono">Ev & Arsa Gayrimenkul Kriterleri</span>
         </div>
         <h3 class="text-base sm:text-lg font-black text-slate-900 flex items-center gap-2">
           <span>{{ currentSector.name }}</span>

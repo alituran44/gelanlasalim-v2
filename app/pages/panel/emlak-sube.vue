@@ -591,7 +591,7 @@ function openPortfolioAiMatch(item?: any) {
                 Toplu Emlak İlanı Yükleme (Excel / CSV)
               </h2>
               <p class="text-xs sm:text-sm text-slate-400 mt-1">
-                Sahibinden.com standartlarındaki dinamik konut ve arsa ilanlarınızı tek bir Excel dosyası ile sisteme aktarın.
+                Ulusal emlak standartlarındaki dinamik konut ve arsa ilanlarınızı tek bir Excel dosyası ile sisteme aktarın.
               </p>
             </div>
             <div class="flex items-center gap-3">

@@ -1,6 +1,6 @@
 import { defineEventHandler, readBody } from 'h3'
 import { saveStoredSmtpConfig, SmtpConfig, sendViaGoogleSmtp } from '~~/server/utils/smtpClient'
-import { requireAdmin } from '~~/server/utils/authGuard'
+import { requireAdmin, sanitizePayload } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
   // 🛡️ Admin Yetki Doğrulaması (401/403)
@@ -8,7 +8,9 @@ export default defineEventHandler(async (event) => {
 
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
   try {
-    const body = await readBody<Partial<SmtpConfig> & { testEmail?: string }>(event)
+    const rawBody = await readBody<Partial<SmtpConfig> & { testEmail?: string }>(event)
+    // 🛡️ SEC-013: Girdi Temizleme
+    const body = sanitizePayload(rawBody || {})
 
     const updated = saveStoredSmtpConfig({
       smtpHost: body.smtpHost || 'smtp.gmail.com',

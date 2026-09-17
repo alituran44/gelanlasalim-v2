@@ -50,6 +50,7 @@ const {
   userName, 
   companyName: sessionCompanyName, 
   isLoggedIn, 
+  isCompanyVerified,
   toggleCompanyMode 
 } = useUserSession()
 
@@ -219,12 +220,25 @@ watch(() => userSession.value, () => {
       <div class="space-y-1.5">
         <div class="flex items-center gap-2 flex-wrap">
           <span 
-            class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase flex items-center gap-1 border"
-            :class="isCompanyMode ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30' : 'bg-blue-500/20 text-blue-300 border-blue-400/30'"
+            v-if="isCompanyMode && isCompanyVerified"
+            class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase flex items-center gap-1 border bg-emerald-500/20 text-emerald-300 border-emerald-400/30"
           >
-            <ShieldCheck v-if="isCompanyMode" :size="12" />
-            <User v-else :size="12" />
-            <span>{{ isCompanyMode ? 'Onaylı Kurumsal Firma' : 'Kişisel / Bireysel Hesap' }}</span>
+            <ShieldCheck :size="12" />
+            <span>✓ Onaylı Kurumsal Firma (Mavi Rozet)</span>
+          </span>
+          <span 
+            v-else-if="isCompanyMode && !isCompanyVerified"
+            class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase flex items-center gap-1 border bg-amber-500/20 text-amber-300 border-amber-400/30"
+          >
+            <Clock :size="12" />
+            <span>⏳ Kurumsal Hesap (Sicil / GİB İncelemesinde)</span>
+          </span>
+          <span 
+            v-else
+            class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase flex items-center gap-1 border bg-blue-500/20 text-blue-300 border-blue-400/30"
+          >
+            <User :size="12" />
+            <span>Kişisel / Bireysel Hesap</span>
           </span>
           <span class="text-xs text-slate-300">|</span>
           <span class="text-xs text-slate-300">{{ isCompanyMode ? 'İlk İhale Ücretsiz Paketi' : 'Kişisel Çalışma Alanı' }}</span>
@@ -597,11 +611,25 @@ watch(() => userSession.value, () => {
               <div class="flex items-center gap-2 flex-wrap">
                 <h2 class="text-xl font-black text-slate-900">{{ editProfileForm.name || displayName }}</h2>
                 <span 
-                  class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 border"
-                  :class="isCompanyMode ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200'"
+                  v-if="isCompanyMode && isCompanyVerified"
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 border bg-emerald-50 text-emerald-700 border-emerald-200"
                 >
                   <ShieldCheck :size="12" />
-                  <span>{{ isCompanyMode ? 'Onaylı Kurumsal Firma' : 'Kişisel / Bireysel Hesap' }}</span>
+                  <span>✓ Onaylı Kurumsal Firma (Mavi Rozet)</span>
+                </span>
+                <span 
+                  v-else-if="isCompanyMode && !isCompanyVerified"
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 border bg-amber-50 text-amber-800 border-amber-200"
+                >
+                  <Clock :size="12" />
+                  <span>⏳ Kurumsal Hesap (Sicil / GİB İncelemesinde)</span>
+                </span>
+                <span 
+                  v-else
+                  class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider flex items-center gap-1 border bg-blue-50 text-blue-700 border-blue-200"
+                >
+                  <User :size="12" />
+                  <span>Kişisel / Bireysel Hesap</span>
                 </span>
               </div>
               <p class="text-xs text-slate-500 font-medium flex items-center gap-3 flex-wrap">

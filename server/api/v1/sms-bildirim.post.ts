@@ -1,7 +1,10 @@
 import { defineEventHandler, readBody } from 'h3'
+import { sanitizePayload } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event) || {}
+  const rawBody = await readBody(event) || {}
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
   const { phone, email, type = 'otp', customMessage } = body
 
   if (!phone && !email) {

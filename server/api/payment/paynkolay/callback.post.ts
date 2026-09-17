@@ -1,7 +1,10 @@
 import { defineEventHandler, readBody, sendRedirect } from 'h3'
+import { sanitizePayload } from '../../../utils/authGuard'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event).catch(() => ({}))
+  const rawBody = await readBody(event).catch(() => ({}))
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
 
   // Paynkolay Return / 3D Secure Callback
   const mdStatus = body?.mdStatus || body?.Response || 'Approved'

@@ -4,18 +4,23 @@ import { sendViaGoogleSmtp, getStoredSmtpConfig } from '~~/server/utils/smtpClie
 import { logBidEvent } from '~~/server/utils/bidAuditStore'
 import { getCompanyForUser } from '~~/server/utils/companyVerificationStore'
 import { detectCollusionSignal, logSecurityEvent } from '~~/server/utils/securityAuditStore'
+import { sanitizePayload } from '~~/server/utils/authGuard'
+import { resolveClientIp } from '~~/server/utils/clientIp'
 import { getRequestHeader } from 'h3'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
   try {
-    const body = await readBody<Partial<BidItem>>(event)
-    if (!body || !body.tenderId || !body.fiyat) {
+    const rawBody = await readBody<Partial<BidItem>>(event)
+    if (!rawBody || !rawBody.tenderId || !rawBody.fiyat) {
       throw createError({
         statusCode: 400,
         statusMessage: 'İhale kimliği (tenderId) ve teklif fiyatı zorunludur.'
       })
     }
+
+    // 🛡️ SEC-013: Girdi Temizleme (Sanitization)
+    const body = sanitizePayload(rawBody)
 
     // 1. İlgili ihaleyi bul
     const allTenders = getAllTenders()
@@ -95,9 +100,8 @@ export default defineEventHandler(async (event) => {
 
     const saved = addBid(newBid)
 
-    // 🛡️ SEC-014: Olası Danışıklı Teklif (Collusion) Sinyal Tespiti
-    const fwd = getRequestHeader(event, 'x-forwarded-for')
-    const clientIp = (fwd ? fwd.split(',')[0].trim() : '') || event.node.req.socket.remoteAddress || '127.0.0.1'
+    // 🛡️ SEC-014 & SEC-IP: Olası Danışıklı Teklif (Collusion) Sinyal Tespiti
+    const clientIp = resolveClientIp(event)
 
     if (newBid.vkn) {
       const collusion = detectCollusionSignal(body.tenderId, newBid.vkn, body.eposta || '', clientIp)

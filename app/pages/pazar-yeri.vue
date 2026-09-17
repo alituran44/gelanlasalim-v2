@@ -91,6 +91,12 @@ function getTenderDirectionBadge(tender: any) {
   const tur = (tender.tur || tender.rekabetTuru || '').toLowerCase()
   const yonu = (tender.ihaleYonu || '').toLowerCase()
   
+  if (yonu === 'ihalesiz_ilan' || tender.isIhalesiz || tur.includes('ihalesiz') || tur.includes('net fiyat') || tur.includes('hemen al')) {
+    return { 
+      label: '💰 İhalesiz İlan (Net Fiyat)', 
+      class: 'bg-teal-100 text-teal-950 border-teal-400 font-black' 
+    }
+  }
   if (yonu === 'sabit_paket' || tender.isSabitPaket || tur.includes('sabit') || tur.includes('paket') || tur.includes('kontenjan')) {
     return { 
       label: '🏷️ Sabit Fiyatlı Paket & Kontenjan', 
@@ -410,8 +416,13 @@ const filteredTenders = computed(() => {
       return false
     }
 
-    if (selectedMethod.value !== 'Tümü' && !t.tur?.toLowerCase().includes(selectedMethod.value.toLowerCase()) && !t.method?.toLowerCase().includes(selectedMethod.value.toLowerCase())) {
-      return false
+    if (selectedMethod.value !== 'Tümü') {
+      const sm = selectedMethod.value.toLowerCase()
+      const tTur = (t.tur || '').toLowerCase()
+      const tMethod = (t.method || '').toLowerCase()
+      const tYonu = (t.ihaleYonu || '').toLowerCase()
+      const isMatch = tTur.includes(sm) || tMethod.includes(sm) || (sm.includes('ihalesiz') && (tYonu === 'ihalesiz_ilan' || t.isIhalesiz))
+      if (!isMatch) return false
     }
 
     if (selectedCity.value !== 'Tümü' && !t.city?.toLowerCase().includes(selectedCity.value.toLowerCase())) {

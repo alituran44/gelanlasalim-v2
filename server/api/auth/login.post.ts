@@ -1,11 +1,13 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { createSession, setSessionCookie } from '~~/server/utils/sessionStore'
-import { sanitizeXss } from '~~/server/utils/authGuard'
+import { sanitizeXss, sanitizePayload } from '~~/server/utils/authGuard'
 import { logSecurityEvent } from '~~/server/utils/securityAuditStore'
 import { getAllCompanies } from '~~/server/utils/companyVerificationStore'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event) || {}
+  const rawBody = await readBody(event) || {}
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
   const email = sanitizeXss(body.email || body.username || '').toLowerCase().trim()
   const password = body.password ? String(body.password) : ''
   const companyVkn = sanitizeXss(body.companyVkn || '').trim()
@@ -59,7 +61,7 @@ export default defineEventHandler(async (event) => {
     if (body.name && typeof body.name === 'string') {
       userName = sanitizeXss(body.name)
     }
-    isVerified = true
+    isVerified = false
   }
 
   const isAdminEmail = email === 'admin@ihaleciburada.com' || email === 'ihalecib@gmail.com' || email.startsWith('admin@')

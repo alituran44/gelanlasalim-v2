@@ -1,4 +1,5 @@
 import { defineEventHandler, readBody } from 'h3'
+import { sanitizePayload } from '~~/server/utils/authGuard'
 
 export interface NetGsmSendRequest {
   usercode?: string
@@ -11,7 +12,9 @@ export interface NetGsmSendRequest {
 }
 
 export default defineEventHandler(async (event) => {
-  const body = (await readBody(event)) as NetGsmSendRequest
+  const rawBody = (await readBody(event)) as NetGsmSendRequest
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
 
   if (!body || !body.phone || !body.message) {
     return {

@@ -2,12 +2,14 @@ import { defineEventHandler, readBody, createError } from 'h3'
 import { answerTenderQuestion, getAllTenderQuestions } from '~~/server/utils/tenderQuestionsStore'
 import { getAllTenders } from '~~/server/utils/tendersStore'
 import { createNotification } from '~~/server/utils/notificationsStore'
-import { sanitizeXss, assertTenantAccess } from '~~/server/utils/authGuard'
+import { sanitizeXss, sanitizePayload, assertTenantAccess } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
   const tenderId = event.context.params?.id
   const qid = event.context.params?.qid
-  const body = await readBody(event) || {}
+  const rawBody = await readBody(event) || {}
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
 
   if (!tenderId || !qid || !body.answer) {
     throw createError({

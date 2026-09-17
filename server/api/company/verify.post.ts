@@ -1,8 +1,12 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { registerNewCompany, getCompanyByVkn } from '~~/server/utils/companyVerificationStore'
+import { queryOfficialTaxRegistry, validateVknChecksum } from '~~/server/utils/taxVerificationService'
+import { sanitizePayload } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event) || {}
+  const rawBody = await readBody(event) || {}
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
   const { vkn, taxOffice, companyTitle, legalName, address, city, kepAddress, userEmail, userName } = body
 
   if (!vkn || typeof vkn !== 'string' || (vkn.length !== 10 && vkn.length !== 11)) {
@@ -19,9 +23,15 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Check checksum
-  const isValidChecksum = validateVknChecksum(vkn)
-  if (!isValidChecksum) {
+  // 🛡️ KATMAN 7: Gerçek GİB / Ticaret Sicil Mükellefiyet Sorgulama Servisi
+  // Sadece checksum kontrolü yetmez; gerçek tescil teyit edilmedikçe otomatik "VERIFIED" verilmez.
+  const taxResult = await queryOfficialTaxRegistry({
+    vkn,
+    taxOffice,
+    companyTitle
+  })
+
+  if (!taxResult.isValidChecksum) {
     throw createError({
       statusCode: 400,
       statusMessage: 'VKN/TCKN algoritma doğrulaması başarısız. Girdiğiniz numarayı kontrol ediniz. (Kural VER-002)'
@@ -37,7 +47,9 @@ export default defineEventHandler(async (event) => {
     city,
     kepAddress,
     ownerEmail: userEmail || 'ihalecib@gmail.com',
-    ownerName: userName || 'Firma Yöneticisi'
+    ownerName: userName || 'Firma Yöneticisi',
+    status: taxResult.status,
+    verificationBadge: taxResult.verificationBadge
   })
 
   if (!result.success) {
@@ -49,37 +61,14 @@ export default defineEventHandler(async (event) => {
 
   return {
     success: true,
-    message: 'Firma ticari kimliği başarıyla doğrulandı ve kurumsal hesap aktive edildi.',
+    status: taxResult.status,
+    isVerified: taxResult.isOfficialRegistryConfirmed,
+    verificationBadge: taxResult.verificationBadge,
+    checksumValid: true,
+    officialRegistryConfirmed: taxResult.isOfficialRegistryConfirmed,
+    message: taxResult.message,
+    officialRecord: taxResult.officialRecord,
     company: result.company,
     timestamp: new Date().toISOString()
   }
 })
-
-function validateVknChecksum(vkn: string): boolean {
-  if (!/^\d+$/.test(vkn)) return false
-  
-  if (vkn.length === 11) {
-    const digits = vkn.split('').map(Number)
-    if (digits[0] === 0) return false
-    const d10 = ((digits[0] + digits[2] + digits[4] + digits[6] + digits[8]) * 7 - (digits[1] + digits[3] + digits[5] + digits[7])) % 10
-    const d11 = (digits.slice(0, 10).reduce((a, b) => a + b, 0)) % 10
-    return digits[9] === d10 && digits[10] === d11
-  }
-
-  if (vkn.length === 10) {
-    const digits = vkn.split('').map(Number)
-    let sum = 0
-    for (let i = 0; i < 9; i++) {
-      let v = (digits[i] + 9 - i) % 10
-      if (v !== 0) {
-        v = (v * Math.pow(2, 9 - i)) % 9
-        if (v === 0) v = 9
-      }
-      sum += v
-    }
-    const checkDigit = (10 - (sum % 10)) % 10
-    return digits[9] === checkDigit
-  }
-
-  return false
-}

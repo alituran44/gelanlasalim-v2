@@ -1,5 +1,7 @@
 import { defineEventHandler, getRequestHeader, setResponseHeader, createError } from 'h3'
 
+import { resolveClientIp } from '../utils/clientIp'
+
 // In-memory rate limiting store (sliding window per IP)
 interface RateLimitRecord {
   count: number
@@ -30,11 +32,9 @@ export default defineEventHandler((event) => {
   const now = Date.now()
   cleanupStale(now)
 
-  // Get client IP address
-  const forwardedFor = getRequestHeader(event, 'x-forwarded-for')
-  const clientIp = (forwardedFor ? forwardedFor.split(',')[0].trim() : '') ||
-    event.node.req.socket.remoteAddress ||
-    '127.0.0.1'
+  // 🛡️ SEC-IP: Güvenilir İstemci IP Çözümleme (Trusted Proxy & Anti-Spoofing)
+  // Vercel / Nginx arkasında 'x-real-ip', Cloudflare arkasında 'cf-connecting-ip' önceliklendirilir.
+  const clientIp = resolveClientIp(event)
 
   const windowMs = 60 * 1000 // 1 minute window
 

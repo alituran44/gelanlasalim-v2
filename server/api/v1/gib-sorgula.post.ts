@@ -1,5 +1,6 @@
 import { defineEventHandler, readBody } from 'h3'
 import crypto from 'node:crypto'
+import { sanitizePayload } from '../../utils/authGuard'
 
 export interface GibMersisResponse {
   success: boolean
@@ -27,7 +28,9 @@ export interface GibMersisResponse {
 }
 
 export default defineEventHandler(async (event): Promise<GibMersisResponse> => {
-  const body = await readBody(event) || {}
+  const rawBody = await readBody(event) || {}
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
   const rawVkn = String(body.vkn || body.vknOrTckn || '').trim().replace(/[^0-9]/g, '')
 
   if (!rawVkn || (rawVkn.length !== 10 && rawVkn.length !== 11)) {
@@ -63,41 +66,69 @@ export default defineEventHandler(async (event): Promise<GibMersisResponse> => {
     vergiDairesi = 'Çanakkale Vergi Dairesi Müdürlüğü'
     naceKodu = '63.12.01'
     naceAciklamasi = 'Web Portalı ve Elektronik İhale Platformu Faaliyetleri'
-  } else if (rawVkn.length === 10) {
-    unvan = body.companyTitle || 'KURUMSAL B2B SANAYİ VE TİCARET ANONİM ŞİRKETİ'
-    vergiDairesi = body.taxOffice || 'Büyük Mükellefler Vergi Dairesi Başkanlığı'
-    naceKodu = '46.90.01'
-    naceAciklamasi = 'Belirli bir mala tahsis edilmemiş mağazalardaki toptan ticaret'
-  } else {
-    unvan = body.companyTitle || 'ŞAHIS TİCARİ İŞLETMESİ'
-    vergiDairesi = body.taxOffice || 'Kadıköy Vergi Dairesi Müdürlüğü'
-    naceKodu = '68.31.01'
-    naceAciklamasi = 'Gayrimenkul Acenteleri ve Brokerlik Faaliyetleri'
+    eFatura = true
+    eIrsaliye = true
+
+    const mersisNo = `0${rawVkn}00018`
+    const verificationHash = crypto.createHash('sha256').update(`${rawVkn}-${unvan}-GIB-2026`).digest('hex').substring(0, 16).toUpperCase()
+
+    return {
+      success: true,
+      code: 'GIB_VERIFIED',
+      message: 'T.C. Gelir İdaresi Başkanlığı ve MERSİS kayıtları resmi olarak teyit edildi.',
+      data: {
+        vkn: rawVkn,
+        unvan,
+        vergiDairesi,
+        faaliyetDurumu: 'FAAL / AKTİF',
+        mersisNo,
+        ticaretSicilNo: `TS-${rawVkn.slice(0, 6)}`,
+        tescilTarihi: '2021-03-15',
+        naceKodu,
+        naceAciklamasi,
+        eFaturaMukellefi: eFatura,
+        eFaturaPostaKutusu: `urn:mail:defaultpk@${rawVkn}.gib.gov.tr`,
+        eFaturaKayitTarihi: '2021-04-01',
+        eIrsaliyeMukellefi: eIrsaliye,
+        eArsivMukellefi: true,
+        gibDogrulamaKodu: `GİB-EFT-${verificationHash}`,
+        sorguZamani: new Date().toLocaleString('tr-TR')
+      },
+      timestamp: new Date().toISOString()
+    }
   }
 
+  // 🛡️ KATMAN 7: Canlı resmi tescil teyidi olmayan VKN'ler için dürüst durum döndür
+  unvan = body.companyTitle || (rawVkn.length === 10 ? 'KURUMSAL ŞİRKET (İnceleme Bekliyor)' : 'ŞAHIS İŞLETMESİ (İnceleme Bekliyor)')
+  vergiDairesi = body.taxOffice || 'İlgili Vergi Dairesi'
+  naceKodu = '46.90.01'
+  naceAciklamasi = 'Belirli bir mala tahsis edilmemiş mağazalardaki toptan ticaret'
+  eFatura = false
+  eIrsaliye = false
+
   const mersisNo = `0${rawVkn}00018`
-  const verificationHash = crypto.createHash('sha256').update(`${rawVkn}-${unvan}-GIB-2026`).digest('hex').substring(0, 16).toUpperCase()
+  const verificationHash = crypto.createHash('sha256').update(`${rawVkn}-${unvan}-PENDING`).digest('hex').substring(0, 16).toUpperCase()
 
   return {
     success: true,
-    code: 'GIB_VERIFIED',
-    message: 'T.C. Gelir İdaresi Başkanlığı ve MERSİS kayıtları başarıyla teyit edildi.',
+    code: 'GIB_PENDING_REGISTRY',
+    message: 'VKN algoritma kontrolü başarılı. Resmi Gelir İdaresi ve MERSİS sicil kaydı inceleme aşamasındadır (Mavi Rozet evrak incelemesi sonrasında verilecektir).',
     data: {
       vkn: rawVkn,
       unvan,
       vergiDairesi,
-      faaliyetDurumu: 'FAAL / AKTİF',
+      faaliyetDurumu: 'İNCELEMEDE / TEYİT BEKLİYOR' as any,
       mersisNo,
       ticaretSicilNo: `TS-${rawVkn.slice(0, 6)}`,
-      tescilTarihi: '2021-03-15',
+      tescilTarihi: new Date().toISOString().slice(0, 10),
       naceKodu,
       naceAciklamasi,
-      eFaturaMukellefi: eFatura,
-      eFaturaPostaKutusu: `urn:mail:defaultpk@${rawVkn}.gib.gov.tr`,
-      eFaturaKayitTarihi: '2021-04-01',
-      eIrsaliyeMukellefi: eIrsaliye,
-      eArsivMukellefi: true,
-      gibDogrulamaKodu: `GİB-EFT-${verificationHash}`,
+      eFaturaMukellefi: false,
+      eFaturaPostaKutusu: '',
+      eFaturaKayitTarihi: '',
+      eIrsaliyeMukellefi: false,
+      eArsivMukellefi: false,
+      gibDogrulamaKodu: `GİB-PND-${verificationHash}`,
       sorguZamani: new Date().toLocaleString('tr-TR')
     },
     timestamp: new Date().toISOString()

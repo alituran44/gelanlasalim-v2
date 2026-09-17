@@ -1,5 +1,6 @@
 import { defineEventHandler, readBody } from 'h3'
 import { sendViaGoogleSmtp, saveStoredSmtpConfig, getStoredSmtpConfig } from '~~/server/utils/smtpClient'
+import { requireAuth, sanitizePayload } from '~~/server/utils/authGuard'
 
 export interface SmtpSendRequest {
   smtpHost?: string
@@ -16,7 +17,12 @@ export interface SmtpSendRequest {
 }
 
 export default defineEventHandler(async (event) => {
-  const body = (await readBody(event)) as SmtpSendRequest
+  // 🛡️ SEC-001: Yetkisiz E-Posta Gönderimini Önle (Anti-Spam / Open Relay Prevention)
+  const session = requireAuth(event)
+
+  const rawBody = (await readBody(event)) as SmtpSendRequest
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
 
   if (!body || !body.recipientEmail || !body.subject) {
     return {

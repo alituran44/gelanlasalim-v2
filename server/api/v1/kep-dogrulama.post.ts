@@ -1,7 +1,10 @@
 import { defineEventHandler, readBody } from 'h3'
+import { sanitizePayload } from '../../utils/authGuard'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event) || {}
+  const rawBody = await readBody(event) || {}
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
   const { kepAddress } = body
 
   if (!kepAddress || typeof kepAddress !== 'string' || !kepAddress.includes('@') || !kepAddress.toLowerCase().includes('.kep.tr')) {

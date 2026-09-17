@@ -1,8 +1,11 @@
 import { defineEventHandler, readBody } from 'h3'
 import { simulateRevenueProjection, SimulationParams } from '~~/server/utils/revenueModelStore'
+import { sanitizePayload } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody<SimulationParams>(event)
+  const rawBody = await readBody<SimulationParams>(event)
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody || {} as SimulationParams)
 
   const params: SimulationParams = {
     monthlyTenderCount: Number(body?.monthlyTenderCount || 50),

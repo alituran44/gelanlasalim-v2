@@ -135,6 +135,7 @@ export const TENDER_METHODS = [
   'Açık Artırma',
   'Kapalı Zarf Usulü',
   'Sabit Fiyatlı Paket & Kontenjan',
+  'İhalesiz İlan (Net Fiyat)',
   'Doğrudan Temin / Fiyat Araştırması',
   'Pazarlık Usulü'
 ];

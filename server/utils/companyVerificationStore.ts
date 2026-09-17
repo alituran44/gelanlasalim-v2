@@ -17,6 +17,7 @@ export type CompanyRole =
   | 'TEKNİK_DEĞERLENDİRİCİ' 
   | 'TEKLİF_YETKİLİSİ' 
   | 'SONUÇ_ONAYLAYICISI' 
+  | 'MUHASEBE'
   | 'GÖRÜNTÜLEYİCİ'
 
 export interface CompanyDocument {
@@ -213,7 +214,7 @@ export function saveCompanies(companies: CompanyProfile[]) {
   trySaveCompaniesToDisk(companies)
 }
 
-// 🛡️ VER-005 & VER-003: Yeni Firma Kaydı (Mükerrer VKN Engeli)
+// 🛡️ VER-005 & KATMAN 7: Yeni Firma Kaydı (Mükerrer VKN Engeli ve Dürüst Doğrulama Statüsü)
 export function registerNewCompany(params: {
   companyTitle: string
   legalName?: string
@@ -224,6 +225,8 @@ export function registerNewCompany(params: {
   kepAddress?: string
   ownerEmail: string
   ownerName: string
+  status?: CompanyVerificationStatus
+  verificationBadge?: string
 }): { success: boolean; company?: CompanyProfile; error?: string; code?: string } {
   const companies = getAllCompanies()
   const cleanVkn = params.vkn.trim()
@@ -239,6 +242,10 @@ export function registerNewCompany(params: {
   }
 
   const now = new Date().toISOString()
+  // 🛡️ KATMAN 7: Otomatik "VERIFIED" rozeti verilmez, varsayılan statü APPROVAL_PENDING'dir
+  const companyStatus: CompanyVerificationStatus = params.status || 'APPROVAL_PENDING'
+  const badge = params.verificationBadge || (companyStatus === 'VERIFIED' ? '✓ GİB & KEP Doğrulanmış Mükellef' : '⏳ Sicil & GİB Teyidi Bekliyor (Algoritmik Kontrol Başarılı)')
+
   const newCompany: CompanyProfile = {
     id: `COMP-${cleanVkn}`,
     companyTitle: params.companyTitle.trim(),
@@ -248,10 +255,10 @@ export function registerNewCompany(params: {
     address: params.address?.trim() || '',
     city: params.city?.trim() || 'İstanbul',
     kepAddress: params.kepAddress?.trim(),
-    status: 'VERIFIED',
-    verificationBadge: '✓ GİB Doğrulanmış Mükellef',
+    status: companyStatus,
+    verificationBadge: badge,
     registeredAt: now,
-    verifiedAt: now,
+    verifiedAt: companyStatus === 'VERIFIED' ? now : undefined,
     members: [
       {
         userId: `USR-${Date.now()}`,
@@ -266,12 +273,12 @@ export function registerNewCompany(params: {
       {
         id: `DOC-${Date.now()}-1`,
         type: 'VERGI_LEVHASI',
-        title: `${params.taxOffice} Vergi Levhası`,
+        title: `${params.taxOffice} Vergi Levhası (İnceleme Bekliyor)`,
         fileUrl: '',
         uploadedAt: now,
         validUntil: '2027-05-31',
         isExpired: false,
-        verifiedByAdmin: true
+        verifiedByAdmin: companyStatus === 'VERIFIED'
       }
     ],
     joinRequests: [],
@@ -280,7 +287,7 @@ export function registerNewCompany(params: {
         action: 'COMPANY_REGISTERED',
         actor: params.ownerEmail,
         timestamp: now,
-        details: { vkn: cleanVkn, title: params.companyTitle }
+        details: { vkn: cleanVkn, title: params.companyTitle, initialStatus: companyStatus }
       }
     ]
   }
@@ -288,6 +295,49 @@ export function registerNewCompany(params: {
   companies.push(newCompany)
   saveCompanies(companies)
   return { success: true, company: newCompany }
+}
+
+/**
+ * 🛡️ KATMAN 7 & KYC Desk: Şirket doğrulama statüsünü güncelleme (Yönetici Onayı / Otomasyon)
+ */
+export function updateCompanyVerificationStatus(params: {
+  vkn: string
+  status: CompanyVerificationStatus
+  verificationBadge?: string
+  actorEmail?: string
+  reason?: string
+}): { success: boolean; company?: CompanyProfile; error?: string } {
+  const company = getCompanyByVkn(params.vkn)
+  if (!company) {
+    return { success: false, error: 'Belirtilen VKN numarasına ait şirket bulunamadı.' }
+  }
+
+  const now = new Date().toISOString()
+  company.status = params.status
+  if (params.verificationBadge) {
+    company.verificationBadge = params.verificationBadge
+  } else if (params.status === 'VERIFIED') {
+    company.verificationBadge = '✓ Doğrulanmış Kurumsal Firma (Mavi Rozet)'
+  } else if (params.status === 'REJECTED') {
+    company.verificationBadge = '✕ Başvuru Reddedildi'
+  } else {
+    company.verificationBadge = '⏳ Sicil & GİB Teyidi Bekliyor (Algoritmik Kontrol Başarılı)'
+  }
+
+  if (params.status === 'VERIFIED') {
+    company.verifiedAt = now
+    company.documents.forEach(d => { d.verifiedByAdmin = true })
+  }
+
+  company.auditLog.push({
+    action: `COMPANY_STATUS_${params.status}`,
+    actor: params.actorEmail || 'SYSTEM_ADMIN',
+    timestamp: now,
+    details: { reason: params.reason, newStatus: params.status }
+  })
+
+  saveCompanies(getAllCompanies())
+  return { success: true, company }
 }
 
 // 🛡️ VER-006: Mevcut Firmaya Katılım Talebi Gönderme

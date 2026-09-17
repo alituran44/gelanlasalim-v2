@@ -304,9 +304,19 @@ onMounted(() => {
             <Building2 :size="12" />
             <span>B2B KURUMSAL KİMLİK (BÖLÜM 2 & 5)</span>
           </span>
-          <span class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-[10px] font-black uppercase tracking-wider border border-emerald-200 flex items-center gap-1">
+          <span 
+            v-if="companyData?.status === 'VERIFIED'"
+            class="px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-[10px] font-black uppercase tracking-wider border border-emerald-200 flex items-center gap-1"
+          >
             <ShieldCheck :size="12" />
-            <span>{{ companyData?.verificationBadge || '✓ GİB Doğrulanmış Mükellef' }}</span>
+            <span>{{ companyData?.verificationBadge || '✓ Doğrulanmış Mükellef (Mavi Rozet)' }}</span>
+          </span>
+          <span 
+            v-else
+            class="px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 text-[10px] font-black uppercase tracking-wider border border-amber-200 flex items-center gap-1"
+          >
+            <Clock :size="12" />
+            <span>{{ companyData?.verificationBadge || '⏳ Sicil & GİB Teyidi Bekliyor (Algoritmik Kontrol Başarılı)' }}</span>
           </span>
         </div>
         <h1 class="text-xl sm:text-2xl font-black text-slate-900">

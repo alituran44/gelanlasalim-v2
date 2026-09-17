@@ -2,7 +2,8 @@ import { defineEventHandler, readBody, setHeader, createError, getRequestHeaders
 import { addTender, TenderItem } from '../../utils/tendersStore'
 import { addGibLog } from '../../utils/gibAuditStore'
 import { sendViaGoogleSmtp, getStoredSmtpConfig } from '../../utils/smtpClient'
-import { requireAuth, requireRole } from '../../utils/authGuard'
+import { requireAuth, requireRole, sanitizePayload } from '../../utils/authGuard'
+import { resolveClientIp } from '../../utils/clientIp'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -11,13 +12,16 @@ export default defineEventHandler(async (event) => {
   requireRole(event, ['FİRMA_YÖNETİCİSİ', 'SATIN_ALMA', 'İHALE_ONAYLAYICISI', 'ADMIN'])
 
   try {
-    const body = await readBody<Partial<TenderItem>>(event)
-    if (!body || !body.baslik) {
+    const rawBody = await readBody<Partial<TenderItem>>(event)
+    if (!rawBody || !rawBody.baslik) {
       throw createError({
         statusCode: 400,
         statusMessage: 'İhale başlığı zorunludur.'
       })
     }
+
+    // 🛡️ SEC-013: Girdi Temizleme (Sanitization)
+    const body = sanitizePayload(rawBody)
 
     const id = body.id || `IHC-2026-${Math.floor(100 + Math.random() * 900)}`
     const now = new Date()
@@ -74,10 +78,7 @@ export default defineEventHandler(async (event) => {
     // 595 Sıra No'lu VUK Genel Tebliği uyarınca yer sağlayıcı ihale denetim kaydını otomatik oluştur
     try {
       const headers = getRequestHeaders(event)
-      const forwardedFor = headers['x-forwarded-for']
-      const clientIp = typeof forwardedFor === 'string' 
-        ? forwardedFor.split(',')[0].trim()
-        : (headers['x-real-ip'] || headers['cf-connecting-ip'] || event.node.req?.socket?.remoteAddress || '127.0.0.1')
+      const clientIp = resolveClientIp(event)
       const userAgent = headers['user-agent'] || 'Web Client'
       const port = (headers['x-forwarded-port'] as string) || '443'
 

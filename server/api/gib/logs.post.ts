@@ -1,28 +1,32 @@
 import { addGibLog, GibAuditLogItem } from '~~/server/utils/gibAuditStore'
+import { requireAuth, sanitizePayload } from '~~/server/utils/authGuard'
+import { resolveClientIp } from '~~/server/utils/clientIp'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
+  // 🛡️ SEC-001: Oturum Doğrulaması
+  requireAuth(event)
+
   try {
-    const body = await readBody<Partial<GibAuditLogItem>>(event)
-    if (!body || !body.tenderId || !body.tenderTitle) {
+    const rawBody = await readBody<Partial<GibAuditLogItem>>(event)
+    if (!rawBody || !rawBody.tenderId || !rawBody.tenderTitle) {
       throw createError({
         statusCode: 400,
         statusMessage: 'İhale ID (tenderId) ve ihale başlığı zorunludur.'
       })
     }
 
-    // Capture real client IP address per 5651 & VUK guidelines
-    const headers = getRequestHeaders(event)
-    const forwardedFor = headers['x-forwarded-for']
-    const clientIp = typeof forwardedFor === 'string' 
-      ? forwardedFor.split(',')[0].trim()
-      : (headers['x-real-ip'] || headers['cf-connecting-ip'] || event.node.req.socket?.remoteAddress || '127.0.0.1')
+    // 🛡️ SEC-013: Girdi Temizleme
+    const body = sanitizePayload(rawBody)
 
+    // 🛡️ SEC-IP: Güvenilir İstemci IP Çözümleme
+    const clientIp = resolveClientIp(event)
+    const headers = getRequestHeaders(event)
     const userAgent = headers['user-agent'] || 'Web Client'
 
     const logEntry = addGibLog({
       ...body,
-      ipAddress: body.ipAddress || String(clientIp),
+      ipAddress: body.ipAddress || clientIp,
       userAgent: body.userAgent || userAgent,
       timestamp: body.timestamp || new Date().toISOString()
     })

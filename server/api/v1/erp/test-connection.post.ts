@@ -1,11 +1,13 @@
 import { defineEventHandler, readBody } from 'h3'
-import { requireActiveSubscription } from '../../../utils/authGuard'
+import { requireActiveSubscription, sanitizePayload } from '../../../utils/authGuard'
 
 export default defineEventHandler(async (event) => {
   // 🛡️ SEC-011 (Katman 5): ERP entegrasyonu Kurumsal Pro veya Enterprise aboneliği gerektirir
   requireActiveSubscription(event, 'kurumsal-pro')
 
-  const body = await readBody(event) || {}
+  const rawBody = await readBody(event) || {}
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
   const { erpSystem, host, port, dbName } = body
 
   if (!erpSystem) {

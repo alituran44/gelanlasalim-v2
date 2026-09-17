@@ -5,6 +5,7 @@ import { logSecurityEvent } from './securityAuditStore'
 import { getSessionCookie, verifySessionToken, verifyAdminSession } from './sessionStore'
 import { consumePurposeBoundMfaToken, verifyMfaOtp } from './mfaStore'
 
+import { resolveClientIp } from './clientIp'
 import { getSubscription } from './subscriptionStore'
 
 export interface UserSessionContext {
@@ -29,10 +30,7 @@ export interface UserSessionContext {
 export function resolveSession(event: H3Event): UserSessionContext {
   const headers = getRequestHeaders(event)
   const authHeader = (headers['authorization'] || '').trim()
-  const fwd = getRequestHeader(event, 'x-forwarded-for')
-  const clientIp = (fwd ? fwd.split(',')[0].trim() : '') ||
-    event.node.req.socket.remoteAddress ||
-    '127.0.0.1'
+  const clientIp = resolveClientIp(event)
 
   // 1. Admin Tespiti: Yalnızca gizli sunucu anahtarıyla veya doğrulanmış admin oturumuyla mümkündür.
   // Header'ın içinde "admin" kelimesi geçmesi KESİNLİKLE yetmez.

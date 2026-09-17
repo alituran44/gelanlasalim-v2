@@ -1,14 +1,19 @@
 import { defineEventHandler, readBody } from 'h3'
 import crypto from 'node:crypto'
+import { sanitizePayload } from '../../../utils/authGuard'
+import { resolveClientIp } from '../../../utils/clientIp'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event)
+  const rawBody = await readBody(event)
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody || {})
 
   const merchantId = process.env.PAYNKOLAY_MERCHANT_ID || '10001'
   const secretKey = process.env.PAYNKOLAY_SECRET_KEY || 'paynkolay_secret_key_demo'
   const terminalId = process.env.PAYNKOLAY_TERMINAL_ID || 'NKOLAY01'
 
-  const userIp = (event.node.req.headers['x-forwarded-for'] as string) || event.node.req.socket.remoteAddress || '127.0.0.1'
+  // 🛡️ SEC-IP: Güvenilir İstemci IP Çözümleme
+  const userIp = resolveClientIp(event)
   const orderId = 'IB-NK-' + Date.now() + '-' + Math.floor(Math.random() * 1000)
   const email = body.email || 'ihalecib@gmail.com'
   const paymentAmount = Math.round((Number(body.amount) || 900) * 100)

@@ -1,7 +1,8 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { getAllTenders, saveTenders } from '~~/server/utils/tendersStore'
 import { logGibAudit } from '~~/server/utils/gibAuditStore'
-import { assertTenantAccess, requireRole } from '~~/server/utils/authGuard'
+import { assertTenantAccess, requireRole, sanitizePayload } from '~~/server/utils/authGuard'
+import { resolveClientIp } from '~~/server/utils/clientIp'
 
 export interface AwardPayload {
   bidId: string
@@ -16,14 +17,17 @@ export interface AwardPayload {
 
 export default defineEventHandler(async (event) => {
   const tenderId = event.context.params?.id
-  const body = await readBody<AwardPayload>(event)
+  const rawBody = await readBody<AwardPayload>(event)
 
-  if (!tenderId || !body || !body.bidId || !body.winnerCompany || !body.amount) {
+  if (!tenderId || !rawBody || !rawBody.bidId || !rawBody.winnerCompany || !rawBody.amount) {
     throw createError({
       statusCode: 400,
       statusMessage: 'İhale kimliği, teklif kimliği, kazanan firma ve teklif tutarı zorunludur. (Kural AWD-001)'
     })
   }
+
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
 
   const tenders = getAllTenders()
   const tender = tenders.find(t => t.id === tenderId)
@@ -102,7 +106,7 @@ export default defineEventHandler(async (event) => {
     tax_number: '9560161511',
     user_id: body.evaluatedBy || 'ihalecib@gmail.com',
     tender_id: tender.id,
-    ip_address: '127.0.0.1',
+    ip_address: resolveClientIp(event),
     status_code: 200,
     request_payload: JSON.stringify(body),
     response_payload: JSON.stringify({ tutanakNo, targetStatus })

@@ -1,8 +1,11 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { requestJoinCompany } from '~~/server/utils/companyVerificationStore'
+import { sanitizePayload } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event) || {}
+  const rawBody = await readBody(event) || {}
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
   const { vkn, userEmail, fullName, requestedRole, note } = body
 
   if (!vkn || !userEmail || !fullName) {

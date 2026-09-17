@@ -1435,6 +1435,14 @@ function approveKyc(kyc: any) {
   kyc.badgeGranted = true
   kyc.rejectionReason = ''
   
+  // 🛡️ KATMAN 7: Sunucu tarafı şirket statüsünü de VERIFIED (Mavi Rozet) yap
+  if (kyc.taxNo || kyc.vkn) {
+    $fetch('/api/company/verify-admin', {
+      method: 'POST',
+      body: { vkn: kyc.taxNo || kyc.vkn, status: 'VERIFIED' }
+    }).catch(e => console.warn('Admin KYC server sync warning', e))
+  }
+
   // Synchronize with client session
   if (typeof window !== 'undefined') {
     try {
@@ -1468,6 +1476,14 @@ function rejectKyc(kyc: any) {
     kyc.badgeGranted = false
     kyc.rejectionReason = reason
     
+    // 🛡️ KATMAN 7: Sunucu tarafı şirket statüsünü REJECTED yap
+    if (kyc.taxNo || kyc.vkn) {
+      $fetch('/api/company/verify-admin', {
+        method: 'POST',
+        body: { vkn: kyc.taxNo || kyc.vkn, status: 'REJECTED', reason }
+      }).catch(e => console.warn('Admin KYC server sync warning', e))
+    }
+
     if (typeof window !== 'undefined') {
       try {
         const session = JSON.parse(localStorage.getItem('userSession') || '{}')
@@ -4077,7 +4093,7 @@ function removeSubmittedBid(index: number) {
                     Yakın zamanda <strong>595 No'lu VUK Genel Tebliği</strong> ile getirilen internette girilen ilanların Gelir İdaresi Başkanlığı'na (GİB) bildirimi hususu, vatandaş ve ilan veren şirketler ile ilgili münferit bir sorumluluk değildir.
                   </p>
                   <p class="text-slate-300 leading-relaxed font-normal">
-                    Bu bildirimlerdeki yasal sorumluluk; Sahibinden.com, Arabam.com, Letgo ve benzeri yer sağlayıcılar veya sosyal ağ sağlayıcılara ait olduğu gibi, B2B ihale alanında <strong>İhaleciBurada.com platformumuza (yer sağlayıcıya)</strong> aittir. Bu düzenleme ile her vatandaşın ya da şirketin ayrı ayrı GİB'e bildirim yapma zorunluluğu bulunmamaktadır. Vatandaş veya şirket ilan verdiğinde, yasal bildirimini ilan verdiği yer sağlayıcı otomatik olarak gerçekleştirir.
+                    Bu bildirimlerdeki yasal sorumluluk; internet ilan portalları, yer sağlayıcılar veya sosyal ağ sağlayıcılara ait olduğu gibi, B2B ihale alanında <strong>İhaleciBurada.com platformumuza (yer sağlayıcıya)</strong> aittir. Bu düzenleme ile her vatandaşın ya da şirketin ayrı ayrı GİB'e bildirim yapma zorunluluğu bulunmamaktadır. Vatandaş veya şirket ilan verdiğinde, yasal bildirimini ilan verdiği yer sağlayıcı otomatik olarak gerçekleştirir.
                   </p>
                   <div class="p-3 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-amber-200/90 leading-relaxed font-mono">
                     💡 <strong>Düzenlemenin Amacı:</strong> Gelir İdaresi Başkanlığı'nın platformdaki veriler ile mükelleflerin beyanlarını doğrudan karşılaştırmasını sağlamak ve ilanlar ile gerçekleşen satışlar arasındaki uyumu sıkı takip etmektir. Bu sebeple platformumuzda açılan tüm ihaleler, verilen teklifler ve nihai mutabakatlar 5651 sayılı kanun uyumlu IP, port ve zaman damgası ile kayıt altına alınarak GİB BTRANS standartlarında arşivlenmektedir.

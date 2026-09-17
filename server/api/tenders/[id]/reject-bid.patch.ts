@@ -2,7 +2,8 @@ import { defineEventHandler, readBody, createError } from 'h3'
 import { getAllBids, saveBids } from '~~/server/utils/bidsStore'
 import { getAllTenders } from '~~/server/utils/tendersStore'
 import { logGibAudit } from '~~/server/utils/gibAuditStore'
-import { assertTenantAccess, requireRole } from '~~/server/utils/authGuard'
+import { assertTenantAccess, requireRole, sanitizePayload } from '~~/server/utils/authGuard'
+import { resolveClientIp } from '~~/server/utils/clientIp'
 
 export interface RejectBidPayload {
   bidId: string
@@ -13,14 +14,17 @@ export interface RejectBidPayload {
 
 export default defineEventHandler(async (event) => {
   const tenderId = event.context.params?.id
-  const body = await readBody<RejectBidPayload>(event)
+  const rawBody = await readBody<RejectBidPayload>(event)
 
-  if (!tenderId || !body || !body.bidId || !body.reasonCode) {
+  if (!tenderId || !rawBody || !rawBody.bidId || !rawBody.reasonCode) {
     throw createError({
       statusCode: 400,
       statusMessage: 'İhale kimliği, teklif kimliği ve zorunlu ret gerekçesi (reasonCode) belirtilmelidir. (Kural AWD-002)'
     })
   }
+
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
 
   const tenders = getAllTenders()
   const tender = tenders.find(t => t.id === tenderId)
@@ -40,7 +44,7 @@ export default defineEventHandler(async (event) => {
   ].filter(Boolean)
 
   assertTenantAccess(event, allowedOwners)
-  requireRole(event, ['FİRMA_YÖNETİCİSİ', 'SATINALMA_UZMANI'])
+  requireRole(event, ['FİRMA_YÖNETİCİSİ', 'SATIN_ALMA'])
 
   const bids = getAllBids()
   const bid = bids.find(b => b.id === body.bidId && b.tenderId === tenderId)
@@ -68,7 +72,7 @@ export default defineEventHandler(async (event) => {
     tax_number: '9560161511',
     user_id: body.rejectedBy || 'ihalecib@gmail.com',
     tender_id: tenderId,
-    ip_address: '127.0.0.1',
+    ip_address: resolveClientIp(event),
     status_code: 200,
     request_payload: JSON.stringify(body),
     response_payload: JSON.stringify({ bidId: bid.id, status: 'reddedildi' })

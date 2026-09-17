@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 # Sektörler 41 - 43 (Özelleşmiş Gayrimenkul & Arsa Alt Sektörleri)
-# sahibinden.com standartları ile birebir uyumlu detaylı özellikler ve kriterler
+# Detaylı ve zengin detaylı özellikler ve kriterler
 DATA = {}
 
 # =========================================================================
-# 41. ARSA, ARAZİ, TARLA & KAT KARŞILIĞI İHALELERİ (ÖZEL - SAHİBİNDEN.COM STANDART)
+# 41. ARSA, ARAZİ, TARLA & KAT KARŞILIĞI İHALELERİ (ÖZEL - DETAYLI STANDART)
 # =========================================================================
 DATA['arsa_arazi'] = {
     'key': 'arsa_arazi',
     'name': 'Arsa, Arazi, Tarla & Kat Karşılığı İhalesi',
     'icon': 'MapPin',
-    'badgeText': '🗺️ Arsa & İmar Şartnamesi (sahibinden.com Standart)',
+    'badgeText': '🗺️ Arsa & İmar Şartnamesi',
     'description': 'Kat karşılığı konut/ticari inşaat, arsa satışı, hasılat paylaşımı ve kentsel dönüşüm alanları için ada/parsel, KAKS, TAKS, altyapı ve imar çapı kriterleri.',
     'groups': {
         'teknik': {'title': '1. İmar Fonksiyonu, Ada/Parsel, KAKS & Altyapı Donanımları', 'desc': 'İmar türü, ada/parsel, arsa yüzölçümü, emsal (KAKS), TAKS, gabari ve zengin altyapı/konum özellikleri'},
@@ -21,7 +21,7 @@ DATA['arsa_arazi'] = {
         # TEKNİK GRUBU
         {
             'id': 'imarDurumu',
-            'label': 'İmar Durumu & Fonksiyonu (sahibinden.com Standart)',
+            'label': 'İmar Durumu & Fonksiyonu',
             'type': 'select',
             'group': 'teknik',
             'required': True,
@@ -145,7 +145,7 @@ DATA['arsa_arazi'] = {
         },
         {
             'id': 'altyapiOzellikleri',
-            'label': 'Altyapı Özellikleri (sahibinden.com Standart)',
+            'label': 'Altyapı Özellikleri',
             'type': 'multi-select',
             'group': 'teknik',
             'options': [
@@ -176,7 +176,7 @@ DATA['arsa_arazi'] = {
         },
         {
             'id': 'konumCevreOzellikleri',
-            'label': 'Konum & Çevre Avantajları (sahibinden.com Standart)',
+            'label': 'Konum & Çevre Avantajları',
             'type': 'multi-select',
             'group': 'teknik',
             'options': [
@@ -409,13 +409,13 @@ DATA['arsa_arazi'] = {
 }
 
 # =========================================================================
-# 42. KONUT, DAİRE, REZİDANS & VİLLA İHALELERİ (ÖZEL - SAHİBİNDEN.COM STANDART)
+# 42. KONUT, DAİRE, REZİDANS & VİLLA İHALELERİ (ÖZEL - DETAYLI STANDART)
 # =========================================================================
 DATA['konut_daire'] = {
     'key': 'konut_daire',
     'name': 'Konut, Daire, Rezidans & Villa İhalesi',
     'icon': 'Home',
-    'badgeText': '🏠 Konut & Daire Şartnamesi (sahibinden.com Standart)',
+    'badgeText': '🏠 Konut & Daire Şartnamesi',
     'description': 'Daire, rezidans, villa ve müstakil konut alım-satım ve kiralama ihaleleri için oda sayısı, metrekare, iç/dış donanım, iskân ve deprem kriterleri.',
     'groups': {
         'teknik': {'title': '1. Konut Tipi, Metrekare, Kat & Temel Nitelikler', 'desc': 'Emlak tipi, oda sayısı, net/brüt m², kat, bina yaşı, ısınma, cephe ve donanım özellikleri'},
@@ -687,7 +687,7 @@ DATA['konut_daire'] = {
         },
         {
             'id': 'icOzellikler',
-            'label': 'İç Özellikler & Donanım (sahibinden.com Standart)',
+            'label': 'İç Özellikler & Donanım',
             'type': 'multi-select',
             'group': 'teknik',
             'options': [

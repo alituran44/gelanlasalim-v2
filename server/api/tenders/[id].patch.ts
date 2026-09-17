@@ -1,7 +1,8 @@
 import { defineEventHandler, getRouterParam, readBody, setHeader, createError } from 'h3'
 import { getAllTenders, updateTenderStatus, TenderStatus, TenderReasonCode } from '~~/server/utils/tendersStore'
 import { addGibLog } from '~~/server/utils/gibAuditStore'
-import { assertTenantAccess, requireRole } from '~~/server/utils/authGuard'
+import { assertTenantAccess, requireRole, sanitizePayload } from '~~/server/utils/authGuard'
+import { resolveClientIp } from '~~/server/utils/clientIp'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -10,15 +11,18 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 400, statusMessage: 'İhale ID belirtilmelidir.' })
   }
 
-  const body = await readBody<{
+  const rawBody = await readBody<{
     statusCode?: TenderStatus
     reasonCode?: TenderReasonCode
     reasonNote?: string
   }>(event)
 
-  if (!body || !body.statusCode) {
+  if (!rawBody || !rawBody.statusCode) {
     throw createError({ statusCode: 400, statusMessage: 'Hedef statü (statusCode) belirtilmelidir.' })
   }
+
+  // 🛡️ SEC-013: Girdi Temizleme (Sanitization)
+  const body = sanitizePayload(rawBody)
 
   const allTenders = getAllTenders()
   const target = allTenders.find(t => t.id === id)
@@ -35,7 +39,7 @@ export default defineEventHandler(async (event) => {
   ].filter(Boolean)
 
   assertTenantAccess(event, allowedOwners)
-  requireRole(event, ['FİRMA_YÖNETİCİSİ', 'SATINALMA_UZMANI'])
+  requireRole(event, ['FİRMA_YÖNETİCİSİ', 'SATIN_ALMA'])
 
   // 🛡️ State Machine Geçişini Uygula (PRD Bölüm 3.3 & 3.5)
   const result = updateTenderStatus(id, body.statusCode, {
@@ -52,6 +56,7 @@ export default defineEventHandler(async (event) => {
 
   // GİB Denetim Günlüğü (595 VUK)
   try {
+    const clientIp = resolveClientIp(event)
     if (body.statusCode === 'CANCELLED') {
       addGibLog({
         tenderId: target.id,
@@ -69,7 +74,7 @@ export default defineEventHandler(async (event) => {
         ownerPhone: '0850 840 86 95',
         city: target.city || 'Türkiye',
         address: `${target.city || 'Türkiye'} / Merkez`,
-        ipAddress: (headers['x-forwarded-for'] as string)?.split(',')[0].trim() || '127.0.0.1',
+        ipAddress: clientIp,
         timestamp: new Date().toISOString(),
         status: 'HAZIR'
       })
@@ -90,7 +95,7 @@ export default defineEventHandler(async (event) => {
         ownerPhone: '0850 840 86 95',
         city: target.city || 'Türkiye',
         address: `${target.city || 'Türkiye'} / Merkez`,
-        ipAddress: (headers['x-forwarded-for'] as string)?.split(',')[0].trim() || '127.0.0.1',
+        ipAddress: clientIp,
         timestamp: new Date().toISOString(),
         status: 'HAZIR'
       })

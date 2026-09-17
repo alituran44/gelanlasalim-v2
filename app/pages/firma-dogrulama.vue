@@ -238,19 +238,49 @@ function submitVerification() {
   currentStep.value = 4 // Open preferences step
 }
 
-function saveAllAndRedirect() {
+async function saveAllAndRedirect() {
+  const vknClean = (vergiNo.value || '').trim()
+  let isVerified = false
+  let verificationStatus = 'APPROVAL_PENDING'
+  let badge = '⏳ Sicil & GİB Teyidi Bekliyor (Algoritmik Kontrol Başarılı)'
+
+  try {
+    const res: any = await $fetch('/api/company/verify', {
+      method: 'POST',
+      body: {
+        vkn: vknClean,
+        taxOffice: vergiDairesi.value,
+        companyTitle: firmaUnvani.value,
+        address: `${mahalle.value} ${ilce.value}/${il.value}`,
+        city: il.value || 'İstanbul'
+      }
+    })
+    if (res?.success) {
+      isVerified = Boolean(res.isVerified)
+      verificationStatus = res.status || 'APPROVAL_PENDING'
+      badge = res.verificationBadge || badge
+    }
+  } catch (e) {
+    console.warn('Firma kayıt servisi uyarısı:', e)
+  }
+
   if (typeof window !== 'undefined') {
     const session = JSON.parse(localStorage.getItem('userSession') || '{}')
     
-    // Save detailed verified company details into session
     session.company = firmaUnvani.value
+    session.companyName = firmaUnvani.value
     session.companyType = firmaTuru.value
-    session.vkn = vergiNo.value
+    session.vkn = vknClean
+    session.taxNo = vknClean
     session.taxOffice = vergiDairesi.value
     session.address = `${mahalle.value} ${ilce.value}/${il.value}`
     session.roleTitle = unvanRol.value
     session.sektorler = faaliyetSektoru.value
-    session.verified = true
+    session.verified = isVerified
+    session.isVerified = isVerified
+    session.kycStatus = verificationStatus === 'VERIFIED' ? 'approved' : 'pending'
+    session.badgeGranted = isVerified
+    session.verificationBadge = badge
     session.notificationPrefs = {
       teklifler: bildirimTeklifler.value,
       ihaleler: bildirimIhaleler.value,
@@ -261,9 +291,10 @@ function saveAllAndRedirect() {
     }
     
     localStorage.setItem('userSession', JSON.stringify(session))
+    window.dispatchEvent(new Event('storage'))
+    window.dispatchEvent(new CustomEvent('user-session-changed', { detail: session }))
   }
   
-  // Verification done, redirect to plan selection or panel directly
   router.push('/panel')
 }
 </script>

@@ -1,18 +1,21 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { updateRevenueModelConfig, RevenueModelConfig } from '~~/server/utils/revenueModelStore'
-import { requireAdmin } from '~~/server/utils/authGuard'
+import { requireAdmin, sanitizePayload } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
   // 🛡️ Admin Yetki Doğrulaması (401/403)
   requireAdmin(event)
-  const body = await readBody<Partial<RevenueModelConfig>>(event)
+  const rawBody = await readBody<Partial<RevenueModelConfig>>(event)
 
-  if (!body) {
+  if (!rawBody) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Geçersiz parametre gövdesi.'
     })
   }
+
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
 
   // Alıcı komisyonu değiştirilemez (PRD kuralı: REV-001)
   if (body.buyerCommissionRate !== undefined && body.buyerCommissionRate !== 0) {

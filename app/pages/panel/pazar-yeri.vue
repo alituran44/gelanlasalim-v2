@@ -76,6 +76,9 @@ const { sendSms } = useNetGsm()
 function getTenderDirectionBadge(tender: any) {
   const tur = (tender.tur || '').toLowerCase()
   const yonu = (tender.ihaleYonu || '').toLowerCase()
+  if (yonu === 'ihalesiz_ilan' || tender.isIhalesiz || tur.includes('ihalesiz') || tur.includes('net fiyat') || tur.includes('hemen al')) {
+    return { label: '💰 İhalesiz İlan (Net Fiyat)', class: 'bg-teal-100 text-teal-900 border-teal-300 font-bold' }
+  }
   if (yonu === 'sabit_paket' || tender.isSabitPaket || tur.includes('sabit') || tur.includes('paket') || tur.includes('kontenjan')) {
     return { label: '🏷️ Sabit Paket & Kontenjan', class: 'bg-amber-100 text-amber-900 border-amber-300 font-bold' }
   }
@@ -149,8 +152,13 @@ const filteredTenders = computed(() => {
     }
 
     // Method filter
-    if (selectedMethod.value !== 'Tümü' && !t.tur?.toLowerCase().includes(selectedMethod.value.toLowerCase()) && !t.type?.toLowerCase().includes(selectedMethod.value.toLowerCase())) {
-      return false
+    if (selectedMethod.value !== 'Tümü') {
+      const sm = selectedMethod.value.toLowerCase()
+      const tTur = (t.tur || '').toLowerCase()
+      const tType = (t.type || '').toLowerCase()
+      const tYonu = (t.ihaleYonu || '').toLowerCase()
+      const isMatch = tTur.includes(sm) || tType.includes(sm) || (sm.includes('ihalesiz') && (tYonu === 'ihalesiz_ilan' || t.isIhalesiz))
+      if (!isMatch) return false
     }
 
     // City filter

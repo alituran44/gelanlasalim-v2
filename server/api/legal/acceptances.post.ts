@@ -1,9 +1,12 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { recordAcceptance, OFFICIAL_LEGAL_DOCUMENTS } from '~~/server/utils/legalComplianceStore'
 import { logSecurityEvent } from '~~/server/utils/securityAuditStore'
+import { sanitizePayload } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
-  const body = await readBody(event) || {}
+  const rawBody = await readBody(event) || {}
+  // 🛡️ SEC-013: Girdi Temizleme
+  const body = sanitizePayload(rawBody)
 
   if (!body.userEmail || !body.documentCode) {
     throw createError({

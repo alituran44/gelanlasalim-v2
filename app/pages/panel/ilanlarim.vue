@@ -68,6 +68,9 @@ watch(() => cmsData.value?.dashboard?.tenders, () => {
 function getTenderDirectionBadge(tender: any) {
   const tur = (tender.tur || tender.rekabetTuru || '').toLowerCase()
   const yonu = (tender.ihaleYonu || '').toLowerCase()
+  if (yonu === 'ihalesiz_ilan' || tender.isIhalesiz || tur.includes('ihalesiz') || tur.includes('net fiyat')) {
+    return { label: '💰 İhalesiz İlan (Net Fiyat)', class: 'bg-teal-100 text-teal-900 border-teal-300 font-bold' }
+  }
   if (yonu === 'sabit_paket' || tender.isSabitPaket || tur.includes('sabit') || tur.includes('paket') || tur.includes('kontenjan')) {
     return { label: '🏷️ Sabit Paket & Kontenjan', class: 'bg-amber-100 text-amber-900 border-amber-300 font-bold' }
   }
@@ -358,7 +361,7 @@ function openEditModal(tender: any) {
     baslik: tender.baslik || '',
     kategori: mainCat,
     subCategory: subCat,
-    ihaleYonu: tender.ihaleYonu || (tender.tur?.includes('Eksiltme') ? 'eksiltme' : (tender.tur?.includes('Artırma') ? 'artirma' : (tender.tur?.includes('Paket') ? 'sabit_paket' : 'kapali_zarf'))),
+    ihaleYonu: tender.ihaleYonu || (tender.tur?.includes('Eksiltme') ? 'eksiltme' : (tender.tur?.includes('Artırma') ? 'artirma' : (tender.tur?.includes('Paket') ? 'sabit_paket' : (tender.tur?.includes('İhalesiz') ? 'ihalesiz_ilan' : 'kapali_zarf')))),
     butce: tender.butce || '',
     sure: tender.sure || '7 gün',
     city: tender.city || 'Balıkesir',
@@ -404,7 +407,8 @@ async function saveTenderEdit() {
 
   const ihaleYonuVal = editForm.value.ihaleYonu || 'kapali_zarf'
   let tenderTur = 'Doğrudan Teklif Alma (Kapalı Zarf)'
-  if (ihaleYonuVal === 'sabit_paket') tenderTur = 'Sabit Fiyatlı Paket & Kontenjan Toplama'
+  if (ihaleYonuVal === 'ihalesiz_ilan') tenderTur = 'İhalesiz İlan (Net Fiyat)'
+  else if (ihaleYonuVal === 'sabit_paket') tenderTur = 'Sabit Fiyatlı Paket & Kontenjan Toplama'
   else if (ihaleYonuVal === 'eksiltme') tenderTur = 'Açık Eksiltme (Fiyat Azaltımlı / Alım)'
   else if (ihaleYonuVal === 'artirma') tenderTur = 'Açık Artırma (Fiyat Artırımlı / Satış)'
 
@@ -414,6 +418,8 @@ async function saveTenderEdit() {
     mainCategory: editForm.value.kategori,
     subCategory: editForm.value.subCategory,
     ihaleYonu: ihaleYonuVal,
+    isIhalesiz: ihaleYonuVal === 'ihalesiz_ilan',
+    isSabitPaket: ihaleYonuVal === 'sabit_paket',
     tur: tenderTur,
     rekabetTuru: tenderTur,
     butce: editForm.value.butce,
@@ -1117,6 +1123,7 @@ const statusTabs = computed(() => {
                 <option value="eksiltme">Açık Eksiltme (Alım)</option>
                 <option value="artirma">Açık Artırma (Satış)</option>
                 <option value="sabit_paket">Sabit Fiyatlı Paket</option>
+                <option value="ihalesiz_ilan">İhalesiz İlan (Net Fiyat)</option>
               </select>
             </div>
             <div>
