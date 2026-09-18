@@ -939,22 +939,22 @@ export function formatSectorSummaryBadges(
 
   switch (sectorKey) {
     case 'gayrimenkul_arsa':
-      if (categorySpecificData.gayrimenkulTuru) badges.push({ label: 'Mülk', value: String(categorySpecificData.gayrimenkulTuru) })
-      if (categorySpecificData.toplamAlanM2) badges.push({ label: 'Alan', value: `${Number(categorySpecificData.toplamAlanM2).toLocaleString('tr-TR')} m²` })
-      if (categorySpecificData.imarDurumu) badges.push({ label: 'İmar', value: String(categorySpecificData.imarDurumu) })
+      if (categorySpecificData.gayrimenkulTuru) badges.push({ label: 'Mülk Türü', value: String(categorySpecificData.gayrimenkulTuru) })
+      if (categorySpecificData.toplamAlanM2) badges.push({ label: 'Toplam Alan', value: `${Number(categorySpecificData.toplamAlanM2).toLocaleString('tr-TR')} m²` })
+      if (categorySpecificData.imarDurumu) badges.push({ label: 'İmar Durumu', value: String(categorySpecificData.imarDurumu) })
       if (categorySpecificData.katKarsiligiAsgariOran) badges.push({ label: 'Kat Karşılığı', value: `%${categorySpecificData.katKarsiligiAsgariOran}` })
       break
 
     case 'arsa_arazi':
-      if (categorySpecificData.adaParselNo) badges.push({ label: 'Ada/Parsel', value: String(categorySpecificData.adaParselNo) })
+      if (categorySpecificData.adaParselNo) badges.push({ label: 'Ada / Parsel', value: String(categorySpecificData.adaParselNo) })
       if (categorySpecificData.toplamYuzolcumuM2) badges.push({ label: 'Yüzölçümü', value: `${Number(categorySpecificData.toplamYuzolcumuM2).toLocaleString('tr-TR')} m²` })
-      if (categorySpecificData.imarDurumu) badges.push({ label: 'İmar', value: String(categorySpecificData.imarDurumu) })
-      if (categorySpecificData.kaksEmsalOrani) badges.push({ label: 'KAKS/Emsal', value: String(categorySpecificData.kaksEmsalOrani) })
+      if (categorySpecificData.imarDurumu) badges.push({ label: 'İmar Durumu', value: String(categorySpecificData.imarDurumu) })
+      if (categorySpecificData.kaksEmsalOrani) badges.push({ label: 'KAKS / Emsal', value: String(categorySpecificData.kaksEmsalOrani) })
       if (categorySpecificData.gabariHmax) badges.push({ label: 'Gabari', value: String(categorySpecificData.gabariHmax) })
       if (categorySpecificData.asgariKatKarsiligiOrani && Number(categorySpecificData.asgariKatKarsiligiOrani) > 0) {
         badges.push({ label: 'Kat Karşılığı', value: `%${categorySpecificData.asgariKatKarsiligiOrani}` })
       }
-      if (categorySpecificData.tapuMulkDurumu) badges.push({ label: 'Tapu', value: String(categorySpecificData.tapuMulkDurumu) })
+      if (categorySpecificData.tapuMulkDurumu) badges.push({ label: 'Tapu Durumu', value: String(categorySpecificData.tapuMulkDurumu) })
       if (categorySpecificData.kimden) badges.push({ label: 'Kimden', value: String(categorySpecificData.kimden) })
       if (Array.isArray(categorySpecificData.altyapiOzellikleri) && categorySpecificData.altyapiOzellikleri.length > 0) {
         badges.push({ label: 'Altyapı', value: `${categorySpecificData.altyapiOzellikleri.length} Donanım` })
@@ -962,42 +962,42 @@ export function formatSectorSummaryBadges(
       break
 
     case 'konut_daire':
-      if (categorySpecificData.odaSayisi) badges.push({ label: 'Oda', value: String(categorySpecificData.odaSayisi) })
+      if (categorySpecificData.odaSayisi) badges.push({ label: 'Oda Sayısı', value: String(categorySpecificData.odaSayisi) })
+      if (categorySpecificData.bulunduguKat) badges.push({ label: 'Bulunduğu Kat', value: String(categorySpecificData.bulunduguKat) })
       if (categorySpecificData.netMetrekare) badges.push({ label: 'Net Alan', value: `${categorySpecificData.netMetrekare} m²` })
-      if (categorySpecificData.konutTipi) badges.push({ label: 'Tip', value: String(categorySpecificData.konutTipi) })
-      if (categorySpecificData.binaYasi) badges.push({ label: 'Yaş', value: String(categorySpecificData.binaYasi) })
-      if (categorySpecificData.bulunduguKat) badges.push({ label: 'Kat', value: String(categorySpecificData.bulunduguKat) })
+      if (categorySpecificData.konutTipi) badges.push({ label: 'Konut Tipi', value: String(categorySpecificData.konutTipi) })
+      if (categorySpecificData.binaYasi) badges.push({ label: 'Bina Yaşı', value: String(categorySpecificData.binaYasi) })
       if (categorySpecificData.isinmaTipi) badges.push({ label: 'Isıtma', value: String(categorySpecificData.isinmaTipi) })
-      if (categorySpecificData.tapuMulkDurumu) badges.push({ label: 'Tapu', value: String(categorySpecificData.tapuMulkDurumu) })
+      if (categorySpecificData.tapuMulkDurumu) badges.push({ label: 'Tapu Durumu', value: String(categorySpecificData.tapuMulkDurumu) })
       if (categorySpecificData.kimden) badges.push({ label: 'Kimden', value: String(categorySpecificData.kimden) })
-      if (categorySpecificData.krediyeUygunluk) badges.push({ label: 'Kredi', value: String(categorySpecificData.krediyeUygunluk) })
+      if (categorySpecificData.krediyeUygunluk) badges.push({ label: 'Kredi Uygunluk', value: String(categorySpecificData.krediyeUygunluk) })
       if (Array.isArray(categorySpecificData.icOzellikler) && categorySpecificData.icOzellikler.length > 0) {
         badges.push({ label: 'İç Donanım', value: `${categorySpecificData.icOzellikler.length} Özellik` })
       }
       if (Array.isArray(categorySpecificData.disOzellikler) && categorySpecificData.disOzellikler.length > 0) {
-        badges.push({ label: 'Sosyal Tesis', value: `${categorySpecificData.disOzellikler.length} Donanım` })
+        badges.push({ label: 'Sosyal Donatı', value: `${categorySpecificData.disOzellikler.length} Donanım` })
       }
       break
 
     case 'ticari_gayrimenkul':
-      if (categorySpecificData.ticariNitelik) badges.push({ label: 'Tip', value: String(categorySpecificData.ticariNitelik) })
+      if (categorySpecificData.ticariNitelik) badges.push({ label: 'Ticari Nitelik', value: String(categorySpecificData.ticariNitelik) })
       if (categorySpecificData.kapaliAlanM2) badges.push({ label: 'Kapalı Alan', value: `${Number(categorySpecificData.kapaliAlanM2).toLocaleString('tr-TR')} m²` })
-      if (categorySpecificData.odaBolumSayisi) badges.push({ label: 'Bölüm', value: String(categorySpecificData.odaBolumSayisi) })
-      if (categorySpecificData.bulunduguKat) badges.push({ label: 'Kat', value: String(categorySpecificData.bulunduguKat) })
+      if (categorySpecificData.odaBolumSayisi) badges.push({ label: 'Bölüm Sayısı', value: String(categorySpecificData.odaBolumSayisi) })
+      if (categorySpecificData.bulunduguKat) badges.push({ label: 'Bulunduğu Kat', value: String(categorySpecificData.bulunduguKat) })
       if (categorySpecificData.isinmaTipi) badges.push({ label: 'Isıtma', value: String(categorySpecificData.isinmaTipi) })
-      if (categorySpecificData.tavanYuksekligiMetre) badges.push({ label: 'Yükseklik', value: String(categorySpecificData.tavanYuksekligiMetre) })
-      if (categorySpecificData.tirYuklemeRampasiAdedi) badges.push({ label: 'Rampa', value: `${categorySpecificData.tirYuklemeRampasiAdedi} Adet` })
-      if (categorySpecificData.tapuMulkDurumu) badges.push({ label: 'Tapu', value: String(categorySpecificData.tapuMulkDurumu) })
+      if (categorySpecificData.tavanYuksekligiMetre) badges.push({ label: 'Tavan Yüksekliği', value: String(categorySpecificData.tavanYuksekligiMetre) })
+      if (categorySpecificData.tirYuklemeRampasiAdedi) badges.push({ label: 'TIR Rampası', value: `${categorySpecificData.tirYuklemeRampasiAdedi} Adet` })
+      if (categorySpecificData.tapuMulkDurumu) badges.push({ label: 'Tapu Durumu', value: String(categorySpecificData.tapuMulkDurumu) })
       if (categorySpecificData.kimden) badges.push({ label: 'Kimden', value: String(categorySpecificData.kimden) })
-      if (categorySpecificData.krediyeUygunluk) badges.push({ label: 'Kredi', value: String(categorySpecificData.krediyeUygunluk) })
+      if (categorySpecificData.krediyeUygunluk) badges.push({ label: 'Kredi Uygunluk', value: String(categorySpecificData.krediyeUygunluk) })
       break
 
     default:
-      if (categorySpecificData.gayrimenkulTuru) badges.push({ label: 'Mülk', value: String(categorySpecificData.gayrimenkulTuru) })
+      if (categorySpecificData.gayrimenkulTuru) badges.push({ label: 'Mülk Türü', value: String(categorySpecificData.gayrimenkulTuru) })
       if (categorySpecificData.toplamAlanM2 || categorySpecificData.toplamYuzolcumuM2 || categorySpecificData.netMetrekare) {
         badges.push({ label: 'Alan', value: `${categorySpecificData.toplamAlanM2 || categorySpecificData.toplamYuzolcumuM2 || categorySpecificData.netMetrekare} m²` })
       }
-      if (categorySpecificData.imarDurumu) badges.push({ label: 'İmar', value: String(categorySpecificData.imarDurumu) })
+      if (categorySpecificData.imarDurumu) badges.push({ label: 'İmar Durumu', value: String(categorySpecificData.imarDurumu) })
       break
   }
 

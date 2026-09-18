@@ -874,10 +874,11 @@ const statusTabs = computed(() => {
               <span 
                 v-for="badge in getTenderSectorBadges(tender)" 
                 :key="badge.label" 
-                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200"
+                class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 shadow-2xs"
               >
-                <span class="text-slate-400 font-normal">{{ badge.label }}:</span>
-                <span class="text-slate-900 font-semibold">{{ badge.value }}</span>
+                <span class="text-slate-500 font-medium">{{ badge.label }}</span>
+                <span class="text-blue-600 font-black">➔</span>
+                <span class="text-slate-900 font-bold">{{ badge.value }}</span>
               </span>
             </div>
           </div>

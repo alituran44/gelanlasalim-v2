@@ -140,6 +140,18 @@ const allTenders = computed(() => {
 })
 
 const categories = computed(() => ['Tümü', ...ALL_40_CATEGORIES.map(c => c.name)])
+
+function getCategoryCount(catName: string): number {
+  if (catName === 'Tümü') return allTenders.value.length
+  const q = catName.toLocaleLowerCase('tr-TR')
+  return allTenders.value.filter(t => {
+    const k = (t.kategori || '').toLocaleLowerCase('tr-TR')
+    const mk = (t.mainCategory || '').toLocaleLowerCase('tr-TR')
+    const b = (t.baslik || '').toLocaleLowerCase('tr-TR')
+    return k.includes(q) || mk.includes(q) || b.includes(q)
+  }).length
+}
+
 const methods = TENDER_METHODS
 const cities = computed(() => ['Tümü', ...ALL_81_CITIES])
 
@@ -457,7 +469,9 @@ function downloadAllSpecs(tender: any) {
             v-model="selectedCategory"
             class="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 outline-none focus:border-blue-500"
           >
-            <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+            <option v-for="c in categories" :key="c" :value="c">
+              {{ c }} ({{ getCategoryCount(c) }})
+            </option>
           </select>
         </div>
 
@@ -581,10 +595,11 @@ function downloadAllSpecs(tender: any) {
               <span 
                 v-for="b in getTenderSectorBadges(tender)" 
                 :key="b.label"
-                class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1"
+                class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1 shadow-2xs"
               >
-                <span class="text-slate-500 font-normal">{{ b.label }}:</span>
-                <span class="text-slate-900 font-semibold">{{ b.value }}</span>
+                <span class="text-slate-500 font-medium">{{ b.label }}</span>
+                <span class="text-blue-600 font-black">➔</span>
+                <span class="text-slate-900 font-bold">{{ b.value }}</span>
               </span>
             </div>
           </div>

@@ -35,6 +35,7 @@ const fileInputRef = ref<HTMLInputElement | null>(null)
 const imageInputRef = ref<HTMLInputElement | null>(null)
 
 const isBudgetUnspecified = ref(true)
+const showAdvancedOptions = ref(false)
 const form = ref({
   ihaleYonu: 'kapali_zarf', // 'kapali_zarf' | 'eksiltme' | 'artirma' | 'sabit_paket' | 'ihalesiz_ilan'
   netFiyat: '',
@@ -785,6 +786,20 @@ async function handleSubmit() {
       currentSession = JSON.parse(localStorage.getItem('userSession') || '{}')
     } catch (e) {}
   }
+
+  // ⚠️ Zorunlu İletişim ve Teslimat Bilgisi Kontrolü
+  const effectivePhone = (form.value.ownerPhone || currentSession?.phone || '').trim()
+  if (!effectivePhone) {
+    alert('⚠️ Lütfen ihaleniz / ilanınız için iletişim telefon numarasını giriniz.')
+    return
+  }
+
+  const effectiveAddress = (form.value.teslimatAdresi || currentSession?.address || '').trim()
+  if (!effectiveAddress) {
+    alert('⚠️ Lütfen teslimat veya işin yapılacağı açık adresi giriniz.')
+    return
+  }
+
   isSubmittingTender.value = true
 
   try {
@@ -1263,188 +1278,98 @@ function resetFormAndCreateNew() {
 
         <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 mb-2">1. İhale Genel Bilgileri</h2>
         
-        <!-- 🎯 İHALE USULÜ VE TEKLİF YÖNÜ SEÇİMİ (ARTIRIMLI / AZALTIMLI / KAPALI ZARF) -->
-        <div class="space-y-2 p-4 bg-slate-50/90 rounded-2xl border-2 border-slate-200">
+        <!-- 🎯 İHALE REKABET USULÜ VE TEKLİF YÖNÜ -->
+        <div class="space-y-2 p-3 bg-slate-50/90 rounded-2xl border border-slate-200">
           <div class="flex items-center justify-between">
-            <label class="block text-[11px] font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
-              <span>🎯 İHALE REKABET USULÜ VE TEKLİF YÖNÜ *</span>
+            <label class="block text-[11px] font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <span>🎯 İHALE / İLAN TÜRÜ *</span>
             </label>
             <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-              İhale Sahibi Belirler
+              Nasıl Teklif Almak İstiyorsunuz?
             </span>
           </div>
 
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 pt-1">
-            <!-- 1. Doğrudan Teklif Alma / Kapalı Zarf Usulü (KULLANICI TALEBİ: BAŞTA) -->
-            <div 
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 pt-1">
+            <!-- 1. Doğrudan Teklif / Kapalı Zarf -->
+            <button 
+              type="button"
               @click="form.ihaleYonu = 'kapali_zarf'"
-              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
-              :class="form.ihaleYonu === 'kapali_zarf' ? 'border-purple-600 bg-purple-50/50 shadow-xs ring-2 ring-purple-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+              class="p-2.5 rounded-xl border text-left transition cursor-pointer flex flex-col justify-between"
+              :class="form.ihaleYonu === 'kapali_zarf' ? 'border-purple-600 bg-purple-50/70 shadow-xs ring-2 ring-purple-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
             >
               <div class="flex items-center justify-between">
-                <span class="font-black text-xs flex items-center gap-1.5" :class="form.ihaleYonu === 'kapali_zarf' ? 'text-purple-900' : 'text-slate-800'">
-                  <span>📑 Doğrudan Teklif Alma</span>
-                </span>
-                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.ihaleYonu === 'kapali_zarf' ? 'border-purple-600 bg-purple-600 text-white text-[10px]' : 'border-slate-300'">
-                  <span v-if="form.ihaleYonu === 'kapali_zarf'">✓</span>
-                </span>
+                <span class="font-black text-xs text-purple-900 flex items-center gap-1">📑 Kapalı Zarf</span>
+                <span v-if="form.ihaleYonu === 'kapali_zarf'" class="text-purple-600 font-bold text-xs">✓</span>
               </div>
-              <p class="text-[11px] text-slate-600 leading-snug">
-                <strong>(Kapalı Zarf):</strong> Fiyatlar gizlidir. Tedarikçiler birbirinin teklifini görmeden doğrudan size sunar.
-              </p>
-            </div>
+              <span class="text-[10px] text-slate-500 mt-1 block">Gizli doğrudan teklifler</span>
+            </button>
 
-            <!-- 2. Açık Eksiltme / Azaltımlı -->
-            <div 
+            <!-- 2. Açık Eksiltme -->
+            <button 
+              type="button"
               @click="form.ihaleYonu = 'eksiltme'"
-              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
-              :class="form.ihaleYonu === 'eksiltme' ? 'border-emerald-600 bg-emerald-50/50 shadow-xs ring-2 ring-emerald-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+              class="p-2.5 rounded-xl border text-left transition cursor-pointer flex flex-col justify-between"
+              :class="form.ihaleYonu === 'eksiltme' ? 'border-emerald-600 bg-emerald-50/70 shadow-xs ring-2 ring-emerald-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
             >
               <div class="flex items-center justify-between">
-                <span class="font-black text-xs flex items-center gap-1.5" :class="form.ihaleYonu === 'eksiltme' ? 'text-emerald-900' : 'text-slate-800'">
-                  <span>📉 Açık Eksiltme</span>
-                </span>
-                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.ihaleYonu === 'eksiltme' ? 'border-emerald-600 bg-emerald-600 text-white text-[10px]' : 'border-slate-300'">
-                  <span v-if="form.ihaleYonu === 'eksiltme'">✓</span>
-                </span>
+                <span class="font-black text-xs text-emerald-900 flex items-center gap-1">📉 Eksiltme</span>
+                <span v-if="form.ihaleYonu === 'eksiltme'" class="text-emerald-600 font-bold text-xs">✓</span>
               </div>
-              <p class="text-[11px] text-slate-600 leading-snug">
-                <strong>(Fiyat Azaltımlı - Alım):</strong> Alıcı sizsiniz. Tedarikçiler en düşük fiyatı vermek için yarışır.
-              </p>
-            </div>
+              <span class="text-[10px] text-slate-500 mt-1 block">En düşük fiyat yarışı</span>
+            </button>
 
-            <!-- 3. Açık Artırma / Artırımlı -->
-            <div 
+            <!-- 3. Açık Artırma -->
+            <button 
+              type="button"
               @click="form.ihaleYonu = 'artirma'"
-              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
-              :class="form.ihaleYonu === 'artirma' ? 'border-blue-600 bg-blue-50/50 shadow-xs ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+              class="p-2.5 rounded-xl border text-left transition cursor-pointer flex flex-col justify-between"
+              :class="form.ihaleYonu === 'artirma' ? 'border-blue-600 bg-blue-50/70 shadow-xs ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
             >
               <div class="flex items-center justify-between">
-                <span class="font-black text-xs flex items-center gap-1.5" :class="form.ihaleYonu === 'artirma' ? 'text-blue-900' : 'text-slate-800'">
-                  <span>📈 Açık Artırma</span>
-                </span>
-                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.ihaleYonu === 'artirma' ? 'border-blue-600 bg-blue-600 text-white text-[10px]' : 'border-slate-300'">
-                  <span v-if="form.ihaleYonu === 'artirma'">✓</span>
-                </span>
+                <span class="font-black text-xs text-blue-900 flex items-center gap-1">📈 Artırma</span>
+                <span v-if="form.ihaleYonu === 'artirma'" class="text-blue-600 font-bold text-xs">✓</span>
               </div>
-              <p class="text-[11px] text-slate-600 leading-snug">
-                <strong>(Fiyat Artırımlı - Satış):</strong> Satıcı sizsiniz. Alıcılar en yüksek teklif için yukarı yönlü yarışır.
-              </p>
-            </div>
+              <span class="text-[10px] text-slate-500 mt-1 block">En yüksek teklif satışı</span>
+            </button>
 
-            <!-- 4. Sabit Fiyatlı Paket & Kontenjan Toplama -->
-            <div 
+            <!-- 4. Sabit Paket -->
+            <button 
+              type="button"
               @click="form.ihaleYonu = 'sabit_paket'"
-              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
+              class="p-2.5 rounded-xl border text-left transition cursor-pointer flex flex-col justify-between"
               :class="form.ihaleYonu === 'sabit_paket' ? 'border-amber-500 bg-amber-50/70 shadow-xs ring-2 ring-amber-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
             >
               <div class="flex items-center justify-between">
-                <span class="font-black text-xs flex items-center gap-1.5" :class="form.ihaleYonu === 'sabit_paket' ? 'text-amber-900' : 'text-slate-800'">
-                  <span>🏷️ Sabit Paket & Kontenjan</span>
-                </span>
-                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.ihaleYonu === 'sabit_paket' ? 'border-amber-500 bg-amber-500 text-white text-[10px]' : 'border-slate-300'">
-                  <span v-if="form.ihaleYonu === 'sabit_paket'">✓</span>
-                </span>
+                <span class="font-black text-xs text-amber-900 flex items-center gap-1">🏷️ Sabit Paket</span>
+                <span v-if="form.ihaleYonu === 'sabit_paket'" class="text-amber-600 font-bold text-xs">✓</span>
               </div>
-              <p class="text-[11px] text-slate-600 leading-snug">
-                <strong>(Tur, Umre, Etkinlik & Grup):</strong> Kişi başı sabit fiyat (örn: 1000$ / 1100$) ile hedef kontenjan/üye toplayın.
-              </p>
-            </div>
+              <span class="text-[10px] text-slate-500 mt-1 block">Kişi başı sabit ücret</span>
+            </button>
 
-            <!-- 5. Proje, Firma & Hizmet İlanı (İhalesiz) -->
-            <div 
+            <!-- 5. İhalesiz İlan -->
+            <button 
+              type="button"
               @click="form.ihaleYonu = 'ihalesiz_ilan'"
-              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
+              class="p-2.5 rounded-xl border text-left transition cursor-pointer flex flex-col justify-between"
               :class="form.ihaleYonu === 'ihalesiz_ilan' ? 'border-teal-600 bg-teal-50/70 shadow-xs ring-2 ring-teal-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
             >
               <div class="flex items-center justify-between">
-                <span class="font-black text-xs flex items-center gap-1.5" :class="form.ihaleYonu === 'ihalesiz_ilan' ? 'text-teal-900' : 'text-slate-800'">
-                  <span>📢 Proje & Hizmet İlanı</span>
-                </span>
-                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.ihaleYonu === 'ihalesiz_ilan' ? 'border-teal-600 bg-teal-600 text-white text-[10px]' : 'border-slate-300'">
-                  <span v-if="form.ihaleYonu === 'ihalesiz_ilan'">✓</span>
-                </span>
+                <span class="font-black text-xs text-teal-900 flex items-center gap-1">📢 Net İlan</span>
+                <span v-if="form.ihaleYonu === 'ihalesiz_ilan'" class="text-teal-600 font-bold text-xs">✓</span>
               </div>
-              <p class="text-[11px] text-slate-600 leading-snug">
-                <strong>(İhalesiz / Doğrudan Tanıtım):</strong> Canlı ihale veya eksiltme olmadan, projenizi veya hizmetinizi web siteniz ve iletişim bilgilerinizle doğrudan yayınlayın.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 🔒 İHALE ERİŞİM TÜRÜ: HERKESE AÇIK GENEL PAZAR vs ÖZEL DAVETLİ KAPALI İHALE -->
-        <div class="space-y-2 p-4 bg-slate-50/90 rounded-2xl border-2 border-slate-200">
-          <div class="flex items-center justify-between">
-            <label class="block text-[11px] font-black text-slate-800 uppercase tracking-wider flex items-center gap-2">
-              <Lock :size="14" class="text-blue-600" />
-              <span>İHALE GÖRÜNÜRLÜK & ERİŞİM MODELİ</span>
-            </label>
-            <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-              Kurumsal Ayrıcalık
-            </span>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-            <!-- 1. Herkese Açık Genel Pazar -->
-            <div 
-              @click="form.visibility = 'public'"
-              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
-              :class="form.visibility === 'public' ? 'border-blue-600 bg-blue-50/50 shadow-xs ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
-            >
-              <div class="flex items-center justify-between">
-                <span class="font-black text-xs flex items-center gap-1.5" :class="form.visibility === 'public' ? 'text-blue-900' : 'text-slate-800'">
-                  <span>🌐 Herkese Açık Genel İhale</span>
-                </span>
-                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.visibility === 'public' ? 'border-blue-600 bg-blue-600 text-white text-[10px]' : 'border-slate-300'">
-                  <span v-if="form.visibility === 'public'">✓</span>
-                </span>
-              </div>
-              <p class="text-[11px] text-slate-600 leading-snug">
-                İhaleniz Pazar Yeri'nde tüm tedarikçilere yayınlanır. Maksimum rekabet ve en geniş tedarikçi havuzuna ulaşılır.
-              </p>
-            </div>
-
-            <!-- 2. Özel Davetli Kapalı İhale (Kurumsal Enterprise & Pro) -->
-            <div 
-              @click="form.visibility = 'private_invited'"
-              class="p-3.5 rounded-xl border-2 cursor-pointer transition-all flex flex-col justify-between space-y-2 text-left"
-              :class="form.visibility === 'private_invited' ? 'border-indigo-600 bg-indigo-50/50 shadow-xs ring-2 ring-indigo-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
-            >
-              <div class="flex items-center justify-between">
-                <span class="font-black text-xs flex items-center gap-1.5" :class="form.visibility === 'private_invited' ? 'text-indigo-900' : 'text-slate-800'">
-                  <span>🔒 Özel Davetli Kapalı İhale (VIP)</span>
-                </span>
-                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center" :class="form.visibility === 'private_invited' ? 'border-indigo-600 bg-indigo-600 text-white text-[10px]' : 'border-slate-300'">
-                  <span v-if="form.visibility === 'private_invited'">✓</span>
-                </span>
-              </div>
-              <p class="text-[11px] text-slate-600 leading-snug">
-                Pazar yerinde genel listelenmez. Yalnızca davet ettiğiniz şirketler veya Mavi Kalkan onaylı seçkin tedarikçiler teklif verebilir.
-              </p>
-            </div>
-          </div>
-
-          <!-- Davetli Tedarikçi Girişi (Kapalı İhale Seçildiğinde) -->
-          <div v-if="form.visibility === 'private_invited'" class="pt-2 space-y-1.5">
-            <label class="block text-[10px] font-black text-indigo-900 uppercase">DAVET EDİLECEK TEDARİKÇİ E-POSTALARI VEYA VKN NUMARALARI</label>
-            <input 
-              v-model="form.invitedSuppliers" 
-              type="text" 
-              placeholder="Örn: tedarik@firma1.com, 4810294719, satis@uretici2.com" 
-              class="w-full rounded-xl border border-indigo-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 outline-none focus:border-indigo-500 font-mono" 
-            />
-            <span class="text-[10px] text-indigo-700 block">Belirttiğiniz tedarikçilere özel şifreli erişim bağlantısı ve öncelikli NetGSM SMS davetiyesi iletilecektir.</span>
+              <span class="text-[10px] text-slate-500 mt-1 block">İhalesiz doğrudan vitrin</span>
+            </button>
           </div>
         </div>
 
         <!-- İhale Başlığı -->
         <div>
-          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">İHALE BAŞLIĞI *</label>
+          <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">İHALE / İLAN BAŞLIĞI *</label>
           <input 
             v-model="form.baslik" 
             type="text" 
             :placeholder="titlePlaceholder" 
-            class="w-full rounded-lg border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-semibold" 
+            class="w-full rounded-xl border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-semibold" 
             style="border-color: #CBD5E1; color: #0F172A;"
           />
         </div>
@@ -1453,7 +1378,7 @@ function resetFormAndCreateNew() {
           <!-- Kategori -->
           <div>
             <div class="flex items-center justify-between mb-1.5">
-              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider">ANA KATEGORİ</label>
+              <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider">ANA KATEGORİ *</label>
               <button 
                 type="button" 
                 @click="showSuggestModal = true" 
@@ -1464,19 +1389,19 @@ function resetFormAndCreateNew() {
             </div>
             <select 
               v-model="form.kategori" 
-              class="w-full rounded-lg border p-3 text-xs outline-none bg-white transition focus:border-blue-600 font-semibold"
+              class="w-full rounded-xl border p-3 text-xs outline-none bg-white transition focus:border-blue-600 font-semibold"
               style="border-color: #CBD5E1; color: #0F172A;"
             >
               <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
             </select>
           </div>
 
-          <!-- Alt Kategori (Photo 4 Alt Kategoriler) -->
+          <!-- Alt Kategori -->
           <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">ALT KATEGORİ *</label>
+            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">ALT KATEGORİ *</label>
             <select 
               v-model="selectedSubcategory" 
-              class="w-full rounded-lg border p-3 text-xs outline-none bg-white transition focus:border-blue-600"
+              class="w-full rounded-xl border p-3 text-xs outline-none bg-white transition focus:border-blue-600 font-semibold"
               style="border-color: #CBD5E1; color: #0F172A;"
             >
               <option v-for="sub in currentSubcategories" :key="sub" :value="sub">{{ sub }}</option>
@@ -1564,10 +1489,6 @@ function resetFormAndCreateNew() {
                 </button>
               </div>
             </div>
-
-            <p class="text-[11px] text-amber-900/90 leading-relaxed font-medium">
-              💡 <strong>Örnek Kullanım:</strong> Umre kafilesi veya turistik gezi için kişi başı <strong>{{ form.kisiBasiFiyat || '1.000' }} {{ form.currency }}</strong> belirleyerek <strong>{{ form.hedefKontenjan || 40 }} kişilik</strong> katılımcı/üye başvurusu toplayabilirsiniz.
-            </p>
           </div>
 
           <!-- İHALESİZ İLAN & NET FİYAT ALANI -->
@@ -1581,41 +1502,7 @@ function resetFormAndCreateNew() {
               </span>
             </div>
 
-            <!-- İlan Yönü: Satış İlanı mı, Alım Talebi mi? -->
-            <div>
-              <label class="block text-[10px] font-bold text-slate-700 mb-1.5">
-                İLAN TÜRÜ (HANGİ TARAFTASINIZ?) *
-              </label>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  @click="form.ilanTuru = 'satis'"
-                  class="p-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-between cursor-pointer"
-                  :class="form.ilanTuru === 'satis' ? 'bg-teal-600 text-white border-teal-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'"
-                >
-                  <span class="flex items-center gap-2">
-                    <span>🏷️ Satış İlanı</span>
-                    <span class="text-[10px] opacity-80">(Satıcıyım - Ürün/Hizmet Satıyorum)</span>
-                  </span>
-                  <span v-if="form.ilanTuru === 'satis'" class="text-xs">✓</span>
-                </button>
-                <button
-                  type="button"
-                  @click="form.ilanTuru = 'alim'"
-                  class="p-2.5 rounded-xl border text-xs font-bold transition flex items-center justify-between cursor-pointer"
-                  :class="form.ilanTuru === 'alim' ? 'bg-teal-600 text-white border-teal-600 shadow-xs' : 'bg-white text-slate-700 border-slate-200 hover:border-slate-300'"
-                >
-                  <span class="flex items-center gap-2">
-                    <span>🛒 Alım Talebi</span>
-                    <span class="text-[10px] opacity-80">(Alıcıyım - Ürün/Hizmet Arıyorum)</span>
-                  </span>
-                  <span v-if="form.ilanTuru === 'alim'" class="text-xs">✓</span>
-                </button>
-              </div>
-            </div>
-
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <!-- Net İlan Fiyatı -->
               <div>
                 <label class="block text-[10px] font-bold text-slate-700 mb-1">
                   NET İLAN FİYATI *
@@ -1634,7 +1521,6 @@ function resetFormAndCreateNew() {
                 </div>
               </div>
 
-              <!-- Para Birimi -->
               <div>
                 <label class="block text-[10px] font-bold text-slate-700 mb-1">
                   PARA BİRİMİ *
@@ -1650,64 +1536,6 @@ function resetFormAndCreateNew() {
                 </select>
               </div>
 
-              <!-- KDV Durumu -->
-              <div>
-                <label class="block text-[10px] font-bold text-slate-700 mb-1">
-                  KDV DURUMU *
-                </label>
-                <select 
-                  v-model="form.vatType" 
-                  class="w-full rounded-xl border p-2.5 text-xs outline-none bg-white transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100 font-bold cursor-pointer"
-                  style="border-color: #CBD5E1; color: #0F172A;"
-                >
-                  <option value="vat_included">KDV Dâhil</option>
-                  <option value="vat_excluded">KDV Hariç (+%20)</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-              <!-- Stok / Miktar -->
-              <div>
-                <label class="block text-[10px] font-bold text-slate-700 mb-1">
-                  MİKTAR / STOK
-                </label>
-                <input 
-                  v-model="form.stokMiktar" 
-                  type="text" 
-                  placeholder="Örn: 100" 
-                  class="w-full rounded-xl border p-2.5 text-xs outline-none bg-white transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100 font-bold"
-                  style="border-color: #CBD5E1; color: #0F172A;"
-                />
-              </div>
-
-              <!-- Birim -->
-              <div>
-                <label class="block text-[10px] font-bold text-slate-700 mb-1">
-                  BİRİM
-                </label>
-                <select 
-                  v-model="form.stokBirim" 
-                  class="w-full rounded-xl border p-2.5 text-xs outline-none bg-white transition focus:border-teal-600 focus:ring-2 focus:ring-teal-100 font-bold cursor-pointer"
-                  style="border-color: #CBD5E1; color: #0F172A;"
-                >
-                  <option value="Adet">Adet</option>
-                  <option value="Ton">Ton</option>
-                  <option value="Metre">Metre</option>
-                  <option value="m²">m² (Metrekare)</option>
-                  <option value="m³">m³ (Metreküp)</option>
-                  <option value="Litre">Litre</option>
-                  <option value="Kilo">Kilo (Kg)</option>
-                  <option value="Koli">Koli</option>
-                  <option value="Paket">Paket</option>
-                  <option value="Parti">Parti / Takım</option>
-                  <option value="Saat">Saat (Hizmet)</option>
-                  <option value="Gün">Gün (Hizmet)</option>
-                  <option value="Sefer">Sefer (Lojistik)</option>
-                </select>
-              </div>
-
-              <!-- Pazarlık Durumu -->
               <div>
                 <label class="block text-[10px] font-bold text-slate-700 mb-1">
                   PAZARLIK DURUMU *
@@ -1722,37 +1550,31 @@ function resetFormAndCreateNew() {
                 </select>
               </div>
             </div>
-
-            <p class="text-[11px] text-teal-900/90 leading-relaxed font-medium">
-              💡 <strong>İhalesiz İlan Modu:</strong> Açık eksiltme veya teklif yarışması yapılmaz. Belirttiğiniz kesin fiyat ile ilanınız vitrine çıkar; ilgilenen alıcı veya satıcılar sizinle doğrudan anlaşmaya varabilir.
-            </p>
           </div>
 
-          <!-- Pazarlık & Bütçe Aralığı (Min Taban - Maks Tavan) -->
-          <div v-else class="col-span-1 md:col-span-2 bg-slate-50/70 p-4 rounded-2xl border border-slate-200/80 space-y-3">
+          <!-- Standart Bütçe Aralığı -->
+          <div v-else class="col-span-1 md:col-span-2 bg-slate-50/70 p-3.5 rounded-2xl border border-slate-200 space-y-2">
             <div class="flex items-center justify-between">
               <label class="block text-[10px] font-black text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
-                <span>💰 PAZARLIK VE BÜTÇE ARALIĞI</span>
+                <span>💰 HEDEF BÜTÇE VEYA TAHMİNİ TUTAR</span>
               </label>
-              <span class="text-[10px] font-bold text-slate-400 lowercase">(isteğe bağlı / boş bırakılabilir)</span>
+              <span class="text-[10px] font-bold text-slate-400 lowercase">(isteğe bağlı / teklif usulü)</span>
             </div>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <!-- Minimum Alt Değer / Taban Fiyat -->
               <div>
                 <label class="block text-[10px] font-bold text-slate-600 mb-1">
-                  MİNİMUM ALT DEĞER (TABAN ₺)
+                  MİNİMUM TABAN TUTAR (₺)
                 </label>
                 <input 
                   v-model="form.minButce" 
                   type="text" 
-                  placeholder="Örn: 50.000 (Pazarlık alt sınırı)" 
-                  class="w-full rounded-xl border p-2.5 text-xs outline-none bg-white transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-medium"
+                  placeholder="Örn: 50.000" 
+                  class="w-full rounded-xl border p-2 text-xs outline-none bg-white transition focus:border-blue-600"
                   style="border-color: #CBD5E1; color: #0F172A;"
                 />
               </div>
 
-              <!-- Maksimum Tavan Bütçe -->
               <div>
                 <label class="block text-[10px] font-bold text-slate-600 mb-1">
                   MAKSİMUM TAVAN BÜTÇE (₺)
@@ -1760,29 +1582,25 @@ function resetFormAndCreateNew() {
                 <input 
                   v-model="form.maxButce" 
                   type="text" 
-                  placeholder="Örn: 150.000 (Hedef üst sınır)" 
-                  class="w-full rounded-xl border p-2.5 text-xs outline-none bg-white transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-medium"
+                  placeholder="Örn: 150.000" 
+                  class="w-full rounded-xl border p-2 text-xs outline-none bg-white transition focus:border-blue-600"
                   style="border-color: #CBD5E1; color: #0F172A;"
                 />
               </div>
             </div>
-
-            <p class="text-[10px] text-slate-500 leading-relaxed">
-              💡 Tedarikçilerin teklif verirken baz alacağı minimum başlangıç tabanını ve maksimum hedef bütçeyi belirleyebilirsiniz. Boş bırakırsanız <strong>"Teklif Usulü (Açık İhale)"</strong> olarak yayınlanır.
-            </p>
           </div>
         </div>
 
         <!-- İhale Süresi -->
         <div>
-          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">TEKLİF TOPLAMA SÜRESİ</label>
+          <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">TEKLİF TOPLAMA SÜRESİ</label>
           <div class="grid grid-cols-3 sm:grid-cols-6 gap-2">
             <button 
               v-for="dur in durations" 
               :key="dur" 
               type="button"
               @click="form.sure = dur"
-              class="rounded-lg border py-2 text-xs font-bold transition text-center"
+              class="rounded-xl border py-2 text-xs font-bold transition text-center cursor-pointer"
               :style="form.sure === dur 
                 ? 'background: #1E3A5F; border-color: #1E3A5F; color: white;' 
                 : 'background: white; border-color: #CBD5E1; color: #475569;'"
@@ -1793,248 +1611,220 @@ function resetFormAndCreateNew() {
         </div>
       </div>
 
-      <!-- KART 2 (GAYRİMENKUL): SAHİBİNDEN.COM STANDART PARAMETRELERİ -->
-      <div v-if="isRealEstateCategory" class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-          <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center font-bold text-base shrink-0">
-              🏡
-            </div>
-            <div>
-              <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] flex items-center gap-1.5">
-                <span>2. Gayrimenkul & Emlak Detay Bilgileri</span>
-                <span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-md border border-amber-200/80">Sahibinden.com Standartları</span>
-              </h2>
-              <p class="text-[11px] text-slate-500 mt-0.5">
-                Oda sayısı, brüt/net m², bina yaşı, kat, ısıtma, tapu durumu ve kredi uygunluğu gibi kriterleri eksiksiz belirleyin veya hazır şablon butonlarıyla hızlıca doldurun.
-              </p>
-            </div>
-          </div>
-          <span class="self-start sm:self-auto text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-            ✓ Emlak Parametreleri Aktif
-          </span>
-        </div>
-
-        <CategorySpecificFields
-          v-model="categorySpecificData"
-          :category="form.kategori"
-          :sub-category="selectedSubcategory"
-          :closeable="false"
-          @sector-changed="handleSectorChanged"
-        />
-      </div>
-
-      <!-- KART: ŞARTNAME / TAPU SENEDİ, İMAR ÇAPI & PROJE DOSYALARI -->
-      <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+      <!-- KART 2: AÇIKLAMA, ŞARTNAME & BELGELER -->
+      <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-5 border-slate-200">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
-            <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] flex items-center gap-1.5">
-              <span>{{ isRealEstateCategory ? '📑 Tapu Senedi, İmar Çapı & Ek Belgeler' : '📄 Teknik Şartname & Proje Dosyaları' }}</span>
+            <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
+              <span>2. Açıklama, Detaylar ve Belgeler</span>
             </h2>
-            <p class="text-[11px] text-slate-500 mt-0.5">
-              {{ isRealEstateCategory ? 'Tapu fotokopisi, belediye imar durum belgesi, mimari kat planı veya şartname dosyanızı yükleyebilirsiniz (İsteğe bağlı).' : 'İhaleniz için teknik şartname, malzeme/metraj listesi veya CAD çizim dosyalarınızı yükleyin.' }}
-            </p>
+            <p class="text-[11px] text-slate-500 mt-0.5">İhtiyacınızı veya ürününüzü açıklayın, varsa şartname ve fotoğrafları ekleyin.</p>
           </div>
-          <span class="self-start sm:self-auto text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-            ✓ {{ isRealEstateCategory ? 'Belge / Tapu Ekleme' : 'Serbest Belge Yükleme' }}
+          <span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+            ✓ Kolay Giriş
           </span>
         </div>
 
-        <!-- Dosya Yükleme Alanı -->
-        <div class="space-y-3 pt-1">
-          <div 
-            @click="triggerFileSelect"
-            class="border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition hover:bg-blue-50/40 flex flex-col items-center justify-center gap-2 group bg-slate-50/50"
-            style="border-color: #93C5FD;"
-          >
-            <div class="w-11 h-11 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 transition">
-              <UploadCloud :size="24" />
-            </div>
+        <!-- Açıklama Metni (Öne Alındı) -->
+        <div>
+          <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">
+            {{ isRealEstateCategory ? 'GAYRİMENKUL DETAYLI AÇIKLAMA & ÖZEL BİLGİLER' : 'İHALE / ALIM DETAYLI AÇIKLAMASI & ŞARTLARI' }}
+          </label>
+          <textarea 
+            v-model="form.aciklama" 
+            rows="4" 
+            :placeholder="descPlaceholder" 
+            class="w-full rounded-xl border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-medium"
+            style="border-color: #CBD5E1; color: #0F172A;"
+          ></textarea>
+        </div>
+
+        <!-- Gayrimenkul ise: Emlak Parametreleri (Sahibinden Standardı) -->
+        <div v-if="isRealEstateCategory" class="rounded-2xl border border-amber-200 bg-amber-50/20 p-4 space-y-3">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">🏡</span>
             <div>
-              <span class="text-xs font-bold text-slate-800 block">
-                {{ isRealEstateCategory ? 'Tapu Fotokopisi, İmar Belgesi veya Mimari Çizim Yükleyin' : 'Teknik Şartname, Metraj Listesi veya Çizim Dosyanızı Yükleyin' }}
-              </span>
-              <p class="text-[10px] text-slate-500 mt-0.5">
-                PDF, Word (.docx), Excel (.xlsx) veya DWG / DXF (AutoCAD Çizim) · Maks: 50MB
-              </p>
+              <span class="text-xs font-black text-slate-900 uppercase tracking-wider block">Gayrimenkul & Emlak Kriterleri</span>
+              <span class="text-[10px] text-slate-500">Oda sayısı, m², kat ve tapu durumu gibi detayları belirleyin</span>
             </div>
-            <button 
-              type="button" 
-              class="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 transition shadow-xs cursor-pointer"
-            >
-              📁 Bilgisayardan / Telefondan Belge Seç
-            </button>
-            <input 
-              ref="fileInputRef"
-              type="file"
-              multiple
-              accept=".dwg,.dxf,.pdf,.doc,.docx,.xls,.xlsx,application/acad,application/x-acad,application/autocad_dwg,image/vnd.dwg,application/dwg,application/x-dwg,application/octet-stream,*/*"
-              class="hidden"
-              @change="handleFileChange"
-            />
           </div>
+          <CategorySpecificFields
+            v-model="categorySpecificData"
+            :category="form.kategori"
+            :sub-category="selectedSubcategory"
+            :closeable="false"
+            @sector-changed="handleSectorChanged"
+          />
+        </div>
 
-          <!-- Yüklenen Belgeler Listesi -->
-          <div v-if="form.files.length > 0" class="space-y-2 mt-3">
+        <!-- Kompakt Dosya & Fotoğraf Ekleme Alanı (Yan Yana) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+          <!-- 1. Şartname & Doküman Yükleme -->
+          <div class="rounded-2xl border border-slate-200 p-4 bg-slate-50/60 space-y-3 flex flex-col justify-between">
             <div class="flex items-center justify-between">
-              <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider">
-                YÜKLENEN BELGELER ({{ form.files.length }})
-              </label>
-              <span class="text-[10px] text-emerald-600 font-bold">✓ İhale / İlan Dosyası Olarak Kaydedildi</span>
+              <span class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                <FileText :size="15" class="text-blue-600" />
+                <span>Şartname / Doküman Ekle</span>
+              </span>
+              <span class="text-[10px] text-slate-400 font-medium">PDF, Excel, Word, DWG</span>
             </div>
+            
             <div 
-              v-for="(file, index) in form.files" 
-              :key="index"
-              class="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl shadow-xs"
+              @click="triggerFileSelect"
+              class="border-2 border-dashed border-blue-200 rounded-xl p-4 text-center cursor-pointer transition hover:bg-blue-50/50 flex flex-col items-center justify-center gap-1.5 bg-white"
             >
-              <FileText v-if="file.type === 'pdf'" :size="16" class="text-red-500 shrink-0" />
-              <FileSpreadsheet v-else-if="file.type === 'excel'" :size="16" class="text-emerald-600 shrink-0" />
-              <FileCode v-else-if="file.type === 'cad'" :size="16" class="text-amber-500 shrink-0" />
-              <FileText v-else :size="16" class="text-blue-600 shrink-0" />
+              <UploadCloud :size="22" class="text-blue-600" />
+              <span class="text-xs font-bold text-slate-700">Dosya Yüklemek İçin Tıklayın</span>
+              <span class="text-[10px] text-slate-400">Teknik şartname, metraj veya tapu belgesi</span>
+              <input 
+                ref="fileInputRef"
+                type="file"
+                multiple
+                accept=".dwg,.dxf,.pdf,.doc,.docx,.xls,.xlsx,application/acad,application/x-acad,application/autocad_dwg,image/vnd.dwg,application/dwg,application/x-dwg,application/octet-stream,*/*"
+                class="hidden"
+                @change="handleFileChange"
+              />
+            </div>
 
-              <div class="flex-1 min-w-0">
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center gap-1.5 truncate pr-4">
-                    <span class="text-xs font-bold text-slate-800 truncate">{{ file.name }}</span>
-                    <span v-if="file.type === 'cad'" class="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20 shrink-0">AutoCAD DWG</span>
-                    <span v-else-if="file.type === 'pdf'" class="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold bg-red-500/10 text-red-600 border border-red-500/20 shrink-0">PDF</span>
-                    <span v-else-if="file.type === 'excel'" class="text-[9px] px-1.5 py-0.2 rounded font-mono font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shrink-0">Excel</span>
-                  </div>
-                  <span class="text-[10px] text-slate-400 shrink-0 font-medium">{{ file.size }}</span>
-                </div>
-                <div class="flex items-center justify-between mt-1">
-                  <span class="text-[9px] font-bold text-emerald-600 flex items-center gap-1">
-                    <CheckCircle2 :size="12" /> Yüklendi ve İhaleye Bağlandı
-                  </span>
-                </div>
-              </div>
-
-              <button 
-                type="button" 
-                @click="removeFile(index)"
-                class="p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-600 transition cursor-pointer"
-                title="Dosyayı Kaldır"
+            <!-- Yüklenen Dosyalar -->
+            <div v-if="form.files.length > 0" class="space-y-1.5 max-h-36 overflow-y-auto">
+              <div 
+                v-for="(file, index) in form.files" 
+                :key="index"
+                class="flex items-center justify-between p-2 bg-white border border-slate-200 rounded-lg text-xs"
               >
-                <Trash2 :size="14" />
-              </button>
+                <div class="flex items-center gap-1.5 truncate pr-2">
+                  <FileText :size="13" class="text-blue-600 shrink-0" />
+                  <span class="truncate font-bold text-slate-800 text-[11px]">{{ file.name }}</span>
+                </div>
+                <button type="button" @click="removeFile(index)" class="text-red-500 hover:text-red-700 p-1 cursor-pointer">
+                  <Trash2 :size="12" />
+                </button>
+              </div>
             </div>
           </div>
 
-          <!-- Bilgi Uyarısı -->
-          <div class="p-3 bg-emerald-50/70 border border-emerald-200/80 rounded-xl flex items-start gap-2.5">
-            <CheckCircle2 :size="16" class="text-emerald-600 shrink-0 mt-0.5" />
-            <p class="text-[11px] text-emerald-900 leading-relaxed font-medium">
-              <strong>{{ isRealEstateCategory ? 'Resmi Evrak Desteği:' : 'Özgür Şartname:' }}</strong>
-              {{ isRealEstateCategory ? 'Tapu senedi ve imar çapı gibi belgeler tedarikçilerin ve alıcıların tekliflerini daha hızlı ve güvenle vermesini sağlar.' : 'Kendi şartname veya proje dosyanızı yüklediğinizde tedarikçiler bu şartnameyi inceleyerek tekliflerini sunacaktır.' }}
-            </p>
+          <!-- 2. Fotoğraf / Numune Görseli Yükleme -->
+          <div class="rounded-2xl border border-slate-200 p-4 bg-slate-50/60 space-y-3 flex flex-col justify-between">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-black text-slate-800 flex items-center gap-1.5">
+                <Camera :size="15" class="text-emerald-600" />
+                <span>Fotoğraf / Görsel Ekle</span>
+              </span>
+              <span class="text-[10px] text-slate-400 font-medium">JPG, PNG, WEBP</span>
+            </div>
+            
+            <div 
+              @click="triggerImageSelect"
+              class="border-2 border-dashed border-emerald-200 rounded-xl p-4 text-center cursor-pointer transition hover:bg-emerald-50/50 flex flex-col items-center justify-center gap-1.5 bg-white"
+            >
+              <Camera :size="22" class="text-emerald-600" />
+              <span class="text-xs font-bold text-slate-700">Fotoğraf Seçmek İçin Tıklayın</span>
+              <span class="text-[10px] text-slate-400">Ürün, numune veya emlak fotoğrafları</span>
+              <input 
+                ref="imageInputRef"
+                type="file"
+                multiple
+                accept="image/*"
+                class="hidden"
+                @change="handleImageChange"
+              />
+            </div>
+
+            <!-- Yüklenen Fotoğraflar -->
+            <div v-if="form.images.length > 0" class="flex flex-wrap gap-2 max-h-36 overflow-y-auto">
+              <div 
+                v-for="(img, idx) in form.images" 
+                :key="idx"
+                class="relative w-14 h-14 rounded-lg overflow-hidden border border-slate-200 shrink-0 group"
+              >
+                <img :src="img.url" :alt="img.name" class="w-full h-full object-cover" />
+                <button 
+                  type="button" 
+                  @click="removeImage(idx)" 
+                  class="absolute inset-0 bg-red-600/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition cursor-pointer"
+                >
+                  <Trash2 :size="12" />
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- KART: LOJİSTİK VE ÖDEME ŞARTLARI -->
+      <!-- KART 3: LOJİSTİK, TESLİMAT & İLETİŞİM BİLGİLERİ (ZORUNLU KONTROLLÜ) -->
       <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
-        <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] mb-2">Lojistik, Teslimat & Ödeme Şartları</h2>
-        
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Ödeme Yöntemi Tercihi -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">ÖDEME YÖNTEMİ TERCİHİ</label>
-            <div class="relative">
-              <CreditCard :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <select 
-                v-model="form.odemeYontemi" 
-                class="w-full pl-9 pr-4 py-3 rounded-xl border text-xs outline-none bg-white transition focus:border-[#003057] border-slate-300 text-slate-900"
-              >
-                <option v-for="method in paymentMethods" :key="method" :value="method">{{ method }}</option>
-              </select>
-            </div>
+            <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
+              <span>3. Lojistik, Teslimat & İletişim Bilgileri</span>
+            </h2>
+            <p class="text-[11px] text-slate-500 mt-0.5">Tekliflerin ve teslimatın sorunsuz iletilebilmesi için adres ve telefon zorunludur.</p>
           </div>
+          <span class="text-[10px] font-bold text-red-700 bg-red-50 px-2.5 py-1 rounded-full border border-red-200">
+            * Telefon ve Adres Zorunlu
+          </span>
+        </div>
 
-          <!-- İl / Bölge Seçimi -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Teslimat İli -->
           <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">TESLİMAT İLİ / BÖLGESİ *</label>
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">
+              TESLİMAT / İŞ İLİ *
+            </label>
             <div class="relative">
               <MapPin :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
               <select 
                 v-model="form.sehir" 
-                class="w-full pl-9 pr-4 py-3 rounded-xl border text-xs outline-none bg-white transition focus:border-[#003057] font-bold border-slate-300 text-slate-900"
+                class="w-full pl-9 pr-3 py-2.5 rounded-xl border text-xs outline-none bg-white transition focus:border-blue-600 font-bold border-slate-300 text-slate-900"
               >
                 <option v-for="city in cities" :key="city" :value="city">{{ city }}</option>
               </select>
             </div>
           </div>
 
-          <!-- Teslimat Adresi -->
+          <!-- İletişim Telefonu (ZORUNLU) -->
           <div>
-            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">TESLİMAT / SEVK ADRESİ *</label>
-            <div class="relative">
-              <MapPin :size="14" class="absolute left-3 top-3 text-slate-400" />
-              <textarea 
-                v-model="form.teslimatAdresi" 
-                rows="1"
-               
-                placeholder="Örn: Balıkesir OSB, 3. Yol No: 12" 
-                class="w-full pl-9 pr-4 py-2.5 rounded-xl border text-xs outline-none transition focus:border-[#003057] border-slate-300 text-slate-900"
-              ></textarea>
-            </div>
-          </div>
-        </div>
-
-        <!-- Kategori Öner Modülü (Photo 3 Kategori Öner) -->
-        <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-slate-500">
-          <span>Aradığınız sektörel kategoriyi listede bulamadınız mı?</span>
-          <button 
-            type="button" 
-            @click="showSuggestModal = true" 
-            class="text-[#003057] hover:text-[#1EAE4C] font-bold flex items-center gap-1 hover:underline"
-          >
-            🚀 Yeni Kategori Öner
-          </button>
-        </div>
-      </div>
-
-      <!-- KART: KURUMSAL İLETİŞİM & PROJE WEB SAYFASI -->
-      <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
-          <div>
-            <h2 class="text-xs font-black uppercase tracking-wider text-[#003057] flex items-center gap-2">
-              <span>🌐 Kurumsal İletişim & Proje Web Sayfası</span>
-            </h2>
-            <p class="text-[11px] text-slate-500 mt-0.5">
-              İlanınızda görünecek iletişim bilgileriniz ve varsa projenizin detaylı web sayfası / portfolyo bağlantısı.
-            </p>
-          </div>
-          <span class="self-start sm:self-auto text-[10px] font-bold text-blue-700 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
-            Otomatik Panelden Çekilir (Düzenlenebilir)
-          </span>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <!-- Firma / Kurum Unvanı -->
-          <div>
-            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">FİRMA / KURUM ADI</label>
-            <input 
-              v-model="form.ownerCompany" 
-              type="text" 
-              placeholder="Örn: Simay Peyzaj & İnşaat Ltd."
-              class="w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition focus:border-blue-600 border-slate-300 text-slate-900 bg-white font-medium"
-            />
-          </div>
-
-          <!-- Telefon Numarası -->
-          <div>
-            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">İLETİŞİM TELEFONU</label>
+            <label class="block text-[10px] font-black text-red-600 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+              <span>İLETİŞİM TELEFONU (GSM) *</span>
+              <span class="text-[9px] font-bold text-red-500">ZORUNLU</span>
+            </label>
             <input 
               v-model="form.ownerPhone" 
               type="tel" 
               placeholder="Örn: 0532 123 45 67"
+              class="w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition focus:border-red-600 border-red-300 text-slate-900 bg-red-50/20 font-bold"
+            />
+          </div>
+
+          <!-- Firma / Şahıs Yetkili Adı -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">FİRMA / YETKİLİ ADI</label>
+            <input 
+              v-model="form.ownerCompany" 
+              type="text" 
+              placeholder="Örn: Simay Peyzaj veya Hasan Bey"
               class="w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition focus:border-blue-600 border-slate-300 text-slate-900 bg-white font-medium"
             />
           </div>
 
-          <!-- E-Posta -->
+          <!-- Açık Teslimat Adresi (ZORUNLU) -->
+          <div class="sm:col-span-2">
+            <label class="block text-[10px] font-black text-red-600 uppercase tracking-wider mb-1.5 flex items-center justify-between">
+              <span>AÇIK TESLİMAT / İŞ ADRESİ *</span>
+              <span class="text-[9px] font-bold text-red-500">ZORUNLU</span>
+            </label>
+            <input 
+              v-model="form.teslimatAdresi" 
+              type="text"
+              placeholder="Örn: Balıkesir OSB 3. Yol No: 12 veya Çanakkale Kepez Sahil Yolu" 
+              class="w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition focus:border-red-600 border-red-300 text-slate-900 bg-red-50/20 font-medium"
+            />
+          </div>
+
+          <!-- Kurumsal E-Posta -->
           <div>
-            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-wider mb-1.5">KURUMSAL E-POSTA</label>
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">E-POSTA ADRESİ</label>
             <input 
               v-model="form.ownerEmail" 
               type="email" 
@@ -2043,11 +1833,11 @@ function resetFormAndCreateNew() {
             />
           </div>
 
-          <!-- Proje / Web Sayfası Linki -->
-          <div>
+          <!-- Web Sayfası Linki -->
+          <div class="sm:col-span-2">
             <label class="block text-[10px] font-black text-emerald-700 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-              <span>PROJE / WEB ADRESİ</span>
-              <span class="text-[9px] font-bold text-slate-400 font-normal">(İsteğe Bağlı)</span>
+              <span>PROJE / FİRMA WEB SAYFASI LİNKİ</span>
+              <span class="text-[9px] font-bold text-slate-400 font-normal">(Varsa İlanda Görünür)</span>
             </label>
             <input 
               v-model="form.websiteUrl" 
@@ -2056,411 +1846,215 @@ function resetFormAndCreateNew() {
               class="w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition focus:border-emerald-600 border-emerald-300 text-slate-900 bg-emerald-50/20 font-bold"
             />
           </div>
-        </div>
 
-        <div class="p-3 bg-blue-50/80 border border-blue-200/80 rounded-xl flex items-start gap-2.5">
-          <CheckCircle2 :size="16" class="text-blue-600 shrink-0 mt-0.5" />
-          <p class="text-[11px] text-blue-950 leading-relaxed">
-            <strong>Doğrudan Web Yönlendirmesi:</strong> Web adresi girdiğinizde, ilanınızda <em>"🌐 Proje / Web Sayfasına Git ↗"</em> butonu aktif olur. Üyeler ve ziyaretçiler tek tıkla projenizi inceleyebilir ve işlemlerine devam edebilir.
-          </p>
+          <!-- Ödeme Yöntemi Tercihi -->
+          <div>
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">ÖDEME YÖNTEMİ</label>
+            <select 
+              v-model="form.odemeYontemi" 
+              class="w-full px-3 py-2.5 rounded-xl border text-xs outline-none bg-white transition focus:border-blue-600 border-slate-300 text-slate-900 font-medium"
+            >
+              <option v-for="method in paymentMethods" :key="method" :value="method">{{ method }}</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      <!-- KART 3: TEKNİK AÇIKLAMALAR & KALEMLER & KURALLAR -->
-      <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-6 border-slate-200">
-        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-          <div>
-            <h2 class="text-xs font-black uppercase tracking-wider text-[#003057]">3. Kalem Listesi & İhale Kuralları</h2>
-            <p class="text-[11px] text-slate-500 mt-0.5">TND-001 ~ TND-014: Kalem bazlı/toplu ihale usulü, para birimi, rezerv fiyat ve teklif adımları.</p>
-          </div>
-          <span class="text-[10px] font-bold text-blue-600 bg-blue-50 px-2.5 py-1 rounded-full border border-blue-200">
-            Resmi Şartname Formatı
-          </span>
-        </div>
-
-        <!-- 3.1 SONUÇLANDIRMA MODELİ (TND-003, TND-004) -->
-        <div class="space-y-2">
-          <label class="block text-[11px] font-black text-slate-800 uppercase tracking-wider">
-            İHALE SONUÇLANDIRMA MODELİ *
-          </label>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div 
-              @click="form.awardMode = 'ALL_OR_NOTHING'"
-              class="p-3.5 rounded-xl border-2 cursor-pointer transition flex flex-col justify-between space-y-1.5 text-left"
-              :class="form.awardMode === 'ALL_OR_NOTHING' ? 'border-blue-600 bg-blue-50/40 ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
-            >
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-xs" :class="form.awardMode === 'ALL_OR_NOTHING' ? 'text-blue-900' : 'text-slate-800'">
-                  📦 Toplu Sonuçlandırma (Tek Kazanan)
-                </span>
-                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center text-[10px]" :class="form.awardMode === 'ALL_OR_NOTHING' ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300'">
-                  <span v-if="form.awardMode === 'ALL_OR_NOTHING'">✓</span>
-                </span>
-              </div>
-              <p class="text-[11px] text-slate-600 leading-snug">
-                Tedarikçi tüm kalemler için tek bir toplam teklif verir. İhale tek bir kazanana bütünüyle verilir.
-              </p>
-            </div>
-
-            <div 
-              @click="form.awardMode = 'ITEM_BASED'"
-              class="p-3.5 rounded-xl border-2 cursor-pointer transition flex flex-col justify-between space-y-1.5 text-left"
-              :class="form.awardMode === 'ITEM_BASED' ? 'border-indigo-600 bg-indigo-50/40 ring-2 ring-indigo-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
-            >
-              <div class="flex items-center justify-between">
-                <span class="font-bold text-xs" :class="form.awardMode === 'ITEM_BASED' ? 'text-indigo-900' : 'text-slate-800'">
-                  🧩 Kalem Bazlı Kısmi Sonuçlandırma
-                </span>
-                <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center text-[10px]" :class="form.awardMode === 'ITEM_BASED' ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-slate-300'">
-                  <span v-if="form.awardMode === 'ITEM_BASED'">✓</span>
-                </span>
-              </div>
-              <p class="text-[11px] text-slate-600 leading-snug">
-                Tedarikçiler bağımsız kalemlere ayrı fiyat verebilir. Her kalem en avantajlı farklı firmaya ihale edilebilir.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- 3.2 KALEMLER / MALZEME LİSTESİ (TND-002) -->
-        <div class="space-y-3 bg-slate-50/80 p-4 rounded-xl border border-slate-200">
-          <div class="flex items-center justify-between">
+      <!-- ⚙️ GELİŞMİŞ İHALE SEÇENEKLERİ & KALEM LİSTESİ (İSTEĞE BAĞLI AKORDEON) -->
+      <div class="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-xs">
+        <button 
+          type="button" 
+          @click="showAdvancedOptions = !showAdvancedOptions"
+          class="w-full p-4 bg-slate-50 hover:bg-slate-100/80 transition flex items-center justify-between text-left cursor-pointer border-b border-slate-200"
+        >
+          <div class="flex items-center gap-2.5">
+            <span class="text-base">⚙️</span>
             <div>
-              <h3 class="text-xs font-black uppercase tracking-wider text-slate-800">İhale Kalemleri / Malzeme Listesi</h3>
-              <p class="text-[10px] text-slate-500">Birden fazla ürün veya hizmet alıyorsanız kalem ekleyerek detaylandırın.</p>
+              <span class="text-xs font-black text-slate-800 uppercase tracking-wider block">Gelişmiş İhale Seçenekleri & Kalem Listesi (İsteğe Bağlı)</span>
+              <span class="text-[11px] text-slate-500">Parçalı kalemler, gizli rezerv fiyat, teklif adımı ve davetli erişim ayarları</span>
             </div>
-            <button 
-              type="button" 
-              @click="addKalem"
-              class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer"
-            >
-              <Plus :size="14" />
-              <span>Kalem Ekle</span>
-            </button>
           </div>
+          <span class="text-xs font-bold text-blue-600 px-3 py-1 bg-blue-50 border border-blue-200 rounded-lg">
+            {{ showAdvancedOptions ? '▲ Seçenekleri Gizle' : '▼ Seçenekleri Göster' }}
+          </span>
+        </button>
 
-          <!-- Empty state -->
-          <div v-if="form.kalemler.length === 0" class="p-4 border border-dashed border-slate-300 rounded-lg text-center bg-white">
-            <p class="text-xs text-slate-500">Henüz özel kalem tanımlanmadı. İhale başlığı tek ana kalem olarak işleme alınacaktır.</p>
-            <button 
-              type="button" 
-              @click="addKalem" 
-              class="mt-2 text-xs font-bold text-blue-600 hover:text-blue-800 underline inline-flex items-center gap-1"
-            >
-              + İlk kalemi ekleyin (Örn: Mukavva Koli, Taşıma Hizmeti vb.)
-            </button>
+        <div v-show="showAdvancedOptions" class="p-5 space-y-6 animate-fadeIn">
+          <!-- Sonuçlandırma Modeli -->
+          <div class="space-y-2">
+            <label class="block text-[11px] font-black text-slate-800 uppercase tracking-wider">
+              İHALE SONUÇLANDIRMA MODELİ
+            </label>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div 
+                @click="form.awardMode = 'ALL_OR_NOTHING'"
+                class="p-3 rounded-xl border-2 cursor-pointer transition flex flex-col justify-between space-y-1 text-left"
+                :class="form.awardMode === 'ALL_OR_NOTHING' ? 'border-blue-600 bg-blue-50/40 ring-2 ring-blue-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs" :class="form.awardMode === 'ALL_OR_NOTHING' ? 'text-blue-900' : 'text-slate-800'">
+                    📦 Toplu Sonuçlandırma (Tek Kazanan)
+                  </span>
+                  <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center text-[10px]" :class="form.awardMode === 'ALL_OR_NOTHING' ? 'border-blue-600 bg-blue-600 text-white' : 'border-slate-300'">
+                    <span v-if="form.awardMode === 'ALL_OR_NOTHING'">✓</span>
+                  </span>
+                </div>
+                <p class="text-[10px] text-slate-600">Tüm kalemler tek bir kazanana bütünüyle verilir.</p>
+              </div>
+
+              <div 
+                @click="form.awardMode = 'ITEM_BASED'"
+                class="p-3 rounded-xl border-2 cursor-pointer transition flex flex-col justify-between space-y-1 text-left"
+                :class="form.awardMode === 'ITEM_BASED' ? 'border-indigo-600 bg-indigo-50/40 ring-2 ring-indigo-500/20' : 'border-slate-200 bg-white hover:border-slate-300'"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="font-bold text-xs" :class="form.awardMode === 'ITEM_BASED' ? 'text-indigo-900' : 'text-slate-800'">
+                    🧩 Kalem Bazlı Kısmi Sonuçlandırma
+                  </span>
+                  <span class="w-4 h-4 rounded-full border-2 flex items-center justify-center text-[10px]" :class="form.awardMode === 'ITEM_BASED' ? 'border-indigo-600 bg-indigo-600 text-white' : 'border-slate-300'">
+                    <span v-if="form.awardMode === 'ITEM_BASED'">✓</span>
+                  </span>
+                </div>
+                <p class="text-[10px] text-slate-600">Her kalem bağımsız olarak en avantajlı farklı firmaya verilebilir.</p>
+              </div>
+            </div>
           </div>
 
           <!-- Kalemler Listesi -->
-          <div v-else class="space-y-3">
-            <div 
-              v-for="(kalem, idx) in form.kalemler" 
-              :key="kalem.id || idx"
-              class="p-3.5 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2.5"
-            >
-              <div class="flex items-center justify-between">
-                <span class="text-[11px] font-black text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
-                  Kalem #{{ idx + 1 }}
-                </span>
-                <button 
-                  type="button" 
-                  @click="removeKalem(idx)"
-                  class="text-red-500 hover:text-red-700 p-1 rounded hover:bg-red-50 transition cursor-pointer"
-                  title="Kalemi Sil"
-                >
-                  <Trash2 :size="14" />
-                </button>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
-                <div class="sm:col-span-6">
-                  <label class="block text-[10px] font-bold text-slate-600 mb-1">KALEM / MALZEME ADI *</label>
-                  <input 
-                    v-model="kalem.ad" 
-                    type="text" 
-                    placeholder="Örn: 60x40x40 Dopel Koli" 
-                    class="w-full rounded-lg border border-slate-300 p-2 text-xs outline-none focus:border-blue-600"
-                  />
-                </div>
-                <div class="sm:col-span-3">
-                  <label class="block text-[10px] font-bold text-slate-600 mb-1">MİKTAR *</label>
-                  <input 
-                    v-model.number="kalem.miktar" 
-                    type="number" 
-                    min="1" 
-                    class="w-full rounded-lg border border-slate-300 p-2 text-xs outline-none focus:border-blue-600 font-bold"
-                  />
-                </div>
-                <div class="sm:col-span-3">
-                  <label class="block text-[10px] font-bold text-slate-600 mb-1">BİRİM *</label>
-                  <select 
-                    v-model="kalem.birim" 
-                    class="w-full rounded-lg border border-slate-300 p-2 text-xs outline-none bg-white focus:border-blue-600"
-                  >
-                    <option value="Adet">Adet</option>
-                    <option value="Kg">Kg</option>
-                    <option value="Ton">Ton</option>
-                    <option value="Metre">Metre</option>
-                    <option value="m²">m²</option>
-                    <option value="Litre">Litre</option>
-                    <option value="Paket">Paket</option>
-                    <option value="Koli">Koli</option>
-                    <option value="Saat">Saat</option>
-                    <option value="Gün">Gün</option>
-                    <option value="Parti">Parti/Lot</option>
-                  </select>
-                </div>
-              </div>
-
+          <div class="space-y-3 bg-slate-50/80 p-4 rounded-xl border border-slate-200">
+            <div class="flex items-center justify-between">
               <div>
-                <label class="block text-[10px] font-bold text-slate-600 mb-1">TEKNİK DETAY / ŞARTNAME NOTU (İsteğe Bağlı)</label>
-                <input 
-                  v-model="kalem.teknikAciklama" 
-                  type="text" 
-                  placeholder="Örn: Su geçirmez kaplama, Kraft renk, TS EN standartlı" 
-                  class="w-full rounded-lg border border-slate-300 p-2 text-xs outline-none focus:border-blue-600 text-slate-700"
-                />
+                <h3 class="text-xs font-black uppercase tracking-wider text-slate-800">İhale Kalemleri / Malzeme Listesi</h3>
+                <p class="text-[10px] text-slate-500">Birden fazla ürün veya hizmet alıyorsanız kalem ekleyerek detaylandırın.</p>
+              </div>
+              <button 
+                type="button" 
+                @click="addKalem"
+                class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer"
+              >
+                <Plus :size="14" />
+                <span>Kalem Ekle</span>
+              </button>
+            </div>
+
+            <div v-if="form.kalemler.length === 0" class="p-4 border border-dashed border-slate-300 rounded-lg text-center bg-white">
+              <p class="text-xs text-slate-500">Henüz özel kalem tanımlanmadı. İhale başlığı tek ana kalem olarak işleme alınacaktır.</p>
+            </div>
+
+            <div v-else class="space-y-2.5">
+              <div 
+                v-for="(kalem, idx) in form.kalemler" 
+                :key="kalem.id || idx"
+                class="p-3 bg-white rounded-xl border border-slate-200 shadow-2xs space-y-2"
+              >
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-black text-blue-900 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                    Kalem #{{ idx + 1 }}
+                  </span>
+                  <button type="button" @click="removeKalem(idx)" class="text-red-500 hover:text-red-700 p-1 cursor-pointer">
+                    <Trash2 :size="13" />
+                  </button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                  <div class="sm:col-span-6">
+                    <input 
+                      v-model="kalem.ad" 
+                      type="text" 
+                      placeholder="Kalem / Malzeme Adı" 
+                      class="w-full rounded-lg border border-slate-300 p-2 text-xs outline-none focus:border-blue-600"
+                    />
+                  </div>
+                  <div class="sm:col-span-3">
+                    <input 
+                      v-model.number="kalem.miktar" 
+                      type="number" 
+                      min="1" 
+                      class="w-full rounded-lg border border-slate-300 p-2 text-xs outline-none focus:border-blue-600 font-bold"
+                    />
+                  </div>
+                  <div class="sm:col-span-3">
+                    <select 
+                      v-model="kalem.birim" 
+                      class="w-full rounded-lg border border-slate-300 p-2 text-xs outline-none bg-white focus:border-blue-600"
+                    >
+                      <option value="Adet">Adet</option>
+                      <option value="Kg">Kg</option>
+                      <option value="Ton">Ton</option>
+                      <option value="Metre">Metre</option>
+                      <option value="m²">m²</option>
+                      <option value="Litre">Litre</option>
+                      <option value="Paket">Paket</option>
+                      <option value="Koli">Koli</option>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- 3.3 PARA BİRİMİ, KDV, MİN ADIM, REZERV FİYAT, ASGARİ TEKLİF SAYISI -->
-        <!-- İhalesiz İlan Bilgi Notu -->
-        <div v-if="form.ihaleYonu === 'ihalesiz_ilan'" class="rounded-xl border border-teal-200 bg-teal-50/70 p-4 space-y-2">
-          <div class="flex items-center gap-2 text-teal-900 font-bold text-xs">
-            <span>💰 Doğrudan Net Fiyatlı İlan Protokolü</span>
-            <span class="text-[10px] font-black bg-teal-200 text-teal-900 px-2 py-0.5 rounded">Rekabet Kuralları Devre Dışı</span>
-          </div>
-          <p class="text-[11px] text-teal-800 leading-relaxed">
-            Bu ilan <strong>İhalesiz (Net Fiyatlı)</strong> olarak yayımlanacaktır. Açık eksiltme/artırma kuralları (Minimum Teklif Adımı, Gizli Rezerv Fiyat ve Asgari Teklif Sayısı barajı) bu ilan tipi için geçerli değildir. İlanınız belirlediğiniz net fiyat ({{ form.netFiyat || '0' }} {{ form.currency }}) üzerinden doğrudan listelenecek ve ilgilenen firmalar sizinle doğrudan anlaşabilecektir.
-          </p>
-        </div>
-
-        <!-- Standart İhale Kuralları (Eksiltme / Artırma / Kapalı Zarf) -->
-        <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 pt-2 border-t border-slate-100">
-          <!-- Para Birimi (TND-005) -->
-          <div>
-            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">
-              İHALE PARA BİRİMİ (TND-005)
-            </label>
-            <select 
-              v-model="form.currency" 
-              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs outline-none bg-white font-bold focus:border-blue-600"
-            >
-              <option value="TRY">₺ TRY (Türk Lirası)</option>
-              <option value="USD">$ USD (Amerikan Doları)</option>
-              <option value="EUR">€ EUR (Euro)</option>
-            </select>
-          </div>
-
-          <!-- KDV Durumu (TND-005) -->
-          <div>
-            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">
-              KDV ESASI (TND-005)
-            </label>
-            <select 
-              v-model="form.vatType" 
-              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs outline-none bg-white font-bold focus:border-blue-600"
-            >
-              <option value="vat_included">KDV DÂHİL</option>
-              <option value="vat_excluded">KDV HARİÇ (+%20 Standart)</option>
-            </select>
-          </div>
-
-          <!-- Minimum Teklif Adımı (TND-009) -->
-          <div>
-            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">
-              MİNİMUM TEKLİF ADIMI (TND-009)
-            </label>
-            <div class="relative">
+          <!-- Standart Parametreler (Min Adım, Rezerv Fiyat, Asgari Teklif Sayısı) -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-slate-100">
+            <div>
+              <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1">
+                MİNİMUM TEKLİF ADIMI
+              </label>
               <input 
                 v-model.number="form.minStep" 
                 type="number" 
-                min="100" 
-                step="100" 
                 placeholder="Örn: 1000" 
-                class="w-full rounded-xl border border-slate-300 p-2.5 text-xs outline-none font-bold focus:border-blue-600 pr-10"
+                class="w-full rounded-xl border border-slate-300 p-2 text-xs outline-none font-bold focus:border-blue-600"
               />
-              <span class="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-slate-400">
-                {{ form.currency === 'TRY' ? '₺' : form.currency === 'USD' ? '$' : '€' }}
-              </span>
             </div>
-            <p class="text-[9px] text-slate-500 mt-1">Eksiltme veya artırmada her yeni teklif en az bu tutar kadar farklı olmalıdır.</p>
-          </div>
 
-          <!-- Gizli Rezerv / Hedef Tavan Fiyat (TND-008) -->
-          <div>
-            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-              <span>GİZLİ REZERV FİYAT (TND-008)</span>
-              <span class="text-amber-600 font-bold lowercase text-[9px]">🔒 gizli / bağlayıcı</span>
-            </label>
-            <input 
-              v-model="form.reservePrice" 
-              type="text" 
-              placeholder="Örn: 120.000 (Boş bırakılabilir)" 
-              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs outline-none font-bold focus:border-amber-600 focus:ring-2 focus:ring-amber-100"
-            />
-            <p class="text-[9px] text-amber-700 mt-1">Tedarikçilere asla gösterilmez. Bu tavanın üstündeki tekliflerle ihale zorunlu sonuçlandırılmaz.</p>
-          </div>
+            <div>
+              <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1 flex items-center justify-between">
+                <span>GİZLİ REZERV FİYAT</span>
+                <span class="text-amber-600 text-[9px]">🔒 gizli</span>
+              </label>
+              <input 
+                v-model="form.reservePrice" 
+                type="text" 
+                placeholder="Örn: 120.000" 
+                class="w-full rounded-xl border border-slate-300 p-2 text-xs outline-none font-bold focus:border-amber-600"
+              />
+            </div>
 
-          <!-- Asgari Geçerli Teklif Sayısı (TND-011) -->
-          <div>
-            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">
-              ASGARİ GEÇERLİ TEKLİF SAYISI (TND-011)
-            </label>
-            <select 
-              v-model.number="form.minBidsCount" 
-              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs outline-none bg-white font-bold focus:border-blue-600"
-            >
-              <option :value="1">En az 1 Geçerli Teklif (Standart)</option>
-              <option :value="2">En az 2 Geçerli Teklif (Rekabet Şartı)</option>
-              <option :value="3">En az 3 Geçerli Teklif (Geniş Rekabet Şartı)</option>
-            </select>
-            <p class="text-[9px] text-slate-500 mt-1">Teklif sayısı bu adede ulaşmazsa ihale yetersiz rekabet sebebiyle sonuçlandırılmaz.</p>
-          </div>
-        </div>
-
-        <!-- 3.4 GENEL ŞARTNAME & AÇIKLAMA METNİ -->
-        <div>
-          <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">
-            {{ isRealEstateCategory ? 'GAYRİMENKUL DETAYLI AÇIKLAMA & ÖZEL HÜKÜMLER' : 'GENEL ŞARTNAME & İHALE ÖZEL HÜKÜMLERİ' }}
-          </label>
-          <textarea 
-            v-model="form.aciklama" 
-            rows="4" 
-            :placeholder="descPlaceholder" 
-            class="w-full rounded-lg border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-medium"
-            style="border-color: #CBD5E1; color: #0F172A;"
-          ></textarea>
-        </div>
-      </div>
-
-      <!-- KART: İHALE & NUMUNE GÖRSELLERİ YÜKLEME -->
-      <div class="rounded-xl border bg-white p-6 shadow-sm space-y-4" style="border-color: #E2E8F0;">
-        <div class="flex items-center justify-between">
-          <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
-            <Camera :size="15" />
-            <span>{{ isRealEstateCategory ? 'Gayrimenkul Fotoğrafları Yükleme' : 'İhale & Numune Görselleri Yükleme (Fotoğraf)' }}</span>
-          </h2>
-          <span class="text-[10px] text-slate-400 font-bold">İsteğe Bağlı</span>
-        </div>
-        
-        <!-- Image Upload Drag & Drop Zone -->
-        <div 
-          @click="triggerImageSelect"
-          class="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition hover:bg-slate-50 flex flex-col items-center justify-center gap-2 group border-slate-300"
-        >
-          <Camera :size="28" class="text-slate-400 group-hover:text-blue-600 transition" />
-          <div>
-            <span class="text-xs font-bold text-slate-700">
-              {{ isRealEstateCategory ? 'Emlak / Gayrimenkul Fotoğrafları Yükleyin' : 'İhale Ürün Fotoğrafı veya Numune Görseli Yükleyin' }}
-            </span>
-            <p class="text-[10px] text-slate-400 mt-1">JPG, PNG veya WEBP (Maks: 5MB)</p>
-          </div>
-          <input 
-            ref="imageInputRef"
-            type="file"
-            multiple
-            accept="image/*"
-            class="hidden"
-            @change="handleImageChange"
-          />
-        </div>
-
-        <!-- Predefined sample quick-add buttons -->
-        <div class="flex flex-wrap items-center gap-2 pt-1">
-          <span class="text-[10px] font-bold text-slate-400">Hızlı Görsel Ekle:</span>
-          <template v-if="isRealEstateCategory">
-            <button 
-              type="button" 
-              @click="addSampleImage('https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&auto=format&fit=crop&q=80', 'Modern Daire Salonu')"
-              class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer border border-amber-200"
-            >
-              <Plus :size="10" /> 🏢 Salon / Daire İçi
-            </button>
-            <button 
-              type="button" 
-              @click="addSampleImage('https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&auto=format&fit=crop&q=80', 'Bina Dış Cephe & Peyzaj')"
-              class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer border border-amber-200"
-            >
-              <Plus :size="10" /> 🏡 Bina Dış Cephe
-            </button>
-            <button 
-              type="button" 
-              @click="addSampleImage('https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=800&auto=format&fit=crop&q=80', 'İmarlı Arsa & Parsel')"
-              class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer border border-amber-200"
-            >
-              <Plus :size="10" /> 🗺️ Arsa & Parsel
-            </button>
-            <button 
-              type="button" 
-              @click="addSampleImage('https://images.unsplash.com/photo-1582037928769-181f2644ecb7?w=800&auto=format&fit=crop&q=80', 'Cadde Dükkanı / Mağaza')"
-              class="px-2.5 py-1 rounded-lg bg-amber-50 hover:bg-amber-100 text-amber-800 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer border border-amber-200"
-            >
-              <Plus :size="10" /> 🏬 Dükkan & Mağaza
-            </button>
-          </template>
-          <template v-else>
-            <button 
-              type="button" 
-              @click="addSampleImage('https://images.unsplash.com/photo-1558904541-efa8c4a08931?w=800&auto=format&fit=crop&q=80', 'Peyzaj & Bahçe Düzenleme')"
-              class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-            >
-              <Plus :size="10" /> 🌿 Peyzaj & Bahçe
-            </button>
-            <button 
-              type="button" 
-              @click="addSampleImage('https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=800&auto=format&fit=crop&q=80', 'Mimari & Statik Proje')"
-              class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-            >
-              <Plus :size="10" /> 📐 Mimarlık & Mühendislik
-            </button>
-            <button 
-              type="button" 
-              @click="addSampleImage('https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=800&auto=format&fit=crop&q=80', 'Kurumsal Donanım Numunesi')"
-              class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-            >
-              <Plus :size="10" /> 💻 Donanım / Laptop
-            </button>
-            <button 
-              type="button" 
-              @click="addSampleImage('https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=800&auto=format&fit=crop&q=80', 'İnşaat / Çatı Numunesi')"
-              class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-            >
-              <Plus :size="10" /> 🏗️ Çatı / İnşaat
-            </button>
-            <button 
-              type="button" 
-              @click="addSampleImage('https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=800&auto=format&fit=crop&q=80', 'Kutu & Koli Ambalaj Numunesi')"
-              class="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-[10px] font-bold transition flex items-center gap-1 cursor-pointer"
-            >
-              <Plus :size="10" /> 📦 Ambalaj / Kutu
-            </button>
-          </template>
-        </div>
-
-        <!-- Uploaded Images Preview Grid -->
-        <div v-if="form.images.length > 0" class="space-y-2 mt-3 pt-3 border-t border-slate-100">
-          <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">YÜKLENEN GÖRSELLER ({{ form.images.length }})</label>
-          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div 
-              v-for="(img, idx) in form.images" 
-              :key="idx"
-              class="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-100 group h-28"
-            >
-              <img :src="img.url" :alt="img.name" class="w-full h-full object-cover" />
-              <button 
-                type="button"
-                @click="removeImage(idx)"
-                class="absolute top-1.5 right-1.5 p-1 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition shadow-xs cursor-pointer"
-                title="Görseli Sil"
+            <div>
+              <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1">
+                ASGARİ TEKLİF SAYISI
+              </label>
+              <select 
+                v-model.number="form.minBidsCount" 
+                class="w-full rounded-xl border border-slate-300 p-2 text-xs outline-none bg-white font-bold focus:border-blue-600"
               >
-                <Trash2 :size="12" />
-              </button>
-              <div class="absolute bottom-0 inset-x-0 bg-slate-900/80 p-1 text-[9px] text-white truncate px-1.5">
-                {{ img.name }}
-              </div>
+                <option :value="1">En az 1 Geçerli Teklif</option>
+                <option :value="2">En az 2 Geçerli Teklif</option>
+                <option :value="3">En az 3 Geçerli Teklif</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Özel Davetli İhale Seçeneği -->
+          <div class="pt-2 border-t border-slate-100">
+            <label class="flex items-center gap-2 cursor-pointer select-none">
+              <input 
+                type="checkbox" 
+                :checked="form.visibility === 'private_invited'"
+                @change="form.visibility = ($event.target as HTMLInputElement).checked ? 'private_invited' : 'public'"
+                class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 h-4 w-4 cursor-pointer"
+              />
+              <span class="text-xs font-bold text-slate-800">
+                🔒 Özel Davetli Kapalı İhale (Yalnızca Belirttiğim Tedarikçiler Teklif Verebilsin)
+              </span>
+            </label>
+            <div v-if="form.visibility === 'private_invited'" class="pt-2">
+              <input 
+                v-model="form.invitedSuppliers" 
+                type="text" 
+                placeholder="Davet edilecek e-posta veya VKN numaraları (virgülle ayırınız)" 
+                class="w-full rounded-xl border border-indigo-200 bg-white p-2.5 text-xs text-slate-800 outline-none focus:border-indigo-500" 
+              />
             </div>
           </div>
         </div>

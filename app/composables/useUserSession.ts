@@ -171,8 +171,9 @@ export function useUserSession() {
     return serverSession.value?.companyVkn || userSession.value?.taxNo || userSession.value?.vkn || '9560161511'
   })
 
+  // 👥 Teklif Verme Yetkisi: Tüm kayıtlı / oturum açmış kullanıcılar (vatandaş, bireysel, memur, kurumsal) teklif verebilir
   const canSubmitBid = computed(() => {
-    return isCompanyVerified.value && ['FİRMA_YÖNETİCİSİ', 'SATIN_ALMA', 'TEKLİF_YETKİLİSİ', 'ADMIN'].includes(companyRole.value)
+    return isLoggedIn.value === true
   })
 
   // 👑 ADM-001 & SEC-011: Süper Admin Yetkisi (SADECE Sunucu Tarafı Teyitli!)

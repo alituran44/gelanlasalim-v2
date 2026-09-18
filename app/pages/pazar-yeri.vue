@@ -41,6 +41,7 @@ import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_TYPES, TENDER_METHODS } from '
 import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
 import { formatSectorSummaryBadges, resolveSectorKey, SECTOR_DEFINITIONS } from '~/utils/categoryFieldsSchema'
 import { isTenderConcluded, containsContactInfo, maskContactInfo } from '~/utils/contactFilter'
+import { exportTenderPdf } from '~/utils/tenderPdfExport'
 
 definePageMeta({
   layout: "public"
@@ -337,7 +338,9 @@ const bidForm = ref({
   fiyat: '',
   sure: '7 gün',
   notum: '',
-  firmaAdi: userSession.value?.companyName || 'Kurumsal Tedarikçi',
+  bidderName: userSession.value?.name || userSession.value?.firstName || '',
+  bidderPhone: userSession.value?.phone || '',
+  firmaAdi: userSession.value?.companyName || userSession.value?.company || 'Teklif Sahibi',
   termsConfirmed: false
 })
 
@@ -379,8 +382,8 @@ onMounted(async () => {
   if (route.query.search) {
     searchQuery.value = String(route.query.search)
   }
-  if (route.query.kategori) {
-    selectedCategory.value = String(route.query.kategori)
+  if (route.query.kategori || route.query.category) {
+    selectedCategory.value = String(route.query.kategori || route.query.category)
   }
 })
 
@@ -393,14 +396,31 @@ const allTenders = computed(() => {
     } catch (e) {}
   }
   const map = new Map<string, any>()
-  localList.forEach(t => { if (t && t.id) map.set(t.id, t) })
-  cmsList.forEach(t => { if (t && t.id) map.set(t.id, t) })
+  for (const t of cmsList) {
+    if (t?.id) map.set(String(t.id), t)
+  }
+  for (const t of localList) {
+    if (t?.id) map.set(String(t.id), t)
+  }
   const combined = Array.from(map.values())
   return combined.filter((t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected')
 })
 
 
 const categories = computed(() => ['Tümü', ...ALL_40_CATEGORIES.map(c => c.name)])
+
+function getCategoryCount(catName: string): number {
+  if (catName === 'Tümü') return allTenders.value.length
+  const q = catName.toLocaleLowerCase('tr-TR')
+  return allTenders.value.filter(t => {
+    const k = (t.kategori || '').toLocaleLowerCase('tr-TR')
+    const mk = (t.mainCategory || '').toLocaleLowerCase('tr-TR')
+    const b = (t.baslik || '').toLocaleLowerCase('tr-TR')
+    return k.includes(q) || mk.includes(q) || b.includes(q)
+  }).length
+}
+
+
 const types = TENDER_TYPES
 const methods = TENDER_METHODS
 const cities = computed(() => ['Tümü', ...ALL_81_CITIES])
@@ -584,17 +604,13 @@ function isMyOwnTender(tender: any): boolean {
 
 
 function openBidModal(tender: any) {
-  let session = userSession.value || {}
-  if (!session.email && typeof window !== 'undefined') {
-    try {
-      session = JSON.parse(localStorage.getItem('userSession') || '{}')
-    } catch (e) {}
-  }
-
-  // Profil doluluk şartı tamamen kaldırıldı - Her kullanıcı doğrudan teklif verebilir
-  // 1. Kendi İlanına Teklif Verme Engeli
   if (isMyOwnTender(tender)) {
     alert(`🚫 KENDİ İLANINIZA TEKLİF VEREMEZSİNİZ!\n\n"${tender.baslik}" ihalesi sizin tarafınızdan açılmıştır.\n\nSistem kuralları gereği kendi açtığınız ihalelere teklif sunamazsınız.\n\nİhaleniz için gelen tedarikçi tekliflerini incelemek, değerlendirmek ve pazarlık yürütmek için lütfen "Gelen Teklifler" sayfasına gidiniz.`)
+    return
+  }
+  if (!isLoggedIn.value) {
+    alert('Teklif verebilmek için lütfen önce üye girişi yapınız veya ücretsiz kayıt olunuz.')
+    navigateTo('/uyelik?tab=login')
     return
   }
 
@@ -608,7 +624,7 @@ function openBidModal(tender: any) {
     return
   }
 
-  const existingBid = (cmsData.value.dashboard.submittedBids || []).find(
+  const existingBid = (cmsData.value?.dashboard?.submittedBids || []).find(
     (b: any) => b.tenderId === tender.id || b.ilanBaslik === tender.baslik
   )
   if (existingBid) {
@@ -619,10 +635,10 @@ function openBidModal(tender: any) {
   selectedTenderForBid.value = tender
   bidForm.value.fiyat = ''
   bidForm.value.notum = ''
+  bidForm.value.bidderName = userSession.value?.name || userSession.value?.firstName || userSession.value?.companyName || ''
+  bidForm.value.bidderPhone = userSession.value?.phone || ''
+  bidForm.value.firmaAdi = userSession.value?.companyName || userSession.value?.company || userSession.value?.name || 'Teklif Sahibi'
   bidForm.value.termsConfirmed = false
-  if (userSession.value.companyName || userSession.value.company) {
-    bidForm.value.firmaAdi = userSession.value.companyName || userSession.value.company
-  }
   showBidModal.value = true
 }
 
@@ -633,11 +649,20 @@ async function submitBid() {
     showBidModal.value = false
     return
   }
-  // 🛡️ VER-001 & VER-004: Firma Doğrulama & Yetki Kontrolü
-  if (!canSubmitBid.value) {
-    alert('⛔ TEKLİF VERME ENGELİ (Kural VER-001 & VER-004):\n\nTeklif verebilmek için firmanızın VKN doğrulaması yapılmış ve firma içi rolünüzün "Teklif Yetkilisi", "Satın Alma" veya "Firma Yöneticisi" olması zorunludur.\n\nLütfen Ekip & Yetki Merkezi üzerinden firmanızı doğrulayınız.')
+
+  if (!isLoggedIn.value) {
+    alert('Teklif verebilmek için lütfen önce üye girişi yapınız veya ücretsiz kayıt olunuz.')
+    showBidModal.value = false
+    navigateTo('/uyelik?tab=login')
     return
   }
+
+  const effectivePhone = bidForm.value.bidderPhone || userSession.value?.phone || ''
+  if (!effectivePhone || !String(effectivePhone).trim()) {
+    alert('Lütfen teklifinizin ilan sahibine iletilebilmesi için iletişim telefon numaranızı giriniz.')
+    return
+  }
+
   if (!bidForm.value.fiyat) {
     alert('Lütfen teklif fiyatınızı giriniz.')
     return
@@ -801,47 +826,7 @@ function downloadFile(filename: string, content: string, mimeType: string = 'tex
 }
 
 function downloadIhaleIlani(tender: any) {
-  const content = `================================================================================
-                    T.C. B2B TİCARET VE İHALE PORTALI
-                     İHALECİBURADA RESMİ İHALE İLANI
-================================================================================
-
-İhale Kayıt No (İKN)    : ${tender.id}
-İhale Başlığı            : ${tender.baslik}
-Sektör & Kategori       : ${tender.kategori}
-İdare / Kurum           : ${tender.authority || 'İhaleciBurada Satın Alma Masası'}
-İhaleyi Açan Kurum      : ${tender.ownerCompany || 'Doğrulanmış B2B Kurumsal Alıcı'}
-İhale Usulü             : ${tender.tur || 'Açık İhale'}
-İhale Türü              : ${tender.type || 'Mal / Hizmet Alımı'}
-Yaklaşık Maliyet / Bütçe: ${tender.butce || 'Açık Teklif'}
-İhale Lokasyonu / İl    : ${tender.city || 'Türkiye Geneli'}
-İlan Yayın Tarihi       : ${tender.yayinTarihi || '28.08.2026'}
-Son Teklif Tarihi       : ${tender.sure || '30.08.2026'}
-
---------------------------------------------------------------------------------
-1. İHALENİN KONUSU VE TEKNİK KAPSAMI
---------------------------------------------------------------------------------
-${tender.aciklama || 'Bu ihale şartnamesinde yer alan tüm teknik detaylar ve mevzuat kriterleri geçerlidir.'}
-
---------------------------------------------------------------------------------
-2. İHALEYE KATILMA ŞARTLARI VE İSTENEN BELGELER
---------------------------------------------------------------------------------
-a) Vergi Levhası ve Faaliyet Belgesi (Son 3 ay içinde alınmış olmalıdır).
-b) İmza Sirküleri veya İmza Beyannamesi.
-c) TSE / ISO Kalite Uygunluk Belgeleri.
-d) Geçici Teminat Mektubu veya Güvenli Havuz (Escrow) Bloke Teminatı.
-
---------------------------------------------------------------------------------
-3. TEKLİF VERME VE DEĞERLENDİRME USULÜ
---------------------------------------------------------------------------------
-Teklifler İhaleciBurada platformu üzerinden kapalı zarf usulü veya canlı eksiltme
-modülüyle toplanacaktır. İhale süresi bitiminde en avantajlı fiyat ve teknik yeterlilik
-sahibi yüklenici ile sözleşme akdedilecektir.
-
-Resmi Belge Doğrulama Kodu: IHC-${String(tender.id).replace('/', '-')}-${Math.floor(1000 + Math.random()*9000)}
-Belge Tanzim Tarihi: ${new Date().toLocaleDateString('tr-TR')}
-`
-  downloadFile(`Ihale_Ilani_${String(tender.id).replace('/', '_')}.txt`, content)
+  exportTenderPdf(tender)
 }
 
 function downloadMalzemeListesi(tender: any) {
@@ -854,108 +839,19 @@ function downloadMalzemeListesi(tender: any) {
 }
 
 function downloadIdariSartname(tender: any) {
-  const content = `================================================================================
-                    İHALECİBURADA B2B ELEKTRONİK İHALE SİSTEMİ
-                             İDARİ ŞARTNAME METNİ
-================================================================================
-
-İhale No : ${tender.id}
-İşin Adı : ${tender.baslik}
-İşin Yeri: ${tender.city || 'Türkiye Geneli'}
-
-MADDE 1 - İHALE SAHİBİ VE İDAREYE İLİŞKİN BİLGİLER
-1.1. İdare: ${tender.authority || 'İhaleciBurada Satın Alma Masası'}
-1.2. İhaleyi Açan Kurum: ${tender.ownerCompany || 'Doğrulanmış B2B Kurumsal Alıcı'}
-
-MADDE 2 - İHALENİN USULÜ VE TEKLİFİN ŞEKLİ
-2.1. İhale Usulü: ${tender.tur || 'Açık Eksiltme ve Doğrudan Temin'}
-2.2. Teklifler platform üzerinden 256-bit TLS şifrelemeyle kapalı zarf formatında alınır.
-
-MADDE 3 - SÖZLEŞME BEDELİ VE ÖDEME ESASLARI
-3.1. Yaklaşık Bütçe: ${tender.butce}
-3.2. Ödemeler, mal ve hizmet muayene kabul tutanağının tanzimini müteakip
-     TCMB lisanslı Güvenli Ticaret Havuz (Escrow) hesabından yüklenici IBAN'ına aktarılır.
-
-MADDE 4 - TESLİMAT VE MUAYENE KABUL
-4.1. Mallar şantiye/depo adresine hasarsız olarak teslim edilecek,
-     3 (üç) iş günü içinde oluşturulacak heyet tarafından fiziki ve teknik muayenesi yapılacaktır.
-
-MADDE 5 - CEZAİ HÜKÜMLER VE ANLAŞMAZLIKLAR
-5.1. Mücbir sebepler haricinde geciken her takvim günü için sözleşme bedelinin %0.1'i oranında ceza kesilir.
-5.2. İhtilaf vukuunda Çanakkale / İstanbul Mahkemeleri ve İcra Daireleri yetkilidir.
-
-Tanzim Tarihi: ${new Date().toLocaleDateString('tr-TR')}
-`
-  downloadFile(`Idari_Sartname_${String(tender.id).replace('/', '_')}.txt`, content)
+  exportTenderPdf(tender)
 }
 
 function downloadSozlesme(tender: any) {
-  const content = `================================================================================
-                    TİP B2B MAL VE HİZMET SATIN ALMA SÖZLEŞMESİ
-================================================================================
-
-Sözleşme Kayıt No : SOZ-${String(tender.id).replace('/', '-')}-2026
-İhale Konusu      : ${tender.baslik}
-Alıcı Taraf       : ${tender.ownerCompany || 'Alıcı Kurumsal Firma'}
-Yüklenici Taraf   : İhaleyi Kazanan Onaylı Tedarikçi Firma
-Sözleşme Tutarı   : ${tender.butce}
-Yürürlük Tarihi   : ${new Date().toLocaleDateString('tr-TR')}
-
-1. TARAFLARIN HAK VE YÜKÜMLÜLÜKLERİ:
-Yüklenici, işbu sözleşme konusu mal ve hizmeti teknik şartnamede belirtilen kalitede ve
-sürede teslim etmeyi; Alıcı ise şartnameye uygun teslimat sonrasında bedeli Güvenli Havuz
-aracılığıyla eksiksiz ödemeyi taahhüt eder.
-
-2. GÜVENCE VE BLOKE:
-İhale bedeli alıcı tarafından TCMB/BDDK güvenceli emanet hesaba yatırılmış olup, teslimat
-onayından önce tedarikçiye ve alıcıya karşılıklı güvence sağlamaktadır.
-
-3. KANUNİ DAYANAK:
-İşbu sözleşme 6098 sayılı Türk Borçlar Kanunu, 6102 sayılı TTK ve 6563 sayılı Elektronik
-Ticaretin Düzenlenmesi Hakkında Kanun hükümlerine tabidir.
-`
-  downloadFile(`Sozlesme_Metni_${String(tender.id).replace('/', '_')}.txt`, content)
+  exportTenderPdf(tender)
 }
 
 function downloadSonucIlani(tender: any) {
-  const content = `================================================================================
-                    İHALE SONUÇ BİLDİRİMİ VE MUTABAKAT TUTANAĞI
-================================================================================
-
-İhale No          : ${tender.id}
-İhale Başlığı     : ${tender.baslik}
-İhale Durumu      : ${tender.durum === 'closed' ? 'SONUÇLANDI / SÖZLEŞME İMZALANDI' : 'DEĞERLENDİRME AŞAMASINDA'}
-Kazanan Yüklenici : ${tender.ownerCompany || 'En Avantajlı Teklif Sahibi Yüklenici'}
-Sözleşme Bedeli   : ${tender.butce}
-Toplam Teklif     : ${tender.teklifSayisi || 0} Firma Katıldı
-Tasarruf Oranı    : %14.2 Ortalama Maliyet Tasarrufu
-Sonuçlanma Tarihi : ${new Date().toLocaleDateString('tr-TR')}
-`
-  downloadFile(`Sonuc_Ilani_${String(tender.id).replace('/', '_')}.txt`, content)
+  exportTenderPdf(tender)
 }
 
 function downloadAllSpecs(tender: any) {
-  let content = `========================================================
-İHALECİBURADA.COM - RESMİ İHALE ŞARTNAME VE MALZEME PAKETİ
-İhale No: ${tender.id}
-İhale Başlığı: ${tender.baslik}
-Kategori: ${tender.kategori}
-Şehir: ${tender.city || 'Türkiye Geneli'}
-Bütçe: ${tender.butce || 'Açık İhale'}
-========================================================
-
-1. İHALE METNİ VE GENEL ŞARTLAR:
-${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
-
-2. MALZEME LİSTESİ & METRAJ:
-- Kalem 1: Standart şartname metrajına uygun malzeme ve işçilik.
-
-3. İDARİ VE TEKNİK ŞARTLAR:
-- Teslimat süresine ve irsaliye kabul kriterlerine uygunluk esastır.
-- Hakediş ödemesi TCMB/BDDK mevzuatına uygun Güvenli Havuz (Escrow) hesabında korunacaktır.
-========================================================
-`
-  downloadFile(`Sartname_Paketi_${String(tender.id).replace('/', '_')}.txt`, content)
+  exportTenderPdf(tender)
 }
 </script>
 
@@ -1021,7 +917,9 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
           <div>
             <label class="block text-[10px] font-bold text-slate-500 mb-1">Kategori:</label>
             <select v-model="selectedCategory" class="w-full p-1.5 bg-white border border-slate-300 rounded text-slate-800 font-bold text-xs outline-none">
-              <option v-for="c in categories" :key="c" :value="c">{{ c }}</option>
+              <option v-for="c in categories" :key="c" :value="c">
+                {{ c }} ({{ getCategoryCount(c) }})
+              </option>
             </select>
           </div>
 
@@ -1329,10 +1227,11 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             <span 
               v-for="b in getTenderSectorBadges(tender)" 
               :key="b.label"
-              class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1"
+              class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1 shadow-2xs"
             >
-              <span class="text-slate-500 font-normal">{{ b.label }}:</span>
-              <span class="text-slate-900 font-semibold">{{ b.value }}</span>
+              <span class="text-slate-500 font-medium">{{ b.label }}</span>
+              <span class="text-blue-600 font-black">➔</span>
+              <span class="text-slate-900 font-bold">{{ b.value }}</span>
             </span>
           </div>
 
@@ -1494,31 +1393,25 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
               {{ selectedTenderForDetail.baslik }}
             </h2>
           </div>
-          <button @click="selectedTenderForDetail = null" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl cursor-pointer">
-            <X :size="22" />
+          <button 
+            type="button" 
+            @click="selectedTenderForDetail = null" 
+            class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer border border-slate-300 shrink-0 shadow-2xs"
+          >
+            <X :size="16" />
+            <span>✕ Kapat</span>
           </button>
         </div>
 
         <!-- EKAP Meta Info Strip (Görseldeki Format) -->
         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
           <div>
-            <span class="text-[10px] font-bold text-slate-400 uppercase block">👥 Yüklenici / Alıcı</span>
-            <span v-if="isLoggedIn" class="font-bold text-slate-800">{{ selectedTenderForDetail.ownerCompany || selectedTenderForDetail.company || 'Doğrulanmış B2B Kurum' }}</span>
-            <span v-else class="flex items-center gap-1.5 mt-0.5">
-              <span class="filter blur-[5px] select-none pointer-events-none font-bold text-slate-400">█████████ A.Ş.</span>
-              <NuxtLink to="/uyelik" class="text-[10px] text-amber-700 font-bold bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                <Lock :size="10" />
-                <span>Üye olmadan görünmez</span>
-              </NuxtLink>
-            </span>
+            <span class="text-[10px] font-bold text-slate-400 uppercase block">👥 İlan Sahibi / Kurum</span>
+            <span class="font-bold text-slate-900">{{ selectedTenderForDetail.ownerCompany || selectedTenderForDetail.company || 'Doğrulanmış B2B Kurum' }}</span>
           </div>
           <div>
             <span class="text-[10px] font-bold text-slate-400 uppercase block">🏢 İdare / Satın Alma</span>
-            <span v-if="isLoggedIn" class="font-bold text-slate-800">{{ selectedTenderForDetail.authority || 'İhaleciBurada Satın Alma Masası' }}</span>
-            <span v-else class="flex items-center gap-1.5 mt-0.5">
-              <span class="filter blur-[5px] select-none pointer-events-none font-medium text-slate-400">████████ Dairesi</span>
-              <NuxtLink to="/uyelik?tab=login" class="text-[10px] text-amber-700 font-bold underline">Giriş Yap</NuxtLink>
-            </span>
+            <span class="font-bold text-slate-900">{{ selectedTenderForDetail.authority || 'İhaleciBurada Satın Alma Masası' }}</span>
           </div>
           <div>
             <span class="text-[10px] font-bold text-slate-400 uppercase block">💰 İhale / Hedef Bedel</span>
@@ -1544,6 +1437,45 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             <span class="text-[10px] font-bold text-slate-400 uppercase block">🏷️ İhale Usulü</span>
             <span class="font-bold text-blue-700">{{ selectedTenderForDetail.tur || 'Açık Eksiltme' }}</span>
           </div>
+        </div>
+
+        <!-- 🌐 İLAN SAHİBİ DOĞRUDAN İLETİŞİM & WEB SAYFASI ŞERİDİ -->
+        <div class="p-3.5 rounded-2xl bg-gradient-to-r from-blue-50/80 via-slate-50 to-emerald-50/80 border border-blue-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-2xs">
+          <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-slate-700">
+            <div class="flex items-center gap-1.5 font-bold">
+              <Building2 :size="14" class="text-blue-600 shrink-0" />
+              <span class="text-slate-900">{{ selectedTenderForDetail.ownerCompany || selectedTenderForDetail.yetkili || 'Kurumsal Satın Alma Masası' }}</span>
+            </div>
+            <div class="flex items-center gap-1.5 font-mono">
+              <Phone :size="13" class="text-emerald-600 shrink-0" />
+              <a v-if="selectedTenderForDetail.ownerPhone || selectedTenderForDetail.phone" :href="'tel:' + (selectedTenderForDetail.ownerPhone || selectedTenderForDetail.phone)" class="font-bold text-emerald-700 hover:underline">
+                {{ selectedTenderForDetail.ownerPhone || selectedTenderForDetail.phone }}
+              </a>
+              <span v-else class="text-slate-600 font-bold">0850 840 86 95</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <Mail :size="13" class="text-blue-600 shrink-0" />
+              <a v-if="selectedTenderForDetail.ownerEmail || selectedTenderForDetail.email" :href="'mailto:' + (selectedTenderForDetail.ownerEmail || selectedTenderForDetail.email)" class="font-semibold text-blue-700 hover:underline">
+                {{ selectedTenderForDetail.ownerEmail || selectedTenderForDetail.email }}
+              </a>
+              <span v-else class="text-slate-500">Doğrulanmış Üye</span>
+            </div>
+            <div v-if="selectedTenderForDetail.teslimatAdresi" class="flex items-center gap-1.5 text-slate-500 text-[11px]">
+              <MapPin :size="13" class="text-slate-400 shrink-0" />
+              <span class="truncate max-w-xs">{{ selectedTenderForDetail.teslimatAdresi }}</span>
+            </div>
+          </div>
+
+          <a 
+            v-if="selectedTenderForDetail.websiteUrl" 
+            :href="selectedTenderForDetail.websiteUrl" 
+            target="_blank" 
+            rel="noopener noreferrer" 
+            class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition flex items-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
+          >
+            <ExternalLink :size="12" />
+            <span>🌐 Resmi Web Sayfasına Git ↗</span>
+          </a>
         </div>
 
         <!-- 6 Interactive EKAP Sub-tabs (Görseldeki 6 Buton) -->
@@ -2108,12 +2040,39 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             <span class="text-xs font-black text-blue-600 uppercase tracking-wider block">KAPALI ZARF TEKLİF VERME</span>
             <h3 class="text-lg font-black text-slate-900 mt-1">{{ selectedTenderForBid?.baslik }}</h3>
           </div>
-          <button @click="showBidModal = false" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl cursor-pointer">
-            <X :size="20" />
+          <button 
+            type="button"
+            @click="showBidModal = false" 
+            class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer border border-slate-300 shrink-0 shadow-2xs"
+          >
+            <X :size="16" />
+            <span>✕ Kapat</span>
           </button>
         </div>
 
         <div class="space-y-4">
+          <!-- Teklif Veren Bilgileri (Vatandaş / Şahıs / Firma) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-200">
+            <div>
+              <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1">AD SOYAD / YETKİLİ ADI *</label>
+              <input 
+                v-model="bidForm.bidderName"
+                type="text"
+                placeholder="Örn: Hasan Yıldırım"
+                class="w-full p-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-900 outline-none focus:border-blue-500"
+              />
+            </div>
+            <div>
+              <label class="block text-[10px] font-black text-emerald-700 uppercase tracking-wider mb-1">İLETİŞİM TELEFONU (GSM) *</label>
+              <input 
+                v-model="bidForm.bidderPhone"
+                type="tel"
+                placeholder="Örn: 0532 123 45 67"
+                class="w-full p-2.5 rounded-xl border border-emerald-300 bg-emerald-50/30 text-xs font-bold text-slate-900 outline-none focus:border-emerald-500"
+              />
+            </div>
+          </div>
+
           <div>
             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">TEKLİF FİYATINIZ (₺ / KDV DAHİL) *</label>
             <input 
@@ -2135,10 +2094,11 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
               />
             </div>
             <div>
-              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">FİRMA ADINIZ</label>
+              <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-1.5">FİRMA / UNVAN (İSTEĞE BAĞLI)</label>
               <input 
                 v-model="bidForm.firmaAdi"
                 type="text"
+                placeholder="Şahıs / Firma Adı"
                 class="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 outline-none focus:border-blue-500"
               />
             </div>
@@ -2206,10 +2166,11 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
 
         <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
           <button 
+            type="button"
             @click="showBidModal = false" 
             class="px-5 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
           >
-            İptal
+            ✕ Kapat
           </button>
           <button
             @click="submitBid"
@@ -2245,32 +2206,18 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
                 </span>
               </div>
               <h2 class="text-lg sm:text-2xl font-black text-slate-900 mt-1">
-                <span v-if="isLoggedIn">{{ selectedCompanyForProfile.name }}</span>
-                <span v-else class="filter blur-[5px] select-none pointer-events-none text-slate-400">
-                  {{ (selectedCompanyForProfile.name || 'Kurumsal Şirket').replace(/[a-zA-Z0-9]/g, '█') }}
-                </span>
+                <span>{{ selectedCompanyForProfile.name || 'Doğrulanmış B2B Firma' }}</span>
               </h2>
             </div>
           </div>
-          <button @click="selectedCompanyForProfile = null" class="text-slate-400 hover:text-slate-700 p-2 rounded-xl cursor-pointer">
-            <X :size="22" />
+          <button 
+            type="button" 
+            @click="selectedCompanyForProfile = null" 
+            class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs transition cursor-pointer border border-slate-300 shrink-0 shadow-2xs"
+          >
+            <X :size="16" />
+            <span>✕ Kapat</span>
           </button>
-        </div>
-
-        <!-- Giriş Yapmamış Kullanıcı İçin Uyarı Barı -->
-        <div v-if="!isLoggedIn" class="p-4 rounded-2xl bg-amber-50 border border-amber-300 text-amber-900 text-xs flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs">
-          <div class="flex items-center gap-2.5">
-            <Lock :size="20" class="text-amber-700 shrink-0" />
-            <div>
-              <span class="font-black text-xs block">Firma Bilgileri Üye Olmadan Görünmemektedir</span>
-              <span class="text-[11px] text-amber-800">
-                Firma unvanı, iletişim numaraları ve resmi ticaret sicil kayıtlarını görüntülemek için kurumsal üye girişi yapınız.
-              </span>
-            </div>
-          </div>
-          <NuxtLink to="/uyelik?tab=login" class="px-4 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-black text-xs shrink-0 shadow-xs transition">
-            Üye Ol / Giriş Yap
-          </NuxtLink>
         </div>
 
         <!-- 🌟 4'LÜ PERFORMANS & YILDIZ İSTATİSTİK ŞERİDİ -->
@@ -2318,7 +2265,7 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
         <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
           <h4 class="font-black text-slate-900 text-xs uppercase tracking-wider flex items-center gap-1.5">
             <BadgeCheck :size="15" class="text-blue-600" />
-            <span>Doğrulanmış Kurumsal Sicil & İletişim Bilgileri</span>
+            <span>Doğrulanmış Kurumsal Sicil & Doğrudan İletişim Bilgileri</span>
           </h4>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
             <div>
@@ -2327,33 +2274,33 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
             </div>
             <div>
               <span class="text-[10px] font-bold text-slate-400 block uppercase">Vergi Dairesi / VKN:</span>
-              <span v-if="isLoggedIn" class="font-mono font-bold text-slate-800">{{ selectedCompanyForProfile.taxOffice }}</span>
-              <span v-else class="filter blur-[4px] select-none pointer-events-none font-mono text-slate-400">██████ V.D. / ██████████</span>
+              <span class="font-mono font-bold text-slate-800">{{ selectedCompanyForProfile.taxOffice || 'Kayıtlı V.D.' }}</span>
             </div>
             <div>
               <span class="text-[10px] font-bold text-slate-400 block uppercase">MERSİS Numarası:</span>
-              <span v-if="isLoggedIn" class="font-mono font-bold text-slate-800">{{ selectedCompanyForProfile.mersis }}</span>
-              <span v-else class="filter blur-[4px] select-none pointer-events-none font-mono text-slate-400">0███████████████</span>
+              <span class="font-mono font-bold text-slate-800">{{ selectedCompanyForProfile.mersis || '—' }}</span>
             </div>
             <div>
               <span class="text-[10px] font-bold text-slate-400 block uppercase">İletişim Telefon & E-Posta:</span>
-              <div v-if="!isLoggedIn" class="flex items-center gap-1.5 text-slate-400 text-xs mt-0.5">
-                <span class="filter blur-[4px] select-none pointer-events-none font-mono">0532 ███ ██ ██ · info@██████.com</span>
-                <span class="text-[10px] text-amber-700 font-bold ml-1">🔒 Üye Olmadan Görünmez</span>
+              <div class="flex flex-wrap items-center gap-2 pt-0.5">
+                <a 
+                  v-if="selectedCompanyForProfile.phone" 
+                  :href="'tel:' + selectedCompanyForProfile.phone" 
+                  class="font-mono font-bold text-emerald-700 hover:underline flex items-center gap-1"
+                >
+                  <Phone :size="12" class="text-emerald-600" />
+                  <span>{{ selectedCompanyForProfile.phone }}</span>
+                </a>
+                <span class="text-slate-300">·</span>
+                <a 
+                  v-if="selectedCompanyForProfile.email" 
+                  :href="'mailto:' + selectedCompanyForProfile.email" 
+                  class="font-bold text-blue-700 hover:underline flex items-center gap-1"
+                >
+                  <Mail :size="12" class="text-blue-600" />
+                  <span>{{ selectedCompanyForProfile.email }}</span>
+                </a>
               </div>
-              <div v-else-if="selectedCompanyForProfile.currentTender && !isTenderConcluded(selectedCompanyForProfile.currentTender)" class="mt-1 p-2.5 rounded-xl bg-amber-50 border border-amber-300 text-amber-900 text-[11px] space-y-1">
-                <div class="flex items-center gap-1 font-black text-amber-800">
-                  <Lock :size="12" />
-                  <span>İhale Sonuçlanana Kadar Korumalı</span>
-                </div>
-                <p class="text-[10px] text-amber-800 leading-tight">
-                  Alıcı kurum doğrudan iletişim bilgileri ihale sonuçlanana kadar platform güvencesinde saklıdır. Lütfen sistem içi mesajlaşmayı kullanınız.
-                </p>
-                <div class="font-mono text-[10px] text-slate-500 pt-0.5">
-                  <span>+90 (***) *** ** **</span> · <span>******@ihaleciburada.com</span>
-                </div>
-              </div>
-              <span v-else class="font-bold text-slate-800">{{ selectedCompanyForProfile.phone }} · {{ selectedCompanyForProfile.email }}</span>
             </div>
           </div>
           <div class="pt-2 border-t border-slate-200 flex flex-wrap items-center gap-4 text-[11px] font-bold text-slate-600">
@@ -2406,10 +2353,11 @@ ${tender.aciklama || 'Belirtilen standart şartname hükümleri geçerlidir.'}
 
           <div class="flex items-center gap-2">
             <button 
+              type="button"
               @click="selectedCompanyForProfile = null" 
               class="px-5 py-2 rounded-xl border border-slate-200 text-xs font-bold text-slate-600 hover:bg-slate-50 cursor-pointer"
             >
-              Kapat
+              ✕ Kapat
             </button>
             <NuxtLink
               to="/panel/mesajlar"

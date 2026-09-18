@@ -72,6 +72,7 @@ import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
 import { useNetGsm } from '~/composables/useNetGsm'
 import { useUserSession } from '~/composables/useUserSession'
 import { isTenderConcluded, maskContactInfo } from '~/utils/contactFilter'
+import { exportTenderPdf } from '~/utils/tenderPdfExport'
 
 definePageMeta({
   layout: 'public'
@@ -136,6 +137,8 @@ const quickOfferFiles = ref<Array<{ name: string; size: string; type: string; ur
 const quoteFileInputRef = ref<HTMLInputElement | null>(null)
 const isSubmittingQuickOffer = ref(false)
 const quickOfferTermsConfirmed = ref(false)
+const quickOfferBidderName = ref('')
+const quickOfferBidderPhone = ref('')
 
 // Shared server tenders & bids from REST API
 const { data: serverTendersData } = useAsyncData('landing-server-tenders', () => 
@@ -1472,118 +1475,29 @@ function openPdfViewer(tender: any, doc?: any) {
 }
 
 function printPdfDocument() {
-  if (typeof window === 'undefined') return
-  window.print()
+  const target = selectedTenderModal.value || pdfTenderTarget.value || quickBidTender.value
+  if (target) {
+    exportTenderPdf(target)
+  } else if (typeof window !== 'undefined') {
+    window.print()
+  }
 }
 
 function downloadTenderFile(doc: any, tender: any) {
-  if (typeof window === 'undefined') return
-
-  const fileName = doc?.name || `Resmi_Sartname_${tender?.id || 'IHC'}.pdf`
-  
   if (doc?.url && doc.url.startsWith('data:')) {
     const link = document.createElement('a')
     link.href = doc.url
-    link.download = fileName
+    link.download = doc?.name || `Resmi_Sartname_${tender?.id || 'IHC'}.pdf`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
     return
   }
-
-  const textContent = `================================================================================
-                    T.C. B2B TICARET VE ELEKTRONIK IHALE PORTALI
-                     IHALECIBURADA RESMI IHALE SARTNAMESI
-================================================================================
-
-Ihale Kayit No (IKN)    : #${tender?.id || 'IHC-2026-178'}
-Ihale Basligi            : ${tender?.baslik || 'Kurumsal Satin Alma Talebi'}
-Sektor & Kategori       : ${tender?.kategori || 'Genel Satin Alma'}
-Alici Kurum / Sirket    : ${tender?.ownerCompany || tender?.authority || 'Kurumsal Masasi'}
-Hedef Sozlesme Butcesi  : ${tender?.butce || 'Acik Eksiltmeli Ihale'}
-Teslimat Sehri / Lokasyon: ${tender?.city || 'Balikesir'}
-Teslimat Adresi         : ${tender?.teslimatAdresi || (tender?.city + ' Merkez / Saha Depo')}
-Teklif Toplama Suresi   : ${tender?.sure || '7 gun'}
-Yayin Tarihi            : ${new Date().toLocaleDateString('tr-TR')}
-
---------------------------------------------------------------------------------
-1. IHALENIN KONUSU VE TEKNIK ISTERLER:
---------------------------------------------------------------------------------
-${tender?.aciklama || tender?.baslik || 'Teknik sartname esaslarina gore temin saglanacaktir.'}
-
---------------------------------------------------------------------------------
-2. IDARI SARTLAR VE TESLIMAT HUKUMLERI:
---------------------------------------------------------------------------------
-- Teslimat adresi ${tender?.teslimatAdresi || (tender?.city + ' Merkez')} olarak teyit edilmistir.
-- Hakedis odemeleri BDDK ve TCMB mevzuatina uygun ESCROW GUVENLI HAVUZ hesabinda bloke edilir.
-- Muayene kabul ve e-Irsaliye teslim onayinin ardindan odeme yukleniciye serbest birakilir.
-
---------------------------------------------------------------------------------
-3. E-IMZA VE DIJITAL MUHUR DOGRULAMASI:
---------------------------------------------------------------------------------
-- 6098 s. Turk Borclar Kanunu ve 6102 s. Turk Ticaret Kanunu kapsaminda duzenlenmistir.
-- Zaman Damgasi: ${new Date().toISOString()}
-- Dogrulama Hash: SHA-256-${tender?.id || 'CERT'}-VALID-SECURE
-- Belge Adi: ${fileName}
-
-IhaleciBurada Platform A.S. | GIB VKN: 9560161511
-================================================================================`;
-
-  const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName.endsWith('.pdf') || fileName.endsWith('.txt') ? fileName : (fileName + '.pdf');
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
+  exportTenderPdf(tender || selectedTenderModal.value)
 }
 
 function downloadPdfDocument(tender: any) {
-  const content = `================================================================================
-                    T.C. B2B TICARET VE ELEKTRONIK IHALE PORTALI
-                     IHALECIBURADA RESMI IHALE SARTNAMESI
-================================================================================
-
-Ihale Kayit No (IKN)    : #${tender.id}
-Ihale Basligi            : ${tender.baslik}
-Sektor & Kategori       : ${tender.kategori || 'Genel Satin Alma'}
-Alici Kurum             : ${tender.ownerCompany || tender.authority || 'Kurumsal Satin Alma Masasi'}
-Ihale Usulu             : ${tender.tur || 'Acik Eksiltmeli Ihale'}
-Hedef / Butce           : ${tender.butce || 'Acik Teklif'}
-Teslimat Sehri          : ${tender.city || 'Balikesir'}
-Teslimat Adresi         : ${tender.teslimatAdresi || (tender.city + ' Merkez / Depo Teslimat')}
-Kalan Sure              : ${tender.sure || '7 gun'}
-Yayin Tarihi            : ${new Date().toLocaleDateString('tr-TR')}
-
---------------------------------------------------------------------------------
-1. IHALENIN KONUSU VE TEKNIK ISTERLER
---------------------------------------------------------------------------------
-${tender.aciklama || tender.baslik}
-
---------------------------------------------------------------------------------
-2. IDARI VE MALI SARTLAR
---------------------------------------------------------------------------------
-- Istekliler tekliflerini KDV haric/dahil belirtilen sartname cercevesinde iletmelidir.
-- Odemeler BDDK/TCMB mevzuatina uygun Escrow Guvenli Havuz hesabinda bloke edilir.
-- Muayene ve kabul islemleri sonrasinda hakedis bedeli yukleniciye aktarilir.
-
---------------------------------------------------------------------------------
-DURUM: e-Imzali & Zaman Damgali Resmi Dokuman
-================================================================================
-`;
-  if (typeof document !== 'undefined') {
-    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = `Resmi_Sartname_${tender.id}.txt`
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
-    URL.revokeObjectURL(url)
-  }
+  exportTenderPdf(tender || selectedTenderModal.value || pdfTenderTarget.value)
 }
 
 
@@ -1625,6 +1539,12 @@ function openQuickBidModal(tender: any) {
     alert(`🚫 KENDİ İLANINIZA TEKLİF VEREMEZSİNİZ!\n\n"${tender.baslik}" ihalesi sizin tarafınızdan açılmıştır.\n\nSistem kuralları ve B2B ihale mevzuatı gereği kendi açtığınız ihalelere teklif sunamazsınız.\n\nİhaleniz için gelen teklifleri incelemek ve pazarlık yürütmek için lütfen "Gelen Teklifler" sayfasına gidiniz.`)
     return
   }
+  let session: any = {}
+  if (typeof window !== 'undefined') {
+    try {
+      session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+  }
   quickBidTender.value = tender
   quickOfferPrice.value = ''
   quickOfferVatType.value = 'vat_excluded'
@@ -1632,6 +1552,8 @@ function openQuickBidModal(tender: any) {
   quickOfferDuration.value = '7 gün'
   quickOfferFiles.value = []
   quickOfferTermsConfirmed.value = false
+  quickOfferBidderName.value = session.name || session.firstName || session.companyName || ''
+  quickOfferBidderPhone.value = session.phone || ''
   showQuickBidModal.value = true
 }
 
@@ -1692,9 +1614,25 @@ async function submitQuickOffer() {
     return
   }
 
-  // 🛡️ VER-001 & VER-004: Firma Doğrulama & Yetki Kontrolü
-  if (!canSubmitBid.value) {
-    alert('⛔ TEKLİF VERME ENGELİ (Kural VER-001 & VER-004):\n\nTeklif verebilmek için firmanızın VKN doğrulaması yapılmış ve firma içi yetkinizin "Teklif Yetkilisi", "Satın Alma" veya "Firma Yöneticisi" olması zorunludur.\n\nLütfen Profil > Ekip & Yetki Merkezi üzerinden firmanızı doğrulayınız.')
+  // Oturum Kontrolü (Vatandaş, Memur, Esnaf, Şirket herkes teklif verebilir)
+  if (!isLoggedIn.value) {
+    alert('Teklif verebilmek için lütfen önce üye girişi yapınız veya ücretsiz kayıt olunuz.')
+    showQuickBidModal.value = false
+    navigateTo('/uyelik?tab=login')
+    return
+  }
+
+  // Current session resolution
+  let session: any = {}
+  if (typeof window !== 'undefined') {
+    try {
+      session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    } catch (e) {}
+  }
+
+  const effectivePhone = quickOfferBidderPhone.value || session.phone || ''
+  if (!effectivePhone || !String(effectivePhone).trim()) {
+    alert('Lütfen teklifinizin ilan sahibine iletilebilmesi için iletişim telefon numaranızı giriniz.')
     return
   }
 
@@ -1718,15 +1656,7 @@ async function submitQuickOffer() {
 
   isSubmittingQuickOffer.value = true
 
-  // Current session resolution
-  let session: any = {}
-  if (typeof window !== 'undefined') {
-    try {
-      session = JSON.parse(localStorage.getItem('userSession') || '{}')
-    } catch (e) {}
-  }
-
-  const bidderCompany = session.companyName || session.company || session.name || session.username || 'Onaylı Tedarikçi Firma'
+  const bidderCompany = quickOfferBidderName.value || session.companyName || session.company || session.name || session.username || 'Teklif Veren Üye'
   const vatLabel = quickOfferVatType.value === 'vat_excluded' ? '+ KDV Hariç' : 'KDV Dahil'
   const formattedPrice = Number(numericPrice).toLocaleString('tr-TR') + ' ₺'
   const fullPriceLabel = formattedPrice + ' (' + vatLabel + ')'
@@ -1747,6 +1677,7 @@ async function submitQuickOffer() {
     validityDuration: quickOfferDuration.value || '7 gün',
     notes: quickOfferNotes.value || 'Şartname ve teknik kriterler uyarınca teklifimizdir.',
     bidderName: bidderCompany,
+    bidderPhone: effectivePhone,
     bidderEmail: session.email || '',
     files: [...quickOfferFiles.value],
     filesCount: quickOfferFiles.value.length,
@@ -3452,9 +3383,9 @@ onMounted(() => {
             <button
               type="button"
               @click="selectedTenderModal = null"
-              class="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer ml-1"
+              class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-red-600 text-white font-bold text-xs transition flex items-center gap-1.5 border border-slate-700 cursor-pointer ml-auto shadow-xs"
             >
-              <X :size="18" />
+              ✕ Kapat
             </button>
           </div>
 
@@ -3836,14 +3767,28 @@ onMounted(() => {
               </div>
             </div>
 
-            <!-- İhale Sonuçlanana Kadar İletişim Bilgileri Koruması -->
-            <div v-if="!isTenderConcluded(selectedTenderModal)" class="mt-3 p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs flex items-start gap-2">
-              <Lock :size="15" class="text-amber-400 shrink-0 mt-0.5" />
+            <!-- Doğrudan İletişim & Web Sayfası Bilgileri -->
+            <div class="mt-3 p-4 rounded-xl bg-slate-950/80 border border-slate-700/80 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 text-xs">
               <div>
-                <span class="font-black block text-amber-300">🔒 İhale Sonuçlanana Kadar Doğrudan İletişim Bilgileri Gizlidir</span>
-                <span class="text-[11px] text-amber-200/90 leading-tight block mt-0.5">
-                  Alıcı firma doğrudan iletişim bilgileri ihale sonuçlanana kadar sistem güvencesinde saklı tutulmaktadır. Görüşmelerinizi panel içi Canlı Mesajlaşma üzerinden yapınız.
-                </span>
+                <span class="text-slate-400 text-[10px] uppercase font-bold block">İletişim Telefonu:</span>
+                <a v-if="selectedTenderModal.ownerPhone" :href="'tel:' + selectedTenderModal.ownerPhone" class="font-bold text-teal-300 hover:underline">
+                  📞 {{ selectedTenderModal.ownerPhone }}
+                </a>
+                <span v-else class="font-mono text-slate-300">0850 840 86 95</span>
+              </div>
+              <div>
+                <span class="text-slate-400 text-[10px] uppercase font-bold block">E-Posta:</span>
+                <a v-if="selectedTenderModal.ownerEmail" :href="'mailto:' + selectedTenderModal.ownerEmail" class="font-bold text-blue-300 hover:underline">
+                  ✉️ {{ selectedTenderModal.ownerEmail }}
+                </a>
+                <span v-else class="font-mono text-slate-300">destek@ihaleciburada.com</span>
+              </div>
+              <div v-if="selectedTenderModal.websiteUrl" class="sm:col-span-2 lg:col-span-1">
+                <span class="text-slate-400 text-[10px] uppercase font-bold block">Web Sitesi / Proje:</span>
+                <a :href="selectedTenderModal.websiteUrl" target="_blank" rel="noopener noreferrer" class="font-bold text-emerald-400 hover:underline flex items-center gap-1 mt-0.5">
+                  <ExternalLink :size="12" />
+                  <span>Resmi Web Sayfası ↗</span>
+                </a>
               </div>
             </div>
           </div>
@@ -3854,9 +3799,9 @@ onMounted(() => {
           <button 
             type="button" 
             @click="selectedTenderModal = null" 
-            class="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 font-bold text-xs hover:bg-slate-800 transition cursor-pointer"
+            class="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-200 hover:text-white font-bold text-xs hover:bg-slate-800 transition cursor-pointer flex items-center gap-1"
           >
-            Kapat
+            ✕ Kapat
           </button>
           
           <div class="flex items-center gap-2">
@@ -4021,8 +3966,8 @@ onMounted(() => {
             <span class="text-[10px] font-black text-blue-600 uppercase tracking-wider block">DOĞRUDAN TEKLİF VER</span>
             <h3 class="text-sm sm:text-base font-black text-slate-900 mt-0.5">{{ quickBidTender.baslik }}</h3>
           </div>
-          <button @click="showQuickBidModal = false" class="text-slate-400 hover:text-slate-700 p-1.5 rounded-xl cursor-pointer">
-            <X :size="18" />
+          <button type="button" @click="showQuickBidModal = false" class="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-red-50 text-slate-700 hover:text-red-600 border border-slate-200 font-bold text-xs transition flex items-center gap-1 cursor-pointer shrink-0">
+            ✕ Kapat
           </button>
         </div>
 
@@ -4062,6 +4007,28 @@ onMounted(() => {
             <span class="text-[10px] opacity-80">
               {{ (quickBidTender.ihaleYonu === 'artirma' || (quickBidTender.tur || '').includes('Artırma')) ? 'En Yüksek Teklif Kazanır' : 'En Düşük Teklif Kazanır' }}
             </span>
+          </div>
+
+          <!-- İletişim Bilgileri (Ad Soyad & Telefon) -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="space-y-1">
+              <label class="block text-xs font-bold text-slate-700">Ad Soyad / Firma: *</label>
+              <input 
+                v-model="quickOfferBidderName" 
+                type="text" 
+                placeholder="Örn: Hasan Yılmaz" 
+                class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500 focus:bg-white"
+              />
+            </div>
+            <div class="space-y-1">
+              <label class="block text-xs font-bold text-slate-700">İletişim Telefon Numarası: *</label>
+              <input 
+                v-model="quickOfferBidderPhone" 
+                type="tel" 
+                placeholder="Örn: 0532 123 45 67" 
+                class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-blue-500 focus:bg-white"
+              />
+            </div>
           </div>
 
           <!-- Teklif Tutarı ve KDV Seçimi -->
@@ -4212,7 +4179,7 @@ onMounted(() => {
               @click="showQuickBidModal = false" 
               class="flex-1 py-2.5 rounded-xl border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-50 transition cursor-pointer"
             >
-              İptal
+              ✕ Kapat
             </button>
             <button 
               type="button" 
