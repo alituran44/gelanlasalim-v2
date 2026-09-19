@@ -1,13 +1,37 @@
 import { defineEventHandler, createError, getQuery } from 'h3'
 import { getMfaOtpForDev } from '~~/server/utils/mfaStore'
+import { logSecurityEvent } from '~~/server/utils/securityAuditStore'
 
 export default defineEventHandler((event) => {
-  // 🛡️ Katı Derleme ve Çalışma Zamanı Koruması:
-  // Production / Staging ortamında bu endpoint tamamen kapalıdır (404).
-  if (process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production') {
+  // 🛡️ Katı Derleme ve Çalışma Zamanı Koruması (Item 6):
+  // Production, Preview, Staging veya herhangi bir bulut dağıtımında (Vercel) bu uç nokta tamamen yok sayılır (404).
+  // Yalnızca lokal makinede ve açıkça ENABLE_DEV_MFA=true bayrağı tanımlandığında çalışabilir.
+  const isStrictLocalDev = 
+    process.env.NODE_ENV === 'development' &&
+    !process.env.VERCEL &&
+    !process.env.VERCEL_ENV &&
+    process.env.ENABLE_DEV_MFA === 'true'
+
+  if (!isStrictLocalDev) {
+    logSecurityEvent(event, {
+      eventType: 'AUTH_FAILURE',
+      severity: 'HIGH',
+      targetResource: '/api/dev/mfa-inspect',
+      actionTaken: 'BLOCKED_404',
+      details: { reason: 'Attempt to access dev inspect endpoint in non-dev or cloud environment' }
+    })
     throw createError({
       statusCode: 404,
       statusMessage: 'Not Found'
+    })
+  }
+
+  // Eğer lokal geliştirme için gizli bir secret tanımlıysa başlık kontrolü yap
+  const devSecret = process.env.DEV_MFA_SECRET
+  if (devSecret && event.node.req.headers['x-dev-secret'] !== devSecret) {
+    throw createError({
+      statusCode: 403,
+      statusMessage: 'Geçersiz geliştirici denetim anahtarı (x-dev-secret).'
     })
   }
 

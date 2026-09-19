@@ -1,9 +1,6 @@
 export interface NetGsmSendOptions {
   phone: string
   message: string
-  usercode?: string
-  password?: string
-  msgheader?: string
   recipientName?: string
 }
 
@@ -45,9 +42,10 @@ export async function sendViaNetGsm(options: NetGsmSendOptions): Promise<NetGsmS
     formattedPhone = '90' + formattedPhone
   }
 
-  const usercode = options.usercode || process.env.NETGSM_USERCODE || '8508408695'
-  const password = options.password || process.env.NETGSM_PASSWORD || '0ZE3LG59'
-  const msgheader = options.msgheader || process.env.NETGSM_HEADER || '8508408695'
+  // 🛡️ SEC-014: Kimlik bilgileri ASLA parametre olarak alınmaz, yalnızca sunucu ortamından okunur
+  const usercode = (process.env.NETGSM_USERCODE || '8508408695').trim()
+  const password = (process.env.NETGSM_PASSWORD || '').trim()
+  const msgheader = (process.env.NETGSM_HEADER || '8508408695').trim()
 
   try {
     // If real credentials are provided (not dummy), make actual NetGSM HTTP call

@@ -153,7 +153,6 @@ export const DEFAULT_CMS_DATA = {
     smtpHost: 'smtp.gmail.com',
     smtpPort: 587,
     smtpUser: 'ihalecib@gmail.com',
-    smtpPassword: '191214.Et',
     smtpEncryption: 'TLS',
     autoNotifications: {
       onRegister: true,
@@ -715,7 +714,12 @@ export function useCmsData() {
   }
 
   function saveCmsData(newData: any) {
-    cmsDataRef.value = JSON.parse(JSON.stringify(newData))
+    const sanitized = JSON.parse(JSON.stringify(newData))
+    // 🛡️ SEC-015 & B1: Asla şifre veya hassas alanları localStorage / CMS verisine kaydetme
+    if (sanitized?.emailSettings?.smtpPassword) {
+      delete sanitized.emailSettings.smtpPassword
+    }
+    cmsDataRef.value = sanitized
     safeLocalStorageSet('cmsData', cmsDataRef.value)
   }
 

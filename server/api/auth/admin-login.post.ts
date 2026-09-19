@@ -17,32 +17,32 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const adminEmail = (body.email || 'admin@ihaleciburada.com').trim().toLowerCase()
-  const isPrivilegedAdminEmail = adminEmail === 'ihalecib@gmail.com' || 
-                                 adminEmail === 'admin@ihaleciburada.com' || 
-                                 adminEmail.startsWith('admin@') || 
-                                 adminEmail.endsWith('@ihaleciburada.com')
-
-  // Timing-safe secret verification
-  const allowedKeys = [
-    ADMIN_SECRET_TOKEN.trim(),
-    'admin-demo-2026-super',
-    'admin123',
-    'admin',
-    '123456',
-    '12345678',
-    'ihaleciburada',
-    'demo-password',
-    'ihb_admin_secret_guard_2026_master_key'
+  const adminEmail = (body.email || '').trim().toLowerCase()
+  const configuredAdminEmail = (process.env.ADMIN_EMAIL || '').trim().toLowerCase()
+  const validAdminEmails = [
+    'admin@ihaleciburada.com',
+    'ihalecib@gmail.com',
+    'hasan@ihaleciburada.com'
   ]
+  if (configuredAdminEmail) {
+    validAdminEmails.push(configuredAdminEmail)
+  }
 
-  const isKeyAuthorized = allowedKeys.some(k => {
-    const kBuf = Buffer.from(k)
+  // 🛡️ Madde 1: E-posta uzantısı joker (wildcard) bypass'ı tamamen kaldırıldı. Sadece yetkili listesi geçerlidir.
+  const isEmailValid = validAdminEmails.includes(adminEmail)
+
+  // 🛡️ SEC-005 & B3: Yalnızca güçlü sunucu ortam değişkeni (ADMIN_PASSWORD veya ADMIN_SECRET_KEY) ile güvenli doğrulama
+  const configuredPassword = process.env.ADMIN_PASSWORD || process.env.ADMIN_SECRET_KEY || ADMIN_SECRET_TOKEN.trim()
+
+  const validPasswords = [configuredPassword].filter(Boolean)
+
+  const isPasswordValid = validPasswords.some(expected => {
+    const expBuf = Buffer.from(expected)
     const inBuf = Buffer.from(secretKey)
-    return inBuf.length === kBuf.length && timingSafeEqual(inBuf, kBuf)
+    return inBuf.length === expBuf.length && timingSafeEqual(inBuf, expBuf)
   })
 
-  const isAuthorized = isKeyAuthorized || (isPrivilegedAdminEmail && secretKey.length >= 3)
+  const isAuthorized = isEmailValid && isPasswordValid
 
   if (!isAuthorized) {
     logSecurityEvent(event, {

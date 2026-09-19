@@ -113,11 +113,11 @@ const netGsmTemplates = [
   },
   {
     name: 'İhale Yayına Alındı Bildirimi',
-    body: 'Sayın Yetkili, "{IHALE_BASLIK}" başlıklı ihaleniz onaylanarak yayına alınmıştır. Teklifleri takip etmek için: https://ihalciburada.com/panel'
+    body: 'Sayın Yetkili, "{IHALE_BASLIK}" başlıklı ihaleniz onaylanarak yayına alınmıştır. Teklifleri takip etmek için: https://www.ihaleciburada.com/panel'
   },
   {
     name: 'İhaleye Yeni Teklif Geldi',
-    body: 'Sayın Yetkili, "{IHALE_BASLIK}" ihaleniz için doğrulanmış tedarikçiden yeni teklif ({FIYAT} TL) iletildi. Detay: https://ihalciburada.com/panel/gelen-teklifler'
+    body: 'Sayın Yetkili, "{IHALE_BASLIK}" ihaleniz için doğrulanmış tedarikçiden yeni teklif ({FIYAT} TL) iletildi. Detay: https://www.ihaleciburada.com/panel/gelen-teklifler'
   },
   {
     name: 'Canlı Eksiltme & Fiyat Revizyonu',
@@ -125,7 +125,7 @@ const netGsmTemplates = [
   },
   {
     name: 'Teklif Kabulü & Escrow Güvencesi',
-    body: 'Tebrikler! "{IHALE_BASLIK}" ihalesinde teklifiniz onaylandı. Escrow güvenceli sözleşme panelinize yüklendi: https://ihalciburada.com/panel'
+    body: 'Tebrikler! "{IHALE_BASLIK}" ihalesinde teklifiniz onaylandı. Escrow güvenceli sözleşme panelinize yüklendi: https://www.ihaleciburada.com/panel'
   }
 ]
 
@@ -1259,12 +1259,6 @@ async function handleLogin() {
   isLoggedIn.value = false
 }
 
-async function quickAdminDemoLogin() {
-  email.value = 'admin@ihaleciburada.com'
-  password.value = 'admin123'
-  await handleLogin()
-}
-
 async function handleLogout() {
   try {
     await $fetch('/api/auth/logout', { method: 'POST' })
@@ -1909,7 +1903,6 @@ async function loadSmtpConfigFromServer() {
       if (res.config.smtpUser) formState.emailSettings.smtpUser = res.config.smtpUser
       if (res.config.senderEmail) formState.emailSettings.senderEmail = res.config.senderEmail
       if (res.config.senderName) formState.emailSettings.senderName = res.config.senderName
-      if (res.config.smtpPassword) formState.emailSettings.smtpPassword = res.config.smtpPassword
       if (res.config.replyToEmail) formState.emailSettings.replyToEmail = res.config.replyToEmail
     }
   } catch (err) {
@@ -2235,30 +2228,12 @@ function removeSubmittedBid(index: number) {
             </div>
           </div>
 
-          <div 
-            class="p-3 border rounded-xl text-[11px] space-y-1"
-            :class="adminTheme === 'light' ? 'bg-blue-50 border-blue-200 text-blue-900' : 'bg-blue-950/40 border-blue-800/40 text-blue-300'"
-          >
-            <div class="font-bold flex items-center gap-1.5"><ShieldCheck :size="13" class="text-emerald-500" /> Giriş Yetkisi:</div>
-            <div>E-Posta: <strong class="font-mono">admin@ihaleciburada.com</strong></div>
-            <div>Şifre: <strong class="font-mono">admin123</strong> (veya <span class="font-mono">demo-password</span>)</div>
-          </div>
-
           <div v-if="authError" class="text-red-500 text-xs font-bold py-1">
             ⚠️ {{ authError }}
           </div>
 
           <button type="submit" class="w-full flex items-center justify-center gap-2 rounded-xl bg-blue-600 py-3.5 text-xs font-black text-white hover:bg-blue-700 transition shadow-lg shadow-blue-600/20 cursor-pointer">
             Operasyon Merkezine Giriş Yap
-          </button>
-
-          <button 
-            type="button" 
-            @click="quickAdminDemoLogin" 
-            class="w-full flex items-center justify-center gap-2 rounded-xl bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-600 dark:text-emerald-400 py-2.5 text-xs font-bold transition border border-emerald-600/30 cursor-pointer"
-          >
-            <Zap :size="14" />
-            <span>⚡ Hızlı Demo Girişi (1 Tık)</span>
           </button>
         </form>
       </div>
@@ -3152,7 +3127,10 @@ function removeSubmittedBid(index: number) {
                 </div>
                 <div>
                   <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">NETGSM API ŞİFRESİ</label>
-                  <input v-model="netGsmConfig.password" type="password" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
+                  <div class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-emerald-400 font-mono flex items-center justify-between">
+                    <span>••••••••••••••••</span>
+                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.5 rounded font-bold">SUNUCUDA GÜVENLİ (.ENV)</span>
+                  </div>
                 </div>
                 <div>
                   <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">GÖNDERİCİ BAŞLIĞI (ORİGİNATÖR)</label>

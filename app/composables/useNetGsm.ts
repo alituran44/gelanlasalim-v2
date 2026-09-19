@@ -2,9 +2,7 @@ import { ref, computed } from 'vue'
 
 export interface NetGsmConfig {
   usercode: string
-  password: string
-  msgheader: string // SMS Gönderici Başlığı (Örn: IHALECI, IHALECIBURADA)
-  apiUrl: string
+  msgheader: string // SMS Gönderici Başlığı (Örn: 8508408695, IHALECIB)
   isActive: boolean
   balanceCredits: number
 }
@@ -26,21 +24,23 @@ const NETGSM_LOGS_KEY = 'netgsm_logs'
 export function useNetGsm() {
   const config = ref<NetGsmConfig>({
     usercode: '8508408695',
-    password: '0ZE3LG59',
     msgheader: '8508408695',
-    apiUrl: 'https://api.netgsm.com.tr/sms/send/get',
     isActive: true,
     balanceCredits: 5000
   })
 
   const logs = ref<NetGsmLog[]>([])
 
-  // Load from localStorage
+  // Load from localStorage and sanitize any legacy sensitive keys
   if (typeof window !== 'undefined') {
     try {
       const savedConfig = localStorage.getItem(NETGSM_STORAGE_KEY)
       if (savedConfig) {
-        config.value = JSON.parse(savedConfig)
+        const parsed = JSON.parse(savedConfig)
+        // 🛡️ SEC-014: İstemci yerel hafızasından eski şifreleri derhal temizle
+        delete parsed.password
+        delete parsed.apiUrl
+        config.value = { ...config.value, ...parsed }
       }
       const savedLogs = localStorage.getItem(NETGSM_LOGS_KEY)
       if (savedLogs) {
@@ -51,14 +51,16 @@ export function useNetGsm() {
     }
   }
 
-  function saveConfig(newConfig: NetGsmConfig) {
-    config.value = { ...newConfig }
+  function saveConfig(newConfig: Partial<NetGsmConfig>) {
+    const sanitized = { ...config.value, ...newConfig }
+    config.value = sanitized
     if (typeof window !== 'undefined') {
-      localStorage.setItem(NETGSM_STORAGE_KEY, JSON.stringify(config.value))
+      localStorage.setItem(NETGSM_STORAGE_KEY, JSON.stringify(sanitized))
     }
   }
 
-  // Send SMS function (calls /api/v1/netgsm-send)
+  // 🛡️ B2 & B4 Çözümü: SMS gönderimi tamamen sunucu tarafındaki güvenli /api/v1/netgsm-send uç noktası üzerinden yapılır.
+  // İstemci asla NetGSM API şifresini veya harici NetGSM URL'ini bilmez/göndermez.
   async function sendSms(params: {
     recipientPhone: string
     recipientName?: string
@@ -76,9 +78,6 @@ export function useNetGsm() {
       const res = await $fetch<any>('/api/v1/netgsm-send', {
         method: 'POST',
         body: {
-          usercode: config.value.usercode,
-          password: config.value.password,
-          msgheader: config.value.msgheader,
           phone: params.recipientPhone,
           message: params.messageBody,
           recipientName: params.recipientName || 'Yetkili',
@@ -118,7 +117,7 @@ export function useNetGsm() {
     return {
       success: isSuccess,
       msgId: resultMsgId,
-      message: `NetGSM SMS başarıyla gönderildi (${params.recipientPhone})`
+      message: `NetGSM SMS başarıyla iletildi (${params.recipientPhone})`
     }
   }
 

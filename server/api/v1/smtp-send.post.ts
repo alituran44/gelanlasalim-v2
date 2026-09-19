@@ -35,6 +35,12 @@ export default defineEventHandler(async (event) => {
 
   // Save config if requested from admin panel
   if (body.saveConfig || body.smtpPassword) {
+    if (!session.isAdmin) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'SMTP yapılandırmasını yalnızca sistem yöneticileri güncelleyebilir.'
+      })
+    }
     saveStoredSmtpConfig({
       smtpHost: body.smtpHost || 'smtp.gmail.com',
       smtpPort: body.smtpPort || 465,
@@ -46,7 +52,9 @@ export default defineEventHandler(async (event) => {
   }
 
   const storedConfig = getStoredSmtpConfig()
-  const passwordToUse = body.smtpPassword || storedConfig.smtpPassword || process.env.GMAIL_APP_PASSWORD || ''
+  const passwordToUse = (session.isAdmin && body.smtpPassword)
+    ? body.smtpPassword
+    : (storedConfig.smtpPassword || process.env.SMTP_PASSWORD || process.env.GMAIL_APP_PASSWORD || '')
 
   // Attempt real Google SMTP dispatch
   const smtpResult = await sendViaGoogleSmtp({

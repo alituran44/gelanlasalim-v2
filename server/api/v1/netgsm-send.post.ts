@@ -1,17 +1,50 @@
-import { defineEventHandler, readBody } from 'h3'
-import { sanitizePayload } from '~~/server/utils/authGuard'
+import { defineEventHandler, readBody, createError } from 'h3'
+import { requireAuth, sanitizePayload } from '~~/server/utils/authGuard'
+import { logSecurityEvent } from '~~/server/utils/securityAuditStore'
+import { resolveClientIp } from '~~/server/utils/clientIp'
 
 export interface NetGsmSendRequest {
-  usercode?: string
-  password?: string
-  msgheader?: string
   phone: string
   message: string
   templateName?: string
   recipientName?: string
 }
 
+// In-memory rate limiting for SMS dispatch (max 10 SMS per 5 minutes per user/IP)
+const smsRateLimitMap = new Map<string, { count: number; resetTime: number }>()
+
 export default defineEventHandler(async (event) => {
+  // 🛡️ SEC-001: Zorunlu Kimlik Doğrulama - Açık SMS Gateway zafiyetini engeller
+  const session = requireAuth(event)
+
+  // Rate Limiting per user/IP
+  const clientIp = resolveClientIp(event)
+  const rateLimitKey = `sms_${session.userEmail || clientIp}`
+  const now = Date.now()
+  const windowMs = 5 * 60 * 1000 // 5 minutes
+  const maxSmsPerWindow = session.isAdmin ? 50 : 10
+
+  const currentLimit = smsRateLimitMap.get(rateLimitKey)
+  if (currentLimit && now < currentLimit.resetTime) {
+    if (currentLimit.count >= maxSmsPerWindow) {
+      logSecurityEvent(event, {
+        eventType: 'RATE_LIMIT_HIT',
+        severity: 'MEDIUM',
+        actorEmail: session.userEmail,
+        targetResource: '/api/v1/netgsm-send',
+        actionTaken: 'BLOCKED_429',
+        details: { reason: 'SMS dispatch rate limit exceeded' }
+      })
+      throw createError({
+        statusCode: 429,
+        statusMessage: 'Kısa süre içinde çok fazla SMS gönderim isteği yapıldı. Lütfen 5 dakika sonra tekrar deneyiniz.'
+      })
+    }
+    currentLimit.count++
+  } else {
+    smsRateLimitMap.set(rateLimitKey, { count: 1, resetTime: now + windowMs })
+  }
+
   const rawBody = (await readBody(event)) as NetGsmSendRequest
   // 🛡️ SEC-013: Girdi Temizleme
   const body = sanitizePayload(rawBody)
@@ -25,9 +58,11 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  const usercode = body.usercode || '8508408695'
-  const password = body.password || '0ZE3LG59'
-  const msgheader = body.msgheader || '8508408695'
+  // 🛡️ KESİN GÜVENLİK SINIRI: İstemciden asla kullanıcı kodu, şifre veya başlık alınmaz
+  const runtimeConfig = useRuntimeConfig()
+  const usercode = (process.env.NETGSM_USERCODE || runtimeConfig.netgsmUsercode || '8508408695').trim()
+  const password = (process.env.NETGSM_PASSWORD || runtimeConfig.netgsmPassword || '').trim()
+  const msgheader = (process.env.NETGSM_HEADER || runtimeConfig.netgsmHeader || '8508408695').trim()
   const cleanPhone = body.phone.replace(/[^0-9]/g, '')
 
   // NetGSM GSM format check (must start with 90 or 05)
@@ -42,7 +77,7 @@ export default defineEventHandler(async (event) => {
   const msgId = `NETGSM_${Date.now()}_${Math.floor(1000 + Math.random() * 9000)}`
 
   try {
-    // If real credentials are provided (not dummy), we can make the actual NetGSM HTTP call
+    // 🛡️ Yalnızca sunucu ortamında gerçek bir parola tanımlıysa NetGSM canlı servisini çağır
     if (usercode && password && password !== '••••••••' && usercode !== '8503080000') {
       const netgsmUrl = `https://api.netgsm.com.tr/sms/send/get/?usercode=${encodeURIComponent(usercode)}&password=${encodeURIComponent(password)}&gsmno=${encodeURIComponent(formattedPhone)}&message=${encodeURIComponent(body.message)}&msgheader=${encodeURIComponent(msgheader)}&dil=TR`
       

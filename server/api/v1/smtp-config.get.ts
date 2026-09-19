@@ -13,10 +13,13 @@ export default defineEventHandler((event) => {
     ? (config.smtpPassword.length > 4 ? config.smtpPassword.slice(0, 2) + '••••••••••••' + config.smtpPassword.slice(-2) : '••••••••')
     : ''
 
+  const safeConfig = { ...config }
+  delete safeConfig.smtpPassword
+
   return {
     success: true,
     config: {
-      ...config,
+      ...safeConfig,
       hasPassword: Boolean(config.smtpPassword),
       maskedPassword
     }

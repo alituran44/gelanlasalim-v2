@@ -18,10 +18,11 @@ logs
 .fleet
 .idea
 
-# Local env files
+# Local env & config files
 .env
 .env.*
 !.env.example
+.smtp_config.json
 .vercel
 
 # Python cache

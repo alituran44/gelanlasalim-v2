@@ -18,9 +18,12 @@ export interface ServerSession {
   expiresAt: number
 }
 
-// 🛡️ SEC-001: Güçlü Oturum Gizli Anahtarı
-const SESSION_SECRET = process.env.SESSION_SECRET || 'ihb_session_master_entropy_key_2026_x89_secure'
-export const ADMIN_SECRET_TOKEN = process.env.ADMIN_SECRET_KEY || 'ihb_admin_secret_guard_2026_master_key'
+// 🛡️ SEC-001 & Madde 5: Statik fallback kaldırıldı. Env anahtarı yoksa güvenli rastgele 256-bit entropy üretilir.
+const SESSION_SECRET = (process.env.SESSION_SECRET || '').trim() || randomBytes(32).toString('hex')
+
+export const ADMIN_SECRET_TOKEN = (process.env.ADMIN_SECRET_KEY || process.env.ADMIN_PASSWORD || '').trim() ||
+  randomBytes(32).toString('hex')
+
 export const SESSION_COOKIE_NAME = 'ihb_session'
 
 declare global {

@@ -923,58 +923,10 @@ async function handleLogin() {
   }
 }
 
-async function handleDemoLogin(role: 'company' | 'individual' | 'admin') {
+async function handleDemoLogin(role: 'company' | 'individual') {
   isSubmitting.value = true
   errorMessage.value = ''
   try {
-    if (role === 'admin') {
-      const targetEmail = 'admin@ihaleciburada.com'
-      const sessionObj = {
-        email: targetEmail,
-        firstName: 'Sistem',
-        name: 'Sistem Yöneticisi (Admin)',
-        company: 'İhaleciBurada Yönetim Suite',
-        role: 'admin',
-        verified: true,
-        isAdmin: true,
-        isPremium: true,
-        subscriptionPlan: 'Kurumsal Enterprise (Sistem Yöneticisi)'
-      }
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
-        localStorage.setItem('userSession', JSON.stringify(sessionObj))
-        window.dispatchEvent(new Event('storage'))
-        window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionObj }))
-      }
-      if (typeof document !== 'undefined') {
-        document.cookie = 'ihb_auth=1; path=/; max-age=604800; SameSite=Lax'
-      }
-      try {
-        authCookie.value = '1'
-      } catch {}
-
-      updateSession(sessionObj)
-
-      await syncServerLogin(
-        targetEmail,
-        'admin',
-        undefined,
-        'admin123',
-        sessionObj.name
-      )
-
-      await fetchServerSession()
-
-      isSubmitting.value = false
-      triggerAuthToast('Yönetici girişi yapıldı! Operasyon paneline aktarılıyorsunuz...', 'success')
-      if (typeof window !== 'undefined') {
-        window.location.href = '/admin'
-      } else {
-        await navigateTo('/admin')
-      }
-      return
-    }
-
     const targetEmail = role === 'company' ? 'firma_demo@ihaleciburada.com' : 'kullanici_demo@ihaleciburada.com'
     const sessionObj = {
       email: targetEmail,
