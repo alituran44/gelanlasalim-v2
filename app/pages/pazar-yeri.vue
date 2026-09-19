@@ -37,7 +37,7 @@ import {
 } from 'lucide-vue-next'
 import { useCmsData, DEFAULT_CMS_DATA } from '~/composables/useCmsData'
 import { useNetGsm } from '~/composables/useNetGsm'
-import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_TYPES, TENDER_METHODS } from '~/utils/taxonomy'
+import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_TYPES, TENDER_METHODS, matchTenderToCategory } from '~/utils/taxonomy'
 import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
 import { formatSectorSummaryBadges, resolveSectorKey, SECTOR_DEFINITIONS } from '~/utils/categoryFieldsSchema'
 import { isTenderConcluded, containsContactInfo, maskContactInfo } from '~/utils/contactFilter'
@@ -411,13 +411,7 @@ const categories = computed(() => ['Tümü', ...ALL_40_CATEGORIES.map(c => c.nam
 
 function getCategoryCount(catName: string): number {
   if (catName === 'Tümü') return allTenders.value.length
-  const q = catName.toLocaleLowerCase('tr-TR')
-  return allTenders.value.filter(t => {
-    const k = (t.kategori || '').toLocaleLowerCase('tr-TR')
-    const mk = (t.mainCategory || '').toLocaleLowerCase('tr-TR')
-    const b = (t.baslik || '').toLocaleLowerCase('tr-TR')
-    return k.includes(q) || mk.includes(q) || b.includes(q)
-  }).length
+  return allTenders.value.filter(t => matchTenderToCategory(t, catName)).length
 }
 
 
@@ -446,7 +440,7 @@ const filteredTenders = computed(() => {
       return false
     }
 
-    if (selectedCategory.value !== 'Tümü' && !t.kategori?.toLowerCase().includes(selectedCategory.value.toLowerCase())) {
+    if (selectedCategory.value !== 'Tümü' && !matchTenderToCategory(t, selectedCategory.value)) {
       return false
     }
 

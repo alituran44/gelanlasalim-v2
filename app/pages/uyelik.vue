@@ -922,59 +922,6 @@ async function handleLogin() {
     errorMessage.value = err?.statusMessage || err?.message || 'Giriş yapılamadı. Lütfen bilgilerinizi kontrol ediniz.'
   }
 }
-
-async function handleDemoLogin(role: 'company' | 'individual') {
-  isSubmitting.value = true
-  errorMessage.value = ''
-  try {
-    const targetEmail = role === 'company' ? 'firma_demo@ihaleciburada.com' : 'kullanici_demo@ihaleciburada.com'
-    const sessionObj = {
-      email: targetEmail,
-      firstName: role === 'company' ? 'Kemal' : 'Ahmet',
-      name: role === 'company' ? 'Kemal Yılmaz' : 'Ahmet Yıldız',
-      company: role === 'company' ? 'Yılmaz Tekstil A.Ş.' : 'Bireysel Üye',
-      role: role === 'company' ? 'company' : 'individual',
-      verified: true,
-      isPremium: true,
-      subscriptionPlan: 'İlk İhale Ücretsiz'
-    }
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('userSession', JSON.stringify(sessionObj))
-      window.dispatchEvent(new Event('storage'))
-      window.dispatchEvent(new CustomEvent('user-session-changed', { detail: sessionObj }))
-    }
-    if (typeof document !== 'undefined') {
-      document.cookie = 'ihb_auth=1; path=/; max-age=604800; SameSite=Lax'
-    }
-    try {
-      authCookie.value = '1'
-    } catch {}
-
-    updateSession(sessionObj)
-
-    // 🛡️ SEC-010: Demo girişi için geçerli sunucu oturum cookie'si oluştur
-    await syncServerLogin(
-      targetEmail,
-      role === 'company' ? 'FİRMA_YÖNETİCİSİ' : 'GÖRÜNTÜLEYİCİ',
-      role === 'company' ? '9560161511' : undefined,
-      'demo_auto_session',
-      sessionObj.name
-    )
-
-    await fetchServerSession()
-
-    isSubmitting.value = false
-    triggerAuthToast('Giriş başarılı! Yönetim panelinize aktarılıyorsunuz...', 'success')
-    if (typeof window !== 'undefined') {
-      window.location.href = '/panel'
-    } else {
-      await navigateTo('/panel')
-    }
-  } catch (e: any) {
-    isSubmitting.value = false
-    errorMessage.value = e?.message || 'Demo girişi başarısız.'
-  }
-}
 </script>
 
 <template>
@@ -1417,37 +1364,6 @@ async function handleDemoLogin(role: 'company' | 'individual') {
               <span>{{ isSubmitting ? ('Giriş Yapılıyor...') : ('Giriş Yap') }}</span>
               <ChevronRight v-if="!isSubmitting" :size="14" />
             </button>
-
-            <!-- Hızlı Test / Demo Giriş Seçenekleri -->
-            <div class="pt-3 border-t border-slate-200">
-              <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2 text-center">Hızlı Test / Demo Erişimi</span>
-              <div class="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  @click="handleDemoLogin('company')"
-                  class="py-2.5 px-2 bg-slate-100 hover:bg-teal-50 hover:border-teal-300 hover:text-teal-900 text-slate-700 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer border border-slate-200"
-                >
-                  <Building2 :size="13" class="text-teal-600 shrink-0" />
-                  <span>🏢 Kurumsal</span>
-                </button>
-                <button
-                  type="button"
-                  @click="handleDemoLogin('individual')"
-                  class="py-2.5 px-2 bg-slate-100 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-900 text-slate-700 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer border border-slate-200"
-                >
-                  <User :size="13" class="text-blue-600 shrink-0" />
-                  <span>👤 Bireysel</span>
-                </button>
-                <button
-                  type="button"
-                  @click="handleDemoLogin('admin')"
-                  class="py-2.5 px-2 bg-slate-100 hover:bg-amber-50 hover:border-amber-300 hover:text-amber-900 text-slate-700 text-[10px] font-bold rounded-xl transition-all flex items-center justify-center gap-1 cursor-pointer border border-slate-200"
-                >
-                  <ShieldCheck :size="13" class="text-amber-600 shrink-0" />
-                  <span>👑 Yönetici</span>
-                </button>
-              </div>
-            </div>
           </form>
         </div>
 

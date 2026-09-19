@@ -309,8 +309,21 @@ const cardName = ref('')
 const cardNumber = ref('')
 const cardExpiry = ref('')
 const cardCvc = ref('')
+const cardMonth = ref('12')
+const cardYear = ref(String(new Date().getFullYear() + 2))
+const isCardValid = ref(false)
 const selectedBank = ref('garanti')
 const transferName = ref('')
+
+function handleCardChange(state: any, validity: any) {
+  cardNumber.value = state.number
+  cardName.value = state.holder
+  cardMonth.value = state.month
+  cardYear.value = state.year
+  cardExpiry.value = state.month && state.year ? `${state.month}/${state.year.slice(-2)}` : ''
+  cardCvc.value = state.cvv
+  isCardValid.value = validity.allValid
+}
 
 const isProcessing = ref(false)
 const showSuccessScreen = ref(false)
@@ -434,9 +447,22 @@ function openCheckout(pkg: any) {
 }
 
 function handlePayment() {
-  if (!preInfoApproved.value || !distanceSalesApproved.value || !refundPolicyApproved.value) {
-    alert(locale.value === 'tr' ? 'Lütfen Ön Bilgilendirme Formu, Mesafeli Satış Sözleşmesi ve İptal/İade Koşullarını onaylayınız.' : 'Please accept all legal agreements and distance sales terms.')
-    return
+  if (selectedPackage.value?.isTrial) {
+    if (!distanceSalesApproved.value) {
+      alert(locale.value === 'tr' ? 'Lütfen Mesafeli Satış Sözleşmesini onaylayınız.' : 'Please accept distance sales terms.')
+      return
+    }
+  } else {
+    if (!distanceSalesApproved.value || !preInfoApproved.value) {
+      alert(locale.value === 'tr' ? 'Lütfen Mesafeli Satış Sözleşmesi ve Gizlilik Aydınlatma Metnini onaylayınız.' : 'Please accept all legal agreements and distance sales terms.')
+      return
+    }
+    if (activePaymentChannel.value !== 'bank_transfer' && activePaymentChannel.value !== 'swift') {
+      if (!isCardValid.value && cardNumber.value.length < 13) {
+        alert(locale.value === 'tr' ? 'Lütfen geçerli bir kart numarası, son kullanma tarihi ve CVV giriniz.' : 'Please provide valid card details.')
+        return
+      }
+    }
   }
 
   isProcessing.value = true
@@ -1070,34 +1096,19 @@ function completeCheckout() {
                 </div>
               </div>
 
-              <!-- Credit Card Form (Domestic & Stripe/PayPal) -->
-              <div v-if="activePaymentChannel !== 'bank_transfer' && activePaymentChannel !== 'swift'" class="space-y-3">
-                <div>
-                  <label class="block text-[10px] font-bold text-slate-600 mb-1">{{ 'Kart Üzerindeki İsim Soyisim' }}</label>
-                  <input v-model="cardName" type="text" placeholder="Ahmet Yılmaz" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs focus:border-blue-600 focus:outline-none" />
-                </div>
-
-                <div>
-                  <label class="block text-[10px] font-bold text-slate-600 mb-1">{{ 'Kart Numarası (Tüm Yerli ve Yabancı Kartlar)' }}</label>
-                  <input v-model="cardNumber" type="text" placeholder="5400 0000 0000 0000" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-mono focus:border-blue-600 focus:outline-none" />
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                  <div>
-                    <label class="block text-[10px] font-bold text-slate-600 mb-1">{{ 'Son Kullanma (AA/YY)' }}</label>
-                    <input v-model="cardExpiry" type="text" placeholder="12/28" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-mono focus:border-blue-600 focus:outline-none" />
-                  </div>
-                  <div>
-                    <label class="block text-[10px] font-bold text-slate-600 mb-1">Güvenlik Kodu (CVC / CVV)</label>
-                    <input v-model="cardCvc" type="text" placeholder="888" class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-mono focus:border-blue-600 focus:outline-none" />
-                  </div>
-                </div>
-
-                <!-- 3D Secure Trust Note -->
-                <div class="flex items-center gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-[10px] text-slate-500 font-medium">
-                  <ShieldCheck :size="15" class="text-emerald-600 shrink-0" />
-                  <span>İşleminiz bankanızın SMS 3D Secure onay sayfası üzerinden 256-Bit SSL ile güvenle tamamlanacaktır.</span>
-                </div>
+              <!-- Credit Card Form (Interactive 3D Flipping Card - Domestic & International) -->
+              <div v-if="activePaymentChannel !== 'bank_transfer' && activePaymentChannel !== 'swift'" class="pt-2">
+                <CreditCardForm
+                  :default-holder="cardName"
+                  :default-number="cardNumber"
+                  :default-month="cardMonth"
+                  :default-year="cardYear"
+                  :default-c-v-v="cardCvc"
+                  :show-submit="false"
+                  ring1="#ff5f00"
+                  ring2="#2563eb"
+                  @change="handleCardChange"
+                />
               </div>
 
               <!-- Bank Transfer (Domestic) -->

@@ -73,6 +73,7 @@ import { useNetGsm } from '~/composables/useNetGsm'
 import { useUserSession } from '~/composables/useUserSession'
 import { isTenderConcluded, maskContactInfo } from '~/utils/contactFilter'
 import { exportTenderPdf } from '~/utils/tenderPdfExport'
+import { matchTenderToCategory } from '~/utils/taxonomy'
 
 definePageMeta({
   layout: 'public'
@@ -1094,17 +1095,7 @@ const todayFinishedCount = computed(() => allTenders.value.filter(t => t.durum =
 
 // ==================== 8. DİNAMİK SAYAÇ VE FİLTRE HESAPLAMALARI ====================
 function getCategoryCount(cat: any) {
-  const catId = typeof cat === 'object' ? cat.id : (typeof cat === 'number' ? cat : null)
-  const catName = typeof cat === 'object' ? (cat.name || '') : String(cat || '')
-  const normName = catName.trim().toLowerCase()
-
-  return allTenders.value.filter((t: any) => {
-    if (catId && t.categoryId) {
-      return Number(t.categoryId) === Number(catId)
-    }
-    const tCat = (t.kategori || '').trim().toLowerCase()
-    return tCat === normName || tCat.startsWith(normName) || normName.startsWith(tCat)
-  }).length
+  return allTenders.value.filter((t: any) => matchTenderToCategory(t, cat)).length
 }
 
 function getCityCount(cityName: string) {
@@ -1185,11 +1176,12 @@ function getSubCategoryCount(catName: string, subName: string) {
   if (!subName || subName === 'Tümü') return getCategoryCount(catName)
   const normSub = subName.trim().toLowerCase()
   return allTenders.value.filter((t: any) => {
+    if (!matchTenderToCategory(t, catName)) return false
     const tSub = (t.subCategory || '').trim().toLowerCase()
     const tCat = (t.kategori || '').trim().toLowerCase()
     const tTitle = (t.baslik || '').trim().toLowerCase()
     const tDesc = (t.aciklama || '').trim().toLowerCase()
-    return tSub === normSub || tSub.includes(normSub) || tTitle.includes(normSub) || tCat.includes(normSub) || tDesc.includes(normSub)
+    return tSub === normSub || tSub.includes(normSub) || normSub.includes(tSub) || tTitle.includes(normSub) || tCat.includes(normSub) || tDesc.includes(normSub)
   }).length
 }
 
@@ -1258,15 +1250,8 @@ const filteredTendersList = computed(() => {
 
   // Kategori Filtresi
   if (selectedCategory.value && selectedCategory.value !== 'Tümü') {
-    const targetCat = allCategoriesList.find(c => c.name === selectedCategory.value || c.short === selectedCategory.value)
-    list = list.filter((t: any) => {
-      if (targetCat && t.categoryId) {
-        return Number(t.categoryId) === Number(targetCat.id)
-      }
-      const tCat = (t.kategori || '').trim().toLowerCase()
-      const sel = selectedCategory.value.trim().toLowerCase()
-      return tCat === sel || tCat.startsWith(sel) || sel.startsWith(tCat)
-    })
+    const targetCat = allCategoriesList.find(c => c.name === selectedCategory.value || c.short === selectedCategory.value) || selectedCategory.value
+    list = list.filter((t: any) => matchTenderToCategory(t, targetCat))
   }
 
   // Alt Kategori Filtresi

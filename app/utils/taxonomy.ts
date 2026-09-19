@@ -158,3 +158,137 @@ export const COMMON_TAX_OFFICES = [
   'Konya Mevlana Vergi Dairesi',
   'Tekirdağ Süleymanpaşa Vergi Dairesi'
 ];
+
+/**
+ * Normalizes text for Turkish-aware, punctuation-insensitive keyword comparison.
+ */
+function normTr(str: string): string {
+  return (str || '')
+    .toLocaleLowerCase('tr-TR')
+    .replace(/['".,/\\()\-&|]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+/**
+ * Category-specific keyword heuristics for robust B2B classification
+ */
+const CATEGORY_KEYWORDS: Record<number, string[]> = {
+  1: ['inşaat', 'yapım', 'altyapı', 'üstyapı', 'bina yapımı', 'yıkım', 'demir', 'çelik', 'hafriyat', 'şantiye', 'beton', 'restorasyon', 'tadilat', 'çatı', 'mantolama'],
+  2: ['sağlık', 'medikal', 'ilaç', 'serum', 'hastane', 'doktor', 'eczane', 'hijyen'],
+  3: ['gıda', 'tarım', 'yiyecek', 'içecek', 'bakliyat', 'hububat', 'un', 'şeker', 'yağ', 'toptan gıda', 'pirinç', 'mercimek'],
+  4: ['tıbbi cihaz', 'laboratuvar', 'hastane ekipman', 'monitör', 'cerrahi', 'otoklav', 'mr', 'röntgen'],
+  5: ['kanalizasyon', 'su şebeke', 'boru', 'doğalgaz', 'sıhhi tesisat', 'vana', 'pompa', 'drenaj'],
+  6: ['enerji', 'elektrik', 'aydınlatma', 'ges', 'güneş enerji', 'trafo', 'jeneratör', 'sinyalizasyon'],
+  7: ['akaryakıt', 'motorin', 'mazot', 'benzin', 'madeni yağ', 'gazyağı', 'lpg', 'otogaz', 'yakıt'],
+  8: ['makine', 'cnc', 'kompresör', 'konveyör', 'motor', 'redüktör', 'dolum', 'paketleme', 'takım tezgah'],
+  9: ['yazılım', 'bilişim', 'bilgi yönetim', 'erp', 'crm', 'bulut', 'sunucu', 'siber', 'yazılım geliştirme'],
+  10: ['nakliye', 'taşımacılık', 'lojistik', 'servis', 'kargo', 'antrepo', 'tır', 'konteyner', 'depolama', 'kara nakliye'],
+  11: ['mobilya', 'ofis', 'büro', 'beyaz eşya', 'mutfak', 'züccaciye', 'masa', 'koltuk', 'dolap'],
+  12: ['hırdavat', 'nalburiye', 'metal', 'plastik', 'civata', 'vida', 'sac', 'profil', 'profil demir'],
+  13: ['yangın', 'söndürme', 'ihbar', 'sprinkler', 'yangın tüp', 'yangın kapısı'],
+  14: ['kimyasal', 'gübre', 'dezenfektan', 'zirai ilaç', 'su şartlandırma'],
+  15: ['matbaa', 'kırtasiye', 'toner', 'kartuş', 'ambalaj', 'koli', 'baskı', 'kağıt', 'ofset'],
+  16: ['kent mobilyaları', 'prefabrik', 'kamelya', 'bank', 'otobüs durağı', 'oyun parkı'],
+  17: ['mühendislik', 'mimarlık', 'danışmanlık', 'statik', 'proje çizim', 'zemin etüdü', 'müşavirlik'],
+  18: ['madencilik', 'hammadde', 'sondaj', 'mermer', 'maden', 'kömür', 'taş ocak', 'granit'],
+  19: ['asansör', 'otomasyon', 'yürüyen merdiven', 'bina otomasyon', 'bms'],
+  20: ['klima', 'soğutma', 'ısıtma', 'havalandırma', 'vrf', 'vrv', 'chiller', 'menfez'],
+  21: ['savunma', 'silah', 'denizcilik', 'havacılık', 'askeri', 'taktik', 'balistik'],
+  22: ['taşıt', 'iş makinesi', 'araç', 'ekskavatör', 'kamyon', 'binek', 'yedek parça', 'loder', 'kepçe', 'kiralama', 'çekici', 'iş makinesi kiralama'],
+  23: ['turizm', 'organizasyon', 'etkinlik', 'kongre', 'fuar', 'ödüllendirme', 'otel'],
+  24: ['reklam', 'tabela', 'billboard', 'tanıtım', 'totem', 'led ekran'],
+  25: ['peyzaj', 'bahçe', 'ormancılık', 'bitki', 'sulama', 'rulo çim', 'ağaç', 'fidan', 'bahçıvanlık', 'otomatik sulama'],
+  26: ['hayvancılık', 'yem', 'veteriner', 'canlı hayvan', 'besi', 'küçükbaş', 'büyükbaş'],
+  27: ['sanat', 'heykel', 'müzik', 'maket', 'rölyef'],
+  28: ['odun', 'kömür', 'katıyakıt', 'pelet', 'briket'],
+  29: ['hazır yemek', 'lokantacılık', 'tabldot', 'catering', 'toplu yemek', 'öğle yemeği', 'ikram'],
+  30: ['elektronik', 'bilgisayar', 'laptop', 'ölçü aletleri', 'switch', 'router', 'multimetre'],
+  31: ['kamera', 'güvenlik kamera', 'scada', 'gps', 'takip', 'telsiz', 'nvr', 'pts'],
+  32: ['temizlik', 'ilaçlama', 'geri dönüşüm', 'hijyen', 'pest kontrol', 'atık', 'çöp', 'bina temizliği', 'dezenfeksiyon'],
+  33: ['tekstil', 'giyim', 'iş kıyafet', 'üniforma', 'ayakkabı', 'tulum'],
+  34: ['isg', 'iş sağlığı', 'iş güvenliği', 'baret', 'emniyet kemeri', 'koruyucu'],
+  35: ['özel güvenlik', 'koruma', 'bekçilik', 'güvenlik görevlisi', 'tesis güvenlik'],
+  36: ['eğitim', 'tercümanlık', 'çeviri', 'anket', 'araştırma'],
+  37: ['işletmecilik', 'işçilik', 'sosyal hizmetler', 'tesis yönetim', 'resepsiyon'],
+  38: ['sigorta', 'mali', 'hukuki', 'kasko', 'dask', 'denetim'],
+  39: ['araç satış', 'hurda', 'menkul mal', 'hurda demir'],
+  40: ['gayrimenkul', 'arsa', 'konut', 'daire', 'dükkan', 'işyeri', 'kantin', 'tarla', 'kat karşılığı']
+};
+
+/**
+ * Merkezi Kategori Eşleştirme Motoru
+ * İhaleleri (veya ilanları) 40 ana taksonomi kategorisinden herhangi biriyle akıllıca eşleştirir.
+ */
+export function matchTenderToCategory(tender: any, catInput: any): boolean {
+  if (!tender) return false;
+
+  let catObj: any = null;
+  if (typeof catInput === 'object' && catInput !== null) {
+    catObj = catInput;
+  } else if (typeof catInput === 'number') {
+    catObj = ALL_40_CATEGORIES.find(c => c.id === catInput);
+  } else if (typeof catInput === 'string') {
+    const s = normTr(catInput);
+    if (!s || s === 'tumu' || s === 'all') return true;
+    catObj = ALL_40_CATEGORIES.find(c => {
+      const cNameNorm = normTr(c.name);
+      const cShortNorm = normTr(c.short);
+      return cNameNorm === s || cShortNorm === s || cNameNorm.includes(s) || s.includes(cShortNorm);
+    });
+  }
+
+  const catId = catObj ? catObj.id : (typeof catInput === 'number' ? catInput : null);
+
+  // 1. Doğrudan Kategori ID eşleşmesi
+  if (catId && tender.categoryId && Number(tender.categoryId) === Number(catId)) {
+    return true;
+  }
+
+  // 2. Normalleştirilmiş metin alanları
+  const tCat = normTr(tender.kategori);
+  const tMain = normTr(tender.mainCategory);
+  const tSub = normTr(tender.subCategory);
+  const tTitle = normTr(tender.baslik);
+  const tDesc = normTr(tender.aciklama);
+
+  if (catObj) {
+    const cName = normTr(catObj.name);
+    const cShort = normTr(catObj.short);
+
+    // Tam veya doğrudan alt dize eşleşmesi
+    if (tCat === cName || tCat === cShort || tMain === cName || tMain === cShort) return true;
+    if (tCat && (cName.includes(tCat) || cShort.includes(tCat) || tCat.includes(cShort))) return true;
+    if (tMain && (cName.includes(tMain) || cShort.includes(tMain) || tMain.includes(cShort))) return true;
+
+    // Alt kategoriler haritasından kontrol
+    const subList = CATEGORY_SUBCATEGORIES_MAP[catObj.id] || [];
+    if (subList.some(sub => {
+      const s = normTr(sub);
+      return tSub === s || tCat.includes(s) || tSub.includes(s) || s.includes(tSub);
+    })) {
+      return true;
+    }
+
+    // Anahtar kelime kümesi kontrolü
+    const keywords = CATEGORY_KEYWORDS[catObj.id] || [];
+    if (keywords.some(kw => {
+      const nKw = normTr(kw);
+      return tCat.includes(nKw) || tMain.includes(nKw) || tSub.includes(nKw) || tTitle.includes(nKw);
+    })) {
+      return true;
+    }
+  }
+
+  // 3. catObj bulunamadıysa serbest metin araması
+  if (typeof catInput === 'string') {
+    const q = normTr(catInput);
+    if (!q || q === 'tumu') return true;
+    if (tCat.includes(q) || tMain.includes(q) || tSub.includes(q) || tTitle.includes(q) || q.includes(tCat)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
