@@ -1,13 +1,14 @@
 import { defineEventHandler, readBody } from 'h3'
 import { deleteNotification, clearNotificationsForUser } from '~~/server/utils/notificationsStore'
-import { resolveSession, sanitizePayload } from '~~/server/utils/authGuard'
+import { requireAuth, sanitizePayload } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
+  // 🛡️ SEC-001 & SEC-002: Yalnızca doğrulanmış oturum sahipleri bildirim silebilir
+  const session = requireAuth(event)
   const rawBody = await readBody(event) || {}
   // 🛡️ SEC-013: Girdi Temizleme
   const body = sanitizePayload(rawBody)
-  const session = resolveSession(event)
-  const email = (session.userEmail || body.email || 'ihalecib@gmail.com') as string
+  const email = (session.isAdmin && body.email ? String(body.email) : session.userEmail).toLowerCase().trim()
 
   if (body.all) {
     const count = clearNotificationsForUser(email, body.ids)

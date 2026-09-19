@@ -2,7 +2,7 @@ import { defineEventHandler, readBody, createError } from 'h3'
 import { addTenderQuestion } from '~~/server/utils/tenderQuestionsStore'
 import { getAllTenders } from '~~/server/utils/tendersStore'
 import { createNotification } from '~~/server/utils/notificationsStore'
-import { sanitizeXss, sanitizePayload } from '~~/server/utils/authGuard'
+import { sanitizeXss, sanitizePayload, resolveSession } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
   const tenderId = event.context.params?.id
@@ -34,11 +34,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  const session = resolveSession(event)
+  const askerEmail = (session.isAuthenticated ? session.userEmail : (body.askerEmail || 'tedarikci@firma.com')).trim().toLowerCase()
+
   const question = addTenderQuestion({
     tenderId,
     tenderTitle: tender.baslik,
-    askerEmail: body.askerEmail || 'tedarikci@firma.com',
-    askerCompanyName: sanitizeXss(body.askerCompanyName) || 'Katılımcı Firma',
+    askerEmail,
+    askerCompanyName: sanitizeXss(body.askerCompanyName) || session.companyVkn || 'Katılımcı Firma',
     isAnonymous: Boolean(body.isAnonymous),
     type: body.type || 'GENEL',
     question: sanitizeXss(body.question)

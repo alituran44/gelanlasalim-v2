@@ -1,15 +1,17 @@
 import { getAllBids, getBidsForTender } from '~~/server/utils/bidsStore'
 import { getAllTenders } from '~~/server/utils/tendersStore'
+import { resolveSession } from '~~/server/utils/authGuard'
 
 export default defineEventHandler((event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
   const query = getQuery(event)
-  const headers = getRequestHeaders(event)
   const tenderId = query.tenderId as string | undefined
   const ownerEmail = query.ownerEmail as string | undefined
-  const requesterEmail = ((query.requesterEmail || headers['x-user-email'] || '') as string).trim().toLowerCase()
-  const authHeader = headers['authorization'] || ''
-  const isAdmin = authHeader.includes('admin') || Boolean(headers['x-admin-token'])
+
+  // 🛡️ SEC-001 & SEC-002: Güvenli sunucu oturumu çözümleme
+  const session = resolveSession(event)
+  const isAdmin = session.isAdmin
+  const requesterEmail = session.isAuthenticated ? session.userEmail.trim().toLowerCase() : ''
 
   let bids = getAllBids()
   const allTenders = getAllTenders()

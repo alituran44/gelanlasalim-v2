@@ -1,12 +1,16 @@
 import { defineEventHandler, getQuery, createError } from 'h3'
 import { getCompanyForUser, getAllCompanies, getCompanyByVkn } from '~~/server/utils/companyVerificationStore'
+import { resolveSession, requireAdmin } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
+  const session = resolveSession(event)
   const query = getQuery(event)
   const userEmail = (query.email as string || '').trim().toLowerCase()
   const vkn = (query.vkn as string || '').trim()
 
   if (query.all === 'true') {
+    // 🛡️ SEC-ADM: Tüm firmaların listelenmesi yalnızca yöneticilere açıktır
+    requireAdmin(event)
     const companies = getAllCompanies()
     return {
       companies: companies.map(c => ({
@@ -26,6 +30,15 @@ export default defineEventHandler(async (event) => {
     const company = getCompanyByVkn(vkn)
     if (company) {
       if (query.full === 'true') {
+        // 🛡️ SEC-002: Detaylı firma verileri sadece firma çalışanlarına veya admine açıktır
+        const isMember = (session.companyVkn && session.companyVkn === vkn) ||
+          (session.userEmail && company.members.some(m => m.userEmail.toLowerCase() === session.userEmail.toLowerCase()))
+        if (!session.isAdmin && !isMember) {
+          throw createError({
+            statusCode: 403,
+            statusMessage: 'Bu firmanın detaylı kurumsal verilerine erişim yetkiniz bulunmamaktadır (Kural SEC-002).'
+          })
+        }
         return {
           hasCompany: true,
           company,
@@ -44,7 +57,8 @@ export default defineEventHandler(async (event) => {
     return { exists: false }
   }
 
-  const membership = getCompanyForUser(userEmail)
+  const effectiveEmail = (session.isAdmin && userEmail) ? userEmail : (session.isAuthenticated ? session.userEmail : userEmail)
+  const membership = getCompanyForUser(effectiveEmail)
   if (membership) {
     return {
       hasCompany: true,

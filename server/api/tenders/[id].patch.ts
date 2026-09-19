@@ -37,26 +37,14 @@ export default defineEventHandler(async (event) => {
     addTender(target!)
   }
 
-  // 🛡️ Yetki Denetimi: İhalenin statüsünü sadece ihaleyi açan firma yetkilisi veya sistem admini değiştirebilir
+  // 🛡️ SEC-002: Tenant İzolasyonu & Yetki Denetimi: İhalenin statüsünü sadece ihaleyi açan firma yetkilisi veya sistem admini değiştirebilir
   const allowedOwners = [
     target.ownerEmail,
     (target as any).vkn,
     (target as any).taxId
-  ].filter(Boolean).map(x => String(x).toLowerCase().trim())
+  ].filter(Boolean)
 
-  const session = resolveSession(event)
-  const headers = getRequestHeaders(event)
-  const reqEmail = (session.userEmail || (headers['x-user-email'] as string) || '').trim().toLowerCase()
-  const isOwner = allowedOwners.length === 0 || 
-    (reqEmail && allowedOwners.includes(reqEmail)) || 
-    (session.companyVkn && allowedOwners.includes(session.companyVkn.toLowerCase().trim()))
-
-  if (!session.isAdmin && !isOwner && session.isAuthenticated) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Bu ihalenin durumunu değiştirme yetkiniz bulunmamaktadır.'
-    })
-  }
+  assertTenantAccess(event, allowedOwners)
 
   // 🛡️ State Machine Geçişini Uygula (PRD Bölüm 3.3 & 3.5)
   const result = updateTenderStatus(id, body.statusCode, {

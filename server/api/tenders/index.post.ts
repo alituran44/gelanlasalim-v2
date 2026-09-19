@@ -22,7 +22,10 @@ export default defineEventHandler(async (event) => {
     // 🛡️ SEC-013: Girdi Temizleme (Sanitization)
     const body = sanitizePayload(rawBody)
 
-    const reqEmail = ((headers['x-user-email'] as string) || body.ownerEmail || session.userEmail || '').trim().toLowerCase()
+    const resolvedOwnerEmail = (session.isAdmin && body.ownerEmail)
+      ? String(body.ownerEmail).trim().toLowerCase()
+      : (session.isAuthenticated ? session.userEmail.trim().toLowerCase() : (body.ownerEmail || 'ihalecib@gmail.com'))
+
     const id = body.id || `IHC-2026-${Math.floor(100 + Math.random() * 900)}`
     const now = new Date()
     const dateFormatted = `${String(now.getDate()).padStart(2, '0')}.${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`
@@ -38,7 +41,7 @@ export default defineEventHandler(async (event) => {
       subCategory: body.subCategory || 'Malzeme & Hizmet',
       city: body.city || body.sehir || 'Türkiye',
       ownerCompany: body.ownerCompany || session.companyVkn || 'Kurumsal Firma',
-      ownerEmail: body.ownerEmail || session.userEmail || reqEmail || 'ihalecib@gmail.com',
+      ownerEmail: resolvedOwnerEmail,
       ownerPhone: body.ownerPhone || (body as any).phone || (body as any).telefon || '',
       websiteUrl: body.websiteUrl || '',
       isIlan,

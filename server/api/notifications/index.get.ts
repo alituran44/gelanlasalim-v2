@@ -1,11 +1,15 @@
-import { defineEventHandler, getQuery, getRequestHeaders } from 'h3'
-import { getNotificationsForUser, getAllNotifications } from '~~/server/utils/notificationsStore'
+import { defineEventHandler, getQuery, setHeader } from 'h3'
+import { getNotificationsForUser } from '~~/server/utils/notificationsStore'
+import { requireAuth } from '~~/server/utils/authGuard'
 
 export default defineEventHandler((event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
+  // 🛡️ SEC-001 & SEC-002: Bildirimler yalnızca oturum açmış kullanıcıya sunulur
+  const session = requireAuth(event)
   const query = getQuery(event)
-  const headers = getRequestHeaders(event)
-  const email = (query.email || headers['x-user-email'] || 'ihalecib@gmail.com') as string
+
+  // Yalnızca sistem yöneticisi başka bir kullanıcının bildirimlerini sorgulayabilir
+  const email = (session.isAdmin && query.email ? String(query.email) : session.userEmail).toLowerCase().trim()
 
   const userNotifications = getNotificationsForUser(email)
 

@@ -1,7 +1,7 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { getCompanyByVkn, saveCompanies, getAllCompanies, CompanyDocument } from '~~/server/utils/companyVerificationStore'
 import { validateUploadedFile } from '~~/server/utils/fileValidation'
-import { resolveSession, sanitizePayload } from '~~/server/utils/authGuard'
+import { assertTenantAccess, sanitizePayload } from '~~/server/utils/authGuard'
 import { logSecurityEvent } from '~~/server/utils/securityAuditStore'
 
 export default defineEventHandler(async (event) => {
@@ -16,29 +16,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // 🛡️ SEC-002: Tenant İzolasyonu - Yalnızca ilgili firmanın yetkilisi veya admin belge yükleyebilir
+  assertTenantAccess(event, vkn)
+
   // 🛡️ SEC-012: Dosya uzantısı, MIME tipi ve zararlı içerik kontrolü
   validateUploadedFile(event, {
     fileName: title.includes('.') ? title : `${title}.pdf`,
     base64OrBuffer: fileUrl
   })
-
-  // 🛡️ SEC-002: Tenant İzolasyonu
-  const session = resolveSession(event)
-  if (session.isAuthenticated && !session.isAdmin && session.companyVkn && session.companyVkn !== vkn) {
-    logSecurityEvent(event, {
-      eventType: 'IDOR_ATTEMPT',
-      severity: 'HIGH',
-      actorEmail: session.userEmail,
-      actorVkn: session.companyVkn,
-      targetResource: `/api/company/documents?vkn=${vkn}`,
-      actionTaken: 'BLOCKED_403',
-      details: { attemptedVkn: vkn, userVkn: session.companyVkn }
-    })
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Başka bir firmaya evrak yükleyemezsiniz (Kural SEC-002).'
-    })
-  }
 
   const company = getCompanyByVkn(vkn)
   if (!company) {

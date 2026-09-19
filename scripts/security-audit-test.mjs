@@ -147,6 +147,63 @@ assert(!cspHeader.includes('unsafe-eval'), 'CSP: unsafe-eval kaldırılmış', '
 assert(!xssHeader, 'Headers: Eski X-XSS-Protection kaldırılmış', 'X-XSS-Protection hala var')
 assert(apiCorsHeader.includes('ihaleciburada.com') && !apiCorsHeader.includes('*'), 'CORS: * yerine spesifik domain sınırlandırılmış', 'CORS hala wildcard')
 
+// 11. NORMAL LOGIN ADMIN ELEVATION ENGELİ TESTİ
+console.log('\n--- 11. Normal Girişte Admin Yetki Yükseltme Engeli Testi ---')
+const userLoginContent = fs.readFileSync(path.join(repoRoot, 'server/api/auth/login.post.ts'), 'utf8')
+assert(!userLoginContent.includes("email.startsWith('admin@')"), 'User Login: admin@ e-posta başlangıcıyla yetki yükseltme engellenmiş', 'Hala startsWith(admin@) var')
+assert(!userLoginContent.includes("isAdminEmail ="), 'User Login: isAdminEmail serbest admin tanımı kaldırılmış', 'Hala isAdminEmail var')
+assert(userLoginContent.includes('isAdmin: false'), 'User Login: Normal girişten açılan oturumlar zorunlu isAdmin: false', 'isAdmin: false eksik')
+
+// 12. BİLDİRİM SERVİSLERİ YETKİLENDİRME VE TENANT İZOLASYONU TESTİ
+console.log('\n--- 12. Bildirim Servisleri Tenant İzolasyonu Testi ---')
+const notifGetContent = fs.readFileSync(path.join(repoRoot, 'server/api/notifications/index.get.ts'), 'utf8')
+assert(notifGetContent.includes('requireAuth(event)'), 'Notifications GET: requireAuth(event) ile anonim istekler engellenmiş', 'requireAuth eksik')
+assert(!notifGetContent.includes("headers['x-user-email']"), 'Notifications GET: x-user-email sahteciliği engellenmiş', 'x-user-email hala var')
+
+const notifReadContent = fs.readFileSync(path.join(repoRoot, 'server/api/notifications/read.patch.ts'), 'utf8')
+assert(notifReadContent.includes('requireAuth(event)'), 'Notifications PATCH: requireAuth(event) zorunlu', 'requireAuth eksik')
+
+const notifDeleteContent = fs.readFileSync(path.join(repoRoot, 'server/api/notifications/index.delete.ts'), 'utf8')
+assert(notifDeleteContent.includes('requireAuth(event)'), 'Notifications DELETE: requireAuth(event) zorunlu', 'requireAuth eksik')
+
+// 13. İHALE İŞLEMLERİ IDOR VE TENANT KORUMASI TESTİ
+console.log('\n--- 13. İhale IDOR ve Tenant Koruması Testi ---')
+const tenderDeleteContent = fs.readFileSync(path.join(repoRoot, 'server/api/tenders/[id].delete.ts'), 'utf8')
+assert(tenderDeleteContent.includes('assertTenantAccess(event, allowedOwners)'), 'Tender DELETE: assertTenantAccess ile IDOR korumalı', 'assertTenantAccess eksik')
+assert(!tenderDeleteContent.includes("headers['x-user-email']"), 'Tender DELETE: x-user-email başlığına güvenilmiyor', 'x-user-email hala var')
+
+const tenderPatchContent = fs.readFileSync(path.join(repoRoot, 'server/api/tenders/[id].patch.ts'), 'utf8')
+assert(tenderPatchContent.includes('assertTenantAccess(event, allowedOwners)'), 'Tender PATCH: assertTenantAccess ile IDOR korumalı', 'assertTenantAccess eksik')
+assert(!tenderPatchContent.includes("headers['x-user-email']"), 'Tender PATCH: x-user-email başlığına güvenilmiyor', 'x-user-email hala var')
+
+const tenderPutContent = fs.readFileSync(path.join(repoRoot, 'server/api/tenders/[id].put.ts'), 'utf8')
+assert(tenderPutContent.includes('assertTenantAccess(event, allowedOwners)'), 'Tender PUT: assertTenantAccess ile IDOR korumalı', 'assertTenantAccess eksik')
+assert(!tenderPutContent.includes("headers['x-user-email']"), 'Tender PUT: x-user-email başlığına güvenilmiyor', 'x-user-email hala var')
+
+// 14. İHALE VE TEKLİF GİZLİLİK TESTİ
+console.log('\n--- 14. İhale ve Teklif Gizlilik / Maskeleme Testi ---')
+const tendersGetContent = fs.readFileSync(path.join(repoRoot, 'server/api/tenders/index.get.ts'), 'utf8')
+assert(tendersGetContent.includes('resolveSession(event)'), 'Tenders GET: resolveSession ile oturum çözümleniyor', 'resolveSession eksik')
+assert(!tendersGetContent.includes("headers['x-admin-token']"), 'Tenders GET: x-admin-token sahteciliği engellenmiş', 'x-admin-token hala var')
+
+const bidsGetContent = fs.readFileSync(path.join(repoRoot, 'server/api/bids/index.get.ts'), 'utf8')
+assert(bidsGetContent.includes('resolveSession(event)'), 'Bids GET: resolveSession ile oturum çözümleniyor', 'resolveSession eksik')
+assert(!bidsGetContent.includes("headers['x-admin-token']"), 'Bids GET: x-admin-token sahteciliği engellenmiş', 'x-admin-token hala var')
+
+// 15. İHALE TUTANAK GİZLİLİK TESTİ
+console.log('\n--- 15. İhale Karar Tutanağı Gizlilik Testi ---')
+const tutanakContent = fs.readFileSync(path.join(repoRoot, 'server/api/tenders/[id]/tutanak.get.ts'), 'utf8')
+assert(tutanakContent.includes('requireAuth(event)'), 'Tutanak GET: requireAuth zorunlu', 'requireAuth eksik')
+assert(tutanakContent.includes('isOwner') && tutanakContent.includes('isParticipant'), 'Tutanak GET: Sadece ihale sahibi veya teklif veren görebilir', 'Owner/Participant kontrolü eksik')
+
+// 16. ŞİRKET EVRAK VE DURUM YETKİLENDİRME TESTİ
+console.log('\n--- 16. Şirket Evrak ve Veri Güvenliği Testi ---')
+const companyDocContent = fs.readFileSync(path.join(repoRoot, 'server/api/company/documents.post.ts'), 'utf8')
+assert(companyDocContent.includes('assertTenantAccess(event, vkn)'), 'Company Documents: assertTenantAccess ile tenant kilitli', 'assertTenantAccess eksik')
+
+const companyStatusContent = fs.readFileSync(path.join(repoRoot, 'server/api/company/status.get.ts'), 'utf8')
+assert(companyStatusContent.includes('requireAdmin(event)'), 'Company Status: Tüm şirketleri listeleme admin korumalı', 'requireAdmin eksik')
+
 console.log('\n====================================================')
 console.log(`📊 TEST SONUÇLARI: Toplam: ${totalTests} | Başarılı: ${passedTests} | Başarısız: ${failedTests}`)
 console.log('====================================================')

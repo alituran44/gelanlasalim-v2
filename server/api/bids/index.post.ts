@@ -4,7 +4,7 @@ import { sendViaGoogleSmtp, getStoredSmtpConfig } from '~~/server/utils/smtpClie
 import { logBidEvent } from '~~/server/utils/bidAuditStore'
 import { getCompanyForUser } from '~~/server/utils/companyVerificationStore'
 import { detectCollusionSignal, logSecurityEvent } from '~~/server/utils/securityAuditStore'
-import { sanitizePayload } from '~~/server/utils/authGuard'
+import { sanitizePayload, resolveSession } from '~~/server/utils/authGuard'
 import { resolveClientIp } from '~~/server/utils/clientIp'
 import { getRequestHeader } from 'h3'
 
@@ -67,7 +67,12 @@ export default defineEventHandler(async (event) => {
       ? cleanPrice 
       : `${cleanPrice} ₺`
 
-    const userCompany = getCompanyForUser(body.eposta || '')
+    const session = resolveSession(event)
+    const bidderEmail = (session.isAdmin && body.eposta) 
+      ? String(body.eposta).trim().toLowerCase() 
+      : (session.isAuthenticated ? session.userEmail.trim().toLowerCase() : (sanitizeInput(body.eposta) || ''))
+
+    const userCompany = getCompanyForUser(bidderEmail)
     const specVersionAccepted = targetTender?.specVersion || 1
 
     const newBid: BidItem = {
@@ -75,14 +80,14 @@ export default defineEventHandler(async (event) => {
       tenderId: body.tenderId,
       tenderTitle,
       ownerEmail,
-      firma: sanitizeInput(body.firma) || userCompany?.company.companyTitle || 'Teklif Veren Tedarikçi',
+      firma: sanitizeInput(body.firma) || userCompany?.company.companyTitle || (session.companyVkn ? `Firma (${session.companyVkn})` : 'Teklif Veren Tedarikçi'),
       fiyat: formattedPrice,
       sure: sanitizeInput(body.sure) || '7 gün geçerli',
       puan: typeof body.puan === 'number' ? body.puan : 5.0,
       durum: body.durum || 'bekliyor',
-      yetkili: sanitizeInput(body.yetkili) || userCompany?.member.fullName || 'Firma Yetkilisi',
+      yetkili: sanitizeInput(body.yetkili) || userCompany?.member.fullName || (session.userName || 'Firma Yetkilisi'),
       telefon: sanitizeInput(body.telefon) || '',
-      eposta: sanitizeInput(body.eposta) || '',
+      eposta: bidderEmail,
       vergiDairesi: sanitizeInput(body.vergiDairesi) || userCompany?.company.taxOffice || '',
       vkn: userCompany?.company.vkn,
       adres: sanitizeInput(body.adres) || userCompany?.company.address || '',

@@ -31,26 +31,14 @@ export default defineEventHandler((event) => {
     })
   }
 
-  // 🛡️ Yetki Denetimi: İhaleyi açan kişi veya sistem admini silebilir
+  // 🛡️ SEC-002: Tenant İzolasyonu & IDOR Doğrulaması (İhaleyi açan firma veya sistem admini silebilir)
   const allowedOwners = [
     targetTender.ownerEmail,
     (targetTender as any).vkn,
     (targetTender as any).taxId
-  ].filter(Boolean).map(x => String(x).toLowerCase().trim())
+  ].filter(Boolean)
 
-  const session = resolveSession(event)
-  const headers = getRequestHeaders(event)
-  const reqEmail = (session.userEmail || (headers['x-user-email'] as string) || '').trim().toLowerCase()
-  const isOwner = allowedOwners.length === 0 || 
-    (reqEmail && allowedOwners.includes(reqEmail)) || 
-    (session.companyVkn && allowedOwners.includes(session.companyVkn.toLowerCase().trim()))
-
-  if (!session.isAdmin && !isOwner && session.isAuthenticated) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Bu ihaleyi silme yetkiniz bulunmamaktadır.'
-    })
-  }
+  assertTenantAccess(event, allowedOwners)
 
   const removed = removeTender(id)
 

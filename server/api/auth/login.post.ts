@@ -53,28 +53,27 @@ export default defineEventHandler(async (event) => {
       }
     }
   } else {
-    if (body.role && typeof body.role === 'string') {
-      role = sanitizeXss(body.role)
-    } else {
-      role = 'FİRMA_YÖNETİCİSİ'
-    }
+    const candidateRole = body.role && typeof body.role === 'string' ? sanitizeXss(body.role) : 'FİRMA_YÖNETİCİSİ'
+    // 🛡️ SEC-ADM: Normal giriş uç noktasından asla ADMIN rolü veya yetkisi verilemez
+    role = (candidateRole === 'ADMIN' || candidateRole === 'admin') ? 'FİRMA_YÖNETİCİSİ' : candidateRole
     if (body.name && typeof body.name === 'string') {
       userName = sanitizeXss(body.name)
     }
     isVerified = false
   }
 
-  const isAdminEmail = email === 'admin@ihaleciburada.com' || email === 'ihalecib@gmail.com' || email.startsWith('admin@')
-  const isAdmin = Boolean(isAdminEmail || body.role === 'admin' || role === 'ADMIN')
+  // 🛡️ SEC-ADM: Admin oturumu YALNIZCA /api/auth/admin-login üzerinden kriptografik secret key ile açılabilir.
+  // Normal /api/auth/login üzerinden e-posta örüntüsü veya istek gövdesi ile admin yetkisi kazanılması KESİNLİKLE engellenmiştir.
+  const isAdmin = false
 
   // 🛡️ Sunucu tarafında oturum oluştur ve imzalı httpOnly cookie ekle
   const { session, token } = createSession({
     userEmail: email,
-    userName: isAdmin ? (userName || 'Sistem Yöneticisi (Admin)') : userName,
+    userName,
     companyVkn: targetVkn || undefined,
-    companyRole: isAdmin ? 'ADMIN' : role,
-    isCompanyVerified: isVerified || isAdmin,
-    isAdmin
+    companyRole: role,
+    isCompanyVerified: isVerified,
+    isAdmin: false
   })
 
   setSessionCookie(event, token)

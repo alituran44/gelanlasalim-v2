@@ -1,8 +1,10 @@
-import { defineEventHandler, createError } from 'h3'
+import { defineEventHandler, createError, setHeader } from 'h3'
 import { getAllTenders } from '~~/server/utils/tendersStore'
 import { getAllBids } from '~~/server/utils/bidsStore'
+import { requireAuth } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
+  setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
   const tenderId = event.context.params?.id
 
   if (!tenderId) {
@@ -24,6 +26,26 @@ export default defineEventHandler(async (event) => {
 
   const allBids = getAllBids()
   const tenderBids = allBids.filter(b => b.tenderId === tender.id || b.tenderTitle === tender.baslik)
+
+  // 🛡️ SEC-002: Tenant İzolasyonu & Ticari Gizlilik Doğrulaması
+  // İhale sonuç tutanağı yalnızca sistem yöneticisi, ihale sahibi veya ihaleye geçerli teklif vermiş katılımcılar tarafından görüntülenebilir.
+  const session = requireAuth(event)
+  if (!session.isAdmin) {
+    const isOwner = Boolean(
+      (session.userEmail && tender.ownerEmail && session.userEmail.trim().toLowerCase() === tender.ownerEmail.trim().toLowerCase()) ||
+      (session.companyVkn && (tender as any).vkn && session.companyVkn.trim().toLowerCase() === String((tender as any).vkn).trim().toLowerCase())
+    )
+    const isParticipant = tenderBids.some(b => 
+      (session.userEmail && b.eposta && session.userEmail.trim().toLowerCase() === b.eposta.trim().toLowerCase()) ||
+      (session.companyVkn && b.vkn && session.companyVkn.trim().toLowerCase() === String(b.vkn).trim().toLowerCase())
+    )
+    if (!isOwner && !isParticipant) {
+      throw createError({
+        statusCode: 403,
+        statusMessage: 'Bu ihalenin karar tutanağını ve teklif dökümünü görüntüleme yetkiniz bulunmamaktadır (Kural SEC-002).'
+      })
+    }
+  }
 
   const activeAward = tender.activeAward || (tender.awardHistory && tender.awardHistory[tender.awardHistory.length - 1]) || {
     awardId: `AWD-${Date.now()}`,

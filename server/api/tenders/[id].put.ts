@@ -1,7 +1,7 @@
 import { defineEventHandler, getRouterParam, readBody, setHeader, createError, getRequestHeaders } from 'h3'
 import { getAllTenders, addTender, TenderItem } from '~~/server/utils/tendersStore'
 import { addGibLog } from '~~/server/utils/gibAuditStore'
-import { resolveSession } from '~~/server/utils/authGuard'
+import { resolveSession, assertTenantAccess, requireAuth } from '~~/server/utils/authGuard'
 import { resolveClientIp } from '~~/server/utils/clientIp'
 
 export default defineEventHandler(async (event) => {
@@ -22,9 +22,8 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const headers = getRequestHeaders(event)
   const session = resolveSession(event)
-  const reqEmail = (session.userEmail || (headers['x-user-email'] as string) || (rawBody.ownerEmail as string) || '').trim().toLowerCase()
+  const reqEmail = (session.userEmail || (rawBody.ownerEmail as string) || '').trim().toLowerCase()
 
   const allTenders = getAllTenders()
   let targetTender = allTenders.find(t => t.id === id)
@@ -61,23 +60,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // 🛡️ Yetki Denetimi: İhaleyi açan kişi veya sistem admini güncelleyebilir
+  // 🛡️ SEC-002: Tenant İzolasyonu & Yetki Denetimi: İhaleyi açan kişi veya sistem admini güncelleyebilir
   const allowedOwners = [
     targetTender.ownerEmail,
     (targetTender as any).vkn,
     (targetTender as any).taxId
-  ].filter(Boolean).map(x => String(x).toLowerCase().trim())
+  ].filter(Boolean)
 
-  const isOwner = allowedOwners.length === 0 || 
-    (reqEmail && allowedOwners.includes(reqEmail)) || 
-    (session.companyVkn && allowedOwners.includes(session.companyVkn.toLowerCase().trim()))
-
-  if (!session.isAdmin && !isOwner && session.isAuthenticated) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Bu ihaleyi güncelleme yetkiniz bulunmamaktadır (IDOR Koruması).'
-    })
-  }
+  assertTenantAccess(event, allowedOwners)
 
   // Revizyon geçmişi kaydı (TND-014 denetim izi)
   const currentVersion = Number(targetTender.specVersion || 1)
