@@ -6,6 +6,7 @@
     "prebuild": "node scripts/clean-output.js",
     "build": "nuxt build",
     "postbuild": "node scripts/resolve-vercel-output.js",
+    "test:security": "node scripts/security-audit-test.mjs",
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
