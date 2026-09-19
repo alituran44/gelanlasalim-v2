@@ -1,14 +1,21 @@
 import { defineEventHandler, readBody, createError } from 'h3'
 import { recordAcceptance, OFFICIAL_LEGAL_DOCUMENTS } from '~~/server/utils/legalComplianceStore'
 import { logSecurityEvent } from '~~/server/utils/securityAuditStore'
-import { sanitizePayload } from '~~/server/utils/authGuard'
+import { requireAuth, sanitizePayload } from '~~/server/utils/authGuard'
 
 export default defineEventHandler(async (event) => {
+  // 🛡️ SEC-001 & Item 6: Sözleşme kabulü için oturum zorunludur
+  const session = requireAuth(event)
+
   const rawBody = await readBody(event) || {}
   // 🛡️ SEC-013: Girdi Temizleme
   const body = sanitizePayload(rawBody)
 
-  if (!body.userEmail || !body.documentCode) {
+  // Kimlik sahteciliğini önle: Sözleşme kabulü yalnızca oturum açmış kullanıcının kendi e-postasına işlenir
+  const userEmail = (session.isAdmin && body.userEmail ? body.userEmail : session.userEmail).trim().toLowerCase()
+  const companyVkn = session.companyVkn || body.companyVkn
+
+  if (!userEmail || !body.documentCode) {
     throw createError({
       statusCode: 400,
       statusMessage: 'Kullanıcı e-postası ve sözleşme kodu zorunludur (Kural LEG-004).'
@@ -24,8 +31,8 @@ export default defineEventHandler(async (event) => {
   }
 
   const record = recordAcceptance(event, {
-    userEmail: body.userEmail,
-    companyVkn: body.companyVkn,
+    userEmail,
+    companyVkn,
     documentCode: body.documentCode,
     documentVersion: body.documentVersion || doc.version,
     channel: body.channel || 'WEB',

@@ -1,7 +1,33 @@
-import { defineEventHandler, readBody } from 'h3'
-import { sanitizePayload } from '../../utils/authGuard'
+import { defineEventHandler, readBody, createError } from 'h3'
+import { requireAuth, sanitizePayload } from '../../utils/authGuard'
+import { resolveClientIp } from '../../utils/clientIp'
+
+const vergiRateLimitMap = new Map<string, { count: number; resetTime: number }>()
 
 export default defineEventHandler(async (event) => {
+  // 🛡️ SEC-001 & Item 5: Kimlik doğrulaması zorunludur
+  const session = requireAuth(event)
+
+  // Rate Limiting per user / IP
+  const clientIp = resolveClientIp(event)
+  const rateKey = `vkn_${session.userEmail || clientIp}`
+  const now = Date.now()
+  const windowMs = 5 * 60 * 1000
+  const maxQueries = session.isAdmin ? 50 : 15
+
+  const record = vergiRateLimitMap.get(rateKey)
+  if (record && now < record.resetTime) {
+    if (record.count >= maxQueries) {
+      throw createError({
+        statusCode: 429,
+        statusMessage: 'Çok fazla vergi doğrulama sorgulaması yapıldı. Lütfen birkaç dakika bekleyiniz.'
+      })
+    }
+    record.count++
+  } else {
+    vergiRateLimitMap.set(rateKey, { count: 1, resetTime: now + windowMs })
+  }
+
   const rawBody = await readBody(event) || {}
   // 🛡️ SEC-013: Girdi Temizleme
   const body = sanitizePayload(rawBody)

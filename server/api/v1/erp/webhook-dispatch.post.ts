@@ -1,11 +1,86 @@
-import { defineEventHandler, readBody } from 'h3'
+import { defineEventHandler, readBody, createError } from 'h3'
 import crypto from 'node:crypto'
 import { formatForSap, formatForLogo, formatForMikro } from './schemas'
 import { requireActiveSubscription, sanitizePayload } from '../../../utils/authGuard'
+import { logSecurityEvent } from '../../../utils/securityAuditStore'
+
+/**
+ * 🛡️ SEC-SSRF: Sunucu Taraflı İstek Sahteciliği (SSRF) Koruması
+ * Özel IP blokları, loopback, bulut metadata (169.254.169.254) ve iç ağ alan adlarını katı şekilde engeller.
+ */
+function validateWebhookUrl(urlString: string): { isValid: boolean; error?: string } {
+  let parsed: URL
+  try {
+    parsed = new URL(urlString)
+  } catch {
+    return { isValid: false, error: 'Geçersiz URL formatı.' }
+  }
+
+  const isDev = process.env.NODE_ENV === 'development'
+  if (parsed.protocol !== 'https:' && (!isDev || parsed.protocol !== 'http:')) {
+    return { isValid: false, error: 'Webhook URL protokolü güvenli HTTPS olmalıdır.' }
+  }
+
+  const hostname = parsed.hostname.toLowerCase().trim()
+
+  // 1. Loopback ve Yerel Alan Adı Engeli
+  if (
+    hostname === 'localhost' ||
+    hostname === '127.0.0.1' ||
+    hostname === '0.0.0.0' ||
+    hostname === '::1' ||
+    hostname === '[::1]' ||
+    hostname.endsWith('.localhost') ||
+    hostname.endsWith('.local') ||
+    hostname.endsWith('.internal') ||
+    hostname.endsWith('.lan') ||
+    hostname.endsWith('.corp')
+  ) {
+    return { isValid: false, error: 'Dahili ağ veya loopback adreslerine webhook gönderimi engellenmiştir (SSRF Koruması).' }
+  }
+
+  // 2. Bulut Metadata Servisleri (AWS / GCP / Azure 169.254.169.254 ve link-local)
+  if (hostname.startsWith('169.254.') || hostname.includes('metadata.google.internal')) {
+    return { isValid: false, error: 'Bulut metadata servislerine (169.254.x.x) erişim engellenmiştir (SSRF Koruması).' }
+  }
+
+  // 3. Özel IPv4 Aralıkları (RFC 1918)
+  if (/^10\.\d{1,3}\.\d{1,3}\.\d{1,3}$/.test(hostname)) {
+    return { isValid: false, error: 'Özel ağ (10.x.x.x) IP adreslerine erişim engellenmiştir.' }
+  }
+  const match172 = hostname.match(/^172\.(\d{1,3})\.\d{1,3}\.\d{1,3}$/)
+  if (match172) {
+    const secondOctet = parseInt(match172[1], 10)
+    if (secondOctet >= 16 && secondOctet <= 31) {
+      return { isValid: false, error: 'Özel ağ (172.16-31.x.x) IP adreslerine erişim engellenmiştir.' }
+    }
+  }
+  if (/^192\.168\.\d{1,3}\.\d{1,3}$/.test(hostname)) {
+    return { isValid: false, error: 'Özel ağ (192.168.x.x) IP adreslerine erişim engellenmiştir.' }
+  }
+  const match100 = hostname.match(/^100\.(\d{1,3})\.\d{1,3}\.\d{1,3}$/)
+  if (match100) {
+    const secondOctet = parseInt(match100[1], 10)
+    if (secondOctet >= 64 && secondOctet <= 127) {
+      return { isValid: false, error: 'Taşıyıcı NAT IP adreslerine erişim engellenmiştir.' }
+    }
+  }
+
+  // 4. Standart Web Portları Dışındakileri Kısıtla
+  if (parsed.port) {
+    const portNum = parseInt(parsed.port, 10)
+    const allowedPorts = [80, 443, 8080, 8443]
+    if (!allowedPorts.includes(portNum)) {
+      return { isValid: false, error: `Port ${portNum} üzerinden webhook gönderimine izin verilmemektedir.` }
+    }
+  }
+
+  return { isValid: true }
+}
 
 export default defineEventHandler(async (event) => {
   // 🛡️ SEC-011 (Katman 5): ERP Webhook dağıtımı Kurumsal Pro veya Enterprise aboneliği gerektirir
-  requireActiveSubscription(event, 'kurumsal-pro')
+  const session = requireActiveSubscription(event, 'kurumsal-pro')
 
   const rawBody = await readBody(event) || {}
   // 🛡️ SEC-013: Girdi Temizleme
@@ -19,6 +94,23 @@ export default defineEventHandler(async (event) => {
       message: 'webhookUrl, secretKey ve erpSystem zorunludur.',
       timestamp: new Date().toISOString()
     }
+  }
+
+  // 🛡️ SSRF Doğrulaması (Item 4):
+  const ssrfCheck = validateWebhookUrl(String(webhookUrl))
+  if (!ssrfCheck.isValid) {
+    logSecurityEvent(event, {
+      eventType: 'IDOR_ATTEMPT',
+      severity: 'CRITICAL',
+      actorEmail: session.userEmail,
+      targetResource: '/api/v1/erp/webhook-dispatch',
+      actionTaken: 'BLOCKED_400',
+      details: { attemptedUrl: webhookUrl, reason: ssrfCheck.error }
+    })
+    throw createError({
+      statusCode: 400,
+      statusMessage: ssrfCheck.error || 'Geçersiz veya engellenmiş Webhook hedef adresi.'
+    })
   }
 
   // Transform data to matching ERP schema

@@ -1,15 +1,19 @@
-import { defineEventHandler, getQuery, getRequestHeaders } from 'h3'
+import { defineEventHandler, getQuery, setHeader } from 'h3'
 import { 
   getUserAcceptances, 
-  OFFICIAL_LEGAL_DOCUMENTS,
+  OFFICIAL_LEGAL_DOCUMENTS, 
   checkHasAcceptedLatest 
 } from '~~/server/utils/legalComplianceStore'
+import { requireAuth } from '~~/server/utils/authGuard'
 
 export default defineEventHandler((event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
+  // 🛡️ SEC-001 & SEC-002: Yetkisiz veri okumayı ve başkasının sözleşme kaydını görmeyi engelle
+  const session = requireAuth(event)
   const query = getQuery(event)
-  const headers = getRequestHeaders(event)
-  const email = (query.email || headers['x-user-email'] || 'ihalecib@gmail.com') as string
+
+  // Normal kullanıcılar yalnızca kendi kabul geçmişini görebilir; Admin yetkisi varsa parametre sorgulayabilir
+  const email = (session.isAdmin && query.email ? String(query.email) : session.userEmail).trim().toLowerCase()
 
   const userAcceptances = getUserAcceptances(email)
 
