@@ -80,6 +80,11 @@ useHead({
 
 const route = useRoute()
 const { cmsData, saveCmsData, fetchServerTenders } = useCmsData()
+const { data: serverTendersData, refresh: refreshServerTenders } = await useAsyncData(
+  'marketplace-server-tenders',
+  () => $fetch<{ success: boolean; tenders: any[] }>('/api/tenders').catch(() => ({ success: true, tenders: [] })),
+  { default: () => ({ success: true, tenders: [] }) }
+)
 const { checkAccountCompleteness } = useDeepSeekAgent()
 const { sendSms } = useNetGsm()
 const { userSession, isLoggedIn, canSubmitBid, isCompanyVerified, companyRole, companyVkn } = useUserSession()
@@ -345,21 +350,11 @@ const bidForm = ref({
 })
 
 onMounted(async () => {
-  if (typeof window !== 'undefined') {
-    try {
-      const raw = localStorage.getItem('myTenders')
-      if (raw) {
-        const localList = JSON.parse(raw)
-        if (Array.isArray(localList) && localList.length > 0) {
-          // Reconcile client tenders with shared server store
-          await $fetch('/api/tenders/sync', {
-            method: 'POST',
-            body: { tenders: localList }
-          }).catch(() => {})
-        }
-      }
-    } catch (e) {}
-  }
+  try {
+    if (refreshServerTenders) {
+      await refreshServerTenders()
+    }
+  } catch (e) {}
 
   try {
     if (fetchServerTenders) {
@@ -388,6 +383,7 @@ onMounted(async () => {
 })
 
 const allTenders = computed(() => {
+  const apiList = serverTendersData.value?.tenders || []
   const cmsList = cmsData.value?.dashboard?.tenders || []
   let localList: any[] = []
   if (typeof window !== 'undefined') {
@@ -396,11 +392,14 @@ const allTenders = computed(() => {
     } catch (e) {}
   }
   const map = new Map<string, any>()
+  for (const t of apiList) {
+    if (t?.id && !t.isBaseline) map.set(String(t.id), t)
+  }
   for (const t of cmsList) {
-    if (t?.id) map.set(String(t.id), t)
+    if (t?.id && !t.isBaseline && !map.has(String(t.id))) map.set(String(t.id), t)
   }
   for (const t of localList) {
-    if (t?.id) map.set(String(t.id), t)
+    if (t?.id && !t.isBaseline && !map.has(String(t.id))) map.set(String(t.id), t)
   }
   const combined = Array.from(map.values())
   return combined.filter((t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected')

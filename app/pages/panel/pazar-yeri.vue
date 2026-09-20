@@ -71,6 +71,11 @@ function getTenderSectorDetails(tender: any) {
 }
 
 const { cmsData, saveCmsData, fetchServerTenders, fetchServerBids } = useCmsData()
+const { data: serverTendersData, refresh: refreshServerTenders } = await useAsyncData(
+  'panel-marketplace-server-tenders',
+  () => $fetch<{ success: boolean; tenders: any[] }>('/api/tenders').catch(() => ({ success: true, tenders: [] })),
+  { default: () => ({ success: true, tenders: [] }) }
+)
 const { sendSms } = useNetGsm()
 
 function getTenderDirectionBadge(tender: any) {
@@ -115,6 +120,12 @@ const bidForm = ref({
 })
 
 onMounted(async () => {
+  try {
+    if (refreshServerTenders) {
+      await refreshServerTenders()
+    }
+  } catch (e) {}
+
   if (fetchServerTenders) {
     try {
       await fetchServerTenders()
@@ -136,7 +147,26 @@ onMounted(async () => {
 })
 
 const allTenders = computed(() => {
-  return cmsData.value?.dashboard?.tenders || []
+  const apiList = serverTendersData.value?.tenders || []
+  const cmsList = cmsData.value?.dashboard?.tenders || []
+  let localList: any[] = []
+  if (typeof window !== 'undefined') {
+    try {
+      localList = JSON.parse(localStorage.getItem('myTenders') || '[]')
+    } catch (e) {}
+  }
+  const map = new Map<string, any>()
+  for (const t of apiList) {
+    if (t?.id && !t.isBaseline) map.set(String(t.id), t)
+  }
+  for (const t of cmsList) {
+    if (t?.id && !t.isBaseline && !map.has(String(t.id))) map.set(String(t.id), t)
+  }
+  for (const t of localList) {
+    if (t?.id && !t.isBaseline && !map.has(String(t.id))) map.set(String(t.id), t)
+  }
+  const combined = Array.from(map.values())
+  return combined.filter((t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected')
 })
 
 const categories = computed(() => ['Tümü', ...ALL_40_CATEGORIES.map(c => c.name)])

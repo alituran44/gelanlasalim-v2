@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 
-const SCHEMA_VERSION = 'v2026_09_10_production_v4'
+const SCHEMA_VERSION = 'v2026_09_20_clean_v5'
 
 // Clean state for platform - zero dummy / mock data
 export const DEFAULT_CMS_DATA = {
@@ -652,19 +652,7 @@ export function useCmsData() {
       const res = await $fetch<{ success: boolean; tenders: any[] }>('/api/tenders')
       if (res && res.success && Array.isArray(res.tenders)) {
         if (!cmsDataRef.value.dashboard) cmsDataRef.value.dashboard = {} as any
-        const serverTenders = res.tenders
-        const map = new Map<string, any>()
-        // Server tenders first
-        serverTenders.forEach((t: any) => {
-          if (t && t.id) map.set(t.id, t)
-        })
-        // Local additions overlay
-        ;(cmsDataRef.value.dashboard.tenders || []).forEach((t: any) => {
-          if (t && t.id && !map.has(t.id)) {
-            map.set(t.id, t)
-          }
-        })
-        cmsDataRef.value.dashboard.tenders = Array.from(map.values())
+        cmsDataRef.value.dashboard.tenders = res.tenders
         safeLocalStorageSet('cmsData', cmsDataRef.value)
       }
     } catch (e) {

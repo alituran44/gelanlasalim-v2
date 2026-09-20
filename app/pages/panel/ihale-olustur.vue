@@ -977,6 +977,8 @@ async function handleSubmit() {
       ownerCompany: form.value.ownerCompany || existingTender.value?.ownerCompany || ownerCompany,
       isIlan: tenderDirection === 'ihalesiz_ilan' || tenderDirection === 'ilan',
       visibility: form.value.visibility || 'public',
+      gorunurluk: (form.value.visibility === 'private_invited') ? 'davetli' : 'kamu',
+      categoryId: form.value.categoryId || undefined,
       isPrivate: form.value.visibility === 'private_invited',
       invitedSuppliers: form.value.invitedSuppliers || '',
       isMine: false,

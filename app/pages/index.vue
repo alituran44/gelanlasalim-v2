@@ -158,20 +158,6 @@ const { checkAccountCompleteness } = useDeepSeekAgent()
 onMounted(async () => {
   if (typeof window !== 'undefined') {
     try {
-      const raw = localStorage.getItem('myTenders')
-      if (raw) {
-        const localList = JSON.parse(raw)
-        if (Array.isArray(localList) && localList.length > 0) {
-          // Reconcile client tenders with shared server store
-          await $fetch('/api/tenders/sync', {
-            method: 'POST',
-            body: { tenders: localList }
-          }).catch(() => {})
-        }
-      }
-    } catch (e) {}
-
-    try {
       const refreshed = await $fetch<{ tenders: any[] }>('/api/tenders')
       if (refreshed && Array.isArray(refreshed.tenders)) {
         if (!serverTendersData.value) serverTendersData.value = { tenders: [] }
@@ -1062,17 +1048,17 @@ function openTenderByIdOrBid(bid: any) {
 
 const allTenders = computed(() => {
   const apiTenders = (serverTendersData.value?.tenders || []).filter(
-    (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected'
+    (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline
   )
   const cmsTenders = (cmsData.value?.dashboard?.tenders || []).filter(
-    (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected'
+    (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline
   )
   
   let localTenders: any[] = []
   if (typeof window !== 'undefined') {
     try {
       localTenders = JSON.parse(localStorage.getItem('myTenders') || '[]').filter(
-        (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected'
+        (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline
       )
     } catch (e) {}
   }
@@ -1081,6 +1067,7 @@ const allTenders = computed(() => {
   const combined = [...localTenders, ...apiTenders, ...cmsTenders, ...seedTenders]
   const seen = new Set()
   return combined.filter(item => {
+    if (!item || item.isBaseline) return false
     const key = item.id || item.baslik
     const duplicate = seen.has(key)
     seen.add(key)
