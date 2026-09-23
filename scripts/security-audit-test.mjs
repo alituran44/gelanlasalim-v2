@@ -205,8 +205,8 @@ assert(companyStatusContent.includes('requireAdmin(event)'), 'Company Status: T�
 
 // 17. CI/CD GÜVENLİK BORU HATTI (GITHUB ACTIONS) TESTİ
 console.log('\n--- 17. CI/CD Güvenlik Boru Hattı Testi ---')
-const workflowPath = path.join(repoRoot, '.github/workflows/security.yml')
-assert(fs.existsSync(workflowPath), 'CI/CD: .github/workflows/security.yml dosyası mevcut', 'security.yml eksik')
+const workflowPath = fs.existsSync(path.join(repoRoot, 'ci/security.yml')) ? path.join(repoRoot, 'ci/security.yml') : path.join(repoRoot, '.github/workflows/security.yml')
+assert(fs.existsSync(workflowPath), 'CI/CD: Güvenlik boru hattı workflow dosyası mevcut (ci/security.yml)', 'security.yml eksik')
 const workflowContent = fs.existsSync(workflowPath) ? fs.readFileSync(workflowPath, 'utf8') : ''
 assert(workflowContent.includes('npm run test:security'), 'CI/CD: Otomatik güvenlik testi komutu tanımlı', 'test:security workflowda yok')
 
