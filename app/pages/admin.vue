@@ -80,6 +80,7 @@ import { useCmsData } from '~/composables/useCmsData'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
 import SystemManagementView from '~/components/admin/SystemManagementView.vue'
 import CompanyTeamsView from '~/components/admin/CompanyTeamsView.vue'
+import SecurityAuditView from '~/components/admin/SecurityAuditView.vue'
 
 definePageMeta({
   layout: false // Custom full screen admin dashboard
@@ -127,6 +128,7 @@ export type AdminTab =
   | 'promo_codes'
   | 'audit_logs'
   | 'system_ops'
+  | 'security_audit'
   | 'site_settings'
   | 'support_ai' 
   | 'crm_leads' 
@@ -1111,6 +1113,8 @@ onMounted(async () => {
         activeTab.value = 'system_ops'
       } else if (qTab === 'company_teams' || qTab === 'ekip-yetki' || qTab === 'ekip_yetki') {
         activeTab.value = 'company_teams'
+      } else if (qTab === 'security' || qTab === 'guvenlik' || qTab === 'security_audit' || qTab === 'guvenlik-denetim') {
+        activeTab.value = 'security_audit'
       } else {
         activeTab.value = qTab as AdminTab
       }
@@ -2257,6 +2261,18 @@ function removeSubmittedBid(index: number) {
               </span>
             </button>
 
+            <button 
+              @click="activeTab = 'security_audit'" 
+              class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
+              :class="activeTab === 'security_audit' ? 'bg-sky-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
+            >
+              <span class="flex items-center gap-2"><ShieldCheck :size="14" /> Güvenlik & Denetim (SEC)</span>
+              <span class="text-[9px] px-1.5 py-0.5 rounded font-mono font-black border"
+                :class="activeTab === 'security_audit' ? 'bg-white/20 text-white border-white/30' : 'bg-sky-500/20 text-sky-400 border-sky-500/30'">
+                SEC-001/020
+              </span>
+            </button>
+
             <!-- GROUP: İHALE & OPERASYON -->
             <div class="text-[9px] font-black text-rose-600 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
               <Zap :size="10" /> İHALE & OPERASYON
@@ -2473,6 +2489,7 @@ function removeSubmittedBid(index: number) {
               <span v-else-if="activeTab === 'promo_codes'">🎟️ Kupon & Lansman Promosyon Kodları</span>
               <span v-else-if="activeTab === 'audit_logs'">🔒 Sistem Denetim İzi & Güvenlik Günlüğü</span>
               <span v-else-if="activeTab === 'system_ops'">🛡️ Canlıya Geçiş, Sistem Yönetimi & Güvenlik Matrisi (SEC-020)</span>
+              <span v-else-if="activeTab === 'security_audit'">🛡️ Güvenlik, Yetki & Danışıklı Teklif İzleme Merkezi (SEC-001 ~ SEC-020)</span>
               <span v-else-if="activeTab === 'site_settings'">⚙️ Site Genel Ayarları, SEO & Bakım Modu</span>
               <span v-else-if="activeTab === 'support_ai'">💬 WhatsApp & Yapay Zeka Canlı Asistan</span>
               <span v-else-if="activeTab === 'crm_leads'">👥 CRM Müşteri / Aday Yönetim Merkezi</span>
@@ -4219,6 +4236,13 @@ function removeSubmittedBid(index: number) {
           <!-- ========================================================================= -->
           <div v-if="activeTab === 'system_ops'" class="space-y-6 text-left">
             <SystemManagementView />
+          </div>
+
+          <!-- ========================================================================= -->
+          <!-- TAB: GÜVENLİK, YETKİ & MANİPÜLASYON İZLEME MERKEZİ (SEC-001 - SEC-020) -->
+          <!-- ========================================================================= -->
+          <div v-if="activeTab === 'security_audit'" class="space-y-6 text-left">
+            <SecurityAuditView />
           </div>
 
           <!-- ========================================================================= -->
