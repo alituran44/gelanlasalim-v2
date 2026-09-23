@@ -24,7 +24,6 @@ import {
   RotateCcw
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
-import { useNetGsm } from '~/composables/useNetGsm'
 import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_METHODS } from '~/utils/taxonomy'
 import { formatSectorSummaryBadges, resolveSectorKey, SECTOR_DEFINITIONS } from '~/utils/categoryFieldsSchema'
 
@@ -76,7 +75,6 @@ const { data: serverTendersData, refresh: refreshServerTenders } = await useAsyn
   () => $fetch<{ success: boolean; tenders: any[] }>('/api/tenders').catch(() => ({ success: true, tenders: [] })),
   { default: () => ({ success: true, tenders: [] }) }
 )
-const { sendSms } = useNetGsm()
 
 function getTenderDirectionBadge(tender: any) {
   const tur = (tender.tur || '').toLowerCase()
@@ -403,15 +401,8 @@ async function submitBid() {
     } catch (e) {}
   }
 
-  await sendSms({
-    recipientPhone: '+90 532 000 11 22',
-    recipientName: 'İhale Sahibi Firma',
-    templateName: 'Yeni Teklif Bildirimi',
-    messageBody: `Sayın Yetkili, "${tender.baslik}" ihaleniz için ${myCompanyName} tarafından ${formattedPrice} tutarında yeni bir teklif verildi. Panelinizi inceleyiniz.`
-  })
-
   showBidModal.value = false
-  alert(`🎉 TEKLİFİNİZ BAŞARIYLA İLETİLDİ!\n\n"${tender.baslik}" ihalesine ${formattedPrice} tutarındaki teklifiniz kapalı zarf usulü ile alıcıya sunuldu. NetGSM SMS bilgilendirmesi yapıldı.`)
+  alert(`🎉 TEKLİFİNİZ BAŞARIYLA İLETİLDİ!\n\n"${tender.baslik}" ihalesine ${formattedPrice} tutarındaki teklifiniz kapalı zarf usulü ile alıcıya sunuldu. Sistem bilgilendirmesi yapıldı.`)
 }
 
 function downloadAllSpecs(tender: any) {
@@ -1243,7 +1234,7 @@ function downloadAllSpecs(tender: any) {
             class="px-6 py-2.5 rounded-xl bg-[#0052FF] hover:bg-blue-600 text-white font-black text-xs transition shadow-lg flex items-center gap-1.5 cursor-pointer"
           >
             <Send :size="13" />
-            Teklifi Gönder & NetGSM SMS İlet
+            Teklifi İlet & Onayla
           </button>
         </div>
       </div>

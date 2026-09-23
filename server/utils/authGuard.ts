@@ -423,7 +423,7 @@ export function sanitizeXss(input: string | undefined): string {
 }
 
 /**
- * 🛡️ SEC-013: Tüm Girdileri Özyinelemeli Temizleme
+ * 🛡️ SEC-013 & SEC-PROTO: Tüm Girdileri Özyinelemeli Temizleme & Prototype Pollution Koruması
  */
 export function sanitizePayload<T>(obj: T): T {
   if (typeof obj === 'string') {
@@ -435,6 +435,10 @@ export function sanitizePayload<T>(obj: T): T {
   if (obj !== null && typeof obj === 'object') {
     const cleaned: any = {}
     for (const [key, value] of Object.entries(obj)) {
+      // 🛡️ Prototype pollution bloklaması (__proto__, constructor, prototype)
+      if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+        continue
+      }
       cleaned[key] = sanitizePayload(value)
     }
     return cleaned

@@ -129,7 +129,7 @@ export const OFFICIAL_DATA_INVENTORY: DataInventoryItem[] = [
     dataFields: ['E-posta Adresi', 'Cep Telefonu No', 'Şirket KEP Adresi', 'Firma Adresi'],
     processingPurposes: ['İhale bildirimleri (COM-001)', 'MFA güvenlik kodları gönderimi (SEC-009)', 'Resmî tebligat'],
     legalBasis: 'KVKK Md. 5/2 (c) & Ticari İleti için Md. 5/1 Açık Rıza',
-    recipientGroups: ['SMS Sağlayıcı (NetGSM - Yurtiçi)', 'E-Posta Servisi (SMTP)'],
+    recipientGroups: ['E-Posta Servisi (Google SMTP - Şifreli TLS)'],
     retentionPeriod: 'Sözleşme süresi + 3 yıl (İYS / Ticari Elektronik İleti mevzuatı)',
     destructionMethod: 'SILME'
   },

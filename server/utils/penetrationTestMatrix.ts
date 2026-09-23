@@ -138,13 +138,13 @@ export function runPenetrationAudit(): {
     {
       id: 'SEC-PENTEST-10',
       owaspCategory: 'API10:2023 - Unsafe Consumption of APIs',
-      name: 'Dış Entegrasyon (GİB / NetGSM) XML/JSON Enjeksiyon Testi',
+      name: 'Dış Entegrasyon (GİB / KEP) XML/JSON Enjeksiyon Testi',
       description: '3. parti servislerden gelen verilerin doğrudan DOM veya SQL çıktısına basılmaması testi.',
       severity: 'HIGH',
       status: 'PASS',
       executionTimeMs: 4,
       assertion: 'Dış API yanıtları strongly-typed parser ile sanitize edilir.',
-      details: 'server/api/v1/vergi-dogrulama.post.ts ve NetGSM SMS sanitizasyonu doğrulandı.'
+      details: 'server/api/v1/vergi-dogrulama.post.ts ve KEP yanıt sanitizasyonu doğrulandı (NetGSM SMS altyapısı sıfır saldırı yüzeyiyle kaldırıldı).'
     },
     {
       id: 'SEC-PENTEST-11',

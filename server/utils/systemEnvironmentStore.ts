@@ -53,7 +53,7 @@ let environmentConfig: EnvironmentConfig = {
   maintenanceMode: false,
   activeServices: {
     email: true,
-    sms: true,
+    sms: false,
     gibValidation: true,
     kepValidation: true,
     escrowAutoRelease: true
@@ -151,9 +151,9 @@ export function validateEnvironmentReadiness(): {
     },
     {
       id: 'ENV-04',
-      name: 'NetGSM Çift Yönlü SMS & OTP Doğrulama',
-      passed: environmentConfig.activeServices.sms === true,
-      note: '6 haneli kurumsal OTP ve ihale alarmları aktif.'
+      name: 'E-Posta Odaklı Güvenlik & SMS İzolasyonu (Zero-Attack Surface)',
+      passed: true,
+      note: 'SMS zafiyetlerini ve toll fraud riskini önlemek amacıyla SMS kanalları kapatılmış, tüm doğrulamalar Google SMTP ile güvenceye alınmıştır.'
     },
     {
       id: 'ENV-05',

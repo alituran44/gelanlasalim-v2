@@ -20,9 +20,6 @@ export default defineNuxtConfig({
     smtpPort: process.env.SMTP_PORT || '587',
     smtpUser: process.env.SMTP_USER || 'ihalecib@gmail.com',
     smtpPassword: process.env.SMTP_PASSWORD || '',
-    netgsmUsercode: process.env.NETGSM_USERCODE || '8508408695',
-    netgsmPassword: process.env.NETGSM_PASSWORD || '',
-    netgsmHeader: process.env.NETGSM_HEADER || '8508408695',
     paynkolayMerchantId: process.env.PAYNKOLAY_MERCHANT_ID || '',
     paynkolaySecretKey: process.env.PAYNKOLAY_SECRET_KEY || '',
     paynkolayTerminalId: process.env.PAYNKOLAY_TERMINAL_ID || '',
@@ -45,16 +42,18 @@ export default defineNuxtConfig({
       failOnError: false
     },
     routeRules: {
-      // Statik JS/CSS varlıkları için 1 yıllık değişmez önbellek (Caching) & CORS serbestisi
-      '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable', 'access-control-allow-origin': '*' } },
-      // Görseller ve ikonlar için 7 günlük önbellek & CORS
-      '/**/*.png': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': '*' } },
-      '/**/*.jpg': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': '*' } },
-      '/**/*.ico': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': '*' } },
-      '/**/*.svg': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': '*' } },
-      // SEO & Crawler dosyaları
-      '/robots.txt': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': '*' } },
-      '/sitemap.xml': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': '*' } },
+      // Statik JS/CSS varlıkları için 1 yıllık değişmez önbellek (Caching) & Güvenli Köken Sınırlandırması
+      '/_nuxt/**': { headers: { 'cache-control': 'public, max-age=31536000, immutable', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
+      // Görseller ve ikonlar için 7 günlük önbellek
+      '/**/*.png': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
+      '/**/*.jpg': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
+      '/**/*.ico': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
+      '/**/*.svg': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
+      // SEO, Crawler & RFC 9116 Güvenlik İletişim Dosyaları
+      '/robots.txt': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
+      '/sitemap.xml': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
+      '/.well-known/security.txt': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
+      '/security.txt': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
       // Yasal Sayfa Kısayolları (301 Yönlendirme)
       '/legal': { redirect: { to: '/sozlesmeler', statusCode: 301 } },
       '/yasal': { redirect: { to: '/sozlesmeler', statusCode: 301 } },
@@ -123,13 +122,15 @@ export default defineNuxtConfig({
       ],
       link: [
         { rel: 'icon', type: 'image/png', href: '/logo.png' },
+        { rel: 'preload', as: 'image', href: '/logo.png' },
+        { rel: 'preconnect', href: 'https://accounts.google.com' },
         { rel: 'canonical', href: 'https://ihaleciburada.com' },
         { rel: 'alternate', hreflang: 'tr', href: 'https://ihaleciburada.com' },
         { rel: 'alternate', hreflang: 'en', href: 'https://ihaleciburada.com' },
         { rel: 'alternate', hreflang: 'x-default', href: 'https://ihaleciburada.com' }
       ],
       script: [
-        { src: 'https://accounts.google.com/gsi/client', async: true, defer: true }
+        { src: 'https://accounts.google.com/gsi/client', async: true, defer: true, crossorigin: 'anonymous' }
       ]
     }
   },

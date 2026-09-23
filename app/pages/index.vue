@@ -69,7 +69,6 @@ import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
 import DeepSeekAiBadge from '~/components/ai/DeepSeekAiBadge.vue'
 import { useCmsData } from '~/composables/useCmsData'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
-import { useNetGsm } from '~/composables/useNetGsm'
 import { useUserSession } from '~/composables/useUserSession'
 import { isTenderConcluded, maskContactInfo } from '~/utils/contactFilter'
 import { exportTenderPdf } from '~/utils/tenderPdfExport'
@@ -166,7 +165,6 @@ onMounted(async () => {
     } catch (e) {}
   }
 })
-const { sendSms } = useNetGsm()
 
 // ==================== SIKÇA SORULAN SORULAR & İLK TEKLİF TALEBİ FORMU ====================
 const activeFaqIndex = ref<number | null>(0) // 0 means first item open by default like screenshot
@@ -353,16 +351,6 @@ async function submitLeadRequest() {
       })
       localStorage.setItem('ihaleInquiries', JSON.stringify(existing))
     }
-    
-    try {
-      await $fetch('/api/v1/sms-bildirim', {
-        method: 'POST',
-        body: {
-          phone: leadForm.value.phone,
-          message: `Sayin ${leadForm.value.firstName} ${leadForm.value.lastName}, IhaleciBurada teklif talebiniz alinmistir. Danismanimiz en kisa surede sizinle iletisime gececektir.`
-        }
-      }).catch(() => {})
-    } catch {}
 
     leadSubmitSuccess.value = true
     leadForm.value = {
@@ -1807,9 +1795,25 @@ onMounted(() => {
   <div class="min-h-screen bg-[#F4F6F9] text-slate-800 font-sans text-xs flex flex-col">
 
     <!-- ========================================================================= -->
+    <!-- 🏷️ SEMANTİK H1 & SEO BAŞLIĞI -->
+    <!-- ========================================================================= -->
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-6 pt-4 pb-1">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 border-b border-slate-200/80 pb-2.5">
+        <h1 class="text-sm sm:text-base font-extrabold text-slate-800 tracking-tight flex items-center gap-2">
+          <span class="inline-block w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></span>
+          <span>Türkiye’nin En Kapsamlı B2B İhale ve Satın Alma Portalı</span>
+          <span class="hidden md:inline text-xs font-semibold text-slate-500">| Doğrudan Teklif & Eksiltme Pazaryeri</span>
+        </h1>
+        <span class="text-[11px] text-slate-500 font-medium hidden sm:inline">
+          Güncel Kamu & Özel Sektör Şartnameleri
+        </span>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
     <!-- 🎛️ 1. ÜST HIZLI ARAMA & GÜNLÜK SAYAÇ ŞERİDİ -->
     <!-- ========================================================================= -->
-    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-6 pt-4">
+    <div class="max-w-[1440px] w-full mx-auto px-4 sm:px-6 pt-3">
       <div class="bg-white border border-slate-300 rounded-2xl p-3.5 shadow-2xs space-y-3">
         
         <!-- Zaman Sekmeleri + Arama Kutusu -->
@@ -1845,6 +1849,8 @@ onMounted(() => {
           <div class="flex items-center gap-2 w-full md:w-auto">
             <div class="relative flex-1 md:w-96">
               <input 
+                id="main-tender-search"
+                aria-label="Ana ihale arama kelimesi veya malzeme adı"
                 v-model="filterKeyword" 
                 type="text" 
                 placeholder="Kelime ara: 'domates', 'mobilya', 'çimento', 'sağlık'..." 
@@ -2022,6 +2028,8 @@ onMounted(() => {
             <!-- Sol Menü İçi Arama Kutusu -->
             <div class="relative">
               <input 
+                id="left-sidebar-search"
+                aria-label="Sol menü içi arama kutusu"
                 v-model="leftSidebarSearch"
                 type="text"
                 :placeholder="activeLeftTab === 'kategoriler' ? 'Kategorilerde ara...' : activeLeftTab === 'sehirler' ? '81 İlde ara (Örn: Çanakkale)...' : activeLeftTab === 'idareler' ? 'Bütün idarelerde ara (DSİ, KGM, TOKİ...)...' : activeLeftTab === 'sektorler' ? 'Sektörlerde ara...' : 'Firmalarda ara...'"
@@ -2032,7 +2040,10 @@ onMounted(() => {
 
             <!-- İdareler Sekmesi İçin Kategori Filtresi (Bakanlık, Belediye, vb.) -->
             <div v-if="activeLeftTab === 'idareler'" class="space-y-1">
+              <label for="authority-category-filter" class="sr-only">Resmi Kurum Kategorisi</label>
               <select 
+                id="authority-category-filter"
+                aria-label="Resmi kurum kategori filtresi"
                 v-model="authorityCategoryFilter"
                 class="w-full p-1.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px] font-bold text-slate-700 outline-none cursor-pointer"
               >
@@ -2333,8 +2344,14 @@ onMounted(() => {
 
             <!-- Şehir Seçimi -->
             <div class="space-y-1">
-              <label class="font-bold text-[11px] text-slate-600 block">Şehir / Konum:</label>
-              <select v-model="selectedCity" @change="currentPage = 1" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none">
+              <label for="select-tender-city" class="font-bold text-[11px] text-slate-600 block">Şehir / Konum:</label>
+              <select 
+                id="select-tender-city"
+                aria-label="Şehir veya konum filtreleme"
+                v-model="selectedCity" 
+                @change="currentPage = 1" 
+                class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none"
+              >
                 <option value="Tümü">Tüm Türkiye (81 İl)</option>
                 <option v-for="city in all81Cities" :key="city" :value="city">{{ city }}</option>
               </select>
@@ -2342,8 +2359,14 @@ onMounted(() => {
 
             <!-- İhale Türü -->
             <div class="space-y-1">
-              <label class="font-bold text-[11px] text-slate-600 block">İhale Türü:</label>
-              <select v-model="filterType" @change="currentPage = 1" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none">
+              <label for="select-tender-type" class="font-bold text-[11px] text-slate-600 block">İhale Türü:</label>
+              <select 
+                id="select-tender-type"
+                aria-label="İhale türü filtreleme"
+                v-model="filterType" 
+                @change="currentPage = 1" 
+                class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none"
+              >
                 <option value="Tümü">Tümü</option>
                 <option value="Mal Alımı">Mal Alımı</option>
                 <option value="Hizmet Alımı">Hizmet Alımı</option>
@@ -2355,8 +2378,14 @@ onMounted(() => {
 
             <!-- İhale Usulü -->
             <div class="space-y-1">
-              <label class="font-bold text-[11px] text-slate-600 block">İhale Usulü:</label>
-              <select v-model="filterMethod" @change="currentPage = 1" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none">
+              <label for="select-tender-method" class="font-bold text-[11px] text-slate-600 block">İhale Usulü:</label>
+              <select 
+                id="select-tender-method"
+                aria-label="İhale usulü filtreleme"
+                v-model="filterMethod" 
+                @change="currentPage = 1" 
+                class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none"
+              >
                 <option value="Tümü">Tümü</option>
                 <option value="Açık İhale">Açık İhale</option>
                 <option value="Doğrudan Temin">Doğrudan Temin</option>
@@ -2368,9 +2397,11 @@ onMounted(() => {
 
             <!-- Fiyat Aralığı -->
             <div class="space-y-1">
-              <label class="font-bold text-[11px] text-slate-600 block">Bütçe / Fiyat Aralığı (₺):</label>
+              <label for="min-price-filter" class="font-bold text-[11px] text-slate-600 block">Bütçe / Fiyat Aralığı (₺):</label>
               <div class="grid grid-cols-2 gap-1.5">
                 <input 
+                  id="min-price-filter"
+                  aria-label="Minimum bütçe tutarı Türk Lirası"
                   v-model.number="minPriceFilter" 
                   @input="currentPage = 1"
                   type="number" 
@@ -2378,6 +2409,8 @@ onMounted(() => {
                   class="p-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none"
                 />
                 <input 
+                  id="max-price-filter"
+                  aria-label="Maksimum bütçe tutarı Türk Lirası"
                   v-model.number="maxPriceFilter" 
                   @input="currentPage = 1"
                   type="number" 
@@ -2463,8 +2496,13 @@ onMounted(() => {
               
               <!-- Sıralama Dropdown -->
               <div class="flex items-center gap-1 bg-slate-50 px-2.5 py-1.5 rounded-xl border border-slate-200 text-xs">
-                <span class="text-slate-400 font-bold">Sırala:</span>
-                <select v-model="selectedSort" class="bg-transparent font-bold text-slate-700 outline-none cursor-pointer">
+                <label for="tender-sort-select" class="text-slate-400 font-bold">Sırala:</label>
+                <select 
+                  id="tender-sort-select"
+                  aria-label="İhaleleri sıralama ölçütü"
+                  v-model="selectedSort" 
+                  class="bg-transparent font-bold text-slate-700 outline-none cursor-pointer"
+                >
                   <option value="otomatik">Gelişmiş Sıralama</option>
                   <option value="price_asc">Fiyata Göre (En Düşük)</option>
                   <option value="price_desc">Fiyata Göre (En Yüksek)</option>
@@ -2503,7 +2541,7 @@ onMounted(() => {
           <!-- ========================================================= -->
           <div v-if="paginatedTenders.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             <div 
-              v-for="tender in paginatedTenders" 
+              v-for="(tender, tenderIdx) in paginatedTenders" 
               :key="tender.id"
               class="bg-white border border-slate-300 hover:border-[#0084B4] hover:shadow-xl rounded-2xl overflow-hidden transition-all duration-300 flex flex-col justify-between group shadow-2xs text-left"
             >
@@ -2516,8 +2554,11 @@ onMounted(() => {
                 <img 
                   :src="getTenderImage(tender)" 
                   :alt="tender.baslik"
-                  loading="lazy"
+                  :loading="tenderIdx === 0 ? 'eager' : 'lazy'"
+                  :fetchpriority="tenderIdx === 0 ? 'high' : 'auto'"
                   decoding="async"
+                  width="600"
+                  height="400"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   @error="($event.target as any).src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'600\' height=\'400\' viewBox=\'0 0 600 400\'><rect width=\'600\' height=\'400\' fill=\'%230b1329\'/><text x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%2338bdf8\' font-size=\'22\' font-family=\'sans-serif\'>İhaleciBurada Kurumsal İhale</text></svg>'"
                 />
@@ -3177,10 +3218,12 @@ onMounted(() => {
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="space-y-1">
                       <div class="flex items-center justify-between text-[11px]">
-                        <label class="text-slate-300 font-bold">Ad</label>
+                        <label for="lead-form-firstname" class="text-slate-300 font-bold">Ad</label>
                         <span class="text-[10px] text-slate-500">Zorunlu</span>
                       </div>
                       <input 
+                        id="lead-form-firstname"
+                        aria-label="Adınız"
                         v-model="leadForm.firstName"
                         type="text" 
                         placeholder="Adınız"
@@ -3190,10 +3233,12 @@ onMounted(() => {
 
                     <div class="space-y-1">
                       <div class="flex items-center justify-between text-[11px]">
-                        <label class="text-slate-300 font-bold">Soyad</label>
+                        <label for="lead-form-lastname" class="text-slate-300 font-bold">Soyad</label>
                         <span class="text-[10px] text-slate-500">Zorunlu</span>
                       </div>
                       <input 
+                        id="lead-form-lastname"
+                        aria-label="Soyadınız"
                         v-model="leadForm.lastName"
                         type="text" 
                         placeholder="Soyadınız"
@@ -3206,10 +3251,12 @@ onMounted(() => {
                   <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div class="space-y-1">
                       <div class="flex items-center justify-between text-[11px]">
-                        <label class="text-slate-300 font-bold">E-posta</label>
+                        <label for="lead-form-email" class="text-slate-300 font-bold">E-posta</label>
                         <span class="text-[10px] text-slate-500">Zorunlu</span>
                       </div>
                       <input 
+                        id="lead-form-email"
+                        aria-label="E-posta adresiniz"
                         v-model="leadForm.email"
                         type="email" 
                         placeholder="ornek@firma.com veya ad@gmail.com"
@@ -3219,10 +3266,12 @@ onMounted(() => {
 
                     <div class="space-y-1">
                       <div class="flex items-center justify-between text-[11px]">
-                        <label class="text-slate-300 font-bold">Telefon</label>
+                        <label for="lead-form-phone" class="text-slate-300 font-bold">Telefon</label>
                         <span class="text-[10px] text-slate-500">Zorunlu</span>
                       </div>
                       <input 
+                        id="lead-form-phone"
+                        aria-label="Telefon numaranız"
                         v-model="leadForm.phone"
                         type="tel" 
                         placeholder="05XX XXX XX XX"
@@ -3235,9 +3284,11 @@ onMounted(() => {
                   <!-- Teklif Talebi İhtiyacınız (Opsiyonel) -->
                   <div class="space-y-1">
                     <div class="flex items-center justify-between text-[11px]">
-                      <label class="text-slate-300 font-bold">Teklif talebi ihtiyacınız (opsiyonel)</label>
+                      <label for="lead-form-description" class="text-slate-300 font-bold">Teklif talebi ihtiyacınız (opsiyonel)</label>
                     </div>
                     <textarea 
+                      id="lead-form-description"
+                      aria-label="Teklif talebi ihtiyacınız"
                       v-model="leadForm.description"
                       rows="3"
                       placeholder="Ne satın almak istiyorsunuz? Kısaca yazabilirsiniz."
@@ -3588,6 +3639,8 @@ onMounted(() => {
               :alt="selectedTenderModal.baslik"
               loading="lazy"
               decoding="async"
+              width="600"
+              height="400"
               class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-102"
               @error="($event.target as any).src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'600\' height=\'400\' viewBox=\'0 0 600 400\'><rect width=\'600\' height=\'400\' fill=\'%230b1329\'/><text x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%2338bdf8\' font-size=\'22\' font-family=\'sans-serif\'>İhaleciBurada Kurumsal İhale</text></svg>'"
             />
@@ -3630,6 +3683,8 @@ onMounted(() => {
                 :alt="selectedTenderModal?.baslik || 'İhale Görseli'"
                 loading="lazy"
                 decoding="async"
+                width="80"
+                height="80"
                 class="w-full h-full object-cover"
                 @error="($event.target as any).src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%230b1329\'/></svg>'"
               />
@@ -3984,8 +4039,10 @@ onMounted(() => {
           <!-- İletişim Bilgileri (Ad Soyad & Telefon) -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div class="space-y-1">
-              <label class="block text-xs font-bold text-slate-700">Ad Soyad / Firma: *</label>
+              <label for="quick-offer-bidder-name" class="block text-xs font-bold text-slate-700">Ad Soyad / Firma: *</label>
               <input 
+                id="quick-offer-bidder-name"
+                aria-label="Ad Soyad veya Firma Adı"
                 v-model="quickOfferBidderName" 
                 type="text" 
                 placeholder="Örn: Hasan Yılmaz" 
@@ -3993,8 +4050,10 @@ onMounted(() => {
               />
             </div>
             <div class="space-y-1">
-              <label class="block text-xs font-bold text-slate-700">İletişim Telefon Numarası: *</label>
+              <label for="quick-offer-bidder-phone" class="block text-xs font-bold text-slate-700">İletişim Telefon Numarası: *</label>
               <input 
+                id="quick-offer-bidder-phone"
+                aria-label="İletişim Telefon Numarası"
                 v-model="quickOfferBidderPhone" 
                 type="tel" 
                 placeholder="Örn: 0532 123 45 67" 
@@ -4005,9 +4064,11 @@ onMounted(() => {
 
           <!-- Teklif Tutarı ve KDV Seçimi -->
           <div class="space-y-1.5">
-            <label class="block text-xs font-bold text-slate-700">Teklif Ettiğiniz Tutar (₺): *</label>
+            <label for="quick-offer-price" class="block text-xs font-bold text-slate-700">Teklif Ettiğiniz Tutar (₺): *</label>
             <div class="relative">
               <input 
+                id="quick-offer-price"
+                aria-label="Teklif Ettiğiniz Tutar Türk Lirası"
                 v-model="quickOfferPrice" 
                 type="text" 
                 placeholder="Örn: 420.000" 
@@ -4041,12 +4102,14 @@ onMounted(() => {
           <!-- 📁 ÇOK KALEMLİ İŞLER İÇİN BİRİM FİYAT CETVELİ & TEKLİF DOSYASI YÜKLEME -->
           <div class="space-y-1.5 pt-1">
             <div class="flex items-center justify-between">
-              <label class="block text-xs font-bold text-slate-700">Teklif Belgesi / Fiyat Cetveli Yükle:</label>
+              <label for="quick-offer-file-input" class="block text-xs font-bold text-slate-700">Teklif Belgesi / Fiyat Cetveli Yükle:</label>
               <span class="text-[10px] text-slate-400 font-medium">(Çok kalemli işler için PDF/Excel)</span>
             </div>
 
             <!-- Dosya Seçim Inputu (Hidden) -->
             <input 
+              id="quick-offer-file-input"
+              aria-label="Teklif belgesi veya fiyat cetveli dosyası yükle"
               ref="quoteFileInputRef"
               type="file" 
               multiple 
@@ -4088,8 +4151,13 @@ onMounted(() => {
 
           <!-- Geçerlilik Süresi -->
           <div class="space-y-1">
-            <label class="block text-xs font-bold text-slate-700">Teklif Geçerlilik Süresi:</label>
-            <select v-model="quickOfferDuration" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 outline-none">
+            <label for="quick-offer-duration" class="block text-xs font-bold text-slate-700">Teklif Geçerlilik Süresi:</label>
+            <select 
+              id="quick-offer-duration"
+              aria-label="Teklif Geçerlilik Süresi"
+              v-model="quickOfferDuration" 
+              class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold text-slate-700 outline-none"
+            >
               <option value="3 gün">3 Gün</option>
               <option value="7 gün">7 Gün (Önerilen)</option>
               <option value="15 gün">15 Gün</option>
@@ -4100,8 +4168,10 @@ onMounted(() => {
 
           <!-- Notlar -->
           <div class="space-y-1">
-            <label class="block text-xs font-bold text-slate-700">Teklif Notu & Teslimat / Termin Taahhüdü:</label>
+            <label for="quick-offer-notes" class="block text-xs font-bold text-slate-700">Teklif Notu & Teslimat / Termin Taahhüdü:</label>
             <textarea 
+              id="quick-offer-notes"
+              aria-label="Teklif Notu ve Teslimat Taahhüdü"
               v-model="quickOfferNotes" 
               rows="2" 
               placeholder="Şartnamedeki tüm teknik kriterler eksiksiz karşılanmakta olup ürünler stoktan sevk edilecektir..." 
@@ -4134,6 +4204,8 @@ onMounted(() => {
             </div>
             <label class="flex items-start gap-2 pt-1 cursor-pointer select-none">
               <input 
+                id="quick-offer-terms-confirmed"
+                aria-label="Şartname ve ticari taahhüt onay kutusu"
                 v-model="quickOfferTermsConfirmed" 
                 type="checkbox" 
                 class="mt-0.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer h-3.5 w-3.5" 

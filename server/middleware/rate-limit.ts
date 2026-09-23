@@ -38,9 +38,9 @@ export default defineEventHandler((event) => {
 
   const windowMs = 60 * 1000 // 1 minute window
 
-  // Stricter limit for SMS, OTP, Payment, and Auth endpoints (15 req/min)
+  // Stricter limit for OTP, Payment, and Auth endpoints (15 req/min)
   // Standard limit for other API endpoints (60 req/min)
-  const isSensitive = path.includes('netgsm') || path.includes('smtp') || path.includes('payment') || path.includes('dogrulama') || path.includes('mfa') || path.includes('sms-bildirim') || path.includes('admin-login') || path.includes('/auth/login')
+  const isSensitive = path.includes('smtp') || path.includes('payment') || path.includes('dogrulama') || path.includes('mfa') || path.includes('admin-login') || path.includes('/auth/login')
   const maxRequests = isSensitive ? 15 : 60
 
   const key = `${clientIp}:${isSensitive ? 'sensitive' : 'standard'}`

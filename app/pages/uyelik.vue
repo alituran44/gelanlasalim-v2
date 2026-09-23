@@ -109,24 +109,16 @@ function parseJwt(token: string) {
 async function syncServerLogin(emailStr: string, roleStr?: string, vknStr?: string, passStr?: string, nameStr?: string) {
   try {
     const cleanEmail = (emailStr || '').trim().toLowerCase()
-    const isAdmin = cleanEmail === 'ihalecib@gmail.com' || cleanEmail === 'admin@ihaleciburada.com' || cleanEmail.startsWith('admin@') || roleStr === 'admin'
-    if (isAdmin) {
-      await $fetch('/api/auth/admin-login', {
-        method: 'POST',
-        body: { email: cleanEmail, secretKey: 'ihb_admin_secret_guard_2026_master_key' }
-      })
-    } else {
-      await $fetch('/api/auth/login', {
-        method: 'POST',
-        body: {
-          email: cleanEmail,
-          password: passStr || 'demo_auto_session',
-          companyVkn: vknStr || '9560161511',
-          role: roleStr,
-          name: nameStr
-        }
-      })
-    }
+    await $fetch('/api/auth/login', {
+      method: 'POST',
+      body: {
+        email: cleanEmail,
+        password: passStr || 'kurumsal_oturum_aktif',
+        companyVkn: vknStr || '9560161511',
+        role: roleStr,
+        name: nameStr
+      }
+    })
     if (typeof document !== 'undefined') {
       document.cookie = 'ihb_auth=1; path=/; max-age=604800; SameSite=Lax'
     }
@@ -272,8 +264,8 @@ function toggleSektor(key: string) {
 
 // OTP Modal State
 const showOtpModal = ref(false)
-const otpInput = ref('849201')
-const currentGeneratedOtp = ref('849201')
+const otpInput = ref('')
+const currentGeneratedOtp = ref('')
 const otpCountdown = ref(180)
 const isSendingOtpEmail = ref(false)
 let otpTimerInterval: any = null
@@ -377,8 +369,8 @@ async function verifyOtp() {
     return
   }
 
-  // Verify entered code matches generated code, universal demo code 849201, or valid 6-digit numeric input
-  if (entered !== currentGeneratedOtp.value && entered !== '849201' && !/^\d{6}$/.test(entered)) {
+  // 🛡️ Yalnızca sistemin ürettiği geçerli dinamik OTP kodunu doğrula
+  if (entered !== currentGeneratedOtp.value) {
     alert(locale.value === 'tr' ? 'Girdiğiniz doğrulama kodu hatalı. Lütfen e-postanızı kontrol edip tekrar deneyiniz.' : 'Invalid verification code. Please check your email and try again.')
     return
   }
@@ -824,15 +816,16 @@ async function handleLogin() {
         subscriptionPlan: matchedAccount.subscriptionPlan || 'İlk İhale Ücretsiz'
       }
       pendingTargetRoute.value = '/panel'
-      otpInput.value = '849201'
+      const dynamicOtp = String(Math.floor(100000 + Math.random() * 900000))
+      otpInput.value = ''
 
       try {
         await $fetch('/api/v1/smtp-send', {
           method: 'POST',
           body: {
             recipientEmail: loginEmail.value,
-            subject: 'İhaleciBurada Giriş Güvenlik Kodu (2FA): 849201',
-            htmlBody: 'Sayın Kullanıcımız,\n\nİhaleciBurada hesabınıza giriş için 2FA güvenlik kodunuz: 849201\n\nBu kod 3 dakika geçerlidir.',
+            subject: `İhaleciBurada Giriş Güvenlik Kodu (2FA): ${dynamicOtp}`,
+            htmlBody: `Sayın Kullanıcımız,\n\nİhaleciBurada hesabınıza giriş için 2FA güvenlik kodunuz: ${dynamicOtp}\n\nBu kod 3 dakika geçerlidir.`,
             templateName: '2FA Giriş Doğrulama'
           }
         })
@@ -849,11 +842,6 @@ async function handleLogin() {
     const rawPrefix = cleanEmail.split('@')[0]
     const derivedName = rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1).replace(/[^a-zA-Z0-9]/g, ' ')
 
-    const isAdminUser = cleanEmail === 'ihalecib@gmail.com' || 
-                        cleanEmail === 'admin@ihaleciburada.com' || 
-                        cleanEmail.startsWith('admin@') || 
-                        existingAccount.role === 'admin'
-
     const sessionObj = {
       email: cleanEmail,
       firstName: existingAccount.firstName || derivedName,
@@ -865,16 +853,13 @@ async function handleLogin() {
       companyName: existingAccount.companyName || existingAccount.company || (derivedName + ' Tedarik'),
       phone: existingAccount.phone || '',
       city: existingAccount.city || 'Balıkesir',
-      role: isAdminUser ? 'admin' : (existingAccount.role || 'company'),
+      role: existingAccount.role || 'company',
       verified: true,
       isPremium: true,
       subscriptionPlan: existingAccount.subscriptionPlan || 'İlk İhale Ücretsiz'
     }
 
     if (typeof window !== 'undefined') {
-      if (isAdminUser) {
-        localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
-      }
       localStorage.setItem('userSession', JSON.stringify(sessionObj))
       registerToAdminKycQueue(sessionObj)
       window.dispatchEvent(new Event('storage'))
@@ -1286,7 +1271,7 @@ async function handleLogin() {
                 />
                 <label for="agree-commercial-consent" class="text-xs text-slate-700 cursor-pointer leading-relaxed select-none">
                   <span class="font-bold text-emerald-950">Ticari Elektronik İleti İzni (6563 s. ETK & İYS Uyumlu): </span>
-                  <span>İhaleciBurada platformundaki yeni alım ihaleleri, sektör duyuruları ve avantajlı tedarik fırsatları hakkında tarafıma SMS (NetGSM) ve E-posta yoluyla bilgilendirme yapılmasını kabul ediyorum (Dilediğiniz an iptal edebilirsiniz).</span>
+                  <span>İhaleciBurada platformundaki yeni alım ihaleleri, sektör duyuruları ve avantajlı tedarik fırsatları hakkında tarafıma kurumsal E-posta yoluyla bilgilendirme yapılmasını kabul ediyorum (Dilediğiniz an iptal edebilirsiniz).</span>
                 </label>
               </div>
 

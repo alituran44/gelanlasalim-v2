@@ -45,13 +45,11 @@ import {
   Sparkles
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
-import { useNetGsm } from '~/composables/useNetGsm'
 import { locale } from '~/composables/useLocale'
 
 definePageMeta({ layout: 'dashboard' })
 
 const { cmsData, saveCmsData } = useCmsData()
-const { sendSms } = useNetGsm()
 
 function getBidRankStatus(bid: any) {
   const tenderId = bid.tenderId || bid.id
@@ -359,14 +357,6 @@ async function acceptCounterOffer(teklif: any) {
 
   saveCmsData(cmsData.value)
 
-  // Send NetGSM SMS to buyer
-  await sendSms({
-    recipientPhone: '+90 532 000 11 22',
-    recipientName: teklif.aliciFirma,
-    templateName: 'Karşı Teklif Kabulü Bildirimi',
-    messageBody: `Sayın Yetkili, "${teklif.ilanBaslik}" ihalesinde ilettiğiniz ${latestPrice} karşı teklif tedarikçi tarafından KABUL EDİLMİŞTİR. İhale mutabakatla sonuçlanmıştır.`
-  })
-
   alert(`✓ MUTABAKAT SAĞLANDI!\n\n"${teklif.ilanBaslik}" ihalesinde ${latestPrice} tutarında anlaşma onaylandı. Sevkiyat ve faturalandırma aşamasına geçebilirsiniz.`)
 }
 
@@ -429,14 +419,6 @@ async function submitRevise() {
   }
 
   saveCmsData(cmsData.value)
-
-  // Send NetGSM SMS to buyer
-  await sendSms({
-    recipientPhone: '+90 532 000 11 22',
-    recipientName: bid.aliciFirma,
-    templateName: 'Revize Teklif Bildirimi',
-    messageBody: `Sayın Yetkili, "${bid.ilanBaslik}" ihalesinde tedarikçi ${formattedPrice} tutarında revize indirimli teklif sunmuştur.`
-  })
 
   showReviseModal.value = false
   alert(`🎉 REVİZE TEKLİFİNİZ İLETİLDİ!\n\n"${bid.ilanBaslik}" ihalesine ${formattedPrice} tutarındaki güncel teklifiniz alıcı firmaya sunulmuştur.`)

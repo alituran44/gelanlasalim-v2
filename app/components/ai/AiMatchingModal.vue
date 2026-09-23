@@ -38,7 +38,6 @@ const {
 } = useAiMatcher()
 
 const activeTab = ref<'candidates' | 'templates'>('candidates')
-const copiedSms = ref(false)
 const bulkSending = ref(false)
 const bulkSentSuccess = ref(false)
 
@@ -96,13 +95,6 @@ async function handleBulkInvite() {
   setTimeout(() => {
     bulkSentSuccess.value = false
   }, 4000)
-}
-
-function copySmsDraft() {
-  if (!currentResult.value?.recommendedNotificationDraft.smsText) return
-  navigator.clipboard.writeText(currentResult.value.recommendedNotificationDraft.smsText)
-  copiedSms.value = true
-  setTimeout(() => copiedSms.value = false, 2500)
 }
 </script>
 
@@ -228,7 +220,7 @@ function copySmsDraft() {
                 {{ currentResult?.matchedCount || 0 }} adet yüksek uyumlu tedarikçi/yatırımcı tespit edildi
               </span>
               <span class="text-[11px] text-slate-400">
-                Tek tıkla tüm listeye NetGSM SMS ve kurumsal davet e-postası iletebilirsiniz.
+                Tek tıkla tüm listeye kurumsal davet e-postası iletebilirsiniz.
               </span>
             </div>
 
@@ -245,7 +237,7 @@ function copySmsDraft() {
           <!-- Bulk Success Alert -->
           <div v-if="bulkSentSuccess" class="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold flex items-center gap-2">
             <CheckCircle2 :size="16" />
-            <span>Tüm adaylara kurumsal SMS ve e-posta davetleri başarıyla sevk edildi!</span>
+            <span>Tüm adaylara kurumsal e-posta davetleri başarıyla sevk edildi!</span>
           </div>
 
           <!-- Candidate List Cards -->
@@ -327,31 +319,6 @@ function copySmsDraft() {
 
         <!-- TAB 2: TEMPLATES PREVIEW -->
         <div v-else-if="activeTab === 'templates'" class="space-y-6">
-          <!-- SMS Preview Card -->
-          <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
-            <div class="flex items-center justify-between">
-              <div class="flex items-center gap-2">
-                <Phone :size="16" class="text-emerald-400" />
-                <h4 class="text-xs font-bold text-white uppercase tracking-wider">NetGSM SMS Davet Metni</h4>
-              </div>
-              <button 
-                @click="copySmsDraft"
-                class="px-2.5 py-1 rounded-lg bg-slate-900 hover:bg-slate-800 text-slate-300 text-xs font-medium flex items-center gap-1 border border-slate-800 transition cursor-pointer"
-              >
-                <Check v-if="copiedSms" :size="12" class="text-emerald-400" />
-                <Copy v-else :size="12" />
-                <span>{{ copiedSms ? 'Kopyalandı!' : 'Metni Kopyala' }}</span>
-              </button>
-            </div>
-
-            <div class="p-4 rounded-xl bg-slate-900 border border-slate-800 font-mono text-xs text-emerald-300 leading-relaxed">
-              {{ currentResult?.recommendedNotificationDraft.smsText }}
-            </div>
-            <p class="text-[11px] text-slate-500">
-              * NetGSM 850 Başlıklı SMS API üzerinden otomatik sevk edilir.
-            </p>
-          </div>
-
           <!-- Email Preview Card -->
           <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
             <div class="flex items-center justify-between">

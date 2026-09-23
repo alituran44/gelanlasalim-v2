@@ -91,6 +91,8 @@ const legalLinks = [
         <div class="w-full lg:w-auto shrink-0">
           <form v-if="!isSubscribed" @submit.prevent="handleSubscribe" class="flex flex-col sm:flex-row gap-2 w-full sm:w-[380px]">
             <input 
+              id="footer-subscriber-email"
+              aria-label="E-posta bülten aboneliği adresi"
               v-model="subscriberEmail" 
               type="email" 
               placeholder="E-posta adresiniz..." 
@@ -273,15 +275,21 @@ const legalLinks = [
           © 2026 İhaleciBurada.com — B2B İhale ve Satın Alma Platformu. Tüm Hakları Saklıdır.
         </div>
         <div class="flex flex-wrap gap-x-4 gap-y-1.5 justify-center lg:justify-end text-slate-400">
+          <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="hover:text-blue-400 transition-colors font-bold text-slate-300">Hakkımızda</NuxtLink>
+          <span class="text-slate-700">•</span>
+          <a href="mailto:ihalecib@gmail.com" class="hover:text-blue-400 transition-colors">İletişim</a>
+          <span class="text-slate-700">•</span>
+          <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-400 transition-colors font-bold text-blue-300">Gizlilik Sözleşmesi & KVKK</NuxtLink>
+          <span class="text-slate-700">•</span>
           <NuxtLink to="/sozlesmeler?tab=kullanim" class="hover:text-blue-400 transition-colors">Kullanım Şartları</NuxtLink>
           <span class="text-slate-700">•</span>
-          <NuxtLink to="/sozlesmeler?tab=gizlilik" class="hover:text-blue-400 transition-colors">Gizlilik & KVKK</NuxtLink>
-          <span class="text-slate-700">•</span>
-          <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-blue-400 transition-colors font-bold text-blue-300">Mesafeli Satış & Abonelik</NuxtLink>
+          <NuxtLink to="/sozlesmeler?tab=mesafeli-satis" class="hover:text-blue-400 transition-colors">Mesafeli Satış</NuxtLink>
           <span class="text-slate-700">•</span>
           <NuxtLink to="/sozlesmeler?tab=ihale-kurallari" class="hover:text-blue-400 transition-colors">B2B İhale Kuralları</NuxtLink>
           <span class="text-slate-700">•</span>
           <NuxtLink to="/sozlesmeler?tab=cerezler" class="hover:text-blue-400 transition-colors">Çerez Politikası</NuxtLink>
+          <span class="text-slate-700">•</span>
+          <a href="/.well-known/security.txt" target="_blank" class="hover:text-emerald-400 transition-colors font-mono text-[10px]">security.txt</a>
         </div>
       </div>
 

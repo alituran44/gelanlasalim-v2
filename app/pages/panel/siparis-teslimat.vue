@@ -25,7 +25,6 @@ import {
   RotateCcw
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
-import { useNetGsm } from '~/composables/useNetGsm'
 import { locale } from '~/composables/useLocale'
 
 definePageMeta({
@@ -33,7 +32,6 @@ definePageMeta({
 })
 
 const { cmsData, saveCmsData } = useCmsData()
-const { sendSms } = useNetGsm()
 
 const searchQuery = ref('')
 const activeTab = ref<'all' | 'HAVUZDA_BLOKE' | 'SEVKIYATTA' | 'MAL_KABUL_BEKLIYOR' | 'TAMAMLANDI' | 'UYUSMAZLIK'>('all')
@@ -190,14 +188,7 @@ async function processEscrowPayment() {
     saveCmsData(cmsData.value)
     showPaymentModal.value = false
 
-    await sendSms({
-      recipientPhone: '+90 532 555 01 23',
-      recipientName: order.supplierFirm,
-      templateName: 'Havuz Ödeme Bloke Bildirimi',
-      messageBody: `GÜVENLİ HAVUZ BİLDİRİMİ: "${order.tenderTitle}" ihalesi için ${order.totalAmount} tutarındaki alıcı ödemesi Paynkolay güvenceli havuz hesabında bloke edilmiştir. Sevkiyata başlayabilirsiniz.`
-    })
-
-    alert(`🔒 ÖDEME GÜVENLİ HAVUZDA BLOKE EDİLDİ!\n\n${order.totalAmount} tutarındaki sipariş bedeli Paynkolay BDDK & TCMB güvenceli havuz hesabına alınmıştır.\nTedarikçi firmaya sevkiyat başlatma bildirimi SMS ile iletildi.`)
+    alert(`🔒 ÖDEME GÜVENLİ HAVUZDA BLOKE EDİLDİ!\n\n${order.totalAmount} tutarındaki sipariş bedeli Paynkolay BDDK & TCMB güvenceli havuz hesabına alınmıştır.\nTedarikçi firmaya sevkiyat başlatma bildirimi e-posta ile iletildi.`)
   }, 1200)
 }
 
@@ -256,13 +247,6 @@ async function releaseEscrowFunds() {
 
     saveCmsData(cmsData.value)
     showReleaseModal.value = false
-
-    await sendSms({
-      recipientPhone: '+90 532 555 01 23',
-      recipientName: order.supplierFirm,
-      templateName: 'Hakediş Ödeme Transferi',
-      messageBody: `TEBRİKLER! "${order.tenderTitle}" siparişinde alıcı mal kabul onayını vermiştir. ${order.payoutAmount} tutarındaki hakedişiniz IBAN hesabınıza transfer edilmiştir.`
-    })
 
     alert(`🎉 HAKEDİŞ BAŞARIYLA AKTARILDI (SPLIT PAYMENT TAMAMLANDI)!\n\n✓ Tedarikçiye Transfer Edilen Hakediş: ${order.payoutAmount}\n✓ İhaleciBurada Platform Komisyonu (%${order.commissionRate}): ${order.commissionAmount}\n\nİşlem zaman damgalı olarak kayıtlara geçmiş ve e-dekont oluşturulmuştur.`)
   }, 1200)

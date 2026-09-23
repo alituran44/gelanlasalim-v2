@@ -36,7 +36,6 @@ import {
   Lock
 } from 'lucide-vue-next'
 import { useCmsData, DEFAULT_CMS_DATA } from '~/composables/useCmsData'
-import { useNetGsm } from '~/composables/useNetGsm'
 import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_TYPES, TENDER_METHODS, matchTenderToCategory } from '~/utils/taxonomy'
 import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
 import { formatSectorSummaryBadges, resolveSectorKey, SECTOR_DEFINITIONS } from '~/utils/categoryFieldsSchema'
@@ -86,7 +85,6 @@ const { data: serverTendersData, refresh: refreshServerTenders } = await useAsyn
   { default: () => ({ success: true, tenders: [] }) }
 )
 const { checkAccountCompleteness } = useDeepSeekAgent()
-const { sendSms } = useNetGsm()
 const { userSession, isLoggedIn, canSubmitBid, isCompanyVerified, companyRole, companyVkn } = useUserSession()
 
 const activeTab = ref<'guncel' | 'gecmis' | 'sonuc' | 'detayli'>('guncel')
@@ -785,18 +783,11 @@ async function submitBid() {
       } catch (e) {}
     }
 
-    await sendSms({
-      recipientPhone: '+90 532 000 11 22',
-      recipientName: 'İhale Sahibi Firma',
-      templateName: 'Yeni Teklif Bildirimi',
-      messageBody: `Sayın Yetkili, "${tender.baslik}" ihaleniz için ${bidForm.value.firmaAdi} tarafından ${formattedPrice} tutarında yeni bir teklif verildi. Panelinizi inceleyiniz.`
-    })
-
     showBidModal.value = false
     const antiSnipingMsg = apiRes?.antiSniping?.triggered 
       ? `\n\n⏰ ANTİ-SNİPİNG KURALI ÇALIŞTI:\nSon 2 dakikada rekabetçi teklif geldiği için ihale süresi otomatik olarak +2 DAKİKA uzatıldı! (Toplam uzatma: ${apiRes.antiSniping.totalExtendedMinutes} dk)`
       : ''
-    alert(`🎉 TEKLİFİNİZ BAŞARIYLA İLETİLDİ!\n\n"${tender.baslik}" ihalesine ${formattedPrice} tutarındaki teklifiniz kurallara uygun biçimde sisteme işlendi.${antiSnipingMsg}\n\nNetGSM SMS ve E-Posta bilgilendirmesi tamamlandı.`)
+    alert(`🎉 TEKLİFİNİZ BAŞARIYLA İLETİLDİ!\n\n"${tender.baslik}" ihalesine ${formattedPrice} tutarındaki teklifiniz kurallara uygun biçimde sisteme işlendi.${antiSnipingMsg}\n\nKurumsal E-Posta bilgilendirmesi tamamlandı.`)
   } catch (err: any) {
     console.error('Bid submit error:', err)
     alert(err?.data?.statusMessage || err?.message || 'Teklif iletilirken bir hata oluştu.')

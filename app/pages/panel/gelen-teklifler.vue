@@ -35,7 +35,6 @@ import {
 } from 'lucide-vue-next'
 import { useRoute } from 'vue-router'
 import { useCmsData } from '~/composables/useCmsData'
-import { useNetGsm } from '~/composables/useNetGsm'
 import { locale } from '~/composables/useLocale'
 
 definePageMeta({ layout: 'dashboard' })
@@ -44,7 +43,6 @@ const route = useRoute()
 const expandedIlan = ref<string | null>(route.query.ilan as string || null)
 
 const { cmsData, saveCmsData, fetchServerTenders, fetchServerBids } = useCmsData()
-const { sendSms } = useNetGsm()
 
 const userSession = ref<any>({})
 
@@ -241,16 +239,6 @@ async function submitCounterOffer() {
   }
 
   saveCmsData(cmsData.value)
-
-  // Send NetGSM SMS to supplier
-  try {
-    await sendSms({
-      recipientPhone: teklif.telefon || '+90 532 555 01 23',
-      recipientName: teklif.firma,
-      templateName: 'Karşı Teklif Pazarlık Bildirimi',
-      messageBody: `Sayın ${teklif.yetkili || teklif.firma}, "${currentIlan.value?.baslik || 'İhale'}" ihalesinde alıcı firma ${formattedPrice} karşı teklif iletmiştir. Panelinizi inceleyiniz.`
-    })
-  } catch (e) {}
 
   showNegotiationModal.value = false
   alert(`💬 PAZARLIK TEKLİFİNİZ İLETİLDİ!\n\n${teklif.firma} firmasına ${formattedPrice} tutarındaki karşı teklifiniz başarıyla gönderilmiştir.`)

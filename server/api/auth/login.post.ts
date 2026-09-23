@@ -3,6 +3,7 @@ import { createSession, setSessionCookie } from '~~/server/utils/sessionStore'
 import { sanitizeXss, sanitizePayload } from '~~/server/utils/authGuard'
 import { logSecurityEvent } from '~~/server/utils/securityAuditStore'
 import { getAllCompanies } from '~~/server/utils/companyVerificationStore'
+import { verifyUserCredential } from '~~/server/utils/credentialStore'
 
 export default defineEventHandler(async (event) => {
   const rawBody = await readBody(event) || {}
@@ -23,6 +24,22 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 400,
       statusMessage: 'Şifreniz en az 3 karakter olmalıdır.'
+    })
+  }
+
+  // 🛡️ SEC-PWD: Şifre Doğrulama (Scrypt + Salt + Timing-Safe)
+  const credentialCheck = verifyUserCredential(email, password)
+  if (!credentialCheck.valid) {
+    logSecurityEvent(event, {
+      eventType: 'AUTH_FAILURE',
+      severity: 'HIGH',
+      actorEmail: email,
+      actionTaken: 'BLOCKED_403',
+      details: { reason: 'Hatalı kullanıcı şifresi denemesi.' }
+    })
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Giriş başarısız: E-posta adresi veya şifre hatalı.'
     })
   }
 

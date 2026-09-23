@@ -113,4 +113,25 @@ html.dark textarea {
   color: #FFFFFF !important;
   border-color: #475569 !important;
 }
+
+/* ==================== WCAG 2.1 AA Erişilebilirlik :focus-visible ==================== */
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #0284C7 !important;
+  outline-offset: 2px !important;
+}
+
+html.dark button:focus-visible,
+html.dark a:focus-visible,
+html.dark input:focus-visible,
+html.dark select:focus-visible,
+html.dark textarea:focus-visible,
+html.dark [tabindex]:focus-visible {
+  outline: 2px solid #38BDF8 !important;
+  outline-offset: 2px !important;
+}
 </style>

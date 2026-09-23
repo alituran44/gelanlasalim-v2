@@ -69,16 +69,15 @@ assert(!adminLoginContent.includes('secretKey.length >= 3'), 'Admin Login: secre
 assert(!adminLoginContent.includes('allowedKeys'), 'Admin Login: allowedKeys zayıf şifre listesi kaldırılmış', 'Hala allowedKeys dizisi var')
 assert(adminLoginContent.includes('timingSafeEqual'), 'Admin Login: timingSafeEqual sabit zamanlı doğrulama aktif', 'timingSafeEqual eksik')
 
-// 3. NETGSM SMS GATEWAY KORUMASI TESTİ
-console.log('\n--- 3. NetGSM SMS Gateway Koruma Testi ---')
-const netgsmSendContent = fs.readFileSync(path.join(repoRoot, 'server/api/v1/netgsm-send.post.ts'), 'utf8')
-assert(netgsmSendContent.includes('requireAuth(event)'), 'NetGSM Gateway: requireAuth(event) ile anonim istekler engellenmiş', 'requireAuth eksik')
-assert(netgsmSendContent.includes('smsRateLimitMap'), 'NetGSM Gateway: Oran sınırlama (Rate Limiting) aktif', 'smsRateLimitMap eksik')
-assert(!netgsmSendContent.includes('body.password'), 'NetGSM Gateway: İstemciden şifre kabul edilmiyor', 'body.password hala var')
-assert(!netgsmSendContent.includes('body.usercode'), 'NetGSM Gateway: İstemciden usercode kabul edilmiyor', 'body.usercode hala var')
-
-const netgsmClientContent = fs.readFileSync(path.join(repoRoot, 'server/utils/netgsmClient.ts'), 'utf8')
-assert(!netgsmClientContent.includes('options.password'), 'NetGSM Client: options.password parametresi kaldırılmış', 'options.password hala var')
+// 3. NETGSM SMS SIFIR SALDIRI YÜZEYİ (ZERO-ATTACK SURFACE) TESTİ
+console.log('\n--- 3. NetGSM SMS Sıfır Saldırı Yüzeyi Testi ---')
+assert(!fs.existsSync(path.join(repoRoot, 'server/api/v1/netgsm-send.post.ts')), 'SMS Gateway: /api/v1/netgsm-send uç noktası tamamen kaldırılmış (Zero Surface)', 'netgsm-send.post.ts hala mevcut')
+assert(!fs.existsSync(path.join(repoRoot, 'server/utils/netgsmClient.ts')), 'SMS Gateway: server/utils/netgsmClient.ts istemcisi tamamen kaldırılmış', 'netgsmClient.ts hala mevcut')
+assert(!fs.existsSync(path.join(repoRoot, 'server/api/v1/sms-bildirim.post.ts')), 'SMS Gateway: /api/v1/sms-bildirim uç noktası tamamen kaldırılmış', 'sms-bildirim.post.ts hala mevcut')
+const mfaSendContent = fs.readFileSync(path.join(repoRoot, 'server/api/auth/mfa/send.post.ts'), 'utf8')
+assert(!mfaSendContent.includes('sendViaNetGsm'), 'MFA Güvenliği: SMS iletim kodu kaldırılmış, yalnızca güvenli Google SMTP aktif', 'sendViaNetGsm hala var')
+const nuxtConfigContent = fs.readFileSync(path.join(repoRoot, 'nuxt.config.ts'), 'utf8')
+assert(!nuxtConfigContent.includes('netgsmUsercode'), 'Konfigürasyon: nuxt.config.ts içerisinden NetGSM anahtarları temizlenmiş', 'netgsmUsercode hala var')
 
 // 4. İHALE SENKRONİZASYONU YETKİSİZ YAZMA TESTİ
 console.log('\n--- 4. İhale Senkronizasyonu Koruma Testi ---')
@@ -204,6 +203,86 @@ assert(companyDocContent.includes('assertTenantAccess(event, vkn)'), 'Company Do
 const companyStatusContent = fs.readFileSync(path.join(repoRoot, 'server/api/company/status.get.ts'), 'utf8')
 assert(companyStatusContent.includes('requireAdmin(event)'), 'Company Status: Tüm şirketleri listeleme admin korumalı', 'requireAdmin eksik')
 
+// 17. CI/CD GÜVENLİK BORU HATTI (GITHUB ACTIONS) TESTİ
+console.log('\n--- 17. CI/CD Güvenlik Boru Hattı Testi ---')
+const workflowPath = path.join(repoRoot, '.github/workflows/security.yml')
+assert(fs.existsSync(workflowPath), 'CI/CD: .github/workflows/security.yml dosyası mevcut', 'security.yml eksik')
+const workflowContent = fs.existsSync(workflowPath) ? fs.readFileSync(workflowPath, 'utf8') : ''
+assert(workflowContent.includes('npm run test:security'), 'CI/CD: Otomatik güvenlik testi komutu tanımlı', 'test:security workflowda yok')
+
+// 18. GLOBAL HATA YÖNETİMİ (EXCEPTION HANDLING) TESTİ
+console.log('\n--- 18. Global Hata Yönetimi Testi ---')
+const errorVuePath = path.join(repoRoot, 'app/error.vue')
+assert(fs.existsSync(errorVuePath), 'Error Handling: app/error.vue global hata arayüzü mevcut', 'app/error.vue eksik')
+const errorVueContent = fs.existsSync(errorVuePath) ? fs.readFileSync(errorVuePath, 'utf8') : ''
+assert(errorVueContent.includes('clearError'), 'Error Handling: clearError ile güvenli hata sıfırlama aktif', 'clearError eksik')
+
+// 19. CSRF & ORIGIN KORUMA MIDDLEWARE TESTİ
+console.log('\n--- 19. CSRF & Origin Koruma Middleware Testi ---')
+const csrfMiddlewarePath = path.join(repoRoot, 'server/middleware/csrf-guard.ts')
+assert(fs.existsSync(csrfMiddlewarePath), 'CSRF Protection: server/middleware/csrf-guard.ts mevcut', 'csrf-guard.ts eksik')
+const csrfContent = fs.existsSync(csrfMiddlewarePath) ? fs.readFileSync(csrfMiddlewarePath, 'utf8') : ''
+assert(csrfContent.includes('sec-fetch-site') && csrfContent.includes('cross-site'), 'CSRF Protection: Sec-Fetch-Site cross-site bloklaması devrede', 'cross-site kontrolü eksik')
+
+// 20. İLERİ DÜZEY GÜVENLİK BAŞLIKLARI (PERMISSIONS-POLICY) TESTİ
+console.log('\n--- 20. İleri Düzey Güvenlik Başlıkları Testi ---')
+const vercelContent = fs.readFileSync(path.join(repoRoot, 'vercel.json'), 'utf8')
+assert(vercelContent.includes('Permissions-Policy'), 'Security Headers: Permissions-Policy donanım kısıtlama başlığı tanımlı', 'Permissions-Policy eksik')
+
+// 21. SCRYPT PAROLA HASHLEME & KİMLİK KORUMASI TESTİ
+console.log('\n--- 21. Scrypt Parola Hashleme & Kimlik Koruması Testi ---')
+const credentialStorePath = path.join(repoRoot, 'server/utils/credentialStore.ts')
+assert(fs.existsSync(credentialStorePath), 'Password Security: server/utils/credentialStore.ts mevcut', 'credentialStore.ts eksik')
+const credentialStoreContent = fs.existsSync(credentialStorePath) ? fs.readFileSync(credentialStorePath, 'utf8') : ''
+assert(credentialStoreContent.includes('scryptSync'), 'Password Security: scryptSync kriptografik hashleme aktif', 'scryptSync eksik')
+assert(credentialStoreContent.includes('timingSafeEqual'), 'Password Security: timingSafeEqual sabit zamanlı parola karşılaştırma aktif', 'timingSafeEqual eksik')
+
+const loginPostContent = fs.readFileSync(path.join(repoRoot, 'server/api/auth/login.post.ts'), 'utf8')
+assert(loginPostContent.includes('verifyUserCredential'), 'Password Security: login.post.ts içinde parola doğrulama zorunlu', 'verifyUserCredential eksik')
+
+// 22. İSTEMCİ DOSYALARINDA STATİK SIR ARINDIRMA TESTİ
+console.log('\n--- 22. İstemci Dosyalarında Statik Sır Arındırma Testi ---')
+const uyelikVueContent = fs.readFileSync(path.join(repoRoot, 'app/pages/uyelik.vue'), 'utf8')
+assert(!uyelikVueContent.includes('ihb_admin_secret_guard_2026_master_key'), 'Client Secret Hygiene: uyelik.vue içinde hardcoded secret kalmamış', 'uyelik.vue içinde statik secret bulundu')
+assert(!uyelikVueContent.includes('849201'), 'Client Secret Hygiene: uyelik.vue içinde statik OTP kodu kaldırılmış, dinamik OTP aktif', '849201 statik OTP hala mevcut')
+
+const adminVueContent = fs.readFileSync(path.join(repoRoot, 'app/pages/admin.vue'), 'utf8')
+assert(!adminVueContent.includes('ihb_admin_secret_guard_2026_master_key'), 'Client Secret Hygiene: admin.vue içinde hardcoded secret kalmamış', 'admin.vue içinde statik secret bulundu')
+
+// 23. PROTOTYPE POLLUTION & INPUT SANITIZATION TESTİ
+console.log('\n--- 23. Prototype Pollution Koruması Testi ---')
+const authGuardContent = fs.readFileSync(path.join(repoRoot, 'server/utils/authGuard.ts'), 'utf8')
+assert(authGuardContent.includes('__proto__') && authGuardContent.includes('constructor') && authGuardContent.includes('prototype'), 'Input Sanitization: Prototype pollution koruması devrede', 'Prototype pollution filtresi eksik')
+
+// 24. RFC 9116, SEO H1, WCAG VE CORS SIKILAŞTIRMA TESTLERİ
+console.log('\n--- 24. RFC 9116, SEO H1, WCAG ve CORS Sıkılaştırma Testleri ---')
+const wellKnownSecPath = path.join(repoRoot, 'public/.well-known/security.txt')
+const rootSecPath = path.join(repoRoot, 'public/security.txt')
+assert(fs.existsSync(wellKnownSecPath), 'RFC 9116: public/.well-known/security.txt mevcut', 'public/.well-known/security.txt eksik')
+assert(fs.existsSync(rootSecPath), 'RFC 9116: public/security.txt mevcut', 'public/security.txt eksik')
+
+const wellKnownSecContent = fs.existsSync(wellKnownSecPath) ? fs.readFileSync(wellKnownSecPath, 'utf8') : ''
+assert(wellKnownSecContent.includes('Contact: mailto:guvenlik@ihaleciburada.com'), 'RFC 9116: Güvenlik iletişim adresi tanımlı', 'security.txt içinde Contact eksik')
+assert(wellKnownSecContent.includes('Expires:'), 'RFC 9116: Son geçerlilik tarihi (Expires) tanımlı', 'security.txt içinde Expires eksik')
+
+const indexVueContent = fs.readFileSync(path.join(repoRoot, 'app/pages/index.vue'), 'utf8')
+const h1Matches = indexVueContent.match(/<h1[^>]*>[\s\S]*?<\/h1>/gi) || []
+assert(h1Matches.length === 1, 'SEO H1: index.vue sayfasında tam olarak 1 adet semantik H1 başlığı mevcut', `H1 başlık sayısı: ${h1Matches.length}`)
+assert(indexVueContent.includes('Türkiye’nin En Kapsamlı B2B İhale ve Satın Alma Portalı'), 'SEO H1: H1 başlığında anahtar kelimeler mevcut', 'H1 anahtar kelimeleri eksik')
+
+assert(indexVueContent.includes('aria-label="Ana ihale arama kelimesi veya malzeme adı"'), 'WCAG Form Labels: Ana arama kutusu erişilebilir aria-label etiketine sahip', 'Ana arama kutusunda aria-label eksik')
+assert(indexVueContent.includes('id="left-sidebar-search"') && indexVueContent.includes('aria-label="Sol menü içi arama kutusu"'), 'WCAG Form Labels: Sol menü arama kutusu erişilebilir aria-label ve id etiketine sahip', 'Sol menü arama kutusunda aria-label eksik')
+assert(indexVueContent.includes('id="select-tender-city"') && indexVueContent.includes('for="select-tender-city"'), 'WCAG Form Labels: Şehir seçimi ilişkili label ve id ile bağlı', 'Şehir filtre label eksik')
+
+const appVueContent = fs.readFileSync(path.join(repoRoot, 'app/app.vue'), 'utf8')
+assert(appVueContent.includes(':focus-visible'), 'WCAG 2.1 AA: Odak çerçevesi (:focus-visible) tanımlı', 'focus-visible tanımı eksik')
+
+const dnsSpfDocPath = path.join(repoRoot, 'DNS-SECURITY-SPF.md')
+assert(fs.existsSync(dnsSpfDocPath), 'DNS Security: DNS-SECURITY-SPF.md kılavuzu mevcut', 'DNS-SECURITY-SPF.md eksik')
+
+const currentNuxtConfig = fs.readFileSync(path.join(repoRoot, 'nuxt.config.ts'), 'utf8')
+assert(currentNuxtConfig.includes("crossorigin: 'anonymous'"), 'SRI & Harici Script: Google Identity Services scriptinde crossorigin: anonymous tanımlı', 'crossorigin anonymous eksik')
+
 console.log('\n====================================================')
 console.log(`📊 TEST SONUÇLARI: Toplam: ${totalTests} | Başarılı: ${passedTests} | Başarısız: ${failedTests}`)
 console.log('====================================================')
@@ -214,3 +293,4 @@ if (failedTests > 0) {
   console.log('🎉 TÜM GÜVENLİK TESTLERİ BAŞARIYLA GEÇTİ!')
   process.exit(0)
 }
+

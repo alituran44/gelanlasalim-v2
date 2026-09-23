@@ -81,8 +81,7 @@ Adana, Adıyaman, Afyonkarahisar, Ağrı, Aksaray, Amasya, Ankara, Antalya, Arda
 - **Logo & Netsis Entegrasyonu**: Tiger 3 ve Netsis 3 ürün ailesiyle cari hesap, malzeme stok kartları ve ambar giriş fişleri çift yönlü senkronizasyonu.
 - **Microsoft Dynamics 365**: Business Central & Finance tedarik zinciri ve onay hiyerarşisi bağlantısı.
 - **Geliştirici REST API & Webhooks**: OpenAPI 3.0 standardında JSON veri formatı, Bearer token yetkilendirmesi, anlık ihale teklif webhook altyapısı.
-- **Excel / CSV Şartname Sihirbazı**: On binlerce kalemlik birim fiyat cetvellerinin tek tıkla sisteme aktarımı.
-- **SMS Altyapısı**: NetGSM kurumsal SMS gateway üzerinden anlık teklif eksiltme bildirimleri ve güvenlik OTP iletimi.
+- **Bildirim & E-Posta Altyapısı**: TLS 1.2+ şifreli Google SMTP kurumsal gateway üzerinden anlık teklif eksiltme bildirimleri ve güvenlik OTP iletimi (Zero-Attack Surface).
 
 ---
 

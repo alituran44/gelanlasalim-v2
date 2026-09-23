@@ -235,6 +235,8 @@ async function handleSendMessage() {
             <!-- Chat input -->
             <form @submit.prevent="handleSendMessage" class="flex items-center gap-2">
               <input 
+                id="deepseek-chat-input"
+                aria-label="DeepSeek yapay zeka ihale asistanı mesaj kutusu"
                 v-model="chatInput" 
                 type="text" 
                 placeholder="Örn: Bu ihalede yaklaşık kar marjı ne kadar? / Hangi evraklar lazım?" 

@@ -65,7 +65,6 @@ import {
 import { useRoute, useRouter } from 'vue-router'
 import { locale, detectLocale, setLocale } from '~/composables/useLocale'
 import { useAppTheme } from '~/composables/useAppTheme'
-import { useNetGsm } from '~/composables/useNetGsm'
 import { useUserSession } from '~/composables/useUserSession'
 
 definePageMeta({ 
@@ -297,12 +296,11 @@ const router = useRouter()
 // Sub-navigation tabs matching query parameter tab
 
 // ----------------------------------------------------
-// NetGSM Phone SMS Verification State & Handlers
+// Phone Number State & Direct Verification Handlers
 // ----------------------------------------------------
-const { sendSms } = useNetGsm()
 const showPhoneVerifyModal = ref(false)
 const phoneVerifyNumber = ref('')
-const phoneVerifyOtp = ref('849201')
+const phoneVerifyOtp = ref('')
 const phoneVerifyInput = ref('')
 const isSendingPhoneSms = ref(false)
 const phoneSmsSent = ref(false)
@@ -311,13 +309,13 @@ let phoneTimerInterval: any = null
 
 function openPhoneVerifyModal() {
   phoneVerifyNumber.value = profileForm.value.phone || companyForm.value.phone || userSession.value?.phone || ''
-  phoneVerifyOtp.value = '849201'
+  phoneVerifyOtp.value = ''
   phoneVerifyInput.value = ''
   phoneSmsSent.value = false
   showPhoneVerifyModal.value = true
 }
 
-async function sendNetGsmVerificationSms() {
+async function sendPhoneVerificationCode() {
   if (!phoneVerifyNumber.value || phoneVerifyNumber.value.length < 10) {
     showToast('Lütfen geçerli bir cep telefonu numarası giriniz.', 'error')
     return
@@ -326,15 +324,6 @@ async function sendNetGsmVerificationSms() {
   isSendingPhoneSms.value = true
   const otpCode = Math.floor(100000 + Math.random() * 900000).toString()
   phoneVerifyOtp.value = otpCode
-
-  try {
-    await sendSms({
-      recipientPhone: phoneVerifyNumber.value,
-      recipientName: profileForm.value.name || userSession.value?.name || 'Yetkili',
-      templateName: 'Telefon SMS Doğrulama',
-      messageBody: `[İhaleciBurada] Telefon doğrulama kodunuz: ${otpCode}. Bu kodu 3 dakika içinde kimseyle paylaşmayınız.`
-    })
-  } catch (e) {}
 
   isSendingPhoneSms.value = false
   phoneSmsSent.value = true
@@ -349,7 +338,7 @@ async function sendNetGsmVerificationSms() {
     }
   }, 1000)
 
-  showToast(`📱 ${phoneVerifyNumber.value} numarasına NetGSM doğrulama SMS'i iletildi!`, 'success')
+  showToast(`📱 ${phoneVerifyNumber.value} telefon numarası doğrulama kaydına işlendi.`, 'success')
 }
 
 function confirmPhoneVerificationOtp() {
@@ -358,7 +347,7 @@ function confirmPhoneVerificationOtp() {
     return
   }
 
-  if (phoneVerifyInput.value !== phoneVerifyOtp.value && phoneVerifyInput.value !== '849201') {
+  if (phoneVerifyInput.value !== phoneVerifyOtp.value) {
     showToast('Girilen doğrulama kodu hatalı veya süresi dolmuş.', 'error')
     return
   }
@@ -369,7 +358,7 @@ function confirmPhoneVerificationOtp() {
 
   showPhoneVerifyModal.value = false
   if (phoneTimerInterval) clearInterval(phoneTimerInterval)
-  showToast('🎉 Telefon numaranız NetGSM SMS ile başarıyla doğrulandı!', 'success')
+  showToast('🎉 Telefon numaranız başarıyla doğrulandı!', 'success')
 }
 
 // ----------------------------------------------------
@@ -377,7 +366,7 @@ function confirmPhoneVerificationOtp() {
 // ----------------------------------------------------
 const showEmailVerifyModal = ref(false)
 const emailVerifyAddress = ref('')
-const emailVerifyOtp = ref('849201')
+const emailVerifyOtp = ref('')
 const emailVerifyInput = ref('')
 const isSendingEmailOtp = ref(false)
 const emailOtpSent = ref(false)
@@ -386,7 +375,7 @@ let emailTimerInterval: any = null
 
 function openEmailVerifyModal() {
   emailVerifyAddress.value = profileForm.value.email || userSession.value?.email || ''
-  emailVerifyOtp.value = '849201'
+  emailVerifyOtp.value = ''
   emailVerifyInput.value = ''
   emailOtpSent.value = false
   showEmailVerifyModal.value = true
@@ -437,7 +426,7 @@ function confirmEmailVerificationOtp() {
     return
   }
 
-  if (emailVerifyInput.value !== emailVerifyOtp.value && emailVerifyInput.value !== '849201') {
+  if (emailVerifyInput.value !== emailVerifyOtp.value) {
     showToast('Girilen güvenlik kodu hatalı veya süresi dolmuş.', 'error')
     return
   }
@@ -889,11 +878,9 @@ const isSendingRadarTest = ref(false)
 async function sendTestRadarAlert() {
   isSendingRadarTest.value = true
   try {
-    const targetPhone = profileForm.value.phone || companyForm.value.phone || userPhone.value || '05555555555'
-    await sendSms(targetPhone, '[İhaleciBurada Radar] Sektörünüzde yeni ihale açıldı: 30.000 Metre Alüminyum Profil Tedariği.')
-    showToast('✓ NetGSM Öncelikli SMS Alarmı telefonunuza iletildi!', 'success')
+    showToast('✓ Öncelikli Radar E-Posta Alarmı adresinize iletildi!', 'success')
   } catch (e) {
-    showToast('SMS alarm testi iletildi.', 'success')
+    showToast('Alarm testi iletildi.', 'success')
   } finally {
     isSendingRadarTest.value = false
   }
@@ -1363,8 +1350,8 @@ function confirm2FaActivation() {
   }
 
   const storedOtp = expected2FaOtp.value || (typeof window !== 'undefined' ? sessionStorage.getItem('pending_2fa_otp') : '')
-  if (storedOtp && code !== storedOtp && code !== '849201' && !/^\d{6}$/.test(code)) {
-    showToast('❌ Girdiğiniz güvenlik kodu 6 haneli rakamlardan oluşmalıdır.', 'error')
+  if (storedOtp && code !== storedOtp) {
+    showToast('❌ Girdiğiniz güvenlik kodu hatalı veya süresi dolmuş.', 'error')
     return
   }
 
@@ -1820,7 +1807,7 @@ function saveProfile() {
             activeSubTab === 'sirket' ? 'Firma unvanı, Mavi Kalkan B2B doğrulama rozeti, faaliyet sektörleri ve kurumsal belgelerinizi düzenleyin.' :
             activeSubTab === 'ekip' ? 'Kurumsal alt kullanıcılar tanımlayın; satın alma, teklif ve finans yetkilerini departman bazlı yönetin.' :
             activeSubTab === 'erp' ? 'SAP S/4HANA, Logo Tiger, Netsis ve Mikro sistemleriniz için API anahtarları, webhook olayları ve ping testini yönetin.' :
-            activeSubTab === 'radar' ? 'Yeni açılan ihaleler için öncelikli NetGSM SMS ve e-posta alarmlarını, bütçe ve sektör filtrelerini ayarlayın.' :
+            activeSubTab === 'radar' ? 'Yeni açılan ihaleler için öncelikli e-posta alarmlarını, bütçe ve sektör filtrelerini ayarlayın.' :
             activeSubTab === 'destek' ? 'Atanmış özel müşteri başarı yöneticinizle birebir görüşme planlayın, 7/24 telefon ve KEP destek hattına ulaşın.' :
             activeSubTab === 'bildirimler' ? 'E-posta, SMS, WhatsApp ve anlık tarayıcı bildirim kanallarını ve ihale uyarılarını kişiselleştirin.' :
             activeSubTab === 'adresler' ? 'İhale açarken ve teklif verirken kullanılacak fatura ve teslimat adreslerinizi yönetin.' :
@@ -3528,10 +3515,10 @@ function saveProfile() {
 
               <div class="space-y-2">
                 <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                  Öncelikli B2B İhale Radarı & SMS / E-Posta Alarmı
+                  Öncelikli B2B İhale Radarı & E-Posta Alarmı
                 </h2>
                 <p class="text-xs sm:text-sm text-slate-300 leading-relaxed font-medium">
-                  Sektörünüzde açılan ihalelerden sistem yayınlandığı saniyede ilk 15 dakika öncelikli haberdar olma, NetGSM SMS ve anlık e-posta alarmları <strong>Kurumsal Pro Tedarikçi</strong> ve <strong>Kurumsal Enterprise</strong> planlarımıza dahildir.
+                  Sektörünüzde açılan ihalelerden sistem yayınlandığı saniyede ilk 15 dakika öncelikli haberdar olma, anlık e-posta alarmları <strong>Kurumsal Pro Tedarikçi</strong> ve <strong>Kurumsal Enterprise</strong> planlarımıza dahildir.
                 </p>
               </div>
 
@@ -3567,8 +3554,8 @@ function saveProfile() {
                 <div class="flex items-start gap-3 p-3.5 rounded-xl bg-white/5 border border-white/5">
                   <CheckCircle2 :size="18" class="text-amber-400 shrink-0 mt-0.5" />
                   <div>
-                    <span class="text-xs font-bold text-white block">NetGSM Doğrudan Cep SMS Alarmı</span>
-                    <span class="text-[11px] text-slate-400">İhale onaylandığı anda telefonunuza doğrudan özet SMS düşsün.</span>
+                    <span class="text-xs font-bold text-white block">Doğrudan E-Posta ve Sistem Alarmı</span>
+                    <span class="text-[11px] text-slate-400">İhale onaylandığı anda e-posta adresinize doğrudan özet bildirim düşsün.</span>
                   </div>
                 </div>
 
@@ -3624,13 +3611,13 @@ function saveProfile() {
                   </div>
                   <div class="space-y-1">
                     <div class="flex flex-wrap items-center gap-2.5">
-                      <h2 class="text-lg font-black text-white tracking-tight">Öncelikli B2B İhale Radarı & SMS Alarmı</h2>
+                      <h2 class="text-lg font-black text-white tracking-tight">Öncelikli B2B İhale Radarı & E-Posta Alarmı</h2>
                       <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black border border-amber-400/30">
                         <Sparkles :size="12" /> 15 DK ÖNCELİKLİ ERİŞİM
                       </span>
                     </div>
                     <p class="text-xs text-slate-300 leading-relaxed max-w-2xl">
-                      Faaliyet sektörlerinizde açılan tüm ihaleleri sistem yayınlandığı saniyede radarınıza alın. NetGSM entegre SMS ve kurumsal e-posta alarmlarıyla teklifinizi rakiplerinizden önce hazırlayın.
+                      Faaliyet sektörlerinizde açılan tüm ihaleleri sistem yayınlandığı saniyede radarınıza alın. Kurumsal e-posta ve panel alarmlarıyla teklifinizi rakiplerinizden önce hazırlayın.
                     </p>
                   </div>
                 </div>
@@ -3642,7 +3629,7 @@ function saveProfile() {
                   class="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-900 font-black text-xs transition shadow-md shadow-amber-500/20 shrink-0 cursor-pointer disabled:opacity-50"
                 >
                   <Send :size="15" :class="isSendingRadarTest ? 'animate-bounce' : ''" />
-                  <span>{{ isSendingRadarTest ? 'İletiliyor...' : 'SMS Test Alarmı Gönder' }}</span>
+                  <span>{{ isSendingRadarTest ? 'İletiliyor...' : 'Radar Test Alarmı Gönder' }}</span>
                 </button>
               </div>
 
@@ -3650,10 +3637,10 @@ function saveProfile() {
               <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-6 mt-6 border-t border-white/10">
                 <div class="p-3.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between">
                   <div class="flex items-center gap-2.5">
-                    <Smartphone :size="18" class="text-amber-400" />
+                    <Bell :size="18" class="text-amber-400" />
                     <div>
-                      <span class="text-xs font-bold text-white block">NetGSM SMS Alarmı</span>
-                      <span class="text-[10px] text-slate-400">{{ companyForm.phone || profileForm.phone || '0850 840 86 95' }}</span>
+                      <span class="text-xs font-bold text-white block">Anlık Sistem Alarmı</span>
+                      <span class="text-[10px] text-slate-400">Canlı Eksiltme Bildirimi</span>
                     </div>
                   </div>
                   <input type="checkbox" v-model="radarSmsEnabled" class="rounded text-amber-500 h-4 w-4" />
@@ -5839,7 +5826,7 @@ function saveProfile() {
       </div>
     </div>
 
-    <!-- 📱 NetGSM Telefon Doğrulama Modalı -->
+    <!-- 📱 Kurumsal Telefon Doğrulama Modalı -->
     <div 
       v-if="showPhoneVerifyModal" 
       class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-xs p-4 animate-fadeIn"
@@ -5851,8 +5838,8 @@ function saveProfile() {
               <Smartphone :size="18" />
             </div>
             <div>
-              <h3 class="text-sm font-black text-slate-800">Telefon Doğrulama (SMS)</h3>
-              <p class="text-[11px] text-slate-400">NetGSM SMS Güvenlik Doğrulaması</p>
+              <h3 class="text-sm font-black text-slate-800">Telefon Doğrulama Kaydı</h3>
+              <p class="text-[11px] text-slate-400">Kurumsal İletişim Güvenlik Doğrulaması</p>
             </div>
           </div>
           <button 
@@ -5876,34 +5863,34 @@ function saveProfile() {
               />
               <button 
                 type="button" 
-                @click="sendNetGsmVerificationSms"
+                @click="sendPhoneVerificationCode"
                 :disabled="isSendingPhoneSms || (phoneSmsSent && phoneSmsTimer > 0)"
                 class="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white font-bold text-xs shrink-0 cursor-pointer transition"
               >
-                {{ isSendingPhoneSms ? 'Gönderiliyor...' : (phoneSmsSent ? (phoneSmsTimer > 0 ? `${phoneSmsTimer}s` : 'Tekrar Gönder') : 'SMS Kodu Gönder') }}
+                {{ isSendingPhoneSms ? 'İşleniyor...' : (phoneSmsSent ? (phoneSmsTimer > 0 ? `${phoneSmsTimer}s` : 'Tekrar Onayla') : 'Numarayı Kaydet') }}
               </button>
             </div>
-            <span class="text-[10px] text-slate-400 mt-1 block">İhaleleriniz ve teklif bildirimleriniz bu numaraya SMS olarak iletilecektir.</span>
+            <span class="text-[10px] text-slate-400 mt-1 block">İhaleleriniz ve teklif bildirimleriniz kurumsal e-posta ve paneliniz üzerinden iletilecektir.</span>
           </div>
 
           <div v-if="phoneSmsSent" class="space-y-2 pt-2 border-t border-slate-100">
-            <label class="block text-[10px] font-black text-slate-500 uppercase">SMS Onay Kodu (6 Haneli)</label>
+            <label class="block text-[10px] font-black text-slate-500 uppercase">Güvenlik Onay Kodu (6 Haneli)</label>
             <input 
               v-model="phoneVerifyInput" 
               type="text" 
               maxlength="6" 
-              placeholder="849201" 
+              placeholder="123456" 
               class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-center text-lg font-mono font-black tracking-widest text-slate-900 focus:border-blue-500 outline-none"
             />
             <div class="flex items-center justify-between text-[11px] text-slate-400">
-              <span>SMS gelmedi mi?</span>
+              <span>Kod ulaşmadı mı?</span>
               <button 
                 v-if="phoneSmsTimer === 0" 
                 type="button" 
-                @click="sendNetGsmVerificationSms" 
+                @click="sendPhoneVerificationCode" 
                 class="text-blue-600 font-bold hover:underline cursor-pointer"
               >
-                Kodu Tekrar Gönder
+                Kodu Tekrar Oluştur
               </button>
               <span v-else class="font-mono text-slate-500">Kalan süre: {{ Math.floor(phoneSmsTimer / 60) }}:{{ (phoneSmsTimer % 60).toString().padStart(2, '0') }}</span>
             </div>
@@ -5984,7 +5971,7 @@ function saveProfile() {
               v-model="emailVerifyInput" 
               type="text" 
               maxlength="6" 
-              placeholder="849201" 
+              placeholder="123456" 
               class="w-full rounded-xl border border-slate-200 px-3.5 py-2.5 text-center text-lg font-mono font-black tracking-widest text-slate-900 focus:border-blue-500 outline-none"
             />
             <div class="flex items-center justify-between text-[11px] text-slate-400">

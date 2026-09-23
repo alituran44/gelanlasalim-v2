@@ -20,7 +20,6 @@ import {
   Send
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
-import { useNetGsm } from '~/composables/useNetGsm'
 import { locale } from '~/composables/useLocale'
 
 definePageMeta({
@@ -28,7 +27,6 @@ definePageMeta({
 })
 
 const { cmsData, saveCmsData } = useCmsData()
-const { sendSms } = useNetGsm()
 
 const activeTab = ref<'all' | 'live' | 'upcoming' | 'ended'>('all')
 const searchQuery = ref('')
@@ -150,14 +148,6 @@ async function placeBid(decrementAmount?: number) {
   })
 
   saveCmsData(cmsData.value)
-
-  // NetGSM SMS to Room Subscribers
-  await sendSms({
-    recipientPhone: '+90 532 555 01 23',
-    recipientName: 'İhale Takipçileri',
-    templateName: 'Canlı Eksiltme Yeni Lider Teklif',
-    messageBody: `CANLI EKSİLTME: "${room.tenderTitle}" ihalesinde ${targetAmount.toLocaleString('tr-TR')} ₺ tutarında yeni lider teklif verildi!`
-  })
 
   alert(`🎉 TEKLİFİNİZ LİDER OLDU!\n\n${targetAmount.toLocaleString('tr-TR')} ₺ ile canlı eksiltmede 1. sıraya yerleştiniz!${extended ? '\n\n⚡ Anti-Sniping devreye girdi: Süre +2 Dakika uzatıldı.' : ''}`)
 }

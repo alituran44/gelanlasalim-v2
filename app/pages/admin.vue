@@ -78,7 +78,6 @@ import {
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
-import { useNetGsm } from '~/composables/useNetGsm'
 import SystemManagementView from '~/components/admin/SystemManagementView.vue'
 import CompanyTeamsView from '~/components/admin/CompanyTeamsView.vue'
 
@@ -96,7 +95,6 @@ useHead({
 const router = useRouter()
 const route = useRoute()
 const { cmsData, saveCmsData, resetCmsData } = useCmsData()
-const { config: netGsmConfig, logs: smsLogs, saveConfig: saveNetGsmConfig, sendSms, clearLogs: clearSmsLogs } = useNetGsm()
 
 // Auth State
 const isLoggedIn = ref(typeof window !== 'undefined' ? (Boolean(localStorage.getItem('adminToken')) || Boolean(document.cookie.includes('ihb_auth=1'))) : false)
@@ -104,62 +102,6 @@ const formState = reactive(JSON.parse(JSON.stringify(cmsData.value)))
 const email = ref('')
 const password = ref('')
 const authError = ref('')
-
-// NetGSM Templates & State
-const netGsmTemplates = [
-  {
-    name: 'Kurumsal Üyelik 6-Haneli OTP Kodu',
-    body: '[İhaleciBurada] Kurumsal üyelik doğrulama kodunuz: {OTP_KODU}. Bu kodu 3 dakika içinde kimseyle paylaşmayınız.'
-  },
-  {
-    name: 'İhale Yayına Alındı Bildirimi',
-    body: 'Sayın Yetkili, "{IHALE_BASLIK}" başlıklı ihaleniz onaylanarak yayına alınmıştır. Teklifleri takip etmek için: https://www.ihaleciburada.com/panel'
-  },
-  {
-    name: 'İhaleye Yeni Teklif Geldi',
-    body: 'Sayın Yetkili, "{IHALE_BASLIK}" ihaleniz için doğrulanmış tedarikçiden yeni teklif ({FIYAT} TL) iletildi. Detay: https://www.ihaleciburada.com/panel/gelen-teklifler'
-  },
-  {
-    name: 'Canlı Eksiltme & Fiyat Revizyonu',
-    body: 'Sayın Yetkili, takip ettiğiniz ihalede canlı eksiltme başladı. Yeni lider fiyat: {FIYAT} TL. Teklifinizi güncellemek için odaya katılın.'
-  },
-  {
-    name: 'Teklif Kabulü & Escrow Güvencesi',
-    body: 'Tebrikler! "{IHALE_BASLIK}" ihalesinde teklifiniz onaylandı. Escrow güvenceli sözleşme panelinize yüklendi: https://www.ihaleciburada.com/panel'
-  }
-]
-
-// Test SMS Form
-const testSmsForm = ref({
-  phone: '05325550123',
-  name: 'Test Yetkilisi',
-  template: 'Kurumsal Üyelik 6-Haneli OTP Kodu',
-  body: '[İhaleciBurada] Kurumsal üyelik doğrulama kodunuz: 849201. Bu kodu 3 dakika içinde kimseyle paylaşmayınız.'
-})
-
-function handleNetGsmTemplateChange(templateName: string) {
-  const tpl = netGsmTemplates.find(t => t.name === templateName)
-  if (tpl) {
-    testSmsForm.value.template = tpl.name
-    testSmsForm.value.body = tpl.body
-  }
-}
-
-async function sendTestSms() {
-  const res = await sendSms({
-    recipientPhone: testSmsForm.value.phone,
-    recipientName: testSmsForm.value.name,
-    templateName: testSmsForm.value.template,
-    messageBody: testSmsForm.value.body
-  })
-  triggerToast(`📱 NetGSM SMS İletildi! (${testSmsForm.value.phone})`, 'success')
-}
-
-function refreshNetGsmBalance() {
-  netGsmConfig.value.balanceCredits = 5000
-  saveNetGsmConfig(netGsmConfig.value)
-  triggerToast('NetGSM SMS kredi bakiyesi güncellendi: 5.000 SMS', 'success')
-}
 
 function resolveDispute(dispute: any, action: 'approved' | 'rejected') {
   if (action === 'approved') {
@@ -187,7 +129,6 @@ export type AdminTab =
   | 'system_ops'
   | 'site_settings'
   | 'support_ai' 
-  | 'netgsm_sms'
   | 'crm_leads' 
   | 'email_center' 
   | 'newsletter_subs' 
@@ -1155,32 +1096,13 @@ onMounted(async () => {
     // 🛡️ SEC-011 (Katman 5): Sunucu tarafı kesin oturum kontrolü (/api/auth/me)
     try {
       const meRes = await $fetch<{ success: boolean; isAuthenticated: boolean; isAdmin?: boolean; user?: any }>('/api/auth/me')
-      if (meRes?.isAdmin || meRes?.user?.isAdmin) {
-        isLoggedIn.value = true
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
-        }
-      } else {
-        const localAdmin = typeof window !== 'undefined' && (Boolean(localStorage.getItem('adminToken')) || Boolean(localStorage.getItem('userSession')?.includes('"admin"')))
-        if (localAdmin) {
-          isLoggedIn.value = true
-          try {
-            await $fetch('/api/auth/admin-login', {
-              method: 'POST',
-              body: { email: email.value || 'admin@ihaleciburada.com', secretKey: 'ihb_admin_secret_guard_2026_master_key' }
-            })
-          } catch {}
-        } else {
-          isLoggedIn.value = false
-        }
-      }
-    } catch {
-      const localAdmin = typeof window !== 'undefined' && (Boolean(localStorage.getItem('adminToken')) || Boolean(localStorage.getItem('userSession')?.includes('"admin"')))
-      if (localAdmin) {
+      if (meRes && meRes.isAuthenticated && meRes.isAdmin) {
         isLoggedIn.value = true
       } else {
         isLoggedIn.value = false
       }
+    } catch {
+      isLoggedIn.value = false
     }
 
     if (route.query.tab) {
@@ -2400,17 +2322,6 @@ function removeSubmittedBid(index: number) {
               WhatsApp & AI Asistan
             </button>
 
-            <button 
-              @click="activeTab = 'netgsm_sms'" 
-              class="w-full flex items-center justify-between rounded-xl px-4 py-2 text-xs font-bold transition text-left cursor-pointer"
-              :class="activeTab === 'netgsm_sms' ? 'bg-emerald-600 text-white shadow-md' : (adminTheme === 'light' ? 'text-slate-700 hover:bg-slate-100' : 'text-slate-400 hover:bg-slate-800 hover:text-white')"
-            >
-              <span class="flex items-center gap-2.5"><Smartphone :size="14" /> NetGSM SMS Gateway</span>
-              <span class="text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-300 px-1.5 py-0.2 rounded font-mono font-bold">
-                Canlı
-              </span>
-            </button>
-
             <!-- GROUP: MÜŞTERİ & PAZARLAMA -->
             <div class="text-[9px] font-black text-amber-600 uppercase tracking-widest px-4 pt-3 mb-1.5 flex items-center gap-1">
               <Users :size="10" /> MÜŞTERİ & PAZARLAMA
@@ -3087,187 +2998,6 @@ function removeSubmittedBid(index: number) {
                           </button>
                         </div>
                         <span v-else class="text-[10px] text-slate-500">İşlem Tamamlandı</span>
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-
-          <!-- ========================================================================= -->
-          <!-- TAB: NETGSM SMS GATEWAY & CANLI LOGLAR -->
-          <!-- ========================================================================= -->
-          <div v-if="activeTab === 'netgsm_sms'" class="space-y-6">
-            <!-- NetGSM Configuration -->
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4 text-left">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div>
-                  <h3 class="text-sm font-black text-white flex items-center gap-2">
-                    <Smartphone :size="16" class="text-emerald-400" />
-                    NetGSM Kurumsal SMS Gateway & API Yapılandırması
-                  </h3>
-                  <p class="text-[11px] text-slate-400">Üyelik OTP doğrulamaları, ihale yayın bildirimleri ve teklif uyarıları için NetGSM XML/HTTP entegrasyonu.</p>
-                </div>
-                <div class="flex items-center gap-2">
-                  <div class="flex items-center gap-2 bg-emerald-950/60 border border-emerald-800 px-3 py-1.5 rounded-xl text-xs font-mono text-emerald-400">
-                    <span>SMS Kredisi:</span>
-                    <strong>{{ netGsmConfig.balanceCredits }} SMS</strong>
-                  </div>
-                  <button @click="refreshNetGsmBalance" class="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-xl font-bold transition flex items-center gap-1 cursor-pointer">
-                    <RefreshCw :size="12" /> Yenile
-                  </button>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">NETGSM KULLANICI KODU (850 NO / ABONE)</label>
-                  <input v-model="netGsmConfig.usercode" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">NETGSM API ŞİFRESİ</label>
-                  <div class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-emerald-400 font-mono flex items-center justify-between">
-                    <span>••••••••••••••••</span>
-                    <span class="text-[9px] bg-emerald-950 text-emerald-300 border border-emerald-800 px-1.5 py-0.5 rounded font-bold">SUNUCUDA GÜVENLİ (.ENV)</span>
-                  </div>
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">GÖNDERİCİ BAŞLIĞI (ORİGİNATÖR)</label>
-                  <input v-model="netGsmConfig.msgheader" type="text" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono font-bold text-emerald-400" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-black text-slate-500 uppercase mb-1">API PROTOKOL DURUMU</label>
-                  <div class="p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs font-bold text-emerald-400 flex items-center gap-2">
-                    <span class="h-2 w-2 rounded-full bg-emerald-500 animate-ping"></span>
-                    Canlı NetGSM XML/GET Aktif
-                  </div>
-                </div>
-              </div>
-
-              <!-- Otomatik Tetikleyiciler -->
-              <div class="pt-2 border-t border-slate-800">
-                <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block mb-2">OTOMATİK SMS BİLDİRİM TETİKLEYİCİLERİ</span>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 text-xs text-slate-300">
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" checked class="rounded border-slate-700 text-emerald-500" />
-                    <span>Üyelik 6-Haneli OTP SMS</span>
-                  </label>
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" checked class="rounded border-slate-700 text-emerald-500" />
-                    <span>İhale Yayına Alındı Bildirimi</span>
-                  </label>
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" checked class="rounded border-slate-700 text-emerald-500" />
-                    <span>Yeni Teklif Alındı Uyarısı</span>
-                  </label>
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" checked class="rounded border-slate-700 text-emerald-500" />
-                    <span>Canlı Eksiltme & Fiyat Revizyonu</span>
-                  </label>
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" checked class="rounded border-slate-700 text-emerald-500" />
-                    <span>Teklif Onayı & Escrow Blokesi</span>
-                  </label>
-                  <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-950/60 border border-slate-800 cursor-pointer">
-                    <input type="checkbox" checked class="rounded border-slate-700 text-emerald-500" />
-                    <span>Mücbir Sebep & Hukuki Fesih Kararı</span>
-                  </label>
-                </div>
-              </div>
-            </div>
-
-            <!-- Test SMS Dispatch -->
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4 text-left">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
-                  <Send :size="14" class="text-emerald-400" /> Canlı NetGSM Test SMS Gönderimi
-                </h3>
-                <div class="flex items-center gap-2 text-xs">
-                  <span class="text-slate-400">Şablon Seç:</span>
-                  <select @change="handleNetGsmTemplateChange(($event.target as HTMLSelectElement).value)" class="p-1.5 bg-slate-950 border border-slate-800 rounded-lg text-xs text-white font-bold">
-                    <option v-for="t in netGsmTemplates" :key="t.name" :value="t.name">{{ t.name }}</option>
-                  </select>
-                </div>
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label class="block text-[10px] font-bold text-slate-400 mb-1">ALICI GSM TELEFON</label>
-                  <input v-model="testSmsForm.phone" type="text" placeholder="0532 555 01 23" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-mono" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-slate-400 mb-1">ALICI / YETKİLİ ADI</label>
-                  <input v-model="testSmsForm.name" type="text" placeholder="Yetkili Adı" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
-                </div>
-                <div>
-                  <label class="block text-[10px] font-bold text-slate-400 mb-1">ŞABLON BAŞLIĞI</label>
-                  <input v-model="testSmsForm.template" type="text" placeholder="Şablon Başlığı" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white" />
-                </div>
-              </div>
-              <div>
-                <label class="block text-[10px] font-bold text-slate-400 mb-1">SMS METNİ (160 Karakter / 1 Kredi)</label>
-                <textarea v-model="testSmsForm.body" rows="2" class="w-full rounded-xl border border-slate-800 bg-slate-950 p-2.5 text-xs text-white font-sans"></textarea>
-              </div>
-              <div class="flex justify-between items-center">
-                <span class="text-[11px] text-slate-500">Karakter Sayısı: {{ testSmsForm.body.length }} / 160 (1 SMS)</span>
-                <button @click="sendTestSms" class="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 shadow-lg shadow-emerald-600/20">
-                  <Smartphone :size="13" /> NetGSM İle Anında Gönder
-                </button>
-              </div>
-            </div>
-
-            <!-- Live SMS Logs -->
-            <div class="p-6 rounded-2xl border border-slate-800 bg-slate-900/60 space-y-4 text-left">
-              <div class="flex items-center justify-between border-b border-slate-800 pb-3">
-                <h3 class="text-xs font-black text-white uppercase tracking-wider flex items-center gap-2">
-                  <Clock :size="14" class="text-blue-400" /> Canlı NetGSM İşlem & İletim Günlükleri (DLR)
-                </h3>
-                <button @click="clearSmsLogs" class="px-3 py-1 bg-red-950/40 hover:bg-red-950 text-red-400 border border-red-800/60 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1">
-                  <Trash2 :size="12" /> Logları Temizle
-                </button>
-              </div>
-
-              <div class="rounded-2xl border border-slate-800 bg-slate-950 overflow-hidden">
-                <table class="w-full text-left text-xs border-collapse">
-                  <thead>
-                    <tr class="bg-slate-900/90 border-b border-slate-800 text-[10px] font-black text-slate-400 uppercase">
-                      <th class="p-3.5">ZAMAN & MSG ID</th>
-                      <th class="p-3.5">ALICI GSM & FİRMA</th>
-                      <th class="p-3.5">ŞABLON</th>
-                      <th class="p-3.5">İÇERİK (SMS GÖVDESİ)</th>
-                      <th class="p-3.5 text-right">DURUM</th>
-                    </tr>
-                  </thead>
-                  <tbody v-if="smsLogs.length > 0" class="divide-y divide-slate-800/60">
-                    <tr v-for="log in smsLogs" :key="log.id" class="hover:bg-slate-900/40 transition">
-                      <td class="p-3.5 font-mono text-[11px]">
-                        <div class="text-slate-300">{{ log.timestamp }}</div>
-                        <div class="text-[10px] text-blue-400">{{ log.msgId }}</div>
-                      </td>
-                      <td class="p-3.5">
-                        <div class="font-bold text-white font-mono">{{ log.recipientPhone }}</div>
-                        <div class="text-[11px] text-slate-400">{{ log.recipientName }}</div>
-                      </td>
-                      <td class="p-3.5">
-                        <span class="text-[10px] bg-slate-900 border border-slate-800 text-slate-300 px-2 py-0.5 rounded font-bold">
-                          {{ log.templateName }}
-                        </span>
-                      </td>
-                      <td class="p-3.5 text-[11px] text-slate-300 max-w-md">
-                        {{ log.messageBody }}
-                      </td>
-                      <td class="p-3.5 text-right">
-                        <span class="px-2 py-0.5 bg-emerald-950 text-emerald-400 border border-emerald-800 text-[10px] font-bold rounded">
-                          ✓ {{ log.status }}
-                        </span>
-                      </td>
-                    </tr>
-                  </tbody>
-                  <tbody v-else>
-                    <tr>
-                      <td colspan="5" class="text-center py-8 text-slate-500 text-xs">
-                        Henüz kayıtlı giden SMS bulunmuyor.
                       </td>
                     </tr>
                   </tbody>
