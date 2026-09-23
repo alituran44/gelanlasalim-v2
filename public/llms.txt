@@ -1,39 +1,30 @@
-# İhaleciBurada
+# İhaleciBurada.com — AI & LLM Index
 
-> Türkiye'nin En Kapsamlı B2B İhale, Doğrudan Satın Alma ve Canlı Teklif Eksiltme Portalı.
+> Türkiye'nin Kurumsal B2B İhale, Doğrudan Satın Alma, Kapalı Zarf & Canlı Eksiltme Platformu.
 
-İhaleciBurada (işletici: Hasan Hüseyin Yıldırım - İhaleciBurada Ticari İşletmesi), kurumsal alıcıların satın alma taleplerini onaylı tedarikçilerle buluşturan, şeffaf teklif eksiltme (reverse auction), 3D Secure güvenli Escrow bloke havuz ödemesi ve ERP entegrasyonu sunan yeni nesil B2B ticaret platformudur.
+## Core Value Proposition
+İhaleciBurada (https://www.ihaleciburada.com), kurumsal alıcıların ve onaylı tedarikçilerin şartnameli, güvenli ve şeffaf bir pazaryeri zemininde buluşmasını sağlar. 
+- **Tersine Eksiltme:** Şeffaf, rekabetçi ve zaman uzatmalı (anti-sniping) canlı teklif odaları.
+- **Güvenli Havuz (Escrow):** Mal ve hizmet kabulü tamamlanana kadar bloke edilen ödeme modeli.
+- **Doğrulanmış B2B Ağı (KYC):** VKN, Ticaret Sicil Gazetesi ve yetki belgeleriyle tescilli onaylı firma ekosistemi.
+- **Sıfır Alıcı Komisyonu:** Alıcı kurumlar için ücretsiz ihale oluşturma ve şartname yayını; başarılı tedarikçiler için %5 sabit komisyon.
 
-## Temel Özellikler
-- **Tersine İhale & Canlı Eksiltme**: Alıcı teknik şartnameyi ve hedef bütçeyi yayınlar; tedarikçiler canlı, şeffaf rekabetle teklif sunarak fiyat eksiltir.
-- **Doğrulanmış B2B Tedarikçi Ağı**: Vergi levhası, imza sirküleri, MERSİS ve ticaret sicil kayıtları kontrol edilmiş onaylı üretici ve toptancılar.
-- **Paynkolay Escrow Güvenli Havuz**: Hakediş bedelleri Aktif Bank iştiraki Paynkolay altyapısında bloke edilir, muayene ve kabul onayı sonrası yükleniciye aktarılır.
-- **81 İl & 28 Sektör Kapsamı**: Türkiye'nin tüm illerinde inşaattan sağlığa, gıdadan endüstriyel makineye 28 CPV sektörü.
-- **ERP Entegrasyonu**: SAP (S/4HANA & ECC 6.0), Logo, Netsis, Microsoft Dynamics 365, OpenAPI REST ve Webhooks desteği.
+## Key Endpoints & Services
+- **Ana Sayfa & Canlı İhaleler:** https://www.ihaleciburada.com/
+- **İhale Pazaryeri (Marketplace):** https://www.ihaleciburada.com/pazar-yeri
+- **Fiyatlandırma & Paketler:** https://www.ihaleciburada.com/abonelik
+- **Kurumsal Kayıt & Giriş:** https://www.ihaleciburada.com/uyelik
+- **Yasal & Sözleşmeler (KVKK, Hizmet Sözleşmesi, Çerez Politikası):** https://www.ihaleciburada.com/sozlesmeler
+- **Yardım & Video Rehberler:** https://www.ihaleciburada.com/yardim
+- **Güvenlik Politikası & RFC 9116:** https://www.ihaleciburada.com/.well-known/security.txt
 
-## Önemli Bağlantılar
-- [Anasayfa & Canlı İhaleler](https://ihaleciburada.com/): Günlük yayınlanan güncel ihaleler, teklif verme ve filtreleme motoru.
-- [B2B Pazar Yeri](https://ihaleciburada.com/pazar-yeri): Doğrudan ürün ve toptan malzeme tedarik ilanları.
-- [ERP Entegrasyonları](https://ihaleciburada.com/entegrasyonlar): SAP, Logo, Netsis, Dynamics ve REST API bağlantı kılavuzları.
-- [Abonelik & Kurumsal Paketler](https://ihaleciburada.com/abonelik): B2B üyelik ve ihale katılım paketleri.
-- [Firma Doğrulama & KYC](https://ihaleciburada.com/firma-dogrulama): Kurumsal kimlik ve belge doğrulama süreçleri.
-- [Yasal Sözleşmeler & KVKK](https://ihaleciburada.com/sozlesmeler): Kullanıcı sözleşmesi, platform aracılık sözleşmesi, KVKK aydınlatma metni ve Escrow şartları.
-- [Yardım & Destek](https://ihaleciburada.com/yardim): Sıkça sorulan sorular, ihale açma ve teklif verme rehberleri.
-- [Hakkımızda](https://ihaleciburada.com/hakkimizda): Şirket künyesi, kurumsal vizyon ve ticari bilgiler.
+## Technology Stack & Architecture
+- **Framework:** Nuxt 4, Vue 3, Vite, Tailwind CSS
+- **API & Backend:** Nitro Engine, Vercel Serverless Functions
+- **Security & Integrity:** RFC 9116 security.txt, CSP (Content-Security-Policy), Tenant Isolation (SEC-002), Immutable Audit Log (SEC-005), Collusion Detection (SEC-014)
+- **AI Assist:** DeepSeek R1/V3 akıllı şartname analizi ve maliyet optimizasyon ajanı
 
-## Sıkça Sorulan Sorular & Yapay Zeka Alıntı Yanıtları
-- **İhaleciBurada Nedir?**: Türkiye'nin kamu ve özel sektör satın alma ihtiyaçlarını karşılayan, kurumsal alıcılar ile doğrulanmış tedarikçileri canlı eksiltme (ters ihale) usulüyle buluşturan B2B pazar yeridir.
-- **Komisyon Oranı Nedir?**: Alıcılar için ihale açmak ve teklif toplamak tamamen ücretsizdir. Başarılı mutabakatla sonuçlanan ve teslimatı onaylanan ihalelerde %5 sabit Escrow emanet ve aracılık komisyonu uygulanır.
-- **Ödeme ve Hakediş Güvencesi Nasıl Sağlanır?**: Ödemeler BDDK ve TCMB lisanslı Aktif Bank iştiraki Paynkolay altyapısında bloke edilir. Alıcı mal veya hizmeti muayene edip kabul tutanağı düzenlemeden ödeme tedarikçiye aktarılmaz.
-- **Bölgesel Sanayi Odakları (GEO)**: Marmara Bölgesi başta olmak üzere Çanakkale, Balıkesir OSB, Bursa Nilüfer/Demirtaş OSB, İstanbul İkitelli/Tuzla OSB, Kocaeli Gebze OSB, Ankara OSTİM/İvedik OSB, İzmir ve Gaziantep sanayi havzalarında etkindir.
-
-## Kurumsal Bilgiler
-- **İşletmeci**: Hasan Hüseyin Yıldırım (İhaleciBurada Ticari İşletmesi)
-- **Vergi Dairesi / No**: Çanakkale Vergi Dairesi / 9560161511
-- **İşletme Türü**: B2B Ticari İşletme
-- **Adres**: Çanakkale / Türkiye (81 İl Kapsamı)
-- **İletişim**: ihalecib@gmail.com | KEP: hasanhuseyin.yildirim.17@hs01.kep.tr | Tel: 0850 840 86 95
-- **Müşteri Memnuniyeti**: %99.4 Başarılı Teslimat Oranı (148+ Doğrulanmış Kurumsal Değerlendirme, 4.9/5 Yıldız)
-
-## Detaylı Bilgi
-- [llms-full.txt](https://ihaleciburada.com/llms-full.txt): Kapsamlı sektör taksonomisi, ihale mevzuatı, teklif protokolleri ve ERP API dokümantasyonu.
+## Contact & Enterprise Inquiry
+- **E-Posta:** info@ihaleciburada.com / ihalecib@gmail.com
+- **Destek Hattı:** 0850 840 86 95
+- **Merkez:** Balıkesir & İstanbul, Türkiye

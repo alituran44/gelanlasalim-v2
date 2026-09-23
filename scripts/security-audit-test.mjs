@@ -283,6 +283,28 @@ assert(fs.existsSync(dnsSpfDocPath), 'DNS Security: DNS-SECURITY-SPF.md kılavuz
 const currentNuxtConfig = fs.readFileSync(path.join(repoRoot, 'nuxt.config.ts'), 'utf8')
 assert(currentNuxtConfig.includes("crossorigin: 'anonymous'"), 'SRI & Harici Script: Google Identity Services scriptinde crossorigin: anonymous tanımlı', 'crossorigin anonymous eksik')
 
+// 25. SENTINEL PENTEST, CSP, SCHEMA.ORG, LLMS.TXT VE WCAG ARIA TESTLERİ
+console.log('\n--- 25. Sentinel Pentest, CSP, Schema.org, LLMS.txt ve WCAG ARIA Testleri ---')
+const llmsPath = path.join(repoRoot, 'public/llms.txt')
+assert(fs.existsSync(llmsPath), 'AI Indexing: public/llms.txt dosyası mevcut', 'public/llms.txt eksik')
+const llmsContent = fs.existsSync(llmsPath) ? fs.readFileSync(llmsPath, 'utf8') : ''
+assert(llmsContent.includes('İhaleciBurada.com — AI & LLM Index') && llmsContent.includes('Core Value Proposition'), 'AI Indexing: llms.txt yapılandırılmış AI model özetine sahip', 'llms.txt içeriği geçersiz')
+
+const secHeadersPath = path.join(repoRoot, 'server/middleware/security-headers.ts')
+assert(fs.existsSync(secHeadersPath), 'Security Middleware: server/middleware/security-headers.ts mevcut', 'security-headers.ts eksik')
+const secHeadersContent = fs.existsSync(secHeadersPath) ? fs.readFileSync(secHeadersPath, 'utf8') : ''
+assert(secHeadersContent.includes('Content-Security-Policy') && secHeadersContent.includes("default-src 'self'"), 'CSP Enforcement: Content-Security-Policy Nitro middleware ile her yanıta basılıyor', 'CSP başlığı eksik')
+assert(secHeadersContent.includes('Permissions-Policy') && secHeadersContent.includes('camera=(), microphone=(), geolocation=()'), 'Permissions-Policy: Donanım sınırlandırması Nitro katmanında devrede', 'Permissions-Policy eksik')
+
+assert(indexVueContent.includes('@type\': \'Organization\'') || indexVueContent.includes('"@type": "Organization"'), 'Schema.org SEO: Organization JSON-LD şeması mevcut', 'Organization şeması eksik')
+assert(indexVueContent.includes('@type\': \'WebSite\'') || indexVueContent.includes('"@type": "WebSite"'), 'Schema.org SEO: WebSite JSON-LD şeması mevcut', 'WebSite şeması eksik')
+assert(indexVueContent.includes('@type\': \'FAQPage\'') || indexVueContent.includes('"@type": "FAQPage"'), 'Schema.org SEO: FAQPage Sıkça Sorulan Sorular şeması mevcut', 'FAQPage şeması eksik')
+
+const publicLayoutContent = fs.readFileSync(path.join(repoRoot, 'app/layouts/public.vue'), 'utf8')
+assert(publicLayoutContent.includes('aria-controls="mobile-navigation-drawer"') && publicLayoutContent.includes('aria-expanded'), 'WCAG ARIA: Mobil hamburger butonu aria-expanded ve aria-controls etiketlerine sahip', 'Hamburger ARIA eksik')
+assert(indexVueContent.includes('aria-controls="mobile-filter-sidebar"') && indexVueContent.includes('aria-expanded'), 'WCAG ARIA: Mobil filtre butonu aria-expanded ve aria-controls etiketlerine sahip', 'Mobil filtre ARIA eksik')
+assert(indexVueContent.includes('aria-label="İhale Detay Penceresini Kapat"'), 'WCAG ARIA: Modal kapatma butonlarında açıklayıcı aria-label mevcut', 'Modal kapatma aria-label eksik')
+
 console.log('\n====================================================')
 console.log(`📊 TEST SONUÇLARI: Toplam: ${totalTests} | Başarılı: ${passedTests} | Başarısız: ${failedTests}`)
 console.log('====================================================')

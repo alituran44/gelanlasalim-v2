@@ -52,6 +52,7 @@ export default defineNuxtConfig({
       // SEO, Crawler & RFC 9116 Güvenlik İletişim Dosyaları
       '/robots.txt': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
       '/sitemap.xml': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
+      '/llms.txt': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
       '/.well-known/security.txt': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
       '/security.txt': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
       // Yasal Sayfa Kısayolları (301 Yönlendirme)
@@ -61,6 +62,17 @@ export default defineNuxtConfig({
       '/gizlilik': { redirect: { to: '/sozlesmeler?tab=gizlilik', statusCode: 301 } },
       '/kullanim-sartlari': { redirect: { to: '/sozlesmeler?tab=kullanim', statusCode: 301 } },
       '/escrow': { redirect: { to: '/sozlesmeler?tab=escrow', statusCode: 301 } },
+      // Tüm rotalarda savunma derinliği (Defense-in-Depth) güvenlik başlıkları
+      '/**': {
+        headers: {
+          'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+          'Content-Security-Policy': "default-src 'self' https: data: blob: 'unsafe-inline'; script-src 'self' 'unsafe-inline' https:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https: blob:; font-src 'self' data: https:; connect-src 'self' https:;",
+          'X-Content-Type-Options': 'nosniff',
+          'X-Frame-Options': 'SAMEORIGIN',
+          'Referrer-Policy': 'strict-origin-when-cross-origin',
+          'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(self)'
+        }
+      }
     }
   },
 
@@ -123,7 +135,10 @@ export default defineNuxtConfig({
       link: [
         { rel: 'icon', type: 'image/png', href: '/logo.png' },
         { rel: 'preload', as: 'image', href: '/logo.png' },
+        { rel: 'preconnect', href: 'https://images.unsplash.com', crossorigin: 'anonymous' },
+        { rel: 'dns-prefetch', href: 'https://images.unsplash.com' },
         { rel: 'preconnect', href: 'https://accounts.google.com' },
+        { rel: 'dns-prefetch', href: 'https://accounts.google.com' },
         { rel: 'canonical', href: 'https://ihaleciburada.com' },
         { rel: 'alternate', hreflang: 'tr', href: 'https://ihaleciburada.com' },
         { rel: 'alternate', hreflang: 'en', href: 'https://ihaleciburada.com' },

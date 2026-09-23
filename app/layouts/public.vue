@@ -288,7 +288,9 @@ onMounted(() => {
             type="button"
             @click="isMobileMenuOpen = !isMobileMenuOpen"
             class="p-2 rounded-xl border border-slate-300 bg-slate-50 text-slate-700 hover:bg-slate-100 transition cursor-pointer"
-            aria-label="Menüyü Aç/Kapat"
+            aria-label="Mobil Menüyü Aç/Kapat"
+            :aria-expanded="isMobileMenuOpen ? 'true' : 'false'"
+            aria-controls="mobile-navigation-drawer"
           >
             <Menu v-if="!isMobileMenuOpen" :size="18" />
             <X v-else :size="18" />
@@ -306,7 +308,7 @@ onMounted(() => {
         leave-from-class="opacity-100 translate-y-0"
         leave-to-class="opacity-0 -translate-y-2"
       >
-        <div v-if="isMobileMenuOpen" class="lg:hidden mt-2 pt-3 border-t border-slate-200 space-y-3 pb-2 animate-fadeIn">
+        <div id="mobile-navigation-drawer" v-if="isMobileMenuOpen" class="lg:hidden mt-2 pt-3 border-t border-slate-200 space-y-3 pb-2 animate-fadeIn">
           
           <!-- Kullanıcı Bilgi Kartı (Giriş Yapılmışsa) -->
           <div v-if="isLoggedIn" class="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">

@@ -85,6 +85,98 @@ useSeoMeta({
   description: 'Günlük ihaleler, kamu ve özel sektör satın alma ilanları, şartnameler, doğrudan teklif verme ve sonuç takip sistemi.'
 })
 
+useHead({
+  script: [
+    {
+      type: 'application/ld+json',
+      children: JSON.stringify({
+        '@context': 'https://schema.org',
+        '@graph': [
+          {
+            '@type': 'Organization',
+            '@id': 'https://www.ihaleciburada.com/#organization',
+            'name': 'İhaleciBurada',
+            'alternateName': 'İhaleciBurada B2B İhale ve Satın Alma Portalı',
+            'url': 'https://www.ihaleciburada.com',
+            'logo': {
+              '@type': 'ImageObject',
+              'url': 'https://www.ihaleciburada.com/logo.png',
+              'caption': 'İhaleciBurada Kurumsal Logo'
+            },
+            'description': 'Türkiye’nin En Kapsamlı B2B İhale, Doğrudan Satın Alma ve Canlı Eksiltme Pazaryeri.',
+            'contactPoint': {
+              '@type': 'ContactPoint',
+              'telephone': '+90-850-840-86-95',
+              'contactType': 'customer service',
+              'areaServed': 'TR',
+              'availableLanguage': ['Turkish', 'English']
+            },
+            'sameAs': [
+              'https://twitter.com/ihaleciburada',
+              'https://www.linkedin.com/company/ihaleciburada'
+            ]
+          },
+          {
+            '@type': 'WebSite',
+            '@id': 'https://www.ihaleciburada.com/#website',
+            'url': 'https://www.ihaleciburada.com',
+            'name': 'İhaleciBurada',
+            'publisher': {
+              '@id': 'https://www.ihaleciburada.com/#organization'
+            },
+            'potentialAction': {
+              '@type': 'SearchAction',
+              'target': 'https://www.ihaleciburada.com/?q={search_term_string}',
+              'query-input': 'required name=search_term_string'
+            }
+          },
+          {
+            '@type': 'FAQPage',
+            '@id': 'https://www.ihaleciburada.com/#faq',
+            'mainEntity': [
+              {
+                '@type': 'Question',
+                'name': 'İhaleciBurada tersine ihale (eksiltme) sistemi nasıl çalışır?',
+                'acceptedAnswer': {
+                  '@type': 'Answer',
+                  'text': 'Alıcı kurum satın almak istediği mal veya hizmetin şartnamesini ve tavan bütçesini belirterek ihale açar. Doğrulanmış tedarikçiler canlı odalarda veya kapalı teklif usulüyle en rekabetçi fiyatlarını sunar. İhale sonunda en uygun teklif sahibiyle güvenli havuz (escrow) güvencesiyle sözleşme kurulur.'
+                }
+              },
+              {
+                '@type': 'Question',
+                'name': 'Firmaların doğrulanması (KYC) nasıl sağlanıyor?',
+                'acceptedAnswer': {
+                  '@type': 'Answer',
+                  'text': 'Platforma üye olan her şirketin VKN, vergi levhası ve yetki belgeleri doğrulanır. Yalnızca ticari yeterliliği onaylanan kurumsal firmalar teklif verebilir.'
+                }
+              },
+              {
+                '@type': 'Question',
+                'name': 'Alıcı kurumlardan komisyon alınıyor mu?',
+                'acceptedAnswer': {
+                  '@type': 'Answer',
+                  'text': 'Hayır. İhaleciBurada platformunda alıcı kurumlardan ihale açma, şartname yayınlama veya alım yapma komisyonu alınmaz.'
+                }
+              },
+              {
+                '@type': 'Question',
+                'name': 'Ödeme ve teslimat süreçleri güvenli mi?',
+                'acceptedAnswer': {
+                  '@type': 'Answer',
+                  'text': 'Evet. İhaleciBurada Güvenli Havuz (Escrow) sistemi sayesinde ihale bedeli bloke edilir ve muayene kabul tutanağı onaylanana kadar güvence altında tutulur.'
+                }
+              }
+            ]
+          }
+        ]
+      })
+    }
+  ],
+  link: [
+    { rel: 'preload', as: 'image', href: '/logo.png', fetchpriority: 'high' }
+  ]
+})
+
 const router = useRouter()
 
 // ==================== MENÜ VE GÖRÜNÜM SEÇİMİ ====================
@@ -1863,6 +1955,7 @@ onMounted(() => {
               @click="resetAllFilters"
               class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition cursor-pointer flex items-center gap-1 border border-slate-200"
               title="Filtreleri Sıfırla"
+              aria-label="Tüm Arama ve Filtreleri Sıfırla"
             >
               <RotateCcw :size="13" />
               <span class="hidden sm:inline">Sıfırla</span>
@@ -1918,6 +2011,9 @@ onMounted(() => {
             type="button"
             @click="showMobileFilters = !showMobileFilters" 
             class="w-full py-2.5 px-4 bg-white border border-slate-300 rounded-xl font-bold text-xs text-slate-800 flex items-center justify-between shadow-2xs cursor-pointer hover:bg-slate-50 transition"
+            aria-label="Filtreler ve Kategoriler Menüsünü Aç veya Kapat"
+            :aria-expanded="showMobileFilters ? 'true' : 'false'"
+            aria-controls="mobile-filter-sidebar"
           >
             <span class="flex items-center gap-2">
               <SlidersHorizontal :size="14" class="text-[#0084B4]" />
@@ -1936,7 +2032,7 @@ onMounted(() => {
         <!-- ========================================================= -->
         <!-- ⬅️ SOL SÜTUN: TÜM DİZİNLER (KATEGORİLER / ŞEHİRLER / İDARELER / SEKTÖRLER / FİRMALAR) -->
         <!-- ========================================================= -->
-        <aside :class="showMobileFilters ? 'block' : 'hidden lg:block'" class="lg:col-span-4 xl:col-span-3 space-y-3.5">
+        <aside id="mobile-filter-sidebar" :class="showMobileFilters ? 'block' : 'hidden lg:block'" class="lg:col-span-4 xl:col-span-3 space-y-3.5">
           
           <!-- Sol Menü Ana Kutusu -->
           <div class="bg-white border border-slate-300 rounded-2xl p-3.5 shadow-2xs space-y-3">
@@ -3407,6 +3503,7 @@ onMounted(() => {
               type="button"
               @click="selectedTenderModal = null"
               class="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-red-600 text-white font-bold text-xs transition flex items-center gap-1.5 border border-slate-700 cursor-pointer ml-auto shadow-xs"
+              aria-label="İhale Detay Penceresini Kapat"
             >
               ✕ Kapat
             </button>
@@ -3651,6 +3748,7 @@ onMounted(() => {
               type="button"
               @click="activeImageIndex = (activeImageIndex > 0 ? activeImageIndex - 1 : selectedTenderModal.images.length - 1)"
               class="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black text-white text-sm font-bold transition cursor-pointer"
+              aria-label="Önceki Görsel"
             >
               ❮
             </button>
@@ -3659,6 +3757,7 @@ onMounted(() => {
               type="button"
               @click="activeImageIndex = (activeImageIndex < selectedTenderModal.images.length - 1 ? activeImageIndex + 1 : 0)"
               class="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black text-white text-sm font-bold transition cursor-pointer"
+              aria-label="Sonraki Görsel"
             >
               ❯
             </button>
@@ -3827,6 +3926,7 @@ onMounted(() => {
             type="button" 
             @click="selectedTenderModal = null" 
             class="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-200 hover:text-white font-bold text-xs hover:bg-slate-800 transition cursor-pointer flex items-center gap-1"
+            aria-label="İhale Detay Penceresini Kapat"
           >
             ✕ Kapat
           </button>
