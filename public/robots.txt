@@ -6,62 +6,123 @@
 # 1. Genel Arama Motoru Botları (Googlebot, Bingbot, Yandex vb.)
 User-agent: *
 Allow: /
-Disallow: /admin/
 Disallow: /admin
-Disallow: /panel/
+Disallow: /admin/
 Disallow: /panel
+Disallow: /panel/
+Disallow: /api
 Disallow: /api/
+Disallow: /uyelik
 
-# 2. Yapay Zeka Arama & Alıntı Botları (OpenAI ChatGPT & SearchGPT)
+# 2. OpenAI GPTBot (ChatGPT, SearchGPT & Web Browsing)
 User-agent: GPTBot
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /panel
+Disallow: /panel/
+Disallow: /api
+Disallow: /api/
+Disallow: /uyelik
+
+# 3. OpenAI ChatGPT User Agent
 User-agent: ChatGPT-User
 Allow: /
+Disallow: /admin
 Disallow: /admin/
+Disallow: /panel
 Disallow: /panel/
+Disallow: /api
 Disallow: /api/
+Disallow: /uyelik
 
-# 3. Perplexity AI Search Crawler
+# 4. Perplexity AI Search Crawler
 User-agent: PerplexityBot
 Allow: /
+Disallow: /admin
 Disallow: /admin/
+Disallow: /panel
 Disallow: /panel/
+Disallow: /api
 Disallow: /api/
+Disallow: /uyelik
 
-# 4. Anthropic Claude Crawler
+# 5. Anthropic Claude Crawler
 User-agent: ClaudeBot
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /panel
+Disallow: /panel/
+Disallow: /api
+Disallow: /api/
+Disallow: /uyelik
+
 User-agent: anthropic-ai
 Allow: /
+Disallow: /admin
 Disallow: /admin/
+Disallow: /panel
 Disallow: /panel/
+Disallow: /api
 Disallow: /api/
+Disallow: /uyelik
 
-# 5. Google AI Overviews & Extended
+# 6. Google AI Overviews & Extended
 User-agent: Google-Extended
 Allow: /
+Disallow: /admin
 Disallow: /admin/
+Disallow: /panel
 Disallow: /panel/
+Disallow: /api
 Disallow: /api/
+Disallow: /uyelik
 
-# 6. Apple Intelligence & Search
+# 7. Apple Intelligence & Search
 User-agent: Applebot-Extended
 Allow: /
+Disallow: /admin
 Disallow: /admin/
+Disallow: /panel
 Disallow: /panel/
+Disallow: /api
 Disallow: /api/
+Disallow: /uyelik
 
-# 7. Diğer Büyük Dil Modeli Tarayıcıları
+# 8. Diğer Büyük Dil Modeli Tarayıcıları (Bytespider, CCBot, Cohere)
 User-agent: Bytespider
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /panel
+Disallow: /panel/
+Disallow: /api
+Disallow: /api/
+Disallow: /uyelik
+
 User-agent: CCBot
 Allow: /
+Disallow: /admin
 Disallow: /admin/
+Disallow: /panel
 Disallow: /panel/
+Disallow: /api
 Disallow: /api/
+Disallow: /uyelik
+
+User-agent: Cohere-ai
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+Disallow: /panel
+Disallow: /panel/
+Disallow: /api
+Disallow: /api/
+Disallow: /uyelik
 
 # ==============================================================================
 # SITEMAP & MACHINE-READABLE AI DISCOVERY FILES (llms.txt standard)
 # ==============================================================================
 Sitemap: https://ihaleciburada.com/sitemap.xml
-
-# LLMs Discovery (2026 AEO Standard):
-# https://ihaleciburada.com/llms.txt
-# https://ihaleciburada.com/llms-full.txt
+Sitemap: https://www.ihaleciburada.com/sitemap.xml

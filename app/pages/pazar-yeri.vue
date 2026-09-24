@@ -1081,7 +1081,7 @@ function downloadAllSpecs(tender: any) {
 
       <!-- 📋 6. TENDER CARDS (EKAP / İHALEBUL FORMATI - GÖRSEL 2 İLE BİREBİR) -->
       <div v-if="filteredTenders.length > 0" class="space-y-3">
-        <div 
+        <article 
           v-for="(tender, index) in filteredTenders" 
           :key="tender.id"
           class="bg-white border border-slate-300 hover:border-[#0084B4] rounded-lg p-3.5 sm:p-4 space-y-2.5 shadow-2xs transition-all duration-150"
@@ -1328,7 +1328,7 @@ function downloadAllSpecs(tender: any) {
               </button>
             </div>
           </div>
-        </div>
+        </article>
       </div>
 
       <!-- Empty State -->
@@ -1539,7 +1539,7 @@ function downloadAllSpecs(tender: any) {
         </div>
 
         <!-- Tab 1: İhale İlanı -->
-        <div v-if="detailActiveTab === 'ilan'" class="space-y-4 text-xs text-slate-700 leading-relaxed">
+        <article v-if="detailActiveTab === 'ilan'" class="space-y-4 text-xs text-slate-700 leading-relaxed">
           <!-- A. PROJE & HİZMET İLANI İSE (Herkese Açık İletişim & Web Sitesi & Not) -->
           <div v-if="selectedTenderForDetail.isIlan || selectedTenderForDetail.ihaleYonu === 'ihalesiz_ilan'" class="p-5 rounded-2xl bg-teal-50/70 border border-teal-200 space-y-4 text-slate-800">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-teal-200/80 pb-3">
@@ -1673,7 +1673,7 @@ function downloadAllSpecs(tender: any) {
               </p>
             </div>
           </div>
-        </div>
+        </article>
 
         <!-- Tab 2: Malzeme Listesi -->
         <div v-if="detailActiveTab === 'malzeme'" class="space-y-4 text-xs">

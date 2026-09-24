@@ -13,7 +13,6 @@ const staticPages = [
   { loc: '/firma-dogrulama', priority: '0.8', changefreq: 'monthly', image: 'https://ihaleciburada.com/logo.png', title: 'Kurumsal Kimlik ve Evrak Doğrulama (KYC)' },
   { loc: '/hakkimizda', priority: '0.7', changefreq: 'monthly', image: 'https://ihaleciburada.com/auth_skyscraper_bg.jpg', title: 'Hakkımızda - İhaleciBurada Şirket Künyesi ve Vizyon' },
   { loc: '/yardim', priority: '0.7', changefreq: 'monthly', image: 'https://ihaleciburada.com/logo.png', title: 'Yardım Merkezi & Sıkça Sorulan Sorular (SSS)' },
-  { loc: '/uyelik', priority: '0.8', changefreq: 'monthly', image: 'https://ihaleciburada.com/logo.png', title: 'Üye Kaydı ve Kurumsal Giriş' },
   { loc: '/videolar', priority: '0.7', changefreq: 'monthly', image: 'https://ihaleciburada.com/logo.png', title: 'Video Kılavuzlar ve İhale Eğitim Rehberi' }
 ];
 

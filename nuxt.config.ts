@@ -50,11 +50,12 @@ export default defineNuxtConfig({
       '/**/*.ico': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
       '/**/*.svg': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
       // SEO, Crawler & RFC 9116 Güvenlik İletişim Dosyaları
-      '/robots.txt': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
-      '/sitemap.xml': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
-      '/llms.txt': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
-      '/.well-known/security.txt': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
-      '/security.txt': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
+      '/robots.txt': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': '*' } },
+      '/sitemap.xml': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': '*' } },
+      '/llms.txt': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': '*' } },
+      '/.well-known/llms.txt': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': '*' } },
+      '/.well-known/security.txt': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': '*' } },
+      '/security.txt': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': '*' } },
       // Yasal Sayfa Kısayolları (301 Yönlendirme)
       '/legal': { redirect: { to: '/sozlesmeler', statusCode: 301 } },
       '/yasal': { redirect: { to: '/sozlesmeler', statusCode: 301 } },

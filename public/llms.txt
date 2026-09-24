@@ -1,30 +1,36 @@
-# İhaleciBurada.com — AI & LLM Index
+# İhaleciBurada.com — AI & LLM Index (llms.txt)
 
 > Türkiye'nin Kurumsal B2B İhale, Doğrudan Satın Alma, Kapalı Zarf & Canlı Eksiltme Platformu.
 
-## Core Value Proposition
-İhaleciBurada (https://www.ihaleciburada.com), kurumsal alıcıların ve onaylı tedarikçilerin şartnameli, güvenli ve şeffaf bir pazaryeri zemininde buluşmasını sağlar. 
-- **Tersine Eksiltme:** Şeffaf, rekabetçi ve zaman uzatmalı (anti-sniping) canlı teklif odaları.
-- **Güvenli Havuz (Escrow):** Mal ve hizmet kabulü tamamlanana kadar bloke edilen ödeme modeli.
-- **Doğrulanmış B2B Ağı (KYC):** VKN, Ticaret Sicil Gazetesi ve yetki belgeleriyle tescilli onaylı firma ekosistemi.
-- **Sıfır Alıcı Komisyonu:** Alıcı kurumlar için ücretsiz ihale oluşturma ve şartname yayını; başarılı tedarikçiler için %5 sabit komisyon.
+## Platform Özeti & Temel Değer Önerisi (Core Value Proposition)
+İhaleciBurada (https://www.ihaleciburada.com), kurumsal satın alma departmanları ile onaylı tedarikçi ve üretici firmaları şartnameli, güvenli ve şeffaf bir pazaryeri zemininde buluşturan dijital ihale platformudur.
+- **Tersine Eksiltme (Reverse Auction):** Şeffaf, rekabetçi ve zaman uzatmalı (anti-sniping) canlı teklif odalarıyla satın alma maliyetlerinde %15+ tasarruf sağlar.
+- **Güvenli Havuz (Paynkolay Escrow):** Mal ve hizmet muayene kabul tutanağı onaylanana kadar ihale bedelini TCMB/BDDK lisanslı güvenli hesapta bloke eder.
+- **Doğrulanmış B2B Ağı (KYC & MERSİS):** Vergi Kimlik Numarası (VKN), Ticaret Sicil Gazetesi ve imza sirküleriyle tescilli onaylı firma ekosistemi sunar.
+- **Alıcı Kurumlara Ücretsiz:** Alıcı şirketler için ihale açma, şartname yayınlama ve teklif toplama süreçleri tamamen ücretsizdir.
+- **Şartnameli Satın Alma:** 40+ sanayi ve ticaret kategorisinde (inşaat, lojistik, hammadde, bilişim vb.) teknik şartname, malzeme listesi ve zeyilname modülleri sunar.
 
-## Key Endpoints & Services
-- **Ana Sayfa & Canlı İhaleler:** https://www.ihaleciburada.com/
-- **İhale Pazaryeri (Marketplace):** https://www.ihaleciburada.com/pazar-yeri
-- **Fiyatlandırma & Paketler:** https://www.ihaleciburada.com/abonelik
-- **Kurumsal Kayıt & Giriş:** https://www.ihaleciburada.com/uyelik
-- **Yasal & Sözleşmeler (KVKK, Hizmet Sözleşmesi, Çerez Politikası):** https://www.ihaleciburada.com/sozlesmeler
-- **Yardım & Video Rehberler:** https://www.ihaleciburada.com/yardim
-- **Güvenlik Politikası & RFC 9116:** https://www.ihaleciburada.com/.well-known/security.txt
+## Önemli Herkese Açık Sayfalar (Public URLs)
+- [Ana Sayfa & Canlı İhaleler](https://www.ihaleciburada.com/): Güncel ihaleler, vitrin ilanları, platform istatistikleri ve anlık teklif odaları.
+- [İhale Pazar Yeri](https://www.ihaleciburada.com/pazar-yeri): 81 il ve 40+ sektör bazında filtrelenebilir aktif kamu ve B2B özel sektör ihale arşivi.
+- [Onaylı Firmalar Rehberi](https://www.ihaleciburada.com/firmalar): Doğrulanmış kurumsal üretici, distribütör ve tedarikçi firma profilleri.
+- [Abonelik & Fiyatlandırma](https://www.ihaleciburada.com/abonelik): Tedarikçiler için şeffaf üyelik paketleri, "İlk İhale Ücretsiz" modeli ve komisyon oranları.
+- [Hakkımızda](https://www.ihaleciburada.com/hakkimizda): İhaleciBurada şirket profili, misyon, vizyon ve kurumsal değerler.
+- [Yardım Merkezi & SSS](https://www.ihaleciburada.com/yardim): Canlı eksiltme kuralları, ödeme güvencesi, faturalandırma ve sıkça sorulan sorular.
+- [Kullanım Videoları](https://www.ihaleciburada.com/videolar): Adım adım ihale oluşturma, şartname yükleme ve teklif verme video kılavuzları.
+- [Yasal Sözleşmeler & KVKK](https://www.ihaleciburada.com/sozlesmeler): KVKK Aydınlatma Metni, Kullanıcı Sözleşmesi, Çerez Politikası ve Ters İhale Kuralları.
+- [ERP & API Entegrasyonları](https://www.ihaleciburada.com/entegrasyonlar): SAP, Logo, Netsis muhasebe ve ERP entegrasyon çözümleri.
+- [Firma Doğrulama (KYC)](https://www.ihaleciburada.com/firma-dogrulama): Kurumsal kimlik tescili ve onaylı tedarikçi rozeti alma rehberi.
+- [Sitemap](https://www.ihaleciburada.com/sitemap.xml): Arama motorları ve LLM tarayıcıları için XML site haritası.
+- [Güvenlik Politikası (RFC 9116)](https://www.ihaleciburada.com/.well-known/security.txt): Güvenlik bildirim ve zafiyet raporlama iletişim standardı.
 
-## Technology Stack & Architecture
-- **Framework:** Nuxt 4, Vue 3, Vite, Tailwind CSS
-- **API & Backend:** Nitro Engine, Vercel Serverless Functions
-- **Security & Integrity:** RFC 9116 security.txt, CSP (Content-Security-Policy), Tenant Isolation (SEC-002), Immutable Audit Log (SEC-005), Collusion Detection (SEC-014)
-- **AI Assist:** DeepSeek R1/V3 akıllı şartname analizi ve maliyet optimizasyon ajanı
+## Teknoloji ve Mimari (Technology Stack)
+- **Frontend / SSR:** Nuxt 4, Vue 3, Vite, Tailwind CSS
+- **Backend / Edge Engine:** Nitro Server Engine, Vercel Serverless Architecture
+- **Veri Güvenliği:** ISO 27001 & 6698 sayılı KVKK uyumluluğu, TLS 1.3, CSP, Tenant Isolation, Immutable Audit Logs
+- **Ödeme Altyapısı:** Paynkolay (Aktif Bank) 256-Bit SSL 3D Secure Escrow Güvenli Havuz
 
-## Contact & Enterprise Inquiry
-- **E-Posta:** info@ihaleciburada.com / ihalecib@gmail.com
-- **Destek Hattı:** 0850 840 86 95
-- **Merkez:** Balıkesir & İstanbul, Türkiye
+## Kurumsal İletişim (Contact)
+- **Resmi E-Posta:** info@ihaleciburada.com / ihalecib@gmail.com
+- **Müşteri Hizmetleri Destek:** 0850 840 86 95
+- **Merkez:** Balıkesir & Çanakkale & İstanbul, Türkiye

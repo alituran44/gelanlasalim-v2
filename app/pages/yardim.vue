@@ -151,7 +151,7 @@ const videoCards = [
       </div>
 
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div
+        <article
           v-for="video in videoCards"
           :key="video.id"
           @click="playVideo(video.id)"
@@ -185,14 +185,14 @@ const videoCards = [
               <span>→</span>
             </div>
           </div>
-        </div>
+        </article>
       </div>
     </div>
 
     <!-- FAQ Accordions -->
     <div class="space-y-4 pt-4">
       <h2 class="text-lg font-bold text-slate-800">Sıkça Sorulan Sorular</h2>
-      <div v-for="(faq, idx) in faqs" :key="idx" class="border border-slate-200 rounded-2xl bg-white overflow-hidden shadow-sm">
+      <article v-for="(faq, idx) in faqs" :key="idx" class="border border-slate-200 rounded-2xl bg-white overflow-hidden shadow-sm">
         <button @click="openFaq = openFaq === idx ? null : idx" class="flex w-full items-center justify-between p-5 text-left font-bold text-slate-800 text-xs sm:text-sm">
           <span>{{ faq.q }}</span>
           <ChevronDown :size="16" class="transition-transform text-slate-400" :class="{ 'rotate-180': openFaq === idx }" />
@@ -200,7 +200,7 @@ const videoCards = [
         <div v-show="openFaq === idx" class="p-5 border-t border-slate-100 bg-slate-50/50 text-xs leading-relaxed text-slate-600">
           {{ faq.a }}
         </div>
-      </div>
+      </article>
     </div>
 
     <!-- Contact Support Box -->

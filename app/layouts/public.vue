@@ -150,7 +150,7 @@ onMounted(() => {
 
         <!-- SAĞ (MASAÜSTÜ): ÜST MENÜ SEKMELERİ (hidden lg:flex) -->
         <!-- Misafir Menüsü (Giriş Yapılmamışsa) -->
-        <div v-if="!isLoggedIn" class="hidden lg:flex flex-wrap items-center gap-1.5 text-white font-bold text-xs">
+        <nav v-if="!isLoggedIn" aria-label="Ana Gezinme Menüsü" class="hidden lg:flex flex-wrap items-center gap-1.5 text-white font-bold text-xs">
           <NuxtLink 
             to="/"
             :class="route.path === '/' ? 'bg-[#0F223D] border-b-2 border-amber-400 text-white shadow-inner' : 'bg-[#1E3A8A] hover:bg-[#172554] text-slate-100'"
@@ -181,10 +181,10 @@ onMounted(() => {
           >
             <span>ℹ️ Hakkımızda</span>
           </NuxtLink>
-        </div>
+        </nav>
 
         <!-- Üye Menüsü (Giriş Yapılmışsa - MASAÜSTÜ) -->
-        <div v-else class="hidden lg:flex flex-wrap items-center gap-1.5 text-white font-bold text-xs">
+        <nav v-else aria-label="Kullanıcı Gezinme Menüsü" class="hidden lg:flex flex-wrap items-center gap-1.5 text-white font-bold text-xs">
           <NuxtLink 
             to="/"
             :class="route.path === '/' ? 'bg-[#0F223D] border-b-2 border-amber-400 text-white shadow-inner' : 'bg-[#1E3A8A] hover:bg-[#172554] text-slate-100'"
@@ -254,7 +254,7 @@ onMounted(() => {
           >
             <span>🏢 Üye Firmalar</span>
           </NuxtLink>
-        </div>
+        </nav>
 
         <!-- SAĞ (MOBİL & TABLET): HIZLI AKSİYONLAR & HAMBURGER MENÜ (flex lg:hidden) -->
         <div class="flex lg:hidden items-center gap-2">
@@ -355,7 +355,7 @@ onMounted(() => {
           </div>
 
           <!-- Temel Gezinme Linkleri -->
-          <div class="rounded-xl border border-slate-200 bg-white divide-y divide-slate-100 text-xs font-bold text-slate-700 overflow-hidden shadow-2xs">
+          <nav aria-label="Mobil Gezinme Menüsü" class="rounded-xl border border-slate-200 bg-white divide-y divide-slate-100 text-xs font-bold text-slate-700 overflow-hidden shadow-2xs">
             <NuxtLink to="/" @click="isMobileMenuOpen = false" class="flex items-center justify-between p-2.5 hover:bg-slate-50">
               <span class="flex items-center gap-2"><span>🏠</span><span>Ana Sayfa</span></span>
               <ArrowRight :size="13" class="text-slate-400" />
@@ -372,10 +372,10 @@ onMounted(() => {
               <span class="flex items-center gap-2"><span>ℹ️</span><span>Hakkımızda</span></span>
               <ArrowRight :size="13" class="text-slate-400" />
             </NuxtLink>
-          </div>
+          </nav>
 
           <!-- Üye Özel Menüsü (Giriş Yapılmışsa) -->
-          <div v-if="isLoggedIn" class="rounded-xl border border-slate-200 bg-white divide-y divide-slate-100 text-xs font-bold text-slate-700 overflow-hidden shadow-2xs">
+          <nav v-if="isLoggedIn" aria-label="Mobil Kullanıcı Menüsü" class="rounded-xl border border-slate-200 bg-white divide-y divide-slate-100 text-xs font-bold text-slate-700 overflow-hidden shadow-2xs">
             <NuxtLink to="/panel" @click="isMobileMenuOpen = false" class="flex items-center justify-between p-2.5 bg-blue-50/60 hover:bg-blue-100/60 text-blue-900 font-black">
               <span class="flex items-center gap-2"><span>🎛️</span><span>Yönetim Paneli</span></span>
               <ArrowRight :size="13" class="text-blue-600" />
@@ -404,7 +404,7 @@ onMounted(() => {
               <span class="flex items-center gap-2"><span>🏢</span><span>Üye Firmalar</span></span>
               <ArrowRight :size="13" class="text-slate-400" />
             </NuxtLink>
-          </div>
+          </nav>
 
           <!-- Giriş Yapılmamışsa: Giriş & Kayıt Butonları -->
           <div v-else class="grid grid-cols-2 gap-2">

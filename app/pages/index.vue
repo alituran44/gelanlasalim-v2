@@ -2653,7 +2653,7 @@ onMounted(() => {
           <!-- 🖼️ 4'LÜ KART DÜZENİ (VİTRİN / 4 SÜTUNLU RESPONSIVE GRID) -->
           <!-- ========================================================= -->
           <div v-if="paginatedTenders.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            <div 
+            <article 
               v-for="(tender, tenderIdx) in paginatedTenders" 
               :key="tender.id"
               class="bg-white border border-slate-300 hover:border-[#0084B4] hover:shadow-xl rounded-2xl overflow-hidden transition-all duration-300 flex flex-col justify-between group shadow-2xs text-left"
@@ -2841,7 +2841,7 @@ onMounted(() => {
                 </div>
 
               </div>
-            </div>
+            </article>
           </div>
 
           <!-- BOŞ DURUM (EMPTY STATE) -->
@@ -3475,7 +3475,7 @@ onMounted(() => {
     <!-- 📄 1. İNTERAKTİF ÇOKLU ŞARTNAME, PDF VE GÖRSEL GALERİSİ MODALI -->
     <!-- ========================================================================= -->
     <div v-if="selectedTenderModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-2 sm:p-4 animate-fadeIn">
-      <div class="bg-slate-900 rounded-3xl max-w-5xl w-full max-h-[96vh] flex flex-col shadow-2xl border border-slate-700 overflow-hidden text-left">
+      <article class="bg-slate-900 rounded-3xl max-w-5xl w-full max-h-[96vh] flex flex-col shadow-2xl border border-slate-700 overflow-hidden text-left">
         
         <!-- Üst Başlık & Sekme Çubuğu -->
         <div class="p-4 bg-slate-950 border-b border-slate-800 flex flex-wrap items-center justify-between gap-3 text-white">
@@ -3995,7 +3995,7 @@ onMounted(() => {
           </div>
         </div>
 
-      </div>
+      </article>
     </div>
 
     <!-- ========================================================================= -->
