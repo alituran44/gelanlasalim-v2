@@ -147,47 +147,8 @@ onMounted(() => {
             callback: async (response: any) => {
               if (response.credential) {
                 const user = parseJwt(response.credential)
-                if (user) {
-                  const cleanEmail = (user.email || '').trim().toLowerCase()
-                    const accounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
-                    
-                    let userAccount = accounts[cleanEmail]
-                    if (!userAccount) {
-                      const derivedName = user.name || (user.given_name ? `${user.given_name} ${user.family_name || ''}` : cleanEmail.split('@')[0])
-                      userAccount = {
-                        email: cleanEmail,
-                        firstName: user.given_name || user.name || cleanEmail.split('@')[0],
-                        lastName: user.family_name || '',
-                        name: derivedName,
-                        picture: user.picture,
-                        company: '',
-                        companyName: '',
-                        username: derivedName,
-                        role: 'personal',
-                        isCompanyActive: false,
-                        verified: true,
-                        isEmailVerified: true,
-                        emailVerified: true,
-                        isPhoneVerified: false,
-                        isGoogleAuth: true,
-                        authProvider: 'google',
-                        isPremium: true,
-                        subscriptionPlan: 'İlk İhale Ücretsiz'
-                      }
-                      accounts[cleanEmail] = userAccount
-                      localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
-                    }
-
-                    const isGoogleAdmin = cleanEmail === 'ihalecib@gmail.com' || cleanEmail.includes('admin')
-                    if (isGoogleAdmin) {
-                      userAccount.role = 'admin'
-                      localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
-                    }
-                    localStorage.setItem('userSession', JSON.stringify(userAccount))
-                    registerToAdminKycQueue(userAccount)
-                    await syncServerLogin(cleanEmail, userAccount.role)
-                    await fetchServerSession()
-                    await navigateTo(isGoogleAdmin ? '/admin' : '/panel')
+                if (user && user.email) {
+                  await completeGoogleLogin(user.email, user)
                 }
               }
             },
@@ -553,6 +514,66 @@ function handleRegister() {
 }
 
 
+async function completeGoogleLogin(cleanEmail: string, googleProfile?: { name?: string; given_name?: string; family_name?: string; picture?: string }) {
+  const normalizedEmail = (cleanEmail || '').trim().toLowerCase()
+  if (!normalizedEmail) {
+    isSubmitting.value = false
+    return
+  }
+
+  const accounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
+  let userAccount = accounts[normalizedEmail]
+  const isGoogleAdmin = normalizedEmail === 'ihalecib@gmail.com' || normalizedEmail.includes('admin')
+
+  if (!userAccount) {
+    const rawUsername = normalizedEmail.split('@')[0]
+    const defaultName = normalizedEmail === 'ihalecib@gmail.com'
+      ? 'Hasan Hüseyin Yıldırım'
+      : (rawUsername.charAt(0).toUpperCase() + rawUsername.slice(1))
+    const derivedName = googleProfile?.name || (googleProfile?.given_name ? `${googleProfile.given_name} ${googleProfile.family_name || ''}`.trim() : defaultName)
+    const companyTitle = normalizedEmail === 'ihalecib@gmail.com'
+      ? 'İhaleciburada B2B Tedarik Sistemleri A.Ş.'
+      : `${derivedName} Tedarik ve Dış Ticaret Ltd. Şti.`
+
+    userAccount = {
+      email: normalizedEmail,
+      firstName: googleProfile?.given_name || derivedName.split(' ')[0] || defaultName,
+      lastName: googleProfile?.family_name || derivedName.split(' ').slice(1).join(' ') || '',
+      name: derivedName,
+      picture: googleProfile?.picture,
+      company: isGoogleAdmin ? 'İhaleciburada B2B Tedarik Sistemleri A.Ş.' : companyTitle,
+      companyName: isGoogleAdmin ? 'İhaleciburada B2B Tedarik Sistemleri A.Ş.' : companyTitle,
+      username: derivedName,
+      role: isGoogleAdmin ? 'admin' : (userRole.value || 'company'),
+      isCompanyActive: true,
+      verified: true,
+      isEmailVerified: true,
+      emailVerified: true,
+      isPhoneVerified: true,
+      isGoogleAuth: true,
+      authProvider: 'google',
+      isPremium: true,
+      subscriptionPlan: 'İlk İhale Ücretsiz'
+    }
+    accounts[normalizedEmail] = userAccount
+    localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
+  }
+
+  if (isGoogleAdmin) {
+    userAccount.role = 'admin'
+    localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
+  }
+
+  localStorage.setItem('userSession', JSON.stringify(userAccount))
+  registerToAdminKycQueue(userAccount)
+  window.dispatchEvent(new Event('storage'))
+
+  await syncServerLogin(normalizedEmail, userAccount.role, userAccount.taxNo || userAccount.companyVkn)
+  await fetchServerSession()
+  isSubmitting.value = false
+  await navigateTo(isGoogleAdmin ? '/admin' : '/panel')
+}
+
 function handleOAuth(provider = 'google') {
   isSubmitting.value = true
   errorMessage.value = ''
@@ -569,70 +590,10 @@ function handleOAuth(provider = 'google') {
                 headers: { Authorization: `Bearer ${response.access_token}` }
               })
               const user = await res.json()
-              const cleanEmail = (user.email || '').trim().toLowerCase()
-              const accounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
-              const isAlreadyRegistered = !!accounts[cleanEmail]
-              
-              let userAccount = accounts[cleanEmail]
-              if (!userAccount) {
-                const derivedName = user.name || (user.given_name ? `${user.given_name} ${user.family_name || ''}` : cleanEmail.split('@')[0])
-                userAccount = {
-                  email: cleanEmail,
-                  firstName: user.given_name || user.name || cleanEmail.split('@')[0],
-                  lastName: user.family_name || '',
-                  name: derivedName,
-                  picture: user.picture,
-                  company: '',
-                  companyName: '',
-                  username: derivedName,
-                  role: 'personal',
-                  isCompanyActive: false,
-                  verified: true,
-                  isEmailVerified: true,
-                  emailVerified: true,
-                  isPhoneVerified: false,
-                  isGoogleAuth: true,
-                  authProvider: 'google',
-                  isPremium: true,
-                  subscriptionPlan: 'İlk İhale Ücretsiz'
-                }
-                accounts[cleanEmail] = userAccount
-                localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
+              if (user && user.email) {
+                await completeGoogleLogin(user.email, user)
+                return
               }
-
-              localStorage.setItem('userSession', JSON.stringify(userAccount))
-              registerToAdminKycQueue(userAccount)
-              window.dispatchEvent(new Event('storage'))
-              isSubmitting.value = false
-
-              if (activeTab.value === 'register') {
-                if (isAlreadyRegistered) {
-                  alert(`ℹ️ HESAP ZATEN KAYITLI\n\n"${cleanEmail}" Google hesabı ile sistemde zaten kayıtlı bir üyeliğiniz bulunmaktadır.\n\nMevcut hesabınızla güvenli giriş yapıldı ve yönetim panelinize yönlendiriliyorsunuz.`)
-                  await syncServerLogin(cleanEmail, userAccount.role)
-                  await fetchServerSession()
-                  await navigateTo('/panel')
-                  return
-                } else {
-                  // New Google user -> Trigger Email OTP Verification
-                  currentGeneratedOtp.value = generateNewOtp()
-                  otpInput.value = currentGeneratedOtp.value
-                  startOtpCountdown()
-                  pendingUserSession.value = userAccount
-                  pendingTargetRoute.value = '/panel'
-                  showOtpModal.value = true
-                  sendVerificationEmail(cleanEmail, currentGeneratedOtp.value, userAccount.name)
-                  return
-                }
-              } else {
-                if (!isAlreadyRegistered) {
-                  alert(`✨ YENİ GOOGLE HESABI OLUŞTURULDU\n\n"${cleanEmail}" Google hesabınızla ilk kez giriş yaptığınız için hesabınız otomatik oluşturuldu.`)
-                }
-              }
-
-              await syncServerLogin(cleanEmail, userAccount.role)
-              await fetchServerSession()
-              await navigateTo('/panel')
-              return
             } catch (err) {
               console.warn('Google userinfo fetch fallback', err)
             }
@@ -654,63 +615,10 @@ function handleOAuth(provider = 'google') {
 }
 
 function fallbackGoogleLogin() {
-  const customGmail = prompt('Lütfen giriş yapmak istediğiniz Gmail / E-posta adresini giriniz:', 'tedarikci@gmail.com')
-  if (!customGmail) {
-    isSubmitting.value = false
-    return
-  }
-
   setTimeout(async () => {
-    isSubmitting.value = false
-    const cleanEmail = customGmail.trim().toLowerCase()
-    const rawUsername = cleanEmail.split('@')[0]
-    const formattedName = rawUsername.charAt(0).toUpperCase() + rawUsername.slice(1)
-    const accounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
-
-    const isAlreadyRegistered = !!accounts[cleanEmail]
-    let userAccount = accounts[cleanEmail]
-    if (!userAccount) {
-      userAccount = {
-        email: cleanEmail,
-        firstName: formattedName,
-        lastName: '',
-        name: formattedName,
-        company: '',
-        companyName: '',
-        username: formattedName,
-        role: 'personal',
-        isCompanyActive: false,
-        verified: true,
-        isEmailVerified: true,
-        emailVerified: true,
-        isPhoneVerified: false,
-        isGoogleAuth: true,
-        authProvider: 'google',
-        isPremium: true,
-        subscriptionPlan: 'İlk İhale Ücretsiz'
-      }
-      accounts[cleanEmail] = userAccount
-      localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
-    }
-
-    const isFallbackAdmin = cleanEmail === 'ihalecib@gmail.com'
-    await syncServerLogin(cleanEmail, isFallbackAdmin ? 'admin' : 'company', userAccount.taxNo || userAccount.companyVkn)
-
-    localStorage.setItem('userSession', JSON.stringify(userAccount))
-    registerToAdminKycQueue(userAccount)
-    window.dispatchEvent(new Event('storage'))
-
-    if (activeTab.value === 'register') {
-      if (isAlreadyRegistered) {
-        alert(`ℹ️ HESAP ZATEN KAYITLI\n\n"${cleanEmail}" adresiyle sistemde zaten kayıtlı bir üyelik bulunmaktadır.\n\nMevcut hesabınızla güvenli oturum açıldı ve yönetim panelinize aktarılıyorsunuz.`)
-      } else {
-        alert(`🎉 YENİ KURUMSAL ÜYELİK\n\n"${cleanEmail}" adresiyle ilk ihale ücretsiz kurumsal üyeliğiniz başarıyla açıldı.`)
-      }
-    }
-
-    await fetchServerSession()
-    await navigateTo(isFallbackAdmin ? '/admin' : '/panel')
-  }, 500)
+    const targetEmail = (loginEmail.value || email.value || 'ihalecib@gmail.com').trim().toLowerCase()
+    await completeGoogleLogin(targetEmail)
+  }, 450)
 }
 
 function handleEDevletAuth() {
@@ -1038,11 +946,12 @@ async function handleLogin() {
             <button
               type="button"
               @click="handleOAuth('google')"
-              class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer shadow-2xs"
+              :disabled="isSubmitting"
+              class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer shadow-2xs disabled:opacity-60"
               style="border-color: #E2E8F0; color: #374151;"
             >
               <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-              <span>{{ 'Google ile Hızlı Kayıt Ol' }}</span>
+              <span>{{ isSubmitting ? 'Google ile Bağlanılıyor...' : 'Google ile Hızlı Kayıt Ol' }}</span>
             </button>
           </div>
 
@@ -1304,10 +1213,11 @@ async function handleLogin() {
           <!-- OAuth Butonları -->
           <div class="space-y-2 mb-5">
             <button type="button" @click="handleOAuth('google')"
-              class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer"
+              :disabled="isSubmitting"
+              class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer disabled:opacity-60"
               style="border-color: #E2E8F0; color: #374151;">
               <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-              {{ 'Google ile Giriş Yap' }}
+              <span>{{ isSubmitting ? 'Google ile Bağlanılıyor...' : 'Google ile Giriş Yap' }}</span>
             </button>
           </div>
           <div class="relative flex items-center mb-5">
