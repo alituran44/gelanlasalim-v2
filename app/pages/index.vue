@@ -81,8 +81,10 @@ definePageMeta({
 const { userSession, isLoggedIn, canSubmitBid, isCompanyVerified, companyRole, companyVkn } = useUserSession()
 
 useSeoMeta({
-  title: 'İhaleciBurada.com — Türkiye’nin En Kapsamlı B2B İhale ve Satın Alma Portalı',
-  description: 'Günlük ihaleler, kamu ve özel sektör satın alma ilanları, şartnameler, doğrudan teklif verme ve sonuç takip sistemi.'
+  title: 'İhaleciBurada — Türkiye’nin En Kapsamlı B2B İhale ve Satın Alma Portalı',
+  ogTitle: 'IHALECIBURADA — Official Digital Experience & Platform',
+  description: 'Türkiye’nin en kapsamlı B2B doğrudan satın alma ve canlı eksiltme pazaryeri. Günlük ihaleler, onaylı tedarikçiler ve güvenli escrow.',
+  ogDescription: 'Comprehensive digital presence, features, and official platform for ihaleciburada.com. Built with next-generation web technologies.'
 })
 
 useHead({
