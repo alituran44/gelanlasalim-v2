@@ -138,7 +138,7 @@ export default defineNuxtConfig({
         { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
         { rel: 'shortcut icon', href: '/favicon.ico' },
-        { rel: 'preload', as: 'image', href: '/logo.png' },
+        { rel: 'preload', as: 'image', href: '/logo.png', fetchpriority: 'high' },
         { rel: 'preconnect', href: 'https://images.unsplash.com', crossorigin: 'anonymous' },
         { rel: 'dns-prefetch', href: 'https://images.unsplash.com' },
         { rel: 'preconnect', href: 'https://accounts.google.com' },

@@ -277,9 +277,10 @@ export function isRequestHttps(event: H3Event): boolean {
       return false
     }
     const proto = getRequestProtocol(event)
-    return proto === 'https'
+    const forwardedProto = event.node?.req?.headers?.['x-forwarded-proto']
+    return proto === 'https' || forwardedProto === 'https' || process.env.NODE_ENV === 'production' || host.includes('ihaleciburada.com')
   } catch {
-    return false
+    return true
   }
 }
 
@@ -296,9 +297,9 @@ export function setSessionCookie(event: H3Event, token: string): void {
     path: '/',
     maxAge: 7 * 24 * 60 * 60 // 7 gün
   })
-  // 🛡️ 2. İstemci tarafı Nuxt route middleware doğrulaması için okunabilir bayrak
+  // 🛡️ 2. İstemci tarafı Nuxt route middleware doğrulaması için HttpOnly ve Secure oturum bayrağı
   setCookie(event, 'ihb_auth', '1', {
-    httpOnly: false,
+    httpOnly: true,
     secure: isHttps,
     sameSite: 'lax',
     path: '/',

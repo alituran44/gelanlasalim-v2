@@ -1,0 +1,30 @@
+# İhaleciBurada.com — AI & LLM Index
+
+> Türkiye'nin Kurumsal B2B İhale, Doğrudan Satın Alma, Kapalı Zarf & Canlı Eksiltme Platformu.
+
+## Core Value Proposition
+İhaleciBurada (https://www.ihaleciburada.com), kurumsal alıcıların ve onaylı tedarikçilerin şartnameli, güvenli ve şeffaf bir pazaryeri zemininde buluşmasını sağlar. 
+- **Tersine Eksiltme:** Şeffaf, rekabetçi ve zaman uzatmalı (anti-sniping) canlı teklif odaları.
+- **Güvenli Havuz (Escrow):** Mal ve hizmet kabulü tamamlanana kadar bloke edilen ödeme modeli.
+- **Doğrulanmış B2B Ağı (KYC):** VKN, Ticaret Sicil Gazetesi ve yetki belgeleriyle tescilli onaylı firma ekosistemi.
+- **Sıfır Alıcı Komisyonu:** Alıcı kurumlar için ücretsiz ihale oluşturma ve şartname yayını; başarılı tedarikçiler için %5 sabit komisyon.
+
+## Key Endpoints & Services
+- **Ana Sayfa & Canlı İhaleler:** https://www.ihaleciburada.com/
+- **İhale Pazaryeri (Marketplace):** https://www.ihaleciburada.com/pazar-yeri
+- **Fiyatlandırma & Paketler:** https://www.ihaleciburada.com/abonelik
+- **Kurumsal Kayıt & Giriş:** https://www.ihaleciburada.com/uyelik
+- **Yasal & Sözleşmeler (KVKK, Hizmet Sözleşmesi, Çerez Politikası):** https://www.ihaleciburada.com/sozlesmeler
+- **Yardım & Video Rehberler:** https://www.ihaleciburada.com/yardim
+- **Güvenlik Politikası & RFC 9116:** https://www.ihaleciburada.com/.well-known/security.txt
+
+## Technology Stack & Architecture
+- **Framework:** Nuxt 4, Vue 3, Vite, Tailwind CSS
+- **API & Backend:** Nitro Engine, Vercel Serverless Functions
+- **Security & Integrity:** RFC 9116 security.txt, CSP (Content-Security-Policy), Tenant Isolation (SEC-002), Immutable Audit Log (SEC-005), Collusion Detection (SEC-014)
+- **AI Assist:** DeepSeek R1/V3 akıllı şartname analizi ve maliyet optimizasyon ajanı
+
+## Contact & Enterprise Inquiry
+- **E-Posta:** info@ihaleciburada.com / ihalecib@gmail.com
+- **Destek Hattı:** 0850 840 86 95
+- **Merkez:** Balıkesir & İstanbul, Türkiye
