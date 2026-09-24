@@ -233,7 +233,7 @@ async function handleSendMessage() {
             </div>
 
             <!-- Chat input -->
-            <form @submit.prevent="handleSendMessage" class="flex items-center gap-2">
+            <form action="/api/v1/ai/chat" method="POST" @submit.prevent="handleSendMessage" class="flex items-center gap-2">
               <input 
                 id="deepseek-chat-input"
                 aria-label="DeepSeek yapay zeka ihale asistanı mesaj kutusu"

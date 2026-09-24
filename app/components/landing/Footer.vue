@@ -25,9 +25,16 @@ const { cmsData, saveCmsData } = useCmsData()
 const subscriberEmail = ref('')
 const isSubscribed = ref(false)
 
-function handleSubscribe() {
+async function handleSubscribe() {
   const email = subscriberEmail.value.trim().toLowerCase()
   if (!email || !email.includes('@')) return
+
+  try {
+    await $fetch('/api/v1/subscribe', {
+      method: 'POST',
+      body: { email, source: 'footer' }
+    })
+  } catch (e) {}
 
   if (cmsData.value?.emailSettings?.subscribers) {
     const today = new Date().toISOString().split('T')[0]
@@ -89,7 +96,7 @@ const legalLinks = [
         </div>
 
         <div class="w-full lg:w-auto shrink-0">
-          <form v-if="!isSubscribed" @submit.prevent="handleSubscribe" class="flex flex-col sm:flex-row gap-2 w-full sm:w-[380px]">
+          <form v-if="!isSubscribed" action="/api/v1/subscribe" method="POST" @submit.prevent="handleSubscribe" class="flex flex-col sm:flex-row gap-2 w-full sm:w-[380px]">
             <input 
               id="footer-subscriber-email"
               aria-label="E-posta bülten aboneliği adresi"

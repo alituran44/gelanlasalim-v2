@@ -2123,7 +2123,7 @@ function removeSubmittedBid(index: number) {
           <p class="text-xs text-slate-400 mt-1 text-center">Kurumsal KYC, İhale ve Satın Alma, Escrow Teslimat, CRM ve E-Posta Merkezi.</p>
         </div>
 
-        <form @submit.prevent="handleLogin" class="space-y-4">
+        <form action="/api/admin/auth/login" method="POST" @submit.prevent="handleLogin" class="space-y-4">
           <div>
             <label class="block text-xs font-bold text-slate-400 mb-1">YÖNETİCİ E-POSTA</label>
             <div class="relative">

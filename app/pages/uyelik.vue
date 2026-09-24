@@ -1054,7 +1054,7 @@ async function handleLogin() {
           </div>
 
           <!-- Standart Kayıt Formu -->
-          <form @submit.prevent="handleRegister" class="space-y-4">
+          <form action="/api/auth/register" method="POST" @submit.prevent="handleRegister" class="space-y-4">
             <!-- Ad & Soyad -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
@@ -1316,7 +1316,7 @@ async function handleLogin() {
             <div class="flex-1 border-t" style="border-color: #E2E8F0;"></div>
           </div>
 
-          <form @submit.prevent="handleLogin" class="space-y-4">
+          <form action="/api/auth/login" method="POST" @submit.prevent="handleLogin" class="space-y-4">
             <div>
               <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'E-Posta Adresi' }}</label>
               <div class="relative">
@@ -1379,7 +1379,7 @@ async function handleLogin() {
             </button>
           </div>
 
-          <form v-else @submit.prevent="handleForgotPassword" class="space-y-4">
+          <form v-else action="/api/auth/forgot-password" method="POST" @submit.prevent="handleForgotPassword" class="space-y-4">
             <div>
               <label class="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">{{ 'Kayıtlı E-Posta Adresiniz *' }}</label>
               <div class="relative">

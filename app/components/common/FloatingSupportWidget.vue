@@ -299,7 +299,7 @@ function generateBotResponse(userQuery: string) {
         </div>
 
         <!-- Chat Input Form -->
-        <form @submit.prevent="handleSendMessage" class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
+        <form action="/api/support/message" method="POST" @submit.prevent="handleSendMessage" class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
           <input 
             v-model="userInput" 
             type="text" 

@@ -418,6 +418,7 @@ const leadForm = ref({
 const isSubmittingLead = ref(false)
 const leadSubmitSuccess = ref(false)
 const leadFormError = ref('')
+const leadFormTermsAccepted = ref(false)
 
 async function submitLeadRequest() {
   leadFormError.value = ''
@@ -433,9 +434,22 @@ async function submitLeadRequest() {
     leadFormError.value = 'Lütfen en az 10 haneli geçerli bir telefon numarası girin.'
     return
   }
+  if (!leadFormTermsAccepted.value) {
+    leadFormError.value = 'Lütfen Kullanım Şartları ve KVKK Aydınlatma Metnini okuyup kabul ediniz.'
+    return
+  }
 
   isSubmittingLead.value = true
   try {
+    // 🛡️ API Uç Noktası Fetch İşleyicisi
+    await $fetch('/api/leads', {
+      method: 'POST',
+      body: {
+        ...leadForm.value,
+        createdAt: new Date().toISOString()
+      }
+    })
+
     if (typeof window !== 'undefined') {
       const existing = JSON.parse(localStorage.getItem('ihaleInquiries') || '[]')
       existing.unshift({
@@ -447,6 +461,7 @@ async function submitLeadRequest() {
     }
 
     leadSubmitSuccess.value = true
+    leadFormTermsAccepted.value = false
     leadForm.value = {
       firstName: '',
       lastName: '',
@@ -3304,7 +3319,7 @@ onMounted(() => {
                 </div>
 
                 <!-- Form Alanları -->
-                <form v-else @submit.prevent="submitLeadRequest" class="space-y-3.5">
+                <form v-else action="/api/leads" method="POST" @submit.prevent="submitLeadRequest" class="space-y-3.5">
                   
                   <!-- Hata Bildirimi -->
                   <div v-if="leadFormError" class="p-2.5 rounded-xl bg-rose-950/60 border border-rose-500/50 text-rose-200 text-xs flex items-center gap-2">
@@ -3393,11 +3408,26 @@ onMounted(() => {
                       class="w-full px-3.5 py-2.5 rounded-xl bg-[#121826] border border-slate-700 text-white placeholder:text-slate-500 text-xs focus:outline-none focus:border-blue-500 transition resize-none"
                     ></textarea>
                   </div>
+ 
+                  <!-- Kullanım Şartları ve KVKK Onay Kutucuğu -->
+                  <div class="flex items-start gap-2 pt-1 text-left">
+                    <input 
+                      id="lead-form-terms" 
+                      v-model="leadFormTermsAccepted" 
+                      type="checkbox" 
+                      class="mt-0.5 h-4 w-4 rounded border-slate-700 bg-[#121826] text-blue-600 focus:ring-blue-500 cursor-pointer shrink-0" 
+                      required
+                    />
+                    <label for="lead-form-terms" class="text-[11px] text-slate-300 leading-snug cursor-pointer select-none">
+                      <NuxtLink to="/sozlesmeler?tab=kullanim" target="_blank" class="underline text-blue-400 hover:text-blue-300 font-bold">Kullanım Şartları</NuxtLink> ve 
+                      <NuxtLink to="/sozlesmeler?tab=kvkk" target="_blank" class="underline text-blue-400 hover:text-blue-300 font-bold">KVKK Aydınlatma Metnini</NuxtLink> okudum, kabul ediyorum. <span class="text-rose-400">*</span>
+                    </label>
+                  </div>
 
                   <!-- Gönder Butonu -->
                   <button 
                     type="submit" 
-                    :disabled="isSubmittingLead"
+                    :disabled="isSubmittingLead || !leadFormTermsAccepted"
                     class="w-full py-3.5 px-5 rounded-xl bg-white hover:bg-slate-100 disabled:opacity-50 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg transition cursor-pointer"
                   >
                     <span v-if="isSubmittingLead">İşleniyor...</span>
@@ -4124,7 +4154,7 @@ onMounted(() => {
           </div>
         </div>
 
-        <form @submit.prevent="submitQuickOffer" class="space-y-4">
+        <form action="/api/bids" method="POST" @submit.prevent="submitQuickOffer" class="space-y-4">
           
           <div 
             class="p-2.5 rounded-xl border text-xs font-bold flex items-center justify-between"
@@ -4313,7 +4343,9 @@ onMounted(() => {
                 class="mt-0.5 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 cursor-pointer h-3.5 w-3.5" 
               />
               <span class="text-[10px] text-slate-600 leading-tight">
-                Teklifimin bağlayıcı ticari taahhüt olduğunu, ihale şartnamesini eksiksiz kabul ettiğimi ve teslimatı onayladığımı beyan ederim.
+                Teklifimin bağlayıcı ticari taahhüt olduğunu, ihale şartnamesi ile birlikte 
+                <NuxtLink to="/sozlesmeler?tab=kullanim" target="_blank" class="underline text-blue-600 font-bold">Kullanım Şartları</NuxtLink> ve 
+                <NuxtLink to="/sozlesmeler?tab=kvkk" target="_blank" class="underline text-blue-600 font-bold">KVKK Aydınlatma Metnini</NuxtLink> okuduğumu, kabul ettiğimi beyan ederim.
               </span>
             </label>
           </div>
