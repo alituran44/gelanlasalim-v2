@@ -787,19 +787,7 @@ async function handleSubmit() {
     } catch (e) {}
   }
 
-  // ⚠️ Zorunlu İletişim ve Teslimat Bilgisi Kontrolü
-  const effectivePhone = (form.value.ownerPhone || currentSession?.phone || '').trim()
-  if (!effectivePhone) {
-    alert('⚠️ Lütfen ihaleniz / ilanınız için iletişim telefon numarasını giriniz.')
-    return
-  }
-
-  const effectiveAddress = (form.value.teslimatAdresi || currentSession?.address || '').trim()
-  if (!effectiveAddress) {
-    alert('⚠️ Lütfen teslimat veya işin yapılacağı açık adresi giriniz.')
-    return
-  }
-
+  // Lojistik ve İletişim Bilgileri (İsteğe Bağlı)
   isSubmittingTender.value = true
 
   try {
@@ -1754,25 +1742,22 @@ function resetFormAndCreateNew() {
         </div>
       </div>
 
-      <!-- KART 3: LOJİSTİK, TESLİMAT & İLETİŞİM BİLGİLERİ (ZORUNLU KONTROLLÜ) -->
+      <!-- KART 3: LOJİSTİK, TESLİMAT & İLETİŞİM BİLGİLERİ -->
       <div class="rounded-2xl border bg-white p-4 sm:p-6 shadow-sm space-y-4 border-slate-200">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
             <h2 class="text-xs font-black uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
               <span>3. Lojistik, Teslimat & İletişim Bilgileri</span>
             </h2>
-            <p class="text-[11px] text-slate-500 mt-0.5">Tekliflerin ve teslimatın sorunsuz iletilebilmesi için adres ve telefon zorunludur.</p>
+            <p class="text-[11px] text-slate-500 mt-0.5">Tekliflerin ve teslimatın sorunsuz iletilebilmesi için teslimat yeri ve iletişim bilgileri.</p>
           </div>
-          <span class="text-[10px] font-bold text-red-700 bg-red-50 px-2.5 py-1 rounded-full border border-red-200">
-            * Telefon ve Adres Zorunlu
-          </span>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <!-- Teslimat İli -->
           <div>
             <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">
-              TESLİMAT / İŞ İLİ *
+              TESLİMAT / İŞ İLİ
             </label>
             <div class="relative">
               <MapPin :size="14" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -1785,17 +1770,16 @@ function resetFormAndCreateNew() {
             </div>
           </div>
 
-          <!-- İletişim Telefonu (ZORUNLU) -->
+          <!-- İletişim Telefonu -->
           <div>
-            <label class="block text-[10px] font-black text-red-600 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-              <span>İLETİŞİM TELEFONU (GSM) *</span>
-              <span class="text-[9px] font-bold text-red-500">ZORUNLU</span>
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">
+              İLETİŞİM TELEFONU (GSM)
             </label>
             <input 
               v-model="form.ownerPhone" 
               type="tel" 
               placeholder="Örn: 0532 123 45 67"
-              class="w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition focus:border-red-600 border-red-300 text-slate-900 bg-red-50/20 font-bold"
+              class="w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition focus:border-blue-600 border-slate-300 text-slate-900 bg-white font-medium"
             />
           </div>
 
@@ -1810,17 +1794,16 @@ function resetFormAndCreateNew() {
             />
           </div>
 
-          <!-- Açık Teslimat Adresi (ZORUNLU) -->
+          <!-- Açık Teslimat Adresi -->
           <div class="sm:col-span-2">
-            <label class="block text-[10px] font-black text-red-600 uppercase tracking-wider mb-1.5 flex items-center justify-between">
-              <span>AÇIK TESLİMAT / İŞ ADRESİ *</span>
-              <span class="text-[9px] font-bold text-red-500">ZORUNLU</span>
+            <label class="block text-[10px] font-black text-slate-600 uppercase tracking-wider mb-1.5">
+              AÇIK TESLİMAT / İŞ ADRESİ
             </label>
             <input 
               v-model="form.teslimatAdresi" 
               type="text"
               placeholder="Örn: Balıkesir OSB 3. Yol No: 12 veya Çanakkale Kepez Sahil Yolu" 
-              class="w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition focus:border-red-600 border-red-300 text-slate-900 bg-red-50/20 font-medium"
+              class="w-full px-3.5 py-2.5 rounded-xl border text-xs outline-none transition focus:border-blue-600 border-slate-300 text-slate-900 bg-white font-medium"
             />
           </div>
 
