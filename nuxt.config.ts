@@ -133,7 +133,11 @@ export default defineNuxtConfig({
         { name: 'twitter:image', content: 'https://ihaleciburada.com/auth_skyscraper_bg.jpg' }
       ],
       link: [
-        { rel: 'icon', type: 'image/png', href: '/logo.png' },
+        { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
+        { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
+        { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
+        { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+        { rel: 'shortcut icon', href: '/favicon.ico' },
         { rel: 'preload', as: 'image', href: '/logo.png' },
         { rel: 'preconnect', href: 'https://images.unsplash.com', crossorigin: 'anonymous' },
         { rel: 'dns-prefetch', href: 'https://images.unsplash.com' },
