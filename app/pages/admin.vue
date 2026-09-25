@@ -97,8 +97,8 @@ const router = useRouter()
 const route = useRoute()
 const { cmsData, saveCmsData, resetCmsData } = useCmsData()
 
-// Auth State
-const isLoggedIn = ref(typeof window !== 'undefined' ? (Boolean(localStorage.getItem('adminToken')) || Boolean(document.cookie.includes('ihb_auth=1'))) : false)
+// Auth State - Sadece sunucu tarafından doğrulanmış admin oturumu kabul edilir
+const isLoggedIn = ref(false)
 const formState = reactive(JSON.parse(JSON.stringify(cmsData.value)))
 const email = ref('')
 const password = ref('')
@@ -1095,16 +1095,25 @@ onMounted(async () => {
       adminTheme.value = 'light'
     }
 
-    // 🛡️ SEC-011 (Katman 5): Sunucu tarafı kesin oturum kontrolü (/api/auth/me)
+    // 🛡️ SEC-011: Sunucu tarafı kesin oturum ve admin yetkisi kontrolü (/api/auth/me)
     try {
       const meRes = await $fetch<{ success: boolean; isAuthenticated: boolean; isAdmin?: boolean; user?: any }>('/api/auth/me')
       if (meRes && meRes.isAuthenticated && meRes.isAdmin) {
         isLoggedIn.value = true
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
+        }
       } else {
         isLoggedIn.value = false
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('adminToken')
+        }
       }
     } catch {
       isLoggedIn.value = false
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('adminToken')
+      }
     }
 
     if (route.query.tab) {

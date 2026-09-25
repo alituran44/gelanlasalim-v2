@@ -523,17 +523,12 @@ async function completeGoogleLogin(cleanEmail: string, googleProfile?: { name?: 
 
   const accounts = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
   let userAccount = accounts[normalizedEmail]
-  const isGoogleAdmin = normalizedEmail === 'ihalecib@gmail.com' || normalizedEmail.includes('admin')
 
   if (!userAccount) {
     const rawUsername = normalizedEmail.split('@')[0]
-    const defaultName = normalizedEmail === 'ihalecib@gmail.com'
-      ? 'Hasan Hüseyin Yıldırım'
-      : (rawUsername.charAt(0).toUpperCase() + rawUsername.slice(1))
+    const defaultName = rawUsername.charAt(0).toUpperCase() + rawUsername.slice(1)
     const derivedName = googleProfile?.name || (googleProfile?.given_name ? `${googleProfile.given_name} ${googleProfile.family_name || ''}`.trim() : defaultName)
-    const companyTitle = normalizedEmail === 'ihalecib@gmail.com'
-      ? 'İhaleciburada B2B Tedarik Sistemleri A.Ş.'
-      : `${derivedName} Tedarik ve Dış Ticaret Ltd. Şti.`
+    const companyTitle = `${derivedName} Tedarik ve Dış Ticaret Ltd. Şti.`
 
     userAccount = {
       email: normalizedEmail,
@@ -541,10 +536,10 @@ async function completeGoogleLogin(cleanEmail: string, googleProfile?: { name?: 
       lastName: googleProfile?.family_name || derivedName.split(' ').slice(1).join(' ') || '',
       name: derivedName,
       picture: googleProfile?.picture,
-      company: isGoogleAdmin ? 'İhaleciburada B2B Tedarik Sistemleri A.Ş.' : companyTitle,
-      companyName: isGoogleAdmin ? 'İhaleciburada B2B Tedarik Sistemleri A.Ş.' : companyTitle,
+      company: companyTitle,
+      companyName: companyTitle,
       username: derivedName,
-      role: isGoogleAdmin ? 'admin' : (userRole.value || 'company'),
+      role: 'company',
       isCompanyActive: true,
       verified: true,
       isEmailVerified: true,
@@ -559,19 +554,18 @@ async function completeGoogleLogin(cleanEmail: string, googleProfile?: { name?: 
     localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
   }
 
-  if (isGoogleAdmin) {
-    userAccount.role = 'admin'
-    localStorage.setItem('adminToken', 'ihaleciburada_authorized_session')
-  }
-
+  // 🛡️ Google ile giriş yapan tüm kullanıcılar standart kullanıcı oturumu açar. Asla admin panele giriş yapamaz.
+  userAccount.role = 'company'
+  userAccount.isAdmin = false
   localStorage.setItem('userSession', JSON.stringify(userAccount))
+  localStorage.removeItem('adminToken')
   registerToAdminKycQueue(userAccount)
   window.dispatchEvent(new Event('storage'))
 
-  await syncServerLogin(normalizedEmail, userAccount.role, userAccount.taxNo || userAccount.companyVkn)
+  await syncServerLogin(normalizedEmail, 'company', userAccount.taxNo || userAccount.companyVkn)
   await fetchServerSession()
   isSubmitting.value = false
-  await navigateTo(isGoogleAdmin ? '/admin' : '/panel')
+  await navigateTo('/panel')
 }
 
 function handleOAuth(provider = 'google') {
@@ -616,7 +610,7 @@ function handleOAuth(provider = 'google') {
 
 function fallbackGoogleLogin() {
   setTimeout(async () => {
-    const targetEmail = (loginEmail.value || email.value || 'ihalecib@gmail.com').trim().toLowerCase()
+    const targetEmail = (loginEmail.value || email.value || 'tedarikci@ihaleciburada.com').trim().toLowerCase()
     await completeGoogleLogin(targetEmail)
   }, 450)
 }
@@ -786,7 +780,7 @@ async function handleLogin() {
     // 🛡️ SEC-010: Sunucu tarafı imzalı oturum cookie'sini oluştur
     await syncServerLogin(
       cleanEmail,
-      isAdminUser ? 'admin' : (existingAccount.role || 'company'),
+      existingAccount.role || 'company',
       existingAccount.taxNo || '9560161511',
       loginPassword.value,
       sessionObj.name
@@ -797,18 +791,10 @@ async function handleLogin() {
     isSubmitting.value = false
     triggerAuthToast('Giriş başarılı! Yönlendiriliyorsunuz...', 'success')
 
-    if (isAdminUser) {
-      if (typeof window !== 'undefined') {
-        window.location.href = '/admin'
-      } else {
-        await navigateTo('/admin')
-      }
+    if (typeof window !== 'undefined') {
+      window.location.href = '/panel'
     } else {
-      if (typeof window !== 'undefined') {
-        window.location.href = '/panel'
-      } else {
-        await navigateTo('/panel')
-      }
+      await navigateTo('/panel')
     }
   } catch (err: any) {
     isSubmitting.value = false
