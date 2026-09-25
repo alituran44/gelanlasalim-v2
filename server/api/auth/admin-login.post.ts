@@ -2,7 +2,6 @@ import { defineEventHandler, readBody, createError } from 'h3'
 import { createAdminSession, setSessionCookie, ADMIN_SECRET_TOKEN } from '~~/server/utils/sessionStore'
 import { logSecurityEvent } from '~~/server/utils/securityAuditStore'
 import { sanitizePayload } from '~~/server/utils/authGuard'
-import { verifyUserCredential } from '~~/server/utils/credentialStore'
 import { timingSafeEqual } from 'node:crypto'
 
 export default defineEventHandler(async (event) => {
@@ -48,13 +47,6 @@ export default defineEventHandler(async (event) => {
     const inBuf = Buffer.from(secretKey)
     return inBuf.length === expBuf.length && timingSafeEqual(inBuf, expBuf)
   })
-
-  if (!isPasswordValid) {
-    const credCheck = verifyUserCredential(adminEmail, secretKey)
-    if (credCheck.valid) {
-      isPasswordValid = true
-    }
-  }
 
   const isAuthorized = isEmailValid && isPasswordValid
 
