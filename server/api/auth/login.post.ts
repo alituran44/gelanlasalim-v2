@@ -70,9 +70,9 @@ export default defineEventHandler(async (event) => {
       }
     }
   } else {
-    const candidateRole = body.role && typeof body.role === 'string' ? sanitizeXss(body.role) : 'FİRMA_YÖNETİCİSİ'
+    const candidateRole = body.role && typeof body.role === 'string' ? sanitizeXss(body.role) : 'individual'
     // 🛡️ SEC-ADM: Normal giriş uç noktasından asla ADMIN rolü veya yetkisi verilemez
-    role = (candidateRole === 'ADMIN' || candidateRole === 'admin') ? 'FİRMA_YÖNETİCİSİ' : candidateRole
+    role = (candidateRole === 'ADMIN' || candidateRole === 'admin') ? 'individual' : candidateRole
     if (body.name && typeof body.name === 'string') {
       userName = sanitizeXss(body.name)
     }

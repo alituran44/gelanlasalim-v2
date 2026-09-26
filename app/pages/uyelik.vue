@@ -110,13 +110,14 @@ function parseJwt(token: string) {
 async function syncServerLogin(emailStr: string, roleStr?: string, vknStr?: string, passStr?: string, nameStr?: string) {
   try {
     const cleanEmail = (emailStr || '').trim().toLowerCase()
+    const targetRole = roleStr || 'individual'
     await $fetch('/api/auth/login', {
       method: 'POST',
       body: {
         email: cleanEmail,
-        password: passStr || 'kurumsal_oturum_aktif',
-        companyVkn: vknStr || '9560161511',
-        role: roleStr,
+        password: passStr || 'bireysel_oturum_aktif',
+        companyVkn: targetRole === 'individual' ? '' : (vknStr || ''),
+        role: targetRole,
         name: nameStr
       }
     })
@@ -181,7 +182,7 @@ const confirmPassword = ref('')
 const showPassword = ref(false)
 const showConfirmPassword = ref(false)
 const showLoginPassword = ref(false)
-const userRole = ref<'company' | 'individual'>('company')
+const userRole = ref<'company' | 'individual'>('individual')
 const companyName = ref('')
 const agreeKvkk = ref(false)
 const agreeUserAgreement = ref(false)
@@ -530,7 +531,6 @@ async function completeGoogleLogin(cleanEmail: string, googleProfile?: { name?: 
     const rawUsername = normalizedEmail.split('@')[0]
     const defaultName = rawUsername.charAt(0).toUpperCase() + rawUsername.slice(1)
     const derivedName = googleProfile?.name || (googleProfile?.given_name ? `${googleProfile.given_name} ${googleProfile.family_name || ''}`.trim() : defaultName)
-    const companyTitle = `${derivedName} Tedarik ve Dış Ticaret Ltd. Şti.`
 
     userAccount = {
       email: normalizedEmail,
@@ -538,11 +538,11 @@ async function completeGoogleLogin(cleanEmail: string, googleProfile?: { name?: 
       lastName: googleProfile?.family_name || derivedName.split(' ').slice(1).join(' ') || '',
       name: derivedName,
       picture: googleProfile?.picture,
-      company: companyTitle,
-      companyName: companyTitle,
+      company: '',
+      companyName: '',
       username: derivedName,
-      role: 'company',
-      isCompanyActive: true,
+      role: 'individual',
+      isCompanyActive: false,
       verified: true,
       isEmailVerified: true,
       emailVerified: true,
@@ -550,21 +550,28 @@ async function completeGoogleLogin(cleanEmail: string, googleProfile?: { name?: 
       isGoogleAuth: true,
       authProvider: 'google',
       isPremium: true,
-      subscriptionPlan: 'İlk İhale Ücretsiz'
+      subscriptionPlan: 'Bireysel Üyelik'
     }
-    accounts[normalizedEmail] = userAccount
-    localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
+  } else {
+    userAccount.isGoogleAuth = true
+    userAccount.authProvider = 'google'
+    if (googleProfile?.name) userAccount.name = googleProfile.name
+    if (googleProfile?.picture) userAccount.picture = googleProfile.picture
   }
 
-  // 🛡️ Google ile giriş yapan tüm kullanıcılar standart kullanıcı oturumu açar. Asla admin panele giriş yapamaz.
-  userAccount.role = 'company'
+  // 🛡️ Kullanıcı talebi: Giriş yapıldığında doğrudan bireysel kullanıcı olarak oturum açar
+  userAccount.role = 'individual'
+  userAccount.isCompanyActive = false
   userAccount.isAdmin = false
+  accounts[normalizedEmail] = userAccount
+  localStorage.setItem('user_accounts_registry', JSON.stringify(accounts))
   localStorage.setItem('userSession', JSON.stringify(userAccount))
+  localStorage.setItem('last_google_account', normalizedEmail)
   localStorage.removeItem('adminToken')
   registerToAdminKycQueue(userAccount)
   window.dispatchEvent(new Event('storage'))
 
-  await syncServerLogin(normalizedEmail, 'company', userAccount.taxNo || userAccount.companyVkn)
+  await syncServerLogin(normalizedEmail, 'individual', '')
   await fetchServerSession()
   isSubmitting.value = false
   showGoogleAccountModal.value = false
@@ -584,7 +591,7 @@ const savedGoogleAccounts = computed(() => {
   if (typeof window === 'undefined') return []
   try {
     const registry = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
-    return Object.values(registry).filter((acc: any) => acc && acc.email && (acc.authProvider === 'google' || acc.isGoogleAuth || acc.email.includes('@gmail.com') || acc.role === 'company'))
+    return Object.values(registry).filter((acc: any) => acc && acc.email && (acc.authProvider === 'google' || acc.isGoogleAuth || acc.email.includes('@gmail.com') || acc.role === 'individual' || acc.role === 'company'))
   } catch {
     return []
   }
@@ -685,17 +692,17 @@ function handleEDevletAuth() {
         surname: lastName.value || 'Yetkili',
         name: authName + ' (e-Devlet Onaylı)',
         username: authName,
-        company: compName,
-        companyName: compName,
-        role: 'company',
-        isCompanyActive: true,
+        company: '',
+        companyName: '',
+        role: 'individual',
+        isCompanyActive: false,
         verified: true,
         isEDevletVerified: true,
         isPremium: true,
-        subscriptionPlan: 'İlk İhale Ücretsiz'
+        subscriptionPlan: 'Bireysel Üyelik'
       }))
     }
-    await syncServerLogin(targetEmail, 'company')
+    await syncServerLogin(targetEmail, 'individual')
     await fetchServerSession()
     await navigateTo('/panel')
   }, 900)
@@ -754,6 +761,7 @@ async function handleLogin() {
       const raw2FaPrefix = cleanEmail.split('@')[0]
       const derived2FaName = raw2FaPrefix.charAt(0).toUpperCase() + raw2FaPrefix.slice(1)
 
+      const isMatchedCompany = matchedAccount.role === 'company' && matchedAccount.isCompanyActive === true
       pendingUserSession.value = {
         email: cleanEmail,
         firstName: matchedAccount.firstName || derived2FaName,
@@ -761,15 +769,16 @@ async function handleLogin() {
         surname: matchedAccount.lastName || matchedAccount.surname || '',
         name: matchedAccount.name || (derived2FaName + (matchedAccount.lastName ? ' ' + matchedAccount.lastName : '')),
         username: matchedAccount.username || derived2FaName,
-        company: matchedAccount.company || matchedAccount.companyName || (derived2FaName + ' Tedarik'),
-        companyName: matchedAccount.companyName || matchedAccount.company || (derived2FaName + ' Tedarik'),
+        company: isMatchedCompany ? (matchedAccount.company || matchedAccount.companyName || '') : '',
+        companyName: isMatchedCompany ? (matchedAccount.companyName || matchedAccount.company || '') : '',
         phone: matchedAccount.phone || '',
         city: matchedAccount.city || 'Balıkesir',
-        role: matchedAccount.role || 'company',
+        role: isMatchedCompany ? 'company' : 'individual',
+        isCompanyActive: isMatchedCompany,
         verified: true,
         is2FaEnabled: true,
         isPremium: true,
-        subscriptionPlan: matchedAccount.subscriptionPlan || 'İlk İhale Ücretsiz'
+        subscriptionPlan: matchedAccount.subscriptionPlan || (isMatchedCompany ? 'Kurumsal Üyelik' : 'Bireysel Üyelik')
       }
       pendingTargetRoute.value = '/panel'
       const dynamicOtp = String(Math.floor(100000 + Math.random() * 900000))
@@ -798,6 +807,7 @@ async function handleLogin() {
     const rawPrefix = cleanEmail.split('@')[0]
     const derivedName = rawPrefix.charAt(0).toUpperCase() + rawPrefix.slice(1).replace(/[^a-zA-Z0-9]/g, ' ')
 
+    const isExplicitCompany = existingAccount.role === 'company' && existingAccount.isCompanyActive === true
     const sessionObj = {
       email: cleanEmail,
       firstName: existingAccount.firstName || derivedName,
@@ -805,14 +815,15 @@ async function handleLogin() {
       surname: existingAccount.lastName || existingAccount.surname || '',
       name: existingAccount.name || (derivedName + (existingAccount.lastName ? ' ' + existingAccount.lastName : '')),
       username: existingAccount.username || derivedName,
-      company: existingAccount.company || existingAccount.companyName || (derivedName + ' Tedarik'),
-      companyName: existingAccount.companyName || existingAccount.company || (derivedName + ' Tedarik'),
+      company: isExplicitCompany ? (existingAccount.company || existingAccount.companyName || '') : '',
+      companyName: isExplicitCompany ? (existingAccount.companyName || existingAccount.company || '') : '',
       phone: existingAccount.phone || '',
       city: existingAccount.city || 'Balıkesir',
-      role: existingAccount.role || 'company',
+      role: isExplicitCompany ? 'company' : 'individual',
+      isCompanyActive: isExplicitCompany,
       verified: true,
       isPremium: true,
-      subscriptionPlan: existingAccount.subscriptionPlan || 'İlk İhale Ücretsiz'
+      subscriptionPlan: existingAccount.subscriptionPlan || (isExplicitCompany ? 'Kurumsal Üyelik' : 'Bireysel Üyelik')
     }
 
     if (typeof window !== 'undefined') {
@@ -834,8 +845,8 @@ async function handleLogin() {
     // 🛡️ SEC-010: Sunucu tarafı imzalı oturum cookie'sini oluştur
     await syncServerLogin(
       cleanEmail,
-      existingAccount.role || 'company',
-      existingAccount.taxNo || '9560161511',
+      sessionObj.role,
+      isExplicitCompany ? (existingAccount.taxNo || '') : '',
       loginPassword.value,
       sessionObj.name
     )
@@ -1414,7 +1425,7 @@ async function handleLogin() {
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <div class="flex items-center gap-2">
               <svg width="22" height="22" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-              <h3 class="text-sm font-black text-slate-900">Google ile Oturum Açın</h3>
+              <h3 class="text-sm font-black text-slate-900">Google ile Bireysel Giriş</h3>
             </div>
             <button @click="showGoogleAccountModal = false" class="text-slate-400 hover:text-slate-700 cursor-pointer p-1">
               <X :size="18" />
@@ -1422,7 +1433,7 @@ async function handleLogin() {
           </div>
 
           <p class="text-xs text-slate-600 leading-relaxed">
-            İhaleciBurada platformuna bağlanmak istediğiniz Google hesabını seçin veya başka bir Google hesabı giriniz:
+            İhaleciBurada platformuna doğrudan <strong>bireysel kullanıcı</strong> olarak bağlanmak istediğiniz Google hesabını seçin veya başka bir Google hesabı giriniz:
           </p>
 
           <!-- Kayıtlı / Önceki Hesaplar Listesi -->

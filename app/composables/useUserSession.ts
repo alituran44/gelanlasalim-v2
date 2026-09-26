@@ -111,9 +111,13 @@ export function useUserSession() {
   // Bireysel (Kişisel) vs Kurumsal (Firma) Modu
   const isCompanyMode = computed(() => {
     if (serverSession.value) {
+      const cr = (serverSession.value.companyRole || '').toLowerCase()
+      if (cr === 'individual' || cr === 'bireysel' || cr === 'personal' || cr === 'görüntüleyici') {
+        return false
+      }
       return Boolean(serverSession.value.companyVkn && serverSession.value.companyRole !== 'GÖRÜNTÜLEYİCİ')
     }
-    return userSession.value?.isCompanyActive === true || userSession.value?.role === 'company'
+    return userSession.value?.isCompanyActive === true && userSession.value?.role === 'company'
   })
 
   // UI Görüntüleme için İsim (Güvenlik kararlarında kullanılmaz)

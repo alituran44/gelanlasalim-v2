@@ -6,7 +6,6 @@ import { useCmsData } from '~/composables/useCmsData'
 import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
 import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
 import { usePublicApis } from '~/composables/usePublicApis'
-import CategorySpecificFields from '~/components/tender/CategorySpecificFields.vue'
 import { resolveSectorKey } from '~/utils/categoryFieldsSchema'
 
 definePageMeta({ layout: 'dashboard' })
@@ -1627,24 +1626,6 @@ function resetFormAndCreateNew() {
             class="w-full rounded-xl border p-3 text-xs outline-none transition focus:border-blue-600 focus:ring-2 focus:ring-blue-100 font-medium"
             style="border-color: #CBD5E1; color: #0F172A;"
           ></textarea>
-        </div>
-
-        <!-- Gayrimenkul ise: Emlak Parametreleri (Sahibinden Standardı) -->
-        <div v-if="isRealEstateCategory" class="rounded-2xl border border-amber-200 bg-amber-50/20 p-4 space-y-3">
-          <div class="flex items-center gap-2">
-            <span class="text-lg">🏡</span>
-            <div>
-              <span class="text-xs font-black text-slate-900 uppercase tracking-wider block">Gayrimenkul & Emlak Kriterleri</span>
-              <span class="text-[10px] text-slate-500">Oda sayısı, m², kat ve tapu durumu gibi detayları belirleyin</span>
-            </div>
-          </div>
-          <CategorySpecificFields
-            v-model="categorySpecificData"
-            :category="form.kategori"
-            :sub-category="selectedSubcategory"
-            :closeable="false"
-            @sector-changed="handleSectorChanged"
-          />
         </div>
 
         <!-- Kompakt Dosya & Fotoğraf Ekleme Alanı (Yan Yana) -->

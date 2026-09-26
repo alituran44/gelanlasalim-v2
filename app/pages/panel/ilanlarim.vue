@@ -5,7 +5,6 @@ import { useCmsData } from '~/composables/useCmsData'
 import { locale } from '~/composables/useLocale'
 import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
 import AiMatchingModal from '~/components/ai/AiMatchingModal.vue'
-import CategorySpecificFields from '~/components/tender/CategorySpecificFields.vue'
 import { formatSectorSummaryBadges } from '~/utils/categoryFieldsSchema'
 import { useAgencyManagement } from '~/composables/useAgencyManagement'
 
@@ -1270,15 +1269,6 @@ const statusTabs = computed(() => {
               placeholder="Teknik şartname gereksinimleri, malzeme kalite standartları ve teslimat koşulları..."
               class="w-full p-3 rounded-xl border border-slate-200 text-xs text-slate-800 outline-none focus:border-blue-600"
             ></textarea>
-          </div>
-
-          <!-- 📐 Sektöre Özel Teknik ve Mevzuat Parametreleri (Yalnızca Ev & Arsa İlanlarında) -->
-          <div v-if="isRealEstateEditForm" class="pt-2 border-t border-slate-100">
-            <CategorySpecificFields 
-              v-model="editForm.categorySpecificData"
-              :category="editForm.kategori"
-              :sub-category="editForm.subCategory"
-            />
           </div>
 
           <!-- Kalemler Listesi -->
