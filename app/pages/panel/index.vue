@@ -31,7 +31,8 @@ import {
   Lock,
   Bell,
   Heart,
-  Award
+  Award,
+  ClipboardList
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useUserSession } from '~/composables/useUserSession'
@@ -51,7 +52,8 @@ const {
   companyName: sessionCompanyName, 
   isLoggedIn, 
   isCompanyVerified,
-  toggleCompanyMode 
+  toggleCompanyMode,
+  setCompanyMode
 } = useUserSession()
 
 const displayName = computed(() => {
@@ -269,6 +271,59 @@ watch(() => userSession.value, () => {
           <span>{{ activeTab === 'profil' ? '📊 Genel Bakışa Dön' : (isCompanyMode ? '🏢 Kurumsal Profil & Hesap' : '👤 Profil & Hesap') }}</span>
         </button>
       </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 🎛️ GÖRSEL 5: ÇALIŞMA MODU (KİŞİSEL / FİRMA) & YAYINDAKİ İLANLARIM -->
+    <!-- ========================================================================= -->
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-xs flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      <div class="flex flex-col sm:flex-row sm:items-center gap-3">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-black text-slate-800 uppercase tracking-wider">HESAP ÇALIŞMA MODU:</span>
+          <span 
+            class="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase"
+            :class="isCompanyMode ? 'bg-emerald-100 text-emerald-800 border border-emerald-300' : 'bg-blue-100 text-blue-800 border border-blue-300'"
+          >
+            {{ isCompanyMode ? '🏢 Firma Modu Aktif' : '👤 Kişisel Mod Aktif' }}
+          </span>
+        </div>
+        <div class="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200">
+          <!-- Bireysel Olarak Devam Et (Kişisel Mod) -->
+          <button
+            type="button"
+            @click="setCompanyMode(false)"
+            class="px-3.5 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer"
+            :class="!isCompanyMode 
+              ? 'bg-blue-600 text-white shadow-xs' 
+              : 'text-slate-600 hover:text-slate-900'"
+          >
+            <User :size="13" />
+            <span>Bireysel Olarak Devam Et (Kişisel Mod)</span>
+          </button>
+
+          <!-- Firma Olarak Devam Et (Firma Modu) -->
+          <button
+            type="button"
+            @click="setCompanyMode(true)"
+            class="px-3.5 py-1.5 rounded-lg text-xs font-black transition-all flex items-center gap-1.5 cursor-pointer"
+            :class="isCompanyMode 
+              ? 'bg-emerald-600 text-white shadow-xs' 
+              : 'text-slate-600 hover:text-slate-900'"
+          >
+            <Building2 :size="13" />
+            <span>Firma Olarak Devam Et (Firma Modu)</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Yayındaki İlanlarım -->
+      <NuxtLink
+        to="/panel/ilanlarim"
+        class="px-4 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-900 border border-blue-200 font-black text-xs flex items-center justify-center gap-2 transition cursor-pointer shadow-2xs"
+      >
+        <ClipboardList :size="15" class="text-blue-700" />
+        <span>Yayındaki İlanlarım ({{ myActiveTenders.length }}) ↗</span>
+      </NuxtLink>
     </div>
 
     <!-- ========================================================================= -->
@@ -646,18 +701,29 @@ watch(() => userSession.value, () => {
             </div>
           </div>
 
-          <!-- Firma Modu / Bireysel Mod Hızlı Geçiş -->
-          <div class="flex items-center gap-3 shrink-0">
+          <!-- GÖRSEL 5: Firma Modu / Bireysel Mod Hızlı Geçiş -->
+          <div class="flex flex-col sm:flex-row items-center gap-2 shrink-0 bg-slate-50 p-1.5 rounded-2xl border border-slate-200">
             <button
               type="button"
-              @click="toggleCompanyMode(!isCompanyMode)"
-              class="px-4 py-2.5 rounded-xl border font-bold text-xs transition-all flex items-center gap-2 cursor-pointer shadow-xs"
+              @click="setCompanyMode(false)"
+              class="px-3.5 py-2 rounded-xl font-black text-xs transition-all flex items-center gap-1.5 cursor-pointer"
+              :class="!isCompanyMode 
+                ? 'bg-blue-600 text-white shadow-xs' 
+                : 'text-slate-600 hover:text-slate-900'"
+            >
+              <User :size="14" />
+              <span>Bireysel Olarak Devam Et (Kişisel Mod)</span>
+            </button>
+            <button
+              type="button"
+              @click="setCompanyMode(true)"
+              class="px-3.5 py-2 rounded-xl font-black text-xs transition-all flex items-center gap-1.5 cursor-pointer"
               :class="isCompanyMode 
-                ? 'bg-amber-50 text-amber-900 border-amber-200 hover:bg-amber-100' 
-                : 'bg-blue-50 text-blue-900 border-blue-200 hover:bg-blue-100'"
+                ? 'bg-emerald-600 text-white shadow-xs' 
+                : 'text-slate-600 hover:text-slate-900'"
             >
               <Building2 :size="14" />
-              <span>{{ isCompanyMode ? '👤 Kişisel Moda Geç' : '🏢 Firma Modunu Aktif Et' }}</span>
+              <span>Firma Olarak Devam Et (Firma Modu)</span>
             </button>
           </div>
         </div>

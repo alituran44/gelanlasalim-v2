@@ -108,16 +108,20 @@ export function useUserSession() {
     return !!(userSession.value?.email || userSession.value?.name || userSession.value?.firstName)
   })
 
-  // Bireysel (Kişisel) vs Kurumsal (Firma) Modu
+  // Bireysel (Kişisel) vs Kurumsal (Firma) Modu (Görsel 5: İlk girişte hep Kişisel Mod, istendiğinde Firma Modu)
   const isCompanyMode = computed(() => {
+    // Kullanıcı açıkça Firma Modunu aktif etmediyse daima Kişisel Mod (false)
+    if (userSession.value?.isCompanyActive !== true) {
+      return false
+    }
     if (serverSession.value) {
       const cr = (serverSession.value.companyRole || '').toLowerCase()
       if (cr === 'individual' || cr === 'bireysel' || cr === 'personal' || cr === 'görüntüleyici') {
-        return false
+        return userSession.value?.isCompanyActive === true
       }
       return Boolean(serverSession.value.companyVkn && serverSession.value.companyRole !== 'GÖRÜNTÜLEYİCİ')
     }
-    return userSession.value?.isCompanyActive === true && userSession.value?.role === 'company'
+    return userSession.value?.isCompanyActive === true
   })
 
   // UI Görüntüleme için İsim (Güvenlik kararlarında kullanılmaz)
@@ -215,11 +219,15 @@ export function useUserSession() {
            plan.includes('enterprise')
   })
 
+  function setCompanyMode(active: boolean) {
+    userSession.value.isCompanyActive = active
+    userSession.value.role = active ? 'company' : 'individual'
+    saveSessionToStorage()
+  }
+
   function toggleCompanyMode(active?: boolean | any) {
     const next = typeof active === 'boolean' ? active : !userSession.value.isCompanyActive
-    userSession.value.isCompanyActive = next
-    userSession.value.role = next ? 'company' : 'personal'
-    saveSessionToStorage()
+    setCompanyMode(next)
   }
 
   function updateSession(data: Partial<UserSessionData>) {
@@ -341,6 +349,7 @@ export function useUserSession() {
     isCorporatePro,
     isCorporateEnterprise,
     toggleCompanyMode,
+    setCompanyMode,
     updateSession,
     setPhoneVerified,
     setEmailVerified,
