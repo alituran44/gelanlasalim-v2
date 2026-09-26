@@ -31,4 +31,5 @@ __pycache__/
 
 # Temporary scratch & inspection files
 scratch/
+scratch-*.mjs
 

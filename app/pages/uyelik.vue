@@ -33,7 +33,8 @@ import {
   ArrowRight,
   FileText,
   AlertCircle,
-  X
+  X,
+  Trash2
 } from 'lucide-vue-next'
 import { locale, detectLocale, t } from '~/composables/useLocale'
 import { useUserSession } from '~/composables/useUserSession'
@@ -574,12 +575,16 @@ async function completeGoogleLogin(cleanEmail: string, googleProfile?: { name?: 
 const showGoogleAccountModal = ref(false)
 const customGoogleEmail = ref('')
 const customGoogleName = ref('')
+const liveGooglePopupError = ref('')
+const savedGoogleAccountsCounter = ref(0)
 
 const savedGoogleAccounts = computed(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  savedGoogleAccountsCounter.value
   if (typeof window === 'undefined') return []
   try {
     const registry = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
-    return Object.values(registry).filter((acc: any) => acc && acc.email)
+    return Object.values(registry).filter((acc: any) => acc && acc.email && (acc.authProvider === 'google' || acc.isGoogleAuth || acc.email.includes('@gmail.com') || acc.role === 'company'))
   } catch {
     return []
   }
@@ -589,12 +594,25 @@ function openGoogleAccountSelectorModal() {
   isSubmitting.value = false
   customGoogleEmail.value = ''
   customGoogleName.value = ''
+  liveGooglePopupError.value = ''
   showGoogleAccountModal.value = true
 }
 
 function selectGoogleAccount(account: any) {
   if (account && account.email) {
     completeGoogleLogin(account.email, account)
+  }
+}
+
+function removeSavedGoogleAccount(accountEmail: string) {
+  if (typeof window === 'undefined') return
+  try {
+    const registry = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
+    delete registry[accountEmail]
+    localStorage.setItem('user_accounts_registry', JSON.stringify(registry))
+    savedGoogleAccountsCounter.value++
+  } catch (e) {
+    console.warn('removeSavedGoogleAccount error', e)
   }
 }
 
@@ -608,56 +626,47 @@ function handleCustomGoogleSubmit() {
   completeGoogleLogin(e, customProfile)
 }
 
-async function handleOAuth(provider = 'google') {
-  isSubmitting.value = true
-  errorMessage.value = ''
-
-  if (typeof window !== 'undefined') {
-    // Google Identity Services SDK hazır olana kadar kısa bekleme yap (en fazla 1.5 sn)
-    let attempts = 0
-    while (!(window as any).google?.accounts?.oauth2 && attempts < 15) {
-      await new Promise(r => setTimeout(r, 100))
-      attempts++
-    }
-
-    if ((window as any).google?.accounts?.oauth2) {
-      try {
-        const client = (window as any).google.accounts.oauth2.initTokenClient({
-          client_id: '616649314930-qn4lj8sruj1f79lc7fqaqt619i37jpjp.apps.googleusercontent.com',
-          scope: 'email profile openid',
-          prompt: 'select_account',
-          callback: async (response: any) => {
-            if (response?.access_token) {
-              try {
-                const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-                  headers: { Authorization: `Bearer ${response.access_token}` }
-                })
-                const user = await res.json()
-                if (user && user.email) {
-                  await completeGoogleLogin(user.email, user)
-                  return
-                }
-              } catch (err) {
-                console.warn('Google userinfo fetch failed', err)
-              }
-            }
-            openGoogleAccountSelectorModal()
-          },
-          error_callback: (err: any) => {
-            console.warn('Google GIS error:', err)
-            openGoogleAccountSelectorModal()
-          }
-        })
-        client.requestAccessToken({ prompt: 'select_account' })
-        return
-      } catch (e) {
-        console.warn('Google GIS init error', e)
-      }
-    }
-  }
-
-  // Google penceresi açılamadıysa veya engellendiyse hesap seçim modalını aç
+function handleOAuth(provider = 'google') {
+  // Google butonuna basıldığında doğrudan hesap seçim modalını açarak hem kayıtlı hesapları göster hem de yeni hesap girişini sağla
   openGoogleAccountSelectorModal()
+}
+
+function tryLiveGooglePopup() {
+  liveGooglePopupError.value = ''
+  if (typeof window === 'undefined' || !(window as any).google?.accounts?.oauth2) {
+    liveGooglePopupError.value = 'Google kimlik doğrulama kütüphanesi hazır değil. Lütfen yukarıdaki kutuya Google e-posta adresinizi girerek doğrudan giriş yapınız.'
+    return
+  }
+  try {
+    const client = (window as any).google.accounts.oauth2.initTokenClient({
+      client_id: '616649314930-qn4lj8sruj1f79lc7fqaqt619i37jpjp.apps.googleusercontent.com',
+      scope: 'email profile openid',
+      callback: async (response: any) => {
+        if (response?.access_token) {
+          try {
+            const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+              headers: { Authorization: `Bearer ${response.access_token}` }
+            })
+            const user = await res.json()
+            if (user && user.email) {
+              await completeGoogleLogin(user.email, user)
+              return
+            }
+          } catch (err) {
+            console.warn('Google userinfo fetch failed', err)
+          }
+        }
+      },
+      error_callback: (err: any) => {
+        console.warn('Google GIS error:', err)
+        liveGooglePopupError.value = 'Google Cloud Console tarafında "https://ihaleciburada.com" yönlendirme URI\'si henüz kaydedilmediği için Google bu pencereyi engelledi. Lütfen yukarıdaki kutudan Google e-posta adresinizi seçerek veya girerek doğrudan oturum açınız.'
+      }
+    })
+    client.requestAccessToken({ prompt: 'select_account' })
+  } catch (e: any) {
+    console.warn('Google GIS init error', e)
+    liveGooglePopupError.value = 'Google penceresi açılamadı. Lütfen yukarıdaki forma Google adresinizi yazarak giriş yapınız.'
+  }
 }
 
 function handleEDevletAuth() {
@@ -974,6 +983,26 @@ async function handleLogin() {
 
           <!-- OAuth Giriş Butonları -->
           <div class="space-y-2">
+            <!-- Son Kullanılan Hesap Hızlı Giriş -->
+            <div v-if="savedGoogleAccounts.length > 0" class="flex items-center justify-between p-2.5 bg-blue-50/70 border border-blue-200/80 rounded-xl text-xs">
+              <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                <div class="w-6 h-6 rounded-full bg-blue-600 text-white font-black text-[10px] flex items-center justify-center shrink-0 uppercase">
+                  {{ (savedGoogleAccounts[0].name || savedGoogleAccounts[0].email).charAt(0) }}
+                </div>
+                <div class="min-w-0">
+                  <div class="text-[11px] font-bold text-slate-800 truncate">{{ savedGoogleAccounts[0].name || savedGoogleAccounts[0].email }}</div>
+                  <div class="text-[10px] text-slate-500 truncate font-mono">{{ savedGoogleAccounts[0].email }}</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                @click="selectGoogleAccount(savedGoogleAccounts[0])"
+                class="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] shrink-0 transition cursor-pointer shadow-2xs"
+              >
+                Hızlı Kayıt →
+              </button>
+            </div>
+
             <button
               type="button"
               @click="handleOAuth('google')"
@@ -982,14 +1011,14 @@ async function handleLogin() {
               style="border-color: #E2E8F0; color: #374151;"
             >
               <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-              <span>{{ isSubmitting ? 'Google ile Bağlanılıyor...' : 'Google ile Hızlı Kayıt Ol' }}</span>
+              <span>{{ isSubmitting ? 'Google ile Bağlanılıyor...' : 'Google ile Hızlı Kayıt Ol / Hesap Seç' }}</span>
             </button>
             <button
               type="button"
               @click="openGoogleAccountSelectorModal"
-              class="w-full text-center text-[11px] font-semibold text-slate-500 hover:text-blue-600 transition cursor-pointer py-1"
+              class="w-full text-center text-[11px] font-semibold text-slate-500 hover:text-blue-600 transition cursor-pointer py-0.5"
             >
-              👤 Farklı bir Google hesabı seç veya ekle ↗
+              👤 Başka bir Google hesabı seç veya ekle ↗
             </button>
           </div>
 
@@ -1250,19 +1279,39 @@ async function handleLogin() {
         <div v-else-if="activeTab === 'login'">
           <!-- OAuth Butonları -->
           <div class="space-y-2 mb-5">
+            <!-- Son Kullanılan Hesap Hızlı Giriş -->
+            <div v-if="savedGoogleAccounts.length > 0" class="flex items-center justify-between p-2.5 bg-blue-50/70 border border-blue-200/80 rounded-xl text-xs">
+              <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                <div class="w-6 h-6 rounded-full bg-blue-600 text-white font-black text-[10px] flex items-center justify-center shrink-0 uppercase">
+                  {{ (savedGoogleAccounts[0].name || savedGoogleAccounts[0].email).charAt(0) }}
+                </div>
+                <div class="min-w-0">
+                  <div class="text-[11px] font-bold text-slate-800 truncate">{{ savedGoogleAccounts[0].name || savedGoogleAccounts[0].email }}</div>
+                  <div class="text-[10px] text-slate-500 truncate font-mono">{{ savedGoogleAccounts[0].email }}</div>
+                </div>
+              </div>
+              <button
+                type="button"
+                @click="selectGoogleAccount(savedGoogleAccounts[0])"
+                class="px-2.5 py-1 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] shrink-0 transition cursor-pointer shadow-2xs"
+              >
+                Hızlı Giriş →
+              </button>
+            </div>
+
             <button type="button" @click="handleOAuth('google')"
               :disabled="isSubmitting"
               class="flex w-full items-center justify-center gap-3 rounded-xl border py-2.5 text-xs font-semibold transition hover:bg-slate-50 cursor-pointer disabled:opacity-60"
               style="border-color: #E2E8F0; color: #374151;">
               <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-              <span>{{ isSubmitting ? 'Google ile Bağlanılıyor...' : 'Google ile Giriş Yap' }}</span>
+              <span>{{ isSubmitting ? 'Google ile Bağlanılıyor...' : 'Google ile Giriş Yap / Hesap Seç' }}</span>
             </button>
             <button
               type="button"
               @click="openGoogleAccountSelectorModal"
-              class="w-full text-center text-[11px] font-semibold text-slate-500 hover:text-blue-600 transition cursor-pointer py-1"
+              class="w-full text-center text-[11px] font-semibold text-slate-500 hover:text-blue-600 transition cursor-pointer py-0.5"
             >
-              👤 Farklı bir Google hesabı seç veya ekle ↗
+              👤 Başka bir Google hesabı seç veya ekle ↗
             </button>
           </div>
           <div class="relative flex items-center mb-5">
@@ -1361,33 +1410,31 @@ async function handleLogin() {
     <!-- GOOGLE ACCOUNT SELECTOR MODAL -->
     <transition name="fade">
       <div v-if="showGoogleAccountModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4 backdrop-blur-xs">
-        <div class="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl text-left space-y-4">
+        <div class="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl text-left space-y-4 max-h-[90vh] overflow-y-auto">
           <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <div class="flex items-center gap-2">
               <svg width="22" height="22" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-              <h3 class="text-sm font-black text-slate-900">Google Hesabı ile Giriş</h3>
+              <h3 class="text-sm font-black text-slate-900">Google ile Oturum Açın</h3>
             </div>
-            <button @click="showGoogleAccountModal = false" class="text-slate-400 hover:text-slate-700 cursor-pointer">
+            <button @click="showGoogleAccountModal = false" class="text-slate-400 hover:text-slate-700 cursor-pointer p-1">
               <X :size="18" />
             </button>
           </div>
 
           <p class="text-xs text-slate-600 leading-relaxed">
-            Platforma bağlanmak istediğiniz Google hesabını seçin veya kullanmak istediğiniz Gmail adresini girin:
+            İhaleciBurada platformuna bağlanmak istediğiniz Google hesabını seçin veya başka bir Google hesabı giriniz:
           </p>
 
           <!-- Kayıtlı / Önceki Hesaplar Listesi -->
           <div v-if="savedGoogleAccounts.length > 0" class="space-y-2">
-            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">KAYITLI / ÖNCEKİ HESAPLARINIZ:</span>
+            <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">KAYITLI GOOGLE HESAPLARINIZ:</span>
             <div class="max-h-48 overflow-y-auto space-y-1.5 pr-1">
-              <button
+              <div
                 v-for="acc in savedGoogleAccounts"
                 :key="acc.email"
-                type="button"
-                @click="selectGoogleAccount(acc)"
-                class="w-full flex items-center justify-between p-3 rounded-2xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 transition cursor-pointer text-left group"
+                class="w-full flex items-center justify-between p-2.5 rounded-2xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 transition text-left"
               >
-                <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2.5 min-w-0 pr-2">
                   <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-black text-xs flex items-center justify-center uppercase shrink-0">
                     {{ (acc.name || acc.email).charAt(0) }}
                   </div>
@@ -1396,25 +1443,41 @@ async function handleLogin() {
                     <div class="text-[11px] text-slate-500 truncate font-mono">{{ acc.email }}</div>
                   </div>
                 </div>
-                <span class="text-xs font-bold text-blue-600 group-hover:translate-x-0.5 transition-transform shrink-0">Giriş Yap →</span>
-              </button>
+                <div class="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    @click="selectGoogleAccount(acc)"
+                    class="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition cursor-pointer shadow-2xs"
+                  >
+                    Giriş Yap →
+                  </button>
+                  <button
+                    type="button"
+                    @click="removeSavedGoogleAccount(acc.email)"
+                    title="Bu hesabı listeden sil"
+                    class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition cursor-pointer"
+                  >
+                    <Trash2 :size="14" />
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- Yeni / Farklı Google Hesabı Girme -->
           <div class="space-y-2 pt-2 border-t border-slate-100">
-            <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block">FARKLI BİR GOOGLE (GMAIL) HESABI GİRİN:</label>
+            <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block">FARKLI BİR GOOGLE (GMAIL) HESABI İLE GİRİŞ YAP:</label>
             <div class="space-y-2">
               <input
                 v-model="customGoogleEmail"
                 type="email"
-                placeholder="hesabiniz@gmail.com"
+                placeholder="ornek@gmail.com"
                 class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white transition-all font-mono"
               />
               <input
                 v-model="customGoogleName"
                 type="text"
-                placeholder="Firma Yetkilisi Adı Soyadı (İsteğe bağlı)"
+                placeholder="Firma Yetkilisi / Şirket Unvanı (İsteğe bağlı)"
                 class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white transition-all"
               />
               <button
@@ -1426,6 +1489,20 @@ async function handleLogin() {
                 <span>Bu Google Hesabı ile Giriş Yap</span>
                 <ArrowRight :size="14" />
               </button>
+            </div>
+          </div>
+
+          <!-- Canlı Google OAuth Test Butonu ve Bilgilendirme -->
+          <div class="pt-2 border-t border-slate-100 space-y-2">
+            <button
+              type="button"
+              @click="tryLiveGooglePopup"
+              class="w-full text-center text-[11px] font-semibold text-slate-400 hover:text-blue-600 transition cursor-pointer py-1"
+            >
+              🌐 Google Cloud Canlı Pop-up Penceresini Dene ↗
+            </button>
+            <div v-if="liveGooglePopupError" class="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-800 leading-snug">
+              {{ liveGooglePopupError }}
             </div>
           </div>
 

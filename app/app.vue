@@ -43,12 +43,18 @@ onMounted(() => {
 
 <style>
 body, html {
-  font-family: 'Inter', sans-serif !important;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  letter-spacing: -0.012em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Outfit', sans-serif !important;
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important;
+  letter-spacing: -0.024em;
+  font-weight: 700;
 }
 
 .premium-shadow {
