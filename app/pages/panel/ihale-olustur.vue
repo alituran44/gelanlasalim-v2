@@ -97,6 +97,184 @@ const categoryMap: Record<string, string[]> = {
 const mainCategoryList = Object.keys(categoryMap)
 
 // =========================================================================
+// 🏢 SAHİBİNDEN.COM STANDART GAYRİMENKUL (EV & ARSA) LİSTELERİ
+// =========================================================================
+const SAHIBINDEN_ODA_SAYISI = [
+  '1+0 (Stüdyo)',
+  '1+1',
+  '2+0',
+  '2+1',
+  '2+2',
+  '3+1',
+  '3+2',
+  '4+1',
+  '4+2',
+  '5+1',
+  '5+2',
+  '6+ ve üzeri'
+]
+
+const SAHIBINDEN_BINA_YASI = [
+  '0 (Yeni)',
+  '1 Yaşında',
+  '2 Yaşında',
+  '3 Yaşında',
+  '4 Yaşında',
+  '5-10 arası',
+  '11-15 arası',
+  '16-20 arası',
+  '21-25 arası',
+  '26-30 arası',
+  '31 ve üzeri'
+]
+
+const SAHIBINDEN_BULUNDUGU_KAT = [
+  'Kot 4',
+  'Kot 3',
+  'Kot 2',
+  'Kot 1',
+  'Bodrum Kat',
+  'Zemin Kat',
+  'Bahçe Katı',
+  'Giriş Katı',
+  'Yüksek Giriş',
+  'Müstakil / Villa',
+  '1. Kat',
+  '2. Kat',
+  '3. Kat',
+  '4. Kat',
+  '5. Kat',
+  '6. Kat',
+  '7. Kat',
+  '8. Kat',
+  '9. Kat',
+  '10. Kat ve üzeri',
+  'Ara Kat',
+  'Çatı Katı',
+  'En Üst Kat',
+  'Dubleks',
+  'Teras Katı'
+]
+
+const SAHIBINDEN_KAT_SAYISI = [
+  '1 Katlı',
+  '2 Katlı',
+  '3 Katlı',
+  '4 Katlı',
+  '5 Katlı',
+  '6 Katlı',
+  '7 Katlı',
+  '8 Katlı',
+  '9 Katlı',
+  '10 Katlı',
+  '11-15 Katlı',
+  '16-20 Katlı',
+  '20 ve üzeri'
+]
+
+const SAHIBINDEN_ISITMA = [
+  'Doğalgaz (Kombi)',
+  'Yerden Isıtma',
+  'Merkezi Sistem',
+  'Merkezi Sistem (Pay Ölçer)',
+  'Klima',
+  'Soba',
+  'Doğalgaz Sobası',
+  'Isı Pompası',
+  'Jeotermal',
+  'Güneş Enerjisi',
+  'Yok'
+]
+
+const SAHIBINDEN_BANYO_SAYISI = [
+  'Yok',
+  '1',
+  '2',
+  '3',
+  '4',
+  '5 ve üzeri'
+]
+
+const SAHIBINDEN_TAPU_KONUT = [
+  'Kat Mülkiyetli',
+  'Kat İrtifaklı',
+  'Hisseli Tapu',
+  'Müstakil Tapu',
+  'Arsa Tapulu',
+  'Tahsis'
+]
+
+const SAHIBINDEN_KULLANIM_DURUMU = [
+  'Boş',
+  'Mülk Sahibi Oturuyor',
+  'Kiracılı'
+]
+
+const SAHIBINDEN_OTOPARK = [
+  'Açık Otopark',
+  'Kapalı Otopark',
+  'Açık & Kapalı Otopark',
+  'Yok'
+]
+
+const SAHIBINDEN_ARSA_IMAR = [
+  'Konut İmarlı',
+  'Ticari İmarlı',
+  'Ticari + Konut',
+  'Sanayi İmarlı',
+  'Turizm İmarlı',
+  'Tarla',
+  'Bağ & Bahçe',
+  'Zeytinlik',
+  'Çiftlik',
+  'Depolama & Antrepo',
+  'Villa İmarlı',
+  'Sit Alanı / İmarsız',
+  'DİĞER'
+]
+
+const SAHIBINDEN_KAKS = [
+  'Belirtilmemiş',
+  '0.10 - 0.30',
+  '0.40 - 0.60',
+  '0.70 - 1.00',
+  '1.20 - 1.50',
+  '1.60 - 2.00',
+  '2.00 ve üzeri',
+  'Emsalsiz / Serbest'
+]
+
+const SAHIBINDEN_GABARI = [
+  'Belirtilmemiş',
+  'Serbest',
+  '6.50 m (2 Kat)',
+  '9.50 m (3 Kat)',
+  '12.50 m (4 Kat)',
+  '15.50 m (5 Kat)',
+  '18.50 m (6 Kat)',
+  '21.50 m (7 Kat)',
+  '30.50 m (10 Kat)'
+]
+
+const SAHIBINDEN_TAPU_ARSA = [
+  'Müstakil Parsel (Tek Tapu)',
+  'Hisseli Tapu',
+  'Tahsis',
+  'Zilliyet'
+]
+
+const SAHIBINDEN_ALTYAPI_LIST = [
+  'Elektrik',
+  'Su',
+  'Doğalgaz',
+  'Kanalizasyon',
+  'Yol Açılmış',
+  'Telefon / İnternet',
+  'Sanayi Elektriği',
+  'Kuyu / Sondaj'
+]
+
+// =========================================================================
 // 1. AÇIK EKSİLTME STATE (Görsel 1 & 4)
 // =========================================================================
 const eksiltmeForm = reactive({
@@ -180,6 +358,7 @@ const arsaForm = reactive({
   mahalle: '',
   ada: '',
   parsel: '',
+  pafta: '',
   haritaIsaretlendi: false,
   haritaKonumBilgisi: '',
   tabanFiyat: '',
@@ -191,6 +370,20 @@ const arsaForm = reactive({
   videoUrl: '',
   videoDosyasi: null as File | null,
   videoDosyaAdi: '',
+
+  // 🗺️ Sahibinden.com Standart Arsa Nitelikleri
+  imarDurumu: 'Konut İmarlı',
+  imarDurumuDiger: '',
+  m2Alan: '',
+  m2Fiyati: '',
+  kaks: '1.20 - 1.50',
+  gabari: 'Serbest',
+  tapuDurumu: 'Müstakil Parsel (Tek Tapu)',
+  katKarsiligi: 'Evet',
+  krediyeUygun: 'Evet',
+  takas: 'Hayır',
+  altyapi: ['Elektrik', 'Su', 'Yol Açılmış', 'Doğalgaz'] as string[],
+
   ilanVeren: '',
   adres: 'Balıkesir',
   telefon: '',
@@ -221,11 +414,27 @@ const evForm = reactive({
   videoUrl: '',
   videoDosyasi: null as File | null,
   videoDosyaAdi: '',
+
+  // 🏠 Sahibinden.com Standart Konut Nitelikleri
+  m2Brut: '',
+  m2Net: '',
   odaSayisi: '3+1',
-  yasi: '0 (Sıfır Bina)',
-  banyoSayisi: '1',
+  yasi: '0 (Yeni)',
   katAdedi: '5 Katlı',
   bulunduguKat: '2. Kat',
+  isitma: 'Doğalgaz (Kombi)',
+  banyoSayisi: '1',
+  balkon: 'Var',
+  asansor: 'Var',
+  otopark: 'Açık & Kapalı Otopark',
+  esyali: 'Hayır',
+  kullanimDurumu: 'Boş',
+  siteIcerisinde: 'Hayır',
+  krediyeUygun: 'Evet',
+  tapuDurumu: 'Kat Mülkiyetli',
+  takas: 'Hayır',
+  aidat: '',
+
   ilanVeren: '',
   adres: 'Balıkesir',
   telefon: '',
@@ -341,6 +550,15 @@ function toggleHaritaIsaretle() {
     arsaForm.haritaKonumBilgisi = `${loc || 'Balıkesir'} ${adaParsel ? `(${adaParsel})` : ''} - Haritada Konum İşaretlendi`
   } else {
     arsaForm.haritaKonumBilgisi = ''
+  }
+}
+
+function toggleArsaAltyapi(item: string) {
+  const idx = arsaForm.altyapi.indexOf(item)
+  if (idx > -1) {
+    arsaForm.altyapi.splice(idx, 1)
+  } else {
+    arsaForm.altyapi.push(item)
   }
 }
 
@@ -471,6 +689,17 @@ async function submitCurrentForm() {
         mahalle: arsaForm.mahalle,
         ada: arsaForm.ada,
         parsel: arsaForm.parsel,
+        pafta: arsaForm.pafta,
+        imarDurumu: arsaForm.imarDurumu === 'DİĞER' ? (arsaForm.imarDurumuDiger || 'Diğer') : arsaForm.imarDurumu,
+        m2Alan: arsaForm.m2Alan,
+        m2Fiyati: arsaForm.m2Fiyati,
+        kaks: arsaForm.kaks,
+        gabari: arsaForm.gabari,
+        tapuDurumu: arsaForm.tapuDurumu,
+        katKarsiligi: arsaForm.katKarsiligi,
+        krediyeUygun: arsaForm.krediyeUygun,
+        takas: arsaForm.takas,
+        altyapi: [...arsaForm.altyapi],
         tabanFiyat: arsaForm.tabanFiyat,
         ekspertizYap: arsaForm.ekspertizYap,
         haritaIsaretlendi: arsaForm.haritaIsaretlendi,
@@ -508,11 +737,24 @@ async function submitCurrentForm() {
         mahalle: evForm.mahalle,
         tabanFiyat: evForm.tabanFiyat,
         ekspertizYap: evForm.ekspertizYap,
+        m2Brut: evForm.m2Brut,
+        m2Net: evForm.m2Net,
         odaSayisi: evForm.odaSayisi,
         yasi: evForm.yasi,
         banyoSayisi: evForm.banyoSayisi,
         katAdedi: evForm.katAdedi,
         bulunduguKat: evForm.bulunduguKat,
+        isitma: evForm.isitma,
+        balkon: evForm.balkon,
+        asansor: evForm.asansor,
+        otopark: evForm.otopark,
+        esyali: evForm.esyali,
+        kullanimDurumu: evForm.kullanimDurumu,
+        siteIcerisinde: evForm.siteIcerisinde,
+        krediyeUygun: evForm.krediyeUygun,
+        tapuDurumu: evForm.tapuDurumu,
+        takas: evForm.takas,
+        aidat: evForm.aidat,
         videoUrl: evForm.videoUrl,
         videoDosyaAdi: evForm.videoDosyaAdi
       }
@@ -1707,6 +1949,195 @@ async function submitCurrentForm() {
 
       </div>
 
+      <!-- ========================================================================= -->
+      <!-- 🗺️ ARSA & ARAZİ ÖZELLİKLERİ (sahibinden.com Standart) -->
+      <!-- ========================================================================= -->
+      <div class="border border-slate-200 rounded-2xl p-4 sm:p-5 bg-slate-50/40 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
+          <span class="block text-[11px] font-black text-slate-800 uppercase tracking-wider">ARSA & ARAZİ ÖZELLİKLERİ</span>
+          <span class="text-[10px] font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-md border border-pink-200">sahibinden.com Standardı</span>
+        </div>
+        
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          
+          <!-- İMAR DURUMU -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">İMAR DURUMU</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="arsaForm.imarDurumu"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option v-for="item in SAHIBINDEN_ARSA_IMAR" :key="item" :value="item">{{ item }}</option>
+            </select>
+            <div v-if="arsaForm.imarDurumu === 'DİĞER'" class="pt-1">
+              <input 
+                v-model="arsaForm.imarDurumuDiger"
+                type="text"
+                placeholder="ELLE GİRİLSİN"
+                class="w-full rounded-xl border-2 border-dashed border-pink-400 p-2 text-xs font-bold"
+              />
+            </div>
+          </div>
+
+          <!-- m² (ARSA ALANI) -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">m² (ARSA ALANI)</label>
+              <span class="text-[10px] font-bold text-slate-400">YAZ</span>
+            </div>
+            <input 
+              v-model="arsaForm.m2Alan"
+              type="text"
+              placeholder="Örn: 2500"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            />
+          </div>
+
+          <!-- m² BİRİM FİYATI -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">m² FİYATI (₺)</label>
+              <span class="text-[10px] font-bold text-slate-400">YAZ</span>
+            </div>
+            <input 
+              v-model="arsaForm.m2Fiyati"
+              type="text"
+              placeholder="Örn: 3500 ₺"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            />
+          </div>
+
+          <!-- PAFTA NO -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">PAFTA NO</label>
+              <span class="text-[10px] font-bold text-slate-400">YAZ</span>
+            </div>
+            <input 
+              v-model="arsaForm.pafta"
+              type="text"
+              placeholder="Örn: 24-K-IV"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            />
+          </div>
+
+          <!-- KAKS (EMSAL) -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">KAKS (EMSAL)</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="arsaForm.kaks"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option v-for="item in SAHIBINDEN_KAKS" :key="item" :value="item">{{ item }}</option>
+            </select>
+          </div>
+
+          <!-- GABARİ -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">GABARİ</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="arsaForm.gabari"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option v-for="item in SAHIBINDEN_GABARI" :key="item" :value="item">{{ item }}</option>
+            </select>
+          </div>
+
+          <!-- TAPU DURUMU -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">TAPU DURUMU</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="arsaForm.tapuDurumu"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option v-for="item in SAHIBINDEN_TAPU_ARSA" :key="item" :value="item">{{ item }}</option>
+            </select>
+          </div>
+
+          <!-- KAT KARŞILIĞINA UYGUN -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">KAT KARŞILIĞI</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="arsaForm.katKarsiligi"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option value="Evet">Evet</option>
+              <option value="Hayır">Hayır</option>
+            </select>
+          </div>
+
+          <!-- KREDİYE UYGUN -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">KREDİYE UYGUN</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="arsaForm.krediyeUygun"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option value="Evet">Evet</option>
+              <option value="Hayır">Hayır</option>
+            </select>
+          </div>
+
+          <!-- TAKAS -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">TAKAS</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="arsaForm.takas"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option value="Hayır">Hayır</option>
+              <option value="Evet">Evet</option>
+            </select>
+          </div>
+
+        </div>
+
+        <!-- ALTYAPI ÖZELLİKLERİ (Hızlı Rozetler) -->
+        <div class="pt-2 border-t border-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <label class="text-[10px] font-black uppercase text-slate-700">ALTYAPI ÖZELLİKLERİ</label>
+            <span class="text-[10px] font-bold text-slate-400">ÇOKLU SEÇ</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="alt in SAHIBINDEN_ALTYAPI_LIST"
+              :key="alt"
+              type="button"
+              @click="toggleArsaAltyapi(alt)"
+              class="px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border flex items-center gap-1.5"
+              :class="arsaForm.altyapi.includes(alt)
+                ? 'bg-pink-600 text-white border-pink-600 shadow-2xs'
+                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'"
+            >
+              <span v-if="arsaForm.altyapi.includes(alt)">✓</span>
+              <span>{{ alt }}</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
       <!-- TABAN FİYAT & EXPERTİZ YAP (ÜCRETLİ) -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
         <div>
@@ -2174,13 +2605,44 @@ async function submitCurrentForm() {
       </div>
 
       <!-- ========================================================================= -->
-      <!-- 🏠 EV ÖZELLİKLERİ (Görsel: EV Birebir 5'li Alan) -->
+      <!-- 🏠 EV & DAİRE ÖZELLİKLERİ (sahibinden.com Standart) -->
       <!-- ========================================================================= -->
-      <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50/40 space-y-3">
-        <span class="block text-[11px] font-black text-slate-800 uppercase tracking-wider">EV & DAİRE ÖZELLİKLERİ</span>
+      <div class="border border-slate-200 rounded-2xl p-4 sm:p-5 bg-slate-50/40 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
+          <span class="block text-[11px] font-black text-slate-800 uppercase tracking-wider">EV & DAİRE ÖZELLİKLERİ</span>
+          <span class="text-[10px] font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded-md border border-pink-200">sahibinden.com Standardı</span>
+        </div>
         
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
           
+          <!-- m² (BRÜT) -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">m² (BRÜT)</label>
+              <span class="text-[10px] font-bold text-slate-400">YAZ</span>
+            </div>
+            <input 
+              v-model="evForm.m2Brut"
+              type="text"
+              placeholder="Örn: 145"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            />
+          </div>
+
+          <!-- m² (NET) -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">m² (NET)</label>
+              <span class="text-[10px] font-bold text-slate-400">YAZ</span>
+            </div>
+            <input 
+              v-model="evForm.m2Net"
+              type="text"
+              placeholder="Örn: 125"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            />
+          </div>
+
           <!-- ODA SAYISI -->
           <div>
             <div class="flex items-center justify-between mb-1">
@@ -2191,31 +2653,63 @@ async function submitCurrentForm() {
               v-model="evForm.odaSayisi"
               class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
             >
-              <option value="1+0 (Stüdyo)">1+0</option>
-              <option value="1+1">1+1</option>
-              <option value="2+1">2+1</option>
-              <option value="3+1">3+1</option>
-              <option value="4+1">4+1</option>
-              <option value="5+1 ve üzeri">5+1 ve üzeri</option>
+              <option v-for="item in SAHIBINDEN_ODA_SAYISI" :key="item" :value="item">{{ item }}</option>
             </select>
           </div>
 
-          <!-- YASI -->
+          <!-- BİNA YAŞI -->
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="text-[10px] font-black uppercase text-slate-700">YASI</label>
+              <label class="text-[10px] font-black uppercase text-slate-700">BİNA YAŞI</label>
               <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
             </div>
             <select 
               v-model="evForm.yasi"
               class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
             >
-              <option value="0 (Sıfır Bina)">Sıfır Bina</option>
-              <option value="1-5 Yaş">1-5 Yaş</option>
-              <option value="6-10 Yaş">6-10 Yaş</option>
-              <option value="11-15 Yaş">11-15 Yaş</option>
-              <option value="16-20 Yaş">16-20 Yaş</option>
-              <option value="21+ Yaş">21+ Yaş</option>
+              <option v-for="item in SAHIBINDEN_BINA_YASI" :key="item" :value="item">{{ item }}</option>
+            </select>
+          </div>
+
+          <!-- BULUNDUĞU KAT -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">BULUNDUĞU KAT</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="evForm.bulunduguKat"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option v-for="item in SAHIBINDEN_BULUNDUGU_KAT" :key="item" :value="item">{{ item }}</option>
+            </select>
+          </div>
+
+          <!-- KAT SAYISI -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">KAT SAYISI</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="evForm.katAdedi"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option v-for="item in SAHIBINDEN_KAT_SAYISI" :key="item" :value="item">{{ item }}</option>
+            </select>
+          </div>
+
+          <!-- ISITMA -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">ISITMA</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="evForm.isitma"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option v-for="item in SAHIBINDEN_ISITMA" :key="item" :value="item">{{ item }}</option>
             </select>
           </div>
 
@@ -2229,52 +2723,154 @@ async function submitCurrentForm() {
               v-model="evForm.banyoSayisi"
               class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
             >
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4 ve üzeri">4+</option>
+              <option v-for="item in SAHIBINDEN_BANYO_SAYISI" :key="item" :value="item">{{ item }}</option>
             </select>
           </div>
 
-          <!-- KAT ADEDİ -->
+          <!-- BALKON -->
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="text-[10px] font-black uppercase text-slate-700">KAT ADEDİ</label>
+              <label class="text-[10px] font-black uppercase text-slate-700">BALKON</label>
               <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
             </div>
             <select 
-              v-model="evForm.katAdedi"
+              v-model="evForm.balkon"
               class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
             >
-              <option v-for="k in [1,2,3,4,5,6,7,8,9,10,12,15,20,30]" :key="k" :value="`${k} Katlı`">
-                {{ k }} Katlı
-              </option>
+              <option value="Var">Var</option>
+              <option value="Yok">Yok</option>
             </select>
           </div>
 
-          <!-- BULUNDUGU KAT -->
+          <!-- ASANSÖR -->
           <div>
             <div class="flex items-center justify-between mb-1">
-              <label class="text-[10px] font-black uppercase text-slate-700">BULUNDUGU KAT</label>
+              <label class="text-[10px] font-black uppercase text-slate-700">ASANSÖR</label>
               <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
             </div>
             <select 
-              v-model="evForm.bulunduguKat"
+              v-model="evForm.asansor"
               class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
             >
-              <option value="Bahçe Katı">Bahçe Katı</option>
-              <option value="Giriş Kat">Giriş Kat</option>
-              <option value="Yüksek Giriş">Yüksek Giriş</option>
-              <option value="1. Kat">1. Kat</option>
-              <option value="2. Kat">2. Kat</option>
-              <option value="3. Kat">3. Kat</option>
-              <option value="4. Kat">4. Kat</option>
-              <option value="5. Kat">5. Kat</option>
-              <option value="Ara Kat">Ara Kat</option>
-              <option value="En Üst Kat">En Üst Kat</option>
-              <option value="Çatı Dubleksi">Çatı Dubleksi</option>
-              <option value="Müstakil / Villa">Müstakil / Villa</option>
+              <option value="Var">Var</option>
+              <option value="Yok">Yok</option>
             </select>
+          </div>
+
+          <!-- OTOPARK -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">OTOPARK</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="evForm.otopark"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option v-for="item in SAHIBINDEN_OTOPARK" :key="item" :value="item">{{ item }}</option>
+            </select>
+          </div>
+
+          <!-- EŞYALI -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">EŞYALI</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="evForm.esyali"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option value="Hayır">Hayır</option>
+              <option value="Evet">Evet</option>
+            </select>
+          </div>
+
+          <!-- KULLANIM DURUMU -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">KULLANIM DURUMU</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="evForm.kullanimDurumu"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option v-for="item in SAHIBINDEN_KULLANIM_DURUMU" :key="item" :value="item">{{ item }}</option>
+            </select>
+          </div>
+
+          <!-- SİTE İÇERİSİNDE -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">SİTE İÇERİSİNDE</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="evForm.siteIcerisinde"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option value="Hayır">Hayır</option>
+              <option value="Evet">Evet</option>
+            </select>
+          </div>
+
+          <!-- KREDİYE UYGUN -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">KREDİYE UYGUN</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="evForm.krediyeUygun"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option value="Evet">Evet</option>
+              <option value="Hayır">Hayır</option>
+            </select>
+          </div>
+
+          <!-- TAPU DURUMU -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">TAPU DURUMU</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="evForm.tapuDurumu"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option v-for="item in SAHIBINDEN_TAPU_KONUT" :key="item" :value="item">{{ item }}</option>
+            </select>
+          </div>
+
+          <!-- TAKAS -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">TAKAS</label>
+              <span class="text-[10px] font-bold text-slate-400">SEÇ</span>
+            </div>
+            <select 
+              v-model="evForm.takas"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            >
+              <option value="Hayır">Hayır</option>
+              <option value="Evet">Evet</option>
+            </select>
+          </div>
+
+          <!-- AİDAT (₺) -->
+          <div>
+            <div class="flex items-center justify-between mb-1">
+              <label class="text-[10px] font-black uppercase text-slate-700">AİDAT (₺)</label>
+              <span class="text-[10px] font-bold text-slate-400">YAZ</span>
+            </div>
+            <input 
+              v-model="evForm.aidat"
+              type="text"
+              placeholder="Örn: 850 ₺"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+            />
           </div>
 
         </div>
