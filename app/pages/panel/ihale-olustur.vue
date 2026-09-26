@@ -314,6 +314,8 @@ const sabitFiyatForm = reactive({
   videoUrl: '',
   videoDosyasi: null as File | null,
   videoDosyaAdi: '',
+  dosya: null as File | null,
+  dosyaAdi: '',
   ilanVeren: '',
   adres: 'Balıkesir',
   telefon: '',
@@ -335,6 +337,8 @@ const reklamForm = reactive({
   videoUrl: '',
   videoDosyasi: null as File | null,
   videoDosyaAdi: '',
+  dosya: null as File | null,
+  dosyaAdi: '',
   ilanVeren: '',
   adres: 'Balıkesir',
   telefon: '',
@@ -630,11 +634,15 @@ async function submitCurrentForm() {
       const symbol = sabitFiyatForm.paraCinsi.includes('USD') ? '$' : (sabitFiyatForm.paraCinsi.includes('EUR') ? '€' : '₺')
       finalBudget = sabitFiyatForm.sabitFiyat ? `${sabitFiyatForm.sabitFiyat} ${symbol}` : 'Fiyat Belirtilmedi'
 
+      if (sabitFiyatForm.dosyaAdi) {
+        finalFiles.push({ name: sabitFiyatForm.dosyaAdi, size: 'İlan Belgesi / Şartname', type: 'doc' })
+      }
       finalImages = sabitFiyatForm.resimler.map(r => r.url)
       finalCustomFields = {
         formType: 'SABIT_FIYAT',
         sabitFiyat: sabitFiyatForm.sabitFiyat,
         paraCinsi: sabitFiyatForm.paraCinsi,
+        dosyaAdi: sabitFiyatForm.dosyaAdi,
         videoUrl: sabitFiyatForm.videoUrl,
         videoDosyaAdi: sabitFiyatForm.videoDosyaAdi
       }
@@ -652,9 +660,13 @@ async function submitCurrentForm() {
       finalDirection = 'ihalesiz_ilan'
       finalBudget = 'Tanıtım / Reklam İlanı'
 
+      if (reklamForm.dosyaAdi) {
+        finalFiles.push({ name: reklamForm.dosyaAdi, size: 'Katalog / Broşür', type: 'doc' })
+      }
       finalImages = reklamForm.resimler.map(r => r.url)
       finalCustomFields = {
         formType: 'REKLAM_ILANI',
+        dosyaAdi: reklamForm.dosyaAdi,
         videoUrl: reklamForm.videoUrl,
         videoDosyaAdi: reklamForm.videoDosyaAdi
       }
@@ -1440,6 +1452,33 @@ async function submitCurrentForm() {
 
       </div>
 
+      <!-- DOSYA / TEKNİK ŞARTNAME / BELGE EKLE -->
+      <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-black uppercase text-slate-800 flex items-center gap-1.5">
+            <FileText :size="14" class="text-pink-600" />
+            <span>DOSYA / TEKNİK ŞARTNAME / BELGE EKLE</span>
+          </span>
+          <span class="text-[10px] font-bold text-emerald-600">ALICI SATICI GÖREBİLSİN</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <label class="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:border-pink-500 font-bold text-xs text-slate-700 transition cursor-pointer flex items-center gap-2 shadow-2xs">
+            <UploadCloud :size="14" class="text-pink-600" />
+            <span>Dosya Seç</span>
+            <input 
+              type="file" 
+              class="hidden" 
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.jpg,.png"
+              @change="e => handleSingleFileUpload(e, sabitFiyatForm, 'dosya', 'dosyaAdi')"
+            />
+          </label>
+          <span v-if="sabitFiyatForm.dosyaAdi" class="text-xs font-bold text-slate-800 flex items-center gap-1">
+            ✓ {{ sabitFiyatForm.dosyaAdi }}
+          </span>
+          <span v-else class="text-xs text-slate-400">PDF, Word, Excel, Şartname veya Ürün Belgesi Yükleyin</span>
+        </div>
+      </div>
+
       <!-- İLAN VEREN BİLGİSİ -->
       <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/30 space-y-3">
         <label class="block text-[11px] font-black uppercase text-slate-800">İLAN VEREN BİLGİSİ</label>
@@ -1641,6 +1680,33 @@ async function submitCurrentForm() {
           </div>
         </div>
 
+      </div>
+
+      <!-- DOSYA / KATALOG / BROŞÜR EKLE -->
+      <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-black uppercase text-slate-800 flex items-center gap-1.5">
+            <FileText :size="14" class="text-pink-600" />
+            <span>DOSYA / KATALOG / BROŞÜR EKLE</span>
+          </span>
+          <span class="text-[10px] font-bold text-emerald-600">ALICI SATICI GÖREBİLSİN</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <label class="px-4 py-2 rounded-xl bg-white border border-slate-300 hover:border-pink-500 font-bold text-xs text-slate-700 transition cursor-pointer flex items-center gap-2 shadow-2xs">
+            <UploadCloud :size="14" class="text-pink-600" />
+            <span>Dosya Seç</span>
+            <input 
+              type="file" 
+              class="hidden" 
+              accept=".pdf,.doc,.docx,.xls,.xlsx,.zip,.jpg,.png"
+              @change="e => handleSingleFileUpload(e, reklamForm, 'dosya', 'dosyaAdi')"
+            />
+          </label>
+          <span v-if="reklamForm.dosyaAdi" class="text-xs font-bold text-slate-800 flex items-center gap-1">
+            ✓ {{ reklamForm.dosyaAdi }}
+          </span>
+          <span v-else class="text-xs text-slate-400">PDF, Tanıtım Kataloğu, Fiyat Listesi veya Broşür Yükleyin</span>
+        </div>
       </div>
 
       <!-- İLAN VEREN BİLGİSİ -->
