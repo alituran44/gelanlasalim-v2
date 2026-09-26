@@ -12,10 +12,10 @@ import {
   Camera,
   Video,
   FileCheck,
-  ShieldCheck,
   Building2,
   User,
-  Plus
+  Tag,
+  Megaphone
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useUserSession } from '~/composables/useUserSession'
@@ -28,13 +28,15 @@ const { cmsData, saveCmsData } = useCmsData()
 const { userSession, userName, isCompanyMode } = useUserSession()
 
 // =========================================================================
-// 🗂️ AKTİF FORM TÜRÜ (Kullanıcı Çizimlerine Göre: 4 Ana Şablon)
+// 🗂️ AKTİF FORM TÜRÜ (Kullanıcı Çizimlerine Göre: 6 Ana Şablon)
 // 1. ACIK EKSILTME
-// 2. ARSA İÇİN
-// 3. EV
-// 4. DİĞER İLAN MENULERİ
+// 2. SABİT FİYAT
+// 3. REKLAM ILANI
+// 4. ARSA İÇİN
+// 5. EV
+// 6. DİĞER İLAN MENULERİ
 // =========================================================================
-type FormMode = 'eksiltme' | 'arsa' | 'ev' | 'diger'
+type FormMode = 'eksiltme' | 'sabit_fiyat' | 'reklam' | 'arsa' | 'ev' | 'diger'
 const activeFormMode = ref<FormMode>('eksiltme')
 
 // 81 İl Listesi
@@ -95,7 +97,7 @@ const categoryMap: Record<string, string[]> = {
 const mainCategoryList = Object.keys(categoryMap)
 
 // =========================================================================
-// 1. AÇIK EKSİLTME STATE (Görsel 1)
+// 1. AÇIK EKSİLTME STATE (Görsel 1 & 4)
 // =========================================================================
 const eksiltmeForm = reactive({
   anaKategori: 'İnşaat ve Yapı',
@@ -120,7 +122,51 @@ const eksiltmeForm = reactive({
 })
 
 // =========================================================================
-// 2. ARSA STATE (Görsel 2)
+// 2. SABİT FİYAT STATE (Yeni Görsel: SABİT FİYAT)
+// =========================================================================
+const sabitFiyatForm = reactive({
+  anaKategori: 'Sanayi ve Makine',
+  anaKategoriDiger: '',
+  altKategori: 'Üretim Makineleri',
+  altKategoriDiger: '',
+  sabitFiyat: '',
+  paraCinsi: 'TRY (₺)', // TRY | USD | EUR
+  baslik: '',
+  resimler: [] as { name: string; url: string }[],
+  videoUrl: '',
+  videoDosyasi: null as File | null,
+  videoDosyaAdi: '',
+  ilanVeren: '',
+  adres: 'Balıkesir',
+  telefon: '',
+  webSayfasi: '',
+  aciklama: '',
+  sure: '15 gün'
+})
+
+// =========================================================================
+// 3. REKLAM İLANI STATE (Yeni Görsel: REKLAM ILANI)
+// =========================================================================
+const reklamForm = reactive({
+  anaKategori: 'Bilgisayar ve Teknoloji',
+  anaKategoriDiger: '',
+  altKategori: 'Web ve Mobil Tasarım',
+  altKategoriDiger: '',
+  baslik: '',
+  resimler: [] as { name: string; url: string }[],
+  videoUrl: '',
+  videoDosyasi: null as File | null,
+  videoDosyaAdi: '',
+  ilanVeren: '',
+  adres: 'Balıkesir',
+  telefon: '',
+  webSayfasi: '',
+  aciklama: '',
+  sure: '30 gün'
+})
+
+// =========================================================================
+// 4. ARSA STATE (Görsel: ARSA İÇİN)
 // =========================================================================
 const arsaForm = reactive({
   anaKategori: 'GAYRİMENKUL İLANI',
@@ -134,6 +180,8 @@ const arsaForm = reactive({
   mahalle: '',
   ada: '',
   parsel: '',
+  haritaIsaretlendi: false,
+  haritaKonumBilgisi: '',
   tabanFiyat: '',
   ekspertizYap: false,
   ekspertizDosyasi: null as File | null,
@@ -152,7 +200,7 @@ const arsaForm = reactive({
 })
 
 // =========================================================================
-// 3. EV STATE (Görsel 3)
+// 5. EV STATE (Görsel: EV)
 // =========================================================================
 const evForm = reactive({
   anaKategori: 'GAYRİMENKUL İLANI',
@@ -176,7 +224,7 @@ const evForm = reactive({
   odaSayisi: '3+1',
   yasi: '0 (Sıfır Bina)',
   banyoSayisi: '1',
-  katAdedi: '5',
+  katAdedi: '5 Katlı',
   bulunduguKat: '2. Kat',
   ilanVeren: '',
   adres: 'Balıkesir',
@@ -187,7 +235,7 @@ const evForm = reactive({
 })
 
 // =========================================================================
-// 4. DİĞER İLAN MENULERİ STATE (Görsel 4)
+// 6. DİĞER İLAN MENULERİ STATE (Görsel: DİĞER İLAN MENULERİ)
 // =========================================================================
 const digerForm = reactive({
   anaKategori: 'Sanayi ve Makine',
@@ -216,11 +264,19 @@ const currentEksiltmeSubcategories = computed(() => {
   return categoryMap[eksiltmeForm.anaKategori] || ['Genel', 'DİĞER']
 })
 
+const currentSabitFiyatSubcategories = computed(() => {
+  return categoryMap[sabitFiyatForm.anaKategori] || ['Genel', 'DİĞER']
+})
+
+const currentReklamSubcategories = computed(() => {
+  return categoryMap[reklamForm.anaKategori] || ['Genel', 'DİĞER']
+})
+
 const currentDigerSubcategories = computed(() => {
   return categoryMap[digerForm.anaKategori] || ['Genel', 'DİĞER']
 })
 
-// Sayfa yüklendiğinde oturum bilgilerini otomatik formlara doldur
+// Sayfa açıldığında oturum bilgilerini formlara doldur
 onMounted(() => {
   const s = userSession.value || {}
   const defaultName = userName.value || s.companyName || s.name || s.email?.split('@')[0] || ''
@@ -228,33 +284,17 @@ onMounted(() => {
   const defaultCity = s.city || 'Balıkesir'
   const defaultWeb = s.website || ''
 
-  // Eksiltme
-  eksiltmeForm.ilanVeren = defaultName
-  eksiltmeForm.telefon = defaultPhone
-  eksiltmeForm.adres = defaultCity
-  eksiltmeForm.webSayfasi = defaultWeb
+  const allForms = [eksiltmeForm, sabitFiyatForm, reklamForm, arsaForm, evForm, digerForm]
+  allForms.forEach(f => {
+    f.ilanVeren = defaultName
+    f.telefon = defaultPhone
+    f.adres = defaultCity
+    f.webSayfasi = defaultWeb
+  })
 
-  // Arsa
-  arsaForm.ilanVeren = defaultName
-  arsaForm.telefon = defaultPhone
-  arsaForm.adres = defaultCity
-  arsaForm.webSayfasi = defaultWeb
-
-  // Ev
-  evForm.ilanVeren = defaultName
-  evForm.telefon = defaultPhone
-  evForm.adres = defaultCity
-  evForm.webSayfasi = defaultWeb
-
-  // Diğer
-  digerForm.ilanVeren = defaultName
-  digerForm.telefon = defaultPhone
-  digerForm.adres = defaultCity
-  digerForm.webSayfasi = defaultWeb
-
-  // URL query ile mod belirleme varsa (?mode=arsa vb.)
+  // URL query ile mod belirleme varsa (?mode=sabit_fiyat vb.)
   const qMode = route.query.mode as FormMode
-  if (qMode && ['eksiltme', 'arsa', 'ev', 'diger'].includes(qMode)) {
+  if (qMode && ['eksiltme', 'sabit_fiyat', 'reklam', 'arsa', 'ev', 'diger'].includes(qMode)) {
     activeFormMode.value = qMode
   }
 })
@@ -293,6 +333,17 @@ function openWebsiteUrl(rawUrl: string) {
   window.open(url, '_blank', 'noopener,noreferrer')
 }
 
+function toggleHaritaIsaretle() {
+  arsaForm.haritaIsaretlendi = !arsaForm.haritaIsaretlendi
+  if (arsaForm.haritaIsaretlendi) {
+    const loc = [arsaForm.il, arsaForm.ilce, arsaForm.mahalle].filter(Boolean).join(' / ')
+    const adaParsel = [arsaForm.ada ? `Ada: ${arsaForm.ada}` : '', arsaForm.parsel ? `Parsel: ${arsaForm.parsel}` : ''].filter(Boolean).join(', ')
+    arsaForm.haritaKonumBilgisi = `${loc || 'Balıkesir'} ${adaParsel ? `(${adaParsel})` : ''} - Haritada Konum İşaretlendi`
+  } else {
+    arsaForm.haritaKonumBilgisi = ''
+  }
+}
+
 // =========================================================================
 // 🚀 İLANI / İHALEYİ YAYINLAMA İŞLEMİ (SUBMIT)
 // =========================================================================
@@ -322,9 +373,7 @@ async function submitCurrentForm() {
 
     // Form türüne göre verileri harmanla
     if (activeFormMode.value === 'eksiltme') {
-      if (!eksiltmeForm.baslik.trim()) {
-        throw new Error('Lütfen ilan başlığını giriniz.')
-      }
+      if (!eksiltmeForm.baslik.trim()) throw new Error('Lütfen ihale başlığını giriniz.')
       finalBaslik = eksiltmeForm.baslik.trim()
       finalCategory = eksiltmeForm.anaKategori === 'DİĞER' ? (eksiltmeForm.anaKategoriDiger || 'Diğer') : eksiltmeForm.anaKategori
       finalSubCategory = eksiltmeForm.altKategori === 'DİĞER' ? (eksiltmeForm.altKategoriDiger || 'Diğer') : eksiltmeForm.altKategori
@@ -353,10 +402,52 @@ async function submitCurrentForm() {
       finalWeb = eksiltmeForm.webSayfasi
       finalAciklama = eksiltmeForm.aciklama
 
-    } else if (activeFormMode.value === 'arsa') {
-      if (!arsaForm.baslik.trim()) {
-        throw new Error('Lütfen arsa ilan başlığını giriniz.')
+    } else if (activeFormMode.value === 'sabit_fiyat') {
+      if (!sabitFiyatForm.baslik.trim()) throw new Error('Lütfen sabit fiyatlı ilan başlığını giriniz.')
+      finalBaslik = sabitFiyatForm.baslik.trim()
+      finalCategory = sabitFiyatForm.anaKategori === 'DİĞER' ? (sabitFiyatForm.anaKategoriDiger || 'Diğer') : sabitFiyatForm.anaKategori
+      finalSubCategory = sabitFiyatForm.altKategori === 'DİĞER' ? (sabitFiyatForm.altKategoriDiger || 'Diğer') : sabitFiyatForm.altKategori
+      finalDirection = 'sabit_paket'
+      
+      const symbol = sabitFiyatForm.paraCinsi.includes('USD') ? '$' : (sabitFiyatForm.paraCinsi.includes('EUR') ? '€' : '₺')
+      finalBudget = sabitFiyatForm.sabitFiyat ? `${sabitFiyatForm.sabitFiyat} ${symbol}` : 'Fiyat Belirtilmedi'
+
+      finalImages = sabitFiyatForm.resimler.map(r => r.url)
+      finalCustomFields = {
+        formType: 'SABIT_FIYAT',
+        sabitFiyat: sabitFiyatForm.sabitFiyat,
+        paraCinsi: sabitFiyatForm.paraCinsi,
+        videoUrl: sabitFiyatForm.videoUrl,
+        videoDosyaAdi: sabitFiyatForm.videoDosyaAdi
       }
+      finalOwner = sabitFiyatForm.ilanVeren
+      finalAddress = sabitFiyatForm.adres
+      finalPhone = sabitFiyatForm.telefon
+      finalWeb = sabitFiyatForm.webSayfasi
+      finalAciklama = sabitFiyatForm.aciklama
+
+    } else if (activeFormMode.value === 'reklam') {
+      if (!reklamForm.baslik.trim()) throw new Error('Lütfen reklam ilan başlığını giriniz.')
+      finalBaslik = reklamForm.baslik.trim()
+      finalCategory = reklamForm.anaKategori === 'DİĞER' ? (reklamForm.anaKategoriDiger || 'Diğer') : reklamForm.anaKategori
+      finalSubCategory = reklamForm.altKategori === 'DİĞER' ? (reklamForm.altKategoriDiger || 'Diğer') : reklamForm.altKategori
+      finalDirection = 'ihalesiz_ilan'
+      finalBudget = 'Tanıtım / Reklam İlanı'
+
+      finalImages = reklamForm.resimler.map(r => r.url)
+      finalCustomFields = {
+        formType: 'REKLAM_ILANI',
+        videoUrl: reklamForm.videoUrl,
+        videoDosyaAdi: reklamForm.videoDosyaAdi
+      }
+      finalOwner = reklamForm.ilanVeren
+      finalAddress = reklamForm.adres
+      finalPhone = reklamForm.telefon
+      finalWeb = reklamForm.webSayfasi
+      finalAciklama = reklamForm.aciklama
+
+    } else if (activeFormMode.value === 'arsa') {
+      if (!arsaForm.baslik.trim()) throw new Error('Lütfen arsa ilan başlığını giriniz.')
       finalBaslik = arsaForm.baslik.trim()
       finalCategory = 'Gayrimenkul'
       const islem = arsaForm.islemTuru === 'DİĞER' ? (arsaForm.islemTuruDiger || 'İlan') : arsaForm.islemTuru
@@ -382,6 +473,8 @@ async function submitCurrentForm() {
         parsel: arsaForm.parsel,
         tabanFiyat: arsaForm.tabanFiyat,
         ekspertizYap: arsaForm.ekspertizYap,
+        haritaIsaretlendi: arsaForm.haritaIsaretlendi,
+        haritaKonumBilgisi: arsaForm.haritaKonumBilgisi,
         videoUrl: arsaForm.videoUrl,
         videoDosyaAdi: arsaForm.videoDosyaAdi
       }
@@ -391,9 +484,7 @@ async function submitCurrentForm() {
       finalAciklama = arsaForm.aciklama
 
     } else if (activeFormMode.value === 'ev') {
-      if (!evForm.baslik.trim()) {
-        throw new Error('Lütfen ev / konut ilan başlığını giriniz.')
-      }
+      if (!evForm.baslik.trim()) throw new Error('Lütfen ev / konut ilan başlığını giriniz.')
       finalBaslik = evForm.baslik.trim()
       finalCategory = 'Gayrimenkul'
       const islem = evForm.islemTuru === 'DİĞER' ? (evForm.islemTuruDiger || 'İlan') : evForm.islemTuru
@@ -431,9 +522,7 @@ async function submitCurrentForm() {
       finalAciklama = evForm.aciklama
 
     } else if (activeFormMode.value === 'diger') {
-      if (!digerForm.baslik.trim()) {
-        throw new Error('Lütfen ilan başlığını giriniz.')
-      }
+      if (!digerForm.baslik.trim()) throw new Error('Lütfen ilan başlığını giriniz.')
       finalBaslik = digerForm.baslik.trim()
       finalCategory = digerForm.anaKategori === 'DİĞER' ? (digerForm.anaKategoriDiger || 'Diğer') : digerForm.anaKategori
       finalSubCategory = digerForm.altKategori === 'DİĞER' ? (digerForm.altKategoriDiger || 'Diğer') : digerForm.altKategori
@@ -463,10 +552,7 @@ async function submitCurrentForm() {
       finalAciklama = digerForm.aciklama
     }
 
-    // Default primary image fallback
     const primaryImg = finalImages[0] || 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?auto=format&fit=crop&w=600&q=80'
-
-    // İhale / İlan ID oluştur
     const newId = `TND-${Date.now().toString().slice(-6)}`
     const ownerEmail = userSession.value?.email || 'kullanici@ihaleciburada.com'
 
@@ -477,7 +563,7 @@ async function submitCurrentForm() {
       mainCategory: finalCategory,
       subCategory: finalSubCategory,
       ihaleYonu: finalDirection,
-      tur: finalDirection === 'eksiltme' ? 'Açık Eksiltme İhalesi' : 'Pazaryeri İlanı',
+      tur: finalDirection === 'eksiltme' ? 'Açık Eksiltme İhalesi' : (activeFormMode.value === 'reklam' ? 'Tanıtım & Reklam İlanı' : 'Pazaryeri İlanı'),
       rekabetTuru: finalDirection === 'eksiltme' ? 'Eksiltme' : 'Doğrudan İlan',
       sure: '7 gün kaldı',
       teklifSayisi: 0,
@@ -536,7 +622,7 @@ async function submitCurrentForm() {
 
     submitSuccess.value = true
 
-    // Yayındaki İlanlarım sayfasına aktar
+    // Yayındaki İlanlarım sayfasına yönlendir
     setTimeout(() => {
       router.push('/panel/ilanlarim')
     }, 1200)
@@ -558,7 +644,7 @@ async function submitCurrentForm() {
         <div class="flex items-center gap-2">
           <NuxtLink 
             to="/panel" 
-            class="p-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 transition"
+            class="p-1.5 rounded-xl border border-slate-200 hover:bg-slate-100 text-slate-600 transition cursor-pointer"
             title="Panele Dön"
           >
             <ArrowLeft :size="16" />
@@ -571,78 +657,111 @@ async function submitCurrentForm() {
       <!-- Yayındaki İlanlarım Butonu -->
       <NuxtLink
         to="/panel/ilanlarim"
-        class="px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 font-bold text-xs flex items-center gap-1.5 transition"
+        class="px-3.5 py-2 rounded-xl bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 font-bold text-xs flex items-center gap-1.5 transition cursor-pointer"
       >
         <span>Yayındaki İlanlarım →</span>
       </NuxtLink>
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 🎛️ 4 ANA ŞABLON SEÇİCİ SEKMELERİ (Görsel 1, 2, 3, 4) -->
+    <!-- 🎛️ 6 ANA ŞABLON SEÇİCİ SEKMELERİ (Görsel 1, 2, 3, 4, Sabit Fiyat, Reklam) -->
     <!-- ========================================================================= -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5">
-      <!-- 1. Açık Eksiltme (Görsel 1) -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+      
+      <!-- 1. Açık Eksiltme (Görsel: ACIK EKSILTME) -->
       <button
         type="button"
         @click="activeFormMode = 'eksiltme'"
         class="p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1 shadow-xs"
         :class="activeFormMode === 'eksiltme' 
-          ? 'border-pink-500 bg-pink-50/70 ring-2 ring-pink-500/20 text-pink-900' 
+          ? 'border-pink-500 bg-pink-50/80 ring-2 ring-pink-500/20 text-pink-900' 
           : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'"
       >
-        <span class="text-xs font-black uppercase tracking-wider flex items-center justify-between">
-          <span>📉 ACIK EKSILTME</span>
-          <span v-if="activeFormMode === 'eksiltme'" class="text-pink-600 text-sm">✓</span>
+        <span class="text-[11px] font-black uppercase tracking-wider flex items-center justify-between">
+          <span>📉 AÇIK EKSİLTME</span>
+          <span v-if="activeFormMode === 'eksiltme'" class="text-pink-600 text-xs">✓</span>
         </span>
-        <span class="text-[10px] text-slate-500 font-medium">Ters ihale & satın alma</span>
+        <span class="text-[9px] text-slate-500 font-medium">Tersine ihale & alım</span>
       </button>
 
-      <!-- 2. Arsa İçin (Görsel 2) -->
+      <!-- 2. Sabit Fiyat (Yeni Görsel: SABİT FİYAT) -->
+      <button
+        type="button"
+        @click="activeFormMode = 'sabit_fiyat'"
+        class="p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1 shadow-xs"
+        :class="activeFormMode === 'sabit_fiyat' 
+          ? 'border-pink-500 bg-pink-50/80 ring-2 ring-pink-500/20 text-pink-900' 
+          : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'"
+      >
+        <span class="text-[11px] font-black uppercase tracking-wider flex items-center justify-between">
+          <span>🏷️ SABİT FİYAT</span>
+          <span v-if="activeFormMode === 'sabit_fiyat'" class="text-pink-600 text-xs">✓</span>
+        </span>
+        <span class="text-[9px] text-slate-500 font-medium">Sabit fiyat & para cinsi</span>
+      </button>
+
+      <!-- 3. Reklam İlanı (Yeni Görsel: REKLAM ILANI) -->
+      <button
+        type="button"
+        @click="activeFormMode = 'reklam'"
+        class="p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1 shadow-xs"
+        :class="activeFormMode === 'reklam' 
+          ? 'border-pink-500 bg-pink-50/80 ring-2 ring-pink-500/20 text-pink-900' 
+          : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'"
+      >
+        <span class="text-[11px] font-black uppercase tracking-wider flex items-center justify-between">
+          <span>📢 REKLAM İLANI</span>
+          <span v-if="activeFormMode === 'reklam'" class="text-pink-600 text-xs">✓</span>
+        </span>
+        <span class="text-[9px] text-slate-500 font-medium">Fiyatsız vitrin tanıtımı</span>
+      </button>
+
+      <!-- 4. Arsa İçin (Görsel: ARSA İÇİN) -->
       <button
         type="button"
         @click="activeFormMode = 'arsa'"
         class="p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1 shadow-xs"
         :class="activeFormMode === 'arsa' 
-          ? 'border-pink-500 bg-pink-50/70 ring-2 ring-pink-500/20 text-pink-900' 
+          ? 'border-pink-500 bg-pink-50/80 ring-2 ring-pink-500/20 text-pink-900' 
           : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'"
       >
-        <span class="text-xs font-black uppercase tracking-wider flex items-center justify-between">
+        <span class="text-[11px] font-black uppercase tracking-wider flex items-center justify-between">
           <span>🗺️ ARSA İÇİN</span>
-          <span v-if="activeFormMode === 'arsa'" class="text-pink-600 text-sm">✓</span>
+          <span v-if="activeFormMode === 'arsa'" class="text-pink-600 text-xs">✓</span>
         </span>
-        <span class="text-[10px] text-slate-500 font-medium">Ada, parsel, tarla, arsa</span>
+        <span class="text-[9px] text-slate-500 font-medium">Ada, parsel, tarla</span>
       </button>
 
-      <!-- 3. Ev (Görsel 3) -->
+      <!-- 5. Ev (Görsel: EV) -->
       <button
         type="button"
         @click="activeFormMode = 'ev'"
         class="p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1 shadow-xs"
         :class="activeFormMode === 'ev' 
-          ? 'border-pink-500 bg-pink-50/70 ring-2 ring-pink-500/20 text-pink-900' 
+          ? 'border-pink-500 bg-pink-50/80 ring-2 ring-pink-500/20 text-pink-900' 
           : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'"
       >
-        <span class="text-xs font-black uppercase tracking-wider flex items-center justify-between">
+        <span class="text-[11px] font-black uppercase tracking-wider flex items-center justify-between">
           <span>🏠 EV</span>
-          <span v-if="activeFormMode === 'ev'" class="text-pink-600 text-sm">✓</span>
+          <span v-if="activeFormMode === 'ev'" class="text-pink-600 text-xs">✓</span>
         </span>
-        <span class="text-[10px] text-slate-500 font-medium">Konut, daire, villa, ofis</span>
+        <span class="text-[9px] text-slate-500 font-medium">Konut, daire, villa</span>
       </button>
 
-      <!-- 4. Diğer İlan Menüleri (Görsel 4) -->
+      <!-- 6. Diğer İlan Menüleri (Görsel: DİĞER İLAN MENULERİ) -->
       <button
         type="button"
         @click="activeFormMode = 'diger'"
         class="p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1 shadow-xs"
         :class="activeFormMode === 'diger' 
-          ? 'border-pink-500 bg-pink-50/70 ring-2 ring-pink-500/20 text-pink-900' 
+          ? 'border-pink-500 bg-pink-50/80 ring-2 ring-pink-500/20 text-pink-900' 
           : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'"
       >
-        <span class="text-xs font-black uppercase tracking-wider flex items-center justify-between">
+        <span class="text-[11px] font-black uppercase tracking-wider flex items-center justify-between">
           <span>📦 DİĞER İLANLAR</span>
-          <span v-if="activeFormMode === 'diger'" class="text-pink-600 text-sm">✓</span>
+          <span v-if="activeFormMode === 'diger'" class="text-pink-600 text-xs">✓</span>
         </span>
-        <span class="text-[10px] text-slate-500 font-medium">Malzeme, teçhizat, genel</span>
+        <span class="text-[9px] text-slate-500 font-medium">Taban & tavan fiyat</span>
       </button>
     </div>
 
@@ -658,7 +777,7 @@ async function submitCurrentForm() {
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 📄 FORM 1: ACIK EKSILTME (Görsel 1 Birebir) -->
+    <!-- 📄 FORM 1: ACIK EKSILTME (Görsel: ACIK EKSILTME) -->
     <!-- ========================================================================= -->
     <div v-if="activeFormMode === 'eksiltme'" class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-8 shadow-xs space-y-6">
       
@@ -676,10 +795,10 @@ async function submitCurrentForm() {
           <label class="block text-[11px] font-black uppercase tracking-wider text-emerald-600">ANA KATAGORİ</label>
           <select 
             v-model="eksiltmeForm.anaKategori"
-            class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500 focus:ring-1 focus:ring-pink-200"
+            class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
           >
             <option v-for="cat in mainCategoryList" :key="cat" :value="cat">
-              {{ cat === 'DİĞER' ? 'DİĞER' : cat }}
+              {{ cat }}
             </option>
           </select>
 
@@ -690,7 +809,7 @@ async function submitCurrentForm() {
               v-model="eksiltmeForm.anaKategoriDiger"
               type="text"
               placeholder="ELLE GİRİLSİN"
-              class="w-full rounded-xl border-2 border-dashed border-pink-400 bg-pink-50/30 p-2.5 text-xs font-bold text-slate-900 outline-none focus:bg-white"
+              class="w-full rounded-xl border-2 border-dashed border-pink-400 bg-pink-50/30 p-2.5 text-xs font-bold text-slate-900 outline-none"
             />
           </div>
         </div>
@@ -700,7 +819,7 @@ async function submitCurrentForm() {
           <label class="block text-[11px] font-black uppercase tracking-wider text-emerald-600">ALT KATAGORİ</label>
           <select 
             v-model="eksiltmeForm.altKategori"
-            class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500 focus:ring-1 focus:ring-pink-200"
+            class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
           >
             <option v-for="sub in currentEksiltmeSubcategories" :key="sub" :value="sub">
               {{ sub }}
@@ -714,7 +833,7 @@ async function submitCurrentForm() {
               v-model="eksiltmeForm.altKategoriDiger"
               type="text"
               placeholder="ELLE GİRİLSİN"
-              class="w-full rounded-xl border-2 border-dashed border-pink-400 bg-pink-50/30 p-2.5 text-xs font-bold text-slate-900 outline-none focus:bg-white"
+              class="w-full rounded-xl border-2 border-dashed border-pink-400 bg-pink-50/30 p-2.5 text-xs font-bold text-slate-900 outline-none"
             />
           </div>
         </div>
@@ -728,7 +847,7 @@ async function submitCurrentForm() {
           v-model="eksiltmeForm.baslik"
           type="text"
           placeholder="Örn: 50.000 Adet Oluklu Koli Alımı veya Şantiye Kaba İnşaat İşi"
-          class="w-full rounded-xl border border-slate-300 p-3.5 text-xs font-bold text-slate-900 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
+          class="w-full rounded-xl border border-slate-300 p-3.5 text-xs font-bold text-slate-900 outline-none focus:border-pink-500"
         />
       </div>
 
@@ -816,7 +935,7 @@ async function submitCurrentForm() {
           <div v-if="eksiltmeForm.resimler.length > 0" class="flex flex-wrap gap-2 pt-1">
             <div v-for="(img, idx) in eksiltmeForm.resimler" :key="idx" class="relative w-14 h-14 rounded-lg overflow-hidden border border-slate-300 group">
               <img :src="img.url" class="w-full h-full object-cover" />
-              <button type="button" @click="removeImage(eksiltmeForm, idx)" class="absolute top-0.5 right-0.5 bg-red-600 text-white rounded p-0.5 opacity-90 hover:opacity-100">
+              <button type="button" @click="removeImage(eksiltmeForm, idx)" class="absolute top-0.5 right-0.5 bg-red-600 text-white rounded p-0.5">
                 <Trash2 :size="10" />
               </button>
             </div>
@@ -900,7 +1019,6 @@ async function submitCurrentForm() {
               type="button"
               @click="openWebsiteUrl(eksiltmeForm.webSayfasi)"
               class="px-3 py-2.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-bold transition flex items-center gap-1 shrink-0 cursor-pointer"
-              title="Yazan Sayfayı Aç"
             >
               <ExternalLink :size="13" />
               <span>Aç</span>
@@ -936,7 +1054,438 @@ async function submitCurrentForm() {
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 📄 FORM 2: ARSA İÇİN (Görsel 2 Birebir) -->
+    <!-- 📄 FORM 2: SABİT FİYAT (Yeni Görsel: SABİT FİYAT Birebir) -->
+    <!-- ========================================================================= -->
+    <div v-else-if="activeFormMode === 'sabit_fiyat'" class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-8 shadow-xs space-y-6">
+      
+      <!-- Pembe Çizim Başlığı -->
+      <div class="border-b border-pink-100 pb-3">
+        <h2 class="text-sm font-black uppercase tracking-wider text-pink-600">SABİT FİYAT</h2>
+        <p class="text-[11px] text-slate-400">Sabit fiyatlı ürün, ekipman veya doğrudan satış ilanı</p>
+      </div>
+
+      <!-- Kategori ve Alt Kategori (Seç / Diğer - Elle Girilsin) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Ana Kategori -->
+        <div class="space-y-1.5">
+          <label class="block text-[11px] font-black uppercase tracking-wider text-emerald-600">ANA KATAGORİ</label>
+          <select 
+            v-model="sabitFiyatForm.anaKategori"
+            class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
+          >
+            <option v-for="cat in mainCategoryList" :key="cat" :value="cat">{{ cat }}</option>
+          </select>
+          <div v-if="sabitFiyatForm.anaKategori === 'DİĞER'" class="pt-1.5">
+            <span class="block text-[10px] font-black text-pink-600 uppercase">DİĞER:</span>
+            <input 
+              v-model="sabitFiyatForm.anaKategoriDiger"
+              type="text"
+              placeholder="ELLE GİRİLSİN"
+              class="w-full rounded-xl border-2 border-dashed border-pink-400 bg-pink-50/30 p-2.5 text-xs font-bold outline-none"
+            />
+          </div>
+        </div>
+
+        <!-- Alt Kategori -->
+        <div class="space-y-1.5">
+          <label class="block text-[11px] font-black uppercase tracking-wider text-emerald-600">ALT KATAGORİ</label>
+          <select 
+            v-model="sabitFiyatForm.altKategori"
+            class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
+          >
+            <option v-for="sub in currentSabitFiyatSubcategories" :key="sub" :value="sub">{{ sub }}</option>
+          </select>
+          <div v-if="sabitFiyatForm.altKategori === 'DİĞER'" class="pt-1.5">
+            <span class="block text-[10px] font-black text-pink-600 uppercase">DİĞER:</span>
+            <input 
+              v-model="sabitFiyatForm.altKategoriDiger"
+              type="text"
+              placeholder="ELLE GİRİLSİN"
+              class="w-full rounded-xl border-2 border-dashed border-pink-400 bg-pink-50/30 p-2.5 text-xs font-bold outline-none"
+            />
+          </div>
+        </div>
+
+      </div>
+
+      <!-- SABİT FİYAT & PARA CİNSİ (Görseldeki Özel Alan) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl border border-slate-200 bg-slate-50/40">
+        <div>
+          <label class="block text-[11px] font-black uppercase text-slate-800 mb-1">SABİT FİYAT *</label>
+          <input 
+            v-model="sabitFiyatForm.sabitFiyat"
+            type="text"
+            placeholder="Fiyatı Yazınız (Örn: 75.000)"
+            class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-900 bg-white outline-none focus:border-pink-500"
+          />
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-black uppercase text-slate-800 mb-1">PARA CİNSİ *</label>
+          <select 
+            v-model="sabitFiyatForm.paraCinsi"
+            class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
+          >
+            <option value="TRY (₺)">TRY (₺) - Türk Lirası</option>
+            <option value="USD ($)">USD ($) - Amerikan Doları</option>
+            <option value="EUR (€)">EUR (€) - Euro</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- İLAN BAŞLIĞI EKLE -->
+      <div class="space-y-1.5">
+        <label class="block text-[11px] font-black uppercase tracking-wider text-slate-700">İLAN BAŞLIĞI EKLE *</label>
+        <input 
+          v-model="sabitFiyatForm.baslik"
+          type="text"
+          placeholder="Örn: Sıfır Ayarında Hidrolik Pres veya 500 Adet Ahşap Sandalye"
+          class="w-full rounded-xl border border-slate-300 p-3.5 text-xs font-bold text-slate-900 outline-none focus:border-pink-500"
+        />
+      </div>
+
+      <!-- MEDYA: RESİM EKLE & VİDEO EKLE -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        
+        <!-- RESİM EKLE -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-black uppercase text-slate-800 flex items-center gap-1">
+              <Camera :size="14" class="text-pink-600" />
+              <span>RESİM EKLE</span>
+            </span>
+            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition">
+              + EKLE
+              <input type="file" multiple accept="image/*" class="hidden" @change="e => handleMultipleImages(e, sabitFiyatForm)" />
+            </label>
+          </div>
+          <div v-if="sabitFiyatForm.resimler.length > 0" class="flex flex-wrap gap-2 pt-1">
+            <div v-for="(img, idx) in sabitFiyatForm.resimler" :key="idx" class="relative w-14 h-14 rounded-lg overflow-hidden border border-slate-300">
+              <img :src="img.url" class="w-full h-full object-cover" />
+              <button type="button" @click="removeImage(sabitFiyatForm, idx)" class="absolute top-0.5 right-0.5 bg-red-600 text-white rounded p-0.5">
+                <Trash2 :size="10" />
+              </button>
+            </div>
+          </div>
+          <p v-else class="text-[10px] text-slate-400">Ürüne ait görselleri yükleyin.</p>
+        </div>
+
+        <!-- VİDEO EKLE -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-black uppercase text-slate-800 flex items-center gap-1">
+              <Video :size="14" class="text-pink-600" />
+              <span>VİDEO EKLE</span>
+            </span>
+            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition">
+              + EKLE
+              <input type="file" accept="video/*" class="hidden" @change="e => handleSingleFileUpload(e, sabitFiyatForm, 'videoDosyasi', 'videoDosyaAdi')" />
+            </label>
+          </div>
+          <div class="space-y-1">
+            <input 
+              v-model="sabitFiyatForm.videoUrl"
+              type="text"
+              placeholder="Veya Video Linki"
+              class="w-full rounded-xl border border-slate-300 p-2 text-[11px] text-slate-800 outline-none bg-white focus:border-pink-500"
+            />
+            <span v-if="sabitFiyatForm.videoDosyaAdi" class="text-[11px] font-bold text-emerald-700 block">
+              ✓ Yüklenen Video: {{ sabitFiyatForm.videoDosyaAdi }}
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- İLAN VEREN BİLGİSİ -->
+      <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/30 space-y-3">
+        <label class="block text-[11px] font-black uppercase text-slate-800">İLAN VEREN BİLGİSİ</label>
+        <input 
+          v-model="sabitFiyatForm.ilanVeren"
+          type="text"
+          placeholder="İlan Veren Ad Soyad / Şirket Unvanı"
+          class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
+        />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] font-black uppercase text-slate-600 mb-1">ADRES</label>
+            <input 
+              v-model="sabitFiyatForm.adres"
+              type="text"
+              placeholder="Şehir / İlçe veya Açık Adres"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs text-slate-800 outline-none bg-white focus:border-pink-500"
+            />
+          </div>
+          <div>
+            <label class="block text-[10px] font-black uppercase text-slate-600 mb-1">TELEFON</label>
+            <input 
+              v-model="sabitFiyatForm.telefon"
+              type="text"
+              placeholder="05XX XXX XX XX"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs text-slate-800 outline-none bg-white focus:border-pink-500"
+            />
+          </div>
+        </div>
+
+        <!-- VARSA WEB SAYFASI -->
+        <div class="pt-1">
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-[10px] font-black uppercase text-slate-600">VARSA WEB SAYFASI</label>
+            <span class="text-[10px] font-bold text-emerald-600">TIKLAYINCA YAZAN SAYFA ACILSIN</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <input 
+              v-model="sabitFiyatForm.webSayfasi"
+              type="text"
+              placeholder="https://www.orneksite.com"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs text-slate-800 outline-none bg-white focus:border-pink-500"
+            />
+            <button
+              v-if="sabitFiyatForm.webSayfasi"
+              type="button"
+              @click="openWebsiteUrl(sabitFiyatForm.webSayfasi)"
+              class="px-3 py-2.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-bold transition flex items-center gap-1 shrink-0 cursor-pointer"
+            >
+              <ExternalLink :size="13" />
+              <span>Aç</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- İsteğe Bağlı Açıklama -->
+      <div class="space-y-1">
+        <label class="block text-[11px] font-black uppercase text-slate-700">DETAYLI AÇIKLAMA (OPSİYONEL)</label>
+        <textarea 
+          v-model="sabitFiyatForm.aciklama"
+          rows="3"
+          placeholder="Ürün durumu, teknik özellikler, teslimat ve fatura koşulları..."
+          class="w-full rounded-xl border border-slate-300 p-3 text-xs text-slate-800 outline-none focus:border-pink-500"
+        ></textarea>
+      </div>
+
+      <!-- Gönder Butonu -->
+      <div class="pt-2">
+        <button
+          type="button"
+          :disabled="isSubmitting"
+          @click="submitCurrentForm"
+          class="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-black text-sm tracking-wide shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+        >
+          <span v-if="isSubmitting">Yayınlanıyor...</span>
+          <span v-else>🚀 SABİT FİYATLI İLANI YAYINLA</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 📄 FORM 3: REKLAM İLANI (Yeni Görsel: REKLAM ILANI Birebir) -->
+    <!-- ========================================================================= -->
+    <div v-else-if="activeFormMode === 'reklam'" class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-8 shadow-xs space-y-6">
+      
+      <!-- Pembe Çizim Başlığı -->
+      <div class="border-b border-pink-100 pb-3">
+        <h2 class="text-sm font-black uppercase tracking-wider text-pink-600">REKLAM ILANI</h2>
+        <p class="text-[11px] text-slate-400">Şirket, hizmet, proje ve kurumsal tanıtım reklam ilanı</p>
+      </div>
+
+      <!-- Kategori ve Alt Kategori (Seç / Diğer - Elle Girilsin) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        
+        <!-- Ana Kategori -->
+        <div class="space-y-1.5">
+          <label class="block text-[11px] font-black uppercase tracking-wider text-emerald-600">ANA KATAGORİ</label>
+          <select 
+            v-model="reklamForm.anaKategori"
+            class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
+          >
+            <option v-for="cat in mainCategoryList" :key="cat" :value="cat">{{ cat }}</option>
+          </select>
+          <div v-if="reklamForm.anaKategori === 'DİĞER'" class="pt-1.5">
+            <span class="block text-[10px] font-black text-pink-600 uppercase">DİĞER:</span>
+            <input 
+              v-model="reklamForm.anaKategoriDiger"
+              type="text"
+              placeholder="ELLE GİRİLSİN"
+              class="w-full rounded-xl border-2 border-dashed border-pink-400 bg-pink-50/30 p-2.5 text-xs font-bold outline-none"
+            />
+          </div>
+        </div>
+
+        <!-- Alt Kategori -->
+        <div class="space-y-1.5">
+          <label class="block text-[11px] font-black uppercase tracking-wider text-emerald-600">ALT KATAGORİ</label>
+          <select 
+            v-model="reklamForm.altKategori"
+            class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
+          >
+            <option v-for="sub in currentReklamSubcategories" :key="sub" :value="sub">{{ sub }}</option>
+          </select>
+          <div v-if="reklamForm.altKategori === 'DİĞER'" class="pt-1.5">
+            <span class="block text-[10px] font-black text-pink-600 uppercase">DİĞER:</span>
+            <input 
+              v-model="reklamForm.altKategoriDiger"
+              type="text"
+              placeholder="ELLE GİRİLSİN"
+              class="w-full rounded-xl border-2 border-dashed border-pink-400 bg-pink-50/30 p-2.5 text-xs font-bold outline-none"
+            />
+          </div>
+        </div>
+
+      </div>
+
+      <!-- İLAN BAŞLIĞI EKLE -->
+      <div class="space-y-1.5">
+        <label class="block text-[11px] font-black uppercase tracking-wider text-slate-700">İLAN BAŞLIĞI EKLE *</label>
+        <input 
+          v-model="reklamForm.baslik"
+          type="text"
+          placeholder="Örn: Fabrika Otomasyon & Yazılım Çözümleri Tanıtımı veya Kurumsal Danışmanlık"
+          class="w-full rounded-xl border border-slate-300 p-3.5 text-xs font-bold text-slate-900 outline-none focus:border-pink-500"
+        />
+      </div>
+
+      <!-- MEDYA: RESİM EKLE & VİDEO EKLE -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        
+        <!-- RESİM EKLE -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-black uppercase text-slate-800 flex items-center gap-1">
+              <Camera :size="14" class="text-pink-600" />
+              <span>RESİM EKLE</span>
+            </span>
+            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition">
+              + EKLE
+              <input type="file" multiple accept="image/*" class="hidden" @change="e => handleMultipleImages(e, reklamForm)" />
+            </label>
+          </div>
+          <div v-if="reklamForm.resimler.length > 0" class="flex flex-wrap gap-2 pt-1">
+            <div v-for="(img, idx) in reklamForm.resimler" :key="idx" class="relative w-14 h-14 rounded-lg overflow-hidden border border-slate-300">
+              <img :src="img.url" class="w-full h-full object-cover" />
+              <button type="button" @click="removeImage(reklamForm, idx)" class="absolute top-0.5 right-0.5 bg-red-600 text-white rounded p-0.5">
+                <Trash2 :size="10" />
+              </button>
+            </div>
+          </div>
+          <p v-else class="text-[10px] text-slate-400">Reklam afişi, logo veya ürün fotoğrafları yükleyin.</p>
+        </div>
+
+        <!-- VİDEO EKLE -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 space-y-2.5">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-black uppercase text-slate-800 flex items-center gap-1">
+              <Video :size="14" class="text-pink-600" />
+              <span>VİDEO EKLE</span>
+            </span>
+            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition">
+              + EKLE
+              <input type="file" accept="video/*" class="hidden" @change="e => handleSingleFileUpload(e, reklamForm, 'videoDosyasi', 'videoDosyaAdi')" />
+            </label>
+          </div>
+          <div class="space-y-1">
+            <input 
+              v-model="reklamForm.videoUrl"
+              type="text"
+              placeholder="Veya Tanıtım Video Linki (YouTube / Vimeo)"
+              class="w-full rounded-xl border border-slate-300 p-2 text-[11px] text-slate-800 outline-none bg-white focus:border-pink-500"
+            />
+            <span v-if="reklamForm.videoDosyaAdi" class="text-[11px] font-bold text-emerald-700 block">
+              ✓ Yüklenen Video: {{ reklamForm.videoDosyaAdi }}
+            </span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- İLAN VEREN BİLGİSİ -->
+      <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/30 space-y-3">
+        <label class="block text-[11px] font-black uppercase text-slate-800">İLAN VEREN BİLGİSİ</label>
+        <input 
+          v-model="reklamForm.ilanVeren"
+          type="text"
+          placeholder="İlan Veren Ad Soyad / Şirket Unvanı"
+          class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
+        />
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-[10px] font-black uppercase text-slate-600 mb-1">ADRES</label>
+            <input 
+              v-model="reklamForm.adres"
+              type="text"
+              placeholder="Şehir / İlçe veya Açık Adres"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs text-slate-800 outline-none bg-white focus:border-pink-500"
+            />
+          </div>
+          <div>
+            <label class="block text-[10px] font-black uppercase text-slate-600 mb-1">TELEFON</label>
+            <input 
+              v-model="reklamForm.telefon"
+              type="text"
+              placeholder="05XX XXX XX XX"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs text-slate-800 outline-none bg-white focus:border-pink-500"
+            />
+          </div>
+        </div>
+
+        <!-- VARSA WEB SAYFASI -->
+        <div class="pt-1">
+          <div class="flex items-center justify-between mb-1">
+            <label class="text-[10px] font-black uppercase text-slate-600">VARSA WEB SAYFASI</label>
+            <span class="text-[10px] font-bold text-emerald-600">TIKLAYINCA YAZAN SAYFA ACILSIN</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <input 
+              v-model="reklamForm.webSayfasi"
+              type="text"
+              placeholder="https://www.orneksite.com"
+              class="w-full rounded-xl border border-slate-300 p-2.5 text-xs text-slate-800 outline-none bg-white focus:border-pink-500"
+            />
+            <button
+              v-if="reklamForm.webSayfasi"
+              type="button"
+              @click="openWebsiteUrl(reklamForm.webSayfasi)"
+              class="px-3 py-2.5 rounded-xl bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-bold transition flex items-center gap-1 shrink-0 cursor-pointer"
+            >
+              <ExternalLink :size="13" />
+              <span>Aç</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- İsteğe Bağlı Açıklama / Reklam Metni -->
+      <div class="space-y-1">
+        <label class="block text-[11px] font-black uppercase text-slate-700">REKLAM & TANITIM METNİ (OPSİYONEL)</label>
+        <textarea 
+          v-model="reklamForm.aciklama"
+          rows="4"
+          placeholder="Hizmet detayları, referanslar, kampanya koşulları ve tanıtım açıklaması..."
+          class="w-full rounded-xl border border-slate-300 p-3 text-xs text-slate-800 outline-none focus:border-pink-500"
+        ></textarea>
+      </div>
+
+      <!-- Gönder Butonu -->
+      <div class="pt-2">
+        <button
+          type="button"
+          :disabled="isSubmitting"
+          @click="submitCurrentForm"
+          class="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-black text-sm tracking-wide shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
+        >
+          <span v-if="isSubmitting">Yayınlanıyor...</span>
+          <span v-else>🚀 REKLAM İLANINI YAYINLA</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- 📄 FORM 4: ARSA İÇİN (Görsel: ARSA İÇİN Birebir) -->
     <!-- ========================================================================= -->
     <div v-else-if="activeFormMode === 'arsa'" class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-8 shadow-xs space-y-6">
       
@@ -949,15 +1498,13 @@ async function submitCurrentForm() {
       <!-- Ana Kategori: GAYRİMENKUL İLANI (veya Diğer) -->
       <div class="space-y-1.5">
         <label class="block text-[11px] font-black uppercase tracking-wider text-emerald-600">ANA KATAGORİ</label>
-        <div class="flex items-center gap-3">
-          <select 
-            v-model="arsaForm.anaKategori"
-            class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
-          >
-            <option value="GAYRİMENKUL İLANI">GAYRİMENKUL İLANI</option>
-            <option value="DİĞER">DİĞER</option>
-          </select>
-        </div>
+        <select 
+          v-model="arsaForm.anaKategori"
+          class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
+        >
+          <option value="GAYRİMENKUL İLANI">GAYRİMENKUL İLANI</option>
+          <option value="DİĞER">DİĞER</option>
+        </select>
         <div v-if="arsaForm.anaKategori === 'DİĞER'" class="pt-1">
           <span class="block text-[10px] font-black text-pink-600 uppercase">DİĞER:</span>
           <input 
@@ -969,7 +1516,7 @@ async function submitCurrentForm() {
         </div>
       </div>
 
-      <!-- Sol & Sağ Menü (Görsel 2): KİRALIK/SATILIK/TAKAS vs. ARSA/KONUT/TARLA -->
+      <!-- Sol & Sağ Menü (Görsel): KİRALIK/SATILIK/TAKAS vs. ARSA/KONUT/TARLA -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         
         <!-- Sol: İLAN TÜRÜ (KİRALIK, SATILIK, TAKAS, DİĞER) -->
@@ -1085,7 +1632,7 @@ async function submitCurrentForm() {
           </div>
         </div>
 
-        <!-- ADA & PARSEL (Görsel 2) -->
+        <!-- ADA & PARSEL (Görsel) -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
           <div>
             <div class="flex items-center justify-between mb-1">
@@ -1110,6 +1657,51 @@ async function submitCurrentForm() {
               placeholder="Örn: 12"
               class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
             />
+          </div>
+        </div>
+
+        <!-- HARİTADA KENDİN SEÇ / İŞARETLE (Kullanıcı Çizimi: media_1790444255802.pdf) -->
+        <div class="pt-3 border-t border-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[11px] font-black uppercase text-pink-600 flex items-center gap-1.5">
+              <span>📍 HARİTADA KENDİN SEÇ</span>
+            </span>
+            <span class="text-[10px] font-bold text-slate-400">ARSANIN KONUMUNU İŞARETLE</span>
+          </div>
+
+          <div class="rounded-2xl border border-slate-200 bg-white p-3 space-y-3">
+            <div class="relative w-full h-44 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center">
+              <iframe 
+                class="w-full h-full border-0"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=26.0%2C38.0%2C32.0%2C42.0&layer=mapnik"
+                loading="lazy"
+              ></iframe>
+              <div v-if="arsaForm.haritaIsaretlendi" class="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1">
+                <span>✓ Konum İşaretlendi</span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+              <div class="text-xs text-slate-600">
+                <span v-if="arsaForm.haritaIsaretlendi" class="font-bold text-emerald-700">
+                  📍 {{ arsaForm.haritaKonumBilgisi }}
+                </span>
+                <span v-else class="text-slate-400 text-[11px]">
+                  Harita üzerinde arsanızın tam konumunu sabitlemek için 'İşaretle' butonuna basın.
+                </span>
+              </div>
+
+              <button
+                type="button"
+                @click="toggleHaritaIsaretle"
+                class="px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 border"
+                :class="arsaForm.haritaIsaretlendi 
+                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-xs' 
+                  : 'bg-pink-600 hover:bg-pink-700 text-white border-pink-600 shadow-xs'"
+              >
+                <span>{{ arsaForm.haritaIsaretlendi ? '✓ İŞARETLENDİ' : '⭕ İŞARETLE' }}</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -1234,7 +1826,7 @@ async function submitCurrentForm() {
 
       </div>
 
-      <!-- İLAN VEREN BİLGİSİ (Arsa İçin) -->
+      <!-- İLAN VEREN BİLGİSİ -->
       <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/30 space-y-3">
         <label class="block text-[11px] font-black uppercase text-slate-800">İLAN VEREN BİLGİSİ</label>
         <input 
@@ -1318,7 +1910,7 @@ async function submitCurrentForm() {
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 📄 FORM 3: EV (Görsel 3 Birebir) -->
+    <!-- 📄 FORM 5: EV (Görsel: EV Birebir) -->
     <!-- ========================================================================= -->
     <div v-else-if="activeFormMode === 'ev'" class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-8 shadow-xs space-y-6">
       
@@ -1348,7 +1940,7 @@ async function submitCurrentForm() {
         </div>
       </div>
 
-      <!-- Sol & Sağ Menü (Görsel 3): KİRALIK/SATILIK vs EV/VİLLA/OFİS/İŞYERİ/SİTE İÇİ EV -->
+      <!-- Sol & Sağ Menü (Görsel): KİRALIK/SATILIK vs EV/VİLLA/OFİS/İŞYERİ/SİTE İÇİ EV -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         
         <!-- Sol: İŞLEM TÜRÜ -->
@@ -1582,8 +2174,7 @@ async function submitCurrentForm() {
       </div>
 
       <!-- ========================================================================= -->
-      <!-- 🏠 EV ÖZELLİKLERİ (Görsel 3 Birebir Grid) -->
-      <!-- ODA SAYISI | YASI | BANYO SAYISI | KAT ADEDİ | BULUNDUGU KAT -->
+      <!-- 🏠 EV ÖZELLİKLERİ (Görsel: EV Birebir 5'li Alan) -->
       <!-- ========================================================================= -->
       <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50/40 space-y-3">
         <span class="block text-[11px] font-black text-slate-800 uppercase tracking-wider">EV & DAİRE ÖZELLİKLERİ</span>
@@ -1689,7 +2280,7 @@ async function submitCurrentForm() {
         </div>
       </div>
 
-      <!-- İLAN VEREN BİLGİSİ (Ev İçin) -->
+      <!-- İLAN VEREN BİLGİSİ -->
       <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/30 space-y-3">
         <label class="block text-[11px] font-black uppercase text-slate-800">İLAN VEREN BİLGİSİ</label>
         <input 
@@ -1773,7 +2364,7 @@ async function submitCurrentForm() {
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 📄 FORM 4: DİĞER İLAN MENULERİ (Görsel 4 Birebir) -->
+    <!-- 📄 FORM 6: DİĞER İLAN MENULERİ (Görsel: DİĞER İLAN MENULERİ Birebir) -->
     <!-- ========================================================================= -->
     <div v-else-if="activeFormMode === 'diger'" class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-8 shadow-xs space-y-6">
       
@@ -1793,12 +2384,8 @@ async function submitCurrentForm() {
             v-model="digerForm.anaKategori"
             class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
           >
-            <option v-for="cat in mainCategoryList" :key="cat" :value="cat">
-              {{ cat }}
-            </option>
+            <option v-for="cat in mainCategoryList" :key="cat" :value="cat">{{ cat }}</option>
           </select>
-
-          <!-- DİĞER: Elle Girilsin -->
           <div v-if="digerForm.anaKategori === 'DİĞER'" class="pt-1.5">
             <span class="block text-[10px] font-black text-pink-600 uppercase">DİĞER:</span>
             <input 
@@ -1817,12 +2404,8 @@ async function submitCurrentForm() {
             v-model="digerForm.altKategori"
             class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
           >
-            <option v-for="sub in currentDigerSubcategories" :key="sub" :value="sub">
-              {{ sub }}
-            </option>
+            <option v-for="sub in currentDigerSubcategories" :key="sub" :value="sub">{{ sub }}</option>
           </select>
-
-          <!-- DİĞER: Elle Girilsin -->
           <div v-if="digerForm.altKategori === 'DİĞER'" class="pt-1.5">
             <span class="block text-[10px] font-black text-pink-600 uppercase">DİĞER:</span>
             <input 
@@ -1847,7 +2430,7 @@ async function submitCurrentForm() {
         />
       </div>
 
-      <!-- TABAN FİYAT & TAVAN FİYAT (Görsel 4) -->
+      <!-- TABAN FİYAT & TAVAN FİYAT -->
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         
         <!-- Taban Fiyat -->
