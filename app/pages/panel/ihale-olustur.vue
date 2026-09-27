@@ -19,6 +19,7 @@ import {
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useUserSession } from '~/composables/useUserSession'
+import { ALL_40_CATEGORIES, CATEGORY_SUBCATEGORIES_MAP } from '~/utils/taxonomy'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -53,48 +54,45 @@ const CITIES = [
   'Tokat', 'Trabzon', 'Tunceli', 'Uşak', 'Van', 'Yalova', 'Yozgat', 'Zonguldak'
 ]
 
-// Standart Kategoriler Haritası
-const categoryMap: Record<string, string[]> = {
-  'İnşaat ve Yapı': [
-    'Anahtar Teslim İnşaat', 'Kaba İnşaat', 'İnce İşçilik', 'Çatı ve Yalıtım', 'Boya Badana',
-    'Elektrik ve Tesisat', 'Peyzaj ve Çevre Düzenleme', 'Yıkım ve Moloz', 'DİĞER'
-  ],
-  'Sanayi ve Makine': [
-    'Üretim Makineleri', 'CNC ve Torna', 'Endüstriyel Otomasyon', 'Kompresör ve Pompa',
-    'Kaynak ve Metal İşleme', 'Paketleme Makineleri', 'Yedek Parça', 'DİĞER'
-  ],
-  'Bilgisayar ve Teknoloji': [
-    'Yazılım Geliştirme', 'Web ve Mobil Tasarım', 'Sunucu ve Bulut', 'Donanım ve Bilgisayar',
-    'Ağ ve Güvenlik', 'ERP / CRM Sistemleri', 'DİĞER'
-  ],
-  'Peyzaj ve Bahçe': [
-    'Otomatik Sulama Sistemleri', 'Rulo Çim Uygulaması', 'Fidan ve Ağaçlandırma',
-    'Bahçe Bakım Hizmetleri', 'Sert Zemin ve Parke Taşı', 'DİĞER'
-  ],
-  'Mühendislik ve Mimarlık': [
-    'Statik Proje Çizimi', 'Mimari Tasarım ve 3D', 'Mekanik Tesisat Çizimi',
-    'Zemin Etüdü ve Geoteknik', 'Yapı Denetim ve Kontrollük', 'DİĞER'
-  ],
-  'Nakliye ve Lojistik': [
-    'Şehirler Arası Nakliye', 'Fabrika Taşımacılığı', 'Depolama ve Dağıtım',
-    'Vinç ve Ağır Nakliyat', 'Kurye ve Dağıtım', 'DİĞER'
-  ],
-  'Mobilya ve Ofis': [
-    'Büro Mobilyaları', 'Okul ve Hastane Donanımı', 'Özel İmalat Ahşap',
-    'Metal Raf Sistemleri', 'Koltuk ve Sandalye', 'DİĞER'
-  ],
-  'Medikal ve Sağlık': [
-    'Tıbbi Sarf Malzeme', 'Laboratuvar Ekipmanları', 'Dezenfektan ve Hijyen',
-    'Hasta Karyolası ve Donanım', 'DİĞER'
-  ],
-  'Gıda ve Catering': [
-    'Kurumsal Yemek / Catering', 'Toptan Bakliyat & Gıda', 'Et ve Süt Ürünleri',
-    'Kantin ve İkram Hizmetleri', 'DİĞER'
-  ],
-  'DİĞER': ['Genel Alım', 'Özel Proje', 'DİĞER']
-}
+// =========================================================================
+// 🗂️ 40 ANA KATEGORİ VE ALT KATEGORİ HARİTASI (Merkezi Taksonomi)
+// =========================================================================
+const categoryMap: Record<string, string[]> = {}
 
-const mainCategoryList = Object.keys(categoryMap)
+// Tüm 40 kategoriyi ve alt kategorilerini doldur
+ALL_40_CATEGORIES.forEach(cat => {
+  const subs = [...(CATEGORY_SUBCATEGORIES_MAP[cat.id] || []), 'DİĞER']
+  categoryMap[cat.name] = subs
+  categoryMap[cat.short] = subs
+})
+
+// Kullanıcı dostu kısa adlar ve eski şablon uyumluluğu için eşleştirmeler
+categoryMap['İnşaat ve Yapı'] = categoryMap['İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri'] || ['Bina Yapımı & Taahhüt', 'Yol, Köprü & Viyadük', 'DİĞER']
+categoryMap['Sanayi ve Makine'] = categoryMap['Endüstriyel Makine - Motor - Konveyör İhaleleri'] || ['Üretim Makineleri', 'CNC & Takım Tezgahları', 'DİĞER']
+categoryMap['Bilgisayar ve Teknoloji'] = categoryMap['Yazılım - Bilgi Yönetim Hizmetleri - Bilişim İhaleleri'] || ['Özel Yazılım Geliştirme', 'ERP & Kurumsal Yazılımlar', 'DİĞER']
+categoryMap['Peyzaj ve Bahçe'] = categoryMap['Ormancılık, Bahçıvanlık, Bitki, Kozalak - Peyzaj İhaleleri'] || ['Peyzaj Proje & Uygulama', 'Otomatik Bahçe Sulama Sistemleri', 'DİĞER']
+categoryMap['Mühendislik ve Mimarlık'] = categoryMap['Mühendislik - Mimarlık - Danışmanlık İhaleleri'] || ['Statik & Betonarme Projelendirme', 'Mimari Tasarım & 3D Modelleme', 'DİĞER']
+categoryMap['Nakliye ve Lojistik'] = categoryMap['Nakliye - Taşımacılık Hizmetleri - Servis İhaleleri'] || ['Şehirlerarası Karayolu Nakliye', 'Personel & Öğrenci Servis Taşımacılığı', 'DİĞER']
+categoryMap['Mobilya ve Ofis'] = categoryMap['Mobilya - Beyaz Eşya - Mutfak - Züccaciye İhaleleri'] || ['Ofis & Büro Mobilyaları', 'Mutfak Ekipmanları & Endüstriyel Mutfak', 'DİĞER']
+categoryMap['Medikal ve Sağlık'] = categoryMap['Sağlık - İlaç - Kozmetik - Medikal İhaleleri'] || ['Tıbbi Cihaz & Sarf Malzemeleri', 'İlaç & Serum Tedariği', 'DİĞER']
+categoryMap['Gıda ve Catering'] = categoryMap['Gıda - Tarım Ürünleri - Yiyecek - İçecek İhaleleri'] || ['Kuru Gıda, Bakliyat & Hububat', 'Et, Tavuk & Şarküteri', 'DİĞER']
+categoryMap['Gayrimenkul'] = categoryMap['Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri'] || ['Satılık Arsa', 'Kiralık Arsa', 'DİĞER']
+categoryMap['DİĞER'] = ['Genel Alım', 'Özel Proje', 'DİĞER']
+
+// Ana Kategori listesi (Kullanıcı dropdown'ında 40 kategori + DİĞER)
+const mainCategoryList = [
+  ...ALL_40_CATEGORIES.map(c => c.name),
+  'DİĞER'
+]
+
+function getCategoryLabel(catName: string): string {
+  if (catName === 'DİĞER') return '📌 DİĞER'
+  const found = ALL_40_CATEGORIES.find(c => c.name === catName || c.short === catName)
+  if (found) {
+    return `${found.icon} ${found.name}`
+  }
+  return catName
+}
 
 // =========================================================================
 // 🏢 SAHİBİNDEN.COM STANDART GAYRİMENKUL (EV & ARSA) LİSTELERİ
@@ -489,6 +487,35 @@ const currentDigerSubcategories = computed(() => {
   return categoryMap[digerForm.anaKategori] || ['Genel', 'DİĞER']
 })
 
+// Ana Kategori değiştikçe Alt Kategoriyi otomatik ilk seçeneğe güncelle
+watch(() => eksiltmeForm.anaKategori, (newCat) => {
+  const subs = categoryMap[newCat] || ['Genel', 'DİĞER']
+  if (!subs.includes(eksiltmeForm.altKategori)) {
+    eksiltmeForm.altKategori = subs[0] || 'Genel'
+  }
+})
+
+watch(() => sabitFiyatForm.anaKategori, (newCat) => {
+  const subs = categoryMap[newCat] || ['Genel', 'DİĞER']
+  if (!subs.includes(sabitFiyatForm.altKategori)) {
+    sabitFiyatForm.altKategori = subs[0] || 'Genel'
+  }
+})
+
+watch(() => reklamForm.anaKategori, (newCat) => {
+  const subs = categoryMap[newCat] || ['Genel', 'DİĞER']
+  if (!subs.includes(reklamForm.altKategori)) {
+    reklamForm.altKategori = subs[0] || 'Genel'
+  }
+})
+
+watch(() => digerForm.anaKategori, (newCat) => {
+  const subs = categoryMap[newCat] || ['Genel', 'DİĞER']
+  if (!subs.includes(digerForm.altKategori)) {
+    digerForm.altKategori = subs[0] || 'Genel'
+  }
+})
+
 // Sayfa açıldığında oturum bilgilerini formlara doldur
 onMounted(() => {
   const s = userSession.value || {}
@@ -679,7 +706,7 @@ async function submitCurrentForm() {
     } else if (activeFormMode.value === 'arsa') {
       if (!arsaForm.baslik.trim()) throw new Error('Lütfen arsa ilan başlığını giriniz.')
       finalBaslik = arsaForm.baslik.trim()
-      finalCategory = 'Gayrimenkul'
+      finalCategory = 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri'
       const islem = arsaForm.islemTuru === 'DİĞER' ? (arsaForm.islemTuruDiger || 'İlan') : arsaForm.islemTuru
       const altK = arsaForm.altKategori === 'DİĞER' ? (arsaForm.altKategoriDiger || 'Arsa') : arsaForm.altKategori
       finalSubCategory = `${islem} ${altK}`
@@ -727,7 +754,7 @@ async function submitCurrentForm() {
     } else if (activeFormMode.value === 'ev') {
       if (!evForm.baslik.trim()) throw new Error('Lütfen ev / konut ilan başlığını giriniz.')
       finalBaslik = evForm.baslik.trim()
-      finalCategory = 'Gayrimenkul'
+      finalCategory = 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri'
       const islem = evForm.islemTuru === 'DİĞER' ? (evForm.islemTuruDiger || 'İlan') : evForm.islemTuru
       const altK = evForm.altKategori === 'DİĞER' ? (evForm.altKategoriDiger || 'Ev') : evForm.altKategori
       finalSubCategory = `${islem} ${altK}`
@@ -806,9 +833,27 @@ async function submitCurrentForm() {
       finalAciklama = digerForm.aciklama
     }
 
-    const primaryImg = finalImages[0] || 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?auto=format&fit=crop&w=600&q=80'
+    const primaryImg = finalImages[0] || (
+      activeFormMode.value === 'arsa' 
+        ? 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80' 
+        : (activeFormMode.value === 'ev' 
+          ? 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80' 
+          : 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?auto=format&fit=crop&w=600&q=80')
+    )
     const newId = `TND-${Date.now().toString().slice(-6)}`
     const ownerEmail = userSession.value?.email || 'kullanici@ihaleciburada.com'
+
+    // Kategori ID Çözümleme
+    const selectedCatObj = ALL_40_CATEGORIES.find(c => c.name === finalCategory || c.short === finalCategory)
+    const finalCategoryId = selectedCatObj?.id || (activeFormMode.value === 'arsa' || activeFormMode.value === 'ev' ? 40 : 1)
+
+    // İlan Türü Belirleme
+    let ilanTuru = 'Pazaryeri İlanı'
+    if (activeFormMode.value === 'eksiltme') ilanTuru = 'Açık Eksiltme İhalesi'
+    else if (activeFormMode.value === 'sabit_fiyat') ilanTuru = 'Sabit Fiyatlı İlan'
+    else if (activeFormMode.value === 'reklam') ilanTuru = 'Tanıtım & Reklam İlanı'
+    else if (activeFormMode.value === 'arsa') ilanTuru = arsaForm.islemTuru === 'KİRALIK' ? 'Kiralık Arsa İlanı' : 'Satılık Arsa İlanı'
+    else if (activeFormMode.value === 'ev') ilanTuru = evForm.islemTuru === 'KİRALIK' ? 'Kiralık Konut İlanı' : 'Satılık Konut İlanı'
 
     const tenderObject: any = {
       id: newId,
@@ -816,8 +861,9 @@ async function submitCurrentForm() {
       kategori: `${finalCategory} / ${finalSubCategory}`,
       mainCategory: finalCategory,
       subCategory: finalSubCategory,
+      categoryId: finalCategoryId,
       ihaleYonu: finalDirection,
-      tur: finalDirection === 'eksiltme' ? 'Açık Eksiltme İhalesi' : (activeFormMode.value === 'reklam' ? 'Tanıtım & Reklam İlanı' : 'Pazaryeri İlanı'),
+      tur: ilanTuru,
       rekabetTuru: finalDirection === 'eksiltme' ? 'Eksiltme' : 'Doğrudan İlan',
       sure: '7 gün kaldı',
       teklifSayisi: 0,
@@ -825,6 +871,7 @@ async function submitCurrentForm() {
       statusCode: 'LIVE',
       adminApproved: true,
       statusLabel: 'Canlı Yayında',
+      isBaseline: false,
       butce: finalBudget,
       city: finalCity,
       teslimatAdresi: finalAddress,
@@ -1052,7 +1099,7 @@ async function submitCurrentForm() {
             class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
           >
             <option v-for="cat in mainCategoryList" :key="cat" :value="cat">
-              {{ cat }}
+              {{ getCategoryLabel(cat) }}
             </option>
           </select>
 
@@ -1328,7 +1375,7 @@ async function submitCurrentForm() {
             v-model="sabitFiyatForm.anaKategori"
             class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
           >
-            <option v-for="cat in mainCategoryList" :key="cat" :value="cat">{{ cat }}</option>
+            <option v-for="cat in mainCategoryList" :key="cat" :value="cat">{{ getCategoryLabel(cat) }}</option>
           </select>
           <div v-if="sabitFiyatForm.anaKategori === 'DİĞER'" class="pt-1.5">
             <span class="block text-[10px] font-black text-pink-600 uppercase">DİĞER:</span>
@@ -1583,7 +1630,7 @@ async function submitCurrentForm() {
             v-model="reklamForm.anaKategori"
             class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
           >
-            <option v-for="cat in mainCategoryList" :key="cat" :value="cat">{{ cat }}</option>
+            <option v-for="cat in mainCategoryList" :key="cat" :value="cat">{{ getCategoryLabel(cat) }}</option>
           </select>
           <div v-if="reklamForm.anaKategori === 'DİĞER'" class="pt-1.5">
             <span class="block text-[10px] font-black text-pink-600 uppercase">DİĞER:</span>
@@ -3046,7 +3093,7 @@ async function submitCurrentForm() {
             v-model="digerForm.anaKategori"
             class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
           >
-            <option v-for="cat in mainCategoryList" :key="cat" :value="cat">{{ cat }}</option>
+            <option v-for="cat in mainCategoryList" :key="cat" :value="cat">{{ getCategoryLabel(cat) }}</option>
           </select>
           <div v-if="digerForm.anaKategori === 'DİĞER'" class="pt-1.5">
             <span class="block text-[10px] font-black text-pink-600 uppercase">DİĞER:</span>

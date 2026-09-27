@@ -885,7 +885,217 @@ const allSectorsList = [
 const allCompaniesList: any[] = []
 
 // ==================== 6. SEED / CANLI İHALE VERİLERİ ====================
-const seedTenders: any[] = []
+const seedTenders: any[] = [
+  {
+    id: 'IHC-2026-101',
+    baslik: '50.000 Adet Çift Oluklu İhracat Kolisi ve Ambalaj Malzemesi Alımı',
+    kategori: 'Matbaa - Toner - Kartuş - Ambalaj - Kırtasiye İhaleleri / Koli, Karton Kutu & Ambalaj',
+    mainCategory: 'Matbaa - Toner - Kartuş - Ambalaj - Kırtasiye İhaleleri',
+    subCategory: 'Koli, Karton Kutu & Ambalaj',
+    categoryId: 15,
+    ihaleYonu: 'eksiltme',
+    tur: 'Açık Eksiltme İhalesi',
+    rekabetTuru: 'Eksiltme',
+    butce: '180.000 ₺ - 250.000 ₺',
+    city: 'Çanakkale',
+    authority: 'Ege Ambalaj ve İhracat Sanayi A.Ş.',
+    ownerCompany: 'Ege Ambalaj ve İhracat Sanayi A.Ş.',
+    ownerEmail: 'egeambalaj@ihaleciburada.com',
+    image: 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80',
+    sure: '5 gün kaldı',
+    teklifSayisi: 3,
+    durum: 'active',
+    statusCode: 'LIVE',
+    statusLabel: 'Canlı Yayında',
+    adminApproved: true,
+    isBaseline: false,
+    olusturma: 'Bugün',
+    aciklama: 'İhracat sevkiyatlarımız için standart ebatlarda çift oluklu dopel koli ve koruyucu köşe karton temini için canlı eksiltme ihalesidir.'
+  },
+  {
+    id: 'IHC-2026-102',
+    baslik: 'Çanakkale Merkez Şantiye Kaba İnşaat ve Kalıp İşçiliği İhalesi',
+    kategori: 'İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri / Kaba İnşaat',
+    mainCategory: 'İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri',
+    subCategory: 'Kaba İnşaat',
+    categoryId: 1,
+    ihaleYonu: 'eksiltme',
+    tur: 'Açık Eksiltme İhalesi',
+    rekabetTuru: 'Eksiltme',
+    butce: '850.000 ₺ - 1.200.000 ₺',
+    city: 'Çanakkale',
+    authority: 'Marmara Altyapı ve İnşaat Grubu',
+    ownerCompany: 'Marmara Altyapı ve İnşaat Grubu',
+    ownerEmail: 'marmarayapi@ihaleciburada.com',
+    image: 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80',
+    sure: '6 gün kaldı',
+    teklifSayisi: 4,
+    durum: 'active',
+    statusCode: 'LIVE',
+    statusLabel: 'Canlı Yayında',
+    adminApproved: true,
+    isBaseline: false,
+    olusturma: 'Bugün',
+    aciklama: 'Merkez şantiyemizde 4 katlı betonarme konut projesi için kalıp, demir işçiliği ve kaba yapı uygulaması için taşeron teklifleri toplanmaktadır.'
+  },
+  {
+    id: 'IHC-2026-103',
+    baslik: 'Sıfır Ayarında 5 Eksen CNC Freze ve Takım Tezgahı',
+    kategori: 'Endüstriyel Makine - Motor - Konveyör İhaleleri / CNC & Takım Tezgahları',
+    mainCategory: 'Endüstriyel Makine - Motor - Konveyör İhaleleri',
+    subCategory: 'CNC & Takım Tezgahları',
+    categoryId: 8,
+    ihaleYonu: 'sabit_paket',
+    tur: 'Sabit Fiyatlı İlan',
+    rekabetTuru: 'Doğrudan İlan',
+    butce: '450.000 ₺',
+    city: 'Bursa',
+    authority: 'Anadolu Çelik ve Metal Sanayi A.Ş.',
+    ownerCompany: 'Anadolu Çelik ve Metal Sanayi A.Ş.',
+    ownerEmail: 'anadolucelik@ihaleciburada.com',
+    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&auto=format&fit=crop&q=80',
+    sure: '12 gün kaldı',
+    teklifSayisi: 2,
+    durum: 'active',
+    statusCode: 'LIVE',
+    statusLabel: 'Canlı Yayında',
+    adminApproved: true,
+    isBaseline: false,
+    olusturma: 'Bugün',
+    aciklama: 'Fabrikamızda az kullanılmış, periyodik bakımları yetkili servis tarafından yapılmış yüksek hassasiyetli 5 eksen CNC freze tezgahı doğrudan satılıktır.'
+  },
+  {
+    id: 'IHC-2026-104',
+    baslik: 'Marmara Bölgesi Frigorifik Soğuk Hava Lojistiği ve Dağıtım Hizmetleri',
+    kategori: 'Nakliye - Taşımacılık Hizmetleri - Servis İhaleleri / Soğuk Hava Zinciri Taşımacılığı',
+    mainCategory: 'Nakliye - Taşımacılık Hizmetleri - Servis İhaleleri',
+    subCategory: 'Soğuk Hava Zinciri Taşımacılığı',
+    categoryId: 10,
+    ihaleYonu: 'ihalesiz_ilan',
+    tur: 'Tanıtım & Reklam İlanı',
+    rekabetTuru: 'Doğrudan İlan',
+    isIlan: true,
+    butce: 'Tanıtım / Kurumsal Hizmet',
+    city: 'Balıkesir',
+    authority: 'Mega Lojistik ve Dağıtım A.Ş.',
+    ownerCompany: 'Mega Lojistik ve Dağıtım A.Ş.',
+    ownerEmail: 'megalojistik@ihaleciburada.com',
+    image: 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80',
+    sure: 'Yayında',
+    teklifSayisi: 0,
+    durum: 'active',
+    statusCode: 'LIVE',
+    statusLabel: '📢 Proje & Hizmet İlanı',
+    adminApproved: true,
+    isBaseline: false,
+    olusturma: 'Bugün',
+    aciklama: 'Balıkesir, Çanakkale, Bursa ve İstanbul hatlarında -18°C / +4°C kontrollü sıcaklıkta filo taşımacılığı ve lojistik antrepo çözümleri sunuyoruz.'
+  },
+  {
+    id: 'IHC-2026-105',
+    baslik: 'Çanakkale Kepez\'de 1.500 m² %50 Kat Karşılığı Konut İmarlı Arsa',
+    kategori: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri / Kat Karşılığı Konut İmarlı',
+    mainCategory: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri',
+    subCategory: 'Kat Karşılığı Konut İmarlı',
+    categoryId: 40,
+    ihaleYonu: 'satis',
+    tur: 'Satılık Arsa İlanı',
+    rekabetTuru: 'Doğrudan İlan',
+    butce: '4.500.000 ₺',
+    city: 'Çanakkale',
+    authority: 'Doğrulanmış Mülk Sahibi',
+    ownerCompany: 'Doğrulanmış Mülk Sahibi',
+    ownerEmail: 'kepezarsa@ihaleciburada.com',
+    image: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&auto=format&fit=crop&q=80',
+    sure: '21 gün kaldı',
+    teklifSayisi: 1,
+    durum: 'active',
+    statusCode: 'LIVE',
+    statusLabel: 'Canlı Yayında',
+    adminApproved: true,
+    isBaseline: false,
+    olusturma: 'Bugün',
+    aciklama: 'Kepez sahil bölgesine yakın, ana cadde cepheli 1.500 m² emsal 1.50 konut imarlı arsa %50 kat karşılığı veya doğrudan peşin satışa uygundur.'
+  },
+  {
+    id: 'IHC-2026-106',
+    baslik: 'Balıkesir Edremit Güre\'de 3.200 m² Satılık Zeytinlik & Yatırımlık Arazi',
+    kategori: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri / Satılık Tarla & Zeytinlik',
+    mainCategory: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri',
+    subCategory: 'Satılık Tarla & Zeytinlik',
+    categoryId: 40,
+    ihaleYonu: 'satis',
+    tur: 'Satılık Arsa İlanı',
+    rekabetTuru: 'Doğrudan İlan',
+    butce: '2.750.000 ₺',
+    city: 'Balıkesir',
+    authority: 'Doğrulanmış Gayrimenkul Portföyü',
+    ownerCompany: 'Doğrulanmış Gayrimenkul Portföyü',
+    ownerEmail: 'gurezeytinlik@ihaleciburada.com',
+    image: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&auto=format&fit=crop&q=80',
+    sure: '18 gün kaldı',
+    teklifSayisi: 2,
+    durum: 'active',
+    statusCode: 'LIVE',
+    statusLabel: 'Canlı Yayında',
+    adminApproved: true,
+    isBaseline: false,
+    olusturma: 'Bugün',
+    aciklama: 'Edremit Körfezi ve Kazdağları manzaralı, içerisinde yetişkin 70 adet Edremit cinsi zeytin ağacı bulunan tek tapu müstakil parsel.'
+  },
+  {
+    id: 'IHC-2026-107',
+    baslik: 'Balıkesir Karesi\'de Sıfır 3+1 Yerden Isıtmalı Ebeveyn Banyolu Lüks Daire',
+    kategori: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri / Satılık Daire',
+    mainCategory: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri',
+    subCategory: 'Satılık Daire',
+    categoryId: 40,
+    ihaleYonu: 'satis',
+    tur: 'Satılık Konut İlanı',
+    rekabetTuru: 'Doğrudan İlan',
+    butce: '3.250.000 ₺',
+    city: 'Balıkesir',
+    authority: 'Doğrulanmış Konut Sahibi',
+    ownerCompany: 'Doğrulanmış Konut Sahibi',
+    ownerEmail: 'karesikonut@ihaleciburada.com',
+    image: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&auto=format&fit=crop&q=80',
+    sure: '14 gün kaldı',
+    teklifSayisi: 1,
+    durum: 'active',
+    statusCode: 'LIVE',
+    statusLabel: 'Canlı Yayında',
+    adminApproved: true,
+    isBaseline: false,
+    olusturma: 'Bugün',
+    aciklama: 'Karesi merkezde sıfır bina, 145 m² brüt, 125 m² net, yerden ısıtma (kombi), ebeveyn banyosu, kapalı otopark ve asansörlü köşe daire.'
+  },
+  {
+    id: 'IHC-2026-108',
+    baslik: 'Fabrikadan Doğrudan Satış: 20 Ton Nervürlü İnşaat Demiri ve Çelik Profil',
+    kategori: 'Hırdavat - Nalburiye - Metal ve Plastik Ürünler İhaleleri / Sac, Profil & Demir Ürünleri',
+    mainCategory: 'Hırdavat - Nalburiye - Metal ve Plastik Ürünler İhaleleri',
+    subCategory: 'Sac, Profil & Demir Ürünleri',
+    categoryId: 12,
+    ihaleYonu: 'satis',
+    tur: 'Pazaryeri İlanı',
+    rekabetTuru: 'Doğrudan İlan',
+    butce: '520.000 ₺',
+    city: 'Kocaeli',
+    authority: 'Anadolu Çelik ve Metal Sanayi A.Ş.',
+    ownerCompany: 'Anadolu Çelik ve Metal Sanayi A.Ş.',
+    ownerEmail: 'anadolucelik@ihaleciburada.com',
+    image: 'https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?w=600&auto=format&fit=crop&q=80',
+    sure: '9 gün kaldı',
+    teklifSayisi: 3,
+    durum: 'active',
+    statusCode: 'LIVE',
+    statusLabel: 'Canlı Yayında',
+    adminApproved: true,
+    isBaseline: false,
+    olusturma: 'Bugün',
+    aciklama: 'TSE belgeli nervürlü inşaat demiri (Q12, Q14, Q16) ve kutu profil partisi fabrika teslim peşin veya teminatlı vadeli teslimata hazırdır.'
+  }
+]
 
 function getTenderImage(tender: any): string {
   if (!tender) return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
@@ -905,13 +1115,19 @@ function getTenderImage(tender: any): string {
   }
 
   const text = ((tender.baslik || '') + ' ' + (tender.kategori || '') + ' ' + (tender.mainCategory || '')).toLowerCase()
+  if (text.includes('arsa') || text.includes('tarla') || text.includes('arazi') || text.includes('zeytinlik') || text.includes('bağ') || text.includes('parsel')) {
+    return 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('konut') || text.includes('daire') || text.includes('villa') || text.includes('gayrimenkul') || text.includes('ev') || text.includes('bina') || text.includes('dükkan')) {
+    return 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&auto=format&fit=crop&q=80'
+  }
   if (text.includes('lojistik') || text.includes('nakliye') || text.includes('taşımacılık') || text.includes('havayolu') || text.includes('kargo') || text.includes('uçak')) {
     return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
   }
   if (text.includes('inşaat') || text.includes('yapı') || text.includes('şantiye') || text.includes('çimento') || text.includes('demir') || text.includes('bina')) {
     return 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80'
   }
-  if (text.includes('makine') || text.includes('yedek parça') || text.includes('metal') || text.includes('sanayi') || text.includes('torna')) {
+  if (text.includes('makine') || text.includes('yedek parça') || text.includes('metal') || text.includes('sanayi') || text.includes('torna') || text.includes('freze')) {
     return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&auto=format&fit=crop&q=80'
   }
   if (text.includes('ambalaj') || text.includes('koli') || text.includes('plastik') || text.includes('kağıt') || text.includes('kutu')) {
@@ -957,13 +1173,41 @@ function formatTenderBudget(raw: any): string {
 }
 
 function getTenderDirectionBadge(tender: any) {
+  if (!tender) {
+    return { 
+      label: '📋 İlan', 
+      fullLabel: '📋 İlan Detayı', 
+      class: 'bg-slate-100 text-slate-900 border-slate-300 font-bold' 
+    }
+  }
   const tur = (tender.tur || tender.rekabetTuru || '').toLowerCase()
   const yonu = (tender.ihaleYonu || '').toLowerCase()
   
+  if (yonu === 'kiralik' || tur.includes('kiralık')) {
+    return {
+      label: '🔑 Kiralık İlanı',
+      fullLabel: '🔑 Kiralık Gayrimenkul & Hizmet İlanı',
+      class: 'bg-indigo-100 text-indigo-950 border-indigo-400 font-black shadow-2xs'
+    }
+  }
+  if (yonu === 'satis' || tur.includes('satılık')) {
+    return {
+      label: '🏷️ Satılık İlanı',
+      fullLabel: '🏷️ Doğrudan Satılık Gayrimenkul & Ürün İlanı',
+      class: 'bg-sky-100 text-sky-950 border-sky-400 font-black shadow-2xs'
+    }
+  }
+  if (yonu === 'reklam' || tur.includes('reklam') || tur.includes('tanıtım') || tender.isIlan) {
+    return {
+      label: '📢 Tanıtım & Reklam',
+      fullLabel: '📢 Kurumsal Tanıtım, Proje & Reklam İlanı',
+      class: 'bg-rose-100 text-rose-950 border-rose-400 font-black shadow-2xs'
+    }
+  }
   if (yonu === 'ihalesiz_ilan' || tender.isIhalesiz || tur.includes('ihalesiz') || tur.includes('net fiyat') || tur.includes('hemen al')) {
     return { 
-      label: '💰 İhalesiz İlan (Net Fiyat)', 
-      fullLabel: '💰 İhalesiz Sabit / Net Fiyatlı İlan',
+      label: '💰 Sabit Fiyatlı İlan', 
+      fullLabel: '💰 Doğrudan Satın Alınabilir Sabit Fiyatlı İlan',
       class: 'bg-teal-100 text-teal-950 border-teal-400 font-black shadow-2xs' 
     }
   }
@@ -981,7 +1225,7 @@ function getTenderDirectionBadge(tender: any) {
       class: 'bg-purple-100 text-purple-950 border-purple-400 font-black shadow-2xs' 
     }
   }
-  if (yonu === 'artirma' || tur.includes('artırma') || tur.includes('artırımlı') || tur.includes('satış')) {
+  if (yonu === 'artirma' || tur.includes('artırma') || tur.includes('artırımlı')) {
     return { 
       label: '📈 Açık Artırma (Fiyat Artırımlı)', 
       fullLabel: '📈 Açık Artırma (Fiyat Artırımlı / Satış İhalesi)',
@@ -1143,24 +1387,42 @@ function openTenderByIdOrBid(bid: any) {
   }
 }
 
+const localTendersList = ref<any[]>([])
+
+function reloadLocalTenders() {
+  if (typeof window === 'undefined') return
+  try {
+    const raw = localStorage.getItem('myTenders')
+    if (raw) {
+      const parsed = JSON.parse(raw)
+      if (Array.isArray(parsed)) {
+        localTendersList.value = parsed.filter(
+          (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline
+        )
+      }
+    }
+  } catch (e) {}
+}
+
 const allTenders = computed(() => {
   const apiTenders = (serverTendersData.value?.tenders || []).filter(
-    (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline
+    (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline
   )
   const cmsTenders = (cmsData.value?.dashboard?.tenders || []).filter(
-    (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline
+    (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline
   )
   
-  let localTenders: any[] = []
-  if (typeof window !== 'undefined') {
+  // localTendersList is reactive, but also check localStorage as instant fallback
+  let localTenders: any[] = localTendersList.value
+  if (localTenders.length === 0 && typeof window !== 'undefined') {
     try {
       localTenders = JSON.parse(localStorage.getItem('myTenders') || '[]').filter(
-        (t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline
+        (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline
       )
     } catch (e) {}
   }
 
-  // Priority: local tenders, apiTenders, cmsTenders, seedTenders
+  // Priority: local tenders (newest user created), apiTenders, cmsTenders, seedTenders
   const combined = [...localTenders, ...apiTenders, ...cmsTenders, ...seedTenders]
   const seen = new Set()
   return combined.filter(item => {
@@ -1891,10 +2153,17 @@ onMounted(() => {
     try {
       userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
     } catch (e) {}
+    reloadLocalTenders()
+
     window.addEventListener('storage', () => {
       try {
         userSession.value = JSON.parse(localStorage.getItem('userSession') || '{}')
       } catch (e) {}
+      reloadLocalTenders()
+    })
+
+    window.addEventListener('focus', () => {
+      reloadLocalTenders()
     })
   }
 })
@@ -2681,9 +2950,9 @@ onMounted(() => {
                 <div class="absolute top-2 left-2 flex flex-col gap-1">
                   <span 
                     class="px-2 py-0.5 rounded text-[9px] font-black uppercase text-white shadow-xs backdrop-blur-xs"
-                    :class="tender.durum === 'closed' ? 'bg-amber-600' : ((tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan') ? 'bg-teal-600' : 'bg-emerald-600')"
+                    :class="tender.durum === 'closed' ? 'bg-amber-600' : ((tender.tur && (tender.tur.includes('Arsa') || tender.tur.includes('Konut'))) ? 'bg-indigo-600' : ((tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan' || (tender.tur && tender.tur.includes('Tanıtım'))) ? 'bg-teal-600' : 'bg-emerald-600'))"
                   >
-                    {{ tender.durum === 'closed' ? '🏆 Sonuçlandı' : ((tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan') ? '📢 Proje & Hizmet İlanı' : '🟢 Canlı İhale') }}
+                    {{ tender.durum === 'closed' ? '🏆 Sonuçlandı' : ((tender.tur && (tender.tur.includes('Arsa') || tender.tur.includes('Konut'))) ? '🏡 Gayrimenkul İlanı' : ((tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan' || (tender.tur && tender.tur.includes('Tanıtım'))) ? '📢 Proje & Hizmet İlanı' : '🟢 Canlı İhale')) }}
                   </span>
                 </div>
 
@@ -3828,20 +4097,157 @@ onMounted(() => {
         <!-- 🏢 3. SEKME: İHALE VE ALICI FİRMA BİLGİLERİ -->
         <!-- =================================================================== -->
         <div v-else-if="activeSpecTab === 'details'" class="flex-1 p-6 sm:p-8 bg-slate-800 overflow-y-auto custom-scrollbar space-y-5 text-white">
-          <!-- A. PROJE & HİZMET İLANI İSE (Herkese Açık İletişim & Web Sitesi) -->
-          <div v-if="selectedTenderModal.isIlan || selectedTenderModal.ihaleYonu === 'ihalesiz_ilan'" class="p-6 rounded-2xl bg-slate-900 border border-teal-500/50 space-y-4">
+          <!-- 🏡 A1. SAHİBİNDEN.COM STANDART GAYRİMENKUL DETAYLARI (ARSA & KONUT) -->
+          <div 
+            v-if="selectedTenderModal.customFields?.formType === 'ARSA' || selectedTenderModal.customFields?.formType === 'EV' || (selectedTenderModal.tur && (selectedTenderModal.tur.includes('Arsa') || selectedTenderModal.tur.includes('Konut')))" 
+            class="p-6 rounded-2xl bg-slate-900 border border-sky-500/50 space-y-4"
+          >
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 flex-wrap gap-2">
+              <div class="flex items-center gap-2">
+                <span class="px-2.5 py-1 rounded-lg bg-sky-500/20 text-sky-300 font-black text-xs border border-sky-500/30">
+                  🏡 {{ selectedTenderModal.customFields?.formType === 'ARSA' || (selectedTenderModal.tur && selectedTenderModal.tur.includes('Arsa')) ? 'Arsa & Arazi İlan Özellikleri' : 'Konut & Emlak İlan Özellikleri' }}
+                </span>
+                <span class="text-xs text-slate-400 font-medium">Sahibinden.com Standart Detayları</span>
+              </div>
+              <span class="text-sm font-mono font-black text-emerald-400">
+                {{ selectedTenderModal.butce }}
+              </span>
+            </div>
+
+            <!-- ARSA DETAY MATRİSİ -->
+            <div v-if="selectedTenderModal.customFields?.formType === 'ARSA' || (selectedTenderModal.tur && selectedTenderModal.tur.includes('Arsa'))" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-xs">
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">İşlem Türü:</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.islemTuru || selectedTenderModal.tur || 'Satılık' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Arsa Türü:</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.altKategori || selectedTenderModal.subCategory || 'İmarlı Arsa' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Metrekare (m²):</span>
+                <span class="font-bold text-sky-300">{{ selectedTenderModal.customFields?.m2 ? Number(selectedTenderModal.customFields.m2).toLocaleString('tr-TR') + ' m²' : '1.500 m²' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">m² Fiyatı:</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.m2Fiyati ? Number(selectedTenderModal.customFields.m2Fiyati).toLocaleString('tr-TR') + ' ₺/m²' : 'Hesaplanıyor' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Ada / Parsel:</span>
+                <span class="font-bold text-white">{{ (selectedTenderModal.customFields?.ada || '-') + ' / ' + (selectedTenderModal.customFields?.parsel || '-') }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">İmar Durumu:</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.imarDurumu || 'Konut İmarlı' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Gabari & KAKS:</span>
+                <span class="font-bold text-white">{{ (selectedTenderModal.customFields?.gabari || 'Serbest') + ' · Emsal ' + (selectedTenderModal.customFields?.kaks || '1.50') }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Tapu Durumu:</span>
+                <span class="font-bold text-emerald-400">{{ selectedTenderModal.customFields?.tapuDurumu || 'Müstakil Parsel' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Kat Karşılığı:</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.katKarsiligi || 'Evet' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Krediye Uygunluk:</span>
+                <span class="font-bold text-emerald-400">{{ selectedTenderModal.customFields?.krediyeUygunluk || 'Evet' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Takas:</span>
+                <span class="font-bold text-amber-300">{{ selectedTenderModal.customFields?.takas || 'Hayır' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Konum:</span>
+                <span class="font-bold text-white truncate">{{ selectedTenderModal.city }} / {{ selectedTenderModal.customFields?.ilce || 'Merkez' }}</span>
+              </div>
+            </div>
+
+            <!-- KONUT DETAY MATRİSİ -->
+            <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-xs">
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">İşlem Türü:</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.islemTuru || selectedTenderModal.tur || 'Satılık' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Konut Tipi:</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.altKategori || selectedTenderModal.subCategory || 'Daire' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Oda Sayısı:</span>
+                <span class="font-bold text-sky-300">{{ selectedTenderModal.customFields?.odaSayisi || '3+1' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">m² (Brüt / Net):</span>
+                <span class="font-bold text-white">{{ (selectedTenderModal.customFields?.m2Brut || '145') + ' m² / ' + (selectedTenderModal.customFields?.m2Net || '125') + ' m²' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Bina Yaşı:</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.binaYasi || '0 (Yeni)' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Bulunduğu Kat:</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.bulunduguKat || '2. Kat' }} / {{ selectedTenderModal.customFields?.katSayisi || '5 Katlı' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Isıtma:</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.isitma || 'Doğalgaz (Kombi)' }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Banyo & Balkon:</span>
+                <span class="font-bold text-white">{{ (selectedTenderModal.customFields?.banyoSayisi || '2') + ' Banyo · Balkon: ' + (selectedTenderModal.customFields?.balkon || 'Var') }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Asansör & Otopark:</span>
+                <span class="font-bold text-white">{{ 'Asansör: ' + (selectedTenderModal.customFields?.asansor || 'Var') + ' · ' + (selectedTenderModal.customFields?.otopark || 'Kapalı Otopark') }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Eşyalı & Durum:</span>
+                <span class="font-bold text-white">{{ 'Eşyalı: ' + (selectedTenderModal.customFields?.esyali || 'Hayır') + ' · ' + (selectedTenderModal.customFields?.kullanimDurumu || 'Boş') }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Site & Aidat:</span>
+                <span class="font-bold text-white">{{ 'Site: ' + (selectedTenderModal.customFields?.siteIcerisinde || 'Evet') + ' · Aidat: ' + (selectedTenderModal.customFields?.aidat ? selectedTenderModal.customFields.aidat + ' ₺' : '450 ₺') }}</span>
+              </div>
+              <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
+                <span class="text-slate-400 text-[10px] block uppercase font-bold">Kredi & Takas:</span>
+                <span class="font-bold text-emerald-400">{{ 'Kredi: ' + (selectedTenderModal.customFields?.krediyeUygunluk || 'Evet') + ' · Takas: ' + (selectedTenderModal.customFields?.takas || 'Hayır') }}</span>
+              </div>
+            </div>
+
+            <!-- Video Varsa Video Butonu -->
+            <div v-if="selectedTenderModal.customFields?.videoUrl" class="p-3 bg-slate-950/80 rounded-xl border border-sky-500/30 flex items-center justify-between">
+              <span class="text-xs font-bold text-sky-300 flex items-center gap-1.5">
+                <span>🎥 İlan Tanıtım Videosu Mevcuttur</span>
+              </span>
+              <a 
+                :href="selectedTenderModal.customFields.videoUrl" 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                class="px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-bold text-xs flex items-center gap-1"
+              >
+                <span>Videoyu İzle ↗</span>
+              </a>
+            </div>
+          </div>
+
+          <!-- A. PROJE, HİZMET & DOĞRUDAN İLANLAR (Herkese Açık İletişim & Web Sitesi) -->
+          <div v-if="selectedTenderModal.isIlan || selectedTenderModal.ihaleYonu === 'ihalesiz_ilan' || selectedTenderModal.ihaleYonu === 'satis' || selectedTenderModal.ihaleYonu === 'kiralik' || (selectedTenderModal.tur && (selectedTenderModal.tur.includes('Arsa') || selectedTenderModal.tur.includes('Konut') || selectedTenderModal.tur.includes('Tanıtım') || selectedTenderModal.tur.includes('Sabit')))" class="p-6 rounded-2xl bg-slate-900 border border-teal-500/50 space-y-4">
             <div class="flex items-center justify-between border-b border-slate-800 pb-3">
               <div class="flex items-center gap-2">
                 <span class="px-2.5 py-1 rounded-lg bg-teal-500/20 text-teal-300 font-black text-xs border border-teal-500/30">
-                  📢 Proje & Hizmet İlanı
+                  {{ selectedTenderModal.tur || '📢 Proje & Hizmet İlanı' }}
                 </span>
-                <span class="text-xs text-slate-400 font-medium">Doğrudan İletişim & Tanıtım</span>
+                <span class="text-xs text-slate-400 font-medium">Doğrudan İletişim & Detaylar</span>
               </div>
               <a 
                 v-if="selectedTenderModal.websiteUrl" 
                 :href="selectedTenderModal.websiteUrl" 
                 target="_blank" 
-                rel="noopener noreferrer"
+                rel="noopener noreferrer" 
                 class="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-md shadow-teal-600/20"
               >
                 <ExternalLink :size="13" />
@@ -3851,7 +4257,7 @@ onMounted(() => {
 
             <!-- İlan Açıklaması / Notu (Vatandaşın Görebileceği Açıklama) -->
             <div class="bg-slate-950/60 p-4 rounded-xl border border-slate-800 space-y-1.5">
-              <span class="text-[10px] font-black uppercase tracking-wider text-teal-400 block">İlan Sahibi Notu & Şartname Özeti:</span>
+              <span class="text-[10px] font-black uppercase tracking-wider text-teal-400 block">İlan Açıklaması & Şartlar:</span>
               <p class="text-xs text-slate-200 leading-relaxed whitespace-pre-line font-medium">
                 {{ selectedTenderModal.aciklama || selectedTenderModal.baslik }}
               </p>
@@ -3861,21 +4267,21 @@ onMounted(() => {
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-xs pt-2">
               <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
                 <span class="text-slate-400 text-[11px] block">İlan Sahibi / Kurum:</span>
-                <span class="font-bold text-white text-sm">{{ selectedTenderModal.ownerCompany || selectedTenderModal.authority || 'Kurumsal Firma' }}</span>
+                <span class="font-bold text-white text-sm">{{ selectedTenderModal.ownerCompany || selectedTenderModal.authority || 'Doğrulanmış İlan Sahibi' }}</span>
               </div>
               <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
                 <span class="text-slate-400 text-[11px] block">İletişim Telefonu:</span>
                 <a v-if="selectedTenderModal.ownerPhone" :href="'tel:' + selectedTenderModal.ownerPhone" class="font-bold text-teal-300 hover:underline text-sm">
                   📞 {{ selectedTenderModal.ownerPhone }}
                 </a>
-                <span v-else class="font-bold text-slate-300">İlanda Belirtilmedi</span>
+                <span v-else class="font-bold text-slate-300">0850 840 86 95</span>
               </div>
               <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
                 <span class="text-slate-400 text-[11px] block">E-Posta:</span>
                 <a v-if="selectedTenderModal.ownerEmail" :href="'mailto:' + selectedTenderModal.ownerEmail" class="font-bold text-blue-300 hover:underline">
                   ✉️ {{ selectedTenderModal.ownerEmail }}
                 </a>
-                <span v-else class="font-bold text-slate-300">Doğrulanmış Üye</span>
+                <span v-else class="font-bold text-slate-300">info@ihaleciburada.com</span>
               </div>
               <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
                 <span class="text-slate-400 text-[11px] block">Lokasyon:</span>

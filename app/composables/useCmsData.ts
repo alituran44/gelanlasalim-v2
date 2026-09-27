@@ -652,7 +652,13 @@ export function useCmsData() {
       const res = await $fetch<{ success: boolean; tenders: any[] }>('/api/tenders')
       if (res && res.success && Array.isArray(res.tenders)) {
         if (!cmsDataRef.value.dashboard) cmsDataRef.value.dashboard = {} as any
-        cmsDataRef.value.dashboard.tenders = res.tenders
+        const existing = cmsDataRef.value.dashboard.tenders || []
+        const map = new Map<string, any>()
+        // Önce mevcut yerel ilanları koru (kullanıcının yeni eklediği ilanlar kaybolmasın)
+        existing.forEach((t: any) => { if (t && t.id) map.set(t.id, t) })
+        // Sunucudan gelen ilanları ekle veya güncelle
+        res.tenders.forEach((t: any) => { if (t && t.id) map.set(t.id, t) })
+        cmsDataRef.value.dashboard.tenders = Array.from(map.values())
         safeLocalStorageSet('cmsData', cmsDataRef.value)
       }
     } catch (e) {
