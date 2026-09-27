@@ -654,10 +654,13 @@ export function useCmsData() {
         if (!cmsDataRef.value.dashboard) cmsDataRef.value.dashboard = {} as any
         const existing = cmsDataRef.value.dashboard.tenders || []
         const map = new Map<string, any>()
-        // Önce mevcut yerel ilanları koru (kullanıcının yeni eklediği ilanlar kaybolmasın)
-        existing.forEach((t: any) => { if (t && t.id) map.set(t.id, t) })
+        existing.forEach((t: any) => { 
+          if (t && t.id && !t.id.startsWith('IHC-2026-') && !t.isBaseline) map.set(t.id, t) 
+        })
         // Sunucudan gelen ilanları ekle veya güncelle
-        res.tenders.forEach((t: any) => { if (t && t.id) map.set(t.id, t) })
+        res.tenders.forEach((t: any) => { 
+          if (t && t.id && !t.id.startsWith('IHC-2026-') && !t.isBaseline) map.set(t.id, t) 
+        })
         cmsDataRef.value.dashboard.tenders = Array.from(map.values())
         safeLocalStorageSet('cmsData', cmsDataRef.value)
       }
