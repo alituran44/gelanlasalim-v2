@@ -51,6 +51,27 @@ body, html {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* Safe-area insets for modern mobile devices (iOS notch, dynamic island, bottom bar) */
+:root {
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+}
+
+html.capacitor-native-app body {
+  padding-top: var(--sat);
+  padding-bottom: var(--sab);
+  -webkit-tap-highlight-color: transparent;
+}
+
+html.capacitor-native-app input,
+html.capacitor-native-app textarea,
+html.capacitor-native-app [contenteditable] {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Plus Jakarta Sans', 'Inter', sans-serif !important;
   letter-spacing: -0.024em;

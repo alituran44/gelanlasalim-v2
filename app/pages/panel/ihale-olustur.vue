@@ -19,7 +19,7 @@ import {
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useUserSession } from '~/composables/useUserSession'
-import { ALL_40_CATEGORIES, CATEGORY_SUBCATEGORIES_MAP } from '~/utils/taxonomy'
+import { ALL_40_CATEGORIES, CATEGORY_SUBCATEGORIES_MAP, sanitizeExternalUrl } from '~/utils/taxonomy'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -66,7 +66,11 @@ ALL_40_CATEGORIES.forEach(cat => {
   categoryMap[cat.short] = subs
 })
 
-// Kullanıcı dostu kısa adlar ve eski şablon uyumluluğu için eşleştirmeler
+// Kullanıcı dostu kısa adlar ve hiyerarşik uyumluluklar
+categoryMap['Diğer İhale ve İlanlar'] = ['Genel İlanlar', 'Özel Talep & Teklifler', 'Serbest Piyasa İlanları', 'Diğer Satış ve Kiralama', 'DİĞER']
+categoryMap['DİĞER'] = ['Genel İlanlar', 'Özel Talep & Teklifler', 'Serbest Piyasa İlanları', 'DİĞER']
+categoryMap['Gayrimenkul'] = ['Ev', 'Arsa', 'Ofis', 'İşyeri', 'Satılık Konut', 'Kiralık Konut', 'Satılık Arsa', 'Kiralık Arsa', 'Tarla & Bağ-Bahçe', 'Ticari Gayrimenkul', 'DİĞER']
+categoryMap['Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri'] = ['Ev', 'Arsa', 'Ofis', 'İşyeri', 'Satılık Konut', 'Kiralık Konut', 'Satılık Arsa', 'Kiralık Arsa', 'Tarla & Bağ-Bahçe', 'Ticari Gayrimenkul', 'DİĞER']
 categoryMap['İnşaat ve Yapı'] = categoryMap['İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri'] || ['Bina Yapımı & Taahhüt', 'Yol, Köprü & Viyadük', 'DİĞER']
 categoryMap['Sanayi ve Makine'] = categoryMap['Endüstriyel Makine - Motor - Konveyör İhaleleri'] || ['Üretim Makineleri', 'CNC & Takım Tezgahları', 'DİĞER']
 categoryMap['Bilgisayar ve Teknoloji'] = categoryMap['Yazılım - Bilgi Yönetim Hizmetleri - Bilişim İhaleleri'] || ['Özel Yazılım Geliştirme', 'ERP & Kurumsal Yazılımlar', 'DİĞER']
@@ -76,22 +80,24 @@ categoryMap['Nakliye ve Lojistik'] = categoryMap['Nakliye - Taşımacılık Hizm
 categoryMap['Mobilya ve Ofis'] = categoryMap['Mobilya - Beyaz Eşya - Mutfak - Züccaciye İhaleleri'] || ['Ofis & Büro Mobilyaları', 'Mutfak Ekipmanları & Endüstriyel Mutfak', 'DİĞER']
 categoryMap['Medikal ve Sağlık'] = categoryMap['Sağlık - İlaç - Kozmetik - Medikal İhaleleri'] || ['Tıbbi Cihaz & Sarf Malzemeleri', 'İlaç & Serum Tedariği', 'DİĞER']
 categoryMap['Gıda ve Catering'] = categoryMap['Gıda - Tarım Ürünleri - Yiyecek - İçecek İhaleleri'] || ['Kuru Gıda, Bakliyat & Hububat', 'Et, Tavuk & Şarküteri', 'DİĞER']
-categoryMap['Gayrimenkul'] = categoryMap['Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri'] || ['Satılık Arsa', 'Kiralık Arsa', 'DİĞER']
-categoryMap['DİĞER'] = ['Genel Alım', 'Özel Proje', 'DİĞER']
 
-// Ana Kategori listesi (Kullanıcı dropdown'ında 40 kategori + DİĞER)
+// Ana Kategori listesi (Kullanıcı dropdown'ında 1. Diğer, 2. Emlak, 3. İnşaat, 4. Tarım...)
 const mainCategoryList = [
   ...ALL_40_CATEGORIES.map(c => c.name),
   'DİĞER'
 ]
 
 function getCategoryLabel(catName: string): string {
-  if (catName === 'DİĞER') return '📌 DİĞER'
+  if (catName === 'DİĞER' || catName === 'Diğer İhale ve İlanlar') return '✨ Diğer İhale ve İlanlar (DİĞER)'
   const found = ALL_40_CATEGORIES.find(c => c.name === catName || c.short === catName)
   if (found) {
     return `${found.icon} ${found.name}`
   }
   return catName
+}
+
+function formatWebsiteUrl(url: string): string {
+  return sanitizeExternalUrl(url)
 }
 
 // =========================================================================
@@ -573,15 +579,126 @@ function openWebsiteUrl(rawUrl: string) {
   window.open(url, '_blank', 'noopener,noreferrer')
 }
 
+// =========================================================================
+// 🗺️ ARSA CANLI HARİTA YÖNETİMİ (Kullanıcı Bilgi Girdikçe Anında Odaklanır)
+// =========================================================================
+const arsaMapType = ref<'roadmap' | 'satellite'>('roadmap')
+const debouncedArsaQuery = ref('Balıkesir, Türkiye')
+let arsaDebounceTimer: any = null
+
+const arsaLocationQuery = computed(() => {
+  const parts: string[] = []
+  if (arsaForm.mahalle && arsaForm.mahalle.trim()) parts.push(arsaForm.mahalle.trim())
+  if (arsaForm.ilce && arsaForm.ilce.trim()) parts.push(arsaForm.ilce.trim())
+  if (arsaForm.il && arsaForm.il.trim()) parts.push(arsaForm.il.trim())
+  if (parts.length === 0) return 'Balıkesir, Türkiye'
+  return parts.join(', ') + ', Türkiye'
+})
+
+const arsaLocationDisplay = computed(() => {
+  const parts: string[] = []
+  if (arsaForm.il) parts.push(arsaForm.il)
+  if (arsaForm.ilce) parts.push(arsaForm.ilce)
+  if (arsaForm.mahalle) parts.push(arsaForm.mahalle)
+  return parts.length > 0 ? parts.join(' / ') : 'Balıkesir'
+})
+
+const arsaAdaParselDisplay = computed(() => {
+  const items: string[] = []
+  if (arsaForm.ada && arsaForm.ada.trim()) items.push(`Ada: ${arsaForm.ada.trim()}`)
+  if (arsaForm.parsel && arsaForm.parsel.trim()) items.push(`Parsel: ${arsaForm.parsel.trim()}`)
+  return items.join(', ')
+})
+
+const arsaMapEmbedUrl = computed(() => {
+  const q = encodeURIComponent(debouncedArsaQuery.value)
+  const zoom = arsaForm.mahalle && arsaForm.mahalle.trim() ? 16 : (arsaForm.ilce && arsaForm.ilce.trim() ? 14 : 11)
+  const mapTypeParam = arsaMapType.value === 'satellite' ? 'k' : 'm'
+  return `https://maps.google.com/maps?q=${q}&t=${mapTypeParam}&z=${zoom}&ie=UTF8&iwloc=&output=embed`
+})
+
+// İl, İlçe, Mahalle, Ada veya Parsel girildiğinde anında debounce ile haritayı güncelle
+watch(
+  () => [arsaForm.il, arsaForm.ilce, arsaForm.mahalle, arsaForm.ada, arsaForm.parsel],
+  () => {
+    clearTimeout(arsaDebounceTimer)
+    arsaDebounceTimer = setTimeout(() => {
+      debouncedArsaQuery.value = arsaLocationQuery.value
+    }, 400)
+
+    const loc = arsaLocationDisplay.value
+    const adaParsel = arsaAdaParselDisplay.value
+    arsaForm.haritaKonumBilgisi = `${loc}${adaParsel ? ` (${adaParsel})` : ''} - Haritada Canlı İşaretlendi`
+    arsaForm.haritaIsaretlendi = true
+  },
+  { immediate: true }
+)
+
 function toggleHaritaIsaretle() {
   arsaForm.haritaIsaretlendi = !arsaForm.haritaIsaretlendi
   if (arsaForm.haritaIsaretlendi) {
-    const loc = [arsaForm.il, arsaForm.ilce, arsaForm.mahalle].filter(Boolean).join(' / ')
-    const adaParsel = [arsaForm.ada ? `Ada: ${arsaForm.ada}` : '', arsaForm.parsel ? `Parsel: ${arsaForm.parsel}` : ''].filter(Boolean).join(', ')
-    arsaForm.haritaKonumBilgisi = `${loc || 'Balıkesir'} ${adaParsel ? `(${adaParsel})` : ''} - Haritada Konum İşaretlendi`
+    const loc = arsaLocationDisplay.value
+    const adaParsel = arsaAdaParselDisplay.value
+    arsaForm.haritaKonumBilgisi = `${loc}${adaParsel ? ` (${adaParsel})` : ''} - Haritada Canlı İşaretlendi`
   } else {
     arsaForm.haritaKonumBilgisi = ''
   }
+}
+
+function openArsaInGoogleMaps() {
+  const q = encodeURIComponent(arsaLocationQuery.value)
+  window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, '_blank', 'noopener,noreferrer')
+}
+
+function openArsaInTKGM() {
+  window.open('https://parselsorgu.tkgm.gov.tr/', '_blank', 'noopener,noreferrer')
+}
+
+// =========================================================================
+// 🏠 EV / KONUT CANLI HARİTA YÖNETİMİ
+// =========================================================================
+const evMapType = ref<'roadmap' | 'satellite'>('roadmap')
+const debouncedEvQuery = ref('Balıkesir, Türkiye')
+let evDebounceTimer: any = null
+
+const evLocationQuery = computed(() => {
+  const parts: string[] = []
+  if (evForm.mahalle && evForm.mahalle.trim()) parts.push(evForm.mahalle.trim())
+  if (evForm.ilce && evForm.ilce.trim()) parts.push(evForm.ilce.trim())
+  if (evForm.il && evForm.il.trim()) parts.push(evForm.il.trim())
+  if (parts.length === 0) return 'Balıkesir, Türkiye'
+  return parts.join(', ') + ', Türkiye'
+})
+
+const evLocationDisplay = computed(() => {
+  const parts: string[] = []
+  if (evForm.il) parts.push(evForm.il)
+  if (evForm.ilce) parts.push(evForm.ilce)
+  if (evForm.mahalle) parts.push(evForm.mahalle)
+  return parts.length > 0 ? parts.join(' / ') : 'Balıkesir'
+})
+
+const evMapEmbedUrl = computed(() => {
+  const q = encodeURIComponent(debouncedEvQuery.value)
+  const zoom = evForm.mahalle && evForm.mahalle.trim() ? 16 : (evForm.ilce && evForm.ilce.trim() ? 14 : 11)
+  const mapTypeParam = evMapType.value === 'satellite' ? 'k' : 'm'
+  return `https://maps.google.com/maps?q=${q}&t=${mapTypeParam}&z=${zoom}&ie=UTF8&iwloc=&output=embed`
+})
+
+watch(
+  () => [evForm.il, evForm.ilce, evForm.mahalle],
+  () => {
+    clearTimeout(evDebounceTimer)
+    evDebounceTimer = setTimeout(() => {
+      debouncedEvQuery.value = evLocationQuery.value
+    }, 400)
+  },
+  { immediate: true }
+)
+
+function openEvInGoogleMaps() {
+  const q = encodeURIComponent(evLocationQuery.value)
+  window.open(`https://www.google.com/maps/search/?api=1&query=${q}`, '_blank', 'noopener,noreferrer')
 }
 
 function toggleArsaAltyapi(item: string) {
@@ -774,6 +891,8 @@ async function submitCurrentForm() {
         il: evForm.il,
         ilce: evForm.ilce,
         mahalle: evForm.mahalle,
+        haritaKonumBilgisi: evLocationDisplay.value,
+        haritaIsaretlendi: true,
         tabanFiyat: evForm.tabanFiyat,
         ekspertizYap: evForm.ekspertizYap,
         m2Brut: evForm.m2Brut,
@@ -805,8 +924,9 @@ async function submitCurrentForm() {
     } else if (activeFormMode.value === 'diger') {
       if (!digerForm.baslik.trim()) throw new Error('Lütfen ilan başlığını giriniz.')
       finalBaslik = digerForm.baslik.trim()
-      finalCategory = digerForm.anaKategori === 'DİĞER' ? (digerForm.anaKategoriDiger || 'Diğer') : digerForm.anaKategori
-      finalSubCategory = digerForm.altKategori === 'DİĞER' ? (digerForm.altKategoriDiger || 'Diğer') : digerForm.altKategori
+      finalCategory = 'Diğer İhale ve İlanlar'
+      const customSub = digerForm.altKategoriDiger?.trim() || (digerForm.altKategori === 'DİĞER' ? 'Diğer' : digerForm.altKategori) || digerForm.anaKategoriDiger?.trim() || 'Genel İlanlar'
+      finalSubCategory = customSub
       finalDirection = 'satis'
       
       const taban = digerForm.tabanFiyat ? `${digerForm.tabanFiyat} ₺` : ''
@@ -823,6 +943,9 @@ async function submitCurrentForm() {
         formType: 'DIGER',
         tabanFiyat: digerForm.tabanFiyat,
         tavanFiyat: digerForm.tavanFiyat,
+        altKategoriDiger: digerForm.altKategoriDiger,
+        anaKategoriDiger: digerForm.anaKategoriDiger,
+        digerMetni: customSub,
         videoUrl: digerForm.videoUrl,
         videoDosyaAdi: digerForm.videoDosyaAdi
       }
@@ -844,8 +967,31 @@ async function submitCurrentForm() {
     const ownerEmail = userSession.value?.email || 'kullanici@ihaleciburada.com'
 
     // Kategori ID Çözümleme
-    const selectedCatObj = ALL_40_CATEGORIES.find(c => c.name === finalCategory || c.short === finalCategory)
-    const finalCategoryId = selectedCatObj?.id || (activeFormMode.value === 'arsa' || activeFormMode.value === 'ev' ? 40 : 1)
+    let finalCategoryId = 99
+    if (
+      activeFormMode.value === 'diger' || 
+      finalCategory === 'Diğer İhale ve İlanlar' || 
+      finalCategory === 'DİĞER' ||
+      finalCategory.toLowerCase().includes('diğer') ||
+      finalCustomFields?.anaKategoriDiger ||
+      finalCustomFields?.altKategoriDiger ||
+      finalCustomFields?.digerMetni
+    ) {
+      finalCategoryId = 99
+      finalCategory = 'Diğer İhale ve İlanlar'
+    } else if (
+      activeFormMode.value === 'arsa' || 
+      activeFormMode.value === 'ev' || 
+      finalCategory.toLowerCase().includes('gayrimenkul') || 
+      finalCategory.toLowerCase().includes('arsa') || 
+      finalCategory.toLowerCase().includes('emlak')
+    ) {
+      finalCategoryId = 40
+      finalCategory = 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri'
+    } else {
+      const selectedCatObj = ALL_40_CATEGORIES.find(c => c.name === finalCategory || c.short === finalCategory)
+      finalCategoryId = selectedCatObj?.id || 99
+    }
 
     // İlan Türü Belirleme
     let ilanTuru = 'Pazaryeri İlanı'
@@ -854,6 +1000,18 @@ async function submitCurrentForm() {
     else if (activeFormMode.value === 'reklam') ilanTuru = 'Tanıtım & Reklam İlanı'
     else if (activeFormMode.value === 'arsa') ilanTuru = arsaForm.islemTuru === 'KİRALIK' ? 'Kiralık Arsa İlanı' : 'Satılık Arsa İlanı'
     else if (activeFormMode.value === 'ev') ilanTuru = evForm.islemTuru === 'KİRALIK' ? 'Kiralık Konut İlanı' : 'Satılık Konut İlanı'
+
+    const normalizedWeb = sanitizeExternalUrl(finalWeb)
+    const isAdListing = activeFormMode.value === 'reklam' || activeFormMode.value === 'sabit_fiyat' || activeFormMode.value === 'arsa' || activeFormMode.value === 'ev' || activeFormMode.value === 'diger' || finalDirection !== 'eksiltme'
+    const computedFormType = activeFormMode.value === 'reklam' 
+      ? 'REKLAM_ILANI' 
+      : (activeFormMode.value === 'diger' 
+        ? 'DIGER' 
+        : (activeFormMode.value === 'arsa' 
+          ? 'ARSA' 
+          : (activeFormMode.value === 'ev' 
+            ? 'EV' 
+            : (activeFormMode.value === 'sabit_fiyat' ? 'SABIT_FIYAT' : 'ACIK_EKSILTME'))))
 
     const tenderObject: any = {
       id: newId,
@@ -864,6 +1022,8 @@ async function submitCurrentForm() {
       categoryId: finalCategoryId,
       ihaleYonu: finalDirection,
       tur: ilanTuru,
+      formType: computedFormType,
+      isIlan: isAdListing,
       rekabetTuru: finalDirection === 'eksiltme' ? 'Eksiltme' : 'Doğrudan İlan',
       sure: '7 gün kaldı',
       teklifSayisi: 0,
@@ -881,9 +1041,15 @@ async function submitCurrentForm() {
       files: finalFiles,
       documents: finalFiles,
       aciklama: finalAciklama || finalBaslik,
-      customFields: finalCustomFields,
+      customFields: {
+        ...finalCustomFields,
+        formType: computedFormType,
+        websiteUrl: normalizedWeb,
+        webSayfasi: normalizedWeb
+      },
       categorySpecificData: finalCustomFields,
-      websiteUrl: finalWeb,
+      websiteUrl: normalizedWeb,
+      webSayfasi: normalizedWeb,
       ownerPhone: finalPhone,
       ownerEmail,
       ownerCompany: finalOwner,
@@ -906,7 +1072,11 @@ async function submitCurrentForm() {
       await $fetch('/api/tenders', {
         method: 'POST',
         headers: { 'x-user-email': ownerEmail },
-        body: tenderObject
+        body: {
+          ...tenderObject,
+          websiteUrl: normalizedWeb,
+          formType: computedFormType
+        }
       })
     } catch (err) {
       console.warn('API sync warn:', err)
@@ -1919,7 +2089,10 @@ async function submitCurrentForm() {
             v-model="arsaForm.altKategori"
             class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
           >
+            <option value="EV">EV</option>
             <option value="ARSA">ARSA</option>
+            <option value="OFİS">OFİS</option>
+            <option value="İŞYERİ">İŞYERİ</option>
             <option value="KONUT İMARLI">KONUT İMARLI</option>
             <option value="İŞYERİ İMARLI">İŞYERİ İMARLI</option>
             <option value="TARLA">TARLA</option>
@@ -2015,47 +2188,120 @@ async function submitCurrentForm() {
           </div>
         </div>
 
-        <!-- HARİTADA KENDİN SEÇ / İŞARETLE (Kullanıcı Çizimi: media_1790444255802.pdf) -->
+        <!-- HARİTADA KENDİN SEÇ / İŞARETLE & CANLI ARSA HARİTASI -->
         <div class="pt-3 border-t border-slate-200">
           <div class="flex items-center justify-between mb-2">
-            <span class="text-[11px] font-black uppercase text-pink-600 flex items-center gap-1.5">
-              <span>📍 HARİTADA KENDİN SEÇ</span>
+            <span class="text-[11px] font-black uppercase text-emerald-700 flex items-center gap-1.5">
+              <span>📍 CANLI ARSA KONUMU & HARİTA</span>
             </span>
-            <span class="text-[10px] font-bold text-slate-400">ARSANIN KONUMUNU İŞARETLE</span>
+            <div class="flex items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Bilgi Girdikçe Anında Odaklanır</span>
+              </span>
+            </div>
           </div>
 
-          <div class="rounded-2xl border border-slate-200 bg-white p-3 space-y-3">
-            <div class="relative w-full h-44 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center">
-              <iframe 
-                class="w-full h-full border-0"
-                src="https://www.openstreetmap.org/export/embed.html?bbox=26.0%2C38.0%2C32.0%2C42.0&layer=mapnik"
-                loading="lazy"
-              ></iframe>
-              <div v-if="arsaForm.haritaIsaretlendi" class="absolute top-2 left-2 bg-emerald-600 text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1">
-                <span>✓ Konum İşaretlendi</span>
+          <div class="rounded-2xl border border-slate-200 bg-white p-3 space-y-3 shadow-xs">
+            <!-- Harita Üst Bilgi Barı: Girilen Konum ve Görünüm Seçenekleri -->
+            <div class="flex flex-wrap items-center justify-between gap-2 bg-slate-50 p-2.5 rounded-xl border border-slate-200/80">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs shrink-0 shadow-xs">📍</span>
+                <div class="min-w-0">
+                  <div class="text-xs font-black text-slate-800 truncate">
+                    {{ arsaLocationDisplay }}
+                    <span v-if="arsaAdaParselDisplay" class="text-pink-600 font-bold ml-1">
+                      ({{ arsaAdaParselDisplay }})
+                    </span>
+                  </div>
+                  <div class="text-[10px] font-medium text-slate-500 truncate">
+                    {{ arsaLocationQuery }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Harita Türü Seçimi (Sokak / Uydu) -->
+              <div class="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200 shadow-2xs">
+                <button
+                  type="button"
+                  @click="arsaMapType = 'roadmap'"
+                  class="px-2.5 py-1 rounded-md text-[11px] font-bold transition cursor-pointer"
+                  :class="arsaMapType === 'roadmap' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'"
+                >
+                  🗺️ Sokak
+                </button>
+                <button
+                  type="button"
+                  @click="arsaMapType = 'satellite'"
+                  class="px-2.5 py-1 rounded-md text-[11px] font-bold transition cursor-pointer"
+                  :class="arsaMapType === 'satellite' ? 'bg-slate-900 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'"
+                >
+                  🛰️ Uydu
+                </button>
               </div>
             </div>
 
-            <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
-              <div class="text-xs text-slate-600">
-                <span v-if="arsaForm.haritaIsaretlendi" class="font-bold text-emerald-700">
-                  📍 {{ arsaForm.haritaKonumBilgisi }}
-                </span>
-                <span v-else class="text-slate-400 text-[11px]">
-                  Harita üzerinde arsanızın tam konumunu sabitlemek için 'İşaretle' butonuna basın.
-                </span>
+            <!-- Canlı İframe Harita Kutusu -->
+            <div class="relative w-full h-64 sm:h-72 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-inner">
+              <iframe 
+                class="w-full h-full border-0"
+                :src="arsaMapEmbedUrl"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+                title="Arsa Harita Konumu"
+              ></iframe>
+
+              <!-- Harita Üzeri Ada/Parsel Rozeti -->
+              <div v-if="arsaForm.ada || arsaForm.parsel" class="absolute bottom-2.5 left-2.5 bg-slate-950/85 backdrop-blur-md text-white text-[10px] font-bold px-3 py-1.5 rounded-lg border border-white/20 shadow-lg flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-pink-500"></span>
+                <span>Ada: {{ arsaForm.ada || '-' }} / Parsel: {{ arsaForm.parsel || '-' }}</span>
               </div>
 
-              <button
-                type="button"
-                @click="toggleHaritaIsaretle"
-                class="px-4 py-2 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-2 border"
-                :class="arsaForm.haritaIsaretlendi 
-                  ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-xs' 
-                  : 'bg-pink-600 hover:bg-pink-700 text-white border-pink-600 shadow-xs'"
-              >
-                <span>{{ arsaForm.haritaIsaretlendi ? '✓ İŞARETLENDİ' : '⭕ İŞARETLE' }}</span>
-              </button>
+              <!-- Sağ Üst: Canlı Konum Rozeti -->
+              <div class="absolute top-2.5 right-2.5 bg-emerald-600/90 backdrop-blur-md text-white text-[10px] font-black px-2.5 py-1 rounded-lg shadow-md flex items-center gap-1.5 border border-emerald-400/40">
+                <span class="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
+                <span>Canlı Konum Aktif</span>
+              </div>
+            </div>
+
+            <!-- Alt Araç Butonları (Google Maps & TKGM Parsel Sorgu) -->
+            <div class="flex flex-wrap items-center justify-between gap-2 pt-1 border-t border-slate-100">
+              <div class="flex items-center gap-1.5 text-xs text-slate-500">
+                <span class="text-[11px]">💡 İl, ilçe, mahalle, ada veya parsel yazdıkça harita anında bu konuma odaklanır.</span>
+              </div>
+
+              <div class="flex items-center gap-2">
+                <!-- TKGM Parsel Sorgu Butonu -->
+                <button
+                  type="button"
+                  @click="openArsaInTKGM"
+                  title="Tapu ve Kadastro Genel Müdürlüğü Resmi Parsel Sorgu Uygulamasında Doğrula"
+                  class="px-3 py-1.5 rounded-xl text-[11px] font-bold transition cursor-pointer flex items-center gap-1.5 border border-amber-300 bg-amber-50 text-amber-900 hover:bg-amber-100"
+                >
+                  <span>📐 TKGM Parsel Sorgu</span>
+                </button>
+
+                <!-- Google Haritalar Butonu -->
+                <button
+                  type="button"
+                  @click="openArsaInGoogleMaps"
+                  class="px-3 py-1.5 rounded-xl text-[11px] font-bold transition cursor-pointer flex items-center gap-1.5 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 shadow-2xs"
+                >
+                  <span>↗️ Google Haritalar</span>
+                </button>
+
+                <!-- İşaretle / Onayla Butonu -->
+                <button
+                  type="button"
+                  @click="toggleHaritaIsaretle"
+                  class="px-3.5 py-1.5 rounded-xl text-xs font-black transition cursor-pointer flex items-center gap-1.5 border"
+                  :class="arsaForm.haritaIsaretlendi 
+                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-xs' 
+                    : 'bg-pink-600 hover:bg-pink-700 text-white border-pink-600 shadow-xs'"
+                >
+                  <span>{{ arsaForm.haritaIsaretlendi ? '✓ KONUM SABİTLENDİ' : '📍 KONUMU SABİTLE' }}</span>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -2533,11 +2779,11 @@ async function submitCurrentForm() {
             class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
           >
             <option value="EV">EV</option>
-            <option value="VİLLA">VİLLA</option>
+            <option value="ARSA">ARSA</option>
             <option value="OFİS">OFİS</option>
             <option value="İŞYERİ">İŞYERİ</option>
+            <option value="VİLLA">VİLLA</option>
             <option value="SİTE İÇİ EV">SİTE İÇİ EV</option>
-            <option value="ARSA">ARSA</option>
             <option value="DİĞER">DİĞER</option>
           </select>
           <div v-if="evForm.altKategori === 'DİĞER'" class="pt-1">
@@ -2594,6 +2840,60 @@ async function submitCurrentForm() {
               placeholder="Örn: Moda Mahallesi"
               class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
             />
+          </div>
+        </div>
+
+        <!-- 📍 CANLI KONUT HARİTA GÖRÜNÜMÜ -->
+        <div class="pt-2 border-t border-slate-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-[11px] font-black uppercase text-emerald-700">📍 CANLI KONUM HARİTASI</span>
+              <span class="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Anında Odaklanır</span>
+              </span>
+            </div>
+            <div class="flex items-center gap-1 bg-white p-0.5 rounded-lg border border-slate-200">
+              <button
+                type="button"
+                @click="evMapType = 'roadmap'"
+                class="px-2 py-0.5 rounded text-[10px] font-bold transition cursor-pointer"
+                :class="evMapType === 'roadmap' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'"
+              >
+                Sokak
+              </button>
+              <button
+                type="button"
+                @click="evMapType = 'satellite'"
+                class="px-2 py-0.5 rounded text-[10px] font-bold transition cursor-pointer"
+                :class="evMapType === 'satellite' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:text-slate-900'"
+              >
+                Uydu
+              </button>
+            </div>
+          </div>
+
+          <div class="relative w-full h-56 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 shadow-inner">
+            <iframe 
+              class="w-full h-full border-0"
+              :src="evMapEmbedUrl"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              title="Konut Harita Konumu"
+            ></iframe>
+            <div class="absolute top-2 left-2 bg-slate-950/80 backdrop-blur-md text-white text-[10px] font-bold px-2.5 py-1 rounded-md border border-white/20 flex items-center gap-1.5">
+              <span>📍 {{ evLocationDisplay }}</span>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-end">
+            <button
+              type="button"
+              @click="openEvInGoogleMaps"
+              class="px-3 py-1 rounded-lg text-[11px] font-bold transition cursor-pointer flex items-center gap-1.5 border border-slate-300 bg-white text-slate-700 hover:bg-slate-50"
+            >
+              <span>↗️ Google Haritalar'da Aç</span>
+            </button>
           </div>
         </div>
       </div>

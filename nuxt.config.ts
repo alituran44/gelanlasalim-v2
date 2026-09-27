@@ -49,7 +49,9 @@ export default defineNuxtConfig({
       '/**/*.jpg': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
       '/**/*.ico': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
       '/**/*.svg': { headers: { 'cache-control': 'public, max-age=604800, stale-while-revalidate=2592000', 'access-control-allow-origin': 'https://www.ihaleciburada.com' } },
-      // SEO, Crawler & RFC 9116 Güvenlik İletişim Dosyaları
+      // SEO, Crawler & RFC 9116 Güvenlik İletişim Dosyaları & PWA Manifest
+      '/manifest.webmanifest': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'application/manifest+json; charset=utf-8', 'access-control-allow-origin': '*' } },
+      '/manifest.json': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'application/manifest+json; charset=utf-8', 'access-control-allow-origin': '*' } },
       '/robots.txt': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': '*' } },
       '/sitemap.xml': { headers: { 'cache-control': 'public, max-age=86400', 'access-control-allow-origin': '*' } },
       '/llms.txt': { headers: { 'cache-control': 'public, max-age=86400', 'content-type': 'text/plain; charset=utf-8', 'access-control-allow-origin': '*' } },
@@ -94,7 +96,11 @@ export default defineNuxtConfig({
       title: 'İhaleciBurada — B2B İhale ve Doğrudan Satın Alma Platformu',
       meta: [
         { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover' },
+        { name: 'mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-capable', content: 'yes' },
+        { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
+        { name: 'apple-mobile-web-app-title', content: 'İhaleciBurada' },
         {
           name: 'description',
           content: 'İhaleciBurada.com ile kurumsal satın alma taleplerinizi yayınlayın, onaylı tedarikçilerden en rekabetçi teklifleri anında toplayın ve güvenle ticaret yapın.'
@@ -134,10 +140,12 @@ export default defineNuxtConfig({
         { name: 'twitter:image', content: 'https://ihaleciburada.com/auth_skyscraper_bg.jpg' }
       ],
       link: [
+        { rel: 'manifest', href: '/manifest.webmanifest' },
         { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' },
         { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
         { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
         { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+        { rel: 'apple-touch-icon-precomposed', sizes: '180x180', href: '/apple-touch-icon.png' },
         { rel: 'shortcut icon', href: '/favicon.ico' },
         { rel: 'preload', as: 'image', href: '/logo.png', fetchpriority: 'high' },
         { rel: 'preconnect', href: 'https://images.unsplash.com', crossorigin: 'anonymous' },

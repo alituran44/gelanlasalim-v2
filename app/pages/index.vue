@@ -62,7 +62,8 @@ import {
   Cpu,
   Database,
   Network,
-  Lock
+  Lock,
+  Camera
 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
@@ -72,7 +73,7 @@ import { useDeepSeekAgent } from '~/composables/useDeepSeekAgent'
 import { useUserSession } from '~/composables/useUserSession'
 import { isTenderConcluded, maskContactInfo } from '~/utils/contactFilter'
 import { exportTenderPdf } from '~/utils/tenderPdfExport'
-import { matchTenderToCategory } from '~/utils/taxonomy'
+import { matchTenderToCategory, ALL_40_CATEGORIES, CATEGORY_SUBCATEGORIES_MAP, sanitizeExternalUrl } from '~/utils/taxonomy'
 
 definePageMeta({
   layout: 'public'
@@ -476,113 +477,10 @@ async function submitLeadRequest() {
   }
 }
 
-// ==================== 1. KATEGORİLER LİSTESİ (ÇOK KULLANILANDAN AZ KULLANILANA SIRALI) ====================
-const allCategoriesList = [
-  { id: 1, name: 'İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri', short: 'İnşaat & Altyapı', icon: '🏗️', orderRank: 1 },
-  { id: 2, name: 'Sağlık - İlaç - Kozmetik - Medikal İhaleleri', short: 'Sağlık & Medikal', icon: '💊', orderRank: 2 },
-  { id: 3, name: 'Gıda - Tarım Ürünleri - Yiyecek - İçecek İhaleleri', short: 'Gıda & Tarım', icon: '🌾', orderRank: 3 },
-  { id: 29, name: 'Hazır Yemek - Lokantacılık İhaleleri', short: 'Hazır Yemek & İkram', icon: '🍽️', orderRank: 4 },
-  { id: 32, name: 'Temizlik - İlaçlama - Geri Dönüşüm İhaleleri', short: 'Temizlik & Geri Dönüşüm', icon: '🧹', orderRank: 5 },
-  { id: 10, name: 'Nakliye - Taşımacılık Hizmetleri - Servis İhaleleri', short: 'Nakliye & Lojistik', icon: '🚚', orderRank: 6 },
-  { id: 35, name: 'Özel Güvenlik - Koruma - Bekçilik İhaleleri', short: 'Özel Güvenlik', icon: '👮', orderRank: 7 },
-  { id: 7, name: 'Akaryakıt - Gazyağı - Madeni Yağ İhaleleri', short: 'Akaryakıt & Madeni Yağ', icon: '⛽', orderRank: 8 },
-  { id: 9, name: 'Yazılım - Bilgi Yönetim Hizmetleri - Bilişim İhaleleri', short: 'Yazılım & Bilişim', icon: '💻', orderRank: 9 },
-  { id: 6, name: 'Enerji - Aydınlatma - Sinyalizasyon - Elektrik Tesisatı İhaleleri', short: 'Enerji & Elektrik', icon: '⚡', orderRank: 10 },
-  { id: 22, name: 'Taşıt - İş Makinesi - Yedek Parça İhaleleri', short: 'Taşıt & İş Makinesi', icon: '🚜', orderRank: 11 },
-  { id: 4, name: 'Tıbbi Cihaz - Laboratuvar - Hastane Ekipmanları İhaleleri', short: 'Tıbbi Cihaz & Hastane', icon: '🩺', orderRank: 12 },
-  { id: 8, name: 'Endüstriyel Makine - Motor - Konveyör İhaleleri', short: 'Endüstriyel Makine', icon: '⚙️', orderRank: 13 },
-  { id: 11, name: 'Mobilya - Beyaz Eşya - Mutfak - Züccaciye İhaleleri', short: 'Mobilya & Ofis', icon: '🪑', orderRank: 14 },
-  { id: 15, name: 'Matbaa - Toner - Kartuş - Ambalaj - Kırtasiye İhaleleri', short: 'Matbaa & Kırtasiye', icon: '📦', orderRank: 15 },
-  { id: 12, name: 'Hırdavat - Nalburiye - Metal ve Plastik Ürünler İhaleleri', short: 'Hırdavat & Metal', icon: '🔩', orderRank: 16 },
-  { id: 33, name: 'Tekstil - Giyim - Spor Ekipmanları İhaleleri', short: 'Tekstil & Giyim', icon: '👕', orderRank: 17 },
-  { id: 34, name: 'İş Sağlığı - İş Güvenliği ve Ekipmanları İhaleleri', short: 'İş Sağlığı & Güvenliği', icon: '⛑️', orderRank: 18 },
-  { id: 17, name: 'Mühendislik - Mimarlık - Danışmanlık İhaleleri', short: 'Mühendislik & Mimarlık', icon: '📐', orderRank: 19 },
-  { id: 20, name: 'Klima - Soğutma - Isıtma - Havalandırma Tesisatı İhaleleri', short: 'Klima & Havalandırma', icon: '❄️', orderRank: 20 },
-  { id: 5, name: 'Kanalizasyon - Boru - Su - Doğalgaz - Sıhhi Tesisat İhaleleri', short: 'Kanalizasyon & Su', icon: '🚰', orderRank: 21 },
-  { id: 13, name: 'Yangın Algılama - Söndürme - İhbar Sistemleri İhaleleri', short: 'Yangın & Güvenlik', icon: '🧯', orderRank: 22 },
-  { id: 14, name: 'Kimyasal Maddeler - Dezenfektan - Gübre İhaleleri', short: 'Kimyasal & Gübre', icon: '🧪', orderRank: 23 },
-  { id: 30, name: 'Elektronik - Ölçü Aletleri - İletişim - Bilgisayar İhaleleri', short: 'Elektronik & Bilgisayar', icon: '🖥️', orderRank: 24 },
-  { id: 24, name: 'Reklam - Tabela - Billboard - Tanıtım Materyalleri İhaleleri', short: 'Reklam & Tanıtım', icon: '📢', orderRank: 25 },
-  { id: 25, name: 'Ormancılık, Bahçıvanlık, Bitki, Kozalak - Peyzaj İhaleleri', short: 'Ormancılık & Peyzaj', icon: '🌲', orderRank: 26 },
-  { id: 36, name: 'Eğitim - Araştırma - Anket - Tercümanlık İhaleleri', short: 'Eğitim & Tercümanlık', icon: '📚', orderRank: 27 },
-  { id: 23, name: 'Turizm - Ödüllendirme Hizmetleri - Organizasyon İhaleleri', short: 'Turizm & Organizasyon', icon: '🎪', orderRank: 28 },
-  { id: 19, name: 'Asansör - Yapı Otomasyon - Mekanik Güvenlik İhaleleri', short: 'Asansör & Otomasyon', icon: '🛗', orderRank: 29 },
-  { id: 40, name: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri', short: 'Gayrimenkul & Arsa', icon: '🏢', orderRank: 30 },
-  { id: 39, name: 'Menkul Mallar - Araç Satışı ve Hurda İhaleleri', short: 'Araç & Hurda Satışı', icon: '🚗', orderRank: 31 },
-  { id: 16, name: 'Kent Mobilyaları - Prefabrik Yapılar - Doğrama İhaleleri', short: 'Kent Mobilyaları', icon: '🏙️', orderRank: 32 },
-  { id: 26, name: 'Hayvancılık - Veterinerlik - Hayvan Yemi İhaleleri', short: 'Hayvancılık & Yem', icon: '🐄', orderRank: 33 },
-  { id: 38, name: 'Sigortacılık - Mali ve Hukuki Hizmetler İhaleleri', short: 'Sigorta & Finans', icon: '⚖️', orderRank: 34 },
-  { id: 37, name: 'İşletmecilik - İşçilik - Sosyal Hizmetler İhaleleri', short: 'İşletmecilik & Hizmet', icon: '🤝', orderRank: 35 },
-  { id: 18, name: 'Madencilik - Doğal Kaynaklar - Sondaj İhaleleri', short: 'Madencilik & Sondaj', icon: '⛏️', orderRank: 36 },
-  { id: 21, name: 'Savunma Sanayi, Silah - Denizcilik - Havacılık İhaleleri', short: 'Savunma & Havacılık', icon: '🛡️', orderRank: 37 },
-  { id: 31, name: 'Uydu Takip - Kamera - Scada - Haberleşme Sistemleri İhaleleri', short: 'Kamera & Güvenlik', icon: '📹', orderRank: 38 },
-  { id: 28, name: 'Odun - Kömür - Katıyakıt İhaleleri', short: 'Odun & Kömür', icon: '🪵', orderRank: 39 },
-  { id: 27, name: 'Sanat Eserleri - Müzik Aletleri - Heykel - Maket İhaleleri', short: 'Sanat & Heykel', icon: '🎨', orderRank: 40 }
-]
+// ==================== 1. KATEGORİLER LİSTESİ (MERKEZİ TAKSONOMİDEN AKTİF) ====================
+const allCategoriesList = ALL_40_CATEGORIES
+const categorySubcategoriesMap = CATEGORY_SUBCATEGORIES_MAP
 
-// ==================== 1.1 ALT KATEGORİLER HARİTASI (TÜM 40 KATEGORİ İÇİN EKSİKSİZ) ====================
-const categorySubcategoriesMap: Record<number, string[]> = {
-  1: ['Bina Yapımı & Taahhüt', 'Yol, Köprü & Viyadük', 'Hafriyat, Kazı & Dolgu', 'Çelik Konstrüksiyon', 'Prefabrik Yapılar', 'İzolasyon & Su Yalıtımı', 'Boya, Sıva & Alçıpan', 'Tadilat & Restorasyon'],
-  2: ['Tıbbi Cihaz & Sarf Malzemeleri', 'İlaç & Serum Tedariği', 'Laboratuvar Kitleri & Reaktifler', 'Ortopedi & Protez Ürünleri', 'Kişisel Koruyucu Hijyen', 'Dental & Diş Sağlığı'],
-  3: ['Kuru Gıda, Bakliyat & Hububat', 'Et, Tavuk & Şarküteri', 'Süt & Süt Ürünleri', 'Sebze & Meyve Toptan', 'Un, Şeker & Yağ', 'Konserve, Salça & Sos', 'Dondurulmuş Gıda'],
-  4: ['Görüntüleme & Radyoloji (MR, CT)', 'Hasta Başı Monitörleri', 'Cerrahi El Aletleri', 'Sterilizatör & Otoklav', 'Hastane Yatağı & Mobilyası', 'Laboratuvar Analiz Cihazları'],
-  5: ['Kanalizasyon & Altyapı Boruları', 'İçme Suyu Şebekesi', 'Doğalgaz Boru & Tesisatı', 'Sıhhi Tesisat & Armatürler', 'Pompalar & Hidroforlar', 'Vana, Sayaç & Ek Parçalar'],
-  6: ['Güneş Enerjisi (GES) Sistemleri', 'Trafo, Pano & Kablolar', 'Sokak & Çevre Aydınlatma', 'İç Mekan LED Aydınlatma', 'Jeneratör & Kesintisiz Güç Kaynağı', 'Elektrik Tesisat Malzemeleri'],
-  7: ['Motorin & Mazot Alımı', 'Kurşunsuz Benzin', 'Madeni Yağ & Gres', 'LPG & Otogaz', 'Gazyağı & Özel Yakıtlar'],
-  8: ['CNC & Takım Tezgahları', 'Kompresör & Basınçlı Hava', 'Konveyör & Bant Sistemleri', 'Endüstriyel Motor & Redüktör', 'Paketleme & Dolum Makineleri', 'Hidrolik & Pnömatik Aksam'],
-  9: ['Özel Yazılım Geliştirme', 'ERP & Kurumsal Yazılımlar', 'Bulut Sunucu & Hosting', 'Siber Güvenlik & Firewall', 'Veri Tabanı & Yedekleme', 'Mobil Uygulama Geliştirme'],
-  10: ['Şehirlerarası Karayolu Nakliye', 'Personel & Öğrenci Servis Taşımacılığı', 'Denizyolu & Konteyner', 'Havayolu Kargo', 'Depolama & Lojistik Dağıtım', 'Soğuk Hava Zinciri Taşımacılığı'],
-  11: ['Ofis & Büro Mobilyaları', 'Mutfak Ekipmanları & Endüstriyel Mutfak', 'Beyaz Eşya & Ankastre', 'Otel & Yurt Mobilyaları', 'Depo & Arşiv Raf Sistemleri', 'Züccaciye & Porselen'],
-  12: ['Civata, Somun & Bağlantı Elemanları', 'El Aletleri & Güç Aletleri', 'Sac, Profil & Demir Ürünleri', 'Plastik Hammadde & Boru', 'Kilit, Menteşe & Nalburiye', 'Boya Tabancası & Aşındırıcılar'],
-  13: ['Yangın Algılama & İhbar Panelleri', 'Otomatik Sprinkler Söndürme', 'Yangın Tüpleri & Dolapları', 'Davlumbaz Söndürme Sistemleri', 'Gazlı Söndürme (FM200)', 'Yangın Kapıları & Kaçış Donanımları'],
-  14: ['Endüstriyel Kimyasallar', 'Tarımsal Gübreler & Zirai İlaç', 'Su Şartlandırma Kimyasalları', 'Yüzey Temizleme Kimyasalları', 'Havuz Kimyasalları', 'Laboratuvar Saf Kimyasalları'],
-  15: ['Ofset & Dijital Matbaa Baskısı', 'Orijinal & Muadil Toner/Kartuş', 'Koli, Karton Kutu & Ambalaj', 'Kağıt, Fotokopi & Kırtasiye', 'Etiket, Barkod & Ribon', 'Promosyon Ürünleri & Baskı'],
-  16: ['Park & Bahçe Kent Mobilyaları', 'Prefabrik Şantiye & Ofis Yapıları', 'Alüminyum & PVC Doğrama', 'Otobüs Durağı & Kamelya', 'Çocuk Oyun Parkı Ekipmanları', 'Güvenlik Kulübeleri'],
-  17: ['Statik & Betonarme Projelendirme', 'Mimari Tasarım & 3D Modelleme', 'Zemin Etüdü & Geoteknik', 'Mekanik & Elektrik Proje Çizimi', 'Harita & İmar Danışmanlığı', 'Teknik Müşavirlik & Kontrollük'],
-  18: ['Sondaj & Kuyu Açma Hizmetleri', 'Mermer, Granit & Taş Ocakları', 'Maden Çıkarma & Kırma-Eleme', 'Kömür & Linyit Ocak İşletmeciliği', 'Jeolojik Etüt & Rezerv Tespiti'],
-  19: ['Yolcu & Yük Asansörleri', 'Yürüyen Merdiven & Bantlar', 'Bina Otomasyon Sistemleri (BMS)', 'Otomatik Kapı & Bariyer Sistemleri', 'Asansör Periyodik Bakım & Revizyon'],
-  20: ['Merkezi VRF/VRV Klima Sistemleri', 'Chiller Soğutma Grupları', 'Havalandırma Kanalları & Menfezler', 'Kazan Dairesi & Isıtma Tesisatı', 'Hassas Kontrollü Sistem Klimaları', 'Rooftop Paket Klimalar'],
-  21: ['Savunma Elektroniği & İletişim', 'Deniz Araçları & Bot Bakım-Onarım', 'Havacılık Yedek Parça & Sarf', 'Askeri Üniforma & Taktik Donanım', 'Balistik Koruyucu Yelek & Kask'],
-  22: ['Binek & Ticari Araç Alımı', 'İş Makinesi Alım & Kiralama', 'Otomotiv Orijinal Yedek Parça', 'Kamyon, Çekici & Dorse', 'Lastik, Akü & Filtre Setleri', 'Araç Periyodik Bakım & Onarım'],
-  23: [
-    'Düğün, Nişan, Kına & Nikah Organizasyonu',
-    'Evlilik Teklifi & Doğum Günü Organizasyonları',
-    'Toplu Yeme-İçme & İftar Organizasyonları',
-    'Konser, Festival, Sahne & Müzik Organizasyonları',
-    'Hac ve Umre Organizasyon Paketleri',
-    'Kültür, Doğa & Gezi Turları',
-    'Kurumsal Kongre, Seminer, Fuar & Lansman',
-    'Catering & Açık Büfe İkram Hizmetleri',
-    'Ses, Işık, Truss & Sahne Sistemleri Kiralama'
-  ],
-  24: ['Işıklı & Işıksız Tabela', 'Billboard & Raket Reklam Üniteleri', 'Totem & Yönlendirme Panoları', 'Araç Giydirme & Cephe Kaplama', 'Fuar Standı Tasarım & Kurulumu', 'Dijital LED Ekran Sistemleri'],
-  25: ['Peyzaj Proje & Uygulama', 'Otomatik Bahçe Sulama Sistemleri', 'Ağaçlandırma & Fidan Dikimi', 'Rulo Çim & Çimlendirme', 'Mevsimlik Çiçek & Süs Bitkileri', 'Budama, Çim Biçme & Bakım'],
-  26: ['Büyükbaş & Küçükbaş Besi Yemi', 'Kanatlı Yemi & Premiks', 'Veteriner Aşı & İlaçları', 'Sağım & Ahır Ekipmanları', 'Canlı Hayvan Alım & Satımı', 'Suni Tohumlama Malzemeleri'],
-  27: ['Bronz, Mermer & Fiber Heykel Yapımı', 'Mimari & Şehir Maketleri', 'Müzik Aletleri & Ses Teçhizatı', 'Geleneksel El Sanatları & Rölyef', 'Dekoratif Sanat Panoları'],
-  28: ['Sanayi & Isınma Kömürü', 'Pelet & Briket Yakıtı', 'Odun & Odun Briketi', 'Kok Kömürü & Biyokütle Yakıt'],
-  29: ['Toplu Tabldot Yemek Üretimi', 'Özel Davet & Protokol İkramları', 'Kumanya & Sandviç Paketleri', 'Kantin & Kafeterya İşletmeciliği', 'Hastane & Okul Diyet Menüleri'],
-  30: ['Masaüstü PC & İş İstasyonları', 'Dizüstü Bilgisayar (Laptop)', 'Sunucu (Server) & Storage', 'Ağ Anahtarı (Switch) & Router', 'Lazer Yazıcı & Fotokopi Makineleri', 'Ölçü Aletleri (Multimetre, Osiloskop)'],
-  31: ['IP Güvenlik Kamerası & NVR Sistemleri', 'Araç Takip & Filo Yönetimi GPS', 'SCADA & Uzaktan İzleme Telemetri', 'Telsiz & Trunk Haberleşme', 'Plaka Tanıma (PTS) Sistemleri'],
-  32: [
-    'Bina, Tesis & Ofis Temizliği',
-    'Hastane & Sağlık Kuruluşu Hijyen Temizliği',
-    'Okul, Üniversite & Yurt Temizliği',
-    'Endüstriyel Fabrika & Atölye Temizliği',
-    'Dış Cephe & Cam Temizleme',
-    'Haşere & Kemirgen İlaçlama (Pest Kontrol)',
-    'Dezenfeksiyon & Sterilizasyon Hizmetleri',
-    'Geri Dönüşüm, Hurda & Atık Yönetimi',
-    'Çöp Toplama & Katı Atık Nakliyesi'
-  ],
-  33: ['Kurumsal İş Kıyafetleri & Tulum', 'Güvenlik Görevlisi Üniformaları', 'Spor Kıyafetleri & Formalar', 'İş Ayakkabısı, Çizme & Çelik Burun', 'Termal İçlik & Yağmurluk', 'Spor Malzemeleri & Saha Donanımları'],
-  34: ['Baret, Emniyet Kemeri & Yaşam Hattı', 'Koruyucu Gözlük & Kulaklık', 'Solunum Maskeleri (FFP2/FFP3/Gaz)', 'Yanmaz & Antistatik İş Elbiseleri', 'İlk Yardım & Acil Müdahale Dolapları', 'İSG Uyarı & İkaz Levhaları'],
-  35: ['Silahlı & Silahsız Özel Güvenlik', 'Tesis & Şantiye Bekçilik Hizmeti', 'VIP Yakın Koruma & Refakat', 'Etkinlik & Konser Güvenliği', 'X-Ray & Kapı Dedektörü Operatörlüğü'],
-  36: ['Yeminli Tercüme & Çeviri Hizmetleri', 'Kurumsal Personel Eğitimleri', 'Piyasa Araştırması & Anket Hizmeti', 'Mesleki Yeterlilik & Sertifikasyon', 'Akademik & Stratejik Raporlama'],
-  37: ['Sosyal Tesis & Misafirhane İşletmeciliği', 'Danışma, Karşılama & Resepsiyon Hizmeti', 'Bina & Site Yönetim Hizmetleri', 'Bordrolama & Destek Personeli Temini', 'Posta, Evrak Dağıtım & Kurye'],
-  38: ['Filo Kasko & Trafik Sigortası', 'Yangın & Deprem (DASK) Sigortası', 'Grup Sağlık & Ferdi Kaza Sigortası', 'Mali Müşavirlik & Bağımsız Denetim', 'Hukuki Danışmanlık & Tahkim'],
-  39: ['Hacizli & Kurum İkinci El Araç Satışı', 'Hurda Demir, Bakır & Alüminyum', 'Hurda Kağıt, Karton & Plastik', 'Kullanım Dışı Elektronik Hurda (E-Atık)', 'Ekonomik Ömrünü Tamamlamış Taşıt Satışı'],
-  40: ['Kamu & Özel Mülk Arsa Satışları', 'Ticari İşyeri & Dükkan İhaleleri', 'Kantin & Çay Ocağı Kiralama', 'Hizmet Binası & Depo Kiralama', 'Otopark İşletmesi Kiralama İhaleleri']
-}
 
 // ==================== 2. TÜRKİYE 81 İL LİSTESİ ====================
 const all81Cities = [
@@ -1300,15 +1198,8 @@ const filteredCategoryTree = computed(() => {
     })
   }
 
-  // 🚀 Çok kullanılandan az kullanılana göre sırala:
-  // 1. İhale sayısı en fazla olanlar en üstte (b.count - a.count)
-  // 2. İhale sayısı eşitse (örneğin hepsi 0 ise) B2B sektör popülerliği / kullanım sırasına göre (orderRank)
-  return [...list].sort((a, b) => {
-    if (b.count !== a.count) {
-      return b.count - a.count
-    }
-    return (a.orderRank || a.id) - (b.orderRank || b.id)
-  })
+  // 🚀 Kurucu Direktifi: 1. Diğer, 2. Emlak & Gayrimenkul, 3. İnşaat, 4. Tarım & Gıda... (orderRank'e göre sabit ve net hiyerarşi)
+  return [...list].sort((a, b) => (a.orderRank || 999) - (b.orderRank || 999))
 })
 
 function toggleCategoryExpand(cat: any) {
@@ -1587,19 +1478,77 @@ function openCompanyProfileModal(companyName?: string, city?: string) {
   showCompanyProfileModal.value = true
 }
 
-function openTenderDetailModal(tender: any) {
+function formatExternalUrl(rawUrl?: string): string {
+  if (!rawUrl) return '#'
+  const sanitized = sanitizeExternalUrl(rawUrl)
+  return sanitized || '#'
+}
+
+function getTenderWebsiteUrl(tender: any): string {
+  if (!tender) return ''
+  const raw = tender.websiteUrl || tender.webSayfasi || tender.website || tender.webUrl || tender.customFields?.webSayfasi || tender.customFields?.websiteUrl || tender.customFields?.webUrl || ''
+  return sanitizeExternalUrl(raw)
+}
+
+function isReklamIlani(tender: any): boolean {
+  if (!tender) return false
+  const fType = (tender.formType || tender.customFields?.formType || '').toString().toUpperCase()
+  const ihaleYonu = (tender.ihaleYonu || '').toString().toLowerCase()
+  const tur = (tender.tur || '').toString().toLowerCase()
+  const kat = (tender.kategori || '').toString().toLowerCase()
+  return (
+    fType === 'REKLAM_ILANI' ||
+    fType === 'REKLAM' ||
+    ihaleYonu === 'reklam' ||
+    ihaleYonu === 'ihalesiz_ilan' ||
+    tur.includes('reklam') ||
+    tur.includes('tanıtım') ||
+    tur.includes('tanitim') ||
+    kat.includes('reklam')
+  )
+}
+
+function getDigerCustomBadge(tender: any): string | null {
+  if (!tender) return null
+  const cf = tender.customFields || {}
+  const raw = cf.altKategoriDiger || cf.anaKategoriDiger || cf.digerMetni || tender.subCategory || (tender.kategori && tender.kategori.includes('/') ? tender.kategori.split('/')[1]?.trim() : null)
+  if (raw && typeof raw === 'string') {
+    const trimmed = raw.trim()
+    if (trimmed && trimmed.toUpperCase() !== 'DİĞER' && trimmed.toUpperCase() !== 'DIGER' && trimmed.toUpperCase() !== 'GENEL' && trimmed.toUpperCase() !== 'TÜMÜ') {
+      return trimmed
+    }
+  }
+  return null
+}
+
+function getTenderImagesList(tender: any): string[] {
+  if (!tender) return []
+  if (Array.isArray(tender.images) && tender.images.length > 0) {
+    const list = tender.images.map((img: any) => typeof img === 'string' ? img : (img?.url || '')).filter(Boolean)
+    if (list.length > 0) return list
+  }
+  if (Array.isArray(tender.customFields?.resimler) && tender.customFields.resimler.length > 0) {
+    const list = tender.customFields.resimler.map((img: any) => typeof img === 'string' ? img : (img?.url || '')).filter(Boolean)
+    if (list.length > 0) return list
+  }
+  if (tender.image) return [tender.image]
+  return []
+}
+
+function openTenderDetailModal(tender: any, initialImageIndex = 0, forceTab?: 'gallery' | 'pdf' | 'details') {
   selectedTenderModal.value = tender
   activeDocIndex.value = 0
-  activeImageIndex.value = 0
+  activeImageIndex.value = initialImageIndex || 0
   pdfZoomLevel.value = 100
   
-  // Auto-select gallery if user has images but no PDF, or PDF if files exist
-  if (tender.files && tender.files.length > 0) {
-    activeSpecTab.value = 'pdf'
+  if (forceTab) {
+    activeSpecTab.value = forceTab
   } else if (tender.images && tender.images.length > 0) {
     activeSpecTab.value = 'gallery'
-  } else {
+  } else if (tender.files && tender.files.length > 0) {
     activeSpecTab.value = 'pdf'
+  } else {
+    activeSpecTab.value = 'details'
   }
 }
 
@@ -2758,7 +2707,16 @@ onMounted(() => {
 
                 <!-- Durum Rozeti -->
                 <div class="absolute top-2 left-2 flex flex-col gap-1">
+                  <!-- 📢 Reklam İlanı Rozeti (Kurucu Talebi) -->
                   <span 
+                    v-if="isReklamIlani(tender)"
+                    class="px-2.5 py-1 rounded text-[10px] font-black uppercase text-white shadow-md backdrop-blur-xs bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 border border-white/30 flex items-center gap-1 tracking-wide"
+                  >
+                    <span>📢 REKLAM İLANI</span>
+                  </span>
+                  <!-- Diğer Durum Rozetleri -->
+                  <span 
+                    v-else
                     class="px-2 py-0.5 rounded text-[9px] font-black uppercase text-white shadow-xs backdrop-blur-xs"
                     :class="tender.durum === 'closed' ? 'bg-amber-600' : ((tender.tur && (tender.tur.includes('Arsa') || tender.tur.includes('Konut'))) ? 'bg-indigo-600' : ((tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan' || (tender.tur && tender.tur.includes('Tanıtım'))) ? 'bg-teal-600' : 'bg-emerald-600'))"
                   >
@@ -2771,25 +2729,70 @@ onMounted(() => {
                   {{ tender.id }}
                 </span>
 
-                <!-- Alt Lokasyon & Kalan Süre -->
+                <!-- Alt Lokasyon & Fotoğraf Sayacı & Kalan Süre -->
                 <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white text-[11px] font-bold">
                   <span class="flex items-center gap-1 truncate max-w-[120px]">
                     <MapPin :size="12" class="text-sky-400 shrink-0" />
                     <span class="truncate">{{ tender.city || 'Balıkesir' }}</span>
                   </span>
-                  <span class="flex items-center gap-1 bg-black/50 px-1.5 py-0.5 rounded backdrop-blur-xs text-[10px] shrink-0">
-                    <Clock :size="11" class="text-amber-400" />
-                    <span>{{ tender.sure || '7 gün' }}</span>
-                  </span>
+                  <div class="flex items-center gap-1.5 shrink-0">
+                    <span 
+                      v-if="getTenderImagesList(tender).length > 1"
+                      @click.stop="openTenderDetailModal(tender, 0, 'gallery')"
+                      class="flex items-center gap-1 bg-black/80 hover:bg-black px-2 py-0.5 rounded-full backdrop-blur-xs text-[10px] text-amber-300 border border-white/25 cursor-pointer shadow-xs transition-transform hover:scale-105"
+                      title="Fotoğraf Galerisini Aç"
+                    >
+                      <Camera :size="11" />
+                      <span>1/{{ getTenderImagesList(tender).length }} Fotoğraf</span>
+                    </span>
+                    <span class="flex items-center gap-1 bg-black/50 px-1.5 py-0.5 rounded backdrop-blur-xs text-[10px]">
+                      <Clock :size="11" class="text-amber-400" />
+                      <span>{{ tender.sure || '7 gün' }}</span>
+                    </span>
+                  </div>
                 </div>
+              </div>
+
+              <!-- 📷 Mikro Fotoğraf Şeridi (Birden Fazla Görsel Varsa) -->
+              <div 
+                v-if="getTenderImagesList(tender).length > 1" 
+                class="px-3 py-1.5 flex items-center gap-1.5 overflow-x-auto bg-slate-50 border-b border-slate-200"
+              >
+                <span class="text-[9px] font-bold text-slate-400 shrink-0 flex items-center gap-0.5">
+                  <Camera :size="10" />
+                  <span>Fotoğraflar:</span>
+                </span>
+                <div 
+                  v-for="(imgUrl, imgIdx) in getTenderImagesList(tender).slice(0, 4)" 
+                  :key="imgIdx"
+                  @click.stop="openTenderDetailModal(tender, imgIdx, 'gallery')"
+                  class="w-6 h-6 rounded overflow-hidden border border-slate-300 hover:border-[#0084B4] cursor-pointer transition shrink-0 bg-slate-200"
+                  :title="`${imgIdx + 1}. Fotoğrafı Aç`"
+                >
+                  <img :src="imgUrl" class="w-full h-full object-cover" />
+                </div>
+                <button 
+                  v-if="getTenderImagesList(tender).length > 4" 
+                  type="button"
+                  @click.stop="openTenderDetailModal(tender, 0, 'gallery')"
+                  class="text-[9px] font-bold text-blue-600 hover:underline px-1 shrink-0"
+                >
+                  +{{ getTenderImagesList(tender).length - 4 }}
+                </button>
               </div>
 
               <!-- 📝 Kart Gövdesi -->
               <div class="p-3.5 flex-1 flex flex-col justify-between space-y-3">
                 <div class="space-y-1.5">
                   
-                  <!-- Kategori ve İhale Yönü Rozeti -->
+                  <!-- Kategori, İhale Yönü ve Diğer Özel Metin Rozeti -->
                   <div class="flex items-center gap-1.5 flex-wrap">
+                    <span 
+                      v-if="isReklamIlani(tender)"
+                      class="text-[9px] font-black px-1.5 py-0.5 rounded bg-orange-100 text-orange-800 border border-orange-300 flex items-center gap-1 shadow-2xs"
+                    >
+                      <span>📢 Reklam İlanı</span>
+                    </span>
                     <span class="text-[10px] font-bold text-slate-500 truncate max-w-[140px]">
                       {{ tender.kategori }}
                     </span>
@@ -2798,6 +2801,15 @@ onMounted(() => {
                       :class="getTenderDirectionBadge(tender).class"
                     >
                       {{ getTenderDirectionBadge(tender).label }}
+                    </span>
+                    <!-- ılan verenler dıger yazdıgında ana sayfadakı ılanların yazıldıgı kucuk yazılar dıger kısmında cıksın -->
+                    <span 
+                      v-if="getDigerCustomBadge(tender)"
+                      class="text-[9px] font-black px-1.5 py-0.5 rounded bg-purple-100 text-purple-800 border border-purple-300 truncate flex items-center gap-1 shadow-2xs"
+                      :title="'Özel Kategori / Belirtilen: ' + getDigerCustomBadge(tender)"
+                    >
+                      <span>✨</span>
+                      <span>Diğer: {{ getDigerCustomBadge(tender) }}</span>
                     </span>
                   </div>
 
@@ -2841,9 +2853,9 @@ onMounted(() => {
                     </span>
                   </div>
 
-                  <!-- ⚡ Canlı Lider Teklif Şeridi -->
+                  <!-- ⚡ Canlı Lider Teklif Şeridi (İhale İse) -->
                   <div 
-                    v-if="getTenderBidsList(tender).length > 0"
+                    v-if="!isReklamIlani(tender) && getTenderBidsList(tender).length > 0"
                     @click="openLiveBidsDrawer(tender)"
                     class="p-2 bg-emerald-50/80 rounded-xl border border-emerald-200 flex items-center justify-between text-[10px] cursor-pointer hover:bg-emerald-100 transition"
                   >
@@ -2861,61 +2873,119 @@ onMounted(() => {
                 <!-- 🔘 Butonlar Grubu -->
                 <div class="pt-2 border-t border-slate-100 space-y-1.5">
                   
-                  <div class="grid grid-cols-2 gap-1.5">
-                    <!-- 1. Şartname İncele -->
-                    <button 
-                      type="button" 
-                      @click.stop="openTenderDetailModal(tender)"
-                      class="py-2 px-2 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-[11px] transition cursor-pointer text-center flex items-center justify-center gap-1"
+                  <!-- A. REKLAM İLANI İSE ÖZEL BUTON DÜZENİ -->
+                  <div v-if="isReklamIlani(tender)" class="space-y-1.5">
+                    <!-- Web Sayfası Butonu (Büyük & Vurgulu) -->
+                    <a
+                      v-if="getTenderWebsiteUrl(tender)"
+                      :href="getTenderWebsiteUrl(tender)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      @click.stop
+                      class="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-orange-600 via-amber-600 to-teal-600 hover:from-orange-500 hover:to-teal-500 text-white font-black text-xs transition cursor-pointer flex items-center justify-center gap-1.5 shadow-sm shadow-orange-600/20"
+                      title="Resmi Web Sayfasına Git (Yeni Sekmede Açılır)"
                     >
-                      <FileText :size="12" />
-                      <span>Şartname</span>
-                    </button>
+                      <ExternalLink :size="13" />
+                      <span>🌐 Web Sayfasına Git ↗</span>
+                    </a>
 
-                    <!-- 2. Teklif Ver -->
-                    <NuxtLink 
-                      v-if="isMyOwnTender(tender)"
-                      to="/panel/gelen-teklifler"
-                      class="py-2 px-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[11px] transition cursor-pointer text-center flex items-center justify-center gap-1"
-                      title="Kendi İlanınız"
-                    >
-                      <Building2 :size="12" class="text-amber-700" />
-                      <span>İlanınız</span>
-                    </NuxtLink>
-                    <button 
-                      v-else
-                      type="button" 
-                      @click.stop="openQuickBidModal(tender)"
-                      class="py-2 px-2 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-[11px] transition cursor-pointer shadow-xs flex items-center justify-center gap-1"
-                    >
-                      <Send :size="12" />
-                      <span>Teklif Ver</span>
-                    </button>
+                    <div class="grid grid-cols-2 gap-1.5">
+                      <!-- İlan Detayını İncele -->
+                      <button 
+                        type="button" 
+                        @click.stop="openTenderDetailModal(tender)"
+                        class="py-2 px-2 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-[11px] transition cursor-pointer text-center flex items-center justify-center gap-1"
+                      >
+                        <FileText :size="12" />
+                        <span>İlan Detayı</span>
+                      </button>
+
+                      <!-- Kendi İlanınız / Ara -->
+                      <NuxtLink 
+                        v-if="isMyOwnTender(tender)"
+                        to="/panel/ilanlarim"
+                        class="py-2 px-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[11px] transition cursor-pointer text-center flex items-center justify-center gap-1"
+                      >
+                        <Building2 :size="12" class="text-amber-700" />
+                        <span>İlanınız</span>
+                      </NuxtLink>
+                      <a 
+                        v-else-if="tender.ownerPhone"
+                        :href="'tel:' + tender.ownerPhone"
+                        @click.stop
+                        class="py-2 px-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-[11px] transition cursor-pointer text-center flex items-center justify-center gap-1"
+                      >
+                        <span>📞 İletişim</span>
+                      </a>
+                      <button 
+                        v-else
+                        type="button"
+                        @click.stop="openTenderDetailModal(tender)"
+                        class="py-2 px-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[11px] transition cursor-pointer text-center flex items-center justify-center gap-1"
+                      >
+                        <span>Görüntüle</span>
+                      </button>
+                    </div>
                   </div>
 
-                  <!-- Web Sitesi Butonu (Varsa) -->
-                  <a
-                    v-if="tender.websiteUrl"
-                    :href="tender.websiteUrl"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    @click.stop
-                    class="w-full py-1.5 px-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-300 font-bold text-[10px] transition cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
-                    title="Proje / Firma Resmi Web Sitesine Git"
-                  >
-                    <ExternalLink :size="11" class="text-teal-700" />
-                    <span>🌐 Proje / Web Sitesine Git ↗</span>
-                  </a>
+                  <!-- B. STANDART İHALE İSE -->
+                  <div v-else class="space-y-1.5">
+                    <div class="grid grid-cols-2 gap-1.5">
+                      <!-- 1. Şartname İncele -->
+                      <button 
+                        type="button" 
+                        @click.stop="openTenderDetailModal(tender)"
+                        class="py-2 px-2 rounded-xl border border-slate-300 hover:bg-slate-50 text-slate-700 font-bold text-[11px] transition cursor-pointer text-center flex items-center justify-center gap-1"
+                      >
+                        <FileText :size="12" />
+                        <span>Şartname</span>
+                      </button>
 
-                  <!-- 3. Canlı Teklifler (Drawer Açıcı) -->
-                  <button
-                    type="button"
-                    @click.stop="openLiveBidsDrawer(tender)"
-                    class="w-full py-1.5 px-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-black text-[10px] transition cursor-pointer flex items-center justify-center gap-1"
-                  >
-                    <Sparkles :size="11" class="text-emerald-600" />
-                    <span>⚡ Canlı Teklifler ({{ getTenderBidsList(tender).length }})</span>
-                  </button>
+                      <!-- 2. Teklif Ver -->
+                      <NuxtLink 
+                        v-if="isMyOwnTender(tender)"
+                        to="/panel/gelen-teklifler"
+                        class="py-2 px-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-[11px] transition cursor-pointer text-center flex items-center justify-center gap-1"
+                        title="Kendi İlanınız"
+                      >
+                        <Building2 :size="12" class="text-amber-700" />
+                        <span>İlanınız</span>
+                      </NuxtLink>
+                      <button 
+                        v-else
+                        type="button" 
+                        @click.stop="openQuickBidModal(tender)"
+                        class="py-2 px-2 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-[11px] transition cursor-pointer shadow-xs flex items-center justify-center gap-1"
+                      >
+                        <Send :size="12" />
+                        <span>Teklif Ver</span>
+                      </button>
+                    </div>
+
+                    <!-- Web Sitesi Butonu (Varsa) -->
+                    <a
+                      v-if="getTenderWebsiteUrl(tender)"
+                      :href="getTenderWebsiteUrl(tender)"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      @click.stop
+                      class="w-full py-1.5 px-2 rounded-xl bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-300 font-bold text-[10px] transition cursor-pointer flex items-center justify-center gap-1 shadow-2xs"
+                      title="Proje / Firma Resmi Web Sitesine Git"
+                    >
+                      <ExternalLink :size="11" class="text-teal-700" />
+                      <span>🌐 Proje / Web Sitesine Git ↗</span>
+                    </a>
+
+                    <!-- 3. Canlı Teklifler (Drawer Açıcı) -->
+                    <button
+                      type="button"
+                      @click.stop="openLiveBidsDrawer(tender)"
+                      class="w-full py-1.5 px-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 font-black text-[10px] transition cursor-pointer flex items-center justify-center gap-1"
+                    >
+                      <Sparkles :size="11" class="text-emerald-600" />
+                      <span>⚡ Canlı Teklifler ({{ getTenderBidsList(tender).length }})</span>
+                    </button>
+                  </div>
 
                 </div>
 
@@ -4036,6 +4106,50 @@ onMounted(() => {
               </div>
             </div>
 
+            <!-- 🗺️ İLAN HARİTA KONUMU & TKGM / GOOGLE MAPS -->
+            <div v-if="selectedTenderModal.customFields?.formType === 'ARSA' || selectedTenderModal.customFields?.formType === 'EV' || selectedTenderModal.customFields?.haritaKonumBilgisi || selectedTenderModal.customFields?.ada" class="rounded-xl border border-slate-800 bg-slate-950/70 p-3 space-y-2.5">
+              <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                  <span class="text-xs font-black text-emerald-400 flex items-center gap-1.5">
+                    <span>📍 İlan Konumu ve Harita</span>
+                  </span>
+                  <span v-if="selectedTenderModal.customFields?.ada || selectedTenderModal.customFields?.parsel" class="text-[10px] font-bold text-pink-400 bg-pink-950/60 px-2 py-0.5 rounded border border-pink-500/30">
+                    Ada: {{ selectedTenderModal.customFields.ada }} / Parsel: {{ selectedTenderModal.customFields.parsel }}
+                  </span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <a 
+                    v-if="selectedTenderModal.customFields?.ada" 
+                    href="https://parselsorgu.tkgm.gov.tr/" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 transition flex items-center gap-1"
+                  >
+                    <span>📐 TKGM Parsel Sorgu</span>
+                  </a>
+                  <a 
+                    :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([selectedTenderModal.customFields?.mahalle, selectedTenderModal.customFields?.ilce, selectedTenderModal.city || 'Balıkesir', 'Türkiye'].filter(Boolean).join(', '))}`" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-800 text-sky-300 border border-slate-700 hover:bg-slate-700 transition flex items-center gap-1"
+                  >
+                    <span>↗️ Google Haritalar</span>
+                  </a>
+                </div>
+              </div>
+
+              <!-- İframe Harita -->
+              <div class="relative w-full h-48 rounded-lg overflow-hidden border border-slate-800 bg-slate-900">
+                <iframe 
+                  class="w-full h-full border-0"
+                  :src="`https://maps.google.com/maps?q=${encodeURIComponent([selectedTenderModal.customFields?.mahalle, selectedTenderModal.customFields?.ilce, selectedTenderModal.city || 'Balıkesir', 'Türkiye'].filter(Boolean).join(', '))}&t=m&z=15&ie=UTF8&iwloc=&output=embed`"
+                  loading="lazy"
+                  referrerpolicy="no-referrer-when-downgrade"
+                  title="İlan Harita Konumu"
+                ></iframe>
+              </div>
+            </div>
+
             <!-- Video Varsa Video Butonu -->
             <div v-if="selectedTenderModal.customFields?.videoUrl" class="p-3 bg-slate-950/80 rounded-xl border border-sky-500/30 flex items-center justify-between">
               <span class="text-xs font-bold text-sky-300 flex items-center gap-1.5">
@@ -4062,8 +4176,8 @@ onMounted(() => {
                 <span class="text-xs text-slate-400 font-medium">Doğrudan İletişim & Detaylar</span>
               </div>
               <a 
-                v-if="selectedTenderModal.websiteUrl" 
-                :href="selectedTenderModal.websiteUrl" 
+                v-if="getTenderWebsiteUrl(selectedTenderModal)" 
+                :href="getTenderWebsiteUrl(selectedTenderModal)" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 class="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-md shadow-teal-600/20"
@@ -4165,9 +4279,9 @@ onMounted(() => {
                 </a>
                 <span v-else class="font-mono text-slate-300">destek@ihaleciburada.com</span>
               </div>
-              <div v-if="selectedTenderModal.websiteUrl" class="sm:col-span-2 lg:col-span-1">
+              <div v-if="getTenderWebsiteUrl(selectedTenderModal)" class="sm:col-span-2 lg:col-span-1">
                 <span class="text-slate-400 text-[10px] uppercase font-bold block">Web Sitesi / Proje:</span>
-                <a :href="selectedTenderModal.websiteUrl" target="_blank" rel="noopener noreferrer" class="font-bold text-emerald-400 hover:underline flex items-center gap-1 mt-0.5">
+                <a :href="getTenderWebsiteUrl(selectedTenderModal)" target="_blank" rel="noopener noreferrer" class="font-bold text-emerald-400 hover:underline flex items-center gap-1 mt-0.5">
                   <ExternalLink :size="12" />
                   <span>Resmi Web Sayfası ↗</span>
                 </a>
@@ -4189,14 +4303,14 @@ onMounted(() => {
           
           <div class="flex items-center gap-2">
             <a 
-              v-if="selectedTenderModal.websiteUrl" 
-              :href="selectedTenderModal.websiteUrl" 
+              v-if="getTenderWebsiteUrl(selectedTenderModal)" 
+              :href="getTenderWebsiteUrl(selectedTenderModal)" 
               target="_blank" 
               rel="noopener noreferrer" 
-              class="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-black text-xs transition cursor-pointer shadow-md flex items-center gap-1.5"
+              class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-orange-600 via-amber-600 to-teal-600 hover:from-orange-500 hover:to-teal-500 text-white font-black text-xs transition cursor-pointer shadow-md flex items-center gap-1.5"
             >
               <ExternalLink :size="13" />
-              <span>🌐 Proje Web Sayfası ↗</span>
+              <span>🌐 Web Sayfasına Git ↗</span>
             </a>
 
             <NuxtLink 
@@ -4207,8 +4321,15 @@ onMounted(() => {
               <Building2 :size="13" class="text-amber-700" />
               <span>👤 Sizin İlanınız</span>
             </NuxtLink>
+            <a 
+              v-else-if="isReklamIlani(selectedTenderModal) && selectedTenderModal.ownerPhone"
+              :href="'tel:' + selectedTenderModal.ownerPhone"
+              class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition cursor-pointer shadow-md flex items-center gap-2"
+            >
+              <span>📞 İlan Sahibini Ara</span>
+            </a>
             <button 
-              v-else
+              v-else-if="!isReklamIlani(selectedTenderModal)"
               type="button" 
               @click="openQuickBidModal(selectedTenderModal); selectedTenderModal = null"
               class="px-6 py-2.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition cursor-pointer shadow-md shadow-blue-600/20 flex items-center gap-2"

@@ -7,6 +7,7 @@ import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
 import AiMatchingModal from '~/components/ai/AiMatchingModal.vue'
 import { formatSectorSummaryBadges } from '~/utils/categoryFieldsSchema'
 import { useAgencyManagement } from '~/composables/useAgencyManagement'
+import { sanitizeExternalUrl } from '~/utils/taxonomy'
 
 definePageMeta({
   layout: "dashboard"
@@ -853,7 +854,7 @@ const statusTabs = computed(() => {
               <!-- Proje / Firma Web Sitesi Bağlantısı -->
               <a 
                 v-if="tender.websiteUrl" 
-                :href="tender.websiteUrl" 
+                :href="sanitizeExternalUrl(tender.websiteUrl)" 
                 target="_blank" 
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-300 font-bold transition text-[10px]"

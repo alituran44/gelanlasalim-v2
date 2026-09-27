@@ -36,7 +36,7 @@ import {
   Lock
 } from 'lucide-vue-next'
 import { useCmsData, DEFAULT_CMS_DATA } from '~/composables/useCmsData'
-import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_TYPES, TENDER_METHODS, matchTenderToCategory } from '~/utils/taxonomy'
+import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_TYPES, TENDER_METHODS, matchTenderToCategory, sanitizeExternalUrl } from '~/utils/taxonomy'
 import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
 import { formatSectorSummaryBadges, resolveSectorKey, SECTOR_DEFINITIONS } from '~/utils/categoryFieldsSchema'
 import { isTenderConcluded, containsContactInfo, maskContactInfo } from '~/utils/contactFilter'
@@ -496,6 +496,12 @@ const filteredTenders = computed(() => {
 function openModalWithTab(tender: any, tab: 'ilan' | 'malzeme' | 'idari' | 'sozlesme' | 'firmalar' | 'sonuc' | 'gecmis' | 'sorular') {
   selectedTenderForDetail.value = tender
   detailActiveTab.value = tab
+}
+
+function formatExternalUrl(rawUrl?: string): string {
+  if (!rawUrl) return '#'
+  const sanitized = sanitizeExternalUrl(rawUrl)
+  return sanitized || '#'
 }
 
 function resetFilters() {
@@ -1290,7 +1296,7 @@ function downloadAllSpecs(tender: any) {
             <div class="flex items-center gap-2">
               <a
                 v-if="tender.websiteUrl"
-                :href="tender.websiteUrl"
+                :href="formatExternalUrl(tender.websiteUrl)"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="px-3 py-1.5 rounded bg-teal-50 hover:bg-teal-100 text-teal-900 border border-teal-300 font-bold text-xs transition flex items-center gap-1.5 cursor-pointer shadow-2xs"
@@ -1452,7 +1458,7 @@ function downloadAllSpecs(tender: any) {
 
           <a 
             v-if="selectedTenderForDetail.websiteUrl" 
-            :href="selectedTenderForDetail.websiteUrl" 
+            :href="formatExternalUrl(selectedTenderForDetail.websiteUrl)" 
             target="_blank" 
             rel="noopener noreferrer" 
             class="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs transition flex items-center gap-1.5 shadow-xs shrink-0 cursor-pointer"
@@ -1551,7 +1557,7 @@ function downloadAllSpecs(tender: any) {
               </div>
               <a
                 v-if="selectedTenderForDetail.websiteUrl"
-                :href="selectedTenderForDetail.websiteUrl"
+                :href="formatExternalUrl(selectedTenderForDetail.websiteUrl)"
                 target="_blank"
                 rel="noopener noreferrer"
                 class="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs transition flex items-center gap-1.5 shadow-md shrink-0"
@@ -1973,7 +1979,7 @@ function downloadAllSpecs(tender: any) {
           <div class="flex items-center gap-2">
             <a 
               v-if="selectedTenderForDetail.websiteUrl" 
-              :href="selectedTenderForDetail.websiteUrl" 
+              :href="formatExternalUrl(selectedTenderForDetail.websiteUrl)" 
               target="_blank" 
               rel="noopener noreferrer" 
               class="px-4 py-2.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white font-black text-xs transition cursor-pointer shadow-md flex items-center gap-1.5"
