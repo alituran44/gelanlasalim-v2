@@ -1090,16 +1090,23 @@ function reloadLocalTenders() {
         const clean = parsed.filter(
           (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && !t.id?.startsWith('IHC-2026-')
         )
-        // Dead blob URL'leri temizle (tarayıcı kapanıp açıldığında geçersiz kalan referanslar)
+        // Dead blob URL'leri ve bozuk referansları onar
         clean.forEach((t: any) => {
           if (Array.isArray(t.images)) {
-            t.images = t.images.filter((img: any) => {
+            const valids = t.images.filter((img: any) => {
               const u = typeof img === 'string' ? img : (img?.url || '')
-              return typeof u === 'string' && !u.startsWith('blob:')
+              return isValidImageUrl(u)
             })
+            if (valids.length > 0) {
+              t.images = valids
+            } else {
+              t.images = getCategoryGalleryFallback(t)
+            }
+          } else {
+            t.images = getCategoryGalleryFallback(t)
           }
-          if (typeof t.image === 'string' && t.image.startsWith('blob:')) {
-            delete t.image
+          if (!isValidImageUrl(t.image)) {
+            t.image = t.images[0] || getTenderImage(t)
           }
         })
         localTendersList.value = clean
@@ -1547,24 +1554,97 @@ function getDigerCustomBadge(tender: any): string | null {
   return null
 }
 
+function isValidImageUrl(u: any): boolean {
+  if (typeof u !== 'string') return false
+  const s = u.trim()
+  if (s.length < 10) return false
+  if (s.toLowerCase().startsWith('blob:')) return false
+  if (s === '[object Object]' || s === 'undefined' || s === 'null') return false
+  if (s.startsWith('http://') || s.startsWith('https://')) return true
+  if (s.startsWith('data:image/') && s.includes(';base64,') && s.length > 50) return true
+  return false
+}
+
+function getCategoryGalleryFallback(tender: any): string[] {
+  const text = ((tender?.baslik || '') + ' ' + (tender?.kategori || '') + ' ' + (tender?.mainCategory || '') + ' ' + (tender?.subCategory || '')).toLowerCase()
+
+  if (text.includes('peyzaj') || text.includes('sulama') || text.includes('bahçe') || text.includes('çim') || text.includes('fidan') || text.includes('botanik')) {
+    return [
+      'https://images.unsplash.com/photo-1558904541-efa8c4a08931?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1592417817098-8f3d69104a47?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80'
+    ]
+  }
+  if (text.includes('arsa') || text.includes('tarla') || text.includes('arazi') || text.includes('zeytinlik') || text.includes('bağ') || text.includes('parsel')) {
+    return [
+      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1500076656116-558758c991c1?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&auto=format&fit=crop&q=80'
+    ]
+  }
+  if (text.includes('konut') || text.includes('daire') || text.includes('villa') || text.includes('gayrimenkul') || text.includes('ev') || text.includes('bina') || text.includes('dükkan') || text.includes('ofis')) {
+    return [
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&auto=format&fit=crop&q=80'
+    ]
+  }
+  if (text.includes('inşaat') || text.includes('yapı') || text.includes('şantiye') || text.includes('çimento') || text.includes('demir') || text.includes('ruhsat') || text.includes('proje')) {
+    return [
+      'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1590496793929-36417d3117de?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&auto=format&fit=crop&q=80'
+    ]
+  }
+
+  return [
+    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80'
+  ]
+}
+
 function getTenderImagesList(tender: any): string[] {
   if (!tender) return []
-  const isValidUrl = (u: any) => typeof u === 'string' && u.trim().length > 0 && !u.startsWith('blob:')
 
-  if (Array.isArray(tender.images) && tender.images.length > 0) {
-    const list = tender.images
-      .map((img: any) => typeof img === 'string' ? img : (img?.url || ''))
-      .filter(isValidUrl)
-    if (list.length > 0) return list
+  const extractValid = (arr: any[]): string[] => {
+    if (!Array.isArray(arr)) return []
+    const out: string[] = []
+    for (const item of arr) {
+      const url = typeof item === 'string' ? item : (item?.url || '')
+      if (isValidImageUrl(url)) {
+        out.push(url)
+      }
+    }
+    return out
   }
-  if (Array.isArray(tender.customFields?.resimler) && tender.customFields.resimler.length > 0) {
-    const list = tender.customFields.resimler
-      .map((img: any) => typeof img === 'string' ? img : (img?.url || ''))
-      .filter(isValidUrl)
-    if (list.length > 0) return list
+
+  const fromImages = extractValid(tender.images)
+  if (fromImages.length > 0) return fromImages
+
+  const fromCustom = extractValid(tender.customFields?.resimler || tender.resimler)
+  if (fromCustom.length > 0) return fromCustom
+
+  if (isValidImageUrl(tender.image)) {
+    return [tender.image]
   }
-  if (tender.image && isValidUrl(tender.image)) return [tender.image]
-  return []
+
+  return getCategoryGalleryFallback(tender)
+}
+
+function handleThumbnailError(event: Event, tender: any, index: number) {
+  const imgEl = event.target as HTMLImageElement
+  if (!imgEl) return
+  const gallery = getCategoryGalleryFallback(tender)
+  const fallback = gallery[index % gallery.length] || getTenderImage(tender)
+  if (imgEl.src !== fallback) {
+    imgEl.src = fallback
+  }
 }
 
 function getSelectedModalImage(): string {
@@ -2855,7 +2935,13 @@ onMounted(() => {
                   class="w-6 h-6 rounded overflow-hidden border border-slate-300 hover:border-[#0084B4] cursor-pointer transition shrink-0 bg-slate-200"
                   :title="`${imgIdx + 1}. Fotoğrafı Aç`"
                 >
-                  <img :src="imgUrl" class="w-full h-full object-cover" @error="($event.target as HTMLElement).parentElement?.remove()" />
+                  <img 
+                    :src="imgUrl" 
+                    :alt="`${imgIdx + 1}. Fotoğraf`"
+                    class="w-full h-full object-cover" 
+                    loading="lazy"
+                    @error="handleThumbnailError($event, tender, imgIdx)" 
+                  />
                 </div>
                 <button 
                   v-if="getTenderImagesList(tender).length > 4" 
