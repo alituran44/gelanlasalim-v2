@@ -871,9 +871,154 @@ function getTenderDirectionBadge(tender: any) {
       class: 'bg-slate-100 text-slate-900 border-slate-300 font-bold' 
     }
   }
+
+  const formType = (tender.formType || tender.customFields?.formType || '').toString().toUpperCase()
   const tur = (tender.tur || tender.rekabetTuru || '').toLowerCase()
   const yonu = (tender.ihaleYonu || '').toLowerCase()
-  
+  const kat = ((tender.kategori || '') + ' ' + (tender.mainCategory || '') + ' ' + (tender.subCategory || '')).toLowerCase()
+  const baslik = (tender.baslik || '').toLowerCase()
+
+  // 1. REKLAM İLANI (2. Fotoğraf: REKLAM İLANI)
+  if (
+    formType === 'REKLAM_ILANI' ||
+    formType === 'REKLAM' ||
+    yonu === 'reklam' ||
+    tur.includes('reklam') ||
+    tur.includes('tanıtım') ||
+    (tender.isIlan && (tender.butce === 'Tanıtım / Reklam İlanı' || !tender.butce))
+  ) {
+    return {
+      label: '📢 Reklam İlanı',
+      fullLabel: '📢 Reklam İlanı (Fiyatsız Vitrin Tanıtımı)',
+      class: 'bg-rose-100 text-rose-950 border-rose-400 font-black shadow-2xs'
+    }
+  }
+
+  // 2. ARSA İÇİN (2. Fotoğraf: ARSA İÇİN)
+  if (
+    formType === 'ARSA' ||
+    tur.includes('arsa') ||
+    kat.includes('arsa') ||
+    kat.includes('tarla') ||
+    kat.includes('arazi') ||
+    kat.includes('zeytinlik') ||
+    kat.includes('bağ / bahçe') ||
+    baslik.includes('arsa') ||
+    baslik.includes('tarla') ||
+    baslik.includes('parsel') ||
+    tender.customFields?.ada ||
+    tender.customFields?.parsel
+  ) {
+    return {
+      label: '🗺️ Arsa İçin',
+      fullLabel: '🗺️ Arsa İçin (Ada, Parsel, Tarla)',
+      class: 'bg-sky-100 text-sky-950 border-sky-400 font-black shadow-2xs'
+    }
+  }
+
+  // 3. EV (2. Fotoğraf: EV)
+  if (
+    formType === 'EV' ||
+    formType === 'KONUT' ||
+    tur.includes('konut') ||
+    tur.includes('ev ') ||
+    tur.includes('daire') ||
+    tur.includes('villa') ||
+    kat.includes('konut') ||
+    kat.includes('daire') ||
+    kat.includes('villa') ||
+    kat.includes('rezidans') ||
+    (kat.includes('ev') && !kat.includes('ev tekstili') && !kat.includes('ev aletleri')) ||
+    (kat.includes('gayrimenkul') && !kat.includes('arsa')) ||
+    baslik.includes('satılık daire') ||
+    baslik.includes('kiralık daire') ||
+    baslik.includes('konut') ||
+    baslik.includes('villa') ||
+    tender.customFields?.odaSayisi ||
+    tender.customFields?.binaYasi
+  ) {
+    return {
+      label: '🏠 Ev',
+      fullLabel: '🏠 Ev (Konut, Daire, Villa)',
+      class: 'bg-orange-100 text-orange-950 border-orange-400 font-black shadow-2xs'
+    }
+  }
+
+  // 4. DİĞER İLANLAR (2. Fotoğraf: DİĞER İLANLAR - 1. fotoğraftaki Diğer etiketli ilanlar dahil)
+  if (
+    formType === 'DIGER' ||
+    formType === 'DIGER_ILANLAR' ||
+    yonu === 'diger' ||
+    yonu === 'diger_ilan' ||
+    tur.includes('diğer') ||
+    tur.includes('diger') ||
+    kat.includes('diğer') ||
+    kat.includes('diger') ||
+    kat.includes('genel ilanlar') ||
+    tender.customFields?.altKategoriDiger ||
+    tender.customFields?.anaKategoriDiger ||
+    tender.customFields?.digerMetni ||
+    tender.digerMetni ||
+    (tender.customFields?.tabanFiyat && tender.customFields?.tavanFiyat)
+  ) {
+    return {
+      label: '📦 Diğer İlanlar',
+      fullLabel: '📦 Diğer İlanlar (Taban & Tavan Fiyat)',
+      class: 'bg-purple-100 text-purple-950 border-purple-400 font-black shadow-2xs'
+    }
+  }
+
+  // 5. SABİT FİYAT (2. Fotoğraf: SABİT FİYAT)
+  if (
+    formType === 'SABIT_FIYAT' ||
+    yonu === 'sabit_fiyat' ||
+    yonu === 'sabit_paket' ||
+    yonu === 'ihalesiz_ilan' ||
+    tender.isIhalesiz ||
+    tender.isSabitPaket ||
+    tur.includes('sabit') ||
+    tur.includes('ihalesiz') ||
+    tur.includes('net fiyat') ||
+    tur.includes('hemen al') ||
+    tur.includes('paket') ||
+    tender.customFields?.sabitFiyat
+  ) {
+    return {
+      label: '🏷️ Sabit Fiyat',
+      fullLabel: '🏷️ Sabit Fiyat (Sabit Fiyat & Para Cinsi)',
+      class: 'bg-amber-100 text-amber-950 border-amber-400 font-black shadow-2xs'
+    }
+  }
+
+  // 6. AÇIK EKSİLTME (2. Fotoğraf: AÇIK EKSİLTME)
+  if (
+    formType === 'ACIK_EKSILTME' ||
+    yonu === 'eksiltme' ||
+    tur.includes('eksiltme') ||
+    tur.includes('fiyat azaltımlı')
+  ) {
+    return {
+      label: '📉 Açık Eksiltme',
+      fullLabel: '📉 Açık Eksiltme (Tersine İhale & Alım)',
+      class: 'bg-emerald-100 text-emerald-950 border-emerald-400 font-black shadow-2xs'
+    }
+  }
+
+  // Özel ihale halleri
+  if (yonu === 'artirma' || tur.includes('artırma') || tur.includes('artırımlı')) {
+    return { 
+      label: '📈 Açık Artırma', 
+      fullLabel: '📈 Açık Artırma (Fiyat Artırımlı İhale)',
+      class: 'bg-cyan-100 text-cyan-950 border-cyan-400 font-black shadow-2xs' 
+    }
+  }
+  if (yonu === 'kapali_zarf' || tur.includes('kapalı') || tur.includes('zarf')) {
+    return { 
+      label: '📑 Kapalı Zarf', 
+      fullLabel: '📑 Kapalı Zarf Usulü Teklif Alma',
+      class: 'bg-indigo-100 text-indigo-950 border-indigo-400 font-black shadow-2xs' 
+    }
+  }
   if (yonu === 'kiralik' || tur.includes('kiralık')) {
     return {
       label: '🔑 Kiralık İlanı',
@@ -881,51 +1026,24 @@ function getTenderDirectionBadge(tender: any) {
       class: 'bg-indigo-100 text-indigo-950 border-indigo-400 font-black shadow-2xs'
     }
   }
-  if (yonu === 'satis' || tur.includes('satılık')) {
-    return {
-      label: '🏷️ Satılık İlanı',
-      fullLabel: '🏷️ Doğrudan Satılık Gayrimenkul & Ürün İlanı',
-      class: 'bg-sky-100 text-sky-950 border-sky-400 font-black shadow-2xs'
+
+  // Kullanıcı Kuralı: Asla "Satılık İlanı" dönme! Kategori varsa kategoriye göre etiketle:
+  if (tender.mainCategory || tender.kategori) {
+    const rawCat = (tender.mainCategory || (tender.kategori ? tender.kategori.split('/')[0] : '')).trim()
+    if (rawCat && rawCat.length > 2 && !rawCat.toLowerCase().includes('satılık')) {
+      const cleanCat = rawCat.replace(/İhaleleri|İlanları|ve /gi, '').trim()
+      return {
+        label: `📋 ${cleanCat.slice(0, 18)} İlanı`,
+        fullLabel: `📋 ${rawCat} İlanı`,
+        class: 'bg-slate-100 text-slate-900 border-slate-300 font-black shadow-2xs'
+      }
     }
   }
-  if (yonu === 'reklam' || tur.includes('reklam') || tur.includes('tanıtım') || tender.isIlan) {
-    return {
-      label: '📢 Tanıtım & Reklam',
-      fullLabel: '📢 Kurumsal Tanıtım, Proje & Reklam İlanı',
-      class: 'bg-rose-100 text-rose-950 border-rose-400 font-black shadow-2xs'
-    }
-  }
-  if (yonu === 'ihalesiz_ilan' || tender.isIhalesiz || tur.includes('ihalesiz') || tur.includes('net fiyat') || tur.includes('hemen al')) {
-    return { 
-      label: '💰 Sabit Fiyatlı İlan', 
-      fullLabel: '💰 Doğrudan Satın Alınabilir Sabit Fiyatlı İlan',
-      class: 'bg-teal-100 text-teal-950 border-teal-400 font-black shadow-2xs' 
-    }
-  }
-  if (yonu === 'sabit_paket' || tender.isSabitPaket || tur.includes('sabit') || tur.includes('paket') || tur.includes('kontenjan')) {
-    return { 
-      label: '🏷️ Sabit Paket & Kontenjan', 
-      fullLabel: '🏷️ Sabit Fiyatlı Paket & Kontenjan Toplama',
-      class: 'bg-amber-100 text-amber-950 border-amber-400 font-black shadow-2xs' 
-    }
-  }
-  if (yonu === 'kapali_zarf' || tur.includes('kapalı') || tur.includes('doğrudan') || tur.includes('zarf')) {
-    return { 
-      label: '📑 Doğrudan Teklif Alma (Kapalı Zarf)', 
-      fullLabel: '📑 Doğrudan Teklif Alma (Kapalı Zarf Usulü)',
-      class: 'bg-purple-100 text-purple-950 border-purple-400 font-black shadow-2xs' 
-    }
-  }
-  if (yonu === 'artirma' || tur.includes('artırma') || tur.includes('artırımlı')) {
-    return { 
-      label: '📈 Açık Artırma (Fiyat Artırımlı)', 
-      fullLabel: '📈 Açık Artırma (Fiyat Artırımlı / Satış İhalesi)',
-      class: 'bg-blue-100 text-blue-950 border-blue-400 font-black shadow-2xs' 
-    }
-  }
+
+  // Varsayılan
   return { 
-    label: '📉 Açık Eksiltme (Fiyat Azaltımlı)', 
-    fullLabel: '📉 Açık Eksiltme (Fiyat Azaltımlı / Alım İhalesi)',
+    label: '📉 Açık Eksiltme', 
+    fullLabel: '📉 Açık Eksiltme (Tersine İhale & Alım)',
     class: 'bg-emerald-100 text-emerald-950 border-emerald-400 font-black shadow-2xs' 
   }
 }
@@ -4178,7 +4296,7 @@ onMounted(() => {
             <div v-if="selectedTenderModal.customFields?.formType === 'ARSA' || (selectedTenderModal.tur && selectedTenderModal.tur.includes('Arsa'))" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-xs">
               <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
                 <span class="text-slate-400 text-[10px] block uppercase font-bold">İşlem Türü:</span>
-                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.islemTuru || selectedTenderModal.tur || 'Satılık' }}</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.islemTuru || selectedTenderModal.tur || 'Arsa İçin' }}</span>
               </div>
               <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
                 <span class="text-slate-400 text-[10px] block uppercase font-bold">Arsa Türü:</span>
@@ -4230,7 +4348,7 @@ onMounted(() => {
             <div v-else class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 text-xs">
               <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
                 <span class="text-slate-400 text-[10px] block uppercase font-bold">İşlem Türü:</span>
-                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.islemTuru || selectedTenderModal.tur || 'Satılık' }}</span>
+                <span class="font-bold text-white">{{ selectedTenderModal.customFields?.islemTuru || selectedTenderModal.tur || 'Ev' }}</span>
               </div>
               <div class="bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80">
                 <span class="text-slate-400 text-[10px] block uppercase font-bold">Konut Tipi:</span>

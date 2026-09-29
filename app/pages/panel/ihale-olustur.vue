@@ -845,7 +845,7 @@ async function submitCurrentForm() {
       finalBaslik = sabitFiyatForm.baslik.trim()
       finalCategory = sabitFiyatForm.anaKategori === 'DİĞER' ? (sabitFiyatForm.anaKategoriDiger || 'Diğer') : sabitFiyatForm.anaKategori
       finalSubCategory = sabitFiyatForm.altKategori === 'DİĞER' ? (sabitFiyatForm.altKategoriDiger || 'Diğer') : sabitFiyatForm.altKategori
-      finalDirection = 'sabit_paket'
+      finalDirection = 'sabit_fiyat'
       
       const symbol = sabitFiyatForm.paraCinsi.includes('USD') ? '$' : (sabitFiyatForm.paraCinsi.includes('EUR') ? '€' : '₺')
       finalBudget = sabitFiyatForm.sabitFiyat ? `${sabitFiyatForm.sabitFiyat} ${symbol}` : 'Fiyat Belirtilmedi'
@@ -873,7 +873,7 @@ async function submitCurrentForm() {
       finalBaslik = reklamForm.baslik.trim()
       finalCategory = reklamForm.anaKategori === 'DİĞER' ? (reklamForm.anaKategoriDiger || 'Diğer') : reklamForm.anaKategori
       finalSubCategory = reklamForm.altKategori === 'DİĞER' ? (reklamForm.altKategoriDiger || 'Diğer') : reklamForm.altKategori
-      finalDirection = 'ihalesiz_ilan'
+      finalDirection = 'reklam'
       finalBudget = 'Tanıtım / Reklam İlanı'
 
       if (reklamForm.dosyaAdi) {
@@ -899,7 +899,7 @@ async function submitCurrentForm() {
       const islem = arsaForm.islemTuru === 'DİĞER' ? (arsaForm.islemTuruDiger || 'İlan') : arsaForm.islemTuru
       const altK = arsaForm.altKategori === 'DİĞER' ? (arsaForm.altKategoriDiger || 'Arsa') : arsaForm.altKategori
       finalSubCategory = `${islem} ${altK}`
-      finalDirection = islem === 'KİRALIK' ? 'kiralik' : 'satis'
+      finalDirection = islem === 'KİRALIK' ? 'kiralik' : 'arsa'
       finalCity = arsaForm.il || 'Balıkesir'
       finalAddress = `${arsaForm.il} / ${arsaForm.ilce || ''} ${arsaForm.mahalle ? ' - ' + arsaForm.mahalle : ''}`
       finalBudget = arsaForm.tabanFiyat ? `${arsaForm.tabanFiyat} ₺` : 'Fiyat Belirtilmedi'
@@ -947,7 +947,7 @@ async function submitCurrentForm() {
       const islem = evForm.islemTuru === 'DİĞER' ? (evForm.islemTuruDiger || 'İlan') : evForm.islemTuru
       const altK = evForm.altKategori === 'DİĞER' ? (evForm.altKategoriDiger || 'Ev') : evForm.altKategori
       finalSubCategory = `${islem} ${altK}`
-      finalDirection = islem === 'KİRALIK' ? 'kiralik' : 'satis'
+      finalDirection = islem === 'KİRALIK' ? 'kiralik' : 'ev'
       finalCity = evForm.il || 'Balıkesir'
       finalAddress = `${evForm.il} / ${evForm.ilce || ''} ${evForm.mahalle ? ' - ' + evForm.mahalle : ''}`
       finalBudget = evForm.tabanFiyat ? `${evForm.tabanFiyat} ₺` : 'Fiyat Belirtilmedi'
@@ -999,7 +999,7 @@ async function submitCurrentForm() {
       finalCategory = 'Diğer İhale ve İlanlar'
       const customSub = digerForm.altKategoriDiger?.trim() || (digerForm.altKategori === 'DİĞER' ? 'Diğer' : digerForm.altKategori) || digerForm.anaKategoriDiger?.trim() || 'Genel İlanlar'
       finalSubCategory = customSub
-      finalDirection = 'satis'
+      finalDirection = 'diger'
       
       const taban = digerForm.tabanFiyat ? `${digerForm.tabanFiyat} ₺` : ''
       const tavan = digerForm.tavanFiyat ? `${digerForm.tavanFiyat} ₺` : ''
@@ -1068,13 +1068,14 @@ async function submitCurrentForm() {
       finalCategoryId = selectedCatObj?.id || 99
     }
 
-    // İlan Türü Belirleme
-    let ilanTuru = 'Pazaryeri İlanı'
-    if (activeFormMode.value === 'eksiltme') ilanTuru = 'Açık Eksiltme İhalesi'
-    else if (activeFormMode.value === 'sabit_fiyat') ilanTuru = 'Sabit Fiyatlı İlan'
-    else if (activeFormMode.value === 'reklam') ilanTuru = 'Tanıtım & Reklam İlanı'
-    else if (activeFormMode.value === 'arsa') ilanTuru = arsaForm.islemTuru === 'KİRALIK' ? 'Kiralık Arsa İlanı' : 'Satılık Arsa İlanı'
-    else if (activeFormMode.value === 'ev') ilanTuru = evForm.islemTuru === 'KİRALIK' ? 'Kiralık Konut İlanı' : 'Satılık Konut İlanı'
+    // İlan Türü Belirleme (2. Fotoğraftaki 6 Kategori Standardı)
+    let ilanTuru = 'Diğer İlanlar'
+    if (activeFormMode.value === 'eksiltme') ilanTuru = 'Açık Eksiltme'
+    else if (activeFormMode.value === 'sabit_fiyat') ilanTuru = 'Sabit Fiyat'
+    else if (activeFormMode.value === 'reklam') ilanTuru = 'Reklam İlanı'
+    else if (activeFormMode.value === 'arsa') ilanTuru = arsaForm.islemTuru === 'KİRALIK' ? 'Kiralık Arsa İlanı' : 'Arsa İçin'
+    else if (activeFormMode.value === 'ev') ilanTuru = evForm.islemTuru === 'KİRALIK' ? 'Kiralık Ev İlanı' : 'Ev'
+    else if (activeFormMode.value === 'diger') ilanTuru = 'Diğer İlanlar'
 
     const normalizedWeb = sanitizeExternalUrl(finalWeb)
     const isAdListing = activeFormMode.value === 'reklam' || activeFormMode.value === 'sabit_fiyat' || activeFormMode.value === 'arsa' || activeFormMode.value === 'ev' || activeFormMode.value === 'diger' || finalDirection !== 'eksiltme'
