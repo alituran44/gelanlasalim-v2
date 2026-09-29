@@ -555,13 +555,85 @@ function handleSingleFileUpload(e: Event, targetForm: any, fieldKey: string, nam
   }
 }
 
-function handleMultipleImages(e: Event, targetForm: any) {
+const isCompressingImages = ref(false)
+
+function compressImageFile(file: File, maxWidth = 960, maxHeight = 960, quality = 0.72): Promise<string> {
+  return new Promise((resolve) => {
+    if (typeof window === 'undefined') {
+      resolve('')
+      return
+    }
+
+    if (file.type === 'image/svg+xml') {
+      const reader = new FileReader()
+      reader.onload = () => resolve(reader.result as string || '')
+      reader.onerror = () => resolve('')
+      reader.readAsDataURL(file)
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const img = new Image()
+      img.onload = () => {
+        let width = img.width
+        let height = img.height
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width)
+            width = maxWidth
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height)
+            height = maxHeight
+          }
+        }
+
+        const canvas = document.createElement('canvas')
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        if (!ctx) {
+          resolve(e.target?.result as string || '')
+          return
+        }
+
+        ctx.fillStyle = '#ffffff'
+        ctx.fillRect(0, 0, width, height)
+        ctx.drawImage(img, 0, 0, width, height)
+
+        try {
+          const dataUrl = canvas.toDataURL('image/jpeg', quality)
+          resolve(dataUrl)
+        } catch {
+          resolve(e.target?.result as string || '')
+        }
+      }
+      img.onerror = () => resolve(e.target?.result as string || '')
+      img.src = e.target?.result as string
+    }
+    reader.onerror = () => resolve('')
+    reader.readAsDataURL(file)
+  })
+}
+
+async function handleMultipleImages(e: Event, targetForm: any) {
   const input = e.target as HTMLInputElement
   if (input.files && input.files.length > 0) {
-    for (let i = 0; i < input.files.length; i++) {
-      const file = input.files[i]
-      const url = URL.createObjectURL(file)
-      targetForm.resimler.push({ name: file.name, url })
+    isCompressingImages.value = true
+    try {
+      const files = Array.from(input.files)
+      for (const file of files) {
+        const compressedUrl = await compressImageFile(file)
+        if (compressedUrl) {
+          targetForm.resimler.push({ name: file.name, url: compressedUrl })
+        }
+      }
+    } finally {
+      isCompressingImages.value = false
+      input.value = ''
     }
   }
 }
@@ -956,12 +1028,15 @@ async function submitCurrentForm() {
       finalAciklama = digerForm.aciklama
     }
 
+    const combinedText = ((finalBaslik || '') + ' ' + (finalCategory || '') + ' ' + (finalSubCategory || '')).toLowerCase()
     const primaryImg = finalImages[0] || (
       activeFormMode.value === 'arsa' 
         ? 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80' 
         : (activeFormMode.value === 'ev' 
           ? 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80' 
-          : 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?auto=format&fit=crop&w=600&q=80')
+          : (combinedText.includes('peyzaj') || combinedText.includes('sulama') || combinedText.includes('bahçe') || combinedText.includes('proje')
+            ? 'https://images.unsplash.com/photo-1558904541-efa8c4a08931?auto=format&fit=crop&w=600&q=80'
+            : 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?auto=format&fit=crop&w=600&q=80'))
     )
     const newId = `TND-${Date.now().toString().slice(-6)}`
     const ownerEmail = userSession.value?.email || 'kullanici@ihaleciburada.com'
@@ -1087,7 +1162,16 @@ async function submitCurrentForm() {
       try {
         const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
         myTenders.unshift(tenderObject)
-        localStorage.setItem('myTenders', JSON.stringify(myTenders.slice(0, 30)))
+        try {
+          localStorage.setItem('myTenders', JSON.stringify(myTenders.slice(0, 30)))
+        } catch (quotaErr) {
+          // LocalStorage 5MB aşıldıysa eski ilanların ağır resimlerini kırp
+          const slimTenders = myTenders.slice(0, 20).map((t, idx) => {
+            if (idx === 0) return t
+            return { ...t, images: [t.image || ''] }
+          })
+          localStorage.setItem('myTenders', JSON.stringify(slimTenders))
+        }
       } catch {}
     }
 
@@ -1398,9 +1482,10 @@ async function submitCurrentForm() {
               <Camera :size="14" class="text-pink-600" />
               <span>RESİM EKLE</span>
             </span>
-            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition">
-              + EKLE
-              <input type="file" multiple accept="image/*" class="hidden" @change="e => handleMultipleImages(e, eksiltmeForm)" />
+            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition flex items-center gap-1">
+              <span v-if="isCompressingImages" class="inline-block animate-spin mr-0.5">⌛</span>
+              <span>{{ isCompressingImages ? 'İşleniyor...' : '+ EKLE' }}</span>
+              <input type="file" multiple accept="image/*" class="hidden" :disabled="isCompressingImages" @change="e => handleMultipleImages(e, eksiltmeForm)" />
             </label>
           </div>
           <div v-if="eksiltmeForm.resimler.length > 0" class="flex flex-wrap gap-2 pt-1">
@@ -1626,9 +1711,10 @@ async function submitCurrentForm() {
               <Camera :size="14" class="text-pink-600" />
               <span>RESİM EKLE</span>
             </span>
-            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition">
-              + EKLE
-              <input type="file" multiple accept="image/*" class="hidden" @change="e => handleMultipleImages(e, sabitFiyatForm)" />
+            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition flex items-center gap-1">
+              <span v-if="isCompressingImages" class="inline-block animate-spin mr-0.5">⌛</span>
+              <span>{{ isCompressingImages ? 'İşleniyor...' : '+ EKLE' }}</span>
+              <input type="file" multiple accept="image/*" class="hidden" :disabled="isCompressingImages" @change="e => handleMultipleImages(e, sabitFiyatForm)" />
             </label>
           </div>
           <div v-if="sabitFiyatForm.resimler.length > 0" class="flex flex-wrap gap-2 pt-1">
@@ -1856,9 +1942,10 @@ async function submitCurrentForm() {
               <Camera :size="14" class="text-pink-600" />
               <span>RESİM EKLE</span>
             </span>
-            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition">
-              + EKLE
-              <input type="file" multiple accept="image/*" class="hidden" @change="e => handleMultipleImages(e, reklamForm)" />
+            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition flex items-center gap-1">
+              <span v-if="isCompressingImages" class="inline-block animate-spin mr-0.5">⌛</span>
+              <span>{{ isCompressingImages ? 'İşleniyor...' : '+ EKLE' }}</span>
+              <input type="file" multiple accept="image/*" class="hidden" :disabled="isCompressingImages" @change="e => handleMultipleImages(e, reklamForm)" />
             </label>
           </div>
           <div v-if="reklamForm.resimler.length > 0" class="flex flex-wrap gap-2 pt-1">
@@ -2573,9 +2660,10 @@ async function submitCurrentForm() {
               <Camera :size="14" class="text-pink-600" />
               <span>ARSA RESİM EKLE</span>
             </span>
-            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition">
-              + EKLE
-              <input type="file" multiple accept="image/*" class="hidden" @change="e => handleMultipleImages(e, arsaForm)" />
+            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition flex items-center gap-1">
+              <span v-if="isCompressingImages" class="inline-block animate-spin mr-0.5">⌛</span>
+              <span>{{ isCompressingImages ? 'İşleniyor...' : '+ EKLE' }}</span>
+              <input type="file" multiple accept="image/*" class="hidden" :disabled="isCompressingImages" @change="e => handleMultipleImages(e, arsaForm)" />
             </label>
           </div>
           <div v-if="arsaForm.resimler.length > 0" class="flex flex-wrap gap-2 pt-1">
@@ -2974,9 +3062,10 @@ async function submitCurrentForm() {
               <Camera :size="14" class="text-pink-600" />
               <span>EV RESİM EKLE</span>
             </span>
-            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition">
-              + EKLE
-              <input type="file" multiple accept="image/*" class="hidden" @change="e => handleMultipleImages(e, evForm)" />
+            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition flex items-center gap-1">
+              <span v-if="isCompressingImages" class="inline-block animate-spin mr-0.5">⌛</span>
+              <span>{{ isCompressingImages ? 'İşleniyor...' : '+ EKLE' }}</span>
+              <input type="file" multiple accept="image/*" class="hidden" :disabled="isCompressingImages" @change="e => handleMultipleImages(e, evForm)" />
             </label>
           </div>
           <div v-if="evForm.resimler.length > 0" class="flex flex-wrap gap-2 pt-1">
@@ -3515,9 +3604,10 @@ async function submitCurrentForm() {
               <Camera :size="14" class="text-pink-600" />
               <span>RESİM EKLE</span>
             </span>
-            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition">
-              + EKLE
-              <input type="file" multiple accept="image/*" class="hidden" @change="e => handleMultipleImages(e, digerForm)" />
+            <label class="px-3 py-1 rounded-lg bg-pink-50 hover:bg-pink-100 text-pink-700 border border-pink-200 text-xs font-black cursor-pointer transition flex items-center gap-1">
+              <span v-if="isCompressingImages" class="inline-block animate-spin mr-0.5">⌛</span>
+              <span>{{ isCompressingImages ? 'İşleniyor...' : '+ EKLE' }}</span>
+              <input type="file" multiple accept="image/*" class="hidden" :disabled="isCompressingImages" @change="e => handleMultipleImages(e, digerForm)" />
             </label>
           </div>
           <div v-if="digerForm.resimler.length > 0" class="flex flex-wrap gap-2 pt-1">

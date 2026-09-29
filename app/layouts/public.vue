@@ -91,9 +91,9 @@ onMounted(() => {
   <div class="min-h-screen bg-[#F0F2F5] font-sans text-slate-800 flex flex-col justify-between">
     
     <!-- ========================================================================= -->
-    <!-- 📞 1. EN ÜST İNCE BİLGİ ŞERİDİ (GÖRSELDEKİ BİREBİR ÜST BAR) -->
+    <!-- 📞 1. EN ÜST İNCE BİLGİ ŞERİDİ (GÖRSELDEKİ BİREBİR ÜST BAR - SADECE MASAÜSTÜNDE GÖRÜNÜR) -->
     <!-- ========================================================================= -->
-    <div class="bg-white border-b border-slate-300 py-1.5 px-4 sm:px-6 text-[11px] text-slate-600">
+    <div class="hidden lg:block bg-white border-b border-slate-300 py-1.5 px-4 sm:px-6 text-[11px] text-slate-600">
       <div class="max-w-[1400px] mx-auto flex items-center justify-between">
         <div class="flex items-center gap-6">
           <span class="flex items-center gap-1">
@@ -504,7 +504,7 @@ onMounted(() => {
     </header>
 
     <!-- SAYFA İÇERİĞİ -->
-    <main class="flex-1 w-full">
+    <main class="flex-1 w-full pb-20 lg:pb-0">
       <slot />
     </main>
 
@@ -512,6 +512,56 @@ onMounted(() => {
     <!-- 🛡️ 3. MODERN KURUMSAL VE HUKUKİ FOOTER ALANI -->
     <!-- ========================================================================= -->
     <Footer />
+
+    <!-- 📱 MOBİL SABİT ALT GEZİNME ÇUBUĞU (NATIVE APP BOTTOM BAR) -->
+    <nav class="lg:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 px-3 py-2 flex items-center justify-around shadow-2xl safe-bottom">
+      <NuxtLink 
+        to="/" 
+        class="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-[#0052FF]"
+        :class="route.path === '/' ? 'text-[#0052FF]' : ''"
+      >
+        <Home :size="20" />
+        <span>Ana Sayfa</span>
+      </NuxtLink>
+
+      <NuxtLink 
+        to="/pazar-yeri" 
+        class="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-[#0052FF]"
+        :class="route.path === '/pazar-yeri' ? 'text-[#0052FF]' : ''"
+      >
+        <ShoppingBag :size="20" />
+        <span>Pazar Yeri</span>
+      </NuxtLink>
+
+      <!-- Ortadaki Vurgulu İhale Aç FAB Butonu -->
+      <NuxtLink 
+        to="/panel/ihale-olustur" 
+        class="flex flex-col items-center -mt-6 group"
+      >
+        <div class="h-12 w-12 rounded-full bg-gradient-to-r from-orange-500 to-amber-500 text-white flex items-center justify-center shadow-lg shadow-orange-500/40 group-active:scale-95 transition-all border-2 border-white">
+          <Plus :size="24" class="stroke-[3]" />
+        </div>
+        <span class="text-[9px] font-black text-orange-600 mt-0.5">+ İhale Aç</span>
+      </NuxtLink>
+
+      <NuxtLink 
+        :to="isLoggedIn ? '/panel/gelen-teklifler' : '/uyelik?tab=login'" 
+        class="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-[#0052FF]"
+        :class="route.path.includes('teklif') ? 'text-[#0052FF]' : ''"
+      >
+        <Inbox :size="20" />
+        <span>Teklifler</span>
+      </NuxtLink>
+
+      <NuxtLink 
+        :to="isLoggedIn ? '/panel' : '/uyelik?tab=login'" 
+        class="flex flex-col items-center gap-1 text-[10px] font-bold text-slate-600 hover:text-[#0052FF]"
+        :class="route.path.startsWith('/panel') || route.path.startsWith('/uyelik') ? 'text-[#0052FF]' : ''"
+      >
+        <User :size="20" />
+        <span>{{ isLoggedIn ? 'Hesabım' : 'Giriş Yap' }}</span>
+      </NuxtLink>
+    </nav>
 
     <!-- Floating Destek Butonu -->
     <FloatingSupportWidget />

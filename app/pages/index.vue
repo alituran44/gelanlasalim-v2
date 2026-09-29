@@ -803,6 +803,9 @@ function getTenderImage(tender: any): string {
   }
 
   const text = ((tender.baslik || '') + ' ' + (tender.kategori || '') + ' ' + (tender.mainCategory || '')).toLowerCase()
+  if (text.includes('peyzaj') || text.includes('sulama') || text.includes('bahçe') || text.includes('çim') || text.includes('fidan') || text.includes('ağaç') || text.includes('botanik')) {
+    return 'https://images.unsplash.com/photo-1558904541-efa8c4a08931?w=600&auto=format&fit=crop&q=80'
+  }
   if (text.includes('arsa') || text.includes('tarla') || text.includes('arazi') || text.includes('zeytinlik') || text.includes('bağ') || text.includes('parsel')) {
     return 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&auto=format&fit=crop&q=80'
   }
@@ -1087,6 +1090,18 @@ function reloadLocalTenders() {
         const clean = parsed.filter(
           (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && !t.id?.startsWith('IHC-2026-')
         )
+        // Dead blob URL'leri temizle (tarayıcı kapanıp açıldığında geçersiz kalan referanslar)
+        clean.forEach((t: any) => {
+          if (Array.isArray(t.images)) {
+            t.images = t.images.filter((img: any) => {
+              const u = typeof img === 'string' ? img : (img?.url || '')
+              return typeof u === 'string' && !u.startsWith('blob:')
+            })
+          }
+          if (typeof t.image === 'string' && t.image.startsWith('blob:')) {
+            delete t.image
+          }
+        })
         localTendersList.value = clean
         if (clean.length !== parsed.length) {
           localStorage.setItem('myTenders', JSON.stringify(clean))
@@ -1101,6 +1116,17 @@ function reloadLocalTenders() {
         const cleanCms = cmsParsed.dashboard.tenders.filter(
           (t: any) => t && t.id && !t.id.startsWith('IHC-2026-') && !t.isBaseline
         )
+        cleanCms.forEach((t: any) => {
+          if (Array.isArray(t.images)) {
+            t.images = t.images.filter((img: any) => {
+              const u = typeof img === 'string' ? img : (img?.url || '')
+              return typeof u === 'string' && !u.startsWith('blob:')
+            })
+          }
+          if (typeof t.image === 'string' && t.image.startsWith('blob:')) {
+            delete t.image
+          }
+        })
         if (cleanCms.length !== cmsParsed.dashboard.tenders.length) {
           cmsParsed.dashboard.tenders = cleanCms
           localStorage.setItem('cmsData', JSON.stringify(cmsParsed))
@@ -1523,16 +1549,74 @@ function getDigerCustomBadge(tender: any): string | null {
 
 function getTenderImagesList(tender: any): string[] {
   if (!tender) return []
+  const isValidUrl = (u: any) => typeof u === 'string' && u.trim().length > 0 && !u.startsWith('blob:')
+
   if (Array.isArray(tender.images) && tender.images.length > 0) {
-    const list = tender.images.map((img: any) => typeof img === 'string' ? img : (img?.url || '')).filter(Boolean)
+    const list = tender.images
+      .map((img: any) => typeof img === 'string' ? img : (img?.url || ''))
+      .filter(isValidUrl)
     if (list.length > 0) return list
   }
   if (Array.isArray(tender.customFields?.resimler) && tender.customFields.resimler.length > 0) {
-    const list = tender.customFields.resimler.map((img: any) => typeof img === 'string' ? img : (img?.url || '')).filter(Boolean)
+    const list = tender.customFields.resimler
+      .map((img: any) => typeof img === 'string' ? img : (img?.url || ''))
+      .filter(isValidUrl)
     if (list.length > 0) return list
   }
-  if (tender.image) return [tender.image]
+  if (tender.image && isValidUrl(tender.image)) return [tender.image]
   return []
+}
+
+function getSelectedModalImage(): string {
+  const tender = selectedTenderModal.value
+  if (!tender) return ''
+  const list = getTenderImagesList(tender)
+  if (list.length > 0 && list[activeImageIndex.value]) {
+    return list[activeImageIndex.value]
+  }
+  return getTenderImage(tender)
+}
+
+function getTenderBadgeCategory(tender: any): string {
+  if (!tender) return 'Genel İhale'
+  if (tender.durum === 'closed') return '🏆 Sonuçlandı'
+  if (isReklamIlani(tender)) return '📢 REKLAM İLANI'
+
+  // 1. Diğer seçilip özel metin yazılmışsa (örn: "Özel Proje", "Peyzaj")
+  const digerCustom = getDigerCustomBadge(tender)
+  if (digerCustom && digerCustom.trim()) {
+    return digerCustom.trim()
+  }
+
+  // 2. Alt kategori ("DİĞER" veya jenerik değilse)
+  const sub = (tender.subCategory || '').trim()
+  if (sub && sub !== 'DİĞER' && sub !== 'Diğer' && sub !== 'Malzeme & Hizmet' && sub !== 'Genel') {
+    return sub
+  }
+
+  // 3. Ana kategori ("DİĞER" veya jenerik değilse)
+  const main = (tender.mainCategory || '').trim()
+  if (main && main !== 'DİĞER' && main !== 'Diğer' && main !== 'Genel Satın Alma') {
+    return main
+  }
+
+  // 4. Kategori string'i ('Kategori / Alt Kategori' formatı)
+  const kat = (tender.kategori || '').trim()
+  if (kat && kat !== 'DİĞER' && kat !== 'Diğer' && kat !== 'Genel Satın Alma') {
+    if (kat.includes(' / ')) {
+      const parts = kat.split(' / ').map(p => p.trim()).filter(p => p && p !== 'DİĞER' && p !== 'Diğer')
+      if (parts.length > 1 && parts[1]) return parts[1]
+      if (parts.length > 0 && parts[0]) return parts[0]
+    }
+    return kat
+  }
+
+  // 5. İlan türü (Arsa, Konut, vb.)
+  if (tender.tur && !tender.tur.includes('Canlı') && !tender.tur.includes('Satın Alma')) {
+    return tender.tur
+  }
+
+  return 'Kurumsal İlan'
 }
 
 function openTenderDetailModal(tender: any, initialImageIndex = 0, forceTab?: 'gallery' | 'pdf' | 'details') {
@@ -2705,8 +2789,8 @@ onMounted(() => {
                 />
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
 
-                <!-- Durum Rozeti -->
-                <div class="absolute top-2 left-2 flex flex-col gap-1">
+                <!-- Durum / Kategori Rozeti (Kurucu Talebi: Canlı İhale Yazmasın, Kategori Ne İse O Yazsın) -->
+                <div class="absolute top-2 left-2 flex flex-col gap-1 max-w-[70%]">
                   <!-- 📢 Reklam İlanı Rozeti (Kurucu Talebi) -->
                   <span 
                     v-if="isReklamIlani(tender)"
@@ -2714,13 +2798,15 @@ onMounted(() => {
                   >
                     <span>📢 REKLAM İLANI</span>
                   </span>
-                  <!-- Diğer Durum Rozetleri -->
+                  <!-- Kategori Rozeti (Canlı İhale yerine gerçek kategori) -->
                   <span 
                     v-else
-                    class="px-2 py-0.5 rounded text-[9px] font-black uppercase text-white shadow-xs backdrop-blur-xs"
-                    :class="tender.durum === 'closed' ? 'bg-amber-600' : ((tender.tur && (tender.tur.includes('Arsa') || tender.tur.includes('Konut'))) ? 'bg-indigo-600' : ((tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan' || (tender.tur && tender.tur.includes('Tanıtım'))) ? 'bg-teal-600' : 'bg-emerald-600'))"
+                    class="px-2.5 py-1 rounded text-[10px] font-black uppercase text-white shadow-md backdrop-blur-xs border border-white/20 truncate flex items-center gap-1 tracking-wide"
+                    :class="tender.durum === 'closed' ? 'bg-amber-600' : 'bg-slate-900/85 text-sky-300 border-sky-400/30'"
+                    :title="getTenderBadgeCategory(tender)"
                   >
-                    {{ tender.durum === 'closed' ? '🏆 Sonuçlandı' : ((tender.tur && (tender.tur.includes('Arsa') || tender.tur.includes('Konut'))) ? '🏡 Gayrimenkul İlanı' : ((tender.isIlan || tender.ihaleYonu === 'ihalesiz_ilan' || (tender.tur && tender.tur.includes('Tanıtım'))) ? '📢 Proje & Hizmet İlanı' : '🟢 Canlı İhale')) }}
+                    <span class="w-1.5 h-1.5 rounded-full bg-sky-400 shrink-0"></span>
+                    <span class="truncate">{{ getTenderBadgeCategory(tender) }}</span>
                   </span>
                 </div>
 
@@ -2737,7 +2823,7 @@ onMounted(() => {
                   </span>
                   <div class="flex items-center gap-1.5 shrink-0">
                     <span 
-                      v-if="getTenderImagesList(tender).length > 1"
+                      v-if="getTenderImagesList(tender).length > 1" 
                       @click.stop="openTenderDetailModal(tender, 0, 'gallery')"
                       class="flex items-center gap-1 bg-black/80 hover:bg-black px-2 py-0.5 rounded-full backdrop-blur-xs text-[10px] text-amber-300 border border-white/25 cursor-pointer shadow-xs transition-transform hover:scale-105"
                       title="Fotoğraf Galerisini Aç"
@@ -2769,7 +2855,7 @@ onMounted(() => {
                   class="w-6 h-6 rounded overflow-hidden border border-slate-300 hover:border-[#0084B4] cursor-pointer transition shrink-0 bg-slate-200"
                   :title="`${imgIdx + 1}. Fotoğrafı Aç`"
                 >
-                  <img :src="imgUrl" class="w-full h-full object-cover" />
+                  <img :src="imgUrl" class="w-full h-full object-cover" @error="($event.target as HTMLElement).parentElement?.remove()" />
                 </div>
                 <button 
                   v-if="getTenderImagesList(tender).length > 4" 
@@ -3675,7 +3761,7 @@ onMounted(() => {
               :class="activeSpecTab === 'gallery' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white hover:bg-slate-800'"
             >
               <Eye :size="13" />
-              <span>Görseller & Numuneler ({{ (selectedTenderModal.images || []).length || 1 }})</span>
+              <span>Görseller & Numuneler ({{ getTenderImagesList(selectedTenderModal).length || 1 }})</span>
             </button>
 
             <button
@@ -3921,30 +4007,30 @@ onMounted(() => {
           <!-- Büyük Görsel Önizleme Alanı -->
           <div class="relative max-w-3xl w-full mx-auto h-72 sm:h-96 rounded-2xl overflow-hidden bg-black/60 border border-slate-800 flex items-center justify-center group">
             <img
-              :src="(selectedTenderModal.images?.[activeImageIndex]?.url) || (typeof selectedTenderModal.images?.[activeImageIndex] === 'string' ? selectedTenderModal.images[activeImageIndex] : getTenderImage(selectedTenderModal))"
-              :alt="selectedTenderModal.baslik"
+              :src="getSelectedModalImage()"
+              :alt="selectedTenderModal?.baslik || 'İhale Görseli'"
               loading="lazy"
               decoding="async"
               width="600"
               height="400"
               class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-102"
-              @error="($event.target as any).src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'600\' height=\'400\' viewBox=\'0 0 600 400\'><rect width=\'600\' height=\'400\' fill=\'%230b1329\'/><text x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%2338bdf8\' font-size=\'22\' font-family=\'sans-serif\'>İhaleciBurada Kurumsal İhale</text></svg>'"
+              @error="($event.target as any).src = getTenderImage(selectedTenderModal)"
             />
 
             <!-- Önceki / Sonraki Butonları -->
             <button
-              v-if="(selectedTenderModal.images || []).length > 1"
+              v-if="getTenderImagesList(selectedTenderModal).length > 1"
               type="button"
-              @click="activeImageIndex = (activeImageIndex > 0 ? activeImageIndex - 1 : selectedTenderModal.images.length - 1)"
+              @click="activeImageIndex = (activeImageIndex > 0 ? activeImageIndex - 1 : getTenderImagesList(selectedTenderModal).length - 1)"
               class="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black text-white text-sm font-bold transition cursor-pointer"
               aria-label="Önceki Görsel"
             >
               ❮
             </button>
             <button
-              v-if="(selectedTenderModal.images || []).length > 1"
+              v-if="getTenderImagesList(selectedTenderModal).length > 1"
               type="button"
-              @click="activeImageIndex = (activeImageIndex < selectedTenderModal.images.length - 1 ? activeImageIndex + 1 : 0)"
+              @click="activeImageIndex = (activeImageIndex < getTenderImagesList(selectedTenderModal).length - 1 ? activeImageIndex + 1 : 0)"
               class="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black text-white text-sm font-bold transition cursor-pointer"
               aria-label="Sonraki Görsel"
             >
@@ -3953,28 +4039,28 @@ onMounted(() => {
 
             <!-- Görsel Sayacı -->
             <div class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-black/70 text-white text-xs font-mono font-bold">
-              Görsel {{ activeImageIndex + 1 }} / {{ (selectedTenderModal.images || []).length || 1 }}
+              Görsel {{ activeImageIndex + 1 }} / {{ getTenderImagesList(selectedTenderModal).length || 1 }}
             </div>
           </div>
 
           <!-- Thumbnail Strip (Tıklandıkça Değişen Fotoğraf Şeridi) -->
           <div class="flex items-center justify-center gap-3 mt-4 overflow-x-auto py-2">
             <div
-              v-for="(imgItem, imgIdx) in (selectedTenderModal.images && selectedTenderModal.images.length > 0 ? selectedTenderModal.images : [getTenderImage(selectedTenderModal)])"
+              v-for="(imgItem, imgIdx) in (getTenderImagesList(selectedTenderModal).length > 0 ? getTenderImagesList(selectedTenderModal) : [getTenderImage(selectedTenderModal)])"
               :key="imgIdx"
               @click="activeImageIndex = imgIdx"
               class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 cursor-pointer transition-all shrink-0 bg-slate-900"
               :class="activeImageIndex === imgIdx ? 'border-blue-500 scale-105 shadow-md shadow-blue-500/20' : 'border-slate-800 opacity-60 hover:opacity-100'"
             >
               <img
-                :src="imgItem.url || imgItem"
+                :src="imgItem"
                 :alt="selectedTenderModal?.baslik || 'İhale Görseli'"
                 loading="lazy"
                 decoding="async"
                 width="80"
                 height="80"
                 class="w-full h-full object-cover"
-                @error="($event.target as any).src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'%230b1329\'/></svg>'"
+                @error="($event.target as any).src = getTenderImage(selectedTenderModal)"
               />
             </div>
           </div>
@@ -4776,7 +4862,7 @@ onMounted(() => {
           <div class="p-2 bg-white rounded-xl border border-slate-200 shadow-2xs">
             <span class="text-[9px] text-slate-500 font-bold uppercase block">Kalan Süre</span>
             <span class="font-black text-blue-700 text-[11px] block">
-              {{ drawerTender.sure || 'Canlı İhale' }}
+              {{ drawerTender.sure || 'Yayında' }}
             </span>
           </div>
         </div>

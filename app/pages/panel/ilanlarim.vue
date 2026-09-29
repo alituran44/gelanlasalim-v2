@@ -22,18 +22,113 @@ const searchQuery = ref('')
 
 const localTendersState = ref<any[]>([])
 
+
+function getCategoryFallbackImage(tender: any): string {
+  const text = ((tender?.baslik || '') + ' ' + (tender?.kategori || '') + ' ' + (tender?.mainCategory || '') + ' ' + (tender?.subCategory || '')).toLowerCase()
+
+  if (text.includes('peyzaj') || text.includes('sulama') || text.includes('bahçe') || text.includes('çim') || text.includes('fidan') || text.includes('ağaç') || text.includes('botanik')) {
+    return 'https://images.unsplash.com/photo-1558904541-efa8c4a08931?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('arsa') || text.includes('tarla') || text.includes('arazi') || text.includes('zeytinlik') || text.includes('bağ') || text.includes('parsel')) {
+    return 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('konut') || text.includes('daire') || text.includes('villa') || text.includes('gayrimenkul') || text.includes('ev') || text.includes('bina') || text.includes('dükkan') || text.includes('ofis')) {
+    return 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('inşaat') || text.includes('yapı') || text.includes('şantiye') || text.includes('çimento') || text.includes('demir') || text.includes('ruhsat') || text.includes('mimari') || text.includes('proje')) {
+    return 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('lojistik') || text.includes('nakliye') || text.includes('taşımacılık') || text.includes('havayolu') || text.includes('kargo') || text.includes('uçak')) {
+    return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('makine') || text.includes('yedek parça') || text.includes('metal') || text.includes('sanayi') || text.includes('torna') || text.includes('freze')) {
+    return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('ambalaj') || text.includes('koli') || text.includes('plastik') || text.includes('kağıt') || text.includes('kutu')) {
+    return 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('akaryakıt') || text.includes('enerji') || text.includes('petrol') || text.includes('madeni yağ') || text.includes('motorin') || text.includes('güneş')) {
+    return 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('kırtasiye') || text.includes('bilişim') || text.includes('teknoloji') || text.includes('yazılım') || text.includes('bilgisayar')) {
+    return 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80'
+  }
+  if (text.includes('tarım') || text.includes('traktör') || text.includes('gübre') || text.includes('tohum') || text.includes('hasat')) {
+    return 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&auto=format&fit=crop&q=80'
+  }
+
+  return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
+}
+
+function getTenderImage(tender: any): string {
+  if (!tender) return 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80'
+
+  const isValidUrl = (u: any) => typeof u === 'string' && u.trim().length > 0 && !u.startsWith('blob:') && (u.startsWith('http') || u.startsWith('data:image'))
+
+  if (isValidUrl(tender.image)) {
+    return tender.image
+  }
+
+  if (Array.isArray(tender.images) && tender.images.length > 0) {
+    for (const img of tender.images) {
+      if (isValidUrl(img)) return img
+      if (img && typeof img === 'object' && isValidUrl(img.url)) return img.url
+    }
+  }
+
+  const altResimler = tender.customFields?.resimler || tender.resimler
+  if (Array.isArray(altResimler) && altResimler.length > 0) {
+    for (const img of altResimler) {
+      if (isValidUrl(img)) return img
+      if (img && typeof img === 'object' && isValidUrl(img.url)) return img.url
+    }
+  }
+
+  return getCategoryFallbackImage(tender)
+}
+
+function handleImageError(event: Event, tender: any) {
+  const imgEl = event.target as HTMLImageElement
+  if (!imgEl) return
+  const fallback = getCategoryFallbackImage(tender)
+  if (imgEl.src !== fallback) {
+    imgEl.src = fallback
+  }
+}
+
 function reloadTenders() {
   const cmsList = cmsData.value?.dashboard?.tenders || []
   let localList: any[] = []
   if (typeof window !== 'undefined') {
     try {
       localList = JSON.parse(localStorage.getItem('myTenders') || '[]')
+      let changed = false
+      localList = localList.map(item => {
+        if (!item.image || item.image.startsWith('blob:')) {
+          item.image = getTenderImage(item)
+          changed = true
+        }
+        return item
+      })
+      if (changed) {
+        localStorage.setItem('myTenders', JSON.stringify(localList))
+      }
     } catch (e) {}
   }
   
   const map = new Map<string, any>()
-  localList.forEach(item => map.set(item.id, item))
-  cmsList.forEach(item => map.set(item.id, item))
+  localList.forEach(item => {
+    if (!item.image || item.image.startsWith('blob:')) {
+      item.image = getTenderImage(item)
+    }
+    map.set(item.id, item)
+  })
+  cmsList.forEach(item => {
+    if (!item.image || item.image.startsWith('blob:')) {
+      item.image = getTenderImage(item)
+    }
+    map.set(item.id, item)
+  })
   
   localTendersState.value = Array.from(map.values())
 }
@@ -382,6 +477,8 @@ function openEditModal(tender: any) {
 
   editForm.value = {
     id: tender.id,
+    image: tender.image || getTenderImage(tender),
+    images: Array.isArray(tender.images) && tender.images.length > 0 ? tender.images : [tender.image || getTenderImage(tender)],
     baslik: tender.baslik || '',
     kategori: mainCat,
     subCategory: subCat,
@@ -441,6 +538,8 @@ async function saveTenderEdit() {
 
   const updatedFields: any = {
     id: tenderId,
+    image: editForm.value.image || getTenderImage(editForm.value),
+    images: editForm.value.images || [editForm.value.image || getTenderImage(editForm.value)],
     baslik: editForm.value.baslik,
     kategori: combinedCategory,
     mainCategory: editForm.value.kategori,
@@ -774,14 +873,14 @@ const statusTabs = computed(() => {
       >
         <div class="flex items-start gap-4">
           <!-- İhale Kapak Görseli veya İkonu -->
-          <div class="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center shadow-2xs">
+          <div class="h-14 w-14 sm:h-16 sm:w-16 shrink-0 rounded-xl overflow-hidden border border-slate-200 bg-slate-100 flex items-center justify-center shadow-2xs relative">
             <img 
-              v-if="tender.image" 
-              :src="tender.image" 
-              :alt="tender.baslik" 
+              :src="getTenderImage(tender)" 
+              :alt="tender.baslik || 'İlan Görseli'" 
               class="h-full w-full object-cover" 
+              loading="lazy"
+              @error="handleImageError($event, tender)"
             />
-            <FileText v-else :size="22" class="text-blue-600" />
           </div>
 
           <div class="flex-1 min-w-0">

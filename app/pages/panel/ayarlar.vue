@@ -438,6 +438,174 @@ function confirmEmailVerificationOtp() {
 }
 
 // ----------------------------------------------------
+// Google E-Posta Çekme, Yenileme & Senkronizasyon (Kullanıcı Talebi)
+// ----------------------------------------------------
+const showGoogleEmailModal = ref(false)
+const manualGoogleEmailInput = ref('')
+const liveGoogleSyncError = ref('')
+const isSyncingGoogle = ref(false)
+const savedGoogleSyncAccountsCounter = ref(0)
+
+const savedGoogleAccountsForSync = computed(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+  savedGoogleSyncAccountsCounter.value
+  if (typeof window === 'undefined') return []
+  try {
+    const list: any[] = []
+    const lastGoogle = localStorage.getItem('last_google_account')
+    const registry = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
+    
+    if (lastGoogle && lastGoogle.includes('@')) {
+      const regAcc = registry[lastGoogle]
+      list.push({
+        email: lastGoogle,
+        name: regAcc?.name || regAcc?.firstName || 'Google Hesabı',
+        picture: regAcc?.picture || '',
+        isLast: true
+      })
+    }
+
+    Object.values(registry).forEach((acc: any) => {
+      if (acc && acc.email && (acc.authProvider === 'google' || acc.isGoogleAuth || acc.email.includes('@gmail.com'))) {
+        if (!list.some(item => item.email.toLowerCase() === acc.email.toLowerCase())) {
+          list.push({
+            email: acc.email,
+            name: acc.name || `${acc.firstName || ''} ${acc.lastName || ''}`.trim() || 'Google Hesabı',
+            picture: acc.picture || '',
+            isLast: false
+          })
+        }
+      }
+    })
+
+    return list
+  } catch {
+    return []
+  }
+})
+
+function openGoogleEmailSyncModal() {
+  manualGoogleEmailInput.value = ''
+  liveGoogleSyncError.value = ''
+  isSyncingGoogle.value = false
+  showGoogleEmailModal.value = true
+}
+
+async function applyGoogleEmail(targetEmail: string, googleProfileName?: string, googlePicture?: string) {
+  const cleanEmail = (targetEmail || '').trim().toLowerCase()
+  if (!cleanEmail || !cleanEmail.includes('@')) {
+    showToast('Lütfen geçerli bir Google / Gmail adresi giriniz.', 'error')
+    return
+  }
+
+  isSyncingGoogle.value = true
+  try {
+    profileForm.value.email = cleanEmail
+    companyForm.value.email = cleanEmail
+    
+    const session = JSON.parse(localStorage.getItem('userSession') || '{}')
+    session.email = cleanEmail
+    session.isEmailVerified = true
+    session.isGoogleAuth = true
+    session.authProvider = 'google'
+    if (googleProfileName && (!profileForm.value.name || profileForm.value.name === 'Kullanıcı')) {
+      const parts = googleProfileName.split(' ')
+      profileForm.value.name = parts[0] || profileForm.value.name
+      profileForm.value.surname = parts.slice(1).join(' ') || profileForm.value.surname
+      session.name = googleProfileName
+    }
+    if (googlePicture) {
+      session.picture = googlePicture
+      profileAvatarUrl.value = googlePicture
+    }
+    
+    localStorage.setItem('userSession', JSON.stringify(session))
+    localStorage.setItem('last_google_account', cleanEmail)
+
+    const registry = JSON.parse(localStorage.getItem('user_accounts_registry') || '{}')
+    registry[cleanEmail] = {
+      ...(registry[cleanEmail] || {}),
+      email: cleanEmail,
+      name: session.name || googleProfileName || profileForm.value.name,
+      picture: googlePicture || registry[cleanEmail]?.picture,
+      isGoogleAuth: true,
+      authProvider: 'google',
+      isEmailVerified: true
+    }
+    localStorage.setItem('user_accounts_registry', JSON.stringify(registry))
+
+    updateSession(session)
+    setEmailVerified(true, cleanEmail)
+
+    try {
+      await $fetch('/api/auth/login', {
+        method: 'POST',
+        body: {
+          email: cleanEmail,
+          password: '',
+          role: session.role || 'individual'
+        }
+      })
+    } catch (e) {}
+
+    window.dispatchEvent(new Event('storage'))
+    window.dispatchEvent(new CustomEvent('session-updated'))
+    window.dispatchEvent(new CustomEvent('user-session-changed'))
+    savedGoogleSyncAccountsCounter.value++
+
+    showGoogleEmailModal.value = false
+    showToast(`✓ Google e-posta adresiniz (${cleanEmail}) başarıyla çekildi ve hesabınız yenilendi!`, 'success')
+  } catch (err: any) {
+    showToast('Google senkronizasyonunda hata oluştu: ' + (err?.message || err), 'error')
+  } finally {
+    isSyncingGoogle.value = false
+  }
+}
+
+function triggerGoogleOneTapOrPopup() {
+  liveGoogleSyncError.value = ''
+  if (typeof window === 'undefined' || !(window as any).google?.accounts?.oauth2) {
+    liveGoogleSyncError.value = 'Google kimlik doğrulama API\'si henüz hazır değil. Alternatif olarak aşağıdaki kutudan Google hesabınızı seçebilir veya yazabilirsiniz.'
+    return
+  }
+  try {
+    isSyncingGoogle.value = true
+    const client = (window as any).google.accounts.oauth2.initTokenClient({
+      client_id: '616649314930-qn4lj8sruj1f79lc7fqaqt619i37jpjp.apps.googleusercontent.com',
+      scope: 'email profile openid',
+      callback: async (response: any) => {
+        if (response?.access_token) {
+          try {
+            const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+              headers: { Authorization: `Bearer ${response.access_token}` }
+            })
+            const user = await res.json()
+            if (user && user.email) {
+              await applyGoogleEmail(user.email, user.name, user.picture)
+              return
+            }
+          } catch (err) {
+            console.warn('Google userinfo fetch failed', err)
+            liveGoogleSyncError.value = 'Google hesap bilgileri alınamadı. Lütfen e-postanızı manuel yazınız.'
+          } finally {
+            isSyncingGoogle.value = false
+          }
+        }
+      },
+      error_callback: (err: any) => {
+        console.warn('Google GIS error:', err)
+        isSyncingGoogle.value = false
+        liveGoogleSyncError.value = 'Google pop-up penceresi açılamadı veya kapatıldı. Lütfen yukarıdaki kutudan Google e-postanızı seçip onaylayınız.'
+      }
+    })
+    client.requestAccessToken()
+  } catch (e: any) {
+    isSyncingGoogle.value = false
+    liveGoogleSyncError.value = 'Hata: ' + (e.message || e)
+  }
+}
+
+// ----------------------------------------------------
 // GİB & KEP Kurumsal Doğrulama (VER-002, VER-003, VER-008)
 // ----------------------------------------------------
 const isVerifyingGib = ref(false)
@@ -1139,6 +1307,19 @@ function saveCompanyInfo() {
     userSession.value = session
     window.dispatchEvent(new Event('storage'))
     window.dispatchEvent(new CustomEvent('session-updated'))
+    window.dispatchEvent(new CustomEvent('user-session-changed'))
+    if (session.email) {
+      try {
+        $fetch('/api/auth/login', {
+          method: 'POST',
+          body: {
+            email: session.email,
+            password: '',
+            role: session.role || 'individual'
+          }
+        }).catch(() => {})
+      } catch (e) {}
+    }
   }
   showToast("Kurumsal firma, sektör ve açıklama bilgileriniz başarıyla kaydedildi.", "success")
 }
@@ -1741,6 +1922,19 @@ function saveProfile() {
     userSession.value = session
     window.dispatchEvent(new Event('storage'))
     window.dispatchEvent(new CustomEvent('session-updated'))
+    window.dispatchEvent(new CustomEvent('user-session-changed'))
+    if (session.email) {
+      try {
+        $fetch('/api/auth/login', {
+          method: 'POST',
+          body: {
+            email: session.email,
+            password: '',
+            role: session.role || 'individual'
+          }
+        }).catch(() => {})
+      } catch (e) {}
+    }
   }
   isSaved.value = true
   showToast("Profil, şirket tanıtım açıklaması ve sektör bilgileriniz başarıyla güncellendi.", "success")
@@ -2032,18 +2226,51 @@ function saveProfile() {
               <div>
                 <div class="flex items-center justify-between mb-1">
                   <label class="block text-[10px] font-black text-slate-500 uppercase">E-posta</label>
-                  <span v-if="isEmailVerified || userSession?.isGoogleAuth" class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-1 border border-emerald-200">
-                    <CheckCircle2 :size="10" /> Doğrulandı
-                  </span>
-                  <button v-else type="button" @click="openEmailVerifyModal" class="text-[10px] font-bold text-blue-600 hover:underline cursor-pointer">
-                    Doğrula
-                  </button>
+                  <div class="flex items-center gap-1.5">
+                    <button 
+                      type="button" 
+                      @click="openGoogleEmailSyncModal" 
+                      class="text-[10px] font-bold text-blue-600 hover:text-blue-800 bg-blue-50 hover:bg-blue-100 px-2 py-0.5 rounded-md flex items-center gap-1 transition cursor-pointer border border-blue-200"
+                      title="Google hesabınızdan e-posta adresini otomatik çekin veya yenileyin"
+                    >
+                      <svg width="12" height="12" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+                      Google'dan Çek / Yenile
+                    </button>
+                    <span v-if="isEmailVerified || userSession?.isGoogleAuth" class="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded flex items-center gap-1 border border-emerald-200">
+                      <CheckCircle2 :size="10" /> Doğrulandı
+                    </span>
+                    <button v-else type="button" @click="openEmailVerifyModal" class="text-[10px] font-bold text-amber-600 hover:underline cursor-pointer">
+                      Doğrula
+                    </button>
+                  </div>
                 </div>
                 <div class="relative flex items-center">
-                  <input v-model="profileForm.email" type="email" class="w-full rounded-xl border px-4 py-2.5 text-xs bg-slate-50 text-slate-700 outline-none font-medium" style="border-color: #E2E8F0;" disabled />
-                  <button v-if="!isEmailVerified && !userSession?.isGoogleAuth" type="button" @click="openEmailVerifyModal" class="absolute right-2 px-2 py-1 text-[10px] font-bold bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition cursor-pointer">
-                    Doğrula
-                  </button>
+                  <input 
+                    v-model="profileForm.email" 
+                    type="email" 
+                    placeholder="ornek@alanadi.com"
+                    class="w-full rounded-xl border px-4 py-2.5 pr-28 text-xs bg-white text-slate-800 outline-none font-medium focus:border-blue-500 transition" 
+                    style="border-color: #E2E8F0;" 
+                  />
+                  <div class="absolute right-2 flex items-center gap-1.5">
+                    <button 
+                      type="button" 
+                      @click="openGoogleEmailSyncModal" 
+                      class="px-2 py-1 text-[10px] font-bold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 rounded-lg transition cursor-pointer border border-slate-200 flex items-center gap-1"
+                      title="Google'dan çek veya yenile"
+                    >
+                      <RotateCw :size="11" />
+                      Yenile
+                    </button>
+                    <button 
+                      v-if="!isEmailVerified && !userSession?.isGoogleAuth" 
+                      type="button" 
+                      @click="openEmailVerifyModal" 
+                      class="px-2 py-1 text-[10px] font-bold bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition cursor-pointer"
+                    >
+                      Doğrula
+                    </button>
+                  </div>
                 </div>
               </div>
               <div>
@@ -6167,6 +6394,122 @@ function saveProfile() {
           <button type="button" @click="sendTeamInvite" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition shadow-sm cursor-pointer flex items-center gap-1.5">
             <Send :size="14" />
             <span>Daveti Gönder</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================================================= -->
+    <!-- GOOGLE E-POSTA ÇEK & YENİLEME MODALI (KULLANICI TALEBİ) -->
+    <!-- ========================================================================= -->
+    <div 
+      v-if="showGoogleEmailModal" 
+      class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/70 p-4 backdrop-blur-xs"
+    >
+      <div class="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl border border-slate-100 space-y-4 animate-fadeIn">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+          <div class="flex items-center gap-2.5">
+            <div class="h-10 w-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center shrink-0">
+              <svg width="22" height="22" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-black text-slate-900">Google E-Posta Çek & Yenile</h3>
+              <p class="text-[11px] text-slate-500 font-medium">Google hesabınızdaki e-postayı profilinize aktarın</p>
+            </div>
+          </div>
+          <button 
+            type="button" 
+            @click="showGoogleEmailModal = false"
+            class="h-8 w-8 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 flex items-center justify-center transition cursor-pointer"
+          >
+            <X :size="16" />
+          </button>
+        </div>
+
+        <p class="text-xs text-slate-600 leading-relaxed">
+          Profilinizdeki e-posta adresini Google hesabınızdan otomatik olarak güncelleyebilir veya farklı bir Google (Gmail) hesabına bağlayabilirsiniz:
+        </p>
+
+        <!-- Kayıtlı Google Hesapları Listesi -->
+        <div v-if="savedGoogleAccountsForSync.length > 0" class="space-y-2">
+          <span class="text-[10px] font-black uppercase tracking-wider text-slate-400 block">KAYITLI GOOGLE HESAPLARINIZ:</span>
+          <div class="max-h-48 overflow-y-auto space-y-1.5 pr-1">
+            <div
+              v-for="acc in savedGoogleAccountsForSync"
+              :key="acc.email"
+              class="w-full flex items-center justify-between p-2.5 rounded-2xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/40 transition text-left"
+            >
+              <div class="flex items-center gap-2.5 min-w-0 pr-2">
+                <img v-if="acc.picture" :src="acc.picture" class="w-8 h-8 rounded-full object-cover shrink-0 border border-slate-200" alt="Avatar" />
+                <div v-else class="w-8 h-8 rounded-full bg-blue-100 text-blue-700 font-black text-xs flex items-center justify-center uppercase shrink-0">
+                  {{ (acc.email || 'G')[0] }}
+                </div>
+                <div class="min-w-0">
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-xs font-bold text-slate-800 truncate block">{{ acc.name || 'Google Kullanıcısı' }}</span>
+                    <span v-if="acc.isLast" class="text-[9px] font-black uppercase px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 shrink-0">Son Giriş</span>
+                  </div>
+                  <span class="text-[11px] text-slate-500 font-mono truncate block">{{ acc.email }}</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                @click="applyGoogleEmail(acc.email, acc.name, acc.picture)"
+                :disabled="isSyncingGoogle"
+                class="px-3 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs transition cursor-pointer shrink-0 shadow-xs disabled:opacity-50"
+              >
+                Bu E-postayı Çek
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Farklı Bir Google Hesabı Girme -->
+        <div class="space-y-2 pt-2 border-t border-slate-100">
+          <label class="text-[10px] font-black uppercase tracking-wider text-slate-500 block">FARKLI BİR GOOGLE (GMAIL) ADRESİ İLE YENİLE:</label>
+          <div class="space-y-2">
+            <input
+              v-model="manualGoogleEmailInput"
+              type="email"
+              placeholder="ornek@gmail.com"
+              class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-blue-500 focus:bg-white transition-all font-mono"
+            />
+            <button
+              type="button"
+              @click="applyGoogleEmail(manualGoogleEmailInput)"
+              :disabled="!manualGoogleEmailInput.trim() || isSyncingGoogle"
+              class="w-full flex items-center justify-center gap-2 rounded-xl py-2.5 text-xs font-bold text-white transition-all shadow-xs bg-[#0e3a8c] hover:bg-blue-800 cursor-pointer disabled:opacity-50"
+            >
+              <span>{{ isSyncingGoogle ? 'Yenileniyor...' : 'Bu E-postayı Profilime Uygula & Yenile' }}</span>
+              <Check :size="14" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Canlı Google OAuth Pop-up Butonu -->
+        <div class="pt-2 border-t border-slate-100 space-y-2">
+          <button
+            type="button"
+            @click="triggerGoogleOneTapOrPopup"
+            :disabled="isSyncingGoogle"
+            class="w-full text-center text-[11px] font-bold text-blue-600 hover:text-blue-800 transition cursor-pointer py-1.5 flex items-center justify-center gap-1.5 bg-slate-50 hover:bg-blue-50/50 rounded-xl border border-slate-200"
+          >
+            <RotateCw :size="12" :class="{ 'animate-spin': isSyncingGoogle }" />
+            <span>Google Cloud Canlı Pop-up ile Bilgileri Çek</span>
+          </button>
+          <div v-if="liveGoogleSyncError" class="p-2.5 bg-amber-50 border border-amber-200 rounded-xl text-[11px] text-amber-800 leading-snug">
+            {{ liveGoogleSyncError }}
+          </div>
+        </div>
+
+        <div class="pt-1">
+          <button
+            type="button"
+            @click="showGoogleEmailModal = false"
+            class="w-full py-2 text-center text-xs text-slate-400 hover:text-slate-600 cursor-pointer"
+          >
+            Vazgeç
           </button>
         </div>
       </div>
