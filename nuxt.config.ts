@@ -93,17 +93,17 @@ export default defineNuxtConfig({
       htmlAttrs: {
         lang: 'tr'
       },
-      title: 'İhaleciBurada — B2B İhale ve Doğrudan Satın Alma Platformu',
+      title: 'İhaleciBurada — B2B İhale, Doğrudan Satın Alma ve Canlı Eksiltme Portalı',
       meta: [
         { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
         { name: 'mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-capable', content: 'yes' },
         { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
         { name: 'apple-mobile-web-app-title', content: 'İhaleciBurada' },
         {
           name: 'description',
-          content: 'İhaleciBurada.com ile kurumsal satın alma taleplerinizi yayınlayın, onaylı tedarikçilerden en rekabetçi teklifleri anında toplayın ve güvenle ticaret yapın.'
+          content: "Türkiye'nin en kapsamlı B2B doğrudan satın alma, tersine ihale ve canlı eksiltme pazaryeri. Günlük kurumsal ihaleler, onaylı tedarikçi ağı ve güvenli escrow."
         },
         { name: 'keywords', content: 'b2b ihale, tersine ihale, eksiltme ihalesi, satın alma platformu, şartname, doğrudan teklif verme, tedarikçi ağı, escrow güvenli havuz, balıkesir ihaleleri, çanakkale ihaleleri, bursa sanayi ihaleleri, istanbul b2b satın alma, kocaeli gebze osb, ankara ostim ihaleleri, izmir b2b portalı, kurumsal satın alma, kamu ve özel sektör ihaleleri, toptan malzeme alımı' },
         { name: 'author', content: 'Hasan Hüseyin Yıldırım - İhaleciBurada' },
@@ -123,8 +123,8 @@ export default defineNuxtConfig({
         }] : []),
         { property: 'og:type', content: 'website' },
         { property: 'og:locale', content: 'tr_TR' },
-        { property: 'og:title', content: 'İhaleciBurada.com — Kurumsal B2B İhale ve Satın Alma Platformu' },
-        { property: 'og:description', content: 'Satın alma taleplerinizi dijital ihale ve şeffaf teklif modülü ile en avantajlı maliyete dönüştürün.' },
+        { property: 'og:title', content: 'İhaleciBurada — B2B İhale, Doğrudan Satın Alma ve Canlı Eksiltme Portalı' },
+        { property: 'og:description', content: "Türkiye'nin en kapsamlı B2B doğrudan satın alma, tersine ihale ve canlı eksiltme pazaryeri. Günlük kurumsal ihaleler, onaylı tedarikçi ağı ve güvenli escrow." },
         { property: 'og:url', content: 'https://ihaleciburada.com' },
         { property: 'og:site_name', content: 'İhaleciBurada' },
         { property: 'og:image', content: 'https://ihaleciburada.com/auth_skyscraper_bg.jpg' },
@@ -135,8 +135,8 @@ export default defineNuxtConfig({
         { name: 'twitter:card', content: 'summary_large_image' },
         { name: 'twitter:site', content: '@ihaleciburada' },
         { name: 'twitter:creator', content: '@ihaleciburada' },
-        { name: 'twitter:title', content: 'İhaleciBurada — Kurumsal B2B İhale' },
-        { name: 'twitter:description', content: 'Satın alma maliyetlerinizi dijital ihale ve doğrudan teklif ile optimize edin.' },
+        { name: 'twitter:title', content: 'İhaleciBurada — B2B İhale, Doğrudan Satın Alma ve Canlı Eksiltme Portalı' },
+        { name: 'twitter:description', content: "Türkiye'nin en kapsamlı B2B doğrudan satın alma, tersine ihale ve canlı eksiltme pazaryeri. Günlük kurumsal ihaleler, onaylı tedarikçi ağı ve güvenli escrow." },
         { name: 'twitter:image', content: 'https://ihaleciburada.com/auth_skyscraper_bg.jpg' }
       ],
       link: [

@@ -29,6 +29,7 @@ import FloatingSupportWidget from '~/components/common/FloatingSupportWidget.vue
 import PaymentBadges from '~/components/common/PaymentBadges.vue'
 import Footer from '~/components/landing/Footer.vue'
 import { useNotifications } from '~/composables/useNotifications'
+import { locale, setLocale, t } from '~/composables/useLocale'
 
 const route = useRoute()
 const userSession = ref<any>(null)
@@ -107,7 +108,31 @@ onMounted(() => {
             <a href="mailto:ihalecib@gmail.com" class="text-blue-700 hover:underline">ihalecib@gmail.com</a>
           </span>
         </div>
-        <div>
+        <div class="flex items-center gap-3">
+          <!-- 🌐 DİL SEÇİCİ (TR / EN) -->
+          <div class="flex items-center rounded-lg border border-slate-300 bg-slate-50 p-0.5 text-[11px] font-bold shadow-2xs" role="group" aria-label="Dil Seçimi / Language Selection">
+            <button 
+              type="button" 
+              @click="setLocale('tr')" 
+              :class="locale === 'tr' ? 'bg-[#0B1E3B] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+              class="px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1"
+              aria-label="Türkçe Diline Geç"
+            >
+              <span>🇹🇷</span>
+              <span>TR</span>
+            </button>
+            <button 
+              type="button" 
+              @click="setLocale('en')" 
+              :class="locale === 'en' ? 'bg-[#0B1E3B] text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'"
+              class="px-2 py-0.5 rounded transition cursor-pointer flex items-center gap-1"
+              aria-label="Switch to English Language"
+            >
+              <span>🇬🇧</span>
+              <span>EN</span>
+            </button>
+          </div>
+
           <NuxtLink to="/sozlesmeler?tab=hakkimizda" class="px-2.5 py-0.5 rounded border border-slate-300 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold transition flex items-center gap-1">
             <span>Kurumsal bilgiler</span> <ArrowRight :size="11" />
           </NuxtLink>
@@ -422,6 +447,34 @@ onMounted(() => {
             >
               <span>👤+ Yeni Üyelik</span>
             </NuxtLink>
+          </div>
+
+          <!-- 🌐 Mobil Dil Seçici (TR / EN) -->
+          <div class="flex items-center justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700">
+            <span class="flex items-center gap-1.5">
+              <span>🌐</span>
+              <span>Dil Seçimi / Language:</span>
+            </span>
+            <div class="flex items-center gap-1">
+              <button 
+                type="button" 
+                @click="setLocale('tr')" 
+                :class="locale === 'tr' ? 'bg-[#0B1E3B] text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-200'"
+                class="px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer"
+                aria-label="Türkçe Diline Geç"
+              >
+                🇹🇷 TR
+              </button>
+              <button 
+                type="button" 
+                @click="setLocale('en')" 
+                :class="locale === 'en' ? 'bg-[#0B1E3B] text-white shadow-xs' : 'bg-white text-slate-700 border border-slate-200'"
+                class="px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer"
+                aria-label="Switch to English Language"
+              >
+                🇬🇧 EN
+              </button>
+            </div>
           </div>
 
           <!-- Destek Bilgileri -->
