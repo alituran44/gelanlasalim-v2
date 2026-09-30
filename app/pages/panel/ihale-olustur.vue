@@ -19,7 +19,14 @@ import {
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useUserSession } from '~/composables/useUserSession'
-import { ALL_40_CATEGORIES, CATEGORY_SUBCATEGORIES_MAP, sanitizeExternalUrl } from '~/utils/taxonomy'
+import { 
+  ALL_40_CATEGORIES, 
+  CATEGORY_SUBCATEGORIES_MAP, 
+  sanitizeExternalUrl,
+  REAL_ESTATE_TRANSACTION_TYPES,
+  REAL_ESTATE_BID_METHODS,
+  REAL_ESTATE_SELLER_TYPES
+} from '~/utils/taxonomy'
 
 definePageMeta({ layout: 'dashboard' })
 
@@ -55,22 +62,28 @@ const CITIES = [
 ]
 
 // =========================================================================
-// 🗂️ 40 ANA KATEGORİ VE ALT KATEGORİ HARİTASI (Merkezi Taksonomi)
+// 🗂️ 40+ ANA KATEGORİ VE ALT KATEGORİ HARİTASI (Merkezi Taksonomi)
 // =========================================================================
 const categoryMap: Record<string, string[]> = {}
 
-// Tüm 40 kategoriyi ve alt kategorilerini doldur
+// Tüm kategorileri ve alt kategorilerini doldur
 ALL_40_CATEGORIES.forEach(cat => {
   const subs = [...(CATEGORY_SUBCATEGORIES_MAP[cat.id] || []), 'DİĞER']
   categoryMap[cat.name] = subs
   categoryMap[cat.short] = subs
 })
 
-// Kullanıcı dostu kısa adlar ve hiyerarşik uyumluluklar
+// Kullanıcı dostu kısa adlar ve hiyerarşik uyumluluklar (Satılık/Kiralık ASLA kategori değil, işlem türüdür)
 categoryMap['Diğer İhale ve İlanlar'] = ['Genel İlanlar', 'Özel Talep & Teklifler', 'Serbest Piyasa İlanları', 'Diğer Satış ve Kiralama', 'DİĞER']
 categoryMap['DİĞER'] = ['Genel İlanlar', 'Özel Talep & Teklifler', 'Serbest Piyasa İlanları', 'DİĞER']
-categoryMap['Gayrimenkul'] = ['Ev', 'Arsa', 'Ofis', 'İşyeri', 'Satılık Konut', 'Kiralık Konut', 'Satılık Arsa', 'Kiralık Arsa', 'Tarla & Bağ-Bahçe', 'Ticari Gayrimenkul', 'DİĞER']
-categoryMap['Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri'] = ['Ev', 'Arsa', 'Ofis', 'İşyeri', 'Satılık Konut', 'Kiralık Konut', 'Satılık Arsa', 'Kiralık Arsa', 'Tarla & Bağ-Bahçe', 'Ticari Gayrimenkul', 'DİĞER']
+categoryMap['Konut / Ev'] = [...(CATEGORY_SUBCATEGORIES_MAP[41] || []), 'DİĞER']
+categoryMap['Arsa / Arazi'] = [...(CATEGORY_SUBCATEGORIES_MAP[42] || []), 'DİĞER']
+categoryMap['İşyeri / Ticari Gayrimenkul'] = [...(CATEGORY_SUBCATEGORIES_MAP[43] || []), 'DİĞER']
+categoryMap['Bina'] = [...(CATEGORY_SUBCATEGORIES_MAP[44] || []), 'DİĞER']
+categoryMap['Turizm Tesisi'] = [...(CATEGORY_SUBCATEGORIES_MAP[45] || []), 'DİĞER']
+categoryMap['Özel Amaçlı Gayrimenkul'] = [...(CATEGORY_SUBCATEGORIES_MAP[46] || []), 'DİĞER']
+categoryMap['Gayrimenkul'] = ['Konut / Ev', 'Arsa / Arazi', 'İşyeri & Ticari Gayrimenkul', 'Bina', 'Turizm Tesisi', 'Özel Amaçlı Gayrimenkul', 'Kantin & Kafeterya', 'DİĞER']
+categoryMap['Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri'] = ['Konut / Ev', 'Arsa / Arazi', 'İşyeri & Ticari Gayrimenkul', 'Bina', 'Turizm Tesisi', 'Özel Amaçlı Gayrimenkul', 'Kantin & Kafeterya', 'DİĞER']
 categoryMap['İnşaat ve Yapı'] = categoryMap['İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri'] || ['Bina Yapımı & Taahhüt', 'Yol, Köprü & Viyadük', 'DİĞER']
 categoryMap['Sanayi ve Makine'] = categoryMap['Endüstriyel Makine - Motor - Konveyör İhaleleri'] || ['Üretim Makineleri', 'CNC & Takım Tezgahları', 'DİĞER']
 categoryMap['Bilgisayar ve Teknoloji'] = categoryMap['Yazılım - Bilgi Yönetim Hizmetleri - Bilişim İhaleleri'] || ['Özel Yazılım Geliştirme', 'ERP & Kurumsal Yazılımlar', 'DİĞER']
@@ -264,7 +277,9 @@ const SAHIBINDEN_TAPU_ARSA = [
   'Müstakil Parsel (Tek Tapu)',
   'Hisseli Tapu',
   'Tahsis',
-  'Zilliyet'
+  'Zilliyet',
+  'Kat İrtifaklı',
+  'Kat Mülkiyetli'
 ]
 
 const SAHIBINDEN_ALTYAPI_LIST = [
@@ -276,6 +291,76 @@ const SAHIBINDEN_ALTYAPI_LIST = [
   'Telefon / İnternet',
   'Sanayi Elektriği',
   'Kuyu / Sondaj'
+]
+
+// 🏡 Görsel 2 Standart Emlak Taksonomisi ve Özellik Sabitleri
+const REAL_ESTATE_ISLEM_TURLERI = [
+  'Satılık',
+  'Kiralık',
+  'Devren Satılık',
+  'Devren Kiralık',
+  'Kat Karşılığı'
+]
+
+const REAL_ESTATE_TEKLIF_YONTEMLERI = [
+  'Sabit Fiyat',
+  'Teklif Al',
+  'Açık Artırma'
+]
+
+const REAL_ESTATE_ILAN_VERENLER = [
+  'Sahibinden',
+  'Emlak Ofisinden',
+  'İnşaat Firmasından',
+  'Kurumdan'
+]
+
+const REAL_ESTATE_ARSA_ALT_KATEGORILER = [
+  'Konut İmarlı Arsa',
+  'Ticaret İmarlı Arsa',
+  'Konut + Ticaret İmarlı Arsa',
+  'Turizm İmarlı Arsa',
+  'Sanayi İmarlı Arsa',
+  'Tarla',
+  'Bağ',
+  'Bahçe',
+  'Zeytinlik',
+  'İmarsız Arazi'
+]
+
+const REAL_ESTATE_KONUT_ALT_KATEGORILER = [
+  'Daire',
+  'Müstakil Ev',
+  'Villa',
+  'İkiz Villa',
+  'Yazlık',
+  'Rezidans',
+  'Çiftlik Evi',
+  'Köy Evi',
+  'Yalı',
+  'Yalı Dairesi'
+]
+
+const REAL_ESTATE_NITELIKLER_ARSA = [
+  'Denize Yakın',
+  'Yatırımlık',
+  'Yola Cepheli',
+  'Köşe Parsel',
+  'Manzaralı',
+  'Köy İçi',
+  'Sanayi Bölgesinde',
+  'Gelişme Alanında'
+]
+
+const REAL_ESTATE_NITELIKLER_KONUT = [
+  'Denize Yakın',
+  'Yatırımlık',
+  'Merkezi Konum',
+  'Manzaralı',
+  'Güney Cephe',
+  'Site İçerisinde',
+  'Güvenlikli',
+  'Akıllı Ev'
 ]
 
 // =========================================================================
@@ -352,14 +437,17 @@ const reklamForm = reactive({
 })
 
 // =========================================================================
-// 4. ARSA STATE (Görsel: ARSA İÇİN)
+// 4. ARSA STATE (Görsel: ARSA İÇİN & Emlak Standartları)
 // =========================================================================
 const arsaForm = reactive({
-  anaKategori: 'GAYRİMENKUL İLANI',
+  anaKategori: 'Arsa / Arazi',
   anaKategoriDiger: '',
-  islemTuru: 'SATILIK', // KİRALIK | SATILIK | TAKAS | DİĞER
+  islemTuru: 'Satılık', // Satılık | Kiralık | Devren Satılık | Devren Kiralık | Kat Karşılığı | DİĞER
   islemTuruDiger: '',
-  altKategori: 'ARSA', // ARSA | KONUT İMARLI | İŞYERİ İMARLI | TARLA | ZEYTİNLİK | MEYVELİK | DİĞER
+  teklifYontemi: 'Sabit Fiyat', // Sabit Fiyat | Teklif Al | Açık Artırma
+  ilanVeren: 'Sahibinden', // Sahibinden | Emlak Ofisinden | İnşaat Firmasından | Kurumdan
+  ilanSahibi: '',
+  altKategori: 'Konut İmarlı Arsa', // 10 Görsel Standart Alt Kategori
   altKategoriDiger: '',
   il: 'Balıkesir',
   ilce: '',
@@ -379,7 +467,7 @@ const arsaForm = reactive({
   videoDosyasi: null as File | null,
   videoDosyaAdi: '',
 
-  // 🗺️ Sahibinden.com Standart Arsa Nitelikleri
+  // 🗺️ Arsa / Arazi Standart Nitelikleri
   imarDurumu: 'Konut İmarlı',
   imarDurumuDiger: '',
   m2Alan: '',
@@ -391,8 +479,8 @@ const arsaForm = reactive({
   krediyeUygun: 'Evet',
   takas: 'Hayır',
   altyapi: ['Elektrik', 'Su', 'Yol Açılmış', 'Doğalgaz'] as string[],
+  nitelikler: ['Yatırımlık'] as string[],
 
-  ilanVeren: '',
   adres: 'Balıkesir',
   telefon: '',
   webSayfasi: '',
@@ -401,14 +489,17 @@ const arsaForm = reactive({
 })
 
 // =========================================================================
-// 5. EV STATE (Görsel: EV)
+// 5. EV STATE (Görsel: EV & Konut Standartları)
 // =========================================================================
 const evForm = reactive({
-  anaKategori: 'GAYRİMENKUL İLANI',
+  anaKategori: 'Konut / Ev',
   anaKategoriDiger: '',
-  islemTuru: 'SATILIK', // KİRALIK | SATILIK | TAKAS | DİĞER
+  islemTuru: 'Satılık', // Satılık | Kiralık | Devren Satılık | Devren Kiralık | Kat Karşılığı | DİĞER
   islemTuruDiger: '',
-  altKategori: 'EV', // EV | VİLLA | OFİS | İŞYERİ | SİTE İÇİ EV | ARSA | DİĞER
+  teklifYontemi: 'Sabit Fiyat', // Sabit Fiyat | Teklif Al | Açık Artırma
+  ilanVeren: 'Sahibinden', // Sahibinden | Emlak Ofisinden | İnşaat Firmasından | Kurumdan
+  ilanSahibi: '',
+  altKategori: 'Daire', // 10 Görsel Standart Alt Kategori
   altKategoriDiger: '',
   il: 'Balıkesir',
   ilce: '',
@@ -423,7 +514,7 @@ const evForm = reactive({
   videoDosyasi: null as File | null,
   videoDosyaAdi: '',
 
-  // 🏠 Sahibinden.com Standart Konut Nitelikleri
+  // 🏠 Konut / Ev Standart Nitelikleri
   m2Brut: '',
   m2Net: '',
   odaSayisi: '3+1',
@@ -442,8 +533,8 @@ const evForm = reactive({
   tapuDurumu: 'Kat Mülkiyetli',
   takas: 'Hayır',
   aidat: '',
+  nitelikler: [] as string[],
 
-  ilanVeren: '',
   adres: 'Balıkesir',
   telefon: '',
   webSayfasi: '',
@@ -782,6 +873,26 @@ function toggleArsaAltyapi(item: string) {
   }
 }
 
+function toggleArsaNitelik(item: string) {
+  if (!arsaForm.nitelikler) arsaForm.nitelikler = []
+  const idx = arsaForm.nitelikler.indexOf(item)
+  if (idx > -1) {
+    arsaForm.nitelikler.splice(idx, 1)
+  } else {
+    arsaForm.nitelikler.push(item)
+  }
+}
+
+function toggleEvNitelik(item: string) {
+  if (!evForm.nitelikler) evForm.nitelikler = []
+  const idx = evForm.nitelikler.indexOf(item)
+  if (idx > -1) {
+    evForm.nitelikler.splice(idx, 1)
+  } else {
+    evForm.nitelikler.push(item)
+  }
+}
+
 // =========================================================================
 // 🚀 İLANI / İHALEYİ YAYINLAMA İŞLEMİ (SUBMIT)
 // =========================================================================
@@ -895,11 +1006,12 @@ async function submitCurrentForm() {
     } else if (activeFormMode.value === 'arsa') {
       if (!arsaForm.baslik.trim()) throw new Error('Lütfen arsa ilan başlığını giriniz.')
       finalBaslik = arsaForm.baslik.trim()
-      finalCategory = 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri'
+      finalCategory = 'Arsa / Arazi'
+      finalCategoryId = 42
       const islem = arsaForm.islemTuru === 'DİĞER' ? (arsaForm.islemTuruDiger || 'İlan') : arsaForm.islemTuru
-      const altK = arsaForm.altKategori === 'DİĞER' ? (arsaForm.altKategoriDiger || 'Arsa') : arsaForm.altKategori
-      finalSubCategory = `${islem} ${altK}`
-      finalDirection = islem === 'KİRALIK' ? 'kiralik' : 'arsa'
+      const altK = arsaForm.altKategori === 'DİĞER' ? (arsaForm.altKategoriDiger || 'Konut İmarlı Arsa') : arsaForm.altKategori
+      finalSubCategory = altK
+      finalDirection = (islem === 'Kiralık' || islem === 'Devren Kiralık') ? 'kiralik' : 'arsa'
       finalCity = arsaForm.il || 'Balıkesir'
       finalAddress = `${arsaForm.il} / ${arsaForm.ilce || ''} ${arsaForm.mahalle ? ' - ' + arsaForm.mahalle : ''}`
       finalBudget = arsaForm.tabanFiyat ? `${arsaForm.tabanFiyat} ₺` : 'Fiyat Belirtilmedi'
@@ -911,6 +1023,9 @@ async function submitCurrentForm() {
       finalCustomFields = {
         formType: 'ARSA',
         islemTuru: islem,
+        teklifYontemi: arsaForm.teklifYontemi,
+        ilanVeren: arsaForm.ilanVeren,
+        ilanSahibi: arsaForm.ilanSahibi,
         altKategori: altK,
         il: arsaForm.il,
         ilce: arsaForm.ilce,
@@ -928,6 +1043,7 @@ async function submitCurrentForm() {
         krediyeUygun: arsaForm.krediyeUygun,
         takas: arsaForm.takas,
         altyapi: [...arsaForm.altyapi],
+        nitelikler: [...(arsaForm.nitelikler || [])],
         tabanFiyat: arsaForm.tabanFiyat,
         ekspertizYap: arsaForm.ekspertizYap,
         haritaIsaretlendi: arsaForm.haritaIsaretlendi,
@@ -935,7 +1051,7 @@ async function submitCurrentForm() {
         videoUrl: arsaForm.videoUrl,
         videoDosyaAdi: arsaForm.videoDosyaAdi
       }
-      finalOwner = arsaForm.ilanVeren
+      finalOwner = arsaForm.ilanSahibi?.trim() || arsaForm.ilanVeren
       finalPhone = arsaForm.telefon
       finalWeb = arsaForm.webSayfasi
       finalAciklama = arsaForm.aciklama
@@ -943,11 +1059,12 @@ async function submitCurrentForm() {
     } else if (activeFormMode.value === 'ev') {
       if (!evForm.baslik.trim()) throw new Error('Lütfen ev / konut ilan başlığını giriniz.')
       finalBaslik = evForm.baslik.trim()
-      finalCategory = 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri'
+      finalCategory = 'Konut / Ev'
+      finalCategoryId = 41
       const islem = evForm.islemTuru === 'DİĞER' ? (evForm.islemTuruDiger || 'İlan') : evForm.islemTuru
-      const altK = evForm.altKategori === 'DİĞER' ? (evForm.altKategoriDiger || 'Ev') : evForm.altKategori
-      finalSubCategory = `${islem} ${altK}`
-      finalDirection = islem === 'KİRALIK' ? 'kiralik' : 'ev'
+      const altK = evForm.altKategori === 'DİĞER' ? (evForm.altKategoriDiger || 'Daire') : evForm.altKategori
+      finalSubCategory = altK
+      finalDirection = (islem === 'Kiralık' || islem === 'Devren Kiralık') ? 'kiralik' : 'ev'
       finalCity = evForm.il || 'Balıkesir'
       finalAddress = `${evForm.il} / ${evForm.ilce || ''} ${evForm.mahalle ? ' - ' + evForm.mahalle : ''}`
       finalBudget = evForm.tabanFiyat ? `${evForm.tabanFiyat} ₺` : 'Fiyat Belirtilmedi'
@@ -959,6 +1076,9 @@ async function submitCurrentForm() {
       finalCustomFields = {
         formType: 'EV',
         islemTuru: islem,
+        teklifYontemi: evForm.teklifYontemi,
+        ilanVeren: evForm.ilanVeren,
+        ilanSahibi: evForm.ilanSahibi,
         altKategori: altK,
         il: evForm.il,
         ilce: evForm.ilce,
@@ -985,10 +1105,11 @@ async function submitCurrentForm() {
         tapuDurumu: evForm.tapuDurumu,
         takas: evForm.takas,
         aidat: evForm.aidat,
+        nitelikler: [...(evForm.nitelikler || [])],
         videoUrl: evForm.videoUrl,
         videoDosyaAdi: evForm.videoDosyaAdi
       }
-      finalOwner = evForm.ilanVeren
+      finalOwner = evForm.ilanSahibi?.trim() || evForm.ilanVeren
       finalPhone = evForm.telefon
       finalWeb = evForm.webSayfasi
       finalAciklama = evForm.aciklama
@@ -1041,7 +1162,7 @@ async function submitCurrentForm() {
     const newId = `TND-${Date.now().toString().slice(-6)}`
     const ownerEmail = userSession.value?.email || 'kullanici@ihaleciburada.com'
 
-    // Kategori ID Çözümleme
+    // Kategori ID Çözümleme (Görsel Standart Taksonomisi: Ev 41, Arsa 42, İşyeri 43...)
     let finalCategoryId = 99
     if (
       activeFormMode.value === 'diger' || 
@@ -1054,11 +1175,22 @@ async function submitCurrentForm() {
     ) {
       finalCategoryId = 99
       finalCategory = 'Diğer İhale ve İlanlar'
+    } else if (activeFormMode.value === 'ev' || finalCategory === 'Konut / Ev') {
+      finalCategoryId = 41
+      finalCategory = 'Konut / Ev'
+    } else if (activeFormMode.value === 'arsa' || finalCategory === 'Arsa / Arazi') {
+      finalCategoryId = 42
+      finalCategory = 'Arsa / Arazi'
+    } else if (finalCategory === 'İşyeri / Ticari Gayrimenkul') {
+      finalCategoryId = 43
+    } else if (finalCategory === 'Bina') {
+      finalCategoryId = 44
+    } else if (finalCategory === 'Turizm Tesisi') {
+      finalCategoryId = 45
+    } else if (finalCategory === 'Özel Amaçlı Gayrimenkul') {
+      finalCategoryId = 46
     } else if (
-      activeFormMode.value === 'arsa' || 
-      activeFormMode.value === 'ev' || 
       finalCategory.toLowerCase().includes('gayrimenkul') || 
-      finalCategory.toLowerCase().includes('arsa') || 
       finalCategory.toLowerCase().includes('emlak')
     ) {
       finalCategoryId = 40
@@ -1073,8 +1205,8 @@ async function submitCurrentForm() {
     if (activeFormMode.value === 'eksiltme') ilanTuru = 'Açık Eksiltme'
     else if (activeFormMode.value === 'sabit_fiyat') ilanTuru = 'Sabit Fiyat'
     else if (activeFormMode.value === 'reklam') ilanTuru = 'Reklam İlanı'
-    else if (activeFormMode.value === 'arsa') ilanTuru = arsaForm.islemTuru === 'KİRALIK' ? 'Kiralık Arsa İlanı' : 'Arsa İçin'
-    else if (activeFormMode.value === 'ev') ilanTuru = evForm.islemTuru === 'KİRALIK' ? 'Kiralık Ev İlanı' : 'Ev'
+    else if (activeFormMode.value === 'arsa') ilanTuru = 'Arsa / Arazi'
+    else if (activeFormMode.value === 'ev') ilanTuru = 'Konut / Ev'
     else if (activeFormMode.value === 'diger') ilanTuru = 'Diğer İlanlar'
 
     const normalizedWeb = sanitizeExternalUrl(finalWeb)
@@ -2104,18 +2236,18 @@ async function submitCurrentForm() {
       
       <!-- Pembe Çizim Başlığı -->
       <div class="border-b border-pink-100 pb-3">
-        <h2 class="text-sm font-black uppercase tracking-wider text-pink-600">ARSA İÇİN</h2>
-        <p class="text-[11px] text-slate-400">Arsa, arazi, tarla, zeytinlik ve imarlı mülk ilanı</p>
+        <h2 class="text-sm font-black uppercase tracking-wider text-pink-600">ARSA / ARAZİ İLANI</h2>
+        <p class="text-[11px] text-slate-400">Konut imarlı, ticaret imarlı, turizm/sanayi imarlı arsa, tarla, bağ, bahçe, zeytinlik ve imarsız arazi</p>
       </div>
 
-      <!-- Ana Kategori: GAYRİMENKUL İLANI (veya Diğer) -->
+      <!-- Ana Kategori: ARSA / ARAZİ -->
       <div class="space-y-1.5">
         <label class="block text-[11px] font-black uppercase tracking-wider text-emerald-600">ANA KATAGORİ</label>
         <select 
           v-model="arsaForm.anaKategori"
           class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
         >
-          <option value="GAYRİMENKUL İLANI">GAYRİMENKUL İLANI</option>
+          <option value="Arsa / Arazi">Arsa / Arazi</option>
           <option value="DİĞER">DİĞER</option>
         </select>
         <div v-if="arsaForm.anaKategori === 'DİĞER'" class="pt-1">
@@ -2129,15 +2261,18 @@ async function submitCurrentForm() {
         </div>
       </div>
 
-      <!-- Sol & Sağ Menü (Görsel): KİRALIK/SATILIK/TAKAS vs. ARSA/KONUT/TARLA -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- 4 Temel Emlak Parametresi: İŞLEM TÜRÜ, TEKLİF YÖNTEMİ, İLAN VEREN, ALT KATEGORİ -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         
-        <!-- Sol: İLAN TÜRÜ (KİRALIK, SATILIK, TAKAS, DİĞER) -->
-        <div class="space-y-2 border border-slate-200 rounded-2xl p-3 bg-slate-50/40">
-          <span class="block text-[11px] font-black text-slate-700 uppercase">İŞLEM TÜRÜ</span>
-          <div class="grid grid-cols-3 gap-2">
+        <!-- 1. İŞLEM TÜRÜ (Satılık, Kiralık, Devren Satılık, Devren Kiralık, Kat Karşılığı) -->
+        <div class="space-y-2 border border-slate-200 rounded-2xl p-3.5 bg-slate-50/40">
+          <div class="flex items-center justify-between">
+            <span class="block text-[11px] font-black text-slate-700 uppercase">İŞLEM TÜRÜ</span>
+            <span class="text-[10px] text-pink-600 font-bold">Kategori Değil, İşlem Seçeneği</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
             <button
-              v-for="tur in ['KİRALIK', 'SATILIK', 'TAKAS']"
+              v-for="tur in REAL_ESTATE_ISLEM_TURLERI"
               :key="tur"
               type="button"
               @click="arsaForm.islemTuru = tur"
@@ -2148,44 +2283,36 @@ async function submitCurrentForm() {
             >
               {{ tur }}
             </button>
+            <button
+              type="button"
+              @click="arsaForm.islemTuru = 'DİĞER'"
+              class="py-2 px-1 rounded-xl text-xs font-black transition cursor-pointer border text-center"
+              :class="arsaForm.islemTuru === 'DİĞER' ? 'bg-pink-600 text-white border-pink-600 shadow-2xs' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'"
+            >
+              DİĞER
+            </button>
           </div>
-          <button
-            type="button"
-            @click="arsaForm.islemTuru = 'DİĞER'"
-            class="w-full py-1.5 px-2 rounded-xl text-xs font-black transition cursor-pointer border text-center"
-            :class="arsaForm.islemTuru === 'DİĞER' ? 'bg-pink-600 text-white border-pink-600' : 'bg-white text-slate-700 border-slate-300'"
-          >
-            DİĞER
-          </button>
           <div v-if="arsaForm.islemTuru === 'DİĞER'" class="pt-1">
             <input 
               v-model="arsaForm.islemTuruDiger"
               type="text"
-              placeholder="ELLE GİRİLSİN"
+              placeholder="Örn: Hasılat Paylaşımlı"
               class="w-full rounded-xl border-2 border-dashed border-pink-400 p-2 text-xs font-bold"
             />
           </div>
         </div>
 
-        <!-- Sağ: ALT KATEGORİ (ARSA, KONUT İMARLI, İŞYERİ İMARLI, TARLA, ZEYTİNLİK, MEYVELİK, DİĞER) -->
-        <div class="space-y-2 border border-slate-200 rounded-2xl p-3 bg-slate-50/40">
+        <!-- 2. ALT KATEGORİ (Arsa / Arazi Standart Taşınmaz Türleri) -->
+        <div class="space-y-2 border border-slate-200 rounded-2xl p-3.5 bg-slate-50/40">
           <div class="flex items-center justify-between">
-            <span class="block text-[11px] font-black text-emerald-600 uppercase">ALT KATAGORİ</span>
+            <span class="block text-[11px] font-black text-emerald-600 uppercase">ALT KATAGORİ (TAŞINMAZ TÜRÜ)</span>
             <span class="text-[10px] text-slate-400 font-bold">SEÇ</span>
           </div>
           <select 
             v-model="arsaForm.altKategori"
             class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
           >
-            <option value="EV">EV</option>
-            <option value="ARSA">ARSA</option>
-            <option value="OFİS">OFİS</option>
-            <option value="İŞYERİ">İŞYERİ</option>
-            <option value="KONUT İMARLI">KONUT İMARLI</option>
-            <option value="İŞYERİ İMARLI">İŞYERİ İMARLI</option>
-            <option value="TARLA">TARLA</option>
-            <option value="ZEYTİNLİK">ZEYTİNLİK</option>
-            <option value="MEYVELİK">MEYVELİK</option>
+            <option v-for="item in REAL_ESTATE_ARSA_ALT_KATEGORILER" :key="item" :value="item">{{ item }}</option>
             <option value="DİĞER">DİĞER</option>
           </select>
           <div v-if="arsaForm.altKategori === 'DİĞER'" class="pt-1">
@@ -2195,6 +2322,44 @@ async function submitCurrentForm() {
               placeholder="ELLE GİRİLSİN"
               class="w-full rounded-xl border-2 border-dashed border-pink-400 p-2 text-xs font-bold"
             />
+          </div>
+        </div>
+
+        <!-- 3. TEKLİF YÖNTEMİ (Sabit Fiyat, Teklif Al, Açık Artırma) -->
+        <div class="space-y-2 border border-slate-200 rounded-2xl p-3.5 bg-slate-50/40">
+          <span class="block text-[11px] font-black text-slate-700 uppercase">TEKLİF YÖNTEMİ</span>
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              v-for="yontem in REAL_ESTATE_TEKLIF_YONTEMLERI"
+              :key="yontem"
+              type="button"
+              @click="arsaForm.teklifYontemi = yontem"
+              class="py-2 px-1 rounded-xl text-xs font-black text-center transition cursor-pointer border"
+              :class="arsaForm.teklifYontemi === yontem 
+                ? 'bg-slate-900 text-white border-slate-900 shadow-2xs' 
+                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'"
+            >
+              {{ yontem }}
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. İLAN VEREN (Sahibinden, Emlak Ofisinden, İnşaat Firmasından, Kurumdan) -->
+        <div class="space-y-2 border border-slate-200 rounded-2xl p-3.5 bg-slate-50/40">
+          <span class="block text-[11px] font-black text-slate-700 uppercase">İLAN VEREN</span>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+            <button
+              v-for="veren in REAL_ESTATE_ILAN_VERENLER"
+              :key="veren"
+              type="button"
+              @click="arsaForm.ilanVeren = veren"
+              class="py-2 px-1 rounded-xl text-[11px] font-black text-center transition cursor-pointer border truncate"
+              :class="arsaForm.ilanVeren === veren 
+                ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs' 
+                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'"
+            >
+              {{ veren }}
+            </button>
           </div>
         </div>
 
@@ -2583,6 +2748,32 @@ async function submitCurrentForm() {
           </div>
         </div>
 
+        <!-- ÖNE ÇIKAN NİTELİKLER (Denize Yakın, Yatırımlık - Kategori Değil, Niteliktir) -->
+        <div class="pt-2 border-t border-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <label class="text-[10px] font-black uppercase text-slate-700">ÖNE ÇIKAN NİTELİKLER & AVANTAJLAR</label>
+              <span class="text-[9px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">Filtre & Rozet Alanı</span>
+            </div>
+            <span class="text-[10px] font-bold text-slate-400">ÇOKLU SEÇ</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="nit in REAL_ESTATE_NITELIKLER_ARSA"
+              :key="nit"
+              type="button"
+              @click="toggleArsaNitelik(nit)"
+              class="px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border flex items-center gap-1.5"
+              :class="arsaForm.nitelikler.includes(nit)
+                ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'"
+            >
+              <span v-if="arsaForm.nitelikler.includes(nit)">✓</span>
+              <span>{{ nit }}</span>
+            </button>
+          </div>
+        </div>
+
       </div>
 
       <!-- TABAN FİYAT & EXPERTİZ YAP (ÜCRETLİ) -->
@@ -2707,11 +2898,14 @@ async function submitCurrentForm() {
 
       <!-- İLAN VEREN BİLGİSİ -->
       <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/30 space-y-3">
-        <label class="block text-[11px] font-black uppercase text-slate-800">İLAN VEREN BİLGİSİ</label>
+        <div class="flex items-center justify-between">
+          <label class="block text-[11px] font-black uppercase text-slate-800">İLAN VEREN ADI / FİRMA BİLGİSİ</label>
+          <span class="text-[10px] text-emerald-700 font-bold">Tür: {{ arsaForm.ilanVeren }}</span>
+        </div>
         <input 
-          v-model="arsaForm.ilanVeren"
+          v-model="arsaForm.ilanSahibi"
           type="text"
-          placeholder="İlan Sahibi / Emlak Ofisi Adı"
+          placeholder="İlan Sahibi / Emlak Ofisi Adı / Yetkili"
           class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
         />
 
@@ -2795,18 +2989,18 @@ async function submitCurrentForm() {
       
       <!-- Pembe Çizim Başlığı -->
       <div class="border-b border-pink-100 pb-3">
-        <h2 class="text-sm font-black uppercase tracking-wider text-pink-600">EV</h2>
-        <p class="text-[11px] text-slate-400">Konut, daire, villa, rezidans, ofis ve mülk ilanı</p>
+        <h2 class="text-sm font-black uppercase tracking-wider text-pink-600">KONUT / EV İLANI</h2>
+        <p class="text-[11px] text-slate-400">Daire, müstakil ev, villa, ikiz villa, yazlık, rezidans, çiftlik evi, köy evi, yalı ve yalı dairesi</p>
       </div>
 
-      <!-- Ana Kategori: GAYRİMENKUL İLANI -->
+      <!-- Ana Kategori: KONUT / EV -->
       <div class="space-y-1.5">
         <label class="block text-[11px] font-black uppercase tracking-wider text-emerald-600">ANA KATAGORİ</label>
         <select 
           v-model="evForm.anaKategori"
           class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
         >
-          <option value="GAYRİMENKUL İLANI">GAYRİMENKUL İLANI</option>
+          <option value="Konut / Ev">Konut / Ev</option>
           <option value="DİĞER">DİĞER</option>
         </select>
         <div v-if="evForm.anaKategori === 'DİĞER'" class="pt-1">
@@ -2819,15 +3013,18 @@ async function submitCurrentForm() {
         </div>
       </div>
 
-      <!-- Sol & Sağ Menü (Görsel): KİRALIK/SATILIK vs EV/VİLLA/OFİS/İŞYERİ/SİTE İÇİ EV -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <!-- 4 Temel Emlak Parametresi: İŞLEM TÜRÜ, TEKLİF YÖNTEMİ, İLAN VEREN, ALT KATEGORİ -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         
-        <!-- Sol: İŞLEM TÜRÜ -->
-        <div class="space-y-2 border border-slate-200 rounded-2xl p-3 bg-slate-50/40">
-          <span class="block text-[11px] font-black text-slate-700 uppercase">İŞLEM TÜRÜ</span>
-          <div class="grid grid-cols-3 gap-2">
+        <!-- 1. İŞLEM TÜRÜ (Satılık, Kiralık, Devren Satılık, Devren Kiralık, Kat Karşılığı) -->
+        <div class="space-y-2 border border-slate-200 rounded-2xl p-3.5 bg-slate-50/40">
+          <div class="flex items-center justify-between">
+            <span class="block text-[11px] font-black text-slate-700 uppercase">İŞLEM TÜRÜ</span>
+            <span class="text-[10px] text-pink-600 font-bold">Kategori Değil, İşlem Seçeneği</span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
             <button
-              v-for="tur in ['KİRALIK', 'SATILIK', 'TAKAS']"
+              v-for="tur in REAL_ESTATE_ISLEM_TURLERI"
               :key="tur"
               type="button"
               @click="evForm.islemTuru = tur"
@@ -2838,41 +3035,36 @@ async function submitCurrentForm() {
             >
               {{ tur }}
             </button>
+            <button
+              type="button"
+              @click="evForm.islemTuru = 'DİĞER'"
+              class="py-2 px-1 rounded-xl text-xs font-black transition cursor-pointer border text-center"
+              :class="evForm.islemTuru === 'DİĞER' ? 'bg-pink-600 text-white border-pink-600 shadow-2xs' : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'"
+            >
+              DİĞER
+            </button>
           </div>
-          <button
-            type="button"
-            @click="evForm.islemTuru = 'DİĞER'"
-            class="w-full py-1.5 px-2 rounded-xl text-xs font-black transition cursor-pointer border text-center"
-            :class="evForm.islemTuru === 'DİĞER' ? 'bg-pink-600 text-white border-pink-600' : 'bg-white text-slate-700 border-slate-300'"
-          >
-            DİĞER
-          </button>
           <div v-if="evForm.islemTuru === 'DİĞER'" class="pt-1">
             <input 
               v-model="evForm.islemTuruDiger"
               type="text"
-              placeholder="ELLE GİRİLSİN"
+              placeholder="Örn: Hasılat Paylaşımlı"
               class="w-full rounded-xl border-2 border-dashed border-pink-400 p-2 text-xs font-bold"
             />
           </div>
         </div>
 
-        <!-- Sağ: ALT KATEGORİ (EV, VİLLA, OFİS, İŞYERİ, SİTE İÇİ EV, ARSA, DİĞER) -->
-        <div class="space-y-2 border border-slate-200 rounded-2xl p-3 bg-slate-50/40">
+        <!-- 2. ALT KATEGORİ (Konut / Ev Standart Taşınmaz Türleri) -->
+        <div class="space-y-2 border border-slate-200 rounded-2xl p-3.5 bg-slate-50/40">
           <div class="flex items-center justify-between">
-            <span class="block text-[11px] font-black text-emerald-600 uppercase">ALT KATAGORİ</span>
+            <span class="block text-[11px] font-black text-emerald-600 uppercase">ALT KATAGORİ (TAŞINMAZ TÜRÜ)</span>
             <span class="text-[10px] text-slate-400 font-bold">SEÇ</span>
           </div>
           <select 
             v-model="evForm.altKategori"
             class="w-full rounded-xl border border-slate-300 p-2.5 text-xs font-bold text-slate-800 bg-white outline-none focus:border-pink-500"
           >
-            <option value="EV">EV</option>
-            <option value="ARSA">ARSA</option>
-            <option value="OFİS">OFİS</option>
-            <option value="İŞYERİ">İŞYERİ</option>
-            <option value="VİLLA">VİLLA</option>
-            <option value="SİTE İÇİ EV">SİTE İÇİ EV</option>
+            <option v-for="item in REAL_ESTATE_KONUT_ALT_KATEGORILER" :key="item" :value="item">{{ item }}</option>
             <option value="DİĞER">DİĞER</option>
           </select>
           <div v-if="evForm.altKategori === 'DİĞER'" class="pt-1">
@@ -2882,6 +3074,44 @@ async function submitCurrentForm() {
               placeholder="ELLE GİRİLSİN"
               class="w-full rounded-xl border-2 border-dashed border-pink-400 p-2 text-xs font-bold"
             />
+          </div>
+        </div>
+
+        <!-- 3. TEKLİF YÖNTEMİ (Sabit Fiyat, Teklif Al, Açık Artırma) -->
+        <div class="space-y-2 border border-slate-200 rounded-2xl p-3.5 bg-slate-50/40">
+          <span class="block text-[11px] font-black text-slate-700 uppercase">TEKLİF YÖNTEMİ</span>
+          <div class="grid grid-cols-3 gap-2">
+            <button
+              v-for="yontem in REAL_ESTATE_TEKLIF_YONTEMLERI"
+              :key="yontem"
+              type="button"
+              @click="evForm.teklifYontemi = yontem"
+              class="py-2 px-1 rounded-xl text-xs font-black text-center transition cursor-pointer border"
+              :class="evForm.teklifYontemi === yontem 
+                ? 'bg-slate-900 text-white border-slate-900 shadow-2xs' 
+                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'"
+            >
+              {{ yontem }}
+            </button>
+          </div>
+        </div>
+
+        <!-- 4. İLAN VEREN (Sahibinden, Emlak Ofisinden, İnşaat Firmasından, Kurumdan) -->
+        <div class="space-y-2 border border-slate-200 rounded-2xl p-3.5 bg-slate-50/40">
+          <span class="block text-[11px] font-black text-slate-700 uppercase">İLAN VEREN</span>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+            <button
+              v-for="veren in REAL_ESTATE_ILAN_VERENLER"
+              :key="veren"
+              type="button"
+              @click="evForm.ilanVeren = veren"
+              class="py-2 px-1 rounded-xl text-[11px] font-black text-center transition cursor-pointer border truncate"
+              :class="evForm.ilanVeren === veren 
+                ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs' 
+                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'"
+            >
+              {{ veren }}
+            </button>
           </div>
         </div>
 
@@ -3377,15 +3607,45 @@ async function submitCurrentForm() {
           </div>
 
         </div>
+
+        <!-- ÖNE ÇIKAN NİTELİKLER (Denize Yakın, Yatırımlık - Kategori Değil, Niteliktir) -->
+        <div class="pt-2 border-t border-slate-200">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <label class="text-[10px] font-black uppercase text-slate-700">ÖNE ÇIKAN NİTELİKLER & AVANTAJLAR</label>
+              <span class="text-[9px] font-bold text-pink-600 bg-pink-50 px-2 py-0.5 rounded border border-pink-200">Filtre & Rozet Alanı</span>
+            </div>
+            <span class="text-[10px] font-bold text-slate-400">ÇOKLU SEÇ</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="nit in REAL_ESTATE_NITELIKLER_KONUT"
+              :key="nit"
+              type="button"
+              @click="toggleEvNitelik(nit)"
+              class="px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border flex items-center gap-1.5"
+              :class="evForm.nitelikler.includes(nit)
+                ? 'bg-pink-600 text-white border-pink-600 shadow-2xs'
+                : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-100'"
+            >
+              <span v-if="evForm.nitelikler.includes(nit)">✓</span>
+              <span>{{ nit }}</span>
+            </button>
+          </div>
+        </div>
+
       </div>
 
       <!-- İLAN VEREN BİLGİSİ -->
       <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/30 space-y-3">
-        <label class="block text-[11px] font-black uppercase text-slate-800">İLAN VEREN BİLGİSİ</label>
+        <div class="flex items-center justify-between">
+          <label class="block text-[11px] font-black uppercase text-slate-800">İLAN VEREN ADI / FİRMA BİLGİSİ</label>
+          <span class="text-[10px] text-pink-600 font-bold">Tür: {{ evForm.ilanVeren }}</span>
+        </div>
         <input 
-          v-model="evForm.ilanVeren"
+          v-model="evForm.ilanSahibi"
           type="text"
-          placeholder="İlan Sahibi / Emlak Ofisi Adı"
+          placeholder="İlan Sahibi / Emlak Ofisi Adı / Yetkili"
           class="w-full rounded-xl border border-slate-300 p-3 text-xs font-bold text-slate-800 outline-none bg-white focus:border-pink-500"
         />
 

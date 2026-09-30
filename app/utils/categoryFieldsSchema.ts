@@ -854,6 +854,17 @@ export function resolveSectorKey(category?: string | number, subCategory?: strin
   const subStr = String(subCategory || '').trim().toLowerCase()
   const combined = `${catStr} ${subStr}`
 
+  // Hızlı ID & Ana Kategori Eşleşmesi (41: Konut, 42: Arsa, 43: Ticari, 44: Bina, 45: Turizm)
+  if (catStr === '42' || catStr.includes('arsa') || catStr.includes('arazi')) {
+    return 'arsa_arazi'
+  }
+  if (catStr === '41' || catStr.includes('konut') || catStr === 'ev') {
+    return 'konut_daire'
+  }
+  if (catStr === '43' || catStr === '44' || catStr === '45' || catStr.includes('işyeri') || catStr.includes('ticari')) {
+    return 'ticari_gayrimenkul'
+  }
+
   // 1. Arsa & İmar & Tarla & Kat Karşılığı & Bağ / Bahçe
   if (
     subStr.includes('arsa') ||

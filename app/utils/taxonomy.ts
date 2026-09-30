@@ -31,7 +31,13 @@ export function sanitizeExternalUrl(url?: string | null): string {
 
 export const ALL_40_CATEGORIES = [
   { id: 99, name: 'Diğer İhale ve İlanlar', short: 'Diğer', icon: '✨', orderRank: 1 },
-  { id: 40, name: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri', short: 'Emlak & Gayrimenkul', icon: '🏢', orderRank: 2 },
+  { id: 41, name: 'Konut / Ev', short: 'Konut / Ev', icon: '🏠', orderRank: 2 },
+  { id: 42, name: 'Arsa / Arazi', short: 'Arsa / Arazi', icon: '🗺️', orderRank: 2.1 },
+  { id: 43, name: 'İşyeri / Ticari Gayrimenkul', short: 'İşyeri & Ticari', icon: '🏢', orderRank: 2.2 },
+  { id: 44, name: 'Bina', short: 'Bina', icon: '🏬', orderRank: 2.3 },
+  { id: 45, name: 'Turizm Tesisi', short: 'Turizm Tesisi', icon: '🏨', orderRank: 2.4 },
+  { id: 46, name: 'Özel Amaçlı Gayrimenkul', short: 'Özel Amaçlı', icon: '🏛️', orderRank: 2.5 },
+  { id: 40, name: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri', short: 'Emlak & Gayrimenkul (Genel)', icon: '🏢', orderRank: 2.6 },
   { id: 1, name: 'İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri', short: 'İnşaat & Altyapı', icon: '🏗️', orderRank: 3 },
   { id: 3, name: 'Gıda - Tarım Ürünleri - Yiyecek - İçecek İhaleleri', short: 'Tarım & Gıda', icon: '🌾', orderRank: 4 },
   { id: 2, name: 'Sağlık - İlaç - Kozmetik - Medikal İhaleleri', short: 'Sağlık & Medikal', icon: '💊', orderRank: 5 },
@@ -133,9 +139,104 @@ export const CATEGORY_SUBCATEGORIES_MAP: Record<number, string[]> = {
   37: ['Sosyal Tesis & Misafirhane İşletmeciliği', 'Danışma, Karşılama & Resepsiyon Hizmeti', 'Bina & Site Yönetim Hizmetleri', 'Bordrolama & Destek Personeli Temini', 'Posta, Evrak Dağıtım & Kurye'],
   38: ['Filo Kasko & Trafik Sigortası', 'Yangın & Deprem (DASK) Sigortası', 'Grup Sağlık & Ferdi Kaza Sigortası', 'Mali Müşavirlik & Bağımsız Denetim', 'Hukuki Danışmanlık & Tahkim'],
   39: ['Hacizli & Kurum İkinci El Araç Satışı', 'Hurda Demir, Bakır & Alüminyum', 'Hurda Kağıt, Karton & Plastik', 'Kullanım Dışı Elektronik Hurda (E-Atık)', 'Ekonomik Ömrünü Tamamlamış Taşıt Satışı'],
-  40: ['Ev', 'Arsa', 'Ofis', 'İşyeri', 'Kiralık Konut & Daire', 'Satılık Konut & Daire', 'Kiralık Arsa & Arazi', 'Satılık Arsa & Arazi', 'Kiralık Ofis & Büro', 'Satılık İşyeri & Dükkan', 'Tarla & Bağ-Bahçe', 'Ticari Gayrimenkul', 'Diğer'],
+  41: [
+    'Daire',
+    'Müstakil Ev',
+    'Villa',
+    'İkiz Villa',
+    'Yazlık',
+    'Rezidans',
+    'Çiftlik Evi',
+    'Köy Evi',
+    'Yalı',
+    'Yalı Dairesi'
+  ],
+  42: [
+    'Konut İmarlı Arsa',
+    'Ticaret İmarlı Arsa',
+    'Konut + Ticaret İmarlı Arsa',
+    'Turizm İmarlı Arsa',
+    'Sanayi İmarlı Arsa',
+    'Tarla',
+    'Bağ',
+    'Bahçe',
+    'Zeytinlik',
+    'İmarsız Arazi'
+  ],
+  43: [
+    'Dükkân',
+    'Mağaza',
+    'Ofis',
+    'Büro',
+    'Depo',
+    'Atölye',
+    'Fabrika',
+    'İmalathane',
+    'Plaza',
+    'İş Hanı',
+    'Alışveriş Merkezi'
+  ],
+  44: [
+    'Apartman',
+    'Ticari Bina',
+    'Karma Kullanımlı Bina',
+    'Müstakil Bina'
+  ],
+  45: [
+    'Otel',
+    'Butik Otel',
+    'Pansiyon',
+    'Apart Otel',
+    'Tatil Köyü',
+    'Kamp Alanı',
+    'Günübirlik Tesis'
+  ],
+  46: [
+    'Akaryakıt İstasyonu',
+    'Otopark',
+    'Özel Okul',
+    'Öğrenci Yurdu',
+    'Sağlık Tesisi',
+    'Spor Tesisi',
+    'Tarımsal İşletme'
+  ],
+  40: [
+    'Konut / Ev',
+    'Arsa / Arazi',
+    'İşyeri & Ticari Gayrimenkul',
+    'Bina',
+    'Turizm Tesisi',
+    'Özel Amaçlı Gayrimenkul',
+    'Kantin & Kafeterya',
+    'Diğer'
+  ],
   99: ['Genel İlanlar', 'Özel Talep & Teklifler', 'Serbest Piyasa İlanları', 'Diğer Satış ve Kiralama', 'Diğer']
 };
+
+/**
+ * 🏡 Emlak / Gayrimenkul Standart İşlem Türleri, Teklif Yöntemleri ve İlan Veren Tanımları
+ * Satılık ve Kiralık alt kategori DEĞİLDİR; İşlem Türü olarak yönetilir.
+ */
+export const REAL_ESTATE_TRANSACTION_TYPES = [
+  'Satılık',
+  'Kiralık',
+  'Devren Satılık',
+  'Devren Kiralık',
+  'Kat Karşılığı'
+] as const;
+
+export const REAL_ESTATE_BID_METHODS = [
+  'Sabit Fiyat',
+  'Teklif Al',
+  'Açık Artırma'
+] as const;
+
+export const REAL_ESTATE_SELLER_TYPES = [
+  'Sahibinden',
+  'Emlak Ofisinden',
+  'İnşaat Firmasından',
+  'Kurumdan'
+] as const;
 
 export const TENDER_TYPES = [
   'Tümü',
@@ -230,6 +331,12 @@ const CATEGORY_KEYWORDS: Record<number, string[]> = {
   37: ['işletmecilik', 'işçilik', 'sosyal hizmetler', 'tesis yönetim', 'resepsiyon'],
   38: ['sigorta', 'mali', 'hukuki', 'kasko', 'dask', 'denetim'],
   39: ['araç satış', 'hurda', 'menkul mal', 'hurda demir'],
+  41: ['konut', 'ev', 'daire', 'müstakil ev', 'villa', 'ikiz villa', 'yazlık', 'rezidans', 'çiftlik evi', 'köy evi', 'yalı', 'yalı dairesi'],
+  42: ['arsa', 'arazi', 'konut imarlı', 'ticaret imarlı', 'turizm imarlı', 'sanayi imarlı', 'tarla', 'bağ', 'bahçe', 'zeytinlik', 'imarsız arazi', 'ada', 'parsel'],
+  43: ['işyeri', 'ticari', 'dükkan', 'dükkân', 'mağaza', 'ofis', 'büro', 'depo', 'atölye', 'fabrika', 'imalathane', 'plaza', 'iş hanı', 'alışveriş merkezi', 'avm'],
+  44: ['bina', 'apartman', 'ticari bina', 'karma kullanımlı bina', 'müstakil bina'],
+  45: ['turizm', 'otel', 'butik otel', 'pansiyon', 'apart otel', 'tatil köyü', 'kamp alanı', 'günübirlik tesis'],
+  46: ['özel amaçlı', 'akaryakıt istasyonu', 'benzinlik', 'otopark', 'özel okul', 'öğrenci yurdu', 'sağlık tesisi', 'spor tesisi', 'tarımsal işletme'],
   40: ['gayrimenkul', 'arsa', 'ev', 'konut', 'daire', 'ofis', 'işyeri', 'dükkan', 'kantin', 'tarla', 'kat karşılığı'],
   99: ['diğer', 'diger', 'özel ilan', 'serbest', 'muhtelif', 'reklam']
 };
@@ -293,10 +400,120 @@ export function matchTenderToCategory(tender: any, catInput: any): boolean {
     }
   }
 
-  // Özel Durum: Kategori 40 (Gayrimenkul & Arsa & Ev & Ofis & İşyeri)
+  // Özel Durum: Kategori 41 (Konut / Ev)
+  if (catId === 41 || (catObj && catObj.id === 41) || (typeof catInput === 'string' && (normTr(catInput).includes('konut') || normTr(catInput) === 'ev'))) {
+    if (
+      Number(tender.categoryId) === 41 ||
+      fType === 'EV' ||
+      tender.ihaleYonu === 'ev' ||
+      tCat.includes('konut') ||
+      tCat.includes('ev') ||
+      tSub.includes('daire') ||
+      tSub.includes('villa') ||
+      tSub.includes('rezidans') ||
+      tSub.includes('yazlık') ||
+      tSub.includes('müstakil') ||
+      tTitle.includes('daire') ||
+      tTitle.includes('villa') ||
+      tTitle.includes('konut')
+    ) {
+      return true;
+    }
+  }
+
+  // Özel Durum: Kategori 42 (Arsa / Arazi)
+  if (catId === 42 || (catObj && catObj.id === 42) || (typeof catInput === 'string' && (normTr(catInput).includes('arsa') || normTr(catInput).includes('arazi')))) {
+    if (
+      Number(tender.categoryId) === 42 ||
+      fType === 'ARSA' ||
+      tender.ihaleYonu === 'arsa' ||
+      tCat.includes('arsa') ||
+      tCat.includes('arazi') ||
+      tSub.includes('arsa') ||
+      tSub.includes('tarla') ||
+      tSub.includes('zeytinlik') ||
+      tSub.includes('bağ') ||
+      tSub.includes('bahçe') ||
+      tTitle.includes('arsa') ||
+      tTitle.includes('tarla')
+    ) {
+      return true;
+    }
+  }
+
+  // Özel Durum: Kategori 43 (İşyeri / Ticari Gayrimenkul)
+  if (catId === 43 || (catObj && catObj.id === 43) || (typeof catInput === 'string' && (normTr(catInput).includes('işyeri') || normTr(catInput).includes('ticari')))) {
+    if (
+      Number(tender.categoryId) === 43 ||
+      tCat.includes('işyeri') ||
+      tCat.includes('ticari') ||
+      tSub.includes('dükkan') ||
+      tSub.includes('dükkân') ||
+      tSub.includes('ofis') ||
+      tSub.includes('büro') ||
+      tSub.includes('depo') ||
+      tSub.includes('fabrika') ||
+      tSub.includes('plaza') ||
+      tTitle.includes('dükkan') ||
+      tTitle.includes('ofis')
+    ) {
+      return true;
+    }
+  }
+
+  // Özel Durum: Kategori 44 (Bina)
+  if (catId === 44 || (catObj && catObj.id === 44) || (typeof catInput === 'string' && normTr(catInput) === 'bina')) {
+    if (
+      Number(tender.categoryId) === 44 ||
+      tCat.includes('bina') ||
+      tSub.includes('apartman') ||
+      tSub.includes('ticari bina') ||
+      tSub.includes('müstakil bina') ||
+      tTitle.includes('bina')
+    ) {
+      return true;
+    }
+  }
+
+  // Özel Durum: Kategori 45 (Turizm Tesisi)
+  if (catId === 45 || (catObj && catObj.id === 45) || (typeof catInput === 'string' && normTr(catInput).includes('turizm tesisi'))) {
+    if (
+      Number(tender.categoryId) === 45 ||
+      tCat.includes('turizm tesisi') ||
+      tSub.includes('otel') ||
+      tSub.includes('pansiyon') ||
+      tSub.includes('tatil köyü') ||
+      tTitle.includes('otel')
+    ) {
+      return true;
+    }
+  }
+
+  // Özel Durum: Kategori 46 (Özel Amaçlı Gayrimenkul)
+  if (catId === 46 || (catObj && catObj.id === 46) || (typeof catInput === 'string' && normTr(catInput).includes('özel amaçlı'))) {
+    if (
+      Number(tender.categoryId) === 46 ||
+      tCat.includes('özel amaçlı') ||
+      tSub.includes('akaryakıt') ||
+      tSub.includes('otopark') ||
+      tSub.includes('okul') ||
+      tSub.includes('yurt') ||
+      tTitle.includes('akaryakıt istasyonu')
+    ) {
+      return true;
+    }
+  }
+
+  // Özel Durum: Kategori 40 (Genel Gayrimenkul & Arsa & Ev & Ofis & İşyeri)
   if (catId === 40 || (catObj && catObj.id === 40) || (typeof catInput === 'string' && (normTr(catInput).includes('gayrimenkul') || normTr(catInput).includes('emlak')))) {
     if (
       Number(tender.categoryId) === 40 ||
+      Number(tender.categoryId) === 41 ||
+      Number(tender.categoryId) === 42 ||
+      Number(tender.categoryId) === 43 ||
+      Number(tender.categoryId) === 44 ||
+      Number(tender.categoryId) === 45 ||
+      Number(tender.categoryId) === 46 ||
       fType === 'ARSA' ||
       fType === 'EV' ||
       fType === 'GAYRIMENKUL' ||

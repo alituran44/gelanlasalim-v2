@@ -2,7 +2,13 @@ import { CategoryItem } from '../types/tender'
 
 export const ALL_40_CATEGORIES: CategoryItem[] = [
   { id: 99, name: 'Diğer İhale ve İlanlar', short: 'Diğer', icon: '✨', orderRank: 1 },
-  { id: 40, name: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri', short: 'Emlak & Gayrimenkul', icon: '🏢', orderRank: 2 },
+  { id: 41, name: 'Konut / Ev', short: 'Konut / Ev', icon: '🏠', orderRank: 2 },
+  { id: 42, name: 'Arsa / Arazi', short: 'Arsa / Arazi', icon: '🗺️', orderRank: 2.1 },
+  { id: 43, name: 'İşyeri / Ticari Gayrimenkul', short: 'İşyeri & Ticari', icon: '🏢', orderRank: 2.2 },
+  { id: 44, name: 'Bina', short: 'Bina', icon: '🏬', orderRank: 2.3 },
+  { id: 45, name: 'Turizm Tesisi', short: 'Turizm Tesisi', icon: '🏨', orderRank: 2.4 },
+  { id: 46, name: 'Özel Amaçlı Gayrimenkul', short: 'Özel Amaçlı', icon: '🏛️', orderRank: 2.5 },
+  { id: 40, name: 'Gayrimenkul, Arsa Satışı, İşyeri ve Kantin İhaleleri', short: 'Emlak & Gayrimenkul (Genel)', icon: '🏢', orderRank: 2.6 },
   { id: 1, name: 'İnşaat - Altyapı - Üstyapı - Yapım İşi ve Yıkım İhaleleri', short: 'İnşaat & Altyapı', icon: '🏗️', orderRank: 3 },
   { id: 3, name: 'Gıda - Tarım Ürünleri - Yiyecek - İçecek İhaleleri', short: 'Tarım & Gıda', icon: '🌾', orderRank: 4 },
   { id: 2, name: 'Sağlık - İlaç - Kozmetik - Medikal İhaleleri', short: 'Sağlık & Medikal', icon: '💊', orderRank: 5 },
