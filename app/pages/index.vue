@@ -1381,30 +1381,20 @@ const allTenders = computed(() => {
   })
 })
 
-// Sayaçlar (SSR ve ilk yüklemede sıfır (0) görünmemesi için canlı fallback destekli)
+// Sayaçlar (Canlı ilan verisine göre dinamik)
 const todayPublishedCount = computed(() => {
-  const count = allTenders.value.filter(t => t.durum !== 'closed').length
-  return count > 0 ? count : 24
+  return allTenders.value.filter(t => t.durum !== 'closed').length
 })
 const todayOngoingCount = computed(() => {
-  const count = allTenders.value.filter(t => t.durum === 'active').length
-  return count > 0 ? count : 18
+  return allTenders.value.filter(t => t.durum === 'active').length
 })
 const todayFinishedCount = computed(() => {
-  const count = allTenders.value.filter(t => t.durum === 'closed').length
-  return count > 0 ? count : 142
+  return allTenders.value.filter(t => t.durum === 'closed').length
 })
 
 // ==================== 8. DİNAMİK SAYAÇ VE FİLTRE HESAPLAMALARI ====================
 function getCategoryCount(cat: any) {
-  const realCount = allTenders.value.filter((t: any) => matchTenderToCategory(t, cat)).length
-  if (realCount > 0) return realCount
-  // SSR ve arama motoru botları için sıfır (0) yerine gerçekçi sektörel ilan hacmi tabanı
-  const catSeedMap: Record<number, number> = {
-    1: 42, 2: 36, 3: 28, 4: 19, 5: 31, 6: 15, 7: 24, 8: 17, 9: 22, 10: 16,
-    11: 18, 12: 14, 13: 20, 14: 12, 15: 25, 16: 19, 17: 15, 18: 21, 19: 13, 20: 17
-  }
-  return catSeedMap[cat.id] || (10 + (cat.id ? (cat.id * 3) % 25 : 8))
+  return allTenders.value.filter((t: any) => matchTenderToCategory(t, cat)).length
 }
 
 function getCityCount(cityName: string) {
