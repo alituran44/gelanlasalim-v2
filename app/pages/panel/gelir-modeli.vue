@@ -142,42 +142,24 @@ const calcSellerVat = computed(() => Math.round(calcSellerCommission.value * 0.2
 const calcSellerTotalDeduction = computed(() => calcSellerCommission.value + calcSellerVat.value)
 const calcSellerNetPayout = computed(() => Math.max(0, calcAmount.value - calcSellerCommission.value))
 
-// Örnek Kullanıcı Hakediş / Kesinti Geçmişi
-const userTransactions = ref([
-  {
-    id: 'İHL-2026-089',
-    title: '400 Ton Nervürlü İnşaat Demiri Alımı',
-    role: 'Satıcı (Tedarikçi)',
-    tenderAmount: 420000,
-    rate: 5,
-    commissionAmount: 21000,
-    netPayout: 399000,
-    status: 'Tamamlandı (Hakediş Ödendi)',
-    date: '10 Eylül 2026'
-  },
-  {
-    id: 'İHL-2026-074',
-    title: '50 Adet Kurumsal Dizüstü Bilgisayar & Monitör',
-    role: 'Alıcı (Kurum)',
-    tenderAmount: 285000,
-    rate: 0,
-    commissionAmount: 0,
-    netPayout: 285000,
-    status: 'Tamamlandı (%0 Masraf)',
-    date: '02 Eylül 2026'
-  },
-  {
-    id: 'İHL-2026-061',
-    title: 'Fabrika Güneş Enerji Paneli ve Trafo Donanımı',
-    role: 'Satıcı (Tedarikçi)',
-    tenderAmount: 750000,
-    rate: 5,
-    commissionAmount: 37500,
-    netPayout: 712500,
-    status: 'Emanet Havuzunda (Teslimat Aşamasında)',
-    date: '28 Ağustos 2026'
-  }
-])
+// Kullanıcı Hakediş / Kesinti Geçmişi (Gerçek tamamlanan / havuzdaki siparişlerden dinamik)
+const userTransactions = computed(() => {
+  const list: any[] = []
+  orders.value.forEach((o: any) => {
+    list.push({
+      id: o.tenderId || o.id,
+      title: o.tenderTitle || o.title || 'İhale Siparişi',
+      role: o.supplierFirm === userSession.value?.companyName ? 'Satıcı (Tedarikçi)' : 'Alıcı (Kurum)',
+      tenderAmount: o.numericAmount || 0,
+      rate: o.commissionRate || (o.supplierFirm === userSession.value?.companyName ? 5 : 0),
+      commissionAmount: parseInt(String(o.commissionAmount || '0').replace(/\D/g, '')) || 0,
+      netPayout: parseInt(String(o.payoutAmount || '0').replace(/\D/g, '')) || (o.numericAmount || 0),
+      status: o.status === 'TAMAMLANDI' ? 'Tamamlandı (Hakediş Ödendi)' : (o.status === 'HAVUZDA_BLOKE' ? 'Emanet Havuzunda (Teslimat Aşamasında)' : o.status),
+      date: o.createdAt || 'Bugün'
+    })
+  })
+  return list
+})
 </script>
 
 <template>
@@ -689,7 +671,7 @@ const userTransactions = ref([
               <th class="py-3 px-3 text-right">Durum</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
+          <tbody v-if="userTransactions.length > 0" class="divide-y divide-slate-100 dark:divide-slate-800/60 font-medium">
             <tr v-for="t in userTransactions" :key="t.id" class="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition">
               <td class="py-3.5 px-3">
                 <div class="font-bold text-slate-900 dark:text-white">{{ t.title }}</div>
@@ -719,6 +701,16 @@ const userTransactions = ref([
                 <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                   {{ t.status }}
                 </span>
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else>
+            <tr>
+              <td colspan="7" class="py-12 text-center text-slate-400 dark:text-slate-500 text-xs font-medium">
+                <div class="flex flex-col items-center justify-center gap-2">
+                  <Receipt class="text-slate-300 dark:text-slate-600" :size="32" />
+                  <span>Henüz tamamlanmış veya havuzda bekleyen bir ihale hakediş / kesinti kaydınız bulunmuyor.</span>
+                </div>
               </td>
             </tr>
           </tbody>
