@@ -136,9 +136,26 @@ function syncProfileFromSession() {
     const session = JSON.parse(localStorage.getItem('userSession') || '{}')
     userSession.value = session
     
-    if (session.email) {
-      profileForm.value.email = session.email
-      companyForm.value.email = session.companyEmail || session.email
+    // E-posta önceliği: Kullanıcının girdiği gerçek Google/Gmail hesabı
+    const lastGoogle = (localStorage.getItem('last_google_account') || '').trim().toLowerCase()
+    let effectiveEmail = (session.email || '').trim().toLowerCase()
+
+    // Eğer kullanıcının daha önce girdiği bir Google hesabı varsa ve oturumdaki mail demo/boş ise veya farklı ise
+    if (lastGoogle && lastGoogle.includes('@')) {
+      if (!effectiveEmail || effectiveEmail === 'ihalecib@gmail.com') {
+        effectiveEmail = lastGoogle
+        session.email = lastGoogle
+        session.isGoogleAuth = true
+        session.isEmailVerified = true
+        try {
+          localStorage.setItem('userSession', JSON.stringify(session))
+        } catch {}
+      }
+    }
+
+    if (effectiveEmail) {
+      profileForm.value.email = effectiveEmail
+      companyForm.value.email = session.companyEmail || effectiveEmail
     } else {
       profileForm.value.email = ''
     }
@@ -538,14 +555,16 @@ async function applyGoogleEmail(targetEmail: string, googleProfileName?: string,
     setEmailVerified(true, cleanEmail)
 
     try {
-      await $fetch('/api/auth/login', {
+      await $fetch('/api/auth/profile-sync', {
         method: 'POST',
         body: {
           email: cleanEmail,
-          password: '',
-          role: session.role || 'individual'
+          name: session.name || googleProfileName || profileForm.value.name,
+          role: session.role || 'individual',
+          isGoogleAuth: true
         }
       })
+      await fetchServerSession()
     } catch (e) {}
 
     window.dispatchEvent(new Event('storage'))
@@ -1308,15 +1327,26 @@ function saveCompanyInfo() {
     window.dispatchEvent(new Event('storage'))
     window.dispatchEvent(new CustomEvent('session-updated'))
     window.dispatchEvent(new CustomEvent('user-session-changed'))
-    if (session.email) {
+    const cleanMail = (profileForm.value.email || '').trim().toLowerCase()
+    session.email = cleanMail
+    if (cleanMail.includes('@gmail.com') || session.isGoogleAuth) {
+      localStorage.setItem('last_google_account', cleanMail)
+      session.isGoogleAuth = true
+      session.isEmailVerified = true
+    }
+
+    if (cleanMail) {
       try {
-        $fetch('/api/auth/login', {
+        $fetch('/api/auth/profile-sync', {
           method: 'POST',
           body: {
-            email: session.email,
-            password: '',
-            role: session.role || 'individual'
+            email: cleanMail,
+            name: fullName || profileForm.value.username,
+            role: session.role || 'individual',
+            isGoogleAuth: Boolean(session.isGoogleAuth || cleanMail.includes('@gmail.com'))
           }
+        }).then(() => {
+          fetchServerSession()
         }).catch(() => {})
       } catch (e) {}
     }
@@ -1923,15 +1953,26 @@ function saveProfile() {
     window.dispatchEvent(new Event('storage'))
     window.dispatchEvent(new CustomEvent('session-updated'))
     window.dispatchEvent(new CustomEvent('user-session-changed'))
-    if (session.email) {
+    const cleanMail = (profileForm.value.email || '').trim().toLowerCase()
+    session.email = cleanMail
+    if (cleanMail.includes('@gmail.com') || session.isGoogleAuth) {
+      localStorage.setItem('last_google_account', cleanMail)
+      session.isGoogleAuth = true
+      session.isEmailVerified = true
+    }
+
+    if (cleanMail) {
       try {
-        $fetch('/api/auth/login', {
+        $fetch('/api/auth/profile-sync', {
           method: 'POST',
           body: {
-            email: session.email,
-            password: '',
-            role: session.role || 'individual'
+            email: cleanMail,
+            name: fullName || profileForm.value.username,
+            role: session.role || 'individual',
+            isGoogleAuth: Boolean(session.isGoogleAuth || cleanMail.includes('@gmail.com'))
           }
+        }).then(() => {
+          fetchServerSession()
         }).catch(() => {})
       } catch (e) {}
     }

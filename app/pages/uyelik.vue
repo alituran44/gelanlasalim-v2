@@ -108,9 +108,9 @@ function parseJwt(token: string) {
 }
 
 async function syncServerLogin(emailStr: string, roleStr?: string, vknStr?: string, passStr?: string, nameStr?: string) {
+  const cleanEmail = (emailStr || '').trim().toLowerCase()
+  const targetRole = roleStr || 'individual'
   try {
-    const cleanEmail = (emailStr || '').trim().toLowerCase()
-    const targetRole = roleStr || 'individual'
     await $fetch('/api/auth/login', {
       method: 'POST',
       body: {
@@ -128,7 +128,25 @@ async function syncServerLogin(emailStr: string, roleStr?: string, vknStr?: stri
       authCookie.value = '1'
     } catch {}
   } catch (e) {
-    console.warn('syncServerLogin warning', e)
+    // Şifresiz Google / SSO oturumlarında profile-sync ile oturum çerezini oluştur
+    try {
+      await $fetch('/api/auth/profile-sync', {
+        method: 'POST',
+        body: {
+          email: cleanEmail,
+          role: targetRole,
+          name: nameStr,
+          companyVkn: targetRole === 'individual' ? '' : (vknStr || ''),
+          isGoogleAuth: cleanEmail.includes('@gmail.com') || targetRole === 'individual'
+        }
+      })
+      if (typeof document !== 'undefined') {
+        document.cookie = 'ihb_auth=1; path=/; max-age=604800; SameSite=Lax'
+      }
+      try {
+        authCookie.value = '1'
+      } catch {}
+    } catch {}
   }
 }
 

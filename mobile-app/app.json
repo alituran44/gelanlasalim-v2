@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "İhaleciBurada",
+    "slug": "ihaleciburada",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0F223D"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ihaleciburada.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0F223D"
+      },
+      "package": "com.ihaleciburada.app",
+      "permissions": [
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE",
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "33cf2c17-5cd1-4e81-8fc0-10dd223ee515"
+      }
+    }
+  }
+}
