@@ -868,23 +868,31 @@ const seedTenders: any[] = []
 function getTenderImage(tender: any): string {
   if (!tender) return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
 
-  if (tender.image && typeof tender.image === 'string' && (tender.image.startsWith('http') || tender.image.startsWith('data:image'))) {
+  const isBrokenUrl = (u: any) => typeof u === 'string' && (
+    u.includes('photo-1558904541-efa8c4a08931') || 
+    u.includes('photo-1541888946425-d0fbb18086f6') || 
+    u.includes('photo-1509391365360-2e959784a276') || 
+    u.includes('photo-1541888946425-d0fbb18f15f6') ||
+    u.includes('photo-1592417817098-8f3d69104a47')
+  )
+
+  if (tender.image && typeof tender.image === 'string' && (tender.image.startsWith('http') || tender.image.startsWith('data:image')) && !isBrokenUrl(tender.image)) {
     return tender.image
   }
 
   if (Array.isArray(tender.images) && tender.images.length > 0) {
     const first = tender.images[0]
-    if (typeof first === 'string' && (first.startsWith('http') || first.startsWith('data:image'))) {
+    if (typeof first === 'string' && (first.startsWith('http') || first.startsWith('data:image')) && !isBrokenUrl(first)) {
       return first
     }
-    if (first && typeof first === 'object' && typeof first.url === 'string' && (first.url.startsWith('http') || first.url.startsWith('data:image'))) {
+    if (first && typeof first === 'object' && typeof first.url === 'string' && (first.url.startsWith('http') || first.url.startsWith('data:image')) && !isBrokenUrl(first.url)) {
       return first.url
     }
   }
 
   const text = ((tender.baslik || '') + ' ' + (tender.kategori || '') + ' ' + (tender.mainCategory || '')).toLowerCase()
   if (text.includes('peyzaj') || text.includes('sulama') || text.includes('bahçe') || text.includes('çim') || text.includes('fidan') || text.includes('ağaç') || text.includes('botanik')) {
-    return 'https://images.unsplash.com/photo-1558904541-efa8c4a08931?w=600&auto=format&fit=crop&q=80'
+    return 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&auto=format&fit=crop&q=80'
   }
   if (text.includes('arsa') || text.includes('tarla') || text.includes('arazi') || text.includes('zeytinlik') || text.includes('bağ') || text.includes('parsel')) {
     return 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&auto=format&fit=crop&q=80'
@@ -895,8 +903,8 @@ function getTenderImage(tender: any): string {
   if (text.includes('lojistik') || text.includes('nakliye') || text.includes('taşımacılık') || text.includes('havayolu') || text.includes('kargo') || text.includes('uçak')) {
     return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
   }
-  if (text.includes('inşaat') || text.includes('yapı') || text.includes('şantiye') || text.includes('çimento') || text.includes('demir') || text.includes('bina')) {
-    return 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80'
+  if (text.includes('inşaat') || text.includes('yapı') || text.includes('şantiye') || text.includes('çimento') || text.includes('demir') || text.includes('bina') || text.includes('ruhsat') || text.includes('proje')) {
+    return 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80'
   }
   if (text.includes('makine') || text.includes('yedek parça') || text.includes('metal') || text.includes('sanayi') || text.includes('torna') || text.includes('freze')) {
     return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&auto=format&fit=crop&q=80'
@@ -905,7 +913,7 @@ function getTenderImage(tender: any): string {
     return 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80'
   }
   if (text.includes('akaryakıt') || text.includes('enerji') || text.includes('petrol') || text.includes('madeni yağ') || text.includes('motorin')) {
-    return 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=600&auto=format&fit=crop&q=80'
+    return 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80'
   }
   if (text.includes('kırtasiye') || text.includes('ofis') || text.includes('bilişim') || text.includes('teknoloji') || text.includes('yazılım') || text.includes('bilgisayar')) {
     return 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80'
@@ -1774,6 +1782,7 @@ function isValidImageUrl(u: any): boolean {
   if (s.length < 10) return false
   if (s.toLowerCase().startsWith('blob:')) return false
   if (s === '[object Object]' || s === 'undefined' || s === 'null') return false
+  if (s.includes('photo-1558904541-efa8c4a08931') || s.includes('photo-1541888946425-d0fbb18086f6') || s.includes('photo-1509391365360-2e959784a276') || s.includes('photo-1541888946425-d0fbb18f15f6') || s.includes('photo-1592417817098-8f3d69104a47')) return false
   if (s.startsWith('http://') || s.startsWith('https://')) return true
   if (s.startsWith('data:image/') && s.includes(';base64,') && s.length > 50) return true
   return false
@@ -1784,9 +1793,9 @@ function getCategoryGalleryFallback(tender: any): string[] {
 
   if (text.includes('peyzaj') || text.includes('sulama') || text.includes('bahçe') || text.includes('çim') || text.includes('fidan') || text.includes('botanik')) {
     return [
-      'https://images.unsplash.com/photo-1558904541-efa8c4a08931?w=600&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1592417817098-8f3d69104a47?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80'
     ]
   }
@@ -1808,8 +1817,8 @@ function getCategoryGalleryFallback(tender: any): string[] {
   }
   if (text.includes('inşaat') || text.includes('yapı') || text.includes('şantiye') || text.includes('çimento') || text.includes('demir') || text.includes('ruhsat') || text.includes('proje')) {
     return [
-      'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1590496793929-36417d3117de?w=600&auto=format&fit=crop&q=80',
       'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&auto=format&fit=crop&q=80'
     ]
@@ -1819,7 +1828,7 @@ function getCategoryGalleryFallback(tender: any): string[] {
     'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80',
     'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80',
     'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80'
+    'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&auto=format&fit=crop&q=80'
   ]
 }
 

@@ -23,11 +23,13 @@ const searchQuery = ref('')
 const localTendersState = ref<any[]>([])
 
 
+const DEFAULT_FALLBACK_SVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'><rect width='600' height='400' fill='%230b1329'/><circle cx='300' cy='180' r='60' fill='%230284c7' opacity='0.25'/><text x='50%25' y='48%25' dominant-baseline='middle' text-anchor='middle' fill='%2338bdf8' font-size='48' font-family='sans-serif'>📋</text><text x='50%25' y='68%25' dominant-baseline='middle' text-anchor='middle' fill='%23f1f5f9' font-size='18' font-family='sans-serif' font-weight='bold'>İhaleciBurada</text><text x='50%25' y='77%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='13' font-family='sans-serif'>Kurumsal İhale</text></svg>"
+
 function getCategoryFallbackImage(tender: any): string {
   const text = ((tender?.baslik || '') + ' ' + (tender?.kategori || '') + ' ' + (tender?.mainCategory || '') + ' ' + (tender?.subCategory || '')).toLowerCase()
 
   if (text.includes('peyzaj') || text.includes('sulama') || text.includes('bahçe') || text.includes('çim') || text.includes('fidan') || text.includes('ağaç') || text.includes('botanik')) {
-    return 'https://images.unsplash.com/photo-1558904541-efa8c4a08931?w=600&auto=format&fit=crop&q=80'
+    return 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&auto=format&fit=crop&q=80'
   }
   if (text.includes('arsa') || text.includes('tarla') || text.includes('arazi') || text.includes('zeytinlik') || text.includes('bağ') || text.includes('parsel')) {
     return 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&auto=format&fit=crop&q=80'
@@ -36,7 +38,7 @@ function getCategoryFallbackImage(tender: any): string {
     return 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&auto=format&fit=crop&q=80'
   }
   if (text.includes('inşaat') || text.includes('yapı') || text.includes('şantiye') || text.includes('çimento') || text.includes('demir') || text.includes('ruhsat') || text.includes('mimari') || text.includes('proje')) {
-    return 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80'
+    return 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80'
   }
   if (text.includes('lojistik') || text.includes('nakliye') || text.includes('taşımacılık') || text.includes('havayolu') || text.includes('kargo') || text.includes('uçak')) {
     return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
@@ -48,7 +50,7 @@ function getCategoryFallbackImage(tender: any): string {
     return 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80'
   }
   if (text.includes('akaryakıt') || text.includes('enerji') || text.includes('petrol') || text.includes('madeni yağ') || text.includes('motorin') || text.includes('güneş')) {
-    return 'https://images.unsplash.com/photo-1509391365360-2e959784a276?w=600&auto=format&fit=crop&q=80'
+    return 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80'
   }
   if (text.includes('kırtasiye') || text.includes('bilişim') || text.includes('teknoloji') || text.includes('yazılım') || text.includes('bilgisayar')) {
     return 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80'
@@ -61,9 +63,17 @@ function getCategoryFallbackImage(tender: any): string {
 }
 
 function getTenderImage(tender: any): string {
-  if (!tender) return 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=80'
+  if (!tender) return 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80'
 
-  const isValidUrl = (u: any) => typeof u === 'string' && u.trim().length > 0 && !u.startsWith('blob:') && (u.startsWith('http') || u.startsWith('data:image'))
+  const isBrokenUrl = (u: any) => typeof u === 'string' && (
+    u.includes('photo-1558904541-efa8c4a08931') || 
+    u.includes('photo-1541888946425-d0fbb18086f6') || 
+    u.includes('photo-1509391365360-2e959784a276') || 
+    u.includes('photo-1541888946425-d0fbb18f15f6') ||
+    u.includes('photo-1592417817098-8f3d69104a47')
+  )
+
+  const isValidUrl = (u: any) => typeof u === 'string' && u.trim().length > 0 && !u.startsWith('blob:') && (u.startsWith('http') || u.startsWith('data:image')) && !isBrokenUrl(u)
 
   if (isValidUrl(tender.image)) {
     return tender.image
@@ -91,8 +101,10 @@ function handleImageError(event: Event, tender: any) {
   const imgEl = event.target as HTMLImageElement
   if (!imgEl) return
   const fallback = getCategoryFallbackImage(tender)
-  if (imgEl.src !== fallback) {
+  if (imgEl.src !== fallback && !fallback.includes('photo-1558904541-efa8c4a08931')) {
     imgEl.src = fallback
+  } else {
+    imgEl.src = DEFAULT_FALLBACK_SVG
   }
 }
 
@@ -104,7 +116,13 @@ function reloadTenders() {
       localList = JSON.parse(localStorage.getItem('myTenders') || '[]')
       let changed = false
       localList = localList.map(item => {
-        if (!item.image || item.image.startsWith('blob:')) {
+        const isBroken = !item.image || 
+          item.image.startsWith('blob:') || 
+          item.image.includes('photo-1558904541-efa8c4a08931') || 
+          item.image.includes('photo-1541888946425-d0fbb18086f6') || 
+          item.image.includes('photo-1509391365360-2e959784a276') ||
+          item.image.includes('photo-1541888946425-d0fbb18f15f6')
+        if (isBroken) {
           item.image = getTenderImage(item)
           changed = true
         }
@@ -118,13 +136,13 @@ function reloadTenders() {
   
   const map = new Map<string, any>()
   localList.forEach(item => {
-    if (!item.image || item.image.startsWith('blob:')) {
+    if (!item.image || item.image.startsWith('blob:') || item.image.includes('photo-1558904541-efa8c4a08931')) {
       item.image = getTenderImage(item)
     }
     map.set(item.id, item)
   })
   cmsList.forEach(item => {
-    if (!item.image || item.image.startsWith('blob:')) {
+    if (!item.image || item.image.startsWith('blob:') || item.image.includes('photo-1558904541-efa8c4a08931')) {
       item.image = getTenderImage(item)
     }
     map.set(item.id, item)

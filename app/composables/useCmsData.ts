@@ -537,7 +537,7 @@ function stripHeavyDataUrls(obj: any, depth = 0): any {
       const val = obj[key]
       if (typeof val === 'string' && (val.startsWith('data:') || val.length > 25000)) {
         if (key.includes('img') || key.includes('image') || key === 'url') {
-          obj[key] = 'https://images.unsplash.com/photo-1541888946425-d0fbb18086f6?w=600&auto=format&fit=crop&q=60'
+          obj[key] = 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80'
         } else {
           obj[key] = ''
         }

@@ -1035,8 +1035,8 @@ async function submitCurrentForm() {
         : (activeFormMode.value === 'ev' 
           ? 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80' 
           : (combinedText.includes('peyzaj') || combinedText.includes('sulama') || combinedText.includes('bahçe') || combinedText.includes('proje')
-            ? 'https://images.unsplash.com/photo-1558904541-efa8c4a08931?auto=format&fit=crop&w=600&q=80'
-            : 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?auto=format&fit=crop&w=600&q=80'))
+            ? 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=600&q=80'
+            : 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80'))
     )
     const newId = `TND-${Date.now().toString().slice(-6)}`
     const ownerEmail = userSession.value?.email || 'kullanici@ihaleciburada.com'
