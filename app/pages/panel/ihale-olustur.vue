@@ -16,7 +16,9 @@ import {
   User,
   Tag,
   Megaphone,
-  X
+  X,
+  MapPin,
+  RefreshCw
 } from 'lucide-vue-next'
 import { useCmsData } from '~/composables/useCmsData'
 import { useUserSession } from '~/composables/useUserSession'
@@ -627,7 +629,239 @@ watch(() => digerForm.anaKategori, (newCat) => {
   }
 })
 
-// Sayfa açıldığında oturum bilgilerini formlara doldur
+// =========================================================================
+// 📍 OTOMATİK KONUM TESPİTİ (Kurucu Talebi: İlan verenin konumu otomatik girilsin)
+// =========================================================================
+const locationDetectionState = reactive({
+  loading: false,
+  detected: false,
+  city: '',
+  district: '',
+  neighborhood: '',
+  fullAddress: '',
+  source: '' as 'gps' | 'ip' | 'session' | '',
+  error: ''
+})
+
+function normalizeTurkishCity(raw: string): string {
+  if (!raw || typeof raw !== 'string') return ''
+  let cleaned = raw.trim()
+    .replace(/Province|İli|ili|Büyükşehir\s*Belediyesi|Belediyesi/gi, '')
+    .trim()
+
+  const aliasMap: Record<string, string> = {
+    'icel': 'Mersin',
+    'içel': 'Mersin',
+    'izmit': 'Kocaeli',
+    'adapazari': 'Sakarya',
+    'adapazarı': 'Sakarya',
+    'antep': 'Gaziantep',
+    'urfa': 'Şanlıurfa',
+    'marash': 'Kahramanmaraş',
+    'maras': 'Kahramanmaraş',
+    'maraş': 'Kahramanmaraş',
+    'afyon': 'Afyonkarahisar'
+  }
+
+  const lower = cleaned.toLowerCase()
+  if (aliasMap[lower]) return aliasMap[lower]
+
+  const trNormalize = (s: string) => s
+    .toLowerCase()
+    .replace(/ğ/g, 'g')
+    .replace(/ü/g, 'u')
+    .replace(/ş/g, 's')
+    .replace(/ı/g, 'i')
+    .replace(/ö/g, 'o')
+    .replace(/ç/g, 'c')
+    .replace(/[^a-z]/g, '')
+
+  const target = trNormalize(cleaned)
+  for (const city of CITIES) {
+    const cNorm = trNormalize(city)
+    if (cNorm === target || target.includes(cNorm) || cNorm.includes(target)) {
+      return city
+    }
+  }
+
+  return cleaned
+}
+
+function applyLocationToForms(city: string, district: string = '', neighborhood: string = '') {
+  if (!city) return
+  const addrText = district ? `${city} / ${district}` : city
+
+  // 1. Arsa Formu
+  if (CITIES.includes(city)) {
+    arsaForm.il = city
+  }
+  if (district) {
+    arsaForm.ilce = district
+  }
+  if (neighborhood) {
+    arsaForm.mahalle = neighborhood
+  }
+  arsaForm.adres = addrText
+
+  // 2. Ev Formu
+  if (CITIES.includes(city)) {
+    evForm.il = city
+  }
+  if (district) {
+    evForm.ilce = district
+  }
+  if (neighborhood) {
+    evForm.mahalle = neighborhood
+  }
+  evForm.adres = addrText
+
+  // 3. Açık Eksiltme Formu
+  eksiltmeForm.adres = addrText
+
+  // 4. Sabit Fiyat Formu
+  sabitFiyatForm.adres = addrText
+
+  // 5. Reklam İlanı Formu
+  reklamForm.adres = addrText
+
+  // 6. Diğer İlanlar Formu
+  digerForm.adres = addrText
+}
+
+async function detectUserLocation(force = false) {
+  if (locationDetectionState.loading) return
+  if (locationDetectionState.detected && !force) return
+
+  locationDetectionState.loading = true
+  locationDetectionState.error = ''
+
+  let foundCity = ''
+  let foundDistrict = ''
+  let foundNeighborhood = ''
+  let detectionSource: 'gps' | 'ip' | 'session' | '' = ''
+
+  // 1. ADIM: Tarayıcı Geolocation API (GPS / Cihaz Konumu)
+  const tryGps = (): Promise<{ lat: number; lon: number } | null> => {
+    return new Promise((resolve) => {
+      if (typeof window === 'undefined' || !navigator.geolocation) {
+        return resolve(null)
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+        () => resolve(null),
+        { timeout: 5000, enableHighAccuracy: true, maximumAge: 60000 }
+      )
+    })
+  }
+
+  try {
+    const coords = await tryGps()
+    if (coords) {
+      // BigDataCloud Client Reverse Geocode
+      try {
+        const bdc = await $fetch<any>(
+          `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${coords.lat}&longitude=${coords.lon}&localityLanguage=tr`,
+          { timeout: 3500 }
+        ).catch(() => null)
+
+        if (bdc) {
+          const rawCity = bdc.principalSubdivision || bdc.city || ''
+          const matched = normalizeTurkishCity(rawCity)
+          if (matched && CITIES.includes(matched)) {
+            foundCity = matched
+            foundDistrict = bdc.locality || bdc.district || ''
+            detectionSource = 'gps'
+          }
+        }
+      } catch {}
+
+      // Nominatim Reverse Geocode Fallback
+      if (!foundCity) {
+        try {
+          const nom = await $fetch<any>(
+            `https://nominatim.openstreetmap.org/reverse?lat=${coords.lat}&lon=${coords.lon}&format=json&accept-language=tr`,
+            { timeout: 3500 }
+          ).catch(() => null)
+
+          if (nom?.address) {
+            const rawCity = nom.address.province || nom.address.state || nom.address.city || ''
+            const matched = normalizeTurkishCity(rawCity)
+            if (matched && CITIES.includes(matched)) {
+              foundCity = matched
+              foundDistrict = nom.address.town || nom.address.district || nom.address.county || nom.address.suburb || ''
+              foundNeighborhood = nom.address.neighbourhood || ''
+              detectionSource = 'gps'
+            }
+          }
+        } catch {}
+      }
+    }
+
+    // 2. ADIM: Vercel Server / IP Geolocation API
+    if (!foundCity) {
+      try {
+        const srv = await $fetch<any>('/api/v1/geo-location', { timeout: 3000 }).catch(() => null)
+        if (srv?.city) {
+          const matched = normalizeTurkishCity(srv.city)
+          if (matched && CITIES.includes(matched)) {
+            foundCity = matched
+            detectionSource = 'ip'
+          }
+        }
+      } catch {}
+    }
+
+    // 3. ADIM: Oturum / Profil Şehri
+    if (!foundCity && userSession.value?.city) {
+      const matched = normalizeTurkishCity(userSession.value.city)
+      if (matched && CITIES.includes(matched)) {
+        foundCity = matched
+        detectionSource = 'session'
+      }
+    }
+
+    // Hiçbir şey bulunamazsa varsayılan
+    if (!foundCity) {
+      foundCity = 'Balıkesir'
+      detectionSource = 'session'
+    }
+
+    locationDetectionState.city = foundCity
+    locationDetectionState.district = foundDistrict
+    locationDetectionState.neighborhood = foundNeighborhood
+    locationDetectionState.source = detectionSource
+    locationDetectionState.detected = true
+    locationDetectionState.fullAddress = foundDistrict ? `${foundCity} / ${foundDistrict}` : foundCity
+
+    applyLocationToForms(foundCity, foundDistrict, foundNeighborhood)
+
+  } catch (err: any) {
+    locationDetectionState.error = err.message || 'Konum algılanamadı'
+  } finally {
+    locationDetectionState.loading = false
+  }
+}
+
+function resolveFinalCity(textOrCity: string): string {
+  if (!textOrCity || typeof textOrCity !== 'string') {
+    return locationDetectionState.city || userSession.value?.city || 'Balıkesir'
+  }
+  const trimmed = textOrCity.trim()
+  if (CITIES.includes(trimmed)) return trimmed
+
+  for (const c of CITIES) {
+    if (trimmed.toLowerCase().includes(c.toLowerCase())) {
+      return c
+    }
+  }
+
+  const normalized = normalizeTurkishCity(trimmed)
+  if (normalized && CITIES.includes(normalized)) return normalized
+
+  return locationDetectionState.city || userSession.value?.city || 'Balıkesir'
+}
+
+// Sayfa açıldığında oturum bilgilerini formlara doldur ve otomatik konum tespit et
 onMounted(() => {
   const s = userSession.value || {}
   const defaultName = userName.value || s.companyName || s.name || s.email?.split('@')[0] || ''
@@ -648,6 +882,9 @@ onMounted(() => {
   if (qMode && ['eksiltme', 'sabit_fiyat', 'reklam', 'arsa', 'ev', 'diger'].includes(qMode)) {
     activeFormMode.value = qMode
   }
+
+  // 📍 İlan verenin bulunduğu konumu anında otomatik tespit et ve formlara aktar
+  detectUserLocation()
 })
 
 // Dosya & Resim Yükleme Yardımcıları
@@ -926,7 +1163,7 @@ async function submitCurrentForm() {
     let finalFiles: any[] = []
     let finalImages: any[] = []
     let finalCustomFields: Record<string, any> = {}
-    let finalCity = 'Balıkesir'
+    let finalCity = locationDetectionState.city || userSession.value?.city || 'Balıkesir'
     let finalAddress = ''
     let finalPhone = ''
     let finalWeb = ''
@@ -960,7 +1197,8 @@ async function submitCurrentForm() {
         videoDosyaAdi: eksiltmeForm.videoDosyaAdi
       }
       finalOwner = eksiltmeForm.ilanVeren
-      finalAddress = eksiltmeForm.adres
+      finalCity = resolveFinalCity(eksiltmeForm.adres)
+      finalAddress = eksiltmeForm.adres || finalCity
       finalPhone = eksiltmeForm.telefon
       finalWeb = eksiltmeForm.webSayfasi
       finalAciklama = eksiltmeForm.aciklama
@@ -988,7 +1226,8 @@ async function submitCurrentForm() {
         videoDosyaAdi: sabitFiyatForm.videoDosyaAdi
       }
       finalOwner = sabitFiyatForm.ilanVeren
-      finalAddress = sabitFiyatForm.adres
+      finalCity = resolveFinalCity(sabitFiyatForm.adres)
+      finalAddress = sabitFiyatForm.adres || finalCity
       finalPhone = sabitFiyatForm.telefon
       finalWeb = sabitFiyatForm.webSayfasi
       finalAciklama = sabitFiyatForm.aciklama
@@ -1012,7 +1251,8 @@ async function submitCurrentForm() {
         videoDosyaAdi: reklamForm.videoDosyaAdi
       }
       finalOwner = reklamForm.ilanVeren
-      finalAddress = reklamForm.adres
+      finalCity = resolveFinalCity(reklamForm.adres)
+      finalAddress = reklamForm.adres || finalCity
       finalPhone = reklamForm.telefon
       finalWeb = reklamForm.webSayfasi
       finalAciklama = reklamForm.aciklama
@@ -1026,8 +1266,8 @@ async function submitCurrentForm() {
       const altK = arsaForm.altKategori === 'DİĞER' ? (arsaForm.altKategoriDiger || 'Konut İmarlı Arsa') : arsaForm.altKategori
       finalSubCategory = altK
       finalDirection = (islem === 'Kiralık' || islem === 'Devren Kiralık') ? 'kiralik' : 'arsa'
-      finalCity = arsaForm.il || 'Balıkesir'
-      finalAddress = `${arsaForm.il} / ${arsaForm.ilce || ''} ${arsaForm.mahalle ? ' - ' + arsaForm.mahalle : ''}`
+      finalCity = arsaForm.il || resolveFinalCity(arsaForm.adres)
+      finalAddress = `${arsaForm.il} / ${arsaForm.ilce || ''} ${arsaForm.mahalle ? ' - ' + arsaForm.mahalle : ''}`.trim()
       finalBudget = arsaForm.tabanFiyat ? `${arsaForm.tabanFiyat} ₺` : 'Fiyat Belirtilmedi'
 
       if (arsaForm.ekspertizDosyaAdi) {
@@ -1079,8 +1319,8 @@ async function submitCurrentForm() {
       const altK = evForm.altKategori === 'DİĞER' ? (evForm.altKategoriDiger || 'Daire') : evForm.altKategori
       finalSubCategory = altK
       finalDirection = (islem === 'Kiralık' || islem === 'Devren Kiralık') ? 'kiralik' : 'ev'
-      finalCity = evForm.il || 'Balıkesir'
-      finalAddress = `${evForm.il} / ${evForm.ilce || ''} ${evForm.mahalle ? ' - ' + evForm.mahalle : ''}`
+      finalCity = evForm.il || resolveFinalCity(evForm.adres)
+      finalAddress = `${evForm.il} / ${evForm.ilce || ''} ${evForm.mahalle ? ' - ' + evForm.mahalle : ''}`.trim()
       finalBudget = evForm.tabanFiyat ? `${evForm.tabanFiyat} ₺` : 'Fiyat Belirtilmedi'
 
       if (evForm.ekspertizDosyaAdi) {
@@ -1157,7 +1397,8 @@ async function submitCurrentForm() {
         videoDosyaAdi: digerForm.videoDosyaAdi
       }
       finalOwner = digerForm.ilanVeren
-      finalAddress = digerForm.adres
+      finalCity = resolveFinalCity(digerForm.adres)
+      finalAddress = digerForm.adres || finalCity
       finalPhone = digerForm.telefon
       finalWeb = digerForm.webSayfasi
       finalAciklama = digerForm.aciklama
@@ -1686,7 +1927,18 @@ async function submitCurrentForm() {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[10px] font-black uppercase text-slate-600 mb-1">ADRES</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[10px] font-black uppercase text-slate-600">ADRES / KONUM</label>
+              <button 
+                type="button" 
+                @click="detectUserLocation(true)" 
+                class="text-[9px] font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1 cursor-pointer"
+                title="Mevcut konumumu otomatik tespit et"
+              >
+                <RefreshCw :size="9" :class="{ 'animate-spin': locationDetectionState.loading }" />
+                <span>{{ locationDetectionState.loading ? 'Aranıyor...' : (locationDetectionState.detected ? '📍 ' + locationDetectionState.fullAddress : 'Konumumu Bul') }}</span>
+              </button>
+            </div>
             <input 
               v-model="eksiltmeForm.adres"
               type="text"
@@ -1942,7 +2194,18 @@ async function submitCurrentForm() {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[10px] font-black uppercase text-slate-600 mb-1">ADRES</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[10px] font-black uppercase text-slate-600">ADRES / KONUM</label>
+              <button 
+                type="button" 
+                @click="detectUserLocation(true)" 
+                class="text-[9px] font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1 cursor-pointer"
+                title="Mevcut konumumu otomatik tespit et"
+              >
+                <RefreshCw :size="9" :class="{ 'animate-spin': locationDetectionState.loading }" />
+                <span>{{ locationDetectionState.loading ? 'Aranıyor...' : (locationDetectionState.detected ? '📍 ' + locationDetectionState.fullAddress : 'Konumumu Bul') }}</span>
+              </button>
+            </div>
             <input 
               v-model="sabitFiyatForm.adres"
               type="text"
@@ -2184,7 +2447,18 @@ async function submitCurrentForm() {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[10px] font-black uppercase text-slate-600 mb-1">ADRES</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[10px] font-black uppercase text-slate-600">ADRES / KONUM</label>
+              <button 
+                type="button" 
+                @click="detectUserLocation(true)" 
+                class="text-[9px] font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1 cursor-pointer"
+                title="Mevcut konumumu otomatik tespit et"
+              >
+                <RefreshCw :size="9" :class="{ 'animate-spin': locationDetectionState.loading }" />
+                <span>{{ locationDetectionState.loading ? 'Aranıyor...' : (locationDetectionState.detected ? '📍 ' + locationDetectionState.fullAddress : 'Konumumu Bul') }}</span>
+              </button>
+            </div>
             <input 
               v-model="reklamForm.adres"
               type="text"
@@ -2393,7 +2667,18 @@ async function submitCurrentForm() {
 
       <!-- KİRALIK/SATILIK AYNI MENU - ARSA KONUM BİLGİLERİ -->
       <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50/30 space-y-3">
-        <span class="block text-[11px] font-black text-emerald-600 uppercase tracking-wider">KİRALIK/SATILIK AYNI MENU - ARSA KONUMU</span>
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <span class="block text-[11px] font-black text-emerald-600 uppercase tracking-wider">KİRALIK/SATILIK AYNI MENU - ARSA KONUMU</span>
+          <button 
+            type="button" 
+            @click="detectUserLocation(true)" 
+            class="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1.5 cursor-pointer bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 transition-colors shadow-2xs"
+            title="Mevcut konumumu otomatik tespit et ve doldur"
+          >
+            <RefreshCw :size="10" :class="{ 'animate-spin': locationDetectionState.loading }" />
+            <span>{{ locationDetectionState.loading ? 'Konum Aranıyor...' : (locationDetectionState.detected ? '📍 ' + locationDetectionState.fullAddress : 'Mevcut Konumumu Kullan') }}</span>
+          </button>
+        </div>
         
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <!-- İL -->
@@ -3145,7 +3430,18 @@ async function submitCurrentForm() {
 
       <!-- KİRALIK/SATILIK AYNI MENU - KONUM (İL, İLÇE, MAHALLE) -->
       <div class="border border-slate-200 rounded-2xl p-4 bg-slate-50/30 space-y-3">
-        <span class="block text-[11px] font-black text-emerald-600 uppercase tracking-wider">KİRALIK/SATILIK AYNI MENU - KONUM</span>
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <span class="block text-[11px] font-black text-emerald-600 uppercase tracking-wider">KİRALIK/SATILIK AYNI MENU - KONUM</span>
+          <button 
+            type="button" 
+            @click="detectUserLocation(true)" 
+            class="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 flex items-center gap-1.5 cursor-pointer bg-emerald-50 hover:bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 transition-colors shadow-2xs"
+            title="Mevcut konumumu otomatik tespit et ve doldur"
+          >
+            <RefreshCw :size="10" :class="{ 'animate-spin': locationDetectionState.loading }" />
+            <span>{{ locationDetectionState.loading ? 'Konum Aranıyor...' : (locationDetectionState.detected ? '📍 ' + locationDetectionState.fullAddress : 'Mevcut Konumumu Kullan') }}</span>
+          </button>
+        </div>
         
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
           <div>
@@ -3947,7 +4243,18 @@ async function submitCurrentForm() {
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label class="block text-[10px] font-black uppercase text-slate-600 mb-1">ADRES</label>
+            <div class="flex items-center justify-between mb-1">
+              <label class="block text-[10px] font-black uppercase text-slate-600">ADRES / KONUM</label>
+              <button 
+                type="button" 
+                @click="detectUserLocation(true)" 
+                class="text-[9px] font-bold text-sky-600 hover:text-sky-800 flex items-center gap-1 cursor-pointer"
+                title="Mevcut konumumu otomatik tespit et"
+              >
+                <RefreshCw :size="9" :class="{ 'animate-spin': locationDetectionState.loading }" />
+                <span>{{ locationDetectionState.loading ? 'Aranıyor...' : (locationDetectionState.detected ? '📍 ' + locationDetectionState.fullAddress : 'Konumumu Bul') }}</span>
+              </button>
+            </div>
             <input 
               v-model="digerForm.adres"
               type="text"
