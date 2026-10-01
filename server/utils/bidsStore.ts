@@ -93,6 +93,35 @@ export function validateBidSubmission(
     return { valid: false, error: 'Teklif verilmek istenen ihale bulunamadı.', statusCode: 404 }
   }
 
+  // 📢 Reklam / Tanıtım ilanlarına teklif verilemez
+  const fType = (tender.formType || (tender as any).customFields?.formType || '').toString().toUpperCase()
+  const ihaleYonu = (tender.ihaleYonu || '').toString().toLowerCase()
+  const tur = (tender.tur || '').toString().toLowerCase()
+  const kat = ((tender.kategori || '') + ' ' + ((tender as any).mainCategory || '')).toLowerCase()
+  const butce = (tender.butce || '').toString().toLowerCase()
+  const isReklam = (
+    fType === 'REKLAM_ILANI' ||
+    fType === 'REKLAM' ||
+    ihaleYonu === 'reklam' ||
+    ihaleYonu === 'ihalesiz_ilan' ||
+    tur.includes('reklam') ||
+    tur.includes('tanıtım') ||
+    tur.includes('tanitim') ||
+    kat.includes('reklam') ||
+    kat.includes('tanıtım') ||
+    butce.includes('reklam') ||
+    butce.includes('tanıtım') ||
+    ((tender as any).isIlan && (butce === 'tanıtım / reklam ilanı' || butce === 'reklam ilanı' || !tender.butce))
+  )
+
+  if (isReklam) {
+    return {
+      valid: false,
+      error: `"${tender.baslik}" bir tanıtım ve reklam ilanıdır. İhale niteliğinde olmadığı için teklif verilemez.`,
+      statusCode: 400
+    }
+  }
+
   // Check if tender is closed or completed
   if (tender.durum === 'closed' || tender.durum === 'mutabakat' || tender.durum === 'anlasildi') {
     return {

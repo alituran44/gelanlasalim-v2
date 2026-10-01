@@ -571,3 +571,33 @@ export function matchTenderToCategory(tender: any, catInput: any): boolean {
   return false;
 }
 
+/**
+ * 📢 İlanın bir Reklam / Tanıtım ilanı olup olmadığını doğrular.
+ * Reklam ilanları ihale niteliğinde değildir, teklife kapalıdır ve teklif verilemez.
+ */
+export function isReklamIlani(tender: any): boolean {
+  if (!tender) return false
+  const fType = (tender.formType || tender.customFields?.formType || '').toString().toUpperCase()
+  const ihaleYonu = (tender.ihaleYonu || '').toString().toLowerCase()
+  const tur = (tender.tur || tender.rekabetTuru || '').toString().toLowerCase()
+  const kat = ((tender.kategori || '') + ' ' + (tender.mainCategory || '') + ' ' + (tender.subCategory || '')).toLowerCase()
+  const butce = (tender.butce || '').toString().toLowerCase()
+  const baslik = (tender.baslik || '').toString().toLowerCase()
+
+  return (
+    fType === 'REKLAM_ILANI' ||
+    fType === 'REKLAM' ||
+    ihaleYonu === 'reklam' ||
+    ihaleYonu === 'ihalesiz_ilan' ||
+    tur.includes('reklam') ||
+    tur.includes('tanıtım') ||
+    tur.includes('tanitim') ||
+    kat.includes('reklam') ||
+    kat.includes('tanıtım') ||
+    butce.includes('reklam') ||
+    butce.includes('tanıtım') ||
+    (tender.isIlan && (butce === 'tanıtım / reklam ilanı' || butce === 'reklam ilanı' || !tender.butce))
+  )
+}
+
+

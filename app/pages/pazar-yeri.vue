@@ -36,7 +36,7 @@ import {
   Lock
 } from 'lucide-vue-next'
 import { useCmsData, DEFAULT_CMS_DATA } from '~/composables/useCmsData'
-import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_TYPES, TENDER_METHODS, matchTenderToCategory, sanitizeExternalUrl } from '~/utils/taxonomy'
+import { ALL_81_CITIES, ALL_40_CATEGORIES, TENDER_TYPES, TENDER_METHODS, matchTenderToCategory, sanitizeExternalUrl, isReklamIlani } from '~/utils/taxonomy'
 import TenderQuestionsModal from '~/components/tender/TenderQuestionsModal.vue'
 import { formatSectorSummaryBadges, resolveSectorKey, SECTOR_DEFINITIONS } from '~/utils/categoryFieldsSchema'
 import { isTenderConcluded, containsContactInfo, maskContactInfo } from '~/utils/contactFilter'
@@ -771,6 +771,10 @@ function isMyOwnTender(tender: any): boolean {
 
 
 function openBidModal(tender: any) {
+  if (isReklamIlani(tender)) {
+    alert(`📢 REKLAM İLANINA TEKLİF VERİLEMEZ!\n\n"${tender.baslik}" bir tanıtım ve reklam ilanıdır. İhale niteliğinde olmadığı için teklif verilemez.\n\nİlan sahibiyle doğrudan iletişime geçmek için lütfen ilan detayındaki iletişim bilgilerini veya web sitesini kullanınız.`)
+    return
+  }
   if (isMyOwnTender(tender)) {
     alert(`🚫 KENDİ İLANINIZA TEKLİF VEREMEZSİNİZ!\n\n"${tender.baslik}" ihalesi sizin tarafınızdan açılmıştır.\n\nSistem kuralları gereği kendi açtığınız ihalelere teklif sunamazsınız.\n\nİhaleniz için gelen tedarikçi tekliflerini incelemek, değerlendirmek ve pazarlık yürütmek için lütfen "Gelen Teklifler" sayfasına gidiniz.`)
     return
@@ -1485,6 +1489,23 @@ function downloadAllSpecs(tender: any) {
                 <Building2 :size="12" class="text-amber-700" />
                 <span>👤 Sizin İlanınız</span>
               </NuxtLink>
+              <template v-else-if="isReklamIlani(tender)">
+                <a 
+                  v-if="tender.ownerPhone"
+                  :href="'tel:' + tender.ownerPhone"
+                  @click.stop
+                  class="px-3.5 py-1.5 rounded bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition flex items-center gap-1 cursor-pointer shadow-xs"
+                  title="İlan Sahibini Ara"
+                >
+                  <span>📞 Ara</span>
+                </a>
+                <span 
+                  v-else
+                  class="px-3 py-1.5 rounded bg-purple-50 text-purple-700 border border-purple-200 font-bold text-xs flex items-center gap-1"
+                >
+                  📢 Reklam İlanı
+                </span>
+              </template>
               <button
                 v-else-if="tender.durum !== 'closed' && tender.durum !== 'expired'"
                 type="button"
@@ -2172,6 +2193,21 @@ function downloadAllSpecs(tender: any) {
               <Building2 :size="13" class="text-amber-700" />
               <span>👤 Sizin İlanınız</span>
             </NuxtLink>
+            <template v-else-if="isReklamIlani(selectedTenderForDetail)">
+              <a 
+                v-if="selectedTenderForDetail.ownerPhone"
+                :href="'tel:' + selectedTenderForDetail.ownerPhone"
+                class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition flex items-center gap-1.5 cursor-pointer shadow-md"
+              >
+                <span>📞 İlan Sahibini Ara</span>
+              </a>
+              <span 
+                v-else
+                class="px-5 py-2.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 font-bold text-xs flex items-center gap-1.5"
+              >
+                📢 Kurumsal Tanıtım / Reklam İlanı (Teklife Kapalı)
+              </span>
+            </template>
             <button
               v-else-if="selectedTenderForDetail.durum !== 'closed' && selectedTenderForDetail.durum !== 'expired'"
               @click="openBidModal(selectedTenderForDetail); selectedTenderForDetail = null"

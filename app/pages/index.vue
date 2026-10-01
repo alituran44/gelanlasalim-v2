@@ -2001,6 +2001,10 @@ function isMyOwnTender(tender: any): boolean {
 
 
 function openQuickBidModal(tender: any) {
+  if (isReklamIlani(tender)) {
+    alert(`📢 REKLAM İLANINA TEKLİF VERİLEMEZ!\n\n"${tender.baslik}" bir tanıtım ve reklam ilanıdır. İhale niteliğinde olmadığı için teklif verilemez.\n\nİlan sahibiyle doğrudan iletişime geçmek için lütfen telefon veya web sayfası bilgilerini kullanınız.`)
+    return
+  }
   // Profil doluluk şartı tamamen kaldırıldı - Her kullanıcı doğrudan teklif verebilir
   if (isMyOwnTender(tender)) {
     alert(`🚫 KENDİ İLANINIZA TEKLİF VEREMEZSİNİZ!\n\n"${tender.baslik}" ihalesi sizin tarafınızdan açılmıştır.\n\nSistem kuralları ve B2B ihale mevzuatı gereği kendi açtığınız ihalelere teklif sunamazsınız.\n\nİhaleniz için gelen teklifleri incelemek ve pazarlık yürütmek için lütfen "Gelen Teklifler" sayfasına gidiniz.`)
@@ -2039,7 +2043,7 @@ function handleQuoteFileChange(event: Event) {
     const lower = file.name.toLowerCase()
     if (lower.endsWith('.xls') || lower.endsWith('.xlsx')) fileType = 'excel'
     else if (lower.endsWith('.doc') || lower.endsWith('.docx')) fileType = 'word'
-    else if (lower.endsWith('.dwg') || lower.endsWith('.dxf')) fileType = 'cad'
+    else if (lower.endsWith('.png') || lower.endsWith('.jpg') || lower.endsWith('.jpeg')) fileType = 'image'
 
     const reader = new FileReader()
     reader.onload = (e) => {
@@ -3336,6 +3340,23 @@ onMounted(() => {
                         <Building2 :size="12" class="text-amber-700" />
                         <span>İlanınız</span>
                       </NuxtLink>
+                      <template v-else-if="isReklamIlani(tender)">
+                        <a 
+                          v-if="tender.ownerPhone"
+                          :href="'tel:' + tender.ownerPhone"
+                          @click.stop
+                          class="py-2 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-[11px] transition cursor-pointer text-center flex items-center justify-center gap-1 shadow-xs"
+                          title="İlan Sahibini Ara"
+                        >
+                          <span>📞 Ara</span>
+                        </a>
+                        <span 
+                          v-else
+                          class="py-2 px-2 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 font-bold text-[10px] text-center flex items-center justify-center gap-1"
+                        >
+                          📢 Reklam
+                        </span>
+                      </template>
                       <button 
                         v-else
                         type="button" 
@@ -4706,15 +4727,23 @@ onMounted(() => {
               <Building2 :size="13" class="text-amber-700" />
               <span>👤 Sizin İlanınız</span>
             </NuxtLink>
-            <a 
-              v-else-if="isReklamIlani(selectedTenderModal) && selectedTenderModal.ownerPhone"
-              :href="'tel:' + selectedTenderModal.ownerPhone"
-              class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition cursor-pointer shadow-md flex items-center gap-2"
-            >
-              <span>📞 İlan Sahibini Ara</span>
-            </a>
+            <template v-else-if="isReklamIlani(selectedTenderModal)">
+              <a 
+                v-if="selectedTenderModal.ownerPhone"
+                :href="'tel:' + selectedTenderModal.ownerPhone"
+                class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs transition cursor-pointer shadow-md flex items-center gap-2"
+              >
+                <span>📞 İlan Sahibini Ara</span>
+              </a>
+              <span 
+                v-else
+                class="px-5 py-2.5 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 font-bold text-xs flex items-center gap-1.5"
+              >
+                📢 Kurumsal Tanıtım / Reklam İlanı (Teklife Kapalı)
+              </span>
+            </template>
             <button 
-              v-else-if="!isReklamIlani(selectedTenderModal)"
+              v-else
               type="button" 
               @click="openQuickBidModal(selectedTenderModal); selectedTenderModal = null"
               class="px-6 py-2.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition cursor-pointer shadow-md shadow-blue-600/20 flex items-center gap-2"
@@ -4975,7 +5004,7 @@ onMounted(() => {
               ref="quoteFileInputRef"
               type="file" 
               multiple 
-              accept=".dwg,.dxf,.pdf,.xls,.xlsx,.doc,.docx,application/acad,application/x-acad,application/autocad_dwg,image/vnd.dwg,application/dwg,application/x-dwg,application/octet-stream,*/*" 
+              accept=".pdf,.xls,.xlsx,.doc,.docx,.png,.jpg,.jpeg" 
               class="hidden" 
               @change="handleQuoteFileChange"
             />
@@ -4986,8 +5015,8 @@ onMounted(() => {
               class="border-2 border-dashed border-slate-300 hover:border-blue-500 bg-slate-50/70 hover:bg-blue-50/30 p-3 rounded-2xl text-center cursor-pointer transition flex flex-col items-center justify-center gap-1 group"
             >
               <UploadCloud :size="20" class="text-slate-400 group-hover:text-blue-600 transition-colors" />
-              <span class="text-xs font-bold text-slate-700 group-hover:text-blue-700">Teklif Cetveli, Şartname & DWG Çizim Ekle</span>
-              <span class="text-[10px] text-slate-400">PDF, Excel, Word veya DWG / DXF (AutoCAD Çizim)</span>
+              <span class="text-xs font-bold text-slate-700 group-hover:text-blue-700">Teklif Belgesi, Şartname & Fiyat Cetveli Ekle</span>
+              <span class="text-[10px] text-slate-400">PDF, Excel, Word veya Görsel Dosyası (Maks. 25 MB)</span>
             </div>
 
             <!-- Yüklenen Dosyalar Listesi -->
@@ -4998,10 +5027,8 @@ onMounted(() => {
                 class="flex items-center justify-between p-2 rounded-xl bg-slate-100 border border-slate-200 text-xs"
               >
                 <div class="flex items-center gap-2 truncate pr-2">
-                  <FileCode v-if="f.type === 'cad'" :size="14" class="text-amber-500 shrink-0" />
-                  <FileText v-else :size="14" class="text-blue-600 shrink-0" />
+                  <FileText :size="14" class="text-blue-600 shrink-0" />
                   <span class="truncate font-bold text-slate-800">{{ f.name }}</span>
-                  <span v-if="f.type === 'cad'" class="text-[9px] px-1 py-0.2 rounded font-mono font-bold bg-amber-500/10 text-amber-600 border border-amber-500/20 shrink-0">DWG</span>
                   <span class="text-[10px] text-slate-400 font-mono shrink-0">({{ f.size }})</span>
                 </div>
                 <button type="button" @click="removeQuoteFile(idx)" class="text-red-500 hover:text-red-700 p-1 cursor-pointer">
@@ -5268,8 +5295,14 @@ onMounted(() => {
             </button>
 
             <!-- Teklif Ver Butonu -->
+            <div 
+              v-if="isReklamIlani(drawerTender)"
+              class="flex-1 py-2.5 rounded-xl bg-purple-50 text-purple-700 font-bold text-xs text-center border border-purple-200"
+            >
+              📢 Reklam İlanı (Teklife Kapalı)
+            </div>
             <button 
-              v-if="!isMyOwnTender(drawerTender) && drawerTender.durum !== 'closed'"
+              v-else-if="!isMyOwnTender(drawerTender) && drawerTender.durum !== 'closed'"
               type="button" 
               @click="showLiveBidsDrawer = false; openQuickBidModal(drawerTender)"
               class="flex-1 py-2.5 rounded-xl bg-[#0084B4] hover:bg-[#00739D] text-white font-black text-xs transition cursor-pointer shadow-md flex items-center justify-center gap-1.5"

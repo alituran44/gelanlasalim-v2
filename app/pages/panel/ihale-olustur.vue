@@ -1422,10 +1422,10 @@ async function submitCurrentForm() {
           : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'"
       >
         <span class="text-[11px] font-black uppercase tracking-wider flex items-center justify-between">
-          <span>📢 REKLAM İLANI</span>
+          <span>📢 YAZILI REKLAM İLANI</span>
           <span v-if="activeFormMode === 'reklam'" class="text-pink-600 text-xs">✓</span>
         </span>
-        <span class="text-[9px] text-slate-500 font-medium">Fiyatsız vitrin tanıtımı</span>
+        <span class="text-[9px] text-slate-500 font-medium">Fiyatsız vitrin & kurumsal tanıtım</span>
       </button>
 
       <!-- 4. Arsa İçin (Görsel: ARSA İÇİN) -->
@@ -2029,8 +2029,19 @@ async function submitCurrentForm() {
       
       <!-- Pembe Çizim Başlığı -->
       <div class="border-b border-pink-100 pb-3">
-        <h2 class="text-sm font-black uppercase tracking-wider text-pink-600">REKLAM ILANI</h2>
-        <p class="text-[11px] text-slate-400">Şirket, hizmet, proje ve kurumsal tanıtım reklam ilanı</p>
+        <h2 class="text-sm font-black uppercase tracking-wider text-pink-600">📢 YAZILI REKLAM İLANI</h2>
+        <p class="text-[11px] text-slate-400">Şirket, hizmet, proje ve kurumsal tanıtım amaçlı yazılı reklam ilanı</p>
+      </div>
+
+      <!-- Bilgilendirme Kutusu: Teklife Kapalı, Doğrudan İletişim -->
+      <div class="p-3.5 bg-pink-50/80 border border-pink-200 rounded-2xl text-xs text-pink-900 flex items-start gap-2.5">
+        <span class="text-base shrink-0 mt-0.5">ℹ️</span>
+        <div class="space-y-0.5">
+          <span class="font-black block">Yazılı Reklam İlanı Bilgilendirmesi:</span>
+          <p class="text-[11px] text-pink-800 leading-relaxed">
+            Bu ilan türü teklif toplama amaçlı bir ihale değildir. Pazar yerinde firma ve ürün tanıtımınız için vitrin oluşturur. İlanınızda doğrudan telefon ve web sayfanız yer alır, harici teklif kabul edilmez.
+          </p>
+        </div>
       </div>
 
       <!-- Kategori ve Alt Kategori (Seç / Diğer - Elle Girilsin) -->
@@ -2247,7 +2258,7 @@ async function submitCurrentForm() {
           class="w-full py-4 rounded-2xl bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-black text-sm tracking-wide shadow-md transition-all cursor-pointer flex items-center justify-center gap-2"
         >
           <span v-if="isSubmitting">Yayınlanıyor...</span>
-          <span v-else>🚀 REKLAM İLANINI YAYINLA</span>
+          <span v-else>🚀 YAZILI REKLAM İLANINI YAYINLA</span>
         </button>
       </div>
 
