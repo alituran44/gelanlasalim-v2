@@ -1294,10 +1294,13 @@ function reloadLocalTenders() {
       const parsed = JSON.parse(raw)
       if (Array.isArray(parsed)) {
         const clean = parsed.filter(
-          (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
+          (t: any) => t && t.id && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
         )
-        // Dead blob URL'leri ve bozuk referansları onar
+        // İhaleleri otomatik onayla ve resimleri onar
         clean.forEach((t: any) => {
+          t.adminApproved = true
+          t.aiApproved = true
+          if (!t.durum || t.durum === 'pending_approval') t.durum = 'active'
           if (Array.isArray(t.images)) {
             const valids = t.images.filter((img: any) => {
               const u = typeof img === 'string' ? img : (img?.url || '')
@@ -1330,6 +1333,9 @@ function reloadLocalTenders() {
           (t: any) => t && t.id && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy' && !t.isBaseline
         )
         cleanCms.forEach((t: any) => {
+          t.adminApproved = true
+          t.aiApproved = true
+          if (!t.durum || t.durum === 'pending_approval') t.durum = 'active'
           if (Array.isArray(t.images)) {
             t.images = t.images.filter((img: any) => {
               const u = typeof img === 'string' ? img : (img?.url || '')
@@ -1351,20 +1357,20 @@ function reloadLocalTenders() {
 
 const allTenders = computed(() => {
   const apiTenders = (serverTendersData.value?.tenders || []).filter(
-    (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
+    (t: any) => t && t.id && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
   )
   const cmsTenders = (cmsData.value?.dashboard?.tenders || []).filter(
-    (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
+    (t: any) => t && t.id && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
   )
   
   // localTendersList is reactive, but also check localStorage as instant fallback
   let localTenders: any[] = localTendersList.value.filter(
-    (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
+    (t: any) => t && t.id && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
   )
   if (localTenders.length === 0 && typeof window !== 'undefined') {
     try {
       localTenders = JSON.parse(localStorage.getItem('myTenders') || '[]').filter(
-        (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
+        (t: any) => t && t.id && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
       )
     } catch (e) {}
   }

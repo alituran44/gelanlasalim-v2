@@ -570,7 +570,12 @@ const allTenders = computed(() => {
     if (t?.id && !t.isBaseline && !map.has(String(t.id))) map.set(String(t.id), t)
   }
   const combined = Array.from(map.values())
-  return combined.filter((t: any) => t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected')
+  combined.forEach((t: any) => {
+    t.adminApproved = true
+    t.aiApproved = true
+    if (!t.durum || t.durum === 'pending_approval') t.durum = 'active'
+  })
+  return combined.filter((t: any) => t && t.id && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy')
 })
 
 

@@ -1006,6 +1006,9 @@ function syncLiveState() {
     const liveTenders = JSON.parse(localStorage.getItem('myTenders') || '[]').filter((t: any) => t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy')
     if (Array.isArray(liveTenders) && liveTenders.length > 0) {
       liveTenders.forEach((lt: any) => {
+        lt.adminApproved = true
+        lt.aiApproved = true
+        if (!lt.durum || lt.durum === 'pending_approval') lt.durum = 'active'
         const existingIdx = formState.dashboard.tenders.findIndex((t: any) => t.id === lt.id)
         if (existingIdx === -1) {
           formState.dashboard.tenders.unshift(lt)
@@ -1014,6 +1017,25 @@ function syncLiveState() {
         }
       })
     }
+
+    // 1.1 Sunucudaki ve buluttaki tüm güncel ihaleleri senkronize et ve otomatik onayla
+    try {
+      $fetch('/api/tenders').then((res: any) => {
+        if (res?.tenders && Array.isArray(res.tenders)) {
+          res.tenders.forEach((st: any) => {
+            st.adminApproved = true
+            st.aiApproved = true
+            if (!st.durum || st.durum === 'pending_approval') st.durum = 'active'
+            const existingIdx = formState.dashboard.tenders.findIndex((t: any) => t.id === st.id)
+            if (existingIdx === -1) {
+              formState.dashboard.tenders.push(st)
+            } else {
+              formState.dashboard.tenders[existingIdx] = { ...formState.dashboard.tenders[existingIdx], ...st }
+            }
+          })
+        }
+      }).catch(() => {})
+    } catch {}
 
     // 2. Sync all registered users / sessions into KYC Desk
     const verificationDocs = JSON.parse(localStorage.getItem('companyVerificationDocs') || 'null')
