@@ -67,7 +67,7 @@ const sidebarMenus = computed(() => {
   if (locale.value === 'tr') {
     const list: any[] = [
       { title: "Genel Bakış & Profil", icon: LayoutDashboard, to: "/panel" },
-      { title: "İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
+      { title: "Yayındaki İhalelerim", icon: ClipboardList, to: "/panel/ilanlarim" },
       { title: "Gelen Teklifler", icon: Inbox, to: "/panel/gelen-teklifler" },
       { title: "Verdiğim Teklifler", icon: Send, to: "/panel/yaptigim-teklifler" },
       { title: "Mesajlar", icon: MessageSquare, to: "/panel/mesajlar" }

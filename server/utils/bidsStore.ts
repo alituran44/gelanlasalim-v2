@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import type { TenderItem } from './tendersStore'
 import { canUserSubmitBid } from './companyVerificationStore'
+import { fetchBidsFromCloud, persistBidsToCloud } from './cloudSync'
 
 export interface BidItem {
   id: string
@@ -190,6 +191,30 @@ export function validateBidSubmission(
   return { valid: true }
 }
 
+let isInitialBidsLoadDone = false
+
+export async function ensureBidsLoaded(forceRefresh = false): Promise<BidItem[]> {
+  const needRefresh = !isInitialBidsLoadDone || forceRefresh || !globalThis.__SHARED_BIDS__ || globalThis.__SHARED_BIDS__.length === 0
+  if (needRefresh) {
+    try {
+      const cloudBids = await fetchBidsFromCloud()
+      if (cloudBids && Array.isArray(cloudBids)) {
+        const existing = globalThis.__SHARED_BIDS__ || tryReadBidsFromDisk() || []
+        const map = new Map<string, BidItem>()
+        existing.forEach(b => { if (b && b.id) map.set(b.id, b) })
+        cloudBids.forEach(b => { if (b && b.id) map.set(b.id, b) })
+        const merged = Array.from(map.values())
+        globalThis.__SHARED_BIDS__ = merged
+        trySaveBidsToDisk(merged)
+        isInitialBidsLoadDone = true
+      }
+    } catch (err) {
+      console.warn('[bidsStore] ensureBidsLoaded warning:', err)
+    }
+  }
+  return getAllBids()
+}
+
 export function getAllBids(): BidItem[] {
   if (!globalThis.__SHARED_BIDS__) {
     const diskBids = tryReadBidsFromDisk()
@@ -201,11 +226,13 @@ export function getAllBids(): BidItem[] {
 export function clearAllBids(): void {
   globalThis.__SHARED_BIDS__ = []
   trySaveBidsToDisk([])
+  persistBidsToCloud([]).catch((e) => console.warn('[CloudSync] clearAllBids error:', e))
 }
 
 export function saveBids(list: BidItem[]): void {
   globalThis.__SHARED_BIDS__ = list
   trySaveBidsToDisk(list)
+  persistBidsToCloud(list).catch((e) => console.warn('[CloudSync] saveBids error:', e))
 }
 
 export function addBid(bid: BidItem): BidItem {
@@ -218,6 +245,7 @@ export function addBid(bid: BidItem): BidItem {
   }
   globalThis.__SHARED_BIDS__ = list
   trySaveBidsToDisk(list)
+  persistBidsToCloud(list).catch((e) => console.warn('[CloudSync] addBid error:', e))
   return bid
 }
 
@@ -232,6 +260,7 @@ export function updateBidStatus(bidId: string, status: string): boolean {
     target.durum = status
     globalThis.__SHARED_BIDS__ = list
     trySaveBidsToDisk(list)
+    persistBidsToCloud(list).catch((e) => console.warn('[CloudSync] updateBidStatus error:', e))
     return true
   }
   return false
@@ -243,5 +272,7 @@ export function removeBid(bidId: string): boolean {
   list = list.filter(b => b.id !== bidId)
   globalThis.__SHARED_BIDS__ = list
   trySaveBidsToDisk(list)
+  persistBidsToCloud(list).catch((e) => console.warn('[CloudSync] removeBid error:', e))
   return list.length < initLen
 }
+

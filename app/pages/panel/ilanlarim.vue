@@ -948,7 +948,7 @@ const statusTabs = computed(() => {
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b pb-4" style="border-color: #F1F5F9;">
       <div>
         <h1 class="text-xl font-black text-slate-800 tracking-tight" style="color: #0F172A;">
-          {{ 'İhalelerim' }}
+          {{ 'Yayındaki İhalelerim' }}
         </h1>
         <p class="text-xs text-slate-500 font-medium mt-0.5">
           {{ 'Oluşturduğunuz ihaleleri durum, tarih ve teklif sürecine göre yönetin.' }}

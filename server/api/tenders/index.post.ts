@@ -1,5 +1,5 @@
 import { defineEventHandler, readBody, setHeader, createError, getRequestHeaders } from 'h3'
-import { addTender, TenderItem } from '../../utils/tendersStore'
+import { addTender, ensureTendersLoaded, TenderItem } from '../../utils/tendersStore'
 import { addGibLog } from '../../utils/gibAuditStore'
 import { sendViaGoogleSmtp, getStoredSmtpConfig } from '../../utils/smtpClient'
 import { resolveSession, sanitizePayload } from '../../utils/authGuard'
@@ -7,6 +7,7 @@ import { resolveClientIp } from '../../utils/clientIp'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
+  await ensureTendersLoaded()
   const session = resolveSession(event)
   const headers = getRequestHeaders(event)
 

@@ -1,9 +1,10 @@
-import { getAllBids, getBidsForTender } from '~~/server/utils/bidsStore'
-import { getAllTenders } from '~~/server/utils/tendersStore'
+import { getAllBids, getBidsForTender, ensureBidsLoaded } from '~~/server/utils/bidsStore'
+import { getAllTenders, ensureTendersLoaded } from '~~/server/utils/tendersStore'
 import { resolveSession } from '~~/server/utils/authGuard'
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
+  await Promise.all([ensureBidsLoaded(), ensureTendersLoaded()])
   const query = getQuery(event)
   const tenderId = query.tenderId as string | undefined
   const ownerEmail = query.ownerEmail as string | undefined

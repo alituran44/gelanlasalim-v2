@@ -1,6 +1,7 @@
 // Shared server-side store for tenders to synchronize across all devices and browsers
 import fs from 'node:fs'
 import path from 'node:path'
+import { fetchTendersFromCloud, persistTendersToCloud, shouldRefreshFromCloud } from './cloudSync'
 
 export type TenderStatus = 
   | 'DRAFT' 
@@ -257,12 +258,44 @@ export function computeTenderTiming(tender: TenderItem): {
   }
 }
 
+let isInitialTendersLoadDone = false
+
+/**
+ * ☁️ Cross-Device & Serverless Cloud Loader:
+ * Lambda soğuk başlangıçlarında veya periyodik TTL dolduğunda bulut deposundan ihaleleri yükler.
+ */
+export async function ensureTendersLoaded(forceRefresh = false): Promise<TenderItem[]> {
+  const needRefresh = !isInitialTendersLoadDone || forceRefresh || !globalThis.__SHARED_TENDERS__ || globalThis.__SHARED_TENDERS__.length === 0 || shouldRefreshFromCloud(12000)
+  if (needRefresh) {
+    try {
+      const cloudList = await fetchTendersFromCloud()
+      if (cloudList && Array.isArray(cloudList)) {
+        const existing = globalThis.__SHARED_TENDERS__ || tryReadFromDisk() || []
+        const map = new Map<string, TenderItem>()
+        existing.forEach(t => { if (t && t.id) map.set(t.id, t) })
+        cloudList.forEach(t => { if (t && t.id) map.set(t.id, t) })
+        const merged = Array.from(map.values()).filter(
+          t => t && t.id && !t.id.startsWith('TND-IDOR') && !t.id.startsWith('TND-TEST') && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
+        )
+        globalThis.__SHARED_TENDERS__ = merged
+        trySaveToDisk(merged)
+        isInitialTendersLoadDone = true
+      }
+    } catch (err) {
+      console.warn('[tendersStore] ensureTendersLoaded warning:', err)
+    }
+  }
+  return getAllTenders()
+}
+
 export function getAllTenders(): TenderItem[] {
   if (!globalThis.__SHARED_TENDERS__) {
     const diskTenders = tryReadFromDisk()
     if (diskTenders && Array.isArray(diskTenders) && diskTenders.length > 0) {
-      // Filter out test dummy tenders and any legacy mock items
-      const cleanDisk = diskTenders.filter(t => t && t.id && !t.id.startsWith('TND-IDOR') && !t.id.startsWith('TND-TEST') && !t.id.startsWith('IHC-2026-') && !t.isBaseline)
+      // Sadece gerçek test dummy ve IDOR öğelerini filtrele, kullanıcının IHC-2026- ilanlarını koru
+      const cleanDisk = diskTenders.filter(
+        t => t && t.id && !t.id.startsWith('TND-IDOR') && !t.id.startsWith('TND-TEST') && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy' && !t.isBaseline
+      )
       globalThis.__SHARED_TENDERS__ = cleanDisk
       trySaveToDisk(cleanDisk)
     } else {
@@ -306,6 +339,7 @@ export function syncTendersBatch(incomingTenders: TenderItem[]): TenderItem[] {
   const updated = Array.from(map.values())
   globalThis.__SHARED_TENDERS__ = updated
   trySaveToDisk(updated)
+  persistTendersToCloud(updated).catch(() => {})
   return updated
 }
 
@@ -319,6 +353,8 @@ export function addTender(tender: TenderItem): TenderItem {
   }
   globalThis.__SHARED_TENDERS__ = list
   trySaveToDisk(list)
+  // ☁️ Buluta derhal kalıcı olarak aktar (tüm cihazlar için)
+  persistTendersToCloud(list).catch((e) => console.warn('[CloudSync] addTender error:', e))
   return tender
 }
 
@@ -328,18 +364,22 @@ export function removeTender(id: string): boolean {
   list = list.filter(t => t.id !== id)
   globalThis.__SHARED_TENDERS__ = list
   trySaveToDisk(list)
+  persistTendersToCloud(list).catch((e) => console.warn('[CloudSync] removeTender error:', e))
   return list.length < initialLen
 }
 
 export function saveTenders(list: TenderItem[]): void {
   globalThis.__SHARED_TENDERS__ = list
   trySaveToDisk(list)
+  persistTendersToCloud(list).catch((e) => console.warn('[CloudSync] saveTenders error:', e))
 }
 
 export function clearAllTenders(): void {
   globalThis.__SHARED_TENDERS__ = []
   trySaveToDisk([])
+  persistTendersToCloud([]).catch((e) => console.warn('[CloudSync] clearAllTenders error:', e))
 }
+
 
 export function validateTenderStatusTransition(
   current: TenderStatus | string | undefined,

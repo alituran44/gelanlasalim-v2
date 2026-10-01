@@ -655,11 +655,11 @@ export function useCmsData() {
         const existing = cmsDataRef.value.dashboard.tenders || []
         const map = new Map<string, any>()
         existing.forEach((t: any) => { 
-          if (t && t.id && !t.id.startsWith('IHC-2026-') && !t.isBaseline) map.set(t.id, t) 
+          if (t && t.id && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy' && !t.isBaseline) map.set(t.id, t) 
         })
         // Sunucudan gelen ilanları ekle veya güncelle
         res.tenders.forEach((t: any) => { 
-          if (t && t.id && !t.id.startsWith('IHC-2026-') && !t.isBaseline) map.set(t.id, t) 
+          if (t && t.id && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy' && !t.isBaseline) map.set(t.id, t) 
         })
         cmsDataRef.value.dashboard.tenders = Array.from(map.values())
         safeLocalStorageSet('cmsData', cmsDataRef.value)

@@ -1,5 +1,5 @@
-import { addBid, BidItem, sanitizeInput, validateBidSubmission } from '~~/server/utils/bidsStore'
-import { getAllTenders, addTender } from '~~/server/utils/tendersStore'
+import { addBid, BidItem, sanitizeInput, validateBidSubmission, ensureBidsLoaded } from '~~/server/utils/bidsStore'
+import { getAllTenders, addTender, ensureTendersLoaded } from '~~/server/utils/tendersStore'
 import { sendViaGoogleSmtp, getStoredSmtpConfig } from '~~/server/utils/smtpClient'
 import { logBidEvent } from '~~/server/utils/bidAuditStore'
 import { getCompanyForUser } from '~~/server/utils/companyVerificationStore'
@@ -10,6 +10,7 @@ import { getRequestHeader } from 'h3'
 
 export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
+  await Promise.all([ensureBidsLoaded(), ensureTendersLoaded()])
   try {
     const rawBody = await readBody<Partial<BidItem>>(event)
     if (!rawBody || !rawBody.tenderId || !rawBody.fiyat) {

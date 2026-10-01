@@ -20,7 +20,7 @@ const actions = computed(() => {
         link: "/panel/ihale-olustur"
       },
       {
-        title: "İhalelerim",
+        title: "Yayındaki İhalelerim",
         description: "Tüm ihaleleri görüntüle",
         icon: FileText,
         color: "bg-emerald-600",

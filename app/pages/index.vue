@@ -1294,7 +1294,7 @@ function reloadLocalTenders() {
       const parsed = JSON.parse(raw)
       if (Array.isArray(parsed)) {
         const clean = parsed.filter(
-          (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && !t.id?.startsWith('IHC-2026-')
+          (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
         )
         // Dead blob URL'leri ve bozuk referansları onar
         clean.forEach((t: any) => {
@@ -1327,7 +1327,7 @@ function reloadLocalTenders() {
       const cmsParsed = JSON.parse(cmsRaw)
       if (cmsParsed?.dashboard?.tenders && Array.isArray(cmsParsed.dashboard.tenders)) {
         const cleanCms = cmsParsed.dashboard.tenders.filter(
-          (t: any) => t && t.id && !t.id.startsWith('IHC-2026-') && !t.isBaseline
+          (t: any) => t && t.id && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy' && !t.isBaseline
         )
         cleanCms.forEach((t: any) => {
           if (Array.isArray(t.images)) {
@@ -1351,20 +1351,20 @@ function reloadLocalTenders() {
 
 const allTenders = computed(() => {
   const apiTenders = (serverTendersData.value?.tenders || []).filter(
-    (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && !t.id?.startsWith('IHC-2026-')
+    (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
   )
   const cmsTenders = (cmsData.value?.dashboard?.tenders || []).filter(
-    (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && !t.id?.startsWith('IHC-2026-')
+    (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
   )
   
   // localTendersList is reactive, but also check localStorage as instant fallback
   let localTenders: any[] = localTendersList.value.filter(
-    (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && !t.id?.startsWith('IHC-2026-')
+    (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
   )
   if (localTenders.length === 0 && typeof window !== 'undefined') {
     try {
       localTenders = JSON.parse(localStorage.getItem('myTenders') || '[]').filter(
-        (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && !t.id?.startsWith('IHC-2026-')
+        (t: any) => t && t.adminApproved !== false && t.durum !== 'pending_approval' && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy'
       )
     } catch (e) {}
   }
@@ -1373,7 +1373,7 @@ const allTenders = computed(() => {
   const combined = [...localTenders, ...apiTenders, ...cmsTenders, ...seedTenders]
   const seen = new Set()
   return combined.filter(item => {
-    if (!item || item.isBaseline || item.id?.startsWith('IHC-2026-')) return false
+    if (!item || item.isBaseline || item.id === 'IHC-2026-178' || item.baslik === 'aesredtruıo85urıy') return false
     const key = item.id || item.baslik
     const duplicate = seen.has(key)
     seen.add(key)

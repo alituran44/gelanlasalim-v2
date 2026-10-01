@@ -1,8 +1,11 @@
-import { getAllTenders } from '~~/server/utils/tendersStore'
+import { getAllTenders, ensureTendersLoaded } from '~~/server/utils/tendersStore'
 import { resolveSession } from '~~/server/utils/authGuard'
 
-export default defineEventHandler((event) => {
+export default defineEventHandler(async (event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
+  // ☁️ Cross-Device Persistence: Sunucu veya bulut deposundaki güncel ihaleleri belleğe al
+  await ensureTendersLoaded()
+
   // 🛡️ SEC-001 & SEC-002: Güvenli sunucu oturumu çözümleme
   const session = resolveSession(event)
   const isAdmin = session.isAdmin

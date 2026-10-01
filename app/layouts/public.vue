@@ -35,6 +35,19 @@ const route = useRoute()
 const userSession = ref<any>(null)
 const activeNavTab = ref('anasayfa')
 const isMobileMenuOpen = ref(false)
+const showExpertiseModal = ref(false)
+const EXPERTISE_TARGET_URL = ref('') // Kullanıcı harici link verdiğinde anında buraya yönlendirilecek
+
+function handleExpertiseClick() {
+  if (EXPERTISE_TARGET_URL.value) {
+    if (typeof window !== 'undefined') {
+      window.open(EXPERTISE_TARGET_URL.value, '_blank')
+    }
+  } else {
+    showExpertiseModal.value = true
+  }
+}
+
 const { unreadCount } = useNotifications()
 
 const isLoggedIn = computed(() => {
@@ -362,21 +375,28 @@ onMounted(() => {
           </div>
 
           <!-- Hızlı Aksiyonlar -->
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-3 gap-1.5">
             <NuxtLink 
-              to="/panel/ihale-olustur"
+              to="/panel/ihale-olustur" 
               @click="isMobileMenuOpen = false"
-              class="py-2.5 px-3 rounded-xl bg-gradient-to-r from-orange-600 to-amber-500 text-white font-black text-xs text-center flex items-center justify-center gap-1 shadow-xs"
+              class="py-2.5 px-1.5 rounded-xl bg-gradient-to-r from-orange-600 to-amber-500 text-white font-black text-[11px] text-center flex items-center justify-center gap-1 shadow-xs"
             >
-              <span>✨ + İHALE AÇ</span>
+              <span>+ İHALE AÇ</span>
             </NuxtLink>
             <NuxtLink 
               to="/abonelik"
               @click="isMobileMenuOpen = false"
-              class="py-2.5 px-3 rounded-xl bg-[#0284C7] text-white font-bold text-xs text-center flex items-center justify-center gap-1 shadow-xs"
+              class="py-2.5 px-1.5 rounded-xl bg-[#0284C7] text-white font-bold text-[11px] text-center flex items-center justify-center gap-1 shadow-xs"
             >
               <span>🔄 Üyelik Uzat</span>
             </NuxtLink>
+            <button 
+              type="button"
+              @click="isMobileMenuOpen = false; handleExpertiseClick()"
+              class="py-2.5 px-1.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-[11px] text-center flex items-center justify-center gap-1 shadow-xs cursor-pointer"
+            >
+              <span>📋 Ekspertiz</span>
+            </button>
           </div>
 
           <!-- Temel Gezinme Linkleri -->
@@ -504,6 +524,15 @@ onMounted(() => {
           <NuxtLink to="/abonelik" class="px-3.5 py-1.5 rounded-lg bg-[#0284C7] hover:bg-[#0369A1] text-white font-bold text-xs shadow-xs flex items-center gap-1 border border-sky-700/30 transition cursor-pointer">
             <span>🔄 Üyelik uzat</span>
           </NuxtLink>
+
+          <!-- 3. Ekspertiz Raporu Al -->
+          <button 
+            type="button"
+            @click="handleExpertiseClick"
+            class="px-3.5 py-1.5 rounded-lg bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs shadow-xs flex items-center gap-1.5 border border-emerald-600/30 transition cursor-pointer"
+          >
+            <span>📋 Ekspertiz Raporu Al</span>
+          </button>
         </div>
 
         <!-- Sağ: Kullanıcı Giriş / Çıkış & Profil Alanı (Her Zaman Sağda Aynı Yerde) -->
@@ -618,6 +647,84 @@ onMounted(() => {
 
     <!-- Floating Destek Butonu -->
     <FloatingSupportWidget />
+
+    <!-- 📋 EKSPERTİZ RAPORU AL BİLGİLENDİRME MODALI -->
+    <Teleport to="body">
+      <div 
+        v-if="showExpertiseModal" 
+        class="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-xs p-4 animate-in fade-in duration-200"
+        @click.self="showExpertiseModal = false"
+      >
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 border border-slate-200 relative overflow-hidden">
+          <!-- Üst Çizgi -->
+          <div class="h-1.5 bg-gradient-to-r from-teal-500 via-emerald-500 to-teal-600 absolute top-0 left-0 right-0"></div>
+
+          <!-- Kapat Butonu -->
+          <button 
+            type="button"
+            @click="showExpertiseModal = false" 
+            aria-label="Kapat"
+            class="absolute top-4 right-4 text-slate-400 hover:text-slate-700 bg-slate-100 hover:bg-slate-200 p-2 rounded-full transition cursor-pointer"
+          >
+            <X :size="18" />
+          </button>
+
+          <!-- İkon ve Başlık -->
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-12 h-12 rounded-xl bg-teal-50 border border-teal-200 flex items-center justify-center text-2xl shrink-0">
+              📋
+            </div>
+            <div>
+              <h3 class="text-lg font-black text-slate-900 leading-tight">Lisanslı Ekspertiz & Değerleme Raporu</h3>
+              <p class="text-xs text-teal-700 font-semibold mt-0.5">SPK & BDDK Akrediteli Bağımsız Uzman Raporlaması</p>
+            </div>
+          </div>
+
+          <p class="text-xs text-slate-600 leading-relaxed mb-4">
+            İhaleye çıkaracağınız veya teklif vereceğiniz tüm gayrimenkul (konut, arsa, ticari vb.), araç, makine ve ticari emtialar için bağımsız lisanslı ekspertiz raporunuzu güvenle temin edebilirsiniz.
+          </p>
+
+          <!-- Özellikler -->
+          <div class="space-y-2 mb-5">
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2.5 text-xs text-slate-700">
+              <span class="text-teal-600 font-black">✓</span>
+              <span><strong>Resmi & Hukuki Geçerlilik:</strong> Mahkeme, banka ve resmi kurumlarda geçerli değerleme.</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2.5 text-xs text-slate-700">
+              <span class="text-teal-600 font-black">✓</span>
+              <span><strong>Hızlı İnceleme:</strong> 24-48 saat içerisinde yerinde inceleme ve dijital rapor teslimi.</span>
+            </div>
+            <div class="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center gap-2.5 text-xs text-slate-700">
+              <span class="text-teal-600 font-black">✓</span>
+              <span><strong>Güvenli İhale Süreci:</strong> Alıcı ve satıcı taraflar için şeffaf, sıfır riskli ticaret.</span>
+            </div>
+          </div>
+
+          <!-- Aksiyon Alanı -->
+          <div class="p-3.5 bg-amber-50 border border-amber-200 rounded-xl mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="text-[11px] font-bold text-amber-900">Ekspertiz Talep & Danışma Hattı:</div>
+              <a href="tel:08508408695" class="text-base font-black text-amber-800 tracking-wide hover:underline">0850 840 86 95</a>
+            </div>
+            <a 
+              href="mailto:ihalecib@gmail.com?subject=Ekspertiz%20Raporu%20Talebi" 
+              class="px-3.5 py-2 rounded-lg bg-white border border-amber-300 text-amber-900 font-bold text-xs hover:bg-amber-100 transition text-center shrink-0"
+            >
+              ✉️ E-posta ile Talep Et
+            </a>
+          </div>
+
+          <!-- Kapat Butonu -->
+          <button 
+            type="button"
+            @click="showExpertiseModal = false" 
+            class="w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition cursor-pointer text-center"
+          >
+            Tamam, Anladım
+          </button>
+        </div>
+      </div>
+    </Teleport>
 
   </div>
 </template>

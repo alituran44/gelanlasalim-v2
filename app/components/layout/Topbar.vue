@@ -55,7 +55,7 @@ const pageTitle = computed(() => {
     const titles: Record<string, string> = {
       '/panel': 'Yönetim Paneli',
       '/panel/pazar-yeri': 'İhale Pazar Yeri',
-      '/panel/ilanlarim': 'İhalelerim',
+      '/panel/ilanlarim': 'Yayındaki İhalelerim',
       '/panel/gelen-teklifler': 'Aldığım Teklifler (Gelen)',
       '/panel/yaptigim-teklifler': 'Verdiğim Teklifler (Yaptığım)',
       '/panel/tekliflerim': 'Teklif Yönetim Merkezi',
