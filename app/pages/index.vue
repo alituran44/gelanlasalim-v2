@@ -63,7 +63,8 @@ import {
   Database,
   Network,
   Lock,
-  Camera
+  Camera,
+  ImageOff
 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import DeepSeekAssistantModal from '~/components/ai/DeepSeekAssistantModal.vue'
@@ -865,8 +866,13 @@ const allCompaniesList: any[] = []
 // ==================== 6. SEED / CANLI İHALE VERİLERİ ====================
 const seedTenders: any[] = []
 
+function isStockUnsplashUrl(url: any): boolean {
+  if (typeof url !== 'string') return false
+  return url.includes('images.unsplash.com')
+}
+
 function getTenderImage(tender: any): string {
-  if (!tender) return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
+  if (!tender) return ''
 
   const isBrokenUrl = (u: any) => typeof u === 'string' && (
     u.includes('photo-1558904541-efa8c4a08931') || 
@@ -876,56 +882,35 @@ function getTenderImage(tender: any): string {
     u.includes('photo-1592417817098-8f3d69104a47')
   )
 
-  if (tender.image && typeof tender.image === 'string' && (tender.image.startsWith('http') || tender.image.startsWith('data:image')) && !isBrokenUrl(tender.image)) {
+  const isValidUserImage = (u: any) => {
+    return typeof u === 'string' && u.trim().length > 0 && !u.startsWith('blob:') && !isBrokenUrl(u) && !isStockUnsplashUrl(u)
+  }
+
+  if (isValidUserImage(tender.image)) {
     return tender.image
   }
 
   if (Array.isArray(tender.images) && tender.images.length > 0) {
-    const first = tender.images[0]
-    if (typeof first === 'string' && (first.startsWith('http') || first.startsWith('data:image')) && !isBrokenUrl(first)) {
-      return first
-    }
-    if (first && typeof first === 'object' && typeof first.url === 'string' && (first.url.startsWith('http') || first.url.startsWith('data:image')) && !isBrokenUrl(first.url)) {
-      return first.url
+    for (const first of tender.images) {
+      const u = typeof first === 'string' ? first : (first?.url || '')
+      if (isValidUserImage(u)) {
+        return u
+      }
     }
   }
 
-  const text = ((tender.baslik || '') + ' ' + (tender.kategori || '') + ' ' + (tender.mainCategory || '')).toLowerCase()
-  if (text.includes('peyzaj') || text.includes('sulama') || text.includes('bahçe') || text.includes('çim') || text.includes('fidan') || text.includes('ağaç') || text.includes('botanik')) {
-    return 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('arsa') || text.includes('tarla') || text.includes('arazi') || text.includes('zeytinlik') || text.includes('bağ') || text.includes('parsel')) {
-    return 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('konut') || text.includes('daire') || text.includes('villa') || text.includes('gayrimenkul') || text.includes('ev') || text.includes('bina') || text.includes('dükkan')) {
-    return 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('lojistik') || text.includes('nakliye') || text.includes('taşımacılık') || text.includes('havayolu') || text.includes('kargo') || text.includes('uçak')) {
-    return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('inşaat') || text.includes('yapı') || text.includes('şantiye') || text.includes('çimento') || text.includes('demir') || text.includes('bina') || text.includes('ruhsat') || text.includes('proje')) {
-    return 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('makine') || text.includes('yedek parça') || text.includes('metal') || text.includes('sanayi') || text.includes('torna') || text.includes('freze')) {
-    return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('ambalaj') || text.includes('koli') || text.includes('plastik') || text.includes('kağıt') || text.includes('kutu')) {
-    return 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('akaryakıt') || text.includes('enerji') || text.includes('petrol') || text.includes('madeni yağ') || text.includes('motorin')) {
-    return 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('kırtasiye') || text.includes('ofis') || text.includes('bilişim') || text.includes('teknoloji') || text.includes('yazılım') || text.includes('bilgisayar')) {
-    return 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('gıda') || text.includes('tarım') || text.includes('yemek') || text.includes('sebze') || text.includes('meyve')) {
-    return 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('sağlık') || text.includes('medikal') || text.includes('ilaç') || text.includes('hastane')) {
-    return 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=600&auto=format&fit=crop&q=80'
+  const customImgs = tender.customFields?.resimler || tender.resimler
+  if (Array.isArray(customImgs) && customImgs.length > 0) {
+    for (const item of customImgs) {
+      const u = typeof item === 'string' ? item : (item?.url || '')
+      if (isValidUserImage(u)) {
+        return u
+      }
+    }
   }
 
-  return 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80'
+  // Resim yüklenmemişse boş döner (Kullanıcı talebi: boş / gri renk gözüksün)
+  return ''
 }
 
 // ==================== 7. CANLI VERİLERİ BİRLEŞTİRME ====================
@@ -1778,54 +1763,15 @@ function isValidImageUrl(u: any): boolean {
   if (s.length < 10) return false
   if (s.toLowerCase().startsWith('blob:')) return false
   if (s === '[object Object]' || s === 'undefined' || s === 'null') return false
+  if (s.includes('images.unsplash.com')) return false
   if (s.includes('photo-1558904541-efa8c4a08931') || s.includes('photo-1541888946425-d0fbb18086f6') || s.includes('photo-1509391365360-2e959784a276') || s.includes('photo-1541888946425-d0fbb18f15f6') || s.includes('photo-1592417817098-8f3d69104a47')) return false
   if (s.startsWith('http://') || s.startsWith('https://')) return true
   if (s.startsWith('data:image/') && s.includes(';base64,') && s.length > 50) return true
   return false
 }
 
-function getCategoryGalleryFallback(tender: any): string[] {
-  const text = ((tender?.baslik || '') + ' ' + (tender?.kategori || '') + ' ' + (tender?.mainCategory || '') + ' ' + (tender?.subCategory || '')).toLowerCase()
-
-  if (text.includes('peyzaj') || text.includes('sulama') || text.includes('bahçe') || text.includes('çim') || text.includes('fidan') || text.includes('botanik')) {
-    return [
-      'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80'
-    ]
-  }
-  if (text.includes('arsa') || text.includes('tarla') || text.includes('arazi') || text.includes('zeytinlik') || text.includes('bağ') || text.includes('parsel')) {
-    return [
-      'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1500076656116-558758c991c1?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&auto=format&fit=crop&q=80'
-    ]
-  }
-  if (text.includes('konut') || text.includes('daire') || text.includes('villa') || text.includes('gayrimenkul') || text.includes('ev') || text.includes('bina') || text.includes('dükkan') || text.includes('ofis')) {
-    return [
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=600&auto=format&fit=crop&q=80'
-    ]
-  }
-  if (text.includes('inşaat') || text.includes('yapı') || text.includes('şantiye') || text.includes('çimento') || text.includes('demir') || text.includes('ruhsat') || text.includes('proje')) {
-    return [
-      'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1590496793929-36417d3117de?w=600&auto=format&fit=crop&q=80',
-      'https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=600&auto=format&fit=crop&q=80'
-    ]
-  }
-
-  return [
-    'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80',
-    'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&auto=format&fit=crop&q=80'
-  ]
+function getCategoryGalleryFallback(_tender: any): string[] {
+  return []
 }
 
 function getTenderImagesList(tender: any): string[] {
@@ -1853,25 +1799,24 @@ function getTenderImagesList(tender: any): string[] {
     return [tender.image]
   }
 
-  return getCategoryGalleryFallback(tender)
+  return []
 }
 
-function handleThumbnailError(event: Event, tender: any, index: number) {
+function handleThumbnailError(event: Event, _tender: any, _index: number) {
   const imgEl = event.target as HTMLImageElement
   if (!imgEl) return
-  const gallery = getCategoryGalleryFallback(tender)
-  const fallback = gallery[index % gallery.length] || getTenderImage(tender)
-  if (imgEl.src !== fallback) {
-    imgEl.src = fallback
-  }
+  imgEl.style.display = 'none'
 }
 
 function getSelectedModalImage(): string {
   const tender = selectedTenderModal.value
   if (!tender) return ''
   const list = getTenderImagesList(tender)
-  if (list.length > 0 && list[activeImageIndex.value]) {
-    return list[activeImageIndex.value]
+  if (list.length > 0) {
+    if (activeImageIndex.value >= list.length) {
+      activeImageIndex.value = 0
+    }
+    return list[activeImageIndex.value] || list[0] || ''
   }
   return getTenderImage(tender)
 }
@@ -3080,6 +3025,7 @@ onMounted(() => {
                 title="Şartname ve İhale Detayını İncele"
               >
                 <img 
+                  v-if="getTenderImage(tender)"
                   :src="getTenderImage(tender)" 
                   :alt="`${tender.baslik || 'Kurumsal İhale'} - ${tender.city || 'Türkiye'} B2B İhale ve Şartname Görseli`"
                   :loading="tenderIdx === 0 ? 'eager' : 'lazy'"
@@ -3090,7 +3036,19 @@ onMounted(() => {
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   @error="($event.target as any).src = 'data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'600\' height=\'400\' viewBox=\'0 0 600 400\'><rect width=\'600\' height=\'400\' fill=\'%230b1329\'/><text x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%2338bdf8\' font-size=\'22\' font-family=\'sans-serif\'>İhaleciBurada Kurumsal İhale</text></svg>'"
                 />
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+                <!-- Görsel Yüklenmemişse Gri Nötr Şık Alan (Kullanıcı talebi: boş / gri renk vs görünsün) -->
+                <div 
+                  v-else 
+                  class="w-full h-full bg-gradient-to-br from-slate-100 via-slate-200 to-slate-300 flex flex-col items-center justify-center text-slate-500 gap-1.5 p-4 border-b border-slate-300 select-none group-hover:bg-slate-200 transition-colors"
+                >
+                  <div class="w-10 h-10 rounded-full bg-slate-300/80 flex items-center justify-center text-slate-600 shadow-inner">
+                    <ImageOff :size="20" class="opacity-80" />
+                  </div>
+                  <span class="text-[11px] font-bold tracking-tight text-slate-700">Görsel Belirtilmedi</span>
+                  <span class="text-[9px] text-slate-500 text-center font-medium leading-tight">Teknik şartname ve şartlar geçerlidir</span>
+                </div>
+                <div v-if="getTenderImage(tender)" class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none"></div>
+                <div v-else class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/35 to-transparent pointer-events-none"></div>
 
                 <!-- Durum / Kategori Rozeti (Kurucu Talebi: Canlı İhale Yazmasın, Kategori Ne İse O Yazsın) -->
                 <div class="absolute top-2 left-2 flex flex-col gap-1 max-w-[70%]">
@@ -3120,8 +3078,8 @@ onMounted(() => {
 
                 <!-- Alt Lokasyon & Fotoğraf Sayacı & Kalan Süre -->
                 <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white text-[11px] font-bold">
-                  <span class="flex items-center gap-1 truncate max-w-[120px]">
-                    <MapPin :size="12" class="text-sky-400 shrink-0" />
+                  <span class="flex items-center gap-1 truncate max-w-[120px] px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-xs text-white">
+                    <MapPin :size="12" class="text-sky-300 shrink-0" />
                     <span class="truncate">{{ tender.city || 'Balıkesir' }}</span>
                   </span>
                   <div class="flex items-center gap-1.5 shrink-0">
@@ -3134,8 +3092,8 @@ onMounted(() => {
                       <Camera :size="11" />
                       <span>1/{{ getTenderImagesList(tender).length }} Fotoğraf</span>
                     </span>
-                    <span class="flex items-center gap-1 bg-black/50 px-1.5 py-0.5 rounded backdrop-blur-xs text-[10px]">
-                      <Clock :size="11" class="text-amber-400" />
+                    <span class="flex items-center gap-1 bg-black/60 px-1.5 py-0.5 rounded backdrop-blur-xs text-[10px] text-white">
+                      <Clock :size="11" class="text-amber-300" />
                       <span>{{ tender.sure || '7 gün' }}</span>
                     </span>
                   </div>
@@ -4087,7 +4045,7 @@ onMounted(() => {
               :class="activeSpecTab === 'gallery' ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-white hover:bg-slate-800'"
             >
               <Eye :size="13" />
-              <span>Görseller & Numuneler ({{ getTenderImagesList(selectedTenderModal).length || 1 }})</span>
+              <span>Görseller & Numuneler ({{ getTenderImagesList(selectedTenderModal).length }})</span>
             </button>
 
             <button
@@ -4328,68 +4286,93 @@ onMounted(() => {
         <!-- =================================================================== -->
         <!-- 🖼️ 2. SEKME: YÜKLENEN GÖRSELLER & PNG/JPG GALERİSİ -->
         <!-- =================================================================== -->
-        <div v-else-if="activeSpecTab === 'gallery'" class="flex-1 flex flex-col min-h-0 bg-slate-950 p-4 sm:p-6 overflow-y-auto custom-scrollbar text-center">
+        <div v-else-if="activeSpecTab === 'gallery'" class="flex-1 flex flex-col min-h-0 bg-slate-950 p-4 sm:p-6 overflow-y-auto custom-scrollbar text-center justify-center">
           
-          <!-- Büyük Görsel Önizleme Alanı -->
-          <div class="relative max-w-3xl w-full mx-auto h-72 sm:h-96 rounded-2xl overflow-hidden bg-black/60 border border-slate-800 flex items-center justify-center group">
-            <img
-              :src="getSelectedModalImage()"
-              :alt="`${selectedTenderModal?.baslik || 'Kurumsal İhale'} - Detaylı Şartname Görseli ${activeImageIndex + 1}`"
-              loading="lazy"
-              decoding="async"
-              width="600"
-              height="400"
-              class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-102"
-              @error="($event.target as any).src = getTenderImage(selectedTenderModal)"
-            />
-
-            <!-- Önceki / Sonraki Butonları -->
-            <button
-              v-if="getTenderImagesList(selectedTenderModal).length > 1"
-              type="button"
-              @click="activeImageIndex = (activeImageIndex > 0 ? activeImageIndex - 1 : getTenderImagesList(selectedTenderModal).length - 1)"
-              class="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black text-white text-sm font-bold transition cursor-pointer"
-              aria-label="Önceki Görsel"
-            >
-              ❮
-            </button>
-            <button
-              v-if="getTenderImagesList(selectedTenderModal).length > 1"
-              type="button"
-              @click="activeImageIndex = (activeImageIndex < getTenderImagesList(selectedTenderModal).length - 1 ? activeImageIndex + 1 : 0)"
-              class="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black text-white text-sm font-bold transition cursor-pointer"
-              aria-label="Sonraki Görsel"
-            >
-              ❯
-            </button>
-
-            <!-- Görsel Sayacı -->
-            <div class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-black/70 text-white text-xs font-mono font-bold">
-              Görsel {{ activeImageIndex + 1 }} / {{ getTenderImagesList(selectedTenderModal).length || 1 }}
+          <!-- Görsel Yoksa: Şık Gri Nötr Boş Durum (Kullanıcı talebi: boş / gri renk vs görünsün) -->
+          <div 
+            v-if="!getSelectedModalImage() || getTenderImagesList(selectedTenderModal).length === 0" 
+            class="max-w-md w-full mx-auto py-12 px-6 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col items-center justify-center text-center my-auto shadow-xl"
+          >
+            <div class="w-16 h-16 rounded-2xl bg-slate-800/80 border border-slate-700/60 flex items-center justify-center text-slate-400 mb-4 shadow-inner">
+              <ImageOff :size="28" class="opacity-80" />
             </div>
+            <h4 class="text-base font-bold text-slate-100 mb-1.5">İlana Ait Görsel Yüklenmemiştir</h4>
+            <p class="text-xs text-slate-400 leading-relaxed mb-5 max-w-xs">
+              Bu ilana ait fotoğraf yüklenmemiştir. İhale teknik şartnamesi, birim fiyat cetveli ve resmi evraklar geçerlidir.
+            </p>
+            <button
+              type="button"
+              @click="activeSpecTab = 'pdf'"
+              class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs transition flex items-center gap-2 shadow-md cursor-pointer"
+            >
+              <FileText :size="14" />
+              <span>Teknik Şartnameyi İncele</span>
+            </button>
           </div>
 
-          <!-- Thumbnail Strip (Tıklandıkça Değişen Fotoğraf Şeridi) -->
-          <div class="flex items-center justify-center gap-3 mt-4 overflow-x-auto py-2">
-            <div
-              v-for="(imgItem, imgIdx) in (getTenderImagesList(selectedTenderModal).length > 0 ? getTenderImagesList(selectedTenderModal) : [getTenderImage(selectedTenderModal)])"
-              :key="imgIdx"
-              @click="activeImageIndex = imgIdx"
-              class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 cursor-pointer transition-all shrink-0 bg-slate-900"
-              :class="activeImageIndex === imgIdx ? 'border-blue-500 scale-105 shadow-md shadow-blue-500/20' : 'border-slate-800 opacity-60 hover:opacity-100'"
-            >
+          <!-- Görsel Varsa: Büyük Görsel Önizleme Alanı -->
+          <template v-else>
+            <div class="relative max-w-3xl w-full mx-auto h-72 sm:h-96 rounded-2xl overflow-hidden bg-black/60 border border-slate-800 flex items-center justify-center group">
               <img
-                :src="imgItem"
-                :alt="`${selectedTenderModal?.baslik || 'İhale'} - Küçük Önizleme Fotoğrafı ${imgIdx + 1}`"
+                :src="getSelectedModalImage()"
+                :alt="`${selectedTenderModal?.baslik || 'Kurumsal İhale'} - Detaylı Şartname Görseli ${activeImageIndex + 1}`"
                 loading="lazy"
                 decoding="async"
-                width="80"
-                height="80"
-                class="w-full h-full object-cover"
-                @error="($event.target as any).src = getTenderImage(selectedTenderModal)"
+                width="600"
+                height="400"
+                class="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-102"
               />
+
+              <!-- Önceki / Sonraki Butonları -->
+              <button
+                v-if="getTenderImagesList(selectedTenderModal).length > 1"
+                type="button"
+                @click="activeImageIndex = (activeImageIndex > 0 ? activeImageIndex - 1 : getTenderImagesList(selectedTenderModal).length - 1)"
+                class="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black text-white text-sm font-bold transition cursor-pointer"
+                aria-label="Önceki Görsel"
+              >
+                ❮
+              </button>
+              <button
+                v-if="getTenderImagesList(selectedTenderModal).length > 1"
+                type="button"
+                @click="activeImageIndex = (activeImageIndex < getTenderImagesList(selectedTenderModal).length - 1 ? activeImageIndex + 1 : 0)"
+                class="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-black/60 hover:bg-black text-white text-sm font-bold transition cursor-pointer"
+                aria-label="Sonraki Görsel"
+              >
+                ❯
+              </button>
+
+              <!-- Görsel Sayacı -->
+              <div class="absolute bottom-3 left-3 px-2.5 py-1 rounded-lg bg-black/70 text-white text-xs font-mono font-bold">
+                Görsel {{ activeImageIndex + 1 }} / {{ getTenderImagesList(selectedTenderModal).length }}
+              </div>
             </div>
-          </div>
+
+            <!-- Thumbnail Strip (Birden Fazla Fotoğraf Varsa) -->
+            <div 
+              v-if="getTenderImagesList(selectedTenderModal).length > 1" 
+              class="flex items-center justify-center gap-3 mt-4 overflow-x-auto py-2"
+            >
+              <div
+                v-for="(imgItem, imgIdx) in getTenderImagesList(selectedTenderModal)"
+                :key="imgIdx"
+                @click="activeImageIndex = imgIdx"
+                class="w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 cursor-pointer transition-all shrink-0 bg-slate-900"
+                :class="activeImageIndex === imgIdx ? 'border-blue-500 scale-105 shadow-md shadow-blue-500/20' : 'border-slate-800 opacity-60 hover:opacity-100'"
+              >
+                <img
+                  :src="imgItem"
+                  :alt="`${selectedTenderModal?.baslik || 'İhale'} - Küçük Önizleme Fotoğrafı ${imgIdx + 1}`"
+                  loading="lazy"
+                  decoding="async"
+                  width="80"
+                  height="80"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          </template>
 
         </div>
 

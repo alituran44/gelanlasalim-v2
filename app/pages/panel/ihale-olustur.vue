@@ -1163,16 +1163,7 @@ async function submitCurrentForm() {
       finalAciklama = digerForm.aciklama
     }
 
-    const combinedText = ((finalBaslik || '') + ' ' + (finalCategory || '') + ' ' + (finalSubCategory || '')).toLowerCase()
-    const primaryImg = finalImages[0] || (
-      activeFormMode.value === 'arsa' 
-        ? 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=600&q=80' 
-        : (activeFormMode.value === 'ev' 
-          ? 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?auto=format&fit=crop&w=600&q=80' 
-          : (combinedText.includes('peyzaj') || combinedText.includes('sulama') || combinedText.includes('bahçe') || combinedText.includes('proje')
-            ? 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=600&q=80'
-            : 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?auto=format&fit=crop&w=600&q=80'))
-    )
+    const primaryImg = finalImages[0] || ''
     const newId = `TND-${Date.now().toString().slice(-6)}`
     const ownerEmail = userSession.value?.email || 'kullanici@ihaleciburada.com'
 

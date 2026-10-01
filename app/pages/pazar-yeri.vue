@@ -279,7 +279,7 @@ function getTenderDirectionBadge(tender: any) {
 const DEFAULT_FALLBACK_SVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'><rect width='600' height='400' fill='%230b1329'/><circle cx='300' cy='180' r='60' fill='%230284c7' opacity='0.25'/><text x='50%25' y='48%25' dominant-baseline='middle' text-anchor='middle' fill='%2338bdf8' font-size='48' font-family='sans-serif'>📋</text><text x='50%25' y='68%25' dominant-baseline='middle' text-anchor='middle' fill='%23f1f5f9' font-size='18' font-family='sans-serif' font-weight='bold'>İhaleciBurada</text><text x='50%25' y='77%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='13' font-family='sans-serif'>Pazar Yeri</text></svg>"
 
 function getTenderImage(tender: any): string {
-  if (!tender) return 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80'
+  if (!tender) return ''
 
   const isBrokenUrl = (u: any) => typeof u === 'string' && (
     u.includes('photo-1558904541-efa8c4a08931') || 
@@ -289,7 +289,7 @@ function getTenderImage(tender: any): string {
     u.includes('photo-1592417817098-8f3d69104a47')
   )
 
-  const isValidUrl = (u: any) => typeof u === 'string' && u.trim().length > 0 && !u.startsWith('blob:') && (u.startsWith('http') || u.startsWith('data:image')) && !isBrokenUrl(u)
+  const isValidUrl = (u: any) => typeof u === 'string' && u.trim().length > 0 && !u.startsWith('blob:') && (u.startsWith('http') || u.startsWith('data:image')) && !isBrokenUrl(u) && !u.includes('images.unsplash.com')
 
   if (isValidUrl(tender.image)) {
     return tender.image
@@ -302,49 +302,15 @@ function getTenderImage(tender: any): string {
     }
   }
 
-  const text = ((tender.baslik || '') + ' ' + (tender.kategori || '') + ' ' + (tender.mainCategory || '') + ' ' + (tender.subCategory || '')).toLowerCase()
-
-  if (text.includes('peyzaj') || text.includes('sulama') || text.includes('bahçe') || text.includes('çim') || text.includes('fidan') || text.includes('ağaç') || text.includes('botanik')) {
-    return 'https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('arsa') || text.includes('tarla') || text.includes('arazi') || text.includes('zeytinlik') || text.includes('bağ') || text.includes('parsel')) {
-    return 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('konut') || text.includes('daire') || text.includes('villa') || text.includes('gayrimenkul') || text.includes('ev') || text.includes('bina') || text.includes('dükkan') || text.includes('ofis')) {
-    return 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('inşaat') || text.includes('yapı') || text.includes('şantiye') || text.includes('çimento') || text.includes('demir') || text.includes('ruhsat') || text.includes('mimari') || text.includes('proje')) {
-    return 'https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('organizasyon') || text.includes('düğün') || text.includes('etkinlik') || text.includes('konser') || text.includes('iftar')) {
-    return 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('hac') || text.includes('umre') || text.includes('turizm') || text.includes('gezi')) {
-    return 'https://images.unsplash.com/photo-1565552645632-d725f8bfc19a?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('lojistik') || text.includes('nakliye') || text.includes('taşımacılık') || text.includes('havayolu') || text.includes('kargo') || text.includes('uçak')) {
-    return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('makine') || text.includes('yedek parça') || text.includes('metal') || text.includes('sanayi') || text.includes('torna') || text.includes('freze')) {
-    return 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('ambalaj') || text.includes('koli') || text.includes('plastik') || text.includes('kağıt') || text.includes('kutu')) {
-    return 'https://images.unsplash.com/photo-1530587191325-3db32d826c18?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('akaryakıt') || text.includes('enerji') || text.includes('petrol') || text.includes('madeni yağ') || text.includes('motorin') || text.includes('güneş')) {
-    return 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('kırtasiye') || text.includes('ofis') || text.includes('bilişim') || text.includes('teknoloji') || text.includes('yazılım') || text.includes('bilgisayar')) {
-    return 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('gıda') || text.includes('tarım') || text.includes('yemek') || text.includes('sebze') || text.includes('meyve')) {
-    return 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&auto=format&fit=crop&q=80'
-  }
-  if (text.includes('sağlık') || text.includes('medikal') || text.includes('ilaç') || text.includes('hastane')) {
-    return 'https://images.unsplash.com/photo-1584515979956-d9f6e5d09982?w=600&auto=format&fit=crop&q=80'
+  const customImgs = tender.customFields?.resimler || tender.resimler
+  if (Array.isArray(customImgs) && customImgs.length > 0) {
+    for (const img of customImgs) {
+      if (isValidUrl(img)) return img
+      if (img && typeof img === 'object' && isValidUrl(img.url)) return img.url
+    }
   }
 
-  return 'https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=600&auto=format&fit=crop&q=80'
+  return ''
 }
 function formatTenderBudget(raw: any): string {
   if (!raw) return 'Açık Eksiltme'
