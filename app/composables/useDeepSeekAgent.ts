@@ -138,68 +138,14 @@ export function useDeepSeekAgent() {
     files?: any[]
     images?: any[]
   }) {
-    const title = (tender.baslik || '').trim()
-    const desc = (tender.aciklama || '').trim()
-    const combinedText = `${title} ${desc}`
-
-    // 1. Müstehcenlik, pornografi, kumar, yasa dışı içerik taraması
-    for (const pattern of BANNED_PATTERNS) {
-      if (pattern.test(combinedText)) {
-        return {
-          score: 0.0,
-          status: 'rejected' as const,
-          reason: '🚨 DeepSeek AI Güvenlik Engeli: İhale başlığında veya açıklamasında müstehcen, ahlaka aykırı veya yasa dışı içerik tespit edildi. Bu ihale yayına alınamaz.',
-          inspectedAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-          model: 'DeepSeek-V3-Reasoner'
-        }
-      }
-    }
-
-    // 2. Yüklenen dosya ve görsellerde müstehcen/zararlı isim taraması
-    const allFiles = [...(tender.files || []), ...(tender.images || [])]
-    for (const file of allFiles) {
-      const fileName = (typeof file === 'string' ? file : (file?.name || file?.url || '')).toLowerCase()
-      for (const fPattern of BANNED_FILE_PATTERNS) {
-        if (fPattern.test(fileName)) {
-          return {
-            score: 0.0,
-            status: 'rejected' as const,
-            reason: `🚨 DeepSeek AI Güvenlik Uyarısı: Yüklenen ek belgede ("${fileName}") uygunsuz/müstehcen veya güvensiz dosya adı tespit edildi. Lütfen uygun kurumsal şartname dosyaları ekleyiniz.`,
-            inspectedAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-            model: 'DeepSeek-V3-Reasoner'
-          }
-        }
-      }
-    }
-
-    // 3. Eksik yapılan kısımlar kontrolü (Başlık / Açıklama / Şehir)
-    if (title.length < 5 || /^(test|ihale|asdf|qwer|deneme|aaa|123)$/i.test(title)) {
-      return {
-        score: 30.0,
-        status: 'rejected' as const,
-        reason: '⚠️ DeepSeek AI Eksik Bilgi Uyarısı: İhale başlığı çok kısa veya anlamsız. Tedarikçilerin anlayabilmesi için lütfen en az 5 karakterlik açıklayıcı bir ihale başlığı yazınız.',
-        inspectedAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-        model: 'DeepSeek-V3-Reasoner'
-      }
-    }
-
-    if (desc.length < 10 && title.length < 10) {
-      return {
-        score: 45.0,
-        status: 'rejected' as const,
-        reason: '⚠️ DeepSeek AI Eksik Şartname Uyarısı: İhale açıklaması yetersiz. Lütfen alım/satım şartlarınızı, miktarını veya teknik detayları en az 10 karakter olarak belirtiniz.',
-        inspectedAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-        model: 'DeepSeek-V3-Reasoner'
-      }
-    }
-
-    // 4. Temiz, güvenli ve kurallara uygun ihale -> Anında Onay
+    // 🛡️ Kullanıcı Talebi Doğrultusunda: Yapay zekanın sisteme müdahalesi ve otomatik reddi devre dışı bırakıldı.
+    // Tüm ihaleler doğrudan yayına alınır ve yapay zeka engeli kaldırılmıştır.
     return {
-      score: 98.8,
+      score: 100.0,
       status: 'approved' as const,
-      reason: '✓ İhale başlığı, kategorisi ve teknik açıklaması mevzuata ve B2B standartlarına uygundur. DeepSeek tarafından doğrulanarak anında yayına alındı.',
+      reason: '✓ İhale doğrudan yayına alındı (Yapay zeka müdahalesi devre dışı).',
       inspectedAt: new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' }),
-      model: 'DeepSeek-V3-Reasoner'
+      model: 'Direct-Pass'
     }
   }
 
@@ -213,29 +159,7 @@ export function useDeepSeekAgent() {
     avatar?: string
     photoName?: string
   }) {
-    const text = `${profileData.name || ''} ${profileData.companyName || ''} ${profileData.bio || ''}`
-    const photo = (profileData.avatar || profileData.photoName || '').toLowerCase()
-
-    // Müstehcen metin kontrolü
-    for (const pattern of BANNED_PATTERNS) {
-      if (pattern.test(text)) {
-        return {
-          passed: false,
-          reason: '🚨 DeepSeek AI Profil Güvenlik Uyarısı: Şirket unvanında veya profil açıklamasında uygunsuz/müstehcen kelimeler tespit edildi. Lütfen kurumsal bilgilerinizi düzeltiniz.'
-        }
-      }
-    }
-
-    // Müstehcen profil fotoğrafı dosya adı kontrolü
-    for (const fPattern of BANNED_FILE_PATTERNS) {
-      if (fPattern.test(photo)) {
-        return {
-          passed: false,
-          reason: '🚨 DeepSeek AI Görsel Güvenlik Uyarısı: Seçilen profil fotoğrafında veya logo dosyasında uygunsuz/müstehcen içerik adı tespit edildi. Lütfen kurumsal şirket logonuzu yükleyiniz.'
-        }
-      }
-    }
-
+    // Yapay zeka profil engellemesi devre dışı
     return {
       passed: true,
       reason: '✓ Profil ve kurumsal logo onaylandı.'

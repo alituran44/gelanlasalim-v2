@@ -328,10 +328,10 @@ function submitDispute() {
     <!-- ESCROW STATS CARDS -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       
-      <!-- Card 1: Havuzda Bloke Tutar -->
+      <!-- Card 1: Havuzda Bloke Tutar / Bekleyen Alacak -->
       <div class="p-5 rounded-2xl bg-gradient-to-br from-[#0F223D] to-[#152B4D] text-white shadow-md relative overflow-hidden">
         <div class="flex items-center justify-between text-slate-300 text-xs font-bold">
-          <span>Güvenli Havuzda Bloke</span>
+          <span>Bekleyen Alacaklar (Havuzda Bloke)</span>
           <Lock :size="16" class="text-amber-400" />
         </div>
         <div class="text-2xl font-black font-mono mt-2 text-[#00C2FF]">
@@ -339,7 +339,7 @@ function submitDispute() {
         </div>
         <div class="text-[10px] text-slate-300 mt-1 font-medium flex items-center gap-1">
           <span class="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-ping"></span>
-          Paynkolay Korumalı Hesapta
+          Paynkolay Güvenli Escrow Havuzunda
         </div>
       </div>
 
@@ -353,28 +353,28 @@ function submitDispute() {
           {{ orders.filter(o => o.status === 'SEVKIYATTA' || o.status === 'MAL_KABUL_BEKLIYOR').length }} Sipariş
         </div>
         <div class="text-[10px] text-slate-400 mt-1 font-medium">
-          Kargo ve İrsaliye Takibinde
+          İrsaliye ve Kargo Denetiminde
         </div>
       </div>
 
-      <!-- Card 3: Tamamlanan Hacim -->
+      <!-- Card 3: Tahsil Edilen Hakediş -->
       <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
         <div class="flex items-center justify-between text-slate-500 text-xs font-bold">
-          <span>Başarıyla Tamamlanan</span>
+          <span>Tahsil Edilen (Hesaba Geçen Hakediş)</span>
           <CheckCircle2 :size="16" class="text-emerald-600" />
         </div>
         <div class="text-2xl font-black font-mono mt-2 text-emerald-600">
           {{ totalCompletedVolume.toLocaleString('tr-TR') }} ₺
         </div>
         <div class="text-[10px] text-slate-400 mt-1 font-medium">
-          Hakedişi Dağıtılmış Ticaret
+          Teslimatı onaylanıp ödenen ticaret
         </div>
       </div>
 
       <!-- Card 4: Platform Komisyonu -->
       <div class="p-5 rounded-2xl bg-white border border-slate-200 shadow-xs">
         <div class="flex items-center justify-between text-slate-500 text-xs font-bold">
-          <span>Platform Komisyon Geliri</span>
+          <span>Platform Komisyon Kesintisi (%5)</span>
           <DollarSign :size="16" class="text-[#1EAE4C]" />
         </div>
         <div class="text-2xl font-black font-mono mt-2 text-[#003057]">

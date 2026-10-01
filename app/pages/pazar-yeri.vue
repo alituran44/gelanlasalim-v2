@@ -539,9 +539,13 @@ const allTenders = computed(() => {
   combined.forEach((t: any) => {
     t.adminApproved = true
     t.aiApproved = true
-    if (!t.durum || t.durum === 'pending_approval') t.durum = 'active'
+    if (t.isArchived || t.durum === 'archived') {
+      t.durum = 'archived'
+    } else if (!t.durum || t.durum === 'pending_approval') {
+      t.durum = 'active'
+    }
   })
-  return combined.filter((t: any) => t && t.id && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy')
+  return combined.filter((t: any) => t && t.id && !t.isArchived && t.durum !== 'archived' && t.durum !== 'rejected' && !t.isBaseline && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy')
 })
 
 

@@ -138,10 +138,10 @@ export const DEFAULT_CMS_DATA = {
     whatsappEnabled: true,
     whatsappNumber: '908508408695',
     whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale süreçleri ve ilk ihale ücretsiz kampanyası hakkında bilgi almak istiyorum.',
-    aiEnabled: true,
+    aiEnabled: false,
     aiBotName: 'İhaleciBurada AI Asistanı',
-    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme veya üyelik süreciniz hakkında size nasıl yardımcı olabilirim?',
-    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman yapay zeka asistanısın.'
+    aiGreeting: 'Merhaba! Ben İhaleciBurada Asistanıyım. B2B ihale açma, teklif verme veya üyelik süreciniz hakkında size nasıl yardımcı olabilirim?',
+    aiPromptContext: 'Sen İhaleciBurada B2B ihale platformunun uzman destek asistanısın.'
   },
   crmSettings: {
     leads: [] as any[]
@@ -581,18 +581,25 @@ function safeLocalStorageSet(key: string, value: any) {
 export function useCmsData() {
   if (typeof window !== 'undefined' && !isInitialized) {
     isInitialized = true
-// Strict clean slate: Wipe any old test tenders like IHC-2026-178 from localStorage
+    // 🛡️ Silinmeme İlkesi: Kullanıcının açtığı ihaleler asla tamamen silinmez
     try {
       const rawMyTenders = localStorage.getItem('myTenders')
-      if (rawMyTenders && (rawMyTenders.includes('IHC-2026-178') || rawMyTenders.includes('aesredtruıo85urıy'))) {
-        localStorage.removeItem('myTenders')
-        localStorage.removeItem('myBids')
-        localStorage.removeItem('mySubmittedBids')
-        localStorage.removeItem('b2b_messages_chats')
+      if (rawMyTenders) {
+        const parsed = JSON.parse(rawMyTenders)
+        if (Array.isArray(parsed)) {
+          const cleaned = parsed.filter((t: any) => t && t.id && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy')
+          if (cleaned.length !== parsed.length) {
+            localStorage.setItem('myTenders', JSON.stringify(cleaned))
+          }
+        }
       }
       const rawCms = localStorage.getItem('cmsData')
       if (rawCms && (rawCms.includes('IHC-2026-178') || rawCms.includes('aesredtruıo85urıy'))) {
-        localStorage.removeItem('cmsData')
+        const parsedCms = JSON.parse(rawCms)
+        if (parsedCms?.dashboard?.tenders) {
+          parsedCms.dashboard.tenders = parsedCms.dashboard.tenders.filter((t: any) => t && t.id && t.id !== 'IHC-2026-178' && t.baslik !== 'aesredtruıo85urıy')
+          localStorage.setItem('cmsData', JSON.stringify(parsedCms))
+        }
       }
     } catch (e) {}
 
@@ -601,25 +608,12 @@ export function useCmsData() {
     const savedVer = localStorage.getItem('cmsData_version')
 
     if (savedVer !== SCHEMA_VERSION) {
-      // Force clean slate for production
-      localStorage.removeItem('cmsData')
-      localStorage.removeItem('myTenders')
-      localStorage.removeItem('myBids')
-      localStorage.removeItem('mySubmittedBids')
-      localStorage.removeItem('allRegisteredUsers')
-      localStorage.removeItem('user_accounts_registry')
-      localStorage.removeItem('registeredUsers')
-      localStorage.removeItem('kycVerifications')
-      localStorage.removeItem('companyVerificationDocs')
-      localStorage.removeItem('b2b_messages_chats')
-      localStorage.removeItem('tenderDraft')
-      localStorage.removeItem('userNotifications')
-      localStorage.removeItem('crmLeads')
-      localStorage.removeItem('bids')
-      localStorage.removeItem('adminAuditLogs')
       localStorage.setItem('cmsData_version', SCHEMA_VERSION)
-      cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
-      safeLocalStorageSet('cmsData', cmsDataRef.value)
+      // Kullanıcı ihalelerini (myTenders) ve oturumunu asla silme, sadece cmsData'yı güvenle birleştir
+      if (!saved) {
+        cmsDataRef.value = JSON.parse(JSON.stringify(DEFAULT_CMS_DATA))
+        safeLocalStorageSet('cmsData', cmsDataRef.value)
+      }
     } else if (saved) {
       try {
         const parsed = JSON.parse(saved)

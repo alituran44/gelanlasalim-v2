@@ -1,7 +1,8 @@
 import { defineEventHandler, getRouterParam, setHeader, createError } from 'h3'
 import { getAllTenders, removeTender } from '~~/server/utils/tendersStore'
 import { addGibLog } from '~~/server/utils/gibAuditStore'
-import { assertTenantAccess, requireRole } from '~~/server/utils/authGuard'
+import { assertTenantAccess } from '~~/server/utils/authGuard'
+import { resolveClientIp } from '~~/server/utils/clientIp'
 
 export default defineEventHandler((event) => {
   setHeader(event, 'Cache-Control', 'no-store, no-cache, must-revalidate')
@@ -19,7 +20,7 @@ export default defineEventHandler((event) => {
   if (!targetTender) {
     return {
       success: true,
-      message: 'İhale kaydı bulunamadı veya zaten silinmiş.'
+      message: 'İhale kaydı bulunamadı veya zaten arşivlenmiş.'
     }
   }
 
@@ -31,7 +32,7 @@ export default defineEventHandler((event) => {
     })
   }
 
-  // 🛡️ SEC-002: Tenant İzolasyonu & IDOR Doğrulaması (İhaleyi açan firma veya sistem admini silebilir)
+  // 🛡️ SEC-002: Tenant İzolasyonu & IDOR Doğrulaması (İhaleyi açan firma veya sistem admini silebilir/arşivleyebilir)
   const allowedOwners = [
     targetTender.ownerEmail,
     (targetTender as any).vkn,
@@ -40,15 +41,17 @@ export default defineEventHandler((event) => {
 
   assertTenantAccess(event, allowedOwners)
 
-  const removed = removeTender(id)
+  // 🛡️ Silinmeme İlkesi: İhale fiziksel olarak asla silinmez; arşivlendi olarak işaretlenir
+  const archived = removeTender(id)
 
-  if (removed) {
+  if (archived) {
     try {
+      const clientIp = resolveClientIp(event)
       addGibLog({
         tenderId: targetTender.id,
         tenderTitle: targetTender.baslik,
-        action: 'IHALE_IPTAL',
-        actionLabel: 'İhale Sistemden Tamamen Silindi / İptal Edildi',
+        action: 'IHALE_ARSIV',
+        actionLabel: 'İhale Yayından Kaldırıldı / Arşive Alındı (Sistemde Korunuyor)',
         category: targetTender.kategori || 'Genel',
         budget: targetTender.butce || '-',
         direction: targetTender.tur || targetTender.ihaleYonu || '-',
@@ -56,11 +59,11 @@ export default defineEventHandler((event) => {
         taxId: '9560161511',
         taxOffice: 'Çanakkale Vergi Dairesi',
         companyOrFullName: targetTender.ownerCompany || 'İhale Sahibi',
-        ownerEmail: targetTender.ownerEmail || reqEmail || 'ihalecib@gmail.com',
-        ownerPhone: '0850 840 86 95',
+        ownerEmail: targetTender.ownerEmail || 'ihalecib@gmail.com',
+        ownerPhone: targetTender.ownerPhone || '0850 840 86 95',
         city: targetTender.city || 'Türkiye',
         address: targetTender.teslimatAdresi || `${targetTender.city || 'Türkiye'} / Merkez`,
-        ipAddress: (headers['x-forwarded-for'] as string)?.split(',')[0].trim() || '127.0.0.1',
+        ipAddress: String(clientIp),
         timestamp: new Date().toISOString(),
         status: 'HAZIR'
       })
@@ -71,7 +74,7 @@ export default defineEventHandler((event) => {
 
   return {
     success: true,
-    removed,
-    message: removed ? 'İhale başarıyla sunucu havuzundan kaldırıldı.' : 'İhale bulunamadı.'
+    archived,
+    message: archived ? 'İhale başarıyla yayından kaldırılarak arşive alındı ve yasal denetim için sistemde kalıcı olarak korundu.' : 'İhale bulunamadı.'
   }
 })

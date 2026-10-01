@@ -806,11 +806,18 @@ async function saveTenderEdit() {
   alert(`✅ İhale Başarıyla Güncellendi!\n\n"${editForm.value.baslik}" (#${tenderId}) ihale bilgileri güncellendi.`)
 }
 
-// 🗑️ İhale Kalıcı Silme (Delete)
+// 📁 İhale Yayından Kaldırma & Arşivleme (Silinmeme İlkesi)
 async function deleteTender(tender: any) {
   if (!tender || !tender.id) return
-  const confirmDelete = confirm(`⚠️ DİKKAT: "${tender.baslik}" (#${tender.id}) ihalesini ve buna bağlı tüm teklif kayıtlarını kalıcı olarak silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz.`)
-  if (!confirmDelete) return
+  const confirmArchive = confirm(`📁 "${tender.baslik}" (#${tender.id}) ihalesini yayından kaldırmak ve arşive almak istiyor musunuz?\n\n(Not: İhale ve teklif geçmişiniz yasal denetim ve şeffaflık ilkeleri uyarınca sistem arşivinde güvenle saklanmaya devam edecektir.)`)
+  if (!confirmArchive) return
+
+  tender.isArchived = true
+  tender.durum = 'archived'
+  tender.statusLabel = '📁 Arşivde (Yayından Kaldırıldı)'
+  tender.durumLabel = '📁 Arşivde'
+  tender.sure = 'Arşivlendi'
+  tender.archivedAt = new Date().toISOString()
 
   try {
     await $fetch('/api/tenders/' + encodeURIComponent(tender.id), {
@@ -820,61 +827,39 @@ async function deleteTender(tender: any) {
       }
     })
   } catch (err: any) {
-    console.warn('Server delete call error:', err)
+    console.warn('Server archive call error:', err)
   }
 
-  // 1. Remove from localStorage 'myTenders'
+  // 1. Update localStorage 'myTenders'
   if (typeof window !== 'undefined') {
     try {
-      const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]').filter(
-        (t: any) => t.id !== tender.id && t.baslik !== tender.baslik
-      )
-      localStorage.setItem('myTenders', JSON.stringify(myTenders))
-
-      // Clean up related bids
-      const mySubmittedBids = JSON.parse(localStorage.getItem('mySubmittedBids') || '[]').filter(
-        (b: any) => b.tenderId !== tender.id && b.tenderTitle !== tender.baslik && b.ilanBaslik !== tender.baslik
-      )
-      localStorage.setItem('mySubmittedBids', JSON.stringify(mySubmittedBids))
-
-      const myBids = JSON.parse(localStorage.getItem('myBids') || '[]').filter(
-        (b: any) => b.tenderId !== tender.id && b.tenderTitle !== tender.baslik && b.ilanBaslik !== tender.baslik
-      )
-      localStorage.setItem('myBids', JSON.stringify(myBids))
-
+      const myTenders = JSON.parse(localStorage.getItem('myTenders') || '[]')
+      const target = myTenders.find((t: any) => t.id === tender.id || t.baslik === tender.baslik)
+      if (target) {
+        target.isArchived = true
+        target.durum = 'archived'
+        target.statusLabel = '📁 Arşivde (Yayından Kaldırıldı)'
+        target.sure = 'Arşivlendi'
+        target.archivedAt = new Date().toISOString()
+        localStorage.setItem('myTenders', JSON.stringify(myTenders))
+      }
       window.dispatchEvent(new Event('storage'))
     } catch (e) {}
   }
 
-  // 2. Remove from cmsData dashboard tenders
+  // 2. Update cmsData dashboard tenders (asla silme, arşivle)
   if (cmsData.value?.dashboard?.tenders) {
-    cmsData.value.dashboard.tenders = cmsData.value.dashboard.tenders.filter(
-      (t: any) => t.id !== tender.id && t.baslik !== tender.baslik
-    )
+    const targetCms = cmsData.value.dashboard.tenders.find((t: any) => t.id === tender.id || t.baslik === tender.baslik)
+    if (targetCms) {
+      targetCms.isArchived = true
+      targetCms.durum = 'archived'
+      targetCms.statusLabel = '📁 Arşivde (Yayından Kaldırıldı)'
+    }
   }
-
-  // 3. Remove from receivedBids group
-  if (cmsData.value?.dashboard?.receivedBids) {
-    cmsData.value.dashboard.receivedBids = cmsData.value.dashboard.receivedBids.filter(
-      (g: any) => g.id !== tender.id && g.baslik !== tender.baslik
-    )
-  }
-
-  // 4. Remove from submittedBids
-  if (cmsData.value?.dashboard?.submittedBids) {
-    cmsData.value.dashboard.submittedBids = cmsData.value.dashboard.submittedBids.filter(
-      (b: any) => b.tenderId !== tender.id && b.ilanBaslik !== tender.baslik
-    )
-  }
-
-  // 5. Update local reactive state
-  localTendersState.value = localTendersState.value.filter(
-    (t: any) => t.id !== tender.id && t.baslik !== tender.baslik
-  )
 
   saveCmsData(cmsData.value)
   reloadTenders()
-  alert(`🗑️ İhale Başarıyla Silindi!\n\n"${tender.baslik}" (#${tender.id}) ihalesi ve buna bağlı tüm teklifler sistemden kaldırılmıştır.`)
+  alert(`📁 İhale Yayından Kaldırıldı!\n\n"${tender.baslik}" (#${tender.id}) ihalesi yayından kaldırılarak arşive alınmıştır. İhale kaydınız sistem arşivinde güvenle saklanmaktadır.`)
 }
 
 function cancelTenderAgreement(tender: any) {
@@ -1180,15 +1165,16 @@ const statusTabs = computed(() => {
             <span>Düzenle</span>
           </button>
 
-          <!-- 🗑️ Kalıcı Olarak Sil Butonu -->
+          <!-- 📁 Yayından Kaldır / Arşive Al Butonu -->
           <button 
+            v-if="!tender.isArchived && tender.durum !== 'archived'"
             type="button" 
             @click.stop="deleteTender(tender)" 
-            class="px-3 py-2 rounded-xl text-xs font-bold text-red-700 bg-red-50 hover:bg-red-100 hover:border-red-300 border border-red-200 transition shadow-2xs flex items-center gap-1.5 cursor-pointer"
-            title="İhaleyi Kalıcı Olarak Sil"
+            class="px-3 py-2 rounded-xl text-xs font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 hover:border-slate-300 border border-slate-200 transition shadow-2xs flex items-center gap-1.5 cursor-pointer"
+            title="İhaleyi Yayından Kaldır ve Arşive Al (Sistemde Kalıcı Olarak Saklanır)"
           >
-            <Trash2 :size="13" class="text-red-600" />
-            <span>Sil</span>
+            <Folder :size="13" class="text-slate-600" />
+            <span>Yayından Kaldır</span>
           </button>
 
           <!-- 🚫 Standart Reason Code ile Kapatma / İptal Butonu (Yalnızca aktif ihalelerde) -->

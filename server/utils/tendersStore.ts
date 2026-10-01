@@ -309,19 +309,29 @@ export function getAllTenders(): TenderItem[] {
   for (const t of tenders) {
     t.adminApproved = true
     t.aiApproved = true
-    if (!t.durum || t.durum === 'pending_approval') {
-      t.durum = 'active'
-    }
-    if (t.id === 'IHC-2026-910') {
-      t.categoryId = 11
-      t.kategori = 'Mobilya - Beyaz Eşya - Mutfak - Züccaciye İhaleleri'
-      t.mainCategory = 'Ofis & Mobilya'
-    }
-    const timing = computeTenderTiming(t)
-    t.durum = timing.durum
-    t.sure = timing.sureText
-    if (t.isIlan || t.ihaleYonu === 'ihalesiz_ilan') {
-      t.durumLabel = '📢 Proje & Hizmet İlanı'
+
+    // 🛡️ Silinmeme İlkesi: Arşivlenen ihaleler asla silinmez, admin panelinde ve geçmişte korunur
+    if (t.isArchived || t.durum === 'archived') {
+      t.durum = 'archived'
+      t.isArchived = true
+      t.statusLabel = '📁 Arşivde (Yayından Kaldırıldı)'
+      t.durumLabel = '📁 Arşivde'
+      t.sure = 'Arşivlendi'
+    } else {
+      if (!t.durum || t.durum === 'pending_approval') {
+        t.durum = 'active'
+      }
+      if (t.id === 'IHC-2026-910') {
+        t.categoryId = 11
+        t.kategori = 'Mobilya - Beyaz Eşya - Mutfak - Züccaciye İhaleleri'
+        t.mainCategory = 'Ofis & Mobilya'
+      }
+      const timing = computeTenderTiming(t)
+      t.durum = timing.durum
+      t.sure = timing.sureText
+      if (t.isIlan || t.ihaleYonu === 'ihalesiz_ilan') {
+        t.durumLabel = '📢 Proje & Hizmet İlanı'
+      }
     }
   }
 
@@ -364,13 +374,42 @@ export function addTender(tender: TenderItem): TenderItem {
 }
 
 export function removeTender(id: string): boolean {
-  let list = getAllTenders()
-  const initialLen = list.length
-  list = list.filter(t => t.id !== id)
+  const list = getAllTenders()
+  const target = list.find(t => t.id === id)
+  if (!target) return false
+
+  // 🛡️ Silinmeme İlkesi: İhale sistemden asla fiziksel olarak silinmez.
+  // Yasal denetim, geçmiş inceleme ve admin paneli görünürlüğü için arşivlendi olarak işaretlenir.
+  target.isArchived = true
+  target.durum = 'archived'
+  target.statusLabel = '📁 Arşivde (Yayından Kaldırıldı)'
+  target.durumLabel = '📁 Arşivde'
+  target.sure = 'Arşivlendi'
+  target.archivedAt = new Date().toISOString()
+
   globalThis.__SHARED_TENDERS__ = list
   trySaveToDisk(list)
   persistTendersToCloud(list).catch((e) => console.warn('[CloudSync] removeTender error:', e))
-  return list.length < initialLen
+  return true
+}
+
+export function reactivateTender(id: string): boolean {
+  const list = getAllTenders()
+  const target = list.find(t => t.id === id)
+  if (!target) return false
+
+  target.isArchived = false
+  target.durum = 'active'
+  target.adminApproved = true
+  target.aiApproved = true
+  target.statusLabel = target.isIlan ? '📢 Proje & Hizmet İlanı' : 'Canlı Yayında'
+  target.durumLabel = target.isIlan ? '📢 Proje & Hizmet İlanı' : 'Canlı İhale'
+  delete target.archivedAt
+
+  globalThis.__SHARED_TENDERS__ = list
+  trySaveToDisk(list)
+  persistTendersToCloud(list).catch((e) => console.warn('[CloudSync] reactivateTender error:', e))
+  return true
 }
 
 export function saveTenders(list: TenderItem[]): void {

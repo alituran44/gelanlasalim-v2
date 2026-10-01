@@ -16,7 +16,13 @@ export default defineEventHandler(async (event) => {
   // 🛡️ SEC-002 & GEN-007: Özel ve Davetli İhalelerin Tenant İzolasyonu & Görünürlük Kontrolü
   const visibleTenders = tenders.filter(t => {
     const isOwner = Boolean(requesterEmail && (t.ownerEmail || '').trim().toLowerCase() === requesterEmail)
+    // Admin veya ihale sahibi tüm ihaleleri (arşivdekiler dahil) eksiksiz görebilir
     if (isOwner || isAdmin) return true
+
+    // Arşivlenen / yayından kaldırılan ihaleler halka açık ana sayfa ve pazar yerinde listelenmez
+    if (t.isArchived || t.durum === 'archived') {
+      return false
+    }
 
     // Özel ve davetli ihaleler pazar yerinde yetkisiz kullanıcılara listelenmez
     if (t.gorunurluk === 'ozel' || t.gorunurluk === 'davetli') {

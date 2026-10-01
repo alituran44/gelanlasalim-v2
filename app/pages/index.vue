@@ -1364,7 +1364,7 @@ const allTenders = computed(() => {
   const combined = [...localTenders, ...apiTenders, ...cmsTenders, ...seedTenders]
   const seen = new Set()
   return combined.filter(item => {
-    if (!item || item.isBaseline || item.id === 'IHC-2026-178' || item.baslik === 'aesredtruıo85urıy') return false
+    if (!item || item.isBaseline || item.isArchived || item.durum === 'archived' || item.id === 'IHC-2026-178' || item.baslik === 'aesredtruıo85urıy') return false
     const key = item.id || item.baslik
     const duplicate = seen.has(key)
     seen.add(key)
