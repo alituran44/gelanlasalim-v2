@@ -141,6 +141,19 @@ html.dark textarea {
   border-color: #475569 !important;
 }
 
+/* ==================== MARKA LOGOSU KARANLIK MOD KONTRASTI ==================== */
+html.dark svg text[fill="#0B1E3B"],
+[data-theme="dark"] svg text[fill="#0B1E3B"],
+.dark svg text[fill="#0B1E3B"] {
+  fill: #FFFFFF !important;
+}
+
+html.dark svg path[fill="#0B1E3B"],
+[data-theme="dark"] svg path[fill="#0B1E3B"],
+.dark svg path[fill="#0B1E3B"] {
+  fill: #38BDF8 !important;
+}
+
 /* ==================== WCAG 2.1 AA Erişilebilirlik :focus-visible ==================== */
 button:focus-visible,
 a:focus-visible,

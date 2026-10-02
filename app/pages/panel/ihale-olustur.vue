@@ -397,7 +397,7 @@ const eksiltmeForm = reactive({
   videoDosyasi: null as File | null,
   videoDosyaAdi: '',
   ilanVeren: '',
-  adres: 'Balıkesir',
+  adres: '',
   telefon: '',
   webSayfasi: '',
   aciklama: '',
@@ -422,7 +422,7 @@ const sabitFiyatForm = reactive({
   dosya: null as File | null,
   dosyaAdi: '',
   ilanVeren: '',
-  adres: 'Balıkesir',
+  adres: '',
   telefon: '',
   webSayfasi: '',
   aciklama: '',
@@ -445,7 +445,7 @@ const reklamForm = reactive({
   dosya: null as File | null,
   dosyaAdi: '',
   ilanVeren: '',
-  adres: 'Balıkesir',
+  adres: '',
   telefon: '',
   webSayfasi: '',
   aciklama: '',
@@ -465,7 +465,7 @@ const arsaForm = reactive({
   ilanSahibi: '',
   altKategori: 'Konut İmarlı Arsa', // 10 Görsel Standart Alt Kategori
   altKategoriDiger: '',
-  il: 'Balıkesir',
+  il: '',
   ilce: '',
   mahalle: '',
   ada: '',
@@ -497,7 +497,7 @@ const arsaForm = reactive({
   altyapi: ['Elektrik', 'Su', 'Yol Açılmış', 'Doğalgaz'] as string[],
   nitelikler: ['Yatırımlık'] as string[],
 
-  adres: 'Balıkesir',
+  adres: '',
   telefon: '',
   webSayfasi: '',
   aciklama: '',
@@ -517,7 +517,7 @@ const evForm = reactive({
   ilanSahibi: '',
   altKategori: 'Daire', // 10 Görsel Standart Alt Kategori
   altKategoriDiger: '',
-  il: 'Balıkesir',
+  il: '',
   ilce: '',
   mahalle: '',
   tabanFiyat: '',
@@ -551,7 +551,7 @@ const evForm = reactive({
   aidat: '',
   nitelikler: [] as string[],
 
-  adres: 'Balıkesir',
+  adres: '',
   telefon: '',
   webSayfasi: '',
   aciklama: '',
@@ -576,7 +576,7 @@ const digerForm = reactive({
   videoDosyasi: null as File | null,
   videoDosyaAdi: '',
   ilanVeren: '',
-  adres: 'Balıkesir',
+  adres: '',
   telefon: '',
   webSayfasi: '',
   aciklama: '',
@@ -715,7 +715,7 @@ function applyLocationToForms(city: string, district: string = '', neighborhood:
   }
   evForm.adres = addrText
 
-  // 3. Açık Eksiltme Formu
+  // 3. İhale Aç Formu
   eksiltmeForm.adres = addrText
 
   // 4. Sabit Fiyat Formu
@@ -820,20 +820,21 @@ async function detectUserLocation(force = false) {
       }
     }
 
-    // Hiçbir şey bulunamazsa varsayılan
-    if (!foundCity) {
-      foundCity = 'Balıkesir'
+    // Hiçbir şey bulunamazsa oturum şehri veya boş bırakılır
+    if (!foundCity && userSession.value?.city) {
+      foundCity = userSession.value.city
       detectionSource = 'session'
     }
 
-    locationDetectionState.city = foundCity
-    locationDetectionState.district = foundDistrict
-    locationDetectionState.neighborhood = foundNeighborhood
-    locationDetectionState.source = detectionSource
-    locationDetectionState.detected = true
-    locationDetectionState.fullAddress = foundDistrict ? `${foundCity} / ${foundDistrict}` : foundCity
-
-    applyLocationToForms(foundCity, foundDistrict, foundNeighborhood)
+    if (foundCity) {
+      locationDetectionState.city = foundCity
+      locationDetectionState.district = foundDistrict
+      locationDetectionState.neighborhood = foundNeighborhood
+      locationDetectionState.source = detectionSource
+      locationDetectionState.detected = true
+      locationDetectionState.fullAddress = foundDistrict ? `${foundCity} / ${foundDistrict}` : foundCity
+      applyLocationToForms(foundCity, foundDistrict, foundNeighborhood)
+    }
 
   } catch (err: any) {
     locationDetectionState.error = err.message || 'Konum algılanamadı'
@@ -844,13 +845,17 @@ async function detectUserLocation(force = false) {
 
 function resolveFinalCity(textOrCity: string): string {
   if (!textOrCity || typeof textOrCity !== 'string') {
-    return locationDetectionState.city || userSession.value?.city || 'Balıkesir'
+    return userSession.value?.city || locationDetectionState.city || 'Türkiye'
   }
   const trimmed = textOrCity.trim()
+  if (!trimmed) {
+    return userSession.value?.city || locationDetectionState.city || 'Türkiye'
+  }
   if (CITIES.includes(trimmed)) return trimmed
 
+  const lower = trimmed.toLocaleLowerCase('tr-TR')
   for (const c of CITIES) {
-    if (trimmed.toLowerCase().includes(c.toLowerCase())) {
+    if (lower.includes(c.toLocaleLowerCase('tr-TR'))) {
       return c
     }
   }
@@ -858,7 +863,20 @@ function resolveFinalCity(textOrCity: string): string {
   const normalized = normalizeTurkishCity(trimmed)
   if (normalized && CITIES.includes(normalized)) return normalized
 
-  return locationDetectionState.city || userSession.value?.city || 'Balıkesir'
+  // Kullanıcı "Kadıköy / İstanbul" veya "Çankaya, Ankara" gibi adres girdiyse parçaları tara
+  const segs = trimmed.split(/[\/,–-]/).map(s => s.trim()).filter(Boolean)
+  for (const seg of segs) {
+    for (const c of CITIES) {
+      if (seg.toLocaleLowerCase('tr-TR').includes(c.toLocaleLowerCase('tr-TR'))) {
+        return c
+      }
+    }
+  }
+  if (segs.length > 0 && segs[0].length >= 2) {
+    return segs[0]
+  }
+
+  return trimmed
 }
 
 // Sayfa açıldığında oturum bilgilerini formlara doldur ve otomatik konum tespit et
@@ -866,14 +884,16 @@ onMounted(() => {
   const s = userSession.value || {}
   const defaultName = userName.value || s.companyName || s.name || s.email?.split('@')[0] || ''
   const defaultPhone = s.phone || ''
-  const defaultCity = s.city || 'Balıkesir'
+  const defaultCity = s.city || ''
   const defaultWeb = s.website || ''
 
   const allForms = [eksiltmeForm, sabitFiyatForm, reklamForm, arsaForm, evForm, digerForm]
   allForms.forEach(f => {
     f.ilanVeren = defaultName
     f.telefon = defaultPhone
-    f.adres = defaultCity
+    if (defaultCity) {
+      f.adres = defaultCity
+    }
     f.webSayfasi = defaultWeb
   })
 
@@ -1163,7 +1183,7 @@ async function submitCurrentForm() {
     let finalFiles: any[] = []
     let finalImages: any[] = []
     let finalCustomFields: Record<string, any> = {}
-    let finalCity = locationDetectionState.city || userSession.value?.city || 'Balıkesir'
+    let finalCity = userSession.value?.city || locationDetectionState.city || 'Türkiye Geneli'
     let finalAddress = ''
     let finalPhone = ''
     let finalWeb = ''
@@ -1448,7 +1468,7 @@ async function submitCurrentForm() {
 
     // İlan Türü Belirleme (2. Fotoğraftaki 6 Kategori Standardı)
     let ilanTuru = 'Diğer İlanlar'
-    if (activeFormMode.value === 'eksiltme') ilanTuru = 'Açık Eksiltme'
+    if (activeFormMode.value === 'eksiltme') ilanTuru = 'İhale'
     else if (activeFormMode.value === 'sabit_fiyat') ilanTuru = 'Sabit Fiyat'
     else if (activeFormMode.value === 'reklam') ilanTuru = 'Reklam İlanı'
     else if (activeFormMode.value === 'arsa') ilanTuru = 'Arsa / Arazi'
@@ -1612,7 +1632,7 @@ async function submitCurrentForm() {
     <!-- ========================================================================= -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
       
-      <!-- 1. Açık Eksiltme (Görsel: ACIK EKSILTME) -->
+      <!-- 1. İhale Aç -->
       <button
         type="button"
         @click="activeFormMode = 'eksiltme'"
@@ -1622,10 +1642,10 @@ async function submitCurrentForm() {
           : 'border-slate-200 bg-white hover:border-slate-300 text-slate-700'"
       >
         <span class="text-[11px] font-black uppercase tracking-wider flex items-center justify-between">
-          <span>📉 AÇIK EKSİLTME</span>
+          <span>⚡ İHALE AÇ</span>
           <span v-if="activeFormMode === 'eksiltme'" class="text-pink-600 text-xs">✓</span>
         </span>
-        <span class="text-[9px] text-slate-500 font-medium">Tersine ihale & alım</span>
+        <span class="text-[9px] text-slate-500 font-medium">Satın alma & teklif toplama</span>
       </button>
 
       <!-- 2. Sabit Fiyat (Yeni Görsel: SABİT FİYAT) -->
@@ -1721,14 +1741,14 @@ async function submitCurrentForm() {
     </div>
 
     <!-- ========================================================================= -->
-    <!-- 📄 FORM 1: ACIK EKSILTME (Görsel: ACIK EKSILTME) -->
+    <!-- 📄 FORM 1: İHALE AÇ -->
     <!-- ========================================================================= -->
     <div v-if="activeFormMode === 'eksiltme'" class="bg-white rounded-3xl border border-slate-200 p-5 sm:p-8 shadow-xs space-y-6">
       
       <!-- Pembe Çizim Başlığı -->
       <div class="border-b border-pink-100 pb-3">
-        <h2 class="text-sm font-black uppercase tracking-wider text-pink-600">ACIK EKSILTME</h2>
-        <p class="text-[11px] text-slate-400">Tersine eksiltme usulü alım ve malzeme tedariği ihalesi</p>
+        <h2 class="text-sm font-black uppercase tracking-wider text-pink-600">İHALE AÇ</h2>
+        <p class="text-[11px] text-slate-400">Satın alma ve malzeme tedariği ihalesi</p>
       </div>
 
       <!-- Kategori ve Alt Kategori (Seç / Diğer - Elle Girilsin) -->

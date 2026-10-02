@@ -89,6 +89,7 @@ const { userSession, isLoggedIn, canSubmitBid, isCompanyVerified, companyRole, c
 
 const activeTab = ref<'guncel' | 'gecmis' | 'sonuc' | 'detayli'>('guncel')
 const viewMode = ref<'gelismis' | 'basit'>('gelismis')
+const viewLayout = ref<'grid' | 'list'>('grid')
 const hideRead = ref(false)
 
 function getTenderDirectionBadge(tender: any) {
@@ -218,16 +219,19 @@ function getTenderDirectionBadge(tender: any) {
     }
   }
 
-  // 6. AÇIK EKSİLTME
+  // 6. İHALE AÇ (Satın Alma & Teklif Toplama)
   if (
     formType === 'ACIK_EKSILTME' ||
+    formType === 'IHALE' ||
     yonu === 'eksiltme' ||
+    yonu === 'ihale' ||
     tur.includes('eksiltme') ||
+    tur.includes('ihale') ||
     tur.includes('fiyat azaltımlı')
   ) {
     return {
-      label: '📉 Açık Eksiltme',
-      fullLabel: '📉 Açık Eksiltme (Tersine İhale & Alım)',
+      label: '⚡ İhale Aç',
+      fullLabel: '⚡ İhale (Satın Alma & Teklif Toplama)',
       class: 'bg-emerald-100 text-emerald-950 border-emerald-400 font-black shadow-2xs'
     }
   }
@@ -270,10 +274,49 @@ function getTenderDirectionBadge(tender: any) {
 
   // Varsayılan
   return { 
-    label: '📉 Açık Eksiltme', 
-    fullLabel: '📉 Açık Eksiltme (Tersine İhale & Alım)',
+    label: '⚡ İhale Aç', 
+    fullLabel: '⚡ İhale (Satın Alma & Teklif Toplama)',
     class: 'bg-emerald-100 text-emerald-950 border-emerald-400 font-black shadow-2xs' 
   }
+}
+
+// 📍 DİNAMİK VE DOĞRU ŞEHİR / LOKASYON TESPİT YARDIMCISI (Balıkesir Sabitliğini Engeller)
+function getTenderCity(tender: any): string {
+  if (!tender) return 'Türkiye Geneli'
+  
+  // 1. İhale üzerinde açıkça tanımlanmış ve Balıkesir harici bir şehir varsa
+  const explicit = (tender.city || '').trim()
+  const rawAddr = String(tender.teslimatAdresi || tender.address || tender.adres || tender.customFields?.adres || tender.customFields?.city || tender.customFields?.il || '').trim()
+
+  if (explicit && explicit !== 'Balıkesir' && explicit !== 'Türkiye') {
+    return explicit
+  }
+
+  // 2. Girilen teslimat veya açık adres metnini 81 il listesiyle tara
+  if (rawAddr) {
+    const lowerAddr = rawAddr.toLocaleLowerCase('tr-TR')
+    for (const c of ALL_81_CITIES) {
+      if (lowerAddr.includes(c.toLocaleLowerCase('tr-TR'))) {
+        return c
+      }
+    }
+    // İlk segmenti (İlçe veya Bölge adı) al: örn: "Kadıköy", "Çankaya", "Ostim"
+    const seg = rawAddr.split(/[\/,–-]/)[0].trim()
+    if (seg && seg.length >= 2 && seg.length < 35) {
+      return seg
+    }
+  }
+
+  // 3. Eğer explicit Balıkesir ise ama girilen adreste Balıkesir geçmiyorsa adresten türet
+  if (explicit === 'Balıkesir') {
+    if (rawAddr && !rawAddr.toLocaleLowerCase('tr-TR').includes('balıkesir')) {
+      const seg = rawAddr.split(/[\/,–-]/)[0].trim()
+      if (seg && seg.length >= 2) return seg
+    }
+    return explicit
+  }
+
+  return explicit || 'Türkiye Geneli'
 }
 
 const DEFAULT_FALLBACK_SVG = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='600' height='400' viewBox='0 0 600 400'><rect width='600' height='400' fill='%230b1329'/><circle cx='300' cy='180' r='60' fill='%230284c7' opacity='0.25'/><text x='50%25' y='48%25' dominant-baseline='middle' text-anchor='middle' fill='%2338bdf8' font-size='48' font-family='sans-serif'>📋</text><text x='50%25' y='68%25' dominant-baseline='middle' text-anchor='middle' fill='%23f1f5f9' font-size='18' font-family='sans-serif' font-weight='bold'>İhaleciBurada</text><text x='50%25' y='77%25' dominant-baseline='middle' text-anchor='middle' fill='%2394a3b8' font-size='13' font-family='sans-serif'>Pazar Yeri</text></svg>"
@@ -313,7 +356,7 @@ function getTenderImage(tender: any): string {
   return ''
 }
 function formatTenderBudget(raw: any): string {
-  if (!raw) return 'Açık Eksiltme'
+  if (!raw) return 'İhale'
   const str = String(raw).trim()
   if (str.includes('Kişi Başı') || str.includes('Kontenjan')) {
     return str
@@ -331,7 +374,7 @@ function formatTenderBudget(raw: any): string {
   if (cleanNum > 0) {
     return Number(cleanNum).toLocaleString('tr-TR') + ' ₺'
   }
-  return str.includes('₺') || str.includes('$') || str.includes('€') ? str : (str || 'Açık Eksiltme')
+  return str.includes('₺') || str.includes('$') || str.includes('€') ? str : (str || 'İhale')
 }
 
 function downloadTenderFile(doc: any, tender: any) {
@@ -1221,6 +1264,30 @@ function downloadAllSpecs(tender: any) {
           <button type="button" @click="selectedSort = 'sehir'" class="hover:text-blue-700 cursor-pointer">⇅ Şehir</button>
         </div>
 
+        <!-- Görünüm Değiştirici (Kart / Liste) -->
+        <div class="inline-flex rounded-xl border border-slate-300 p-0.5 bg-slate-100 items-center">
+          <button 
+            type="button" 
+            @click="viewLayout = 'grid'"
+            class="px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1"
+            :class="viewLayout === 'grid' ? 'bg-white text-[#0084B4] shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+            title="Kart Görünümü (Yan Yana)"
+          >
+            <BarChart3 :size="13" />
+            <span>Kartlar</span>
+          </button>
+          <button 
+            type="button" 
+            @click="viewLayout = 'list'"
+            class="px-2.5 py-1 rounded-lg text-xs font-bold transition cursor-pointer flex items-center gap-1"
+            :class="viewLayout === 'list' ? 'bg-white text-[#0084B4] shadow-xs' : 'text-slate-500 hover:text-slate-800'"
+            title="Liste Görünümü"
+          >
+            <Layers :size="13" />
+            <span>Liste</span>
+          </button>
+        </div>
+
         <!-- Pagination -->
         <div class="flex items-center gap-1 text-xs">
           <button type="button" class="px-2 py-1 rounded border border-slate-300 bg-slate-50 hover:bg-slate-100 font-bold">|‹ İlk sayfa</button>
@@ -1234,8 +1301,122 @@ function downloadAllSpecs(tender: any) {
         </div>
       </div>
 
-      <!-- 📋 6. TENDER CARDS (EKAP / İHALEBUL FORMATI - GÖRSEL 2 İLE BİREBİR) -->
-      <div v-if="filteredTenders.length > 0" class="space-y-3">
+      <!-- 🖼️ 6. TENDER GRID (MOBİLDE 2'Lİ YAN YANA, MASAÜSTÜNDE 4'LÜ KART DÜZENİ) -->
+      <div v-if="filteredTenders.length > 0 && viewLayout === 'grid'" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4">
+        <article 
+          v-for="(tender, index) in filteredTenders" 
+          :key="tender.id"
+          class="bg-white border border-slate-300 hover:border-[#0084B4] hover:shadow-xl rounded-2xl overflow-hidden transition-all duration-300 flex flex-col justify-between group shadow-2xs text-left"
+        >
+          <!-- 🖼️ Üst Görsel ve Rozetler -->
+          <div 
+            @click="openModalWithTab(tender, 'ilan')" 
+            class="relative h-32 sm:h-40 w-full bg-slate-100 overflow-hidden cursor-pointer"
+            title="Şartname ve İhale Detayını İncele"
+          >
+            <img 
+              :src="getTenderImage(tender) || DEFAULT_FALLBACK_SVG" 
+              :alt="`${tender.baslik || 'Kurumsal İhale'} - ${getTenderCity(tender)} B2B İhale ve Şartname Görseli`"
+              loading="lazy"
+              decoding="async"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              @error="($event.target as any).src = DEFAULT_FALLBACK_SVG"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent"></div>
+
+            <!-- Sol Üst: Durum / Kategori Rozeti -->
+            <div class="absolute top-2 left-2 flex items-center gap-1 max-w-[75%]">
+              <span 
+                class="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-black uppercase text-white shadow-md backdrop-blur-xs border border-white/20 truncate"
+                :class="tender.durum === 'closed' ? 'bg-amber-600' : 'bg-slate-900/85 text-sky-300 border-sky-400/30'"
+              >
+                {{ tender.durum === 'closed' ? 'Tamamlandı' : (tender.kategori || 'İhale') }}
+              </span>
+            </div>
+
+            <!-- Sağ Üst: İhale No -->
+            <span class="absolute top-2 right-2 px-1.5 sm:px-2 py-0.5 rounded bg-black/70 text-white text-[8px] sm:text-[9px] font-mono font-black uppercase border border-white/20">
+              #{{ tender.id }}
+            </span>
+
+            <!-- Alt Bar: Lokasyon & Süre -->
+            <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white text-[10px] sm:text-[11px] font-bold">
+              <span class="flex items-center gap-1 truncate max-w-[120px] px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-xs text-white">
+                <MapPin :size="11" class="text-sky-300 shrink-0" />
+                <span class="truncate">{{ getTenderCity(tender) }}</span>
+              </span>
+              <span class="flex items-center gap-1 bg-black/60 px-1.5 py-0.5 rounded backdrop-blur-xs text-[9px] sm:text-[10px] text-white shrink-0">
+                <Clock :size="10" class="text-amber-300" />
+                <span>{{ tender.sure || '7 gün' }}</span>
+              </span>
+            </div>
+          </div>
+
+          <!-- 📝 Kart Gövdesi -->
+          <div class="p-3 sm:p-3.5 flex-1 flex flex-col justify-between space-y-2.5">
+            <div class="space-y-1.5">
+              <!-- Yön Rozeti & İhale Usulü -->
+              <div class="flex items-center gap-1 flex-wrap">
+                <span 
+                  class="text-[9px] font-bold px-1.5 py-0.5 rounded border truncate"
+                  :class="getTenderDirectionBadge(tender).class"
+                >
+                  {{ getTenderDirectionBadge(tender).label }}
+                </span>
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 truncate">
+                  {{ tender.tur || 'Doğrudan Temin' }}
+                </span>
+              </div>
+
+              <!-- Başlık -->
+              <h3 
+                @click="openModalWithTab(tender, 'ilan')" 
+                class="font-black text-xs sm:text-sm text-slate-900 hover:text-[#0084B4] cursor-pointer line-clamp-2 leading-snug transition-colors"
+                :title="tender.baslik"
+              >
+                {{ tender.baslik }}
+              </h3>
+
+              <!-- Yüklenici / İdare -->
+              <div class="text-[11px] text-slate-600 truncate flex items-center gap-1">
+                <Building2 :size="12" class="text-slate-400 shrink-0" />
+                <span class="truncate font-semibold">{{ tender.ownerCompany || tender.authority || 'Kurumsal Satın Alma Masası' }}</span>
+              </div>
+
+              <!-- Bütçe / Hedef Bedel -->
+              <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+                <span class="text-[10px] font-bold text-slate-400 uppercase">Sözleşme Bedeli:</span>
+                <span class="font-mono font-black text-emerald-700 text-xs sm:text-sm">{{ formatTenderBudget(tender.butce) }}</span>
+              </div>
+            </div>
+
+            <!-- Aksiyon Butonları -->
+            <div class="pt-2 border-t border-slate-100 grid grid-cols-2 gap-1.5">
+              <button 
+                type="button" 
+                @click="openModalWithTab(tender, 'ilan')"
+                class="w-full py-1.5 sm:py-2 px-1 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-[10px] sm:text-xs transition cursor-pointer text-center flex items-center justify-center gap-1"
+                title="Şartname & Malzeme Listesi"
+              >
+                <FileText :size="12" class="text-blue-600 shrink-0" />
+                <span>Şartname</span>
+              </button>
+
+              <button 
+                type="button" 
+                @click="openModalWithTab(tender, 'sozlesme')"
+                class="w-full py-1.5 sm:py-2 px-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[10px] sm:text-xs transition cursor-pointer text-center flex items-center justify-center gap-1 shadow-xs shadow-emerald-600/20"
+                title="Teklif Ver & İncele"
+              >
+                <span>⚡ Teklif Ver</span>
+              </button>
+            </div>
+          </div>
+        </article>
+      </div>
+
+      <!-- 📋 6. TENDER CARDS (EKAP / İHALEBUL DETAYLI LİSTE FORMATI) -->
+      <div v-else-if="filteredTenders.length > 0 && viewLayout === 'list'" class="space-y-3">
         <article 
           v-for="(tender, index) in filteredTenders" 
           :key="tender.id"
@@ -1346,7 +1527,7 @@ function downloadAllSpecs(tender: any) {
 
             <div class="flex items-center sm:justify-end gap-1.5 text-xs text-slate-600 font-bold">
               <MapPin :size="13" class="text-slate-400" />
-              <span>{{ tender.city || 'Ankara' }}</span>
+              <span>{{ getTenderCity(tender) }}</span>
             </div>
           </div>
 
@@ -1591,7 +1772,7 @@ function downloadAllSpecs(tender: any) {
           </div>
           <div>
             <span class="text-[10px] font-bold text-slate-400 uppercase block">🏷️ İhale Usulü</span>
-            <span class="font-bold text-blue-700">{{ selectedTenderForDetail.tur || 'Açık Eksiltme' }}</span>
+            <span class="font-bold text-blue-700">{{ selectedTenderForDetail.tur || 'İhale' }}</span>
           </div>
         </div>
 
@@ -2639,11 +2820,11 @@ function downloadAllSpecs(tender: any) {
               </div>
               <div>
                 <span class="text-[10px] font-black text-slate-400 uppercase block">Teslimat / Uygulama İli</span>
-                <span class="font-bold text-slate-800">{{ pdfTenderTarget.city || 'Balıkesir' }}</span>
+                <span class="font-bold text-slate-800">{{ getTenderCity(pdfTenderTarget) }}</span>
               </div>
               <div>
                 <span class="text-[10px] font-black text-slate-400 uppercase block">İhale Usulü</span>
-                <span class="font-bold text-slate-800">{{ pdfTenderTarget.tur || 'Açık Eksiltmeli İhale' }}</span>
+                <span class="font-bold text-slate-800">{{ pdfTenderTarget.tur || 'İhale' }}</span>
               </div>
               <div>
                 <span class="text-[10px] font-black text-slate-400 uppercase block">Kalan Süre / Son Tarih</span>

@@ -19,10 +19,10 @@ export function exportTenderPdf(tender: any) {
   const ikn = tender.id || 'IHC-2026-001'
   const baslik = tender.baslik || 'Kurumsal Satın Alma İhalesi'
   const kategori = tender.kategori || 'Genel Satın Alma'
-  const tur = tender.tur || 'Açık Eksiltme'
+  const tur = tender.tur || 'İhale'
   const butce = tender.butce || 'Teklif Usulü'
-  const sehir = tender.city || 'Balıkesir'
-  const adres = tender.teslimatAdresi || `${sehir} Merkez / Saha Depo Teslimat`
+  const sehir = tender.city || 'Türkiye Geneli'
+  const adres = tender.teslimatAdresi || (sehir && sehir !== 'Türkiye Geneli' ? `${sehir} Merkez / Saha Depo Teslimat` : 'Belirtilen Teslimat Adresi')
   const aliciFirma = tender.ownerCompany || tender.company || tender.authority || 'İhaleciBurada Kurumsal Alıcı Masası'
   const yetkili = tender.authority || 'Satın Alma Komisyonu'
   const telefon = tender.ownerPhone || '0850 840 86 95'
@@ -414,7 +414,7 @@ export function exportTenderPdf(tender: any) {
       <li><strong>Teklif Bağlayıcılığı:</strong> Sunulan tüm teklifler 6098 sayılı Türk Borçlar Kanunu kapsamında bağlayıcı ticari icap ve taahhüt niteliğindedir.</li>
       <li><strong>Güvenli Emanet Havuz (Escrow):</strong> İhale kabulünden sonra alıcı bedeli BDDK ve TCMB mevzuatına uygun Güvenli Havuz hesabında bloke edilir. Mal/hizmet teslim alınıp muayene kabulü onaylanmadan satıcıya aktarılmaz.</li>
       <li><strong>Yeterlilik Belgeleri:</strong> İhaleye teklif veren yükleniciler şartnamede istenen vergi levhası, yetki belgesi ve teknik yeterlilik evraklarını sağlamakla yükümlüdür.</li>
-      <li><strong>Uyuşmazlık Çözümü:</strong> Taraflar arasında doğabilecek hukuki uyuşmazlıklarda Balıkesir / İstanbul Mahkemeleri ve İcra Daireleri yetkilidir.</li>
+      <li><strong>Uyuşmazlık Çözümü:</strong> Taraflar arasında doğabilecek hukuki uyuşmazlıklarda Türkiye Cumhuriyeti Mahkemeleri ve İcra Daireleri yetkilidir.</li>
     </ol>
 
     <div class="footer-stamp">

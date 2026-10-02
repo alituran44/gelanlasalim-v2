@@ -30,7 +30,7 @@ const supportConfig = computed(() => {
     whatsappMessage: 'Merhaba İhaleciBurada ekibi, B2B ihale ve ilk ihale ücretsiz kampanyası hakkında bilgi almak istiyorum.',
     aiEnabled: true,
     aiBotName: 'İhaleciBurada AI Asistanı',
-    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, canlı tersine eksiltme veya lansmana özel İlk İhale %100 Ücretsiz süreciniz hakkında size nasıl yardımcı olabilirim?'
+    aiGreeting: 'Merhaba! Ben İhaleciBurada Yapay Zeka Asistanıyım. 🤖 B2B ihale açma, teklif verme, satın alma veya lansmana özel İlk İhale %100 Ücretsiz süreciniz hakkında size nasıl yardımcı olabilirim?'
   }
 })
 
@@ -144,14 +144,14 @@ function generateBotResponse(userQuery: string) {
 </script>
 
 <template>
-  <!-- FLOATING WIDGET WRAPPER -->
-  <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3 font-sans select-none">
+  <!-- FLOATING WIDGET WRAPPER (Mobile: bottom-20 clears bottom nav bar; Desktop: bottom-6) -->
+  <div class="fixed bottom-20 lg:bottom-6 right-3 sm:right-6 z-40 flex flex-col items-end gap-2.5 sm:gap-3 font-sans select-none">
 
     <!-- EXPANDED AI CHAT WINDOW -->
     <transition name="chat-popup">
       <div 
         v-if="isChatOpen" 
-        class="w-[360px] sm:w-[390px] h-[520px] max-h-[85vh] bg-white rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-fadeIn"
+        class="w-[340px] sm:w-[390px] h-[480px] sm:h-[520px] max-h-[75vh] bg-white rounded-3xl shadow-2xl border border-slate-200/90 flex flex-col overflow-hidden animate-fadeIn"
       >
         <!-- Chat Header -->
         <div class="p-4 bg-gradient-to-r from-[#0F223D] via-blue-950 to-blue-900 text-white flex items-center justify-between shadow-md">
@@ -278,10 +278,10 @@ function generateBotResponse(userQuery: string) {
             💼 Teklif Verme
           </button>
           <button 
-            @click="sendPreset('Canlı tersine eksiltme nedir?')"
+            @click="sendPreset('İhale süreci nasıl işler?')"
             class="whitespace-nowrap px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition cursor-pointer"
           >
-            ⚡ Tersine Eksiltme
+            ⚡ İhale Süreci
           </button>
         </div>
 

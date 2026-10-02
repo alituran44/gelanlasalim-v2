@@ -305,16 +305,19 @@ function getTenderDirectionBadge(tender: any) {
     }
   }
 
-  // 6. AÇIK EKSİLTME
+  // 6. İHALE AÇ (Satın Alma & Teklif Toplama)
   if (
     formType === 'ACIK_EKSILTME' ||
+    formType === 'IHALE' ||
     yonu === 'eksiltme' ||
+    yonu === 'ihale' ||
     tur.includes('eksiltme') ||
+    tur.includes('ihale') ||
     tur.includes('fiyat azaltımlı')
   ) {
     return {
-      label: '📉 Açık Eksiltme',
-      fullLabel: '📉 Açık Eksiltme (Tersine İhale & Alım)',
+      label: '⚡ İhale Aç',
+      fullLabel: '⚡ İhale (Satın Alma & Teklif Toplama)',
       class: 'bg-emerald-100 text-emerald-950 border-emerald-300 font-black shadow-2xs'
     }
   }
@@ -357,8 +360,8 @@ function getTenderDirectionBadge(tender: any) {
 
   // Varsayılan
   return { 
-    label: '📉 Açık Eksiltme', 
-    fullLabel: '📉 Açık Eksiltme (Tersine İhale & Alım)',
+    label: '⚡ İhale Aç', 
+    fullLabel: '⚡ İhale (Satın Alma & Teklif Toplama)',
     class: 'bg-emerald-100 text-emerald-950 border-emerald-300 font-black shadow-2xs' 
   }
 }
@@ -619,7 +622,7 @@ const editForm = ref({
   ihaleYonu: 'kapali_zarf',
   butce: '',
   sure: '7 gün',
-  city: 'Balıkesir',
+  city: 'Türkiye Geneli',
   teslimatAdresi: '',
   ownerPhone: '',
   websiteUrl: '',
@@ -670,7 +673,7 @@ function openEditModal(tender: any) {
     ihaleYonu: tender.ihaleYonu || (tender.tur?.includes('Eksiltme') ? 'eksiltme' : (tender.tur?.includes('Artırma') ? 'artirma' : (tender.tur?.includes('Paket') ? 'sabit_paket' : (tender.tur?.includes('İhalesiz') ? 'ihalesiz_ilan' : 'kapali_zarf')))),
     butce: tender.butce || '',
     sure: tender.sure || '7 gün',
-    city: tender.city || 'Balıkesir',
+    city: tender.city || 'Türkiye Geneli',
     teslimatAdresi: tender.teslimatAdresi || '',
     ownerPhone: tender.ownerPhone || '',
     websiteUrl: tender.websiteUrl || '',
@@ -718,7 +721,7 @@ async function saveTenderEdit() {
   let tenderTur = 'Doğrudan Teklif Alma (Kapalı Zarf)'
   if (ihaleYonuVal === 'ihalesiz_ilan') tenderTur = 'İhalesiz İlan (Net Fiyat)'
   else if (ihaleYonuVal === 'sabit_paket') tenderTur = 'Sabit Fiyatlı Paket & Kontenjan Toplama'
-  else if (ihaleYonuVal === 'eksiltme') tenderTur = 'Açık Eksiltme (Fiyat Azaltımlı / Alım)'
+  else if (ihaleYonuVal === 'eksiltme') tenderTur = 'İhale (Satın Alma & Teklif Toplama)'
   else if (ihaleYonuVal === 'artirma') tenderTur = 'Açık Artırma (Fiyat Artırımlı / Satış)'
 
   const updatedFields: any = {
@@ -1442,7 +1445,7 @@ const statusTabs = computed(() => {
                 class="w-full p-3 rounded-xl border border-slate-200 text-xs font-bold text-slate-800 bg-white outline-none focus:border-blue-600"
               >
                 <option value="kapali_zarf">Kapalı Zarf Usulü</option>
-                <option value="eksiltme">Açık Eksiltme (Alım)</option>
+                <option value="eksiltme">İhale Aç (Satın Alma & Teklif Toplama)</option>
                 <option value="artirma">Açık Artırma (Satış)</option>
                 <option value="sabit_paket">Sabit Fiyatlı Paket</option>
                 <option value="ihalesiz_ilan">İhalesiz İlan (Net Fiyat)</option>

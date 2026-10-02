@@ -1063,16 +1063,19 @@ function getTenderDirectionBadge(tender: any) {
     }
   }
 
-  // 6. AÇIK EKSİLTME (2. Fotoğraf: AÇIK EKSİLTME)
+  // 6. İHALE AÇ (Satın Alma & Teklif Toplama)
   if (
     formType === 'ACIK_EKSILTME' ||
+    formType === 'IHALE' ||
     yonu === 'eksiltme' ||
+    yonu === 'ihale' ||
     tur.includes('eksiltme') ||
+    tur.includes('ihale') ||
     tur.includes('fiyat azaltımlı')
   ) {
     return {
-      label: '📉 Açık Eksiltme',
-      fullLabel: '📉 Açık Eksiltme (Tersine İhale & Alım)',
+      label: '⚡ İhale Aç',
+      fullLabel: '⚡ İhale (Satın Alma & Teklif Toplama)',
       class: 'bg-emerald-100 text-emerald-950 border-emerald-400 font-black shadow-2xs'
     }
   }
@@ -1115,10 +1118,49 @@ function getTenderDirectionBadge(tender: any) {
 
   // Varsayılan
   return { 
-    label: '📉 Açık Eksiltme', 
-    fullLabel: '📉 Açık Eksiltme (Tersine İhale & Alım)',
+    label: '⚡ İhale Aç', 
+    fullLabel: '⚡ İhale (Satın Alma & Teklif Toplama)',
     class: 'bg-emerald-100 text-emerald-950 border-emerald-400 font-black shadow-2xs' 
   }
+}
+
+// 📍 DİNAMİK VE DOĞRU ŞEHİR / LOKASYON TESPİT YARDIMCISI (Balıkesir Sabitliğini Engeller)
+function getTenderCity(tender: any): string {
+  if (!tender) return 'Türkiye'
+  
+  // 1. İhale üzerinde açıkça tanımlanmış ve Balıkesir harici bir şehir varsa
+  const explicit = (tender.city || '').trim()
+  const rawAddr = String(tender.teslimatAdresi || tender.address || tender.adres || tender.customFields?.adres || tender.customFields?.city || tender.customFields?.il || '').trim()
+
+  if (explicit && explicit !== 'Balıkesir' && explicit !== 'Türkiye') {
+    return explicit
+  }
+
+  // 2. Girilen teslimat veya açık adres metnini 81 il listesiyle tara
+  if (rawAddr) {
+    const lowerAddr = rawAddr.toLocaleLowerCase('tr-TR')
+    for (const c of all81Cities) {
+      if (lowerAddr.includes(c.toLocaleLowerCase('tr-TR'))) {
+        return c
+      }
+    }
+    // İlk segmenti (İlçe veya Bölge adı) al: örn: "Kadıköy", "Çankaya", "Ostim"
+    const seg = rawAddr.split(/[\/,–-]/)[0].trim()
+    if (seg && seg.length >= 2 && seg.length < 35) {
+      return seg
+    }
+  }
+
+  // 3. Eğer explicit Balıkesir ise ama girilen adreste Balıkesir geçmiyorsa adresten türet
+  if (explicit === 'Balıkesir') {
+    if (rawAddr && !rawAddr.toLocaleLowerCase('tr-TR').includes('balıkesir')) {
+      const seg = rawAddr.split(/[\/,–-]/)[0].trim()
+      if (seg && seg.length >= 2) return seg
+    }
+    return explicit
+  }
+
+  return explicit || 'Türkiye Geneli'
 }
 
 function maskBidderName(bid: any, idx?: number): string {
@@ -1261,10 +1303,10 @@ function openTenderByIdOrBid(bid: any) {
       baslik: bid.tenderTitle,
       kategori: 'Kurumsal Satın Alma & Tedarik',
       ownerCompany: 'Doğrulanmış B2B Kurumsal Alıcı',
-      city: bid.city || 'Balıkesir',
+      city: bid.city || 'Türkiye Geneli',
       butce: 'Açık Teklif Usulü',
       sure: '7 gün kaldı',
-      aciklama: `"${bid.tenderTitle}" için canlı eksiltme ve teklif süreci devam etmektedir. Şartname detaylarını inceleyebilir ve teklifinizi sunabilirsiniz.`
+      aciklama: `"${bid.tenderTitle}" için ihale ve teklif süreci devam etmektedir. Şartname detaylarını inceleyebilir ve teklifinizi sunabilirsiniz.`
     })
   }
 }
@@ -1702,7 +1744,7 @@ function openCompanyProfileModal(companyName?: string, city?: string) {
     email: 'kurumsal@' + name.toLowerCase().replace(/[^a-z0-9]/g, '') + '.com.tr',
     taxOffice: 'Karesi V.D. / 1450293847',
     mersis: '',
-    address: `Organize Sanayi Bölgesi 2. Cadde No:14 ${city || 'Balıkesir'} / Türkiye`,
+    address: `Organize Sanayi Bölgesi 2. Cadde No:14 ${city || 'Türkiye'}`,
     completedTenders: 28,
     onTimeDelivery: '%99.4',
     specCompliance: '%98.9',
@@ -2090,7 +2132,7 @@ async function submitQuickOffer() {
     tenderId: tender.id,
     tenderTitle: tender.baslik,
     tenderCategory: tender.kategori,
-    tenderCity: tender.city || 'Balıkesir',
+    tenderCity: getTenderCity(tender),
     buyerCompany: tender.ownerCompany || tender.authority || 'Kurumsal Masası',
     price: fullPriceLabel,
     priceNum: numericPrice,
@@ -2125,7 +2167,7 @@ async function submitQuickOffer() {
         yetkili: session.name || session.username || 'Yetkili',
         telefon: session.phone || session.telefon || '0850 840 86 95',
         eposta: session.email || '',
-        adres: (session.city || tender.city || 'Balıkesir') + ' / Türkiye',
+        adres: (session.city || getTenderCity(tender)) + ' / Türkiye',
         notum: quickOfferNotes.value || 'Şartname ve teknik kriterler uyarınca teklifimizdir.'
       }
     })
@@ -2199,7 +2241,7 @@ async function submitQuickOffer() {
         sure: quickOfferDuration.value || '7 gün',
         durum: 'degerlendirmede',
         tarih: 'Az önce',
-        adres: (session.city || tender.city || 'Balıkesir') + ' / Türkiye',
+        adres: (session.city || getTenderCity(tender)) + ' / Türkiye',
         aciklama: quickOfferNotes.value || '',
         files: [...quickOfferFiles.value]
       })
@@ -3010,9 +3052,9 @@ onMounted(() => {
           </div>
 
           <!-- ========================================================= -->
-          <!-- 🖼️ 4'LÜ KART DÜZENİ (VİTRİN / 4 SÜTUNLU RESPONSIVE GRID) -->
+          <!-- 🖼️ KART DÜZENİ (MOBİLDE 2'Lİ YAN YANA, MASAÜSTÜNDE 4'LÜ GRID) -->
           <!-- ========================================================= -->
-          <div v-if="paginatedTenders.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div v-if="paginatedTenders.length > 0" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-2.5 sm:gap-4">
             <article 
               v-for="(tender, tenderIdx) in paginatedTenders" 
               :key="tender.id"
@@ -3021,13 +3063,13 @@ onMounted(() => {
               <!-- 🖼️ Üst Görsel ve Rozetler -->
               <div 
                 @click="openTenderDetailModal(tender); selectTenderForLiveBids(tender)" 
-                class="relative h-40 w-full bg-slate-100 overflow-hidden cursor-pointer"
+                class="relative h-32 sm:h-40 w-full bg-slate-100 overflow-hidden cursor-pointer"
                 title="Şartname ve İhale Detayını İncele"
               >
                 <img 
                   v-if="getTenderImage(tender)"
                   :src="getTenderImage(tender)" 
-                  :alt="`${tender.baslik || 'Kurumsal İhale'} - ${tender.city || 'Türkiye'} B2B İhale ve Şartname Görseli`"
+                  :alt="`${tender.baslik || 'Kurumsal İhale'} - ${getTenderCity(tender)} B2B İhale ve Şartname Görseli`"
                   :loading="tenderIdx === 0 ? 'eager' : 'lazy'"
                   :fetchpriority="tenderIdx === 0 ? 'high' : 'auto'"
                   decoding="async"
@@ -3055,14 +3097,14 @@ onMounted(() => {
                   <!-- 📢 Reklam İlanı Rozeti (Kurucu Talebi) -->
                   <span 
                     v-if="isReklamIlani(tender)"
-                    class="px-2.5 py-1 rounded text-[10px] font-black uppercase text-white shadow-md backdrop-blur-xs bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 border border-white/30 flex items-center gap-1 tracking-wide"
+                    class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded text-[9px] sm:text-[10px] font-black uppercase text-white shadow-md backdrop-blur-xs bg-gradient-to-r from-amber-500 via-orange-500 to-rose-600 border border-white/30 flex items-center gap-1 tracking-wide"
                   >
                     <span>📢 REKLAM İLANI</span>
                   </span>
                   <!-- Kategori Rozeti (Canlı İhale yerine gerçek kategori) -->
                   <span 
                     v-else
-                    class="px-2.5 py-1 rounded text-[10px] font-black uppercase text-white shadow-md backdrop-blur-xs border border-white/20 truncate flex items-center gap-1 tracking-wide"
+                    class="px-2 py-0.5 sm:px-2.5 sm:py-1 rounded text-[9px] sm:text-[10px] font-black uppercase text-white shadow-md backdrop-blur-xs border border-white/20 truncate flex items-center gap-1 tracking-wide"
                     :class="tender.durum === 'closed' ? 'bg-amber-600' : 'bg-slate-900/85 text-sky-300 border-sky-400/30'"
                     :title="getTenderBadgeCategory(tender)"
                   >
@@ -3072,28 +3114,28 @@ onMounted(() => {
                 </div>
 
                 <!-- İhale No Rozeti -->
-                <span class="absolute top-2 right-2 px-2 py-0.5 rounded bg-black/70 text-white text-[9px] font-mono font-black uppercase border border-white/20">
+                <span class="absolute top-2 right-2 px-1.5 sm:px-2 py-0.5 rounded bg-black/70 text-white text-[8px] sm:text-[9px] font-mono font-black uppercase border border-white/20">
                   {{ tender.id }}
                 </span>
 
                 <!-- Alt Lokasyon & Fotoğraf Sayacı & Kalan Süre -->
-                <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white text-[11px] font-bold">
+                <div class="absolute bottom-2 left-2 right-2 flex items-center justify-between text-white text-[10px] sm:text-[11px] font-bold">
                   <span class="flex items-center gap-1 truncate max-w-[120px] px-1.5 py-0.5 rounded bg-black/60 backdrop-blur-xs text-white">
                     <MapPin :size="12" class="text-sky-300 shrink-0" />
-                    <span class="truncate">{{ tender.city || 'Balıkesir' }}</span>
+                    <span class="truncate">{{ getTenderCity(tender) }}</span>
                   </span>
-                  <div class="flex items-center gap-1.5 shrink-0">
+                  <div class="flex items-center gap-1 shrink-0">
                     <span 
                       v-if="getTenderImagesList(tender).length > 1" 
                       @click.stop="openTenderDetailModal(tender, 0, 'gallery')"
-                      class="flex items-center gap-1 bg-black/80 hover:bg-black px-2 py-0.5 rounded-full backdrop-blur-xs text-[10px] text-amber-300 border border-white/25 cursor-pointer shadow-xs transition-transform hover:scale-105"
+                      class="flex items-center gap-1 bg-black/80 hover:bg-black px-1.5 sm:px-2 py-0.5 rounded-full backdrop-blur-xs text-[9px] sm:text-[10px] text-amber-300 border border-white/25 cursor-pointer shadow-xs transition-transform hover:scale-105"
                       title="Fotoğraf Galerisini Aç"
                     >
-                      <Camera :size="11" />
-                      <span>1/{{ getTenderImagesList(tender).length }} Fotoğraf</span>
+                      <Camera :size="10" />
+                      <span>1/{{ getTenderImagesList(tender).length }}</span>
                     </span>
-                    <span class="flex items-center gap-1 bg-black/60 px-1.5 py-0.5 rounded backdrop-blur-xs text-[10px] text-white">
-                      <Clock :size="11" class="text-amber-300" />
+                    <span class="flex items-center gap-1 bg-black/60 px-1.5 py-0.5 rounded backdrop-blur-xs text-[9px] sm:text-[10px] text-white">
+                      <Clock :size="10" class="text-amber-300" />
                       <span>{{ tender.sure || '7 gün' }}</span>
                     </span>
                   </div>
@@ -4176,7 +4218,7 @@ onMounted(() => {
                 </div>
                 <div>
                   <span class="text-[10px] font-black text-slate-400 uppercase block">İhale Usulü</span>
-                  <span class="font-bold text-slate-800">{{ selectedTenderModal.tur || 'Açık Eksiltmeli İhale' }}</span>
+                  <span class="font-bold text-slate-800">{{ selectedTenderModal.tur || 'İhale' }}</span>
                 </div>
                 <div>
                   <span class="text-[10px] font-black text-slate-400 uppercase block">Son Teklif / Kalan Süre</span>
@@ -4523,7 +4565,7 @@ onMounted(() => {
                     <span>📐 TKGM Parsel Sorgu</span>
                   </a>
                   <a 
-                    :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([selectedTenderModal.customFields?.mahalle, selectedTenderModal.customFields?.ilce, selectedTenderModal.city || 'Balıkesir', 'Türkiye'].filter(Boolean).join(', '))}`" 
+                    :href="`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent([selectedTenderModal.customFields?.mahalle, selectedTenderModal.customFields?.ilce, getTenderCity(selectedTenderModal), 'Türkiye'].filter(Boolean).join(', '))}`" 
                     target="_blank" 
                     rel="noopener noreferrer" 
                     class="px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-800 text-sky-300 border border-slate-700 hover:bg-slate-700 transition flex items-center gap-1"
@@ -4537,7 +4579,7 @@ onMounted(() => {
               <div class="relative w-full h-48 rounded-lg overflow-hidden border border-slate-800 bg-slate-900">
                 <iframe 
                   class="w-full h-full border-0"
-                  :src="`https://maps.google.com/maps?q=${encodeURIComponent([selectedTenderModal.customFields?.mahalle, selectedTenderModal.customFields?.ilce, selectedTenderModal.city || 'Balıkesir', 'Türkiye'].filter(Boolean).join(', '))}&t=m&z=15&ie=UTF8&iwloc=&output=embed`"
+                  :src="`https://maps.google.com/maps?q=${encodeURIComponent([selectedTenderModal.customFields?.mahalle, selectedTenderModal.customFields?.ilce, getTenderCity(selectedTenderModal), 'Türkiye'].filter(Boolean).join(', '))}&t=m&z=15&ie=UTF8&iwloc=&output=embed`"
                   loading="lazy"
                   referrerpolicy="no-referrer-when-downgrade"
                   title="İlan Harita Konumu"
@@ -4612,7 +4654,7 @@ onMounted(() => {
               </div>
               <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/80">
                 <span class="text-slate-400 text-[11px] block">Lokasyon:</span>
-                <span class="font-bold text-white">{{ selectedTenderModal.city || 'Balıkesir' }}</span>
+                <span class="font-bold text-white">{{ getTenderCity(selectedTenderModal) }}</span>
               </div>
               <div class="bg-slate-950/40 p-3 rounded-xl border border-slate-800/80 sm:col-span-2">
                 <span class="text-slate-400 text-[11px] block">Adres / Saha:</span>
@@ -4894,11 +4936,11 @@ onMounted(() => {
           </div>
           <div class="flex justify-between items-center">
             <span class="text-slate-500 font-bold">Kategori & İhale Türü:</span>
-            <span class="font-bold text-slate-800">{{ quickBidTender.kategori || 'Açık Eksiltmeli İhale' }}</span>
+            <span class="font-bold text-slate-800">{{ quickBidTender.kategori || 'İhale' }}</span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-slate-500 font-bold">Teslimat Lokasyonu:</span>
-            <span class="font-bold text-slate-800">{{ quickBidTender.city || 'Balıkesir' }} (Saha Depo Teslim)</span>
+            <span class="font-bold text-slate-800">{{ getTenderCity(quickBidTender) }} (Saha Depo Teslim)</span>
           </div>
         </div>
 
@@ -5148,7 +5190,7 @@ onMounted(() => {
             <p class="text-[11px] text-slate-400">
               <span v-if="isLoggedIn">{{ drawerTender.ownerCompany || drawerTender.authority }}</span>
               <span v-else class="filter blur-[4px] select-none pointer-events-none text-slate-500">████████ A.Ş.</span>
-              • {{ drawerTender.city || 'Balıkesir' }}
+              • {{ getTenderCity(drawerTender) }}
             </p>
           </div>
           <button 
@@ -5413,11 +5455,11 @@ onMounted(() => {
               </div>
               <div>
                 <span class="text-[10px] font-black text-slate-400 uppercase block">Teslimat / Uygulama İli</span>
-                <span class="font-bold text-slate-800">{{ pdfTenderTarget.city || 'Balıkesir' }}</span>
+                <span class="font-bold text-slate-800">{{ getTenderCity(pdfTenderTarget) }}</span>
               </div>
               <div>
                 <span class="text-[10px] font-black text-slate-400 uppercase block">İhale Usulü</span>
-                <span class="font-bold text-slate-800">{{ pdfTenderTarget.tur || 'Açık Eksiltmeli İhale' }}</span>
+                <span class="font-bold text-slate-800">{{ pdfTenderTarget.tur || 'İhale' }}</span>
               </div>
               <div>
                 <span class="text-[10px] font-black text-slate-400 uppercase block">Kalan Süre / Son Tarih</span>

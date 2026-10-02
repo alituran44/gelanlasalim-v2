@@ -249,7 +249,7 @@ export const TENDER_TYPES = [
 
 export const TENDER_METHODS = [
   'Tümü',
-  'Açık Eksiltme (Ters İhale)',
+  'İhale Aç (Satın Alma & Teklif Toplama)',
   'Açık Artırma',
   'Kapalı Zarf Usulü',
   'Sabit Fiyatlı Paket & Kontenjan',

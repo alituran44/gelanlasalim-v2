@@ -160,7 +160,7 @@ function getTenderDirectionBadge(tender: any) {
   if (yonu === 'kapali_zarf' || tur.includes('kapalı')) {
     return { label: '📑 Kapalı Zarf Usulü', class: 'bg-purple-100 text-purple-800 border-purple-200' }
   }
-  return { label: '📉 Açık Eksiltme (Fiyat Azaltımlı)', class: 'bg-emerald-100 text-emerald-800 border-emerald-200' }
+  return { label: '⚡ İhale Aç (Satın Alma & Teklif Toplama)', class: 'bg-emerald-100 text-emerald-800 border-emerald-200' }
 }
 
 const searchQuery = ref('')
@@ -607,17 +607,17 @@ function downloadAllSpecs(tender: any) {
       </div>
     </div>
 
-    <!-- Tenders Grid (Terminal-Grade Card Layout) -->
-    <div v-if="filteredTenders.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Tenders Grid (Terminal-Grade Card Layout - Mobilde 2'li Yan Yana) -->
+    <div v-if="filteredTenders.length > 0" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
       <div
         v-for="tender in filteredTenders"
         :key="tender.id"
-        class="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl hover:border-blue-400 transition-all duration-300 flex flex-col justify-between group"
+        class="bg-white rounded-2xl sm:rounded-3xl border border-slate-200 overflow-hidden shadow-xs hover:shadow-xl hover:border-blue-400 transition-all duration-300 flex flex-col justify-between group"
       >
         <!-- Image Box with Badges (Clickable) -->
         <div 
           @click="selectedTenderForDetail = tender"
-          class="relative h-44 w-full bg-slate-100 overflow-hidden cursor-pointer"
+          class="relative h-32 sm:h-44 w-full bg-slate-100 overflow-hidden cursor-pointer"
           title="İhale detaylarını görüntüle"
         >
           <img 
@@ -628,50 +628,50 @@ function downloadAllSpecs(tender: any) {
           />
           <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
 
-          <div class="absolute top-3 left-3">
-            <span class="px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md text-white text-[10px] font-mono font-black uppercase tracking-wider border border-white/20">
+          <div class="absolute top-2 sm:top-3 left-2 sm:left-3">
+            <span class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg bg-black/70 backdrop-blur-md text-white text-[9px] sm:text-[10px] font-mono font-black uppercase tracking-wider border border-white/20">
               #{{ tender.id }}
             </span>
           </div>
 
-          <div class="absolute top-3 right-3">
+          <div class="absolute top-2 sm:top-3 right-2 sm:right-3">
             <span 
-              class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 text-white"
+              class="px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-md sm:rounded-lg text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-sm flex items-center gap-1 text-white"
               :class="tender.durum === 'closed' ? 'bg-amber-600' : (tender.durum === 'expired' ? 'bg-slate-600' : 'bg-emerald-600')"
             >
-              <span v-if="tender.durum === 'closed'">🔒 Mutabakat Sağlandı</span>
-              <span v-else-if="tender.durum === 'expired'">⌛ Süresi Doldu</span>
-              <span v-else>{{ tender.sure || 'Aktif İhale' }}</span>
+              <span v-if="tender.durum === 'closed'">🔒 Kapandı</span>
+              <span v-else-if="tender.durum === 'expired'">⌛ Doldu</span>
+              <span v-else class="truncate max-w-[100px]">{{ tender.sure || 'Aktif İhale' }}</span>
             </span>
           </div>
 
-          <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white text-xs">
-            <div class="flex items-center gap-1 font-bold">
-              <MapPin :size="13" class="text-[#00C2FF]" />
-              <span>{{ tender.city || 'Türkiye Geneli' }}</span>
+          <div class="absolute bottom-2 sm:bottom-3 left-2 sm:left-3 right-2 sm:right-3 flex items-center justify-between text-white text-[10px] sm:text-xs">
+            <div class="flex items-center gap-1 font-bold truncate max-w-[120px]">
+              <MapPin :size="12" class="text-[#00C2FF] shrink-0" />
+              <span class="truncate">{{ tender.city || 'Türkiye Geneli' }}</span>
             </div>
-            <div class="flex items-center gap-1 font-bold">
-              <Tag :size="13" class="text-amber-400" />
+            <div class="flex items-center gap-1 font-bold shrink-0">
+              <Tag :size="12" class="text-amber-400" />
               <span>{{ tender.teklifSayisi || 0 }} Teklif</span>
             </div>
           </div>
         </div>
 
         <!-- Card Body -->
-        <div class="p-6 flex-1 flex flex-col justify-between space-y-4">
-          <div class="space-y-2">
-            <div class="flex items-center justify-between">
-              <span class="text-[11px] font-bold text-blue-600 uppercase tracking-wider block">
+        <div class="p-3 sm:p-6 flex-1 flex flex-col justify-between space-y-3 sm:space-y-4">
+          <div class="space-y-1.5 sm:space-y-2">
+            <div class="flex items-center justify-between gap-1">
+              <span class="text-[10px] sm:text-[11px] font-bold text-blue-600 uppercase tracking-wider block truncate">
                 {{ tender.kategori }}
               </span>
-              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border" :class="getTenderDirectionBadge(tender).class">
+              <span class="text-[9px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full border truncate" :class="getTenderDirectionBadge(tender).class">
                 {{ getTenderDirectionBadge(tender).label }}
               </span>
             </div>
 
             <h2 
               @click="selectedTenderForDetail = tender"
-              class="text-base font-black text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors cursor-pointer"
+              class="text-xs sm:text-base font-black text-slate-800 line-clamp-2 group-hover:text-blue-600 transition-colors cursor-pointer leading-snug"
               title="İhale detaylarını görüntüle"
             >
               {{ tender.baslik }}
@@ -964,7 +964,7 @@ function downloadAllSpecs(tender: any) {
           </div>
           <div>
             <span class="text-[10px] font-bold text-slate-400 uppercase block">🏷️ İhale Usulü</span>
-            <span class="font-bold text-blue-700">{{ selectedTenderForDetail.tur || 'Açık Eksiltme' }}</span>
+            <span class="font-bold text-blue-700">{{ selectedTenderForDetail.tur || 'İhale' }}</span>
           </div>
         </div>
 

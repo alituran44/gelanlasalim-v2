@@ -156,7 +156,7 @@ onMounted(() => {
     <!-- ========================================================================= -->
     <!-- 🏛️ 2. ANA HEADER: LOGO, MENÜ SEKMELERİ & HIZLI GİRİŞ ŞERİDİ -->
     <!-- ========================================================================= -->
-    <header class="bg-white border-b border-slate-300 pt-2 pb-2 px-3 sm:px-6 shadow-xs sticky top-0 z-50">
+    <header class="bg-white dark:bg-[#070E1E] border-b border-slate-300 dark:border-slate-800 pt-2 pb-2 px-3 sm:px-6 shadow-xs sticky top-0 z-50">
       <div class="max-w-[1400px] mx-auto flex items-center justify-between gap-3">
 
         <!-- SOL: ORİJİNAL MARKA LOGOSU (İHALECİBURADA.COM) -->
@@ -176,13 +176,13 @@ onMounted(() => {
               <path d="M 38 68 L 86 63 L 83 58 L 32 64 Z" fill="#0052FF" />
               <path d="M 18 84 L 78 78 L 75 73 L 12 80 Z" fill="#0084FF" />
               <path d="M 0 98 L 70 91 L 67 86 L -4 94 Z" fill="#00C2FF" />
-              <!-- Koyu Lacivert Gövde -->
-              <path d="M 94 33 C 90 33 82 37 81 40 L 89 40 C 97 40 94 48 91 58 L 79 97 C 76 107 84 105 91 101 C 101 95 108 78 114 55 C 117 42 110 33 94 33 Z" fill="#0B1E3B" />
+              <!-- Gövde -->
+              <path d="M 94 33 C 90 33 82 37 81 40 L 89 40 C 97 40 94 48 91 58 L 79 97 C 76 107 84 105 91 101 C 101 95 108 78 114 55 C 117 42 110 33 94 33 Z" fill="#0B1E3B" class="fill-[#0B1E3B] dark:fill-[#38BDF8]" />
             </g>
-            <!-- ihaleciburada Metni -->
-            <text x="152" y="84" fill="#0B1E3B" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-1.2px">ihaleciburada</text>
-            <!-- .com Uzantısı -->
-            <text x="430" y="84" fill="#0052FF" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-0.8px">.com</text>
+            <!-- ihaleciburada Metni (Açıkta Koyu, Karanlıkta Net Beyaz) -->
+            <text x="152" y="84" fill="#0B1E3B" class="fill-[#0B1E3B] dark:fill-white font-black" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-1.2px">ihaleciburada</text>
+            <!-- .com Uzantısı (Canlı Mavi / Cyan) -->
+            <text x="430" y="84" fill="#0052FF" class="fill-[#0052FF] dark:fill-[#38BDF8] font-black" font-family="'Outfit', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="46" font-weight="900" letter-spacing="-0.8px">.com</text>
           </svg>
         </NuxtLink>
 
